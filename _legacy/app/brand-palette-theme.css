@@ -1,0 +1,263 @@
+/*
+ * Paleta oficial TEMPO Pelotas / MOBI.
+ * Substitui o amarelo decorativo pelas cores reais do logotipo.
+ */
+
+:root {
+  --brand-cyan: #18bdcd;
+  --brand-cyan-rgb: 24, 189, 205;
+  --brand-purple: #5e2ced;
+  --brand-purple-rgb: 94, 44, 237;
+  --brand-magenta: #e70b85;
+  --brand-magenta-rgb: 231, 11, 133;
+  --brand-orange: #f27035;
+  --brand-orange-rgb: 242, 112, 53;
+
+  /* O sol e os destaques quentes passam a usar o laranja oficial. */
+  --sun: var(--brand-orange);
+  --sky: var(--brand-cyan);
+  --alert: var(--brand-orange);
+}
+
+::selection {
+  background: rgba(var(--brand-cyan-rgb), 0.3);
+}
+
+/* Elementos de identidade e escalas visuais. */
+.brand-symbol span:nth-child(1) {
+  background: var(--brand-cyan);
+}
+
+.brand-symbol span:nth-child(2) {
+  background: var(--brand-orange);
+}
+
+.brand-symbol span:nth-child(3) {
+  background: var(--brand-magenta);
+}
+
+.map-legend i {
+  background: linear-gradient(
+    90deg,
+    var(--brand-cyan) 0%,
+    var(--brand-purple) 36%,
+    var(--brand-magenta) 68%,
+    var(--brand-orange) 100%
+  );
+}
+
+/* Primeira dobra. */
+.weather-hero {
+  --hero-accent: var(--brand-orange);
+  --hero-accent-rgb: var(--brand-orange-rgb);
+  --hero-highlight: var(--brand-cyan);
+  --hero-metric: var(--brand-cyan);
+}
+
+.weather-hero--attention {
+  --hero-accent: var(--brand-orange);
+  --hero-accent-rgb: var(--brand-orange-rgb);
+  --hero-highlight: var(--brand-orange);
+  --hero-metric: var(--brand-orange);
+  --hero-status: var(--brand-orange);
+  --hero-status-ring: rgba(var(--brand-orange-rgb), 0.18);
+}
+
+.weather-hero .weather-hero-primary {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--brand-orange);
+  color: #071e2f;
+  box-shadow:
+    0 15px 34px rgba(var(--brand-orange-rgb), 0.22),
+    0 0 0 1px rgba(var(--brand-magenta-rgb), 0.05);
+}
+
+.weather-hero .weather-hero-primary:hover,
+.weather-hero .weather-hero-primary:focus-visible {
+  box-shadow:
+    0 19px 42px rgba(var(--brand-orange-rgb), 0.29),
+    0 0 0 4px rgba(var(--brand-magenta-rgb), 0.08);
+}
+
+.weather-hero-now::after {
+  background:
+    radial-gradient(circle, rgba(var(--brand-magenta-rgb), 0.17), rgba(var(--brand-purple-rgb), 0.1) 38%, transparent 70%);
+}
+
+.weather-hero--attention .weather-hero-orbit--one {
+  background: linear-gradient(
+    100deg,
+    rgba(var(--brand-orange-rgb), 0.08),
+    rgba(var(--brand-magenta-rgb), 0.26)
+  );
+}
+
+.weather-hero--attention .weather-hero-orbit--two {
+  border-color: rgba(var(--brand-orange-rgb), 0.22);
+  background: rgba(var(--brand-magenta-rgb), 0.11);
+}
+
+.site-header--hero .header-action--attention {
+  border-color: rgba(var(--brand-orange-rgb), 0.5);
+  background: var(--brand-orange);
+  color: #071e2f;
+}
+
+/* Condição atual e previsão. */
+.current-weather {
+  background:
+    radial-gradient(circle at 82% 28%, rgba(var(--brand-magenta-rgb), 0.19), transparent 17rem),
+    radial-gradient(circle at 70% 70%, rgba(var(--brand-cyan-rgb), 0.3), transparent 27rem),
+    linear-gradient(135deg, #0a2940 0%, #0b3b56 62%, #11657b 100%);
+}
+
+.dashboard-layout--after-hero .hourly-list article.is-current {
+  background:
+    radial-gradient(circle at 82% 12%, rgba(var(--brand-magenta-rgb), 0.19), transparent 8rem),
+    radial-gradient(circle at 20% 100%, rgba(var(--brand-purple-rgb), 0.12), transparent 9rem),
+    linear-gradient(145deg, #061e30, #0b4059);
+}
+
+.dashboard-layout--after-hero .daily-list article.is-today {
+  border-color: rgba(var(--brand-cyan-rgb), 0.22);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(var(--brand-purple-rgb), 0.08), transparent 9rem),
+    linear-gradient(110deg, rgba(var(--brand-cyan-rgb), 0.14), rgba(245, 250, 248, 0.96));
+}
+
+.dashboard-layout--after-hero .alert-card--attention,
+.alert-card--attention {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(var(--brand-magenta-rgb), 0.065), transparent 13rem),
+    linear-gradient(120deg, rgba(var(--brand-orange-rgb), 0.16), rgba(255, 250, 247, 0.98));
+}
+
+.alert-card--attention .alert-icon {
+  background: var(--brand-orange);
+}
+
+.alert-card--attention .eyebrow,
+.alert-card--attention p,
+.alert-card--attention > a {
+  color: #91401f;
+}
+
+/* Situação das águas. */
+.hydrology-home .hydrology-primary-action {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--brand-orange);
+  color: #071e2f;
+  box-shadow: 0 14px 34px rgba(var(--brand-orange-rgb), 0.22);
+}
+
+.hydrology-home .hydrology-primary-action:hover,
+.hydrology-home .hydrology-primary-action:focus-visible {
+  box-shadow:
+    0 18px 38px rgba(var(--brand-orange-rgb), 0.28),
+    0 0 0 4px rgba(var(--brand-magenta-rgb), 0.08);
+}
+
+.hydrology-flow-number {
+  background: var(--brand-cyan);
+  color: #071e2f;
+}
+
+.hydrology-community-note {
+  border-color: rgba(var(--brand-orange-rgb), 0.24);
+  background:
+    linear-gradient(120deg, rgba(var(--brand-orange-rgb), 0.1), rgba(var(--brand-magenta-rgb), 0.045));
+}
+
+.hydrology-community-note strong {
+  color: #f79364;
+}
+
+/* Páginas internas. */
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] {
+  --topic-accent: var(--brand-orange);
+  --topic-accent-soft: rgba(var(--brand-orange-rgb), 0.12);
+  --topic-accent-border: rgba(var(--brand-orange-rgb), 0.24);
+  --topic-hero-start: #24130d;
+  --topic-hero-end: #8a3f24;
+}
+
+.site-shell--topic[data-topic="previsao-7-dias-pelotas"] {
+  --topic-accent: var(--brand-purple);
+  --topic-accent-soft: rgba(var(--brand-purple-rgb), 0.1);
+  --topic-accent-border: rgba(var(--brand-purple-rgb), 0.22);
+}
+
+.site-shell--topic[data-topic="cameras-ao-vivo-pelotas"] {
+  --topic-accent: var(--brand-magenta);
+  --topic-accent-soft: rgba(var(--brand-magenta-rgb), 0.1);
+  --topic-accent-border: rgba(var(--brand-magenta-rgb), 0.22);
+}
+
+.site-shell--topic[data-topic="vento-em-pelotas"] {
+  --topic-accent: var(--brand-cyan);
+  --topic-accent-soft: rgba(var(--brand-cyan-rgb), 0.11);
+  --topic-accent-border: rgba(var(--brand-cyan-rgb), 0.23);
+}
+
+.advisory-panel--attention {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(var(--brand-magenta-rgb), 0.06), transparent 16rem),
+    linear-gradient(120deg, rgba(var(--brand-orange-rgb), 0.16), white);
+}
+
+.advisory-panel--attention .advisory-symbol,
+.threshold-dot--attention {
+  background: var(--brand-orange);
+}
+
+.threshold-dot--attention {
+  box-shadow: 0 0 0 6px rgba(var(--brand-orange-rgb), 0.13);
+}
+
+/* Footer novo. */
+.portal-footer--theme {
+  --footer-accent: var(--topic-accent, var(--brand-cyan));
+}
+
+.portal-footer-source-panel.is-fallback .portal-footer-status-dot {
+  background: var(--brand-orange);
+  box-shadow:
+    0 0 0 6px rgba(var(--brand-orange-rgb), 0.13),
+    0 0 22px rgba(var(--brand-orange-rgb), 0.34);
+}
+
+.portal-footer-priority-card--alert {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(var(--brand-orange-rgb), 0.17), transparent 12rem),
+    rgba(255, 255, 255, 0.04);
+}
+
+.portal-footer-priority-card--water {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(var(--brand-cyan-rgb), 0.15), transparent 12rem),
+    rgba(255, 255, 255, 0.04);
+}
+
+.portal-footer-atmosphere span:last-child {
+  background:
+    radial-gradient(circle, rgba(var(--brand-magenta-rgb), 0.11), rgba(var(--brand-purple-rgb), 0.07) 42%, transparent 72%);
+}
+
+/* Navegação mobile e superfícies compactas. */
+@media (max-width: 900px) {
+  .current-weather {
+    background:
+      radial-gradient(circle at 83% 23%, rgba(var(--brand-magenta-rgb), 0.2), transparent 11rem),
+      radial-gradient(circle at 70% 78%, rgba(var(--brand-cyan-rgb), 0.28), transparent 20rem),
+      linear-gradient(150deg, #071e2f 0%, #0b3952 62%, #11657b 100%);
+  }
+
+  .mobile-tab-bar a.is-active {
+    background:
+      linear-gradient(145deg, rgba(var(--brand-cyan-rgb), 0.12), rgba(var(--brand-purple-rgb), 0.055));
+  }
+
+  .mobile-tab-bar a.is-active::before {
+    background: linear-gradient(90deg, var(--brand-cyan), var(--brand-purple));
+  }
+}

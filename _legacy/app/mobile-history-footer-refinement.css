@@ -1,0 +1,182 @@
+@media (max-width: 900px) {
+  .history-summary,
+  .history-records,
+  .history-chart,
+  .history-note,
+  .history-chart-heading,
+  .history-chart-controls,
+  .history-chart-reading,
+  .history-days,
+  .history-legend,
+  .mobi-sites-banner,
+  .mobi-ad-brand,
+  .mobi-ad-message,
+  .mobi-ad-action,
+  .site-footer > p {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .history-chart {
+    width: 100%;
+  }
+
+  .history-chart-heading,
+  .history-chart-controls {
+    flex-wrap: wrap;
+  }
+
+  .history-chart-reading {
+    min-width: 0;
+  }
+
+  .history-chart-canvas {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .history-chart-canvas svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  .history-chart-tabs,
+  .history-period {
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+
+  .history-chart-tabs::-webkit-scrollbar,
+  .history-period::-webkit-scrollbar {
+    display: none;
+  }
+
+  .history-chart-tabs button,
+  .history-period button,
+  .history-days button {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .history-legend {
+    flex-wrap: wrap;
+  }
+
+  .history-summary article,
+  .history-records article,
+  .history-note {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .history-summary strong,
+  .history-records strong,
+  .history-note h2,
+  .history-note p,
+  .mobi-ad-message strong,
+  .mobi-ad-message small,
+  .site-footer > p {
+    overflow-wrap: anywhere;
+  }
+
+  .mobi-sites-banner {
+    width: 100%;
+  }
+
+  .site-footer > p {
+    white-space: normal;
+  }
+}
+
+@media (max-width: 640px) {
+  .history-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .history-summary article {
+    min-height: 124px;
+    padding: 17px;
+  }
+
+  .history-summary strong {
+    font-size: clamp(1.55rem, 8vw, 2.2rem);
+  }
+
+  .history-chart-heading,
+  .history-chart-controls {
+    padding-inline: 15px;
+  }
+
+  .history-chart-tabs {
+    display: flex;
+    width: 100%;
+    padding: 4px;
+  }
+
+  .history-chart-tabs button {
+    flex: 1 0 auto;
+    white-space: nowrap;
+  }
+
+  .history-period {
+    width: 100%;
+  }
+
+  .history-period button {
+    flex: 1 0 auto;
+  }
+
+  .history-chart-canvas {
+    height: 220px;
+    padding-inline: 8px;
+  }
+
+  .history-days {
+    padding-inline: 15px;
+  }
+
+  .history-legend {
+    gap: 10px 14px;
+    padding-inline: 15px;
+  }
+
+  .site-footer {
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .mobi-sites-banner {
+    margin-inline: 0;
+  }
+
+  .site-footer > p {
+    width: 100%;
+    text-align: center;
+    line-height: 1.55;
+  }
+}
+
+@media (max-width: 390px) {
+  .history-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .history-summary article {
+    min-height: 108px;
+  }
+
+  .history-chart-reading strong {
+    font-size: 2.25rem;
+  }
+
+  .mobi-sites-banner {
+    padding: 15px;
+  }
+
+  .mobi-ad-brand {
+    align-items: center;
+  }
+}
