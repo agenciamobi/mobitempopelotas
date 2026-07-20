@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SiteLayout } from "@/components/layout/SiteLayout";
+import { MigrationPlaceholderPage } from "@/components/migration/MigrationPlaceholderPage";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -16,13 +16,9 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
-  component: Index,
+  component: HomePage,
 });
 
-function Index() {
-  return (
-    <SiteLayout>
-      <h2 className="text-2xl font-semibold">Projeto em migração</h2>
-    </SiteLayout>
-  );
+function HomePage() {
+  return <MigrationPlaceholderPage />;
 }
