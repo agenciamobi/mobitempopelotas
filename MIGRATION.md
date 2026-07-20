@@ -29,7 +29,7 @@ A arquitetura nativa do novo projeto deve ser preservada. Arquivos de configura�
 1. Nunca importar arquivos diretamente de `_legacy/`.
 2. Copiar somente a implementação necessária e adaptá-la para `src/`.
 3. Migrar em fatias pequenas, compiláveis e revisáveis.
-4. Executar `npm run typecheck`, `npm run lint` e `npm run build` antes de integrar cada etapa.
+4. Executar `npm run build`, `npm run typecheck` e `npm run lint` antes de integrar cada etapa. O build deve ocorrer primeiro para gerar a árvore de rotas do TanStack Router.
 5. Manter dados meteorológicos normalizados e desacoplados dos componentes visuais.
 6. Manter segredos exclusivamente no servidor.
 7. Não expor `SUPABASE_SERVICE_ROLE_KEY`, segredos de cron ou chaves privadas no bundle do navegador.
@@ -43,6 +43,7 @@ A arquitetura nativa do novo projeto deve ser preservada. Arquivos de configura�
 src/
   components/
     layout/
+    migration/
     weather/
     ui/
   lib/
@@ -70,20 +71,22 @@ _legacy/
 
 ### 2. Supabase externo
 
-- [ ] Definir variáveis públicas e privadas da nova aplicação
-- [ ] Criar clientes Supabase separados para browser e servidor, caso necessários
+- [x] Definir variáveis públicas e modo controlado em `.env.example`
+- [x] Criar configuração e adaptador mock sem acesso de rede
+- [ ] Instalar o SDK e criar clientes reais separados para browser e servidor
 - [ ] Copiar e revisar migrations existentes
 - [ ] Validar RLS e permissões
 - [ ] Definir estratégia de Edge Functions para tarefas incompatíveis com o runtime do deploy
 
 ### 3. Layout e identidade
 
-- [ ] Migrar tokens visuais úteis do projeto original
-- [ ] Implementar container e grid responsivos
-- [ ] Migrar header desktop e mobile
-- [ ] Migrar footer
-- [ ] Implementar navegação acessível
-- [ ] Validar estados de erro e página 404
+- [x] Migrar tokens visuais essenciais do projeto original
+- [x] Implementar container responsivo
+- [x] Migrar header desktop e mobile
+- [x] Migrar footer
+- [x] Implementar navegação acessível
+- [x] Integrar o layout global ao `__root.tsx`
+- [x] Integrar estados de erro e página 404 ao layout
 
 ### 4. Camada meteorológica
 
@@ -95,6 +98,7 @@ _legacy/
 
 ### 5. Home
 
+- [x] Migrar a rota inicial com placeholder `Projeto em migração`
 - [ ] Condições atuais
 - [ ] Previsão horária
 - [ ] Previsão para sete dias
@@ -105,16 +109,18 @@ _legacy/
 
 ### 6. Páginas internas e SEO
 
-- [ ] Histórico meteorológico
+- [x] Criar rotas estáticas para os destinos atuais do Header e Footer
+- [x] Adicionar metadados básicos por rota
+- [ ] Histórico meteorológico funcional
 - [ ] Radar e mapas
-- [ ] Alertas
+- [ ] Alertas funcionais
 - [ ] Câmeras ao vivo
 - [ ] Nível da Lagoa dos Patos
 - [ ] Conteúdo institucional e metodologia
 - [ ] Sitemap
 - [ ] Robots
 - [ ] Canonicals
-- [ ] Open Graph
+- [ ] Open Graph completo
 - [ ] Schema.org
 
 ### 7. PWA, cron e notificações
@@ -142,4 +148,4 @@ _legacy/
 
 ## Próxima fatia
 
-A próxima implementação deve migrar o layout base do portal: tokens visuais, container, header, navegação mobile e footer. A Home continuará temporariamente simples até que a camada meteorológica esteja normalizada.
+A próxima implementação deve normalizar a camada meteorológica e migrar os primeiros dados reais da Home. Até essa etapa ser concluída, a Home e as páginas internas permanecem deliberadamente com o estado `Projeto em migração`.
