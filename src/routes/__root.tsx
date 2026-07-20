@@ -16,6 +16,8 @@ import appCss from "../styles.css?url";
 const siteTitle = "Tempo Pelotas | Previsão do tempo em Pelotas e região";
 const siteDescription =
   "Previsão do tempo, condições atuais, chuva, vento e informações meteorológicas de Pelotas e da Zona Sul do Rio Grande do Sul.";
+const socialImage =
+  "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3f08c889-e910-4b95-8e86-5c37fa31c1c8/id-preview-9ab27e4f--d63df7b2-45db-4890-823c-87629dab73a1.lovable.app-1784525496143.png";
 
 function NotFoundComponent() {
   return (
@@ -77,15 +79,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:description", content: siteDescription },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "pt_BR" },
+      { property: "og:image", content: socialImage },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: siteTitle },
       { name: "twitter:description", content: siteDescription },
+      { name: "twitter:image", content: socialImage },
       { name: "theme-color", content: "#071e2f" },
     ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-    ],
+    links: [{ rel: "stylesheet", href: appCss }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
