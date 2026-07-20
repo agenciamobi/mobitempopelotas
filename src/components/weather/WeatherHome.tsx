@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import {
   Cloud,
   CloudLightning,
@@ -50,7 +51,7 @@ export function WeatherHome({ data }: { data: WeatherHomeData }) {
         <h1 id="weather-unavailable-title">Dados temporariamente indisponíveis</h1>
         <p>{data.message}</p>
         <p className="weather-source-note">
-          Fonte consultada:{" ""}
+          Fonte consultada:{" "}
           <a href={data.source.url} target="_blank" rel="noreferrer">
             {data.source.name}
           </a>
@@ -127,7 +128,7 @@ export function WeatherHome({ data }: { data: WeatherHomeData }) {
             <p className="weather-kicker">Próximas horas</p>
             <h2 id="hourly-title">Evolução do tempo</h2>
           </div>
-          <a href="/tempo-hoje-pelotas">Ver previsão de hoje</a>
+          <Link to="/tempo-hoje-pelotas">Ver previsão de hoje</Link>
         </div>
 
         <div className="hourly-forecast">
@@ -148,7 +149,7 @@ export function WeatherHome({ data }: { data: WeatherHomeData }) {
             <p className="weather-kicker">Previsão estendida</p>
             <h2 id="daily-title">Próximos 7 dias</h2>
           </div>
-          <a href="/previsao-7-dias-pelotas">Ver detalhes</a>
+          <Link to="/previsao-7-dias-pelotas">Ver detalhes</Link>
         </div>
 
         <div className="daily-forecast">
@@ -171,7 +172,7 @@ export function WeatherHome({ data }: { data: WeatherHomeData }) {
       </section>
 
       <p className="weather-source-note">
-        Fonte:{" ""}
+        Fonte:{" "}
         <a href={data.source.url} target="_blank" rel="noreferrer">
           {data.source.name}
         </a>
