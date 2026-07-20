@@ -19,6 +19,8 @@ import {
 
 import type { WeatherHomeData, WeatherIconName } from "@/lib/weather/types";
 
+import "./WeatherHome.css";
+
 const iconMap: Record<WeatherIconName, LucideIcon> = {
   sun: Sun,
   moon: Moon,
