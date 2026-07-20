@@ -1,16 +1,17 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
-  Outlet,
+  HeadContent,
   Link,
+  Outlet,
+  Scripts,
   createRootRouteWithContext,
   useRouter,
-  HeadContent,
-  Scripts,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
+import { SiteLayout } from "@/components/layout/SiteLayout";
+import { reportLovableError } from "@/lib/lovable-error-reporting";
 import appCss from "../styles.css?url";
-import { reportLovableError } from "../lib/lovable-error-reporting";
 
 const siteTitle = "Tempo Pelotas | Previsão do tempo em Pelotas e região";
 const siteDescription =
@@ -18,23 +19,16 @@ const siteDescription =
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <p className="text-sm font-medium text-primary">Erro 404</p>
-        <h1 className="mt-2 text-4xl font-bold text-foreground">Página não encontrada</h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          O endereço acessado não existe ou foi alterado.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Voltar para o início
-          </Link>
-        </div>
-      </div>
-    </div>
+    <SiteLayout>
+      <section className="status-page" aria-labelledby="not-found-title">
+        <p className="status-kicker">Erro 404</p>
+        <h1 id="not-found-title">Página não encontrada</h1>
+        <p>O endereço acessado não existe ou foi alterado.</p>
+        <Link className="primary-link" to="/">
+          Voltar para o início
+        </Link>
+      </section>
+    </SiteLayout>
   );
 }
 
@@ -47,34 +41,28 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          Não foi possível carregar esta página
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Ocorreu um erro inesperado. Tente novamente ou retorne para a página inicial.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
+    <SiteLayout>
+      <section className="status-page" aria-labelledby="error-title">
+        <p className="status-kicker">Erro inesperado</p>
+        <h1 id="error-title">Não foi possível carregar esta página</h1>
+        <p>Ocorreu um erro inesperado. Tente novamente ou retorne para a página inicial.</p>
+        <div className="status-actions">
           <button
             type="button"
+            className="primary-button"
             onClick={() => {
               router.invalidate();
               reset();
             }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             Tentar novamente
           </button>
-          <a
-            href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-          >
+          <Link className="secondary-link" to="/">
             Voltar para o início
-          </a>
+          </Link>
         </div>
-      </div>
-    </div>
+      </section>
+    </SiteLayout>
   );
 }
 
@@ -92,13 +80,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: siteTitle },
       { name: "twitter:description", content: siteDescription },
-      { name: "theme-color", content: "#0f172a" },
+      { name: "theme-color", content: "#071e2f" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
@@ -114,7 +99,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="min-h-screen antialiased">
+      <body>
         {children}
         <Scripts />
       </body>
@@ -127,8 +112,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <SiteLayout>
+        <Outlet />
+      </SiteLayout>
     </QueryClientProvider>
   );
 }
