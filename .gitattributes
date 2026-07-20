@@ -1,0 +1,16 @@
+# Mantém o repositório consistente entre Windows, Linux e CI.
+* text=auto eol=lf
+
+# Arquivos binários não devem sofrer normalização de conteúdo.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.zip binary
