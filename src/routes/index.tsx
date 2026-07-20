@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
         name: "description",
         content: "Portal Tempo Pelotas — projeto em migração.",
       },
-      { property: "og:title", content: "Tempo Pelotas" },
+      { property: "og:title", content: "Tempo Pelotas — Portal" },
       {
         property: "og:description",
         content: "Portal Tempo Pelotas — projeto em migração.",

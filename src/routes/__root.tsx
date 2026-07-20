@@ -77,12 +77,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Tempo Pelotas" },
+      { title: "Tempo Pelotas — Portal" },
       { name: "description", content: "Portal Tempo Pelotas — projeto em migração." },
-      { property: "og:title", content: "Tempo Pelotas" },
+      { property: "og:title", content: "Tempo Pelotas — Portal" },
       { property: "og:description", content: "Portal Tempo Pelotas — projeto em migração." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Tempo Pelotas — Portal" },
+      { name: "twitter:description", content: "Portal Tempo Pelotas — projeto em migração." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2d2754d8-93c2-4ff0-8323-4c84d74a8511/id-preview-8a481d85--d63df7b2-45db-4890-823c-87629dab73a1.lovable.app-1784518545427.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/2d2754d8-93c2-4ff0-8323-4c84d74a8511/id-preview-8a481d85--d63df7b2-45db-4890-823c-87629dab73a1.lovable.app-1784518545427.png" },
     ],
     links: [
       {
