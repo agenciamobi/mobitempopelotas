@@ -1,17 +1,12 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 
-type NavigationItem = {
-  label: string;
-  to: string;
-};
-
-const primaryNavigation: NavigationItem[] = [
+const primaryNavigation = [
   { label: "Agora", to: "/" },
   { label: "Hoje", to: "/tempo-hoje-pelotas" },
   { label: "7 dias", to: "/previsao-7-dias-pelotas" },
   { label: "Chuva", to: "/chuva-em-pelotas" },
   { label: "Águas", to: "/situacao-hidrologica-pelotas" },
-];
+] as const;
 
 function isActivePath(pathname: string, to: string) {
   if (to === "/") return pathname === "/";
@@ -20,6 +15,7 @@ function isActivePath(pathname: string, to: string) {
 
 export function Header() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const alertsActive = isActivePath(pathname, "/alertas");
 
   return (
     <>
@@ -59,9 +55,9 @@ export function Header() {
           </nav>
 
           <Link
-            className={isActivePath(pathname, "/alertas") ? "header-alert is-active" : "header-alert"}
+            className={alertsActive ? "header-alert is-active" : "header-alert"}
             to="/alertas"
-            aria-current={isActivePath(pathname, "/alertas") ? "page" : undefined}
+            aria-current={alertsActive ? "page" : undefined}
           >
             <span aria-hidden="true" />
             Alertas
@@ -85,8 +81,8 @@ export function Header() {
           })}
           <Link
             to="/alertas"
-            className={isActivePath(pathname, "/alertas") ? "is-active" : undefined}
-            aria-current={isActivePath(pathname, "/alertas") ? "page" : undefined}
+            className={alertsActive ? "is-active" : undefined}
+            aria-current={alertsActive ? "page" : undefined}
           >
             Alertas
           </Link>
