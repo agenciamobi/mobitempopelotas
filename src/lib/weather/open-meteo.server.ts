@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import type {
   DailyForecast,
   HourlyForecast,
@@ -17,43 +19,72 @@ const PELOTAS = {
   longitude: -52.3376,
 } as const;
 
-type OpenMeteoCurrent = {
-  time: string;
-  temperature_2m: number;
-  relative_humidity_2m: number;
-  apparent_temperature: number;
-  weather_code: number;
-  pressure_msl: number;
-  visibility?: number;
-  wind_speed_10m: number;
-  wind_gusts_10m: number;
-  wind_direction_10m: number;
-  is_day: number;
-};
+const finiteNumber = z.number().finite();
+const finiteNumberArray = z.array(finiteNumber).min(1);
+const timeArray = z.array(z.string().min(1)).min(1);
 
-type OpenMeteoResponse = {
-  current: OpenMeteoCurrent;
-  hourly: {
-    time: string[];
-    temperature_2m: number[];
-    precipitation_probability: number[];
-    wind_speed_10m: number[];
-    wind_gusts_10m: number[];
-    weather_code: number[];
-    is_day: number[];
-  };
-  daily: {
-    time: string[];
-    weather_code: number[];
-    temperature_2m_max: number[];
-    temperature_2m_min: number[];
-    precipitation_probability_max: number[];
-    precipitation_sum: number[];
-    wind_gusts_10m_max: number[];
-    sunrise: string[];
-    sunset: string[];
-  };
-};
+const openMeteoResponseSchema = z
+  .object({
+    current: z.object({
+      time: z.string().min(1),
+      temperature_2m: finiteNumber,
+      relative_humidity_2m: finiteNumber,
+      apparent_temperature: finiteNumber,
+      weather_code: z.number().int(),
+      pressure_msl: finiteNumber,
+      visibility: finiteNumber.optional(),
+      wind_speed_10m: finiteNumber,
+      wind_gusts_10m: finiteNumber,
+      wind_direction_10m: finiteNumber,
+      is_day: z.number().int().min(0).max(1),
+    }),
+    hourly: z.object({
+      time: timeArray,
+      temperature_2m: finiteNumberArray,
+      precipitation_probability: finiteNumberArray,
+      wind_speed_10m: finiteNumberArray,
+      wind_gusts_10m: finiteNumberArray,
+      weather_code: finiteNumberArray,
+      is_day: finiteNumberArray,
+    }),
+    daily: z.object({
+      time: timeArray,
+      weather_code: finiteNumberArray,
+      temperature_2m_max: finiteNumberArray,
+      temperature_2m_min: finiteNumberArray,
+      precipitation_probability_max: finiteNumberArray,
+      precipitation_sum: finiteNumberArray,
+      wind_gusts_10m_max: finiteNumberArray,
+      sunrise: timeArray,
+      sunset: timeArray,
+    }),
+  })
+  .superRefine((data, context) => {
+    const hourlyLength = data.hourly.time.length;
+    const dailyLength = data.daily.time.length;
+
+    for (const [key, values] of Object.entries(data.hourly)) {
+      if (values.length !== hourlyLength) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["hourly", key],
+          message: "Série horária incompleta",
+        });
+      }
+    }
+
+    for (const [key, values] of Object.entries(data.daily)) {
+      if (values.length !== dailyLength) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["daily", key],
+          message: "Série diária incompleta",
+        });
+      }
+    }
+  });
+
+type OpenMeteoResponse = z.infer<typeof openMeteoResponseSchema>;
 
 type WeatherPresentation = {
   label: string;
@@ -297,7 +328,7 @@ export async function fetchPelotasWeather(): Promise<WeatherHomeData> {
       throw new Error(`Open-Meteo respondeu com status ${response.status}`);
     }
 
-    return normalizeWeather((await response.json()) as OpenMeteoResponse);
+    return normalizeWeather(openMeteoResponseSchema.parse(await response.json()));
   } catch (error) {
     console.error("Falha ao carregar a previsão meteorológica:", error);
     return createUnavailableWeather(
