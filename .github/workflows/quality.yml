@@ -18,9 +18,19 @@ concurrency:
 
 jobs:
   validate:
-    name: Build, typecheck e lint
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Build
+            command: npm run build
+          - name: Typecheck
+            command: npm run build && npm run typecheck
+          - name: Lint
+            command: npm run lint
 
     steps:
       - name: Checkout
@@ -35,11 +45,5 @@ jobs:
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
 
-      - name: Gerar build e árvore de rotas
-        run: npm run build
-
-      - name: Validar TypeScript
-        run: npm run typecheck
-
-      - name: Validar ESLint
-        run: npm run lint
+      - name: Executar ${{ matrix.name }}
+        run: ${{ matrix.command }}
