@@ -43,7 +43,7 @@ jobs:
           cache: npm
 
       - name: Instalar dependências
-        run: npm ci --no-audit --no-fund
+        run: npm install --no-audit --no-fund
 
       - name: Executar ${{ matrix.name }}
         run: ${{ matrix.command }}
