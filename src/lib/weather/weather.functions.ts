@@ -5,8 +5,7 @@ import { fetchPelotasWeather } from "./open-meteo.server";
 
 export const getPelotasWeather = createServerFn({ method: "GET" }).handler(async () => {
   setResponseHeaders({
-    "cache-control": "public, max-age=300, stale-while-revalidate=300",
-    "cdn-cache-control": "max-age=300, stale-while-revalidate=300",
+    "Cache-Control": "public, max-age=300, stale-while-revalidate=300",
   });
 
   return fetchPelotasWeather();
