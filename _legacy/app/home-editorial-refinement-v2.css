@@ -1,0 +1,1098 @@
+/*
+ * Segunda etapa do theme editorial da homepage.
+ * A leitura passa a ser conduzida por linhas, ritmo e hierarquia — não por pilhas de cards.
+ */
+
+.site-shell--home-editorial {
+  --home-ink: #071e2f;
+  --home-muted: #60747d;
+  --home-line: rgba(7, 30, 47, 0.13);
+  --home-soft-line: rgba(7, 30, 47, 0.075);
+  --home-paper: #f7f9f7;
+  background:
+    radial-gradient(circle at 82% 17%, rgba(94, 44, 237, 0.035), transparent 27rem),
+    radial-gradient(circle at 8% 62%, rgba(24, 189, 205, 0.045), transparent 32rem),
+    linear-gradient(180deg, #f4f7f5 0%, #f8faf8 52%, #eef4f2 100%);
+}
+
+.site-shell--home-editorial .home-editorial-main {
+  width: min(1460px, calc(100% - 64px));
+}
+
+.home-story {
+  padding: clamp(76px, 8vw, 124px) 0;
+  border-bottom: 1px solid var(--home-line);
+}
+
+.home-story-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(460px, 0.8fr);
+  gap: clamp(42px, 7vw, 112px);
+  align-items: end;
+  margin-bottom: clamp(34px, 5vw, 62px);
+}
+
+.home-story-heading h2,
+.home-map-story h2,
+.home-observation-story h2,
+.home-explore-story h2 {
+  max-width: 790px;
+  margin: 10px 0 0;
+  color: var(--home-ink);
+  font-size: clamp(2.8rem, 5.2vw, 5.45rem);
+  line-height: 0.92;
+  letter-spacing: -0.075em;
+  text-wrap: balance;
+}
+
+.home-story-heading > p,
+.home-map-story__copy > p,
+.home-observation-story__intro > p {
+  max-width: 520px;
+  margin: 0;
+  color: var(--home-muted);
+  font-size: clamp(0.93rem, 1.1vw, 1.05rem);
+  line-height: 1.75;
+}
+
+/* Resumo do dia: dados em uma linha, sem superfícies individuais. */
+.home-today-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-self: stretch;
+  margin: 0;
+  border-top: 1px solid var(--home-line);
+  border-bottom: 1px solid var(--home-line);
+}
+
+.home-today-facts > div {
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  min-width: 0;
+  padding: 15px clamp(10px, 1.4vw, 20px);
+  border-right: 1px solid var(--home-line);
+}
+
+.home-today-facts > div:first-child {
+  padding-left: 0;
+}
+
+.home-today-facts > div:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.home-today-facts dt {
+  color: var(--home-muted);
+  font-size: 0.57rem;
+  font-weight: 790;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.home-today-facts dd {
+  margin: 0;
+  color: var(--home-ink);
+  font-size: clamp(1rem, 1.45vw, 1.4rem);
+  font-weight: 870;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.home-advisory-strip {
+  display: grid;
+  grid-template-columns: auto minmax(220px, 0.45fr) minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  padding: 16px 0;
+  border-top: 1px solid var(--home-line);
+  border-bottom: 1px solid var(--home-line);
+}
+
+.home-advisory-strip > span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--brand-cyan, #18bdcd);
+  box-shadow: 0 0 0 7px rgba(24, 189, 205, 0.09);
+}
+
+.home-advisory-strip.is-attention > span,
+.home-advisory-strip.is-warning > span {
+  background: var(--brand-orange, #f27035);
+  box-shadow: 0 0 0 7px rgba(242, 112, 53, 0.1);
+}
+
+.home-advisory-strip > div {
+  display: grid;
+  gap: 3px;
+}
+
+.home-advisory-strip small {
+  color: #177f96;
+  font-size: 0.57rem;
+  font-weight: 840;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-advisory-strip.is-attention small,
+.home-advisory-strip.is-warning small {
+  color: #c65122;
+}
+
+.home-advisory-strip strong {
+  color: var(--home-ink);
+  font-size: 0.91rem;
+  letter-spacing: -0.025em;
+}
+
+.home-advisory-strip p {
+  margin: 0;
+  color: var(--home-muted);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.home-advisory-strip > a,
+.home-inline-links a,
+.home-observation-story__intro > a,
+.home-water-focus > a,
+.home-water-story__footer > a {
+  color: var(--home-ink);
+  font-size: 0.69rem;
+  font-weight: 840;
+  text-decoration: underline;
+  text-decoration-color: rgba(24, 189, 205, 0.5);
+  text-underline-offset: 5px;
+}
+
+/* Linha horária contínua. */
+.home-hourly-story {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(92px, 1fr));
+  overflow-x: auto;
+  margin-top: clamp(30px, 4vw, 48px);
+  border-top: 1px solid var(--home-line);
+  border-bottom: 1px solid var(--home-line);
+  scrollbar-width: thin;
+}
+
+.home-hourly-story article {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 155px;
+  align-content: center;
+  justify-items: center;
+  gap: 9px;
+  padding: 17px 10px;
+  border-right: 1px solid var(--home-line);
+  text-align: center;
+}
+
+.home-hourly-story article:last-child {
+  border-right: 0;
+}
+
+.home-hourly-story article.is-current::before {
+  position: absolute;
+  top: -1px;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--brand-cyan, #18bdcd), var(--brand-purple, #5e2ced));
+  content: "";
+}
+
+.home-hourly-story article > span {
+  color: var(--home-muted);
+  font-size: 0.62rem;
+  font-weight: 760;
+}
+
+.home-hourly-story article svg {
+  width: 37px;
+  height: 37px;
+}
+
+.home-hourly-story article strong {
+  color: var(--home-ink);
+  font-size: 1.42rem;
+  letter-spacing: -0.05em;
+}
+
+.home-hourly-story article small {
+  color: #28798a;
+  font-size: 0.57rem;
+}
+
+.home-next-days {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.32fr) minmax(0, 1fr);
+  gap: 28px clamp(30px, 5vw, 72px);
+  align-items: start;
+  margin-top: clamp(38px, 5vw, 64px);
+}
+
+.home-next-days__heading {
+  display: grid;
+  gap: 8px;
+}
+
+.home-next-days__heading > strong {
+  color: var(--home-ink);
+  font-size: clamp(1.18rem, 1.8vw, 1.65rem);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+}
+
+.home-next-days__list {
+  border-top: 1px solid var(--home-line);
+}
+
+.home-next-days__list article {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) 38px minmax(92px, 0.8fr) auto;
+  gap: 18px;
+  align-items: center;
+  min-height: 64px;
+  border-bottom: 1px solid var(--home-line);
+}
+
+.home-next-days__list article > div {
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+}
+
+.home-next-days__list article > div strong {
+  color: var(--home-ink);
+  font-size: 0.78rem;
+}
+
+.home-next-days__list article > div span,
+.home-next-days__list article > span {
+  color: var(--home-muted);
+  font-size: 0.62rem;
+}
+
+.home-next-days__list article svg {
+  width: 30px;
+  height: 30px;
+}
+
+.home-next-days__list article > b {
+  color: var(--home-ink);
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.home-next-days__list article > b small {
+  color: var(--home-muted);
+  font-size: 0.68rem;
+  font-weight: 650;
+}
+
+.home-inline-links {
+  grid-column: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+}
+
+/* Mapa como pausa visual, sem painel dentro de painel. */
+.home-map-story {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.38fr) minmax(0, 1fr);
+  gap: clamp(36px, 6vw, 90px);
+  align-items: center;
+  padding: clamp(62px, 7vw, 104px) 0;
+  border-bottom: 1px solid var(--home-line);
+}
+
+.home-map-story h2 {
+  font-size: clamp(2.35rem, 4.1vw, 4.35rem);
+}
+
+.home-map-story__copy {
+  position: relative;
+  z-index: 2;
+}
+
+.home-map-story__copy > p {
+  margin-top: 24px;
+}
+
+.home-map-story__frame {
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  box-shadow: 0 24px 62px rgba(7, 30, 47, 0.12);
+}
+
+.home-map-story .map-panel {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.home-map-story .map-panel-heading {
+  display: none;
+}
+
+.home-map-story .map-canvas {
+  min-height: 520px;
+  border: 0;
+  border-radius: 0;
+}
+
+/* Embrapa: uma única faixa de contraste. */
+.home-observation-story {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.78fr) minmax(0, 1.1fr);
+  gap: clamp(48px, 8vw, 124px);
+  align-items: center;
+  margin: clamp(72px, 8vw, 120px) 0;
+  padding: clamp(42px, 6vw, 78px);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 92% 10%, rgba(94, 44, 237, 0.22), transparent 24rem),
+    radial-gradient(circle at 12% 100%, rgba(24, 189, 205, 0.14), transparent 22rem),
+    linear-gradient(135deg, #061b2b, #092f43 58%, #0a4054);
+  color: white;
+  box-shadow: 0 30px 80px rgba(3, 18, 29, 0.18);
+}
+
+.home-observation-story h2 {
+  color: white;
+  font-size: clamp(2.55rem, 4.5vw, 4.8rem);
+}
+
+.home-observation-story .eyebrow {
+  color: var(--brand-cyan, #18bdcd);
+}
+
+.home-observation-story__intro > p {
+  margin-top: 22px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.home-observation-story__intro > a {
+  display: inline-flex;
+  margin-top: 24px;
+  color: white;
+}
+
+.home-observation-story__reading {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.6fr) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 68px);
+  align-items: center;
+}
+
+.home-observation-temperature {
+  display: grid;
+  gap: 7px;
+}
+
+.home-observation-temperature small {
+  color: var(--brand-cyan, #18bdcd);
+  font-size: 0.59rem;
+  font-weight: 840;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.home-observation-temperature strong {
+  color: white;
+  font-size: clamp(4.8rem, 8vw, 8.4rem);
+  line-height: 0.82;
+  letter-spacing: -0.09em;
+}
+
+.home-observation-temperature span {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.72rem;
+}
+
+.home-observation-story__reading dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.17);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.17);
+}
+
+.home-observation-story__reading dl > div {
+  display: grid;
+  gap: 7px;
+  min-height: 90px;
+  align-content: center;
+  padding: 16px 18px;
+  border-right: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.home-observation-story__reading dl > div:nth-child(2n) {
+  border-right: 0;
+}
+
+.home-observation-story__reading dl > div:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.home-observation-story__reading dt {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 0.54rem;
+  font-weight: 760;
+  letter-spacing: 0.065em;
+  text-transform: uppercase;
+}
+
+.home-observation-story__reading dd {
+  margin: 0;
+  color: white;
+  font-size: clamp(0.95rem, 1.35vw, 1.25rem);
+  font-weight: 850;
+  letter-spacing: -0.035em;
+}
+
+.home-observation-story__unavailable {
+  display: grid;
+  gap: 9px;
+  padding: 28px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.home-observation-story__unavailable span {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.72rem;
+}
+
+/* Águas: destaque local e tabela regional. */
+.home-water-story__layout {
+  display: grid;
+  grid-template-columns: minmax(330px, 0.64fr) minmax(0, 1fr);
+  gap: clamp(34px, 5vw, 76px);
+  align-items: start;
+}
+
+.home-water-focus {
+  position: sticky;
+  top: 92px;
+  overflow: hidden;
+  padding: clamp(28px, 4vw, 46px);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(24, 189, 205, 0.13), transparent 18rem),
+    #071e2f;
+  color: white;
+  box-shadow: 0 24px 64px rgba(7, 30, 47, 0.16);
+}
+
+.home-water-focus__topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.home-water-focus__topline > div {
+  display: grid;
+  gap: 5px;
+}
+
+.home-water-focus__topline span {
+  font-size: 0.82rem;
+  font-weight: 840;
+}
+
+.home-water-focus__topline small,
+.home-water-focus__topline > b {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.53rem;
+}
+
+.home-water-focus__topline > b {
+  padding: 6px 8px;
+  border: 1px solid rgba(24, 189, 205, 0.24);
+  border-radius: 999px;
+  color: #74e6ee;
+  white-space: nowrap;
+}
+
+.home-water-focus__reading {
+  display: flex;
+  align-items: baseline;
+  margin-top: clamp(44px, 6vw, 76px);
+}
+
+.home-water-focus__reading strong {
+  color: white;
+  font-size: clamp(5rem, 9vw, 8.8rem);
+  line-height: 0.78;
+  letter-spacing: -0.1em;
+}
+
+.home-water-focus__reading span {
+  margin-left: 10px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1rem;
+  font-weight: 760;
+}
+
+.home-water-trend {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 22px 0 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.72rem;
+}
+
+.home-water-trend > b {
+  display: grid;
+  width: 29px;
+  height: 29px;
+  place-items: center;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+
+.home-water-trend.is-rising {
+  color: #ffb18a;
+}
+
+.home-water-trend.is-falling {
+  color: #75e6ee;
+}
+
+.home-water-focus dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 34px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.home-water-focus dl > div {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 15px 12px;
+  border-right: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.home-water-focus dl > div:first-child {
+  padding-left: 0;
+}
+
+.home-water-focus dl > div:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.home-water-focus dt {
+  color: rgba(255, 255, 255, 0.43);
+  font-size: 0.47rem;
+  font-weight: 750;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.home-water-focus dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: white;
+  font-size: 0.66rem;
+  font-weight: 820;
+}
+
+.home-water-focus > a {
+  display: inline-flex;
+  margin-top: 25px;
+  color: white;
+}
+
+.home-water-table {
+  min-width: 0;
+}
+
+.home-water-table__heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--home-line);
+}
+
+.home-water-table__heading > div {
+  display: grid;
+  gap: 8px;
+}
+
+.home-water-table__heading strong {
+  color: var(--home-ink);
+  font-size: clamp(1.2rem, 1.8vw, 1.65rem);
+  letter-spacing: -0.04em;
+}
+
+.home-water-table__heading > small {
+  color: var(--home-muted);
+  font-size: 0.59rem;
+  white-space: nowrap;
+}
+
+.home-water-table__rows article,
+.home-water-context {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 92px minmax(145px, 0.75fr) 86px;
+  gap: 18px;
+  align-items: center;
+  min-height: 76px;
+  border-bottom: 1px solid var(--home-line);
+}
+
+.home-water-table__rows article > div,
+.home-water-context > div {
+  display: grid;
+  gap: 4px;
+}
+
+.home-water-table__rows article > div strong,
+.home-water-context > div strong {
+  color: var(--home-ink);
+  font-size: 0.76rem;
+}
+
+.home-water-table__rows article > div span,
+.home-water-context > div span {
+  color: var(--home-muted);
+  font-size: 0.55rem;
+}
+
+.home-water-table__rows article > b,
+.home-water-context > b {
+  color: var(--home-ink);
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.home-water-table__rows article > span,
+.home-water-context > span {
+  color: var(--home-muted);
+  font-size: 0.59rem;
+}
+
+.home-water-table__rows article > span.is-rising,
+.home-water-context > span.is-rising {
+  color: #c65a2d;
+}
+
+.home-water-table__rows article > span.is-falling,
+.home-water-context > span.is-falling {
+  color: #16869a;
+}
+
+.home-water-table__rows article > small,
+.home-water-context > small {
+  justify-self: end;
+  color: var(--home-muted);
+  font-size: 0.52rem;
+  text-align: right;
+}
+
+.home-water-table__rows article.risk-attention > small {
+  color: #c65a2d;
+}
+
+.home-water-table__rows article.risk-flooding > small {
+  color: var(--brand-magenta, #e70b85);
+}
+
+.home-water-context {
+  margin-top: 18px;
+  padding: 0 16px;
+  border: 1px solid rgba(94, 44, 237, 0.13);
+  border-radius: 16px;
+  background: rgba(94, 44, 237, 0.035);
+}
+
+.home-water-story__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  margin-top: 30px;
+  padding-top: 18px;
+  border-top: 1px solid var(--home-line);
+}
+
+.home-water-story__footer p {
+  margin: 0;
+  color: var(--home-muted);
+  font-size: 0.63rem;
+  line-height: 1.55;
+}
+
+/* Diretório agrupado: quatro assuntos em vez de oito cards equivalentes. */
+.home-explore-story {
+  display: grid;
+  grid-template-columns: minmax(270px, 0.42fr) minmax(0, 1fr);
+  gap: clamp(48px, 8vw, 130px);
+  padding: clamp(76px, 8vw, 124px) 0;
+}
+
+.home-explore-story h2 {
+  font-size: clamp(2.5rem, 4.4vw, 4.7rem);
+}
+
+.home-explore-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 42px clamp(38px, 6vw, 88px);
+}
+
+.home-explore-groups > section {
+  min-width: 0;
+}
+
+.home-explore-groups h3 {
+  margin: 0 0 13px;
+  color: var(--home-muted);
+  font-size: 0.58rem;
+  font-weight: 830;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-explore-groups > section > div {
+  border-top: 1px solid var(--home-line);
+}
+
+.home-explore-groups a {
+  display: flex;
+  min-height: 55px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid var(--home-line);
+  color: var(--home-ink);
+  font-size: 0.77rem;
+  font-weight: 800;
+}
+
+.home-explore-groups a span {
+  color: #16869a;
+  transition: transform 160ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .home-explore-groups a:hover span,
+  .home-explore-groups a:focus-visible span {
+    transform: translateX(4px);
+  }
+
+  .home-advisory-strip > a:hover,
+  .home-inline-links a:hover,
+  .home-observation-story__intro > a:hover,
+  .home-water-focus > a:hover,
+  .home-water-story__footer > a:hover {
+    text-decoration-color: var(--brand-magenta, #e70b85);
+  }
+}
+
+@media (max-width: 1180px) {
+  .home-story-heading {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .home-today-facts {
+    max-width: 760px;
+  }
+
+  .home-map-story {
+    grid-template-columns: minmax(240px, 0.42fr) minmax(0, 1fr);
+    gap: 38px;
+  }
+
+  .home-water-story__layout {
+    grid-template-columns: minmax(300px, 0.58fr) minmax(0, 1fr);
+    gap: 34px;
+  }
+
+  .home-water-table__rows article,
+  .home-water-context {
+    grid-template-columns: minmax(150px, 1fr) 78px minmax(120px, 0.72fr);
+  }
+
+  .home-water-table__rows article > small,
+  .home-water-context > small {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .site-shell--home-editorial .home-editorial-main {
+    width: min(100% - 40px, 780px);
+  }
+
+  .home-story,
+  .home-map-story,
+  .home-explore-story {
+    padding-top: 74px;
+    padding-bottom: 74px;
+  }
+
+  .home-advisory-strip {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .home-advisory-strip p {
+    grid-column: 2 / -1;
+  }
+
+  .home-next-days {
+    grid-template-columns: 1fr;
+  }
+
+  .home-inline-links {
+    grid-column: 1;
+  }
+
+  .home-map-story {
+    grid-template-columns: 1fr;
+  }
+
+  .home-map-story__copy {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 0.65fr);
+    gap: 32px;
+    align-items: end;
+  }
+
+  .home-map-story__copy > p {
+    margin: 0;
+  }
+
+  .home-map-story .map-canvas {
+    min-height: 460px;
+  }
+
+  .home-observation-story {
+    grid-template-columns: 1fr;
+    gap: 42px;
+    padding: 42px;
+  }
+
+  .home-observation-story__intro {
+    max-width: 650px;
+  }
+
+  .home-water-story__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .home-water-focus {
+    position: static;
+  }
+
+  .home-explore-story {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .site-shell--home-editorial .home-editorial-main {
+    width: calc(100% - 28px);
+  }
+
+  .home-story,
+  .home-map-story,
+  .home-explore-story {
+    padding-top: 58px;
+    padding-bottom: 58px;
+  }
+
+  .home-story-heading h2,
+  .home-map-story h2,
+  .home-observation-story h2,
+  .home-explore-story h2 {
+    font-size: clamp(2.15rem, 11vw, 3.35rem);
+  }
+
+  .home-today-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-today-facts > div {
+    min-height: 68px;
+    border-bottom: 1px solid var(--home-line);
+  }
+
+  .home-today-facts > div:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .home-today-facts > div:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .home-today-facts > div:first-child,
+  .home-today-facts > div:nth-child(3) {
+    padding-left: 0;
+  }
+
+  .home-today-facts > div:nth-child(2),
+  .home-today-facts > div:last-child {
+    padding-right: 0;
+  }
+
+  .home-advisory-strip {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 13px;
+  }
+
+  .home-advisory-strip p,
+  .home-advisory-strip > a {
+    grid-column: 2;
+  }
+
+  .home-hourly-story {
+    grid-template-columns: repeat(7, 92px);
+    margin-right: -14px;
+    margin-left: -14px;
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .home-hourly-story article {
+    min-height: 142px;
+  }
+
+  .home-next-days__list article {
+    grid-template-columns: minmax(80px, 1fr) 32px auto;
+    gap: 12px;
+    min-height: 61px;
+  }
+
+  .home-next-days__list article > span {
+    display: none;
+  }
+
+  .home-map-story__copy {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .home-map-story .map-canvas {
+    min-height: 360px;
+  }
+
+  .home-map-story__frame {
+    border-radius: 18px;
+  }
+
+  .home-observation-story {
+    margin: 58px 0;
+    padding: 30px 22px;
+    border-radius: 22px;
+  }
+
+  .home-observation-story__reading {
+    grid-template-columns: 1fr;
+  }
+
+  .home-observation-temperature strong {
+    font-size: 5rem;
+  }
+
+  .home-observation-story__reading dl > div {
+    min-height: 74px;
+    padding: 13px 10px;
+  }
+
+  .home-water-focus {
+    padding: 28px 22px;
+    border-radius: 22px;
+  }
+
+  .home-water-focus__reading {
+    margin-top: 46px;
+  }
+
+  .home-water-focus__reading strong {
+    font-size: 5.3rem;
+  }
+
+  .home-water-focus dl {
+    grid-template-columns: 1fr;
+  }
+
+  .home-water-focus dl > div,
+  .home-water-focus dl > div:first-child,
+  .home-water-focus dl > div:last-child {
+    grid-template-columns: 1fr auto;
+    padding: 11px 0;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .home-water-focus dl > div:last-child {
+    border-bottom: 0;
+  }
+
+  .home-water-table__heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-water-table__rows article,
+  .home-water-context {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 16px;
+    min-height: 82px;
+    padding: 12px 0;
+  }
+
+  .home-water-table__rows article > span,
+  .home-water-context > span {
+    grid-column: 1;
+  }
+
+  .home-water-table__rows article > b,
+  .home-water-context > b {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .home-water-context {
+    padding: 12px 14px;
+  }
+
+  .home-water-story__footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-explore-groups {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-explore-groups a span {
+    transition: none;
+  }
+}

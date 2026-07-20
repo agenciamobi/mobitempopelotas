@@ -1,0 +1,258 @@
+.guaiba-city-directory {
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid rgba(7, 30, 47, 0.075);
+  border-radius: 19px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(94, 44, 237, 0.07), transparent 14rem),
+    rgba(255, 255, 255, 0.68);
+}
+
+.guaiba-city-directory-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.guaiba-city-directory-heading > div {
+  min-width: 0;
+}
+
+.guaiba-city-directory-heading strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.82rem;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+}
+
+.guaiba-city-directory-heading small {
+  flex: 0 0 auto;
+  color: var(--ink-soft);
+  font-size: 0.57rem;
+  font-weight: 700;
+}
+
+.guaiba-city-directory-note {
+  max-width: 680px;
+  margin: 9px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.59rem;
+  line-height: 1.5;
+}
+
+.guaiba-city-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.guaiba-city-links > a {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 104px;
+  align-content: space-between;
+  gap: 8px;
+  padding: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(7, 30, 47, 0.07);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--ink);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.guaiba-city-links > a::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: var(--brand-cyan, var(--sky-deep));
+  content: "";
+  opacity: 0.5;
+}
+
+.guaiba-city-link-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+}
+
+.guaiba-city-link-head strong {
+  min-width: 0;
+  font-size: 0.67rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.guaiba-city-link-head i {
+  color: var(--brand-cyan, var(--sky-deep));
+  font-size: 0.72rem;
+  font-style: normal;
+}
+
+.guaiba-city-level {
+  display: block;
+  font-size: clamp(1.42rem, 2.4vw, 1.85rem);
+  font-weight: 900;
+  letter-spacing: -0.065em;
+  line-height: 0.95;
+}
+
+.guaiba-city-level small {
+  margin-left: 2px;
+  color: var(--ink-soft);
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0;
+}
+
+.guaiba-city-level--unavailable {
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  font-weight: 780;
+  letter-spacing: -0.02em;
+}
+
+.guaiba-city-meta {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 5px;
+  color: var(--ink-soft);
+  font-size: 0.54rem;
+  font-weight: 690;
+  line-height: 1.25;
+}
+
+.guaiba-city-meta b {
+  display: grid;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 6px;
+  background: rgba(24, 189, 205, 0.11);
+  color: #0d7286;
+  font-size: 0.68rem;
+}
+
+.guaiba-city-meta.is-rising b {
+  background: rgba(242, 112, 53, 0.13);
+  color: #9a4c16;
+}
+
+.guaiba-city-meta.is-falling b {
+  background: rgba(24, 189, 205, 0.13);
+  color: #0d7286;
+}
+
+.guaiba-city-meta.is-unavailable b {
+  background: rgba(107, 122, 132, 0.1);
+  color: var(--ink-soft);
+}
+
+.guaiba-city-links > a.is-primary {
+  border-color: rgba(24, 189, 205, 0.25);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(94, 44, 237, 0.08), transparent 8rem),
+    linear-gradient(135deg, rgba(24, 189, 205, 0.12), rgba(255, 255, 255, 0.9));
+}
+
+.guaiba-city-links > a.is-primary::before {
+  background: linear-gradient(
+    90deg,
+    var(--brand-cyan, #18bdcd),
+    var(--brand-purple, #5e2ced),
+    var(--brand-magenta, #e70b85),
+    var(--brand-orange, #f27035)
+  );
+  opacity: 1;
+}
+
+.guaiba-city-links > a.is-stale {
+  border-color: rgba(242, 112, 53, 0.18);
+}
+
+.guaiba-city-links > a.is-stale::before {
+  background: var(--brand-orange, #f27035);
+}
+
+.guaiba-city-links > a.is-unavailable {
+  background: rgba(248, 250, 250, 0.62);
+  color: var(--ink-soft);
+}
+
+.guaiba-city-links > a.is-unavailable::before {
+  background: #8a9aa3;
+  opacity: 0.24;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .guaiba-city-links > a:hover,
+  .guaiba-city-links > a:focus-visible {
+    border-color: rgba(24, 189, 205, 0.34);
+    background-color: white;
+    box-shadow: 0 12px 24px rgba(7, 30, 47, 0.08);
+    transform: translateY(-2px);
+    outline: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  .guaiba-city-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .guaiba-city-directory {
+    padding: 14px;
+    border-radius: 17px;
+  }
+
+  .guaiba-city-directory-heading {
+    display: grid;
+    gap: 7px;
+  }
+
+  .guaiba-city-directory-heading small {
+    white-space: normal;
+  }
+
+  .guaiba-city-links {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    margin-right: -14px;
+    margin-left: -14px;
+    padding: 0 14px 5px;
+    scroll-snap-type: x proximity;
+    scrollbar-width: thin;
+  }
+
+  .guaiba-city-links > a {
+    flex: 0 0 min(76vw, 230px);
+    min-height: 112px;
+    scroll-snap-align: start;
+  }
+
+  .guaiba-city-level {
+    font-size: 1.72rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guaiba-city-links > a {
+    transition: none;
+  }
+}

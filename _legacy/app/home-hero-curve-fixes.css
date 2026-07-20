@@ -1,0 +1,35 @@
+.weather-hero::before {
+  width: clamp(160px, 14vw, 248px);
+  height: clamp(72px, 6vw, 108px);
+  border-radius: 0 0 84px 0;
+}
+
+.weather-hero::after {
+  width: clamp(220px, 24%, 360px);
+  height: clamp(70px, 6vw, 104px);
+  border-radius: 92px 0 0 0;
+}
+
+.weather-hero-content {
+  padding-bottom: 122px;
+}
+
+.weather-hero-scroll {
+  right: clamp(28px, 4.2%, 76px);
+  bottom: 24px;
+}
+
+@media (max-width: 900px) {
+  .weather-hero::before {
+    width: 86px;
+    height: 34px;
+    border-radius: 0 0 34px 0;
+  }
+
+  .weather-hero::after {
+    display: block;
+    width: 160px;
+    height: 44px;
+    border-radius: 44px 0 0 0;
+  }
+}

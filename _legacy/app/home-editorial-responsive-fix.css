@@ -1,0 +1,5 @@
+@media (max-width: 900px) and (min-width: 621px) {
+  .site-shell--home-editorial .home-editorial-main {
+    width: min(780px, calc(100% - 40px));
+  }
+}

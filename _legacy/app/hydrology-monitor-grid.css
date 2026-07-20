@@ -1,0 +1,56 @@
+.hydrology-live-section {
+  overflow: hidden;
+}
+
+.hydrology-monitor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 16px;
+}
+
+.hydrology-monitor-grid > * {
+  min-width: 0;
+}
+
+.hydrology-monitor-grid .laranjal-monitor {
+  width: 100%;
+  margin: 0;
+}
+
+.hydrology-monitor-grid .guaiba-level-card,
+.hydrology-monitor-grid .laranjal-level-card {
+  height: 100%;
+}
+
+.hydrology-monitor-grid .laranjal-level-card .guaiba-level-card-header h3 {
+  margin: 7px 0 4px;
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+}
+
+.hydrology-monitor-grid .laranjal-level-card .guaiba-level-value strong {
+  font-size: clamp(3.5rem, 7vw, 5.6rem);
+}
+
+@media (max-width: 1100px) {
+  .hydrology-monitor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hydrology-monitor-grid .guaiba-level-card,
+  .hydrology-monitor-grid .laranjal-level-card {
+    height: auto;
+  }
+}
+
+@media (max-width: 700px) {
+  .hydrology-live-section {
+    padding-inline: 14px;
+  }
+
+  .hydrology-monitor-grid {
+    gap: 12px;
+  }
+}

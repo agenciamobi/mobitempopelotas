@@ -1,0 +1,682 @@
+/*
+ * Continuidade visual da home, da segunda dobra ao footer.
+ * Esta camada corrige conflitos acumulados entre os estilos do theme e do rodapé.
+ */
+
+.site-shell--home {
+  --home-section-gap: 14px;
+}
+
+.site-shell--home > .dashboard-layout,
+.site-shell--home > .embrapa-observation-home,
+.site-shell--home > .hydrology-home,
+.site-shell--home > .home-weather-navigation,
+.site-shell--home > .site-footer {
+  min-width: 0;
+}
+
+.site-shell--home > .dashboard-layout,
+.site-shell--home > .embrapa-observation-home,
+.site-shell--home > .hydrology-home,
+.site-shell--home > .home-weather-navigation {
+  margin-top: var(--home-section-gap);
+}
+
+/* Segunda dobra: reduz a sensação de blocos desconectados. */
+.dashboard-layout--after-hero {
+  gap: var(--home-section-gap);
+}
+
+.dashboard-layout--after-hero .map-panel,
+.dashboard-layout--after-hero .weather-content,
+.dashboard-layout--after-hero .hourly-section,
+.dashboard-layout--after-hero .weekly-section,
+.dashboard-layout--after-hero .trend-chart,
+.dashboard-layout--after-hero .alert-card {
+  min-width: 0;
+}
+
+.dashboard-layout--after-hero .weather-content {
+  gap: var(--home-section-gap);
+}
+
+.dashboard-layout--after-hero .hourly-list,
+.dashboard-layout--after-hero .daily-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(7, 30, 47, 0.18) transparent;
+}
+
+.dashboard-layout--after-hero .hourly-list::-webkit-scrollbar,
+.dashboard-layout--after-hero .daily-list::-webkit-scrollbar,
+.related-weather-grid::-webkit-scrollbar,
+.hydrology-flow::-webkit-scrollbar {
+  height: 7px;
+}
+
+.dashboard-layout--after-hero .hourly-list::-webkit-scrollbar-thumb,
+.dashboard-layout--after-hero .daily-list::-webkit-scrollbar-thumb,
+.related-weather-grid::-webkit-scrollbar-thumb,
+.hydrology-flow::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(7, 30, 47, 0.16);
+}
+
+.dashboard-layout--after-hero .section-heading,
+.dashboard-layout--after-hero .trend-chart-heading {
+  align-items: end;
+}
+
+.dashboard-layout--after-hero .section-heading > div,
+.dashboard-layout--after-hero .trend-chart-heading > div {
+  min-width: 0;
+}
+
+.dashboard-layout--after-hero .section-heading h2,
+.dashboard-layout--after-hero .trend-chart-heading h2 {
+  text-wrap: balance;
+}
+
+.dashboard-layout--after-hero .hourly-list article,
+.dashboard-layout--after-hero .daily-list article {
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.72);
+}
+
+.dashboard-layout--after-hero .alert-card {
+  align-items: center;
+}
+
+.dashboard-layout--after-hero .alert-card > div {
+  min-width: 0;
+}
+
+/* Embrapa: melhora proporção, leitura e continuidade. */
+.embrapa-observation-home {
+  scroll-margin-top: 24px;
+}
+
+.embrapa-observation-intro > div:first-child,
+.hydrology-home-intro > div:first-child {
+  min-width: 0;
+}
+
+.embrapa-observation-intro h2,
+.hydrology-home-intro h2 {
+  text-wrap: balance;
+}
+
+.embrapa-observation-actions,
+.hydrology-home-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.embrapa-current-card,
+.embrapa-observation-metrics,
+.embrapa-station-context {
+  min-width: 0;
+}
+
+.embrapa-current-card {
+  height: 100%;
+}
+
+.embrapa-current-topline > small {
+  text-align: right;
+}
+
+.embrapa-primary-metrics > div,
+.embrapa-observation-metrics article {
+  overflow: hidden;
+}
+
+.embrapa-primary-metrics strong,
+.embrapa-observation-metrics strong,
+.embrapa-observation-metrics span,
+.embrapa-station-context dd {
+  overflow-wrap: anywhere;
+}
+
+.embrapa-station-map {
+  overflow: hidden;
+}
+
+.embrapa-station-map iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+}
+
+/* Hidrologia: organiza o bloco escuro e evita cards comprimidos. */
+.hydrology-home {
+  scroll-margin-top: 24px;
+}
+
+.hydrology-home-grid,
+.hydrology-context-column,
+.pelotas-hydrology-widget--home,
+.guaiba-level-card {
+  min-width: 0;
+}
+
+.hydrology-flow li,
+.hydrology-community-note,
+.hydrology-sgb-link {
+  min-width: 0;
+}
+
+.hydrology-flow p,
+.hydrology-community-note p,
+.hydrology-sgb-link strong {
+  overflow-wrap: anywhere;
+}
+
+.hydrology-community-note {
+  align-items: start;
+}
+
+/* Navegação editorial: cards mais claros e menos densos. */
+.home-weather-navigation .related-weather .section-heading {
+  margin-bottom: 24px;
+}
+
+.home-weather-navigation .related-weather-grid a {
+  min-width: 0;
+  min-height: 122px;
+  align-content: start;
+  padding: 20px;
+}
+
+.home-weather-navigation .related-weather-grid a strong,
+.home-weather-navigation .related-weather-grid a span {
+  overflow-wrap: anywhere;
+}
+
+.home-weather-navigation .related-weather-grid a i {
+  align-self: end;
+  justify-self: end;
+  flex: 0 0 auto;
+}
+
+/*
+ * Correção principal do footer:
+ * remove o card claro externo criado pelo refinamento anterior.
+ */
+.site-shell--home > .site-footer {
+  width: 100%;
+  margin: var(--home-section-gap) 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.site-shell--home .portal-footer {
+  min-height: 0;
+  padding: clamp(34px, 4vw, 58px);
+  border-radius: 42px;
+  box-shadow: 0 30px 86px rgba(7, 30, 47, 0.2);
+}
+
+.site-shell--home .portal-footer > *,
+.site-shell--home .portal-footer-intro > *,
+.site-shell--home .portal-footer-directory > *,
+.site-shell--home .portal-footer-bottom > * {
+  min-width: 0;
+}
+
+.site-shell--home .portal-footer-intro {
+  grid-template-columns: minmax(180px, 0.58fr) minmax(360px, 1.55fr) minmax(210px, 0.62fr);
+  gap: clamp(28px, 4vw, 62px);
+}
+
+.site-shell--home .portal-footer-brand {
+  align-self: center;
+}
+
+.site-shell--home .portal-footer-logo {
+  width: min(100%, 215px);
+  max-height: 92px;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.site-shell--home .portal-footer-heading h2 {
+  max-width: 680px;
+  font-size: clamp(2rem, 3vw, 3.25rem);
+  text-wrap: balance;
+}
+
+.site-shell--home .portal-footer-heading p {
+  max-width: 650px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.site-shell--home .portal-footer-status {
+  align-self: center;
+  min-height: 72px;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.075);
+}
+
+.site-shell--home .portal-footer-divider {
+  margin: clamp(30px, 3.5vw, 48px) 0;
+}
+
+.site-shell--home .portal-footer-directory {
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.7fr);
+  gap: clamp(30px, 4vw, 64px);
+}
+
+.site-shell--home .portal-footer-links {
+  gap: clamp(24px, 3vw, 44px);
+}
+
+.site-shell--home .portal-footer-column > strong {
+  margin-bottom: 18px;
+  color: rgba(255, 255, 255, 0.96);
+  font-size: 0.72rem;
+}
+
+.site-shell--home .portal-footer-column ul {
+  gap: 8px;
+}
+
+.site-shell--home .portal-footer-column a {
+  min-height: 34px;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 0.74rem;
+}
+
+.site-shell--home .portal-footer-highlight {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  padding: 28px;
+  border-radius: 28px;
+}
+
+.site-shell--home .portal-footer-highlight h3 {
+  text-wrap: balance;
+}
+
+.site-shell--home .portal-footer-actions {
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.site-shell--home .portal-footer-primary-action,
+.site-shell--home .portal-footer-secondary-action {
+  min-height: 50px;
+}
+
+.site-shell--home .portal-footer-notice {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  min-height: 60px;
+  margin-top: 34px;
+}
+
+.site-shell--home .portal-footer-notice p {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.site-shell--home .portal-footer-bottom {
+  padding-top: 2px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.site-shell--home .portal-footer-bottom a {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+@media (min-width: 901px) {
+  .dashboard-layout--after-hero {
+    grid-template-columns: minmax(360px, 0.4fr) minmax(0, 0.6fr);
+    align-items: start;
+  }
+
+  .dashboard-layout--after-hero .map-panel {
+    top: 18px;
+    height: calc(100svh - 36px);
+    min-height: 680px;
+    max-height: 860px;
+  }
+
+  .dashboard-layout--after-hero .hourly-section,
+  .dashboard-layout--after-hero .weekly-section,
+  .dashboard-layout--after-hero .trend-chart {
+    padding: clamp(26px, 2.65vw, 38px);
+  }
+
+  .embrapa-observation-grid {
+    grid-template-columns: minmax(0, 1.08fr) minmax(270px, 0.7fr) minmax(280px, 0.7fr);
+    align-items: stretch;
+  }
+
+  .embrapa-observation-metrics {
+    align-content: stretch;
+  }
+
+  .embrapa-observation-metrics article {
+    min-height: 0;
+  }
+
+  .hydrology-home-grid {
+    align-items: stretch;
+  }
+
+  .hydrology-context-column {
+    height: 100%;
+  }
+
+  .home-weather-navigation .related-weather-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1320px) {
+  .dashboard-layout--after-hero {
+    grid-template-columns: minmax(330px, 0.37fr) minmax(0, 0.63fr);
+  }
+
+  .dashboard-layout--after-hero .map-panel {
+    min-height: 650px;
+  }
+
+  .embrapa-observation-grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+  }
+
+  .embrapa-station-context {
+    grid-column: 1 / -1;
+  }
+
+  .site-shell--home .portal-footer-intro {
+    grid-template-columns: minmax(170px, 0.52fr) minmax(0, 1.48fr);
+  }
+
+  .site-shell--home .portal-footer-status {
+    grid-column: 1 / -1;
+    width: fit-content;
+    min-width: min(100%, 320px);
+  }
+}
+
+@media (max-width: 900px) {
+  .site-shell--home {
+    --home-section-gap: 10px;
+  }
+
+  .dashboard-layout--after-hero {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dashboard-layout--after-hero .weather-content {
+    order: 1;
+    width: 100%;
+  }
+
+  .dashboard-layout--after-hero .map-panel {
+    order: 2;
+    width: 100%;
+    min-height: 370px;
+  }
+
+  .dashboard-layout--after-hero .section-heading,
+  .dashboard-layout--after-hero .trend-chart-heading {
+    align-items: start;
+  }
+
+  .dashboard-layout--after-hero .section-heading h2,
+  .dashboard-layout--after-hero .trend-chart-heading h2 {
+    font-size: clamp(1.7rem, 7.4vw, 2.35rem);
+  }
+
+  .dashboard-layout--after-hero .sun-times {
+    width: 100%;
+  }
+
+  .dashboard-layout--after-hero .sun-times > span {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+
+  .embrapa-observation-intro,
+  .hydrology-home-intro {
+    gap: 22px;
+  }
+
+  .embrapa-observation-actions,
+  .hydrology-home-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .embrapa-primary-action,
+  .embrapa-secondary-action,
+  .hydrology-primary-action,
+  .hydrology-secondary-action {
+    width: 100%;
+    min-width: 0;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .embrapa-observation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .embrapa-current-topline {
+    align-items: flex-start;
+  }
+
+  .embrapa-current-topline > small {
+    max-width: 44%;
+    text-align: right;
+  }
+
+  .embrapa-primary-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .embrapa-primary-metrics strong {
+    white-space: normal;
+  }
+
+  .embrapa-observation-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .embrapa-observation-metrics article {
+    align-content: start;
+    min-height: 128px;
+  }
+
+  .embrapa-station-map iframe {
+    min-height: 220px;
+  }
+
+  .hydrology-flow {
+    grid-template-columns: repeat(4, minmax(220px, 76vw));
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-inline: contain;
+  }
+
+  .hydrology-flow li {
+    scroll-snap-align: start;
+  }
+
+  .hydrology-community-note {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .hydrology-community-note strong {
+    white-space: normal;
+  }
+
+  .home-weather-navigation .related-weather-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+  .home-weather-navigation .related-weather-grid a {
+    min-width: 0;
+    min-height: 126px;
+  }
+
+  .site-shell--home > .site-footer {
+    margin-top: var(--home-section-gap);
+    padding: 0;
+  }
+
+  .site-shell--home .portal-footer {
+    padding: 28px 22px;
+    border-radius: 28px;
+  }
+
+  .site-shell--home .portal-footer-intro {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .site-shell--home .portal-footer-logo {
+    width: min(100%, 190px);
+    max-height: 78px;
+  }
+
+  .site-shell--home .portal-footer-heading h2 {
+    font-size: clamp(2rem, 8vw, 2.8rem);
+  }
+
+  .site-shell--home .portal-footer-status {
+    width: 100%;
+  }
+
+  .site-shell--home .portal-footer-directory {
+    grid-template-columns: 1fr;
+    gap: 34px;
+  }
+
+  .site-shell--home .portal-footer-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 22px;
+  }
+
+  .site-shell--home .portal-footer-column:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .site-shell--home .portal-footer-highlight {
+    min-height: 0;
+    padding: 24px;
+  }
+
+  .site-shell--home .portal-footer-notice {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  .site-shell--home .portal-footer-notice a {
+    grid-column: 2;
+    justify-self: start;
+    white-space: normal;
+  }
+
+  .site-shell--home .portal-footer-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .site-shell--home .portal-footer-bottom > div {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 560px) {
+  .embrapa-observation-actions,
+  .hydrology-home-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .embrapa-current-topline {
+    display: grid;
+    gap: 10px;
+  }
+
+  .embrapa-current-topline > small {
+    max-width: none;
+    text-align: left;
+  }
+
+  .embrapa-observation-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .embrapa-observation-metrics article {
+    min-height: 92px;
+  }
+
+  .home-weather-navigation .related-weather-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-weather-navigation .related-weather-grid a {
+    min-height: 108px;
+  }
+
+  .site-shell--home .portal-footer {
+    padding: 24px 18px;
+    border-radius: 24px;
+  }
+
+  .site-shell--home .portal-footer-heading h2 {
+    font-size: clamp(1.85rem, 9.5vw, 2.5rem);
+  }
+
+  .site-shell--home .portal-footer-links {
+    grid-template-columns: 1fr;
+    gap: 26px;
+  }
+
+  .site-shell--home .portal-footer-column:last-child {
+    grid-column: auto;
+  }
+
+  .site-shell--home .portal-footer-highlight {
+    padding: 21px;
+    border-radius: 22px;
+  }
+
+  .site-shell--home .portal-footer-actions {
+    padding-top: 20px;
+  }
+
+  .site-shell--home .portal-footer-bottom > div {
+    display: grid;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .site-shell--home .portal-footer-bottom a {
+    display: block;
+    width: fit-content;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-layout--after-hero .hourly-list,
+  .dashboard-layout--after-hero .daily-list,
+  .hydrology-flow {
+    scroll-behavior: auto;
+  }
+}

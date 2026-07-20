@@ -1,0 +1,113 @@
+/*
+ * Escala editorial de leitura v2.
+ * Mantém os títulos atuais e amplia dados, descrições, rótulos e ações.
+ */
+
+/* Homepage: resumo, horas e próximos dias. */
+.site-shell--home-editorial .home-today-facts dt{font-size:.75rem;line-height:1.3}
+.site-shell--home-editorial .home-today-facts dd{font-size:clamp(1.35rem,1.8vw,1.72rem);line-height:1.05}
+.site-shell--home-editorial .home-advisory-strip small{font-size:.72rem}
+.site-shell--home-editorial .home-advisory-strip strong{font-size:1.1rem;line-height:1.35}
+.site-shell--home-editorial .home-advisory-strip p{font-size:.9rem;line-height:1.6}
+.site-shell--home-editorial .home-advisory-strip>a{font-size:.86rem}
+.site-shell--home-editorial .home-hourly-story article{min-height:188px;padding-top:22px;padding-bottom:22px}
+.site-shell--home-editorial .home-hourly-story article>span{font-size:.8rem}
+.site-shell--home-editorial .home-hourly-story article strong{font-size:1.76rem}
+.site-shell--home-editorial .home-hourly-story article small{font-size:.78rem;line-height:1.35}
+.site-shell--home-editorial .home-next-days__list article{min-height:80px}
+.site-shell--home-editorial .home-next-days__list article>div strong{font-size:.98rem}
+.site-shell--home-editorial .home-next-days__list article>div span,
+.site-shell--home-editorial .home-next-days__list article>span{font-size:.8rem}
+.site-shell--home-editorial .home-next-days__list article>b{font-size:1.12rem}
+.site-shell--home-editorial .home-next-days__list article>b small{font-size:.86rem}
+.site-shell--home-editorial .home-inline-links a{font-size:.86rem}
+
+/* Homepage: observação, águas e navegação. */
+.site-shell--home-editorial .home-observation-temperature small{font-size:.75rem}
+.site-shell--home-editorial .home-observation-temperature span{font-size:.92rem}
+.site-shell--home-editorial .home-observation-story__reading dt{font-size:.7rem}
+.site-shell--home-editorial .home-observation-story__reading dd{font-size:clamp(1.18rem,1.55vw,1.48rem)}
+.site-shell--home-editorial .home-water-focus__topline span{font-size:1.02rem}
+.site-shell--home-editorial .home-water-focus__topline small,
+.site-shell--home-editorial .home-water-focus__topline>b{font-size:.7rem}
+.site-shell--home-editorial .home-water-trend{font-size:.9rem}
+.site-shell--home-editorial .home-water-focus dt{font-size:.64rem}
+.site-shell--home-editorial .home-water-focus dd{font-size:.86rem;line-height:1.35}
+.site-shell--home-editorial .home-water-table__heading>small{font-size:.76rem}
+.site-shell--home-editorial .home-water-table__rows article,
+.site-shell--home-editorial .home-water-context{min-height:86px}
+.site-shell--home-editorial .home-water-table__rows article>div strong,
+.site-shell--home-editorial .home-water-context>div strong{font-size:.98rem}
+.site-shell--home-editorial .home-water-table__rows article>div span,
+.site-shell--home-editorial .home-water-context>div span{font-size:.73rem}
+.site-shell--home-editorial .home-water-table__rows article>b,
+.site-shell--home-editorial .home-water-context>b{font-size:1.04rem}
+.site-shell--home-editorial .home-water-table__rows article>span,
+.site-shell--home-editorial .home-water-context>span{font-size:.78rem}
+.site-shell--home-editorial .home-water-table__rows article>small,
+.site-shell--home-editorial .home-water-context>small{font-size:.7rem;line-height:1.4}
+.site-shell--home-editorial .home-water-story__footer p{font-size:.82rem;line-height:1.65}
+.site-shell--home-editorial .home-explore-groups h3{font-size:.75rem}
+.site-shell--home-editorial .home-explore-groups a{min-height:64px;font-size:.96rem}
+
+/* Avisos do INMET. */
+.inmet-alerts-heading p{font-size:1.04rem;line-height:1.7}
+.inmet-source-status{font-size:.73rem}
+.inmet-alerts-counts span{font-size:.7rem}
+.inmet-alert-group>header p{font-size:.88rem;line-height:1.6}
+.inmet-alert-severity,.inmet-alert-relevance,.inmet-alert-event{font-size:.71rem}
+.inmet-alert-card__heading p{font-size:.84rem}
+.inmet-alert-area,.inmet-alert-description{font-size:.96rem;line-height:1.72}
+.inmet-alert-card summary{font-size:.86rem}
+.inmet-alert-card details p{font-size:.92rem;line-height:1.72}
+.inmet-alert-card>a,.inmet-alerts-empty>a,.inmet-alerts-footer>a{font-size:.86rem}
+.inmet-alerts-footer p{font-size:.82rem;line-height:1.65}
+.inmet-alerts-empty p{font-size:.94rem;line-height:1.68}
+.site-shell--home-editorial .home-inmet-alerts__copy>span{font-size:.71rem}
+.site-shell--home-editorial .home-inmet-alerts p{font-size:.84rem}
+.site-shell--home-editorial .home-inmet-alerts>a{font-size:.84rem}
+
+/* Páginas internas: mantém títulos e amplia leitura corrente. */
+.site-shell--topic .main-nav a{font-size:.84rem}
+.site-shell--topic .header-action{font-size:.86rem}
+.site-shell--topic .topic-hero .eyebrow{font-size:.77rem}
+.site-shell--topic .topic-hero p{font-size:clamp(1.06rem,1.22vw,1.2rem);line-height:1.72}
+.site-shell--topic .topic-hero-status span{font-size:.72rem}
+.site-shell--topic .topic-hero-status small{font-size:.88rem}
+.site-shell--topic .section-heading .eyebrow,
+.site-shell--topic .topic-section .eyebrow,
+.site-shell--topic .related-weather .eyebrow{font-size:.75rem}
+.site-shell--topic .section-heading>p{font-size:.96rem;line-height:1.68}
+.site-shell--topic .topic-metrics article>span{font-size:.74rem}
+.site-shell--topic .topic-metrics article>small{font-size:.86rem;line-height:1.55}
+.site-shell--topic .data-table-head{font-size:.73rem}
+.site-shell--topic .data-table-row{min-height:74px;font-size:.9rem}
+.site-shell--topic .data-table-row small{font-size:.78rem}
+.site-shell--topic .copy-columns p,
+.site-shell--topic .threshold-grid p,
+.site-shell--topic .methodology-rules-grid p,
+.site-shell--topic .methodology-source-grid p,
+.site-shell--topic .hydrology-stations-grid p,
+.site-shell--topic .raw-data-grid span,
+.site-shell--topic .lagoon-disclaimer p,
+.site-shell--topic .advisory-panel p,
+.site-shell--topic .advisory-panel li{font-size:.95rem;line-height:1.7}
+.site-shell--topic .copy-columns h3,
+.site-shell--topic .threshold-grid h3{font-size:1.12rem}
+
+@media(max-width:720px){
+.site-shell--home-editorial .home-today-facts dt{font-size:.68rem}
+.site-shell--home-editorial .home-today-facts dd{font-size:1.28rem}
+.site-shell--home-editorial .home-hourly-story article{min-height:174px}
+.site-shell--home-editorial .home-hourly-story article>span{font-size:.74rem}
+.site-shell--home-editorial .home-hourly-story article strong{font-size:1.62rem}
+.site-shell--home-editorial .home-hourly-story article small{font-size:.72rem}
+.site-shell--home-editorial .home-next-days__list article>div strong{font-size:.92rem}
+.site-shell--home-editorial .home-next-days__list article>div span,
+.site-shell--home-editorial .home-next-days__list article>span{font-size:.74rem}
+.site-shell--home-editorial .home-water-table__rows article>div strong,
+.site-shell--home-editorial .home-water-context>div strong{font-size:.92rem}
+.site-shell--topic .topic-hero p{font-size:1rem}
+.site-shell--topic .section-heading>p{font-size:.92rem}
+.inmet-alert-area,.inmet-alert-description{font-size:.9rem}
+}

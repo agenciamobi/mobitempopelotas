@@ -1,0 +1,274 @@
+.site-shell--home {
+  position: relative;
+}
+
+@media (min-width: 901px) {
+  .site-shell--home > .site-header--hero {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    left: 18px;
+    z-index: 40;
+    grid-template-columns: minmax(220px, 285px) minmax(0, 1fr) auto;
+    min-height: 86px;
+    padding: 0 24px;
+    border: 0;
+    border-radius: 42px 42px 0 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .site-header--hero .brand {
+    align-self: center;
+    display: flex;
+    width: fit-content;
+    min-height: 52px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .site-header--hero .brand-logo {
+    width: clamp(158px, 12vw, 194px);
+    max-height: 31px;
+    filter: brightness(0) invert(1) drop-shadow(0 2px 12px rgba(0, 0, 0, 0.28));
+  }
+
+  .site-header--hero .main-nav {
+    justify-self: start;
+    gap: clamp(9px, 1.25vw, 22px);
+    margin-left: clamp(8px, 2vw, 34px);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .site-header--hero .main-nav a {
+    position: relative;
+    padding: 13px 4px;
+    border-radius: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.78rem;
+    text-shadow: 0 1px 18px rgba(0, 0, 0, 0.34);
+  }
+
+  .site-header--hero .main-nav a::after {
+    content: "";
+    position: absolute;
+    right: 4px;
+    bottom: 5px;
+    left: 4px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    opacity: 0;
+    transform: scaleX(0.35);
+    transition: opacity 160ms ease, transform 160ms ease;
+  }
+
+  .site-header--hero .main-nav a:hover,
+  .site-header--hero .main-nav a:focus-visible,
+  .site-header--hero .main-nav a.is-active {
+    background: transparent;
+    color: white;
+    box-shadow: none;
+  }
+
+  .site-header--hero .main-nav a:hover::after,
+  .site-header--hero .main-nav a:focus-visible::after,
+  .site-header--hero .main-nav a.is-active::after {
+    opacity: 0.86;
+    transform: scaleX(1);
+  }
+
+  .site-header--hero .header-action {
+    min-height: 50px;
+    padding: 0 20px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 13px;
+    background: rgba(7, 30, 47, 0.68);
+    box-shadow: 0 14px 32px rgba(3, 16, 27, 0.2);
+    backdrop-filter: blur(15px) saturate(130%);
+  }
+
+  .site-header--hero .header-action--attention {
+    border-color: rgba(255, 213, 148, 0.42);
+    background: #e99232;
+    color: #1d130b;
+  }
+
+  .site-header--hero .header-action--warning {
+    border-color: rgba(255, 205, 196, 0.42);
+    background: #ef5e51;
+  }
+
+  .site-header--hero .header-action--attention .header-action-dot,
+  .site-header--hero .header-action--warning .header-action-dot {
+    background: white;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.16);
+  }
+
+  .site-header--hero .header-action:hover,
+  .site-header--hero .header-action:focus-visible {
+    filter: brightness(1.06);
+    transform: translateY(-1px);
+  }
+
+  .site-shell--home > .weather-hero {
+    min-height: min(820px, calc(100svh - 36px));
+    margin-top: 0;
+    border-radius: 42px;
+  }
+
+  .site-shell--home > .weather-hero::before {
+    display: none;
+  }
+
+  .site-shell--home > .weather-hero::after {
+    width: clamp(330px, 27%, 440px);
+    height: 98px;
+    border-radius: 98px 0 0 0;
+  }
+
+  .site-shell--home .weather-hero-content {
+    grid-template-columns: minmax(0, 1.03fr) minmax(410px, 0.82fr);
+    gap: clamp(38px, 4.4vw, 76px);
+    padding-top: 132px;
+    padding-right: clamp(48px, 5vw, 88px);
+    padding-bottom: 112px;
+    padding-left: clamp(72px, 10vw, 174px);
+  }
+
+  .site-shell--home .weather-hero-copy {
+    max-width: 660px;
+  }
+
+  .site-shell--home .weather-hero-status {
+    padding: 9px 14px;
+    font-size: 0.72rem;
+  }
+
+  .site-shell--home .weather-hero-kicker {
+    margin-top: 24px;
+    margin-bottom: 11px;
+  }
+
+  .site-shell--home .weather-hero h1 {
+    max-width: 660px;
+    font-size: clamp(3.35rem, 4vw, 4.9rem);
+    line-height: 0.98;
+    letter-spacing: -0.056em;
+  }
+
+  .site-shell--home .weather-hero-description {
+    max-width: 580px;
+    margin-top: 22px;
+    font-size: clamp(0.94rem, 1vw, 1.05rem);
+    line-height: 1.62;
+  }
+
+  .site-shell--home .weather-hero-reasons {
+    gap: 9px;
+    margin-top: 18px;
+  }
+
+  .site-shell--home .weather-hero-reasons span {
+    min-height: 36px;
+    padding: 8px 13px 8px 30px;
+    font-size: 0.72rem;
+  }
+
+  .site-shell--home .weather-hero-actions {
+    margin-top: 27px;
+  }
+
+  .site-shell--home .weather-hero-primary,
+  .site-shell--home .weather-hero-secondary {
+    min-height: 52px;
+  }
+
+  .site-shell--home .weather-hero-now {
+    width: min(100%, 500px);
+    padding: 22px;
+    border-radius: 30px;
+    transform: translateY(8px);
+  }
+
+  .site-shell--home .weather-hero-now-heading {
+    align-items: flex-start;
+  }
+
+  .site-shell--home .weather-hero-now-heading small {
+    display: block;
+    max-width: 300px;
+    margin-top: 2px;
+    font-size: 0.66rem;
+    line-height: 1.4;
+  }
+
+  .site-shell--home .weather-hero-visual {
+    min-height: 224px;
+  }
+
+  .site-shell--home .weather-hero-temperature > strong {
+    font-size: clamp(5.25rem, 6.3vw, 7.4rem);
+  }
+
+  .site-shell--home .weather-hero-scroll {
+    right: clamp(132px, 10vw, 176px);
+    bottom: 25px;
+  }
+
+  .site-shell--home .weather-hero-credit {
+    bottom: 16px;
+    left: 22px;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1220px) {
+  .site-shell--home > .site-header--hero {
+    grid-template-columns: minmax(185px, 225px) minmax(0, 1fr) auto;
+    padding-inline: 18px;
+  }
+
+  .site-header--hero .brand-logo {
+    width: clamp(145px, 14vw, 166px);
+  }
+
+  .site-header--hero .main-nav {
+    gap: 8px;
+    margin-left: 4px;
+  }
+
+  .site-header--hero .main-nav a {
+    padding-inline: 3px;
+    font-size: 0.72rem;
+  }
+
+  .site-shell--home .weather-hero-content {
+    grid-template-columns: minmax(0, 1fr) minmax(370px, 0.78fr);
+    padding-right: 36px;
+    padding-left: clamp(48px, 6vw, 78px);
+  }
+
+  .site-shell--home .weather-hero h1 {
+    font-size: clamp(3.15rem, 4.6vw, 4.25rem);
+  }
+}
+
+@media (max-width: 900px) {
+  .site-shell--home > .site-header--hero {
+    position: sticky;
+  }
+
+  .site-shell--home > .weather-hero {
+    margin-top: 12px;
+  }
+}

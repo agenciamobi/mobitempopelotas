@@ -1,0 +1,78 @@
+@media (max-width: 900px) {
+  :root {
+    --mobile-tab-safe-height: calc(var(--mobile-tab-height) + env(safe-area-inset-bottom));
+  }
+
+  body {
+    min-height: 100dvh;
+  }
+
+  .site-shell {
+    min-height: 100dvh;
+    padding-bottom: calc(var(--mobile-tab-safe-height) + 20px);
+  }
+
+  .mobile-tab-bar {
+    min-height: var(--mobile-tab-safe-height);
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  .mobile-tab-bar a {
+    min-height: 54px;
+  }
+
+  .pwa-dialog-backdrop {
+    min-height: 100dvh;
+  }
+
+  .pwa-dialog {
+    padding-bottom: calc(22px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  html,
+  body {
+    min-height: 100dvh;
+    overscroll-behavior: none;
+  }
+
+  body {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .site-shell {
+    min-height: calc(100dvh - env(safe-area-inset-top));
+  }
+}
+
+@media (display-mode: standalone) and (max-width: 900px),
+  (display-mode: fullscreen) and (max-width: 900px) {
+  .site-header {
+    top: 0;
+    padding-top: 9px;
+  }
+
+  .mobile-tab-bar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  .pwa-launcher {
+    bottom: calc(var(--mobile-tab-height) + 14px + env(safe-area-inset-bottom));
+  }
+}
+
+@supports (padding: max(0px)) {
+  @media (display-mode: standalone) and (max-width: 900px),
+    (display-mode: fullscreen) and (max-width: 900px) {
+    .mobile-tab-bar {
+      padding-right: max(8px, env(safe-area-inset-right));
+      padding-left: max(8px, env(safe-area-inset-left));
+    }
+  }
+}

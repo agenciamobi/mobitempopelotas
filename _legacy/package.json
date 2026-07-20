@@ -1,0 +1,32 @@
+{
+  "name": "tempopelotas",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 5175",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "pwa:keys": "web-push generate-vapid-keys --json",
+    "windy:diagnose": "node scripts/windy-stations-diagnostic.mjs"
+  },
+  "dependencies": {
+    "maplibre-gl": "5.24.0",
+    "next": "16.2.10",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "web-push": "3.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@types/web-push": "3.6.4",
+    "tailwindcss": "4.3.3",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}

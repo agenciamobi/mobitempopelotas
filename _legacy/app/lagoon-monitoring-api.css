@@ -1,0 +1,210 @@
+.lagoon-monitoring-reading-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.lagoon-monitoring-reading-row .lagoon-monitoring-reading {
+  min-width: 0;
+  margin-top: 0;
+}
+
+.lagoon-monitoring-trend {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.065);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.lagoon-monitoring-trend > b {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.09);
+  color: white;
+  font-size: 0.68rem;
+}
+
+.lagoon-monitoring-trend > span {
+  display: grid;
+  gap: 1px;
+}
+
+.lagoon-monitoring-trend strong {
+  color: white;
+  font-size: 0.55rem;
+}
+
+.lagoon-monitoring-trend small {
+  color: currentColor;
+  font-size: 0.48rem;
+  white-space: nowrap;
+}
+
+.lagoon-monitoring-trend.is-rising {
+  background: rgba(242, 112, 53, 0.12);
+  color: #ffad85;
+}
+
+.lagoon-monitoring-trend.is-falling {
+  background: rgba(24, 189, 205, 0.11);
+  color: #68e3ed;
+}
+
+.lagoon-monitoring-trend.is-stable {
+  background: rgba(94, 44, 237, 0.12);
+  color: #b8a6ff;
+}
+
+.lagoon-monitoring-chart {
+  position: relative;
+  overflow: hidden;
+  margin-top: 11px;
+  padding: 8px 8px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.035);
+  color: var(--brand-cyan, #18bdcd);
+}
+
+.lagoon-monitoring-chart > div {
+  position: absolute;
+  z-index: 2;
+  top: 6px;
+  right: 8px;
+  left: 8px;
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.36);
+  font-size: 0.43rem;
+  pointer-events: none;
+}
+
+.lagoon-monitoring-chart svg {
+  display: block;
+  width: 100%;
+  height: 54px;
+  overflow: visible;
+}
+
+.lagoon-monitoring-chart-area {
+  fill: currentColor;
+  opacity: 0.09;
+  stroke: none;
+}
+
+.lagoon-monitoring-chart-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.lagoon-monitoring-chart > small {
+  display: block;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.36);
+  font-size: 0.44rem;
+  text-align: right;
+}
+
+.lagoon-monitoring-card.risk-attention .lagoon-monitoring-chart {
+  color: var(--brand-orange, #f27035);
+}
+
+.lagoon-monitoring-card.risk-flooding .lagoon-monitoring-chart {
+  color: var(--brand-magenta, #e70b85);
+}
+
+.lagoon-monitoring-card {
+  min-height: 390px;
+}
+
+.lagoon-monitoring-metrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.lagoon-monitoring-metrics div {
+  padding: 8px 7px;
+}
+
+.lagoon-monitoring-metrics dt {
+  font-size: 0.43rem;
+}
+
+.lagoon-monitoring-metrics dd {
+  overflow-wrap: anywhere;
+  font-size: 0.58rem;
+}
+
+.lagoon-monitoring-role {
+  min-height: 42px;
+}
+
+@media (max-width: 1450px) and (min-width: 1261px) {
+  .lagoon-monitoring-reading-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .lagoon-monitoring-trend {
+    width: 100%;
+  }
+}
+
+@media (max-width: 1260px) {
+  .lagoon-monitoring-card {
+    min-height: 410px;
+  }
+
+  .lagoon-monitoring-reading-row {
+    align-items: flex-end;
+    flex-direction: row;
+  }
+}
+
+@media (max-width: 860px) {
+  .lagoon-monitoring-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .lagoon-monitoring-card {
+    min-height: 410px;
+  }
+
+  .lagoon-monitoring-reading-row {
+    align-items: flex-end;
+  }
+
+  .lagoon-monitoring-chart svg {
+    height: 58px;
+  }
+}
+
+@media (max-width: 360px) {
+  .lagoon-monitoring-reading-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .lagoon-monitoring-trend {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lagoon-monitoring-chart-line {
+    transition: none;
+  }
+}

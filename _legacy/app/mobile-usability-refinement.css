@@ -1,0 +1,688 @@
+@media (max-width: 900px) {
+  :root {
+    --mobile-gutter: 10px;
+    --mobile-card-radius: 24px;
+    --mobile-tab-height: 72px;
+  }
+
+  html {
+    scroll-padding-top: calc(82px + env(safe-area-inset-top));
+  }
+
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  a,
+  button,
+  summary {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  summary:focus-visible {
+    outline: 3px solid rgba(24, 189, 205, 0.34);
+    outline-offset: 3px;
+  }
+
+  .site-shell {
+    padding-bottom: calc(var(--mobile-tab-height) + 22px + env(safe-area-inset-bottom));
+  }
+
+  .site-header {
+    min-height: calc(68px + env(safe-area-inset-top));
+    padding: calc(8px + env(safe-area-inset-top)) 14px 8px;
+  }
+
+  .site-header .header-action {
+    width: 46px;
+    height: 46px;
+    min-height: 46px;
+    border-radius: 14px;
+  }
+
+  /* A home usa o cabeçalho como parte visual do hero. Páginas internas mantêm o header claro e sticky. */
+  .site-shell--home > .site-header--hero {
+    position: absolute;
+    top: 12px;
+    right: var(--mobile-gutter);
+    left: var(--mobile-gutter);
+    z-index: 45;
+    min-height: calc(72px + env(safe-area-inset-top));
+    padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
+    border: 0;
+    border-radius: 28px 28px 0 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .site-shell--home .site-header--hero .brand {
+    min-height: 46px;
+    padding: 0;
+    background: transparent;
+  }
+
+  .site-shell--home .site-header--hero .brand-logo {
+    width: clamp(132px, 39vw, 158px);
+    max-height: 25px;
+    filter: brightness(0) invert(1) drop-shadow(0 2px 12px rgba(0, 0, 0, 0.42));
+  }
+
+  .site-shell--home .site-header--hero .header-action {
+    border-color: rgba(255, 255, 255, 0.24);
+    background: rgba(5, 24, 38, 0.58);
+    color: white;
+    box-shadow: 0 10px 28px rgba(2, 13, 23, 0.22);
+    backdrop-filter: blur(14px) saturate(130%);
+  }
+
+  .site-shell--home .site-header--hero .header-action--attention {
+    border-color: rgba(255, 221, 170, 0.42);
+    background: #e99232;
+    color: #1d130b;
+  }
+
+  .site-shell--home .site-header--hero .header-action--warning {
+    border-color: rgba(255, 218, 211, 0.42);
+    background: #ef5e51;
+    color: white;
+  }
+
+  .site-shell--home .site-header--hero .header-action-icon {
+    width: 21px;
+    height: 21px;
+  }
+
+  .site-shell--home > .weather-hero {
+    margin: 12px var(--mobile-gutter) 0;
+    border-radius: 28px;
+  }
+
+  .site-shell--home > .weather-hero::before,
+  .site-shell--home > .weather-hero::after {
+    display: none;
+  }
+
+  .site-shell--home .weather-hero-overlay {
+    box-shadow: inset 0 112px 92px -82px rgba(0, 0, 0, 0.78);
+  }
+
+  .site-shell--home .weather-hero-content {
+    gap: 20px;
+    padding: calc(96px + env(safe-area-inset-top)) 16px 18px;
+  }
+
+  .site-shell--home .weather-hero-copy {
+    min-width: 0;
+  }
+
+  .site-shell--home .weather-hero-status {
+    max-width: 100%;
+    padding: 9px 12px;
+    font-size: 0.7rem;
+    line-height: 1.35;
+    white-space: normal;
+  }
+
+  .site-shell--home .weather-hero-kicker {
+    margin: 20px 0 10px;
+    font-size: 0.7rem;
+    line-height: 1.35;
+    letter-spacing: 0.12em;
+  }
+
+  .site-shell--home .weather-hero h1 {
+    max-width: 100%;
+    font-size: clamp(2.4rem, 10.8vw, 3.5rem);
+    line-height: 0.98;
+    letter-spacing: -0.052em;
+    text-wrap: balance;
+  }
+
+  .site-shell--home .weather-hero h1 span {
+    margin-top: 3px;
+  }
+
+  .site-shell--home .weather-hero-description {
+    max-width: 42rem;
+    margin-top: 17px;
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 0.93rem;
+    line-height: 1.62;
+  }
+
+  .site-shell--home .weather-hero-reasons {
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .site-shell--home .weather-hero-reasons span {
+    min-height: 43px;
+    padding: 11px 12px 11px 32px;
+    border-radius: 14px;
+    font-size: 0.75rem;
+    line-height: 1.42;
+  }
+
+  .site-shell--home .weather-hero-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+    margin-top: 21px;
+  }
+
+  .site-shell--home .weather-hero-primary,
+  .site-shell--home .weather-hero-secondary {
+    width: 100%;
+    min-height: 52px;
+    padding: 0 15px;
+    border-radius: 14px;
+    font-size: 0.8rem;
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  .site-shell--home .weather-hero-primary {
+    justify-content: space-between;
+  }
+
+  .site-shell--home .weather-hero-now {
+    width: 100%;
+    padding: 16px;
+    border-radius: 22px;
+    transform: none;
+    box-shadow: 0 20px 48px rgba(2, 14, 24, 0.26);
+    backdrop-filter: blur(16px) saturate(125%);
+  }
+
+  .site-shell--home .weather-hero-now-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 10px;
+  }
+
+  .site-shell--home .weather-hero-now-heading > div {
+    min-width: 0;
+  }
+
+  .site-shell--home .weather-hero-now-heading > div > span {
+    font-size: 0.92rem;
+  }
+
+  .site-shell--home .weather-hero-now-heading small {
+    max-width: none;
+    margin-top: 4px;
+    overflow-wrap: anywhere;
+    color: rgba(255, 255, 255, 0.68);
+    font-size: 0.7rem;
+    line-height: 1.42;
+  }
+
+  .site-shell--home .weather-hero-live {
+    padding: 7px 9px;
+    font-size: 0.59rem !important;
+  }
+
+  .site-shell--home .weather-hero-visual {
+    grid-template-columns: minmax(94px, 0.72fr) minmax(0, 1.28fr);
+    gap: 8px;
+    min-height: 166px;
+    margin-top: 4px;
+  }
+
+  .site-shell--home .weather-hero-icon svg {
+    width: min(100%, 112px);
+  }
+
+  .site-shell--home .weather-hero-temperature {
+    min-width: 0;
+    gap: 9px;
+  }
+
+  .site-shell--home .weather-hero-temperature > strong {
+    font-size: clamp(4.45rem, 21vw, 6rem);
+    line-height: 0.82;
+  }
+
+  .site-shell--home .weather-hero-temperature span {
+    max-width: 100%;
+    font-size: 0.94rem;
+    line-height: 1.25;
+  }
+
+  .site-shell--home .weather-hero-temperature small {
+    font-size: 0.69rem;
+    line-height: 1.35;
+  }
+
+  .site-shell--home .weather-hero-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .site-shell--home .weather-hero-metric {
+    grid-template-columns: 26px minmax(0, 1fr);
+    min-height: 64px;
+    gap: 8px;
+    padding: 10px 11px;
+    border-radius: 15px;
+  }
+
+  .site-shell--home .weather-hero-metric > svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .site-shell--home .weather-hero-metric span {
+    font-size: 0.64rem;
+    line-height: 1.25;
+  }
+
+  .site-shell--home .weather-hero-metric strong {
+    overflow: visible;
+    font-size: 0.82rem;
+    line-height: 1.25;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .dashboard-layout,
+  .home-weather-navigation,
+  .embrapa-observation-home,
+  .hydrology-home,
+  .site-footer {
+    margin-right: var(--mobile-gutter);
+    margin-left: var(--mobile-gutter);
+  }
+
+  .dashboard-layout {
+    gap: 10px;
+  }
+
+  .current-weather,
+  .hourly-section,
+  .weekly-section,
+  .map-panel,
+  .alert-card,
+  .topic-hero,
+  .topic-section,
+  .related-weather,
+  .topic-current-card,
+  .wind-hero,
+  .advisory-panel {
+    border-radius: var(--mobile-card-radius);
+  }
+
+  .section-heading,
+  .map-panel-heading {
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .section-heading h2,
+  .map-panel-heading h2 {
+    font-size: clamp(1.5rem, 7vw, 2rem);
+    line-height: 1.03;
+  }
+
+  .section-heading > p,
+  .map-panel-heading > p {
+    font-size: 0.8rem;
+    line-height: 1.55;
+  }
+
+  .hourly-list,
+  .week-forecast-grid,
+  .related-weather-grid,
+  .embrapa-observation-metrics,
+  .embrapa-page-current-grid,
+  .embrapa-accumulated-grid,
+  .embrapa-extremes-grid,
+  .hydrology-flow {
+    scroll-snap-stop: always;
+    overscroll-behavior-x: contain;
+  }
+
+  .hourly-list article {
+    flex-basis: 94px;
+    min-width: 94px;
+  }
+
+  .alert-card {
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    align-items: center;
+    gap: 11px;
+    padding: 16px 14px;
+  }
+
+  .alert-card p {
+    display: block;
+    overflow: visible;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    -webkit-line-clamp: unset;
+  }
+
+  .alert-card > a {
+    width: 44px;
+    height: 44px;
+  }
+
+  .map-panel,
+  .map-canvas {
+    min-height: 410px;
+  }
+
+  .embrapa-observation-home {
+    padding: 20px 14px 14px;
+  }
+
+  .embrapa-observation-intro h2 {
+    font-size: clamp(2rem, 9.6vw, 3rem);
+    line-height: 0.98;
+  }
+
+  .embrapa-observation-intro p,
+  .embrapa-station-context > p,
+  .hydrology-home-intro p {
+    font-size: 0.87rem;
+    line-height: 1.62;
+  }
+
+  .embrapa-primary-action,
+  .embrapa-secondary-action,
+  .hydrology-primary-action,
+  .hydrology-secondary-action {
+    min-height: 50px;
+    font-size: 0.8rem;
+  }
+
+  .embrapa-current-card,
+  .embrapa-station-context {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .embrapa-temperature-reading {
+    align-items: flex-end;
+    flex-direction: row;
+    gap: 14px;
+    margin: 24px 0;
+  }
+
+  .embrapa-temperature-reading > span {
+    font-size: clamp(4.6rem, 22vw, 5.8rem);
+  }
+
+  .embrapa-temperature-reading > div {
+    padding-bottom: 2px;
+  }
+
+  .embrapa-primary-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .embrapa-primary-metrics > div:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .embrapa-observation-metrics article {
+    min-width: min(82vw, 300px);
+  }
+
+  .embrapa-station-map {
+    min-height: 190px;
+  }
+
+  .embrapa-station-map iframe {
+    min-height: 190px;
+  }
+
+  .embrapa-station-map > a {
+    min-height: 58px;
+    padding: 9px 12px;
+  }
+
+  .embrapa-station-map > a strong {
+    font-size: 0.76rem;
+  }
+
+  .embrapa-station-map > a small {
+    font-size: 0.64rem;
+  }
+
+  .hydrology-home {
+    padding: 20px 14px 16px;
+    border-radius: 26px;
+  }
+
+  .hydrology-home-intro h2 {
+    font-size: clamp(2rem, 9.8vw, 3.25rem);
+    line-height: 0.98;
+  }
+
+  .hydrology-flow li {
+    min-height: 152px;
+  }
+
+  .hydrology-community-note {
+    grid-template-columns: 1fr;
+    gap: 7px;
+    padding: 16px;
+  }
+
+  .hydrology-community-note strong {
+    white-space: normal;
+  }
+
+  .mobile-tab-bar {
+    min-height: calc(var(--mobile-tab-height) + env(safe-area-inset-bottom));
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+  }
+
+  .mobile-tab-bar a {
+    grid-template-rows: 30px auto;
+    min-height: 58px;
+    border-radius: 15px;
+    color: #607985;
+    font-size: 0.66rem;
+    font-weight: 790;
+    white-space: nowrap;
+  }
+
+  .mobile-tab-bar a.is-active {
+    background: rgba(24, 189, 205, 0.14);
+    color: #071e2f;
+  }
+
+  .mobile-tab-bar a.is-active::before {
+    width: 30px;
+    background: #1798b1;
+  }
+
+  .mobile-tab-icon svg {
+    width: 23px;
+    height: 23px;
+    stroke-width: 1.9;
+  }
+
+  .pwa-launcher {
+    right: 10px;
+    bottom: calc(var(--mobile-tab-height) + 10px + env(safe-area-inset-bottom));
+    min-width: 48px;
+    min-height: 48px;
+    padding: 8px;
+  }
+
+  .pwa-dialog-close {
+    width: 44px;
+    height: 44px;
+  }
+
+  .pwa-dialog h2 {
+    font-size: clamp(1.7rem, 8vw, 2.15rem);
+    line-height: 1.02;
+  }
+
+  .pwa-dialog-intro {
+    font-size: 0.86rem;
+    line-height: 1.58;
+  }
+
+  .pwa-option-list article {
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .pwa-option-list strong {
+    font-size: 0.86rem;
+  }
+
+  .pwa-option-list p {
+    font-size: 0.74rem;
+    line-height: 1.5;
+  }
+
+  .pwa-option-list button,
+  .pwa-test-button {
+    min-height: 48px;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-shell--home .weather-hero-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .site-shell--home .weather-hero-primary,
+  .site-shell--home .weather-hero-secondary {
+    justify-content: center;
+  }
+
+  .site-shell--home .weather-hero-primary span {
+    position: absolute;
+    right: 17px;
+  }
+
+  .embrapa-observation-actions,
+  .hydrology-home-actions {
+    gap: 8px;
+  }
+}
+
+@media (max-width: 420px) {
+  :root {
+    --mobile-gutter: 8px;
+    --mobile-card-radius: 22px;
+  }
+
+  .site-shell--home > .site-header--hero {
+    padding-right: 12px;
+    padding-left: 13px;
+  }
+
+  .site-shell--home .site-header--hero .brand-logo {
+    width: min(39vw, 132px);
+  }
+
+  .site-shell--home .site-header--hero .header-action {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+
+  .site-shell--home .weather-hero-content {
+    padding-right: 13px;
+    padding-left: 13px;
+  }
+
+  .site-shell--home .weather-hero h1 {
+    font-size: clamp(2.25rem, 11.2vw, 2.9rem);
+  }
+
+  .site-shell--home .weather-hero-description {
+    font-size: 0.89rem;
+  }
+
+  .site-shell--home .weather-hero-now {
+    padding: 14px;
+  }
+
+  .site-shell--home .weather-hero-visual {
+    grid-template-columns: 88px minmax(0, 1fr);
+    min-height: 152px;
+  }
+
+  .site-shell--home .weather-hero-icon svg {
+    width: 98px;
+  }
+
+  .site-shell--home .weather-hero-temperature > strong {
+    font-size: clamp(4.1rem, 21vw, 5rem);
+  }
+
+  .site-shell--home .weather-hero-metric {
+    grid-template-columns: 23px minmax(0, 1fr);
+    padding: 9px;
+  }
+
+  .site-shell--home .weather-hero-metric strong {
+    font-size: 0.76rem;
+  }
+
+  .embrapa-temperature-reading {
+    gap: 10px;
+  }
+
+  .embrapa-temperature-reading > span {
+    font-size: clamp(4.2rem, 22vw, 5rem);
+  }
+
+  .mobile-tab-bar a {
+    font-size: 0.62rem;
+  }
+}
+
+@media (max-width: 350px) {
+  .site-shell--home .site-header--hero .brand-logo {
+    width: 112px;
+  }
+
+  .site-shell--home .weather-hero h1 {
+    font-size: 2.08rem;
+  }
+
+  .site-shell--home .weather-hero-visual {
+    grid-template-columns: 78px minmax(0, 1fr);
+  }
+
+  .site-shell--home .weather-hero-icon svg {
+    width: 88px;
+  }
+
+  .site-shell--home .weather-hero-temperature > strong {
+    font-size: 3.75rem;
+  }
+
+  .mobile-tab-bar a {
+    font-size: 0.58rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width: 900px) {
+  .mobile-tab-bar a,
+  .weather-hero-primary,
+  .weather-hero-secondary,
+  .header-action,
+  .embrapa-primary-action,
+  .embrapa-secondary-action,
+  .hydrology-primary-action,
+  .hydrology-secondary-action {
+    transition: none;
+  }
+}

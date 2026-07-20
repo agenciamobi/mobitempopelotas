@@ -1,0 +1,40 @@
+@media (max-width: 900px) {
+  .hourly-list article,
+  .week-forecast-grid article,
+  .related-weather-grid a,
+  .embrapa-observation-metrics article,
+  .embrapa-page-current-grid article,
+  .embrapa-accumulated-grid article,
+  .embrapa-extremes-grid article,
+  .hydrology-flow li {
+    scroll-snap-stop: always;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-shell--home .weather-hero-primary {
+    position: relative;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) and (max-width: 900px) {
+  .weather-hero-primary:hover,
+  .weather-hero-secondary:hover,
+  .header-action:hover,
+  .embrapa-primary-action:hover,
+  .embrapa-secondary-action:hover,
+  .hydrology-primary-action:hover,
+  .hydrology-secondary-action:hover {
+    transform: none;
+  }
+
+  .weather-hero-primary:active,
+  .weather-hero-secondary:active,
+  .header-action:active,
+  .embrapa-primary-action:active,
+  .embrapa-secondary-action:active,
+  .hydrology-primary-action:active,
+  .hydrology-secondary-action:active {
+    transform: scale(0.985);
+  }
+}
