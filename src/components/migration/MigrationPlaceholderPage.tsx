@@ -5,8 +5,7 @@ type MigrationPlaceholderPageProps = {
 
 export function MigrationPlaceholderPage({
   title = "Projeto em migração",
-  description =
-    "A estrutura desta página já foi portada para a nova aplicação. Os dados e componentes meteorológicos serão conectados na próxima etapa.",
+  description = "A estrutura desta página já foi portada para a nova aplicação. Os dados e componentes meteorológicos serão conectados na próxima etapa.",
 }: MigrationPlaceholderPageProps) {
   return (
     <section className="migration-page" aria-labelledby="migration-page-title">

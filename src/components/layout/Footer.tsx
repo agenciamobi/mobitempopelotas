@@ -40,8 +40,8 @@ export function Footer() {
         <div className="footer-summary">
           <strong>Tempo Pelotas</strong>
           <p>
-            Informação meteorológica e hidrológica organizada para Pelotas e a Zona Sul do Rio Grande
-            do Sul.
+            Informação meteorológica e hidrológica organizada para Pelotas e a Zona Sul do Rio
+            Grande do Sul.
           </p>
         </div>
 
