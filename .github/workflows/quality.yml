@@ -17,36 +17,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  runner:
-    name: Runner
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Confirmar runner
-        run: echo "Runner disponível"
-
-  checkout:
-    name: Checkout
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-  node:
-    name: Node
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Exibir versões
-        run: node --version && npm --version
-
   validate:
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
@@ -55,8 +25,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Install
-            command: echo "Dependências instaladas"
           - name: Build
             command: npm run build
           - name: Typecheck
@@ -72,9 +40,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
       - name: Instalar dependências
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Executar ${{ matrix.name }}
         run: ${{ matrix.command }}
