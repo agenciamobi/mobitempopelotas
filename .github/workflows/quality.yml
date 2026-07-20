@@ -17,6 +17,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  runner:
+    name: Runner
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Confirmar runner
+        run: echo "Runner disponível"
+
   checkout:
     name: Checkout
     runs-on: ubuntu-latest
