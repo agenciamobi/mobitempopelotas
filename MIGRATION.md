@@ -90,19 +90,22 @@ _legacy/
 
 ### 4. Camada meteorológica
 
-- [ ] Mapear fontes externas utilizadas
-- [ ] Criar contratos TypeScript normalizados
-- [ ] Separar módulos browser, server e compartilhados
-- [ ] Implementar timeout, cache, validação e fallback explícito
-- [ ] Impedir que dados demonstrativos sejam identificados como observações reais
+- [x] Mapear e portar a fonte de previsão Open-Meteo usada pela Home
+- [x] Criar contratos TypeScript normalizados
+- [x] Separar contratos compartilhados, helper server-only e server function
+- [x] Implementar timeout, cache e fallback explícito
+- [x] Impedir que dados demonstrativos sejam identificados como observações reais
+- [ ] Portar observação local da Embrapa com validação de atualidade
+- [ ] Portar alertas oficiais do INMET
+- [ ] Mapear e revisar as fontes hidrológicas
 
 ### 5. Home
 
-- [x] Migrar a rota inicial com placeholder `Projeto em migração`
-- [ ] Condições atuais
-- [ ] Previsão horária
-- [ ] Previsão para sete dias
-- [ ] Chuva e vento
+- [x] Migrar a rota inicial
+- [x] Exibir condições atuais de previsão
+- [x] Exibir previsão horária
+- [x] Exibir previsão para sete dias
+- [x] Exibir chuva e vento
 - [ ] Alertas e destaques locais
 - [ ] Links para histórico, mapa, câmeras e nível da Lagoa
 - [ ] Dados estruturados e metadados específicos
@@ -148,4 +151,4 @@ _legacy/
 
 ## Próxima fatia
 
-A próxima implementação deve normalizar a camada meteorológica e migrar os primeiros dados reais da Home. Até essa etapa ser concluída, a Home e as páginas internas permanecem deliberadamente com o estado `Projeto em migração`.
+A próxima implementação deve combinar a previsão do Open-Meteo com uma observação local validada da Embrapa, portar os alertas oficiais do INMET e substituir os placeholders das páginas Hoje e 7 dias por visões completas dos mesmos contratos normalizados.
