@@ -1,13 +1,17 @@
 import type { ReactNode } from "react";
-import { Header } from "./Header";
 import { Footer } from "./Footer";
+import { Header } from "./Header";
 
-export function SiteLayout({ children }: { children: ReactNode }) {
+type SiteLayoutProps = {
+  children: ReactNode;
+};
+
+export function SiteLayout({ children }: SiteLayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
+    <div className="site-shell">
       <Header />
-      <main className="flex-1">
-        <div className="mx-auto max-w-5xl px-4 py-12">{children}</div>
+      <main id="conteudo-principal" className="site-main" tabIndex={-1}>
+        <div className="site-container">{children}</div>
       </main>
       <Footer />
     </div>
