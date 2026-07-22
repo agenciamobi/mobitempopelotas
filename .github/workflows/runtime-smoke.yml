@@ -1,0 +1,67 @@
+name: Runtime smoke
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    if: github.head_ref == 'agent/weather-runtime-resilience'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Compilar aplicação
+        run: npm run build
+
+      - name: Iniciar servidor de produção
+        run: |
+          PORT=3000 HOST=127.0.0.1 node .output/server/index.mjs > /tmp/tempo-pelotas.log 2>&1 &
+          echo $! > /tmp/tempo-pelotas.pid
+
+      - name: Aguardar servidor
+        run: |
+          for attempt in {1..40}; do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/ > /tmp/home.html; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/tempo-pelotas.log
+          exit 1
+
+      - name: Validar home meteorológica
+        run: |
+          test -s /tmp/home.html
+          if grep -q "Dados temporariamente indisponíveis" /tmp/home.html; then
+            echo "A home renderizou o estado de indisponibilidade total."
+            cat /tmp/tempo-pelotas.log
+            exit 1
+          fi
+          grep -Eq "Tempo em Pelotas|Previsão|Pelotas" /tmp/home.html
+
+      - name: Validar rota de câmeras
+        run: |
+          curl --fail --silent --show-error http://127.0.0.1:3000/cameras > /tmp/cameras.html
+          test -s /tmp/cameras.html
+          grep -Eq "Câmeras|Laranjal|YouTube" /tmp/cameras.html
+
+      - name: Exibir diagnóstico do servidor
+        if: always()
+        run: cat /tmp/tempo-pelotas.log || true
