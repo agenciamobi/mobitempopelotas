@@ -1,0 +1,84 @@
+name: Formatar e validar histórico meteorológico
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  format-and-validate:
+    if: github.head_ref == 'agent/migrate-weather-history' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout da branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/migrate-weather-history
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Formatar lote
+        run: |
+          npx prettier --write \
+            src/lib/weather/history.types.ts \
+            src/lib/weather/history.server.ts \
+            src/lib/weather/history.functions.ts \
+            src/components/history/WeatherHistoryChart.tsx \
+            src/components/history/WeatherHistoryPage.tsx \
+            src/components/history/WeatherHistoryPage.css \
+            src/routes/historico-climatico-pelotas.tsx
+
+      - name: Validar fonte histórica real
+        shell: bash
+        run: |
+          set -euo pipefail
+          END_DATE="$(TZ=America/Sao_Paulo date -d 'yesterday' +%F)"
+          START_DATE="$(TZ=America/Sao_Paulo date -d "$END_DATE -29 days" +%F)"
+          URL="https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=-31.7654&longitude=-52.3376&timezone=America%2FSao_Paulo&start_date=$START_DATE&end_date=$END_DATE&daily=temperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Cwind_gusts_10m_max"
+          STATUS="$(curl --silent --show-error --max-time 20 \
+            --user-agent 'MOBI-Tempo-Pelotas/1.0 (+https://agenciamobi.com.br)' \
+            --output historical-response.json \
+            --write-out '%{http_code}' \
+            "$URL")"
+          test "$STATUS" = "200"
+          jq -e '.daily.time | length >= 25' historical-response.json >/dev/null
+          jq -e '.daily.temperature_2m_max | length == (.daily.temperature_2m_min | length)' historical-response.json >/dev/null
+          jq -e '.daily.precipitation_sum | length == (.daily.time | length)' historical-response.json >/dev/null
+          jq -e '.daily.wind_gusts_10m_max | length == (.daily.time | length)' historical-response.json >/dev/null
+          rm historical-response.json
+
+      - name: Validar build
+        run: npm run build
+
+      - name: Validar tipos
+        run: npm run typecheck
+
+      - name: Validar lint
+        run: npm run lint
+
+      - name: Publicar formatação
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/lib/weather/history.types.ts \
+            src/lib/weather/history.server.ts \
+            src/lib/weather/history.functions.ts \
+            src/components/history/WeatherHistoryChart.tsx \
+            src/components/history/WeatherHistoryPage.tsx \
+            src/components/history/WeatherHistoryPage.css \
+            src/routes/historico-climatico-pelotas.tsx
+          git commit -m "style: formata histórico meteorológico"
+          git push origin HEAD:agent/migrate-weather-history
