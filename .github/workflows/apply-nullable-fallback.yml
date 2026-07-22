@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - agent/fix-met-norway-missing-fields
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
