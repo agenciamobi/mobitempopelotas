@@ -142,11 +142,12 @@ export async function fetchWeatherIntelligence(): Promise<WeatherIntelligenceDat
   const weather = await fetchAggregatedPelotasWeather();
   const deterministicBrief = createDeterministicWeatherBrief(weather);
   const gemini = await generateGeminiWeatherBrief(weather);
-  const useGemini = gemini.status === "generated" && gemini.brief !== null;
+  const generatedBrief = gemini.status === "generated" ? gemini.brief : null;
+  const useGemini = generatedBrief !== null;
 
   return {
     weather,
-    brief: useGemini ? gemini.brief : deterministicBrief,
+    brief: generatedBrief ?? deterministicBrief,
     intelligence: {
       origin: useGemini ? "gemini" : "deterministic",
       geminiStatus: gemini.status,
