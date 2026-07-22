@@ -8,10 +8,12 @@ import type {
 
 const TIMEZONE = "America/Sao_Paulo";
 const REQUEST_TIMEOUT_MS = 10_000;
+const NASA_REQUEST_TIMEOUT_MS = 20_000;
 const HISTORY_DAYS = 30;
+const NASA_LOOKBACK_DAYS = 90;
 const PELOTAS = { latitude: -31.7654, longitude: -52.3376 } as const;
 
-const HISTORY_SOURCES = [
+const OPEN_METEO_HISTORY_SOURCES = [
   {
     id: "historical-forecast",
     name: "Open-Meteo Historical Forecast",
@@ -26,9 +28,17 @@ const HISTORY_SOURCES = [
   },
 ] as const;
 
+const NASA_POWER_SOURCE = {
+  id: "nasa-power",
+  name: "NASA POWER Daily",
+  endpoint: "https://power.larc.nasa.gov/api/temporal/daily/point",
+  url: "https://power.larc.nasa.gov/docs/services/api/temporal/daily/",
+} as const;
+
 const finiteNumber = z.number().finite();
 const nullableNumberArray = z.array(finiteNumber.nullable()).min(1);
 const dateArray = z.array(z.string().regex(/^\d{4}-\d{2}-\d{2}$/)).min(1);
+const nasaDailySeries = z.record(finiteNumber);
 
 const historicalResponseSchema = z
   .object({
@@ -53,8 +63,29 @@ const historicalResponseSchema = z
     }
   });
 
+const nasaPowerResponseSchema = z.object({
+  header: z
+    .object({
+      fill_value: finiteNumber.optional(),
+    })
+    .passthrough(),
+  properties: z.object({
+    parameter: z.object({
+      T2M_MAX: nasaDailySeries,
+      T2M_MIN: nasaDailySeries,
+      PRECTOTCORR: nasaDailySeries,
+    }),
+  }),
+});
+
 type HistoricalResponse = z.infer<typeof historicalResponseSchema>;
-type HistorySource = (typeof HISTORY_SOURCES)[number];
+type NasaPowerResponse = z.infer<typeof nasaPowerResponseSchema>;
+type OpenMeteoHistorySource = (typeof OPEN_METEO_HISTORY_SOURCES)[number];
+type HistorySourceInfo = {
+  id: string;
+  name: string;
+  url: string;
+};
 
 function localDateString(date = new Date()) {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -92,6 +123,26 @@ function formatDay(date: string) {
     .replace(/^./, (letter) => letter.toUpperCase());
 
   return { label, weekday };
+}
+
+function formatDateForMessage(date: string) {
+  const value = new Date(`${date}T12:00:00-03:00`);
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: TIMEZONE,
+  }).format(value);
+}
+
+function dateDifferenceDays(laterDate: string, earlierDate: string) {
+  const later = new Date(`${laterDate}T12:00:00Z`).getTime();
+  const earlier = new Date(`${earlierDate}T12:00:00Z`).getTime();
+  return Math.max(0, Math.round((later - earlier) / 86_400_000));
+}
+
+function nasaDateToIso(date: string) {
+  return `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}`;
 }
 
 function round(value: number, digits = 1) {
@@ -141,7 +192,7 @@ function buildSummary(days: HistoricalWeatherDay[]): HistoricalWeatherSummary {
   };
 }
 
-function normalizeHistory(response: HistoricalResponse) {
+function normalizeOpenMeteoHistory(response: HistoricalResponse) {
   return response.daily.time.flatMap((date, index): HistoricalWeatherDay[] => {
     const temperatureMax = response.daily.temperature_2m_max[index];
     const temperatureMin = response.daily.temperature_2m_min[index];
@@ -165,11 +216,56 @@ function normalizeHistory(response: HistoricalResponse) {
   });
 }
 
-function createQueryParams() {
+function normalizeNasaPowerHistory(response: NasaPowerResponse) {
+  const fillValue = response.header.fill_value ?? -999;
+  const parameters = response.properties.parameter;
+
+  return Object.keys(parameters.T2M_MAX)
+    .filter((date) => /^\d{8}$/.test(date))
+    .sort()
+    .flatMap((date): HistoricalWeatherDay[] => {
+      const temperatureMax = parameters.T2M_MAX[date];
+      const temperatureMin = parameters.T2M_MIN[date];
+      if (
+        temperatureMax === undefined ||
+        temperatureMin === undefined ||
+        temperatureMax === fillValue ||
+        temperatureMin === fillValue
+      ) {
+        return [];
+      }
+
+      const precipitationValue = parameters.PRECTOTCORR[date];
+      const precipitation =
+        precipitationValue === undefined || precipitationValue === fillValue
+          ? null
+          : round(precipitationValue);
+      const isoDate = nasaDateToIso(date);
+      const { label, weekday } = formatDay(isoDate);
+
+      return [
+        {
+          date: isoDate,
+          label,
+          weekday,
+          temperatureMax: round(temperatureMax),
+          temperatureMin: round(temperatureMin),
+          precipitation,
+          windGust: null,
+        },
+      ];
+    })
+    .slice(-HISTORY_DAYS);
+}
+
+function historyPeriod() {
   const today = localDateString();
   const endDate = shiftDate(today, -1);
   const startDate = shiftDate(endDate, -(HISTORY_DAYS - 1));
+  return { startDate, endDate };
+}
 
+function createOpenMeteoQueryParams(startDate: string, endDate: string) {
   return new URLSearchParams({
     latitude: String(PELOTAS.latitude),
     longitude: String(PELOTAS.longitude),
@@ -185,7 +281,24 @@ function createQueryParams() {
   });
 }
 
-async function fetchHistorySource(source: HistorySource, params: URLSearchParams) {
+function createNasaPowerQueryParams(endDate: string) {
+  const startDate = shiftDate(endDate, -(NASA_LOOKBACK_DAYS - 1));
+  return new URLSearchParams({
+    parameters: "T2M_MAX,T2M_MIN,PRECTOTCORR",
+    community: "AG",
+    longitude: String(PELOTAS.longitude),
+    latitude: String(PELOTAS.latitude),
+    start: startDate.replaceAll("-", ""),
+    end: endDate.replaceAll("-", ""),
+    format: "JSON",
+    "time-standard": "UTC",
+  });
+}
+
+async function fetchOpenMeteoHistory(
+  source: OpenMeteoHistorySource,
+  params: URLSearchParams,
+) {
   const response = await fetch(`${source.endpoint}?${params}`, {
     headers: {
       Accept: "application/json",
@@ -203,9 +316,36 @@ async function fetchHistorySource(source: HistorySource, params: URLSearchParams
     throw new Error(`${source.name} respondeu com uma estrutura inesperada.`);
   }
 
-  const days = normalizeHistory(parsed.data).slice(-HISTORY_DAYS);
+  const days = normalizeOpenMeteoHistory(parsed.data).slice(-HISTORY_DAYS);
   if (days.length === 0) {
     throw new Error(`${source.name} não devolveu dias válidos para Pelotas.`);
+  }
+
+  return days;
+}
+
+async function fetchNasaPowerHistory(endDate: string) {
+  const params = createNasaPowerQueryParams(endDate);
+  const response = await fetch(`${NASA_POWER_SOURCE.endpoint}?${params}`, {
+    headers: {
+      Accept: "application/json",
+      "User-Agent": "MOBI-Tempo-Pelotas/1.0 (+https://agenciamobi.com.br)",
+    },
+    signal: AbortSignal.timeout(NASA_REQUEST_TIMEOUT_MS),
+  });
+
+  if (!response.ok) {
+    throw new Error(`${NASA_POWER_SOURCE.name} respondeu com HTTP ${response.status}.`);
+  }
+
+  const parsed = nasaPowerResponseSchema.safeParse(await response.json());
+  if (!parsed.success) {
+    throw new Error(`${NASA_POWER_SOURCE.name} respondeu com uma estrutura inesperada.`);
+  }
+
+  const days = normalizeNasaPowerHistory(parsed.data);
+  if (days.length === 0) {
+    throw new Error(`${NASA_POWER_SOURCE.name} não devolveu dias válidos para Pelotas.`);
   }
 
   return days;
@@ -217,8 +357,8 @@ function unavailable(error: string, fetchedAt: string): WeatherHistoryData {
     days: [],
     summary: null,
     source: {
-      name: "Open-Meteo Historical APIs",
-      url: HISTORY_SOURCES[0].url,
+      name: "Open-Meteo / NASA POWER",
+      url: NASA_POWER_SOURCE.url,
       fetchedAt,
       periodStart: null,
       periodEnd: null,
@@ -229,11 +369,28 @@ function unavailable(error: string, fetchedAt: string): WeatherHistoryData {
 
 function createHistoryData(
   days: HistoricalWeatherDay[],
-  source: HistorySource,
+  source: HistorySourceInfo,
   fetchedAt: string,
+  expectedEndDate: string,
 ): WeatherHistoryData {
+  const periodEnd = days.at(-1)?.date ?? null;
+  const lagDays = periodEnd ? dateDifferenceDays(expectedEndDate, periodEnd) : 0;
+  const notes: string[] = [];
+
+  if (days.length !== HISTORY_DAYS) {
+    notes.push(`${source.name} retornou apenas ${days.length} dos ${HISTORY_DAYS} dias solicitados.`);
+  }
+  if (periodEnd && lagDays > 0) {
+    notes.push(
+      `${source.name} possui dados até ${formatDateForMessage(periodEnd)}, ${lagDays} ${lagDays === 1 ? "dia" : "dias"} antes do fim solicitado.`,
+    );
+  }
+  if (source.id === NASA_POWER_SOURCE.id) {
+    notes.push("A NASA POWER não fornece rajadas compatíveis com este histórico; esse campo permanece não informado.");
+  }
+
   return {
-    status: days.length === HISTORY_DAYS ? "live" : "partial",
+    status: notes.length === 0 ? "live" : "partial",
     days,
     summary: buildSummary(days),
     source: {
@@ -241,30 +398,28 @@ function createHistoryData(
       url: source.url,
       fetchedAt,
       periodStart: days[0]?.date ?? null,
-      periodEnd: days.at(-1)?.date ?? null,
+      periodEnd,
     },
-    error:
-      days.length === HISTORY_DAYS
-        ? null
-        : `${source.name} retornou apenas ${days.length} dos ${HISTORY_DAYS} dias solicitados.`,
+    error: notes.length > 0 ? notes.join(" ") : null,
   };
 }
 
 export async function fetchPelotasWeatherHistory(): Promise<WeatherHistoryData> {
   const fetchedAt = new Date().toISOString();
-  const params = createQueryParams();
+  const { startDate, endDate } = historyPeriod();
+  const openMeteoParams = createOpenMeteoQueryParams(startDate, endDate);
   const failures: string[] = [];
 
-  for (const source of HISTORY_SOURCES) {
+  for (const source of OPEN_METEO_HISTORY_SOURCES) {
     try {
-      const days = await fetchHistorySource(source, params);
-      if (source.id !== HISTORY_SOURCES[0].id) {
+      const days = await fetchOpenMeteoHistory(source, openMeteoParams);
+      if (source.id !== OPEN_METEO_HISTORY_SOURCES[0].id) {
         console.warn("[weather/history] Fonte principal indisponível; contingência utilizada", {
           source: source.name,
           failures,
         });
       }
-      return createHistoryData(days, source, fetchedAt);
+      return createHistoryData(days, source, fetchedAt, endDate);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       failures.push(message);
@@ -273,6 +428,22 @@ export async function fetchPelotasWeatherHistory(): Promise<WeatherHistoryData> 
         message,
       });
     }
+  }
+
+  try {
+    const days = await fetchNasaPowerHistory(endDate);
+    console.warn("[weather/history] Open-Meteo indisponível; NASA POWER utilizada", {
+      source: NASA_POWER_SOURCE.name,
+      failures,
+    });
+    return createHistoryData(days, NASA_POWER_SOURCE, fetchedAt, endDate);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    failures.push(message);
+    console.warn("[weather/history] Fonte histórica indisponível", {
+      source: NASA_POWER_SOURCE.name,
+      message,
+    });
   }
 
   const error =
