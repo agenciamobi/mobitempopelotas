@@ -1,16 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MigrationPlaceholderPage } from "@/components/migration/MigrationPlaceholderPage";
+
+import { WindPage } from "@/components/weather/RainWindPages";
 import { createPageHead } from "@/lib/page-meta";
+import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 export const Route = createFileRoute("/vento-em-pelotas")({
   head: () =>
     createPageHead(
       "Vento em Pelotas",
-      "Condições de vento, direção e rajadas em Pelotas. Página em migração.",
+      "Velocidade, direção e rajadas de vento previstas para Pelotas nas próximas horas e nos próximos sete dias.",
     ),
+  loader: () => getWeatherIntelligence(),
+  staleTime: 5 * 60 * 1_000,
   component: VentoPage,
 });
 
 function VentoPage() {
-  return <MigrationPlaceholderPage title="Vento em Pelotas" />;
+  const weather = Route.useLoaderData();
+  return <WindPage data={weather} />;
 }
