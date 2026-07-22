@@ -2,35 +2,25 @@ import { fetchMetNorwayWeather } from "./met-norway.server";
 import { fetchPelotasWeather as fetchOpenMeteoWeather } from "./open-meteo.server";
 import type { WeatherHomeData } from "./types";
 
-const OPEN_METEO_DEADLINE_MS = 2_200;
+function unavailableMessage(openMeteo: WeatherHomeData, metNorway: WeatherHomeData) {
+  const details = [openMeteo.message, metNorway.message].filter(Boolean).join(" ");
 
-async function settleOpenMeteo(): Promise<WeatherHomeData | null> {
-  let timeout: ReturnType<typeof setTimeout> | undefined;
-
-  try {
-    return await Promise.race([
-      fetchOpenMeteoWeather(),
-      new Promise<null>((resolve) => {
-        timeout = setTimeout(() => resolve(null), OPEN_METEO_DEADLINE_MS);
-      }),
-    ]);
-  } finally {
-    if (timeout) clearTimeout(timeout);
-  }
+  return details
+    ? `Não foi possível obter uma previsão meteorológica utilizável. ${details}`
+    : "Não foi possível obter a previsão no Open-Meteo nem na fonte de contingência do MET Norway.";
 }
 
 export async function fetchPelotasWeather(): Promise<WeatherHomeData> {
-  const openMeteo = await settleOpenMeteo();
-  if (openMeteo?.status === "live") return openMeteo;
+  const [openMeteo, metNorway] = await Promise.all([
+    fetchOpenMeteoWeather(),
+    fetchMetNorwayWeather(),
+  ]);
 
-  const metNorway = await fetchMetNorwayWeather();
+  if (openMeteo.status === "live") return openMeteo;
   if (metNorway.status === "live") return metNorway;
 
-  return (
-    openMeteo ?? {
-      ...metNorway,
-      message:
-        "Não foi possível obter a previsão no Open-Meteo nem na fonte de contingência do MET Norway.",
-    }
-  );
+  return {
+    ...openMeteo,
+    message: unavailableMessage(openMeteo, metNorway),
+  };
 }
