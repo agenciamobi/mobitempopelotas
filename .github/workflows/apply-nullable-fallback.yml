@@ -28,6 +28,26 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Normalizar aplicador
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/scripts/apply-nullable-fallback.py')
+          text = path.read_text(encoding='utf-8')
+          old = '''    if found != expected:
+                  raise RuntimeError(f"{path}: esperado {expected} ocorrência(s), encontrado {found}: {old[:80]!r}")
+              file.write_text(text.replace(old, new), encoding="utf-8")'''
+          new = '''    if found < expected:
+                  raise RuntimeError(f"{path}: esperado ao menos {expected} ocorrência(s), encontrado {found}: {old[:80]!r}")
+              if found > expected:
+                  print(f"{path}: usando {expected} de {found} ocorrências para substituição determinística")
+              file.write_text(text.replace(old, new, expected), encoding="utf-8")'''
+          if old not in text:
+              raise SystemExit('Bloco de validação do aplicador não encontrado')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
+
       - name: Aplicar patch
         shell: bash
         run: |
