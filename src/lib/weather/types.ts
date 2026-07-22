@@ -12,19 +12,19 @@ export type WeatherSource = {
 export type CurrentWeather = {
   city: string;
   state: string;
-  temperature: number;
-  feelsLike: number;
-  condition: string;
-  humidity: number;
-  pressure: number;
-  windSpeed: number;
-  windGust: number;
-  windDirection: string;
-  visibilityKm: number;
-  sunrise: string;
-  sunset: string;
-  observedAt: string;
-  icon: WeatherIconName;
+  temperature: number | null;
+  feelsLike: number | null;
+  condition: string | null;
+  humidity: number | null;
+  pressure: number | null;
+  windSpeed: number | null;
+  windGust: number | null;
+  windDirection: string | null;
+  visibilityKm: number | null;
+  sunrise: string | null;
+  sunset: string | null;
+  observedAt: string | null;
+  icon: WeatherIconName | null;
 };
 
 export type HourlyForecast = {
