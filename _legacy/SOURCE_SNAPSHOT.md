@@ -1,37 +1,33 @@
 # Snapshot da origem legada
 
-Este diretório é **somente referência**. Nenhum arquivo daqui deve ser
-importado pelo código em `src/`. Ver `_legacy/README-LOVABLE.md`.
+Este diretório é **somente referência**. Nenhum arquivo daqui deve ser importado
+pelo código em `src/`. A migração é feita reescrevendo e adaptando cada peça
+para a stack TanStack Start deste projeto.
 
 ## Origem sincronizada
 
-- Repositório: `agenciamobi/tempopelotas` (GitHub)
+- Repositório: `agenciamobi/tempopelotas`
 - Branch: `main`
-- Commit canônico: `05cd2d268ad25c070718ecc170bd30e8ad181341`
-- Data UTC do snapshot: `2026-07-22T00:14:00Z`
-- Método: ponte temporária autenticada no GitHub → ZIP curado
-- SHA-256 do ZIP: `7714992dd24a2a2b2bdecac800d4640c0465ecd0bdb10ed0ca63c5477c52eac7`
-- Entradas de arquivo no ZIP: `244`
-- Arquivos em `_legacy/` após extração: `244`
+- Commit: `05cd2d268ad25c070718ecc170bd30e8ad181341`
+- Data UTC do snapshot: `2026-07-22T00:11:00Z`
+- Método: `git clone --depth 1` seguido de `rsync` para `_legacy/`
+- Arquivos em `_legacy/`: `249`
 
-## Exclusões aplicadas pela ponte
+## Exclusões aplicadas
 
-Caminhos relativos preservados; excluídos do ZIP:
+Os caminhos relativos versionados foram preservados. Foram excluídos somente:
 
-- `.git/`, `.github/workflows/**`, `.gitignore`
-- `node_modules/`, `.next/`, `dist/`, `build/`, `.turbo/`, `.vercel/`, `coverage/`
-- Arquivos locais de ambiente com valores: `.env`, `.env.local`, `.env.*.local`
-- Também excluído: `.env.example` (para eliminar qualquer risco de vazamento
-  incidental; a lista canônica de variáveis vive agora em `MIGRATION_MATRIX.md`)
-- Qualquer log ou artefato de build
+- `.git/`;
+- `node_modules/`, `.next/`, `dist/`, `build/`, `.turbo/`, `.vercel/` e `coverage/`;
+- arquivos de log;
+- arquivos locais com valores de ambiente: `.env`, `.env.local` e `.env.*.local`.
 
-## Verificação
+O arquivo `_legacy/.env.example` foi mantido porque contém apenas nomes de
+variáveis, comentários e valores padrão públicos, sem credenciais.
 
-Antes de substituir o conteúdo antigo, foi conferido:
+## Regra de uso
 
-1. SHA-256 do ZIP baixado bate com o hash divulgado.
-2. Estrutura raiz corresponde ao repositório (`app/`, `components/`, `lib/`,
-   `supabase/`, `public/`, `scripts/`, `docs/`, `README.md`,
-   `package.json`, `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`,
-   `proxy.ts`, `vercel.json`, `next-env.d.ts`).
-3. Nenhum arquivo `.env*` presente após extração.
+- `_legacy/` não é compilado, formatado, lintado ou incluído no bundle;
+- nada em `src/` pode importar diretamente arquivos de `_legacy/`;
+- cada recurso deve ser copiado e adaptado para a arquitetura TanStack Start;
+- o diretório pode ser removido somente após a conclusão e auditoria da migração.
