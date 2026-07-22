@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { WeatherHome } from "@/components/weather/WeatherHome";
+import "@/components/weather/WeatherHomeIntegrated.css";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 export const Route = createFileRoute("/")({
