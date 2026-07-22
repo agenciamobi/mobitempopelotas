@@ -1,16 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MigrationPlaceholderPage } from "@/components/migration/MigrationPlaceholderPage";
+
+import { WeatherHistoryPage } from "@/components/history/WeatherHistoryPage";
 import { createPageHead } from "@/lib/page-meta";
+import { getPelotasWeatherHistory } from "@/lib/weather/history.functions";
 
 export const Route = createFileRoute("/historico-climatico-pelotas")({
   head: () =>
     createPageHead(
-      "Histórico climático de Pelotas",
-      "Histórico meteorológico e climático de Pelotas. Página em migração.",
+      "Como foi o tempo nos últimos 30 dias em Pelotas",
+      "Compare temperaturas máximas e mínimas, chuva e rajadas dos últimos 30 dias completos em Pelotas, com fonte e metodologia explícitas.",
     ),
+  loader: () => getPelotasWeatherHistory(),
+  staleTime: 6 * 60 * 60 * 1_000,
   component: HistoricoClimaticoPage,
 });
 
 function HistoricoClimaticoPage() {
-  return <MigrationPlaceholderPage title="Histórico climático de Pelotas" />;
+  const history = Route.useLoaderData();
+  return <WeatherHistoryPage history={history} />;
 }
