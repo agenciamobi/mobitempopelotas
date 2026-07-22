@@ -1,0 +1,66 @@
+name: Corrigir landmark da metodologia
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  fix-and-validate:
+    if: github.head_ref == 'agent/migrate-methodology-page' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout da branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/migrate-methodology-page
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Corrigir landmark aninhado
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('src/components/methodology/MethodologyPage.tsx')
+          text = path.read_text(encoding='utf-8')
+          opening = '<main className="methodology-page">'
+          closing = '</main>'
+          if text.count(opening) != 1 or text.count(closing) != 1:
+              raise SystemExit('Estrutura esperada da página de metodologia não encontrada')
+          text = text.replace(opening, '<div className="methodology-page">', 1)
+          text = text.replace(closing, '</div>', 1)
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Formatar arquivo
+        run: npx prettier --write src/components/methodology/MethodologyPage.tsx
+
+      - name: Validar build
+        run: npm run build
+
+      - name: Validar tipos
+        run: npm run typecheck
+
+      - name: Validar lint
+        run: npm run lint
+
+      - name: Publicar correção
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/methodology/MethodologyPage.tsx
+          git commit -m "fix: evita landmark principal aninhado"
+          git push origin HEAD:agent/migrate-methodology-page
