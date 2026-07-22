@@ -22,6 +22,7 @@ jobs:
           set -uo pipefail
           BASE_URL="https://mobitempopelotas.lovable.app"
           OPEN_METEO_URL="https://api.open-meteo.com/v1/forecast?latitude=-31.7654&longitude=-52.3376&timezone=America%2FSao_Paulo&forecast_days=7&current=temperature_2m%2Crelative_humidity_2m%2Capparent_temperature%2Cweather_code%2Cpressure_msl%2Cvisibility%2Cwind_speed_10m%2Cwind_gusts_10m%2Cwind_direction_10m%2Cis_day&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m%2Cweather_code%2Cis_day&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_probability_max%2Cprecipitation_sum%2Cwind_gusts_10m_max%2Csunrise%2Csunset"
+          MET_NORWAY_URL="https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=-31.7654&lon=-52.3376&altitude=7"
           LOG_FILE="smoke-artifacts/smoke-production.log"
           FAILED=0
           mkdir -p smoke-artifacts
@@ -41,6 +42,22 @@ jobs:
             FAILED=1
           else
             echo "OK: Open-Meteo direto possui condições e previsão diária" | tee -a "$LOG_FILE"
+          fi
+
+          met_metrics="$(curl --silent --show-error --max-time 20 \
+            --user-agent 'MOBI-Tempo-Pelotas/1.0 https://agenciamobi.com.br' \
+            --output smoke-artifacts/met-norway.json \
+            --write-out '%{http_code}|%{time_total}' \
+            "$MET_NORWAY_URL" || echo '000|20')"
+          echo "MET Norway direto: $met_metrics" | tee -a "$LOG_FILE"
+          if [[ "${met_metrics%%|*}" != "200" ]]; then
+            echo "ERRO: MET Norway não respondeu diretamente" | tee -a "$LOG_FILE"
+            FAILED=1
+          elif ! jq -e '.properties.timeseries[0].data.instant.details.air_temperature != null and (.properties.timeseries | length) > 24' smoke-artifacts/met-norway.json >/dev/null; then
+            echo "ERRO: payload do MET Norway sem previsão utilizável" | tee -a "$LOG_FILE"
+            FAILED=1
+          else
+            echo "OK: MET Norway possui previsão global utilizável" | tee -a "$LOG_FILE"
           fi
 
           auth_metrics="$(curl --silent --show-error --max-time 15 \
@@ -74,8 +91,6 @@ jobs:
               FAILED=1
             elif ! grep -Fq "$expected" "$body"; then
               echo "ERRO: conteúdo esperado não encontrado: $expected" | tee -a "$LOG_FILE"
-              echo "TÍTULO/H1 ENCONTRADO:" | tee -a "$LOG_FILE"
-              grep -Eo '<(title|h1)[^>]*>[^<]+' "$body" | head -n 6 | tee -a "$LOG_FILE" || true
               FAILED=1
             else
               echo "OK: conteúdo validado" | tee -a "$LOG_FILE"
