@@ -160,7 +160,10 @@ export function WeatherHistoryChart({ days }: WeatherHistoryChartProps) {
   };
 
   return (
-    <section className={`history-chart history-chart-${metric}`} aria-labelledby="history-chart-title">
+    <section
+      className={`history-chart history-chart-${metric}`}
+      aria-labelledby="history-chart-title"
+    >
       <div className="history-chart-heading">
         <div>
           <p className="history-kicker">Comparação diária</p>

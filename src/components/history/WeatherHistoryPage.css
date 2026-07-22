@@ -646,8 +646,7 @@
 .history-methodology {
   border: 1px solid rgba(94, 44, 237, 0.12);
   background:
-    radial-gradient(circle at 100% 100%, rgba(94, 44, 237, 0.1), transparent 24rem),
-    #f8f7ff;
+    radial-gradient(circle at 100% 100%, rgba(94, 44, 237, 0.1), transparent 24rem), #f8f7ff;
   color: #514472;
 }
 

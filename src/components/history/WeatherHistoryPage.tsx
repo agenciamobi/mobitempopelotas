@@ -81,7 +81,9 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
       {datasetSchema ? (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetSchema).replace(/</g, "\\u003c") }}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(datasetSchema).replace(/</g, "\\u003c"),
+          }}
         />
       ) : null}
 
@@ -93,8 +95,8 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
           <p className="history-kicker">Histórico meteorológico recente</p>
           <h1>Como foi o tempo nos últimos 30 dias em Pelotas</h1>
           <p className="history-lead">
-            Compare máximas, mínimas, chuva e rajadas em dias completos. Nenhum valor demonstrativo é
-            usado quando a fonte histórica está indisponível.
+            Compare máximas, mínimas, chuva e rajadas em dias completos. Nenhum valor demonstrativo
+            é usado quando a fonte histórica está indisponível.
           </p>
           <div className="history-hero-meta">
             <span>
@@ -166,8 +168,8 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
                 <h2 id="history-records-title">Dias que se destacaram na série</h2>
               </div>
               <p>
-                Os recordes abaixo valem apenas para o intervalo consultado e para o ponto de grade da
-                fonte. Não representam recordes históricos oficiais do município.
+                Os recordes abaixo valem apenas para o intervalo consultado e para o ponto de grade
+                da fonte. Não representam recordes históricos oficiais do município.
               </p>
             </div>
 
@@ -218,14 +220,16 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
                 <h2 id="history-table-title">Valores usados nos cálculos</h2>
               </div>
               <p>
-                A tabela complementa o gráfico e permite verificar cada data. Campos não publicados pela
-                fonte aparecem como “não informado”.
+                A tabela complementa o gráfico e permite verificar cada data. Campos não publicados
+                pela fonte aparecem como “não informado”.
               </p>
             </div>
 
             <div className="history-table-wrap">
               <table className="history-table">
-                <caption>Temperatura, chuva e rajadas dos últimos dias completos em Pelotas</caption>
+                <caption>
+                  Temperatura, chuva e rajadas dos últimos dias completos em Pelotas
+                </caption>
                 <thead>
                   <tr>
                     <th scope="col">Data</th>
@@ -259,8 +263,8 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
             <p className="history-kicker">Dados temporariamente indisponíveis</p>
             <h2 id="history-unavailable-title">O histórico recente não pôde ser carregado</h2>
             <p>
-              O portal não substitui a ausência da fonte por números simulados. O gráfico e os resumos
-              voltarão a aparecer quando uma série real estiver disponível.
+              O portal não substitui a ausência da fonte por números simulados. O gráfico e os
+              resumos voltarão a aparecer quando uma série real estiver disponível.
             </p>
             <small>{history.error}</small>
           </div>
@@ -274,23 +278,32 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
           <h2 id="history-methodology-title">Histórico recente não é normal climatológica</h2>
           <p>
             Esta página descreve o comportamento dos últimos dias. Climatologia exige séries longas,
-            controle de qualidade e períodos padronizados. Portanto, estes dados não devem ser usados para
-            afirmar que um mês foi “normal” ou para definir tendências climáticas de longo prazo.
+            controle de qualidade e períodos padronizados. Portanto, estes dados não devem ser
+            usados para afirmar que um mês foi “normal” ou para definir tendências climáticas de
+            longo prazo.
           </p>
           <p>
-            A fonte é modelada para a região de Pelotas e pode diferir de instrumentos instalados em locais
-            específicos, como a Estação Embrapa.
+            A fonte é modelada para a região de Pelotas e pode diferir de instrumentos instalados em
+            locais específicos, como a Estação Embrapa.
           </p>
         </div>
       </section>
 
-      <section className="history-actions" aria-label="Ações relacionadas ao histórico meteorológico">
+      <section
+        className="history-actions"
+        aria-label="Ações relacionadas ao histórico meteorológico"
+      >
         <div>
           <p className="history-kicker">Fonte e contexto</p>
           <h2>Compare a série recente com medições e previsão</h2>
         </div>
         <div>
-          <a className="history-primary-action" href={history.source.url} target="_blank" rel="noreferrer">
+          <a
+            className="history-primary-action"
+            href={history.source.url}
+            target="_blank"
+            rel="noreferrer"
+          >
             Fonte histórica <ExternalLink aria-hidden="true" />
           </a>
           <Link className="history-secondary-action" to="/estacao-embrapa-pelotas">
