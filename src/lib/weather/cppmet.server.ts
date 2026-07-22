@@ -179,7 +179,8 @@ export async function fetchCppmetForecast(): Promise<CppmetForecast> {
         error: null,
       };
     } catch (error) {
-      lastError = error instanceof Error ? error.message : "Falha desconhecida ao consultar o CPPMet.";
+      lastError =
+        error instanceof Error ? error.message : "Falha desconhecida ao consultar o CPPMet.";
     }
   }
   return unavailable(lastError);

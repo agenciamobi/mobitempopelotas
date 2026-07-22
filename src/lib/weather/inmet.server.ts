@@ -154,7 +154,9 @@ function parseCapAlert(xml: string, fallbackUrl: string): InmetAlert | null {
   const description = tagText(info, "description");
   const instruction = tagText(info, "instruction");
   const relevance = relevanceFrom(
-    [event, headline, description, instruction, areas.join(" "), municipalities.join(" ")].join(" "),
+    [event, headline, description, instruction, areas.join(" "), municipalities.join(" ")].join(
+      " ",
+    ),
     municipalityCodes,
   );
   if (!relevance) return null;
@@ -229,11 +231,17 @@ export async function fetchInmetAlerts(): Promise<InmetAlerts> {
           regional: alerts.filter((alert) => alert.relevance === "regional").length,
           state: alerts.filter((alert) => alert.relevance === "state").length,
         },
-        source: { name: "INMET", feedUrl, portalUrl: PORTAL_URL, fetchedAt: new Date().toISOString() },
+        source: {
+          name: "INMET",
+          feedUrl,
+          portalUrl: PORTAL_URL,
+          fetchedAt: new Date().toISOString(),
+        },
         error: null,
       };
     } catch (error) {
-      lastError = error instanceof Error ? error.message : "Falha desconhecida ao consultar o INMET.";
+      lastError =
+        error instanceof Error ? error.message : "Falha desconhecida ao consultar o INMET.";
     }
   }
   return unavailable(lastError);
