@@ -53,10 +53,11 @@ jobs:
             --write-out '%{http_code}' \
             "$URL")"
           test "$STATUS" = "200"
-          jq -e '.daily.time | length >= 25' historical-response.json >/dev/null
-          jq -e '.daily.temperature_2m_max | length == (.daily.temperature_2m_min | length)' historical-response.json >/dev/null
-          jq -e '.daily.precipitation_sum | length == (.daily.time | length)' historical-response.json >/dev/null
-          jq -e '.daily.wind_gusts_10m_max | length == (.daily.time | length)' historical-response.json >/dev/null
+          jq -e '(.daily.time | length) >= 25' historical-response.json >/dev/null
+          jq -e '(.daily.temperature_2m_max | length) == (.daily.temperature_2m_min | length)' historical-response.json >/dev/null
+          jq -e '(.daily.precipitation_sum | length) == (.daily.time | length)' historical-response.json >/dev/null
+          jq -e '(.daily.wind_gusts_10m_max | length) == (.daily.time | length)' historical-response.json >/dev/null
+          jq -r '"Dias históricos recebidos: \(.daily.time | length) · \(.daily.time[0]) a \(.daily.time[-1])"' historical-response.json
           rm historical-response.json
 
       - name: Validar build
