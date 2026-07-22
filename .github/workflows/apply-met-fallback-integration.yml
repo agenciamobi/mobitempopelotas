@@ -1,0 +1,118 @@
+name: Aplicar integração do fallback meteorológico
+
+on:
+  push:
+    branches:
+      - agent/add-met-norway-fallback
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: agent/add-met-norway-fallback
+
+      - name: Atualizar integração e atribuição
+        shell: python
+        run: |
+          from pathlib import Path
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              file = Path(path)
+              content = file.read_text()
+              if old not in content:
+                  raise SystemExit(f"Trecho não encontrado em {path}: {old[:120]!r}")
+              file.write_text(content.replace(old, new, 1))
+
+          replace_once(
+              "src/lib/weather/aggregated-weather.server.ts",
+              'import { fetchPelotasWeather } from "./open-meteo.server";',
+              'import { fetchPelotasWeather } from "./weather-baseline.server";',
+          )
+          replace_once(
+              "src/lib/weather/aggregated-weather.server.ts",
+              '  "open-meteo": "Open-Meteo",',
+              '  "open-meteo": "Modelo meteorológico",',
+          )
+          replace_once(
+              "src/lib/weather/aggregated-weather.server.ts",
+              'function buildNotes(options: {\n  currentSource: "embrapa" | "open-meteo" | null;\n  sources:',
+              'function buildNotes(options: {\n  currentSource: "embrapa" | "open-meteo" | null;\n  forecastProvider: string;\n  sources:',
+          )
+          replace_once(
+              "src/lib/weather/aggregated-weather.server.ts",
+              '  } else if (options.currentSource === "open-meteo") {\n    notes.push("Condições atuais usam o modelo do Open-Meteo.");\n  }',
+              '  } else if (options.currentSource === "open-meteo") {\n    notes.push(`Condições atuais usam ${options.forecastProvider}.`);\n  }',
+          )
+          replace_once(
+              "src/lib/weather/aggregated-weather.server.ts",
+              '      forecastSource: baseline.daily.length > 0 ? "open-meteo" : null,\n      degradedSources,',
+              '      forecastSource: baseline.daily.length > 0 ? "open-meteo" : null,\n      forecastProvider: baseline.status === "live" ? baseline.source.name : null,\n      degradedSources,',
+          )
+          replace_once(
+              "src/lib/weather/aggregated-weather.server.ts",
+              '        currentSource:\n          currentSource === "embrapa" || currentSource === "open-meteo" ? currentSource : null,\n        sources,',
+              '        currentSource:\n          currentSource === "embrapa" || currentSource === "open-meteo" ? currentSource : null,\n        forecastProvider: baseline.source.name,\n        sources,',
+          )
+          replace_once(
+              "src/lib/weather/aggregated-weather.types.ts",
+              '  forecastSource: "open-meteo" | null;\n  degradedSources:',
+              '  forecastSource: "open-meteo" | null;\n  forecastProvider: string | null;\n  degradedSources:',
+          )
+          replace_once(
+              "src/components/weather/WeatherEditorialHero.tsx",
+              '  const currentSource = weather.quality.currentSource === "embrapa" ? "Embrapa" : "Open-Meteo";',
+              '  const currentSource =\n    weather.quality.currentSource === "embrapa"\n      ? "Embrapa"\n      : (weather.quality.forecastProvider ?? "Modelo meteorológico");',
+          )
+          replace_once(
+              "src/components/weather/WeatherHome.tsx",
+              '  "open-meteo": "Open-Meteo",',
+              '  "open-meteo": "Modelo meteorológico",',
+          )
+          replace_once(
+              "src/components/weather/WeatherHome.tsx",
+              '        Dados consolidados por MOBI Tempo Pelotas a partir de Embrapa Clima Temperado, INMET,\n        CPPMet/UFPel e Open-Meteo. Consulta realizada em {formatFetchedAt(weather.source.fetchedAt)}\n        .',
+              '        Dados consolidados por MOBI Tempo Pelotas a partir de Embrapa Clima Temperado, INMET,\n        CPPMet/UFPel e {weather.quality.forecastProvider ?? "modelo meteorológico"}. Consulta realizada\n        em {formatFetchedAt(weather.source.fetchedAt)}.',
+          )
+          replace_once(
+              "src/lib/weather/weather-intelligence.server.ts",
+              '  "open-meteo": "Open-Meteo",',
+              '  "open-meteo": "Modelo meteorológico",',
+          )
+          replace_once(
+              "src/components/weather/ForecastPages.tsx",
+              '        INMET, CPPMet/UFPel e Open-Meteo.',
+              '        INMET, CPPMet/UFPel e {weather.quality.forecastProvider ?? "modelo meteorológico"}.',
+          )
+          replace_once(
+              "src/components/weather/ForecastPages.tsx",
+              '        Previsão consolidada em {formatFetchedAt(weather.source.fetchedAt)}. O modelo principal é o\n        Open-Meteo, enriquecido com fontes oficiais e regionais quando disponíveis.',
+              '        Previsão consolidada em {formatFetchedAt(weather.source.fetchedAt)}. O modelo principal é\n        {` ${weather.quality.forecastProvider ?? "o modelo meteorológico disponível"}`}, enriquecido com\n        fontes oficiais e regionais quando disponíveis.',
+          )
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Formatar arquivos
+        run: npx prettier --write src/lib/weather/met-norway.server.ts src/lib/weather/weather-baseline.server.ts src/lib/weather/aggregated-weather.server.ts src/lib/weather/aggregated-weather.types.ts src/lib/weather/weather-intelligence.server.ts src/components/weather/WeatherEditorialHero.tsx src/components/weather/WeatherHome.tsx src/components/weather/ForecastPages.tsx
+
+      - name: Registrar integração
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/weather src/components/weather
+          git commit -m "feat: integra MET Norway como contingência meteorológica"
+          git push origin HEAD:agent/add-met-norway-fallback
