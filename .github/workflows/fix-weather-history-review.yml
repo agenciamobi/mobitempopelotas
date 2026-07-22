@@ -25,41 +25,24 @@ jobs:
           python - <<'PY'
           from pathlib import Path
 
-          def replace(path: str, old: str, new: str) -> None:
-              file = Path(path)
-              text = file.read_text(encoding="utf-8")
-              count = text.count(old)
-              if count != 1:
-                  raise SystemExit(f"{path}: esperado 1 trecho, encontrado {count}: {old[:100]!r}")
-              file.write_text(text.replace(old, new, 1), encoding="utf-8")
+          server = Path('src/lib/weather/history.server.ts')
+          text = server.read_text(encoding='utf-8')
+          old = 'days.length >= 25'
+          if text.count(old) != 2:
+              raise SystemExit(f'history.server.ts: esperado 2 ocorrências, encontrado {text.count(old)}')
+          server.write_text(text.replace(old, 'days.length === HISTORY_DAYS'), encoding='utf-8')
 
-          replace(
-              "src/lib/weather/history.server.ts",
-              '''      status: days.length >= 25 ? "live" : "partial",''',
-              '''      status: days.length === HISTORY_DAYS ? "live" : "partial",''',
-          )
-          replace(
-              "src/lib/weather/history.server.ts",
-              '''      error:
-            days.length >= 25
-              ? null
-              : `A fonte retornou apenas ${days.length} dos ${HISTORY_DAYS} dias solicitados.`,''',
-              '''      error:
-            days.length === HISTORY_DAYS
-              ? null
-              : `A fonte retornou apenas ${days.length} dos ${HISTORY_DAYS} dias solicitados.`,''',
-          )
-          replace(
-              "src/components/history/WeatherHistoryChart.tsx",
-              '''        <div className="history-chart-tabs" role="tablist" aria-label="Variável do gráfico">''',
-              '''        <div className="history-chart-tabs" role="group" aria-label="Variável do gráfico">''',
-          )
-          replace(
-              "src/components/history/WeatherHistoryChart.tsx",
-              '''              role="tab"
-              aria-selected={metric === value}''',
-              '''              aria-pressed={metric === value}''',
-          )
+          chart = Path('src/components/history/WeatherHistoryChart.tsx')
+          text = chart.read_text(encoding='utf-8')
+          replacements = [
+              ('role="tablist"', 'role="group"'),
+              ('              role="tab"\n              aria-selected={metric === value}', '              aria-pressed={metric === value}'),
+          ]
+          for old, new in replacements:
+              if text.count(old) != 1:
+                  raise SystemExit(f'WeatherHistoryChart.tsx: esperado 1 trecho, encontrado {text.count(old)}: {old!r}')
+              text = text.replace(old, new, 1)
+          chart.write_text(text, encoding='utf-8')
           PY
 
       - name: Configurar Node.js
