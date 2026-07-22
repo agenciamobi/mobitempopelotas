@@ -32,18 +32,10 @@ export type AggregatedCurrentWeather = {
 
 export type AggregatedCurrentField = Exclude<keyof AggregatedCurrentWeather, "city" | "state">;
 
-export type AggregatedCurrentProvenance = Partial<
-  Record<AggregatedCurrentField, WeatherSourceKey>
->;
+export type AggregatedCurrentProvenance = Partial<Record<AggregatedCurrentField, WeatherSourceKey>>;
 
 export type WeatherDiscrepancyField =
-  | "temperature"
-  | "feelsLike"
-  | "humidity"
-  | "pressure"
-  | "windSpeed"
-  | "minimum"
-  | "maximum";
+  "temperature" | "feelsLike" | "humidity" | "pressure" | "windSpeed" | "minimum" | "maximum";
 
 export type WeatherDiscrepancy = {
   scope: "current" | "daily";

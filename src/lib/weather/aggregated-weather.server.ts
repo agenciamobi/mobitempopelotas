@@ -73,10 +73,7 @@ function getObservationAgeMinutes(observation: EmbrapaObservation) {
   return Math.max(0, age);
 }
 
-function canUseEmbrapaObservation(
-  observation: EmbrapaObservation,
-  ageMinutes: number | null,
-) {
+function canUseEmbrapaObservation(observation: EmbrapaObservation, ageMinutes: number | null) {
   if (observation.status === "unavailable" || observation.current.temperature === null) {
     return false;
   }
@@ -88,9 +85,7 @@ function createCurrentFromBaseline(current: CurrentWeather): AggregatedCurrentWe
   return { ...current };
 }
 
-function createCurrentFromObservation(
-  observation: EmbrapaObservation,
-): AggregatedCurrentWeather {
+function createCurrentFromObservation(observation: EmbrapaObservation): AggregatedCurrentWeather {
   return {
     city: "Pelotas",
     state: "RS",
@@ -112,7 +107,9 @@ function createCurrentFromObservation(
 
 function baselineProvenance(current: CurrentWeather | null): AggregatedCurrentProvenance {
   if (!current) return {};
-  return Object.fromEntries(CURRENT_FIELDS.map((field) => [field, "open-meteo"])) as AggregatedCurrentProvenance;
+  return Object.fromEntries(
+    CURRENT_FIELDS.map((field) => [field, "open-meteo"]),
+  ) as AggregatedCurrentProvenance;
 }
 
 function applyEmbrapaObservation(
@@ -354,9 +351,7 @@ function calculateQualityScore(options: {
   if (options.inmetLive) score += 10;
   if (options.cppmetLive) score += 10;
 
-  const notices = options.discrepancies.filter(
-    (item) => item.severity === "notice",
-  ).length;
+  const notices = options.discrepancies.filter((item) => item.severity === "notice").length;
   const significant = options.discrepancies.filter(
     (item) => item.severity === "significant",
   ).length;
