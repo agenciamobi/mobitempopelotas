@@ -1,16 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MigrationPlaceholderPage } from "@/components/migration/MigrationPlaceholderPage";
+
+import { SevenDayForecastPage } from "@/components/weather/ForecastPages";
 import { createPageHead } from "@/lib/page-meta";
+import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 export const Route = createFileRoute("/previsao-7-dias-pelotas")({
   head: () =>
     createPageHead(
       "Previsão de 7 dias para Pelotas",
-      "Previsão meteorológica para os próximos sete dias em Pelotas. Página em migração.",
+      "Previsão meteorológica para os próximos sete dias em Pelotas, com temperaturas, chuva, vento e contexto regional.",
     ),
+  loader: () => getWeatherIntelligence(),
+  staleTime: 5 * 60 * 1_000,
   component: PrevisaoSeteDiasPage,
 });
 
 function PrevisaoSeteDiasPage() {
-  return <MigrationPlaceholderPage title="Previsão de 7 dias para Pelotas" />;
+  const weather = Route.useLoaderData();
+  return <SevenDayForecastPage data={weather} />;
 }
