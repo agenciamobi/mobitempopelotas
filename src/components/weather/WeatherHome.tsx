@@ -125,12 +125,19 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
               {current.condition ?? "Condição meteorológica em atualização"}
             </p>
             <p className="weather-update">
-              {current.observedAt ? `Atualizado às ${current.observedAt}` : "Horário em atualização"}
+              {current.observedAt
+                ? `Atualizado às ${current.observedAt}`
+                : "Horário em atualização"}
               {" · "}
               {sourceLabel(weather.quality.currentSource)}
             </p>
-            <div className="weather-quality-summary" aria-label="Qualidade dos dados meteorológicos">
-              <span className={`weather-confidence weather-confidence-${weather.quality.confidence}`}>
+            <div
+              className="weather-quality-summary"
+              aria-label="Qualidade dos dados meteorológicos"
+            >
+              <span
+                className={`weather-confidence weather-confidence-${weather.quality.confidence}`}
+              >
                 {weather.quality.confidence === "high" ? (
                   <CheckCircle2 aria-hidden="true" />
                 ) : (
@@ -149,7 +156,9 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
             <WeatherIcon name={current.icon} size={58} />
             <strong>{current.temperature === null ? "—" : `${current.temperature}°`}</strong>
             <span>
-              {current.feelsLike === null ? "Sensação indisponível" : `Sensação de ${current.feelsLike}°`}
+              {current.feelsLike === null
+                ? "Sensação indisponível"
+                : `Sensação de ${current.feelsLike}°`}
             </span>
           </div>
         </section>
@@ -267,7 +276,9 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
                   <h3>{alert.headline || alert.event}</h3>
                   <p>{alert.description}</p>
                   <small>
-                    {formatDateTime(alert.startsAt) ? `Início: ${formatDateTime(alert.startsAt)}` : null}
+                    {formatDateTime(alert.startsAt)
+                      ? `Início: ${formatDateTime(alert.startsAt)}`
+                      : null}
                     {formatDateTime(alert.expiresAt)
                       ? ` · Término: ${formatDateTime(alert.expiresAt)}`
                       : null}
@@ -306,7 +317,10 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
       ) : null}
 
       {weather.officialForecast.length > 0 ? (
-        <section className="weather-section weather-official-forecast" aria-labelledby="cppmet-title">
+        <section
+          className="weather-section weather-official-forecast"
+          aria-labelledby="cppmet-title"
+        >
           <div className="weather-section-heading">
             <div>
               <p className="weather-kicker">Contexto regional</p>
@@ -364,7 +378,8 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
 
       <p className="weather-source-note">
         Dados consolidados por MOBI Tempo Pelotas a partir de Embrapa Clima Temperado, INMET,
-        CPPMet/UFPel e Open-Meteo. Consulta realizada em {formatFetchedAt(weather.source.fetchedAt)}.
+        CPPMet/UFPel e Open-Meteo. Consulta realizada em {formatFetchedAt(weather.source.fetchedAt)}
+        .
         {degradedSources.length > 0
           ? ` Fontes com restrição: ${degradedSources.map((source) => sourceLabels[source]).join(", ")}.`
           : " Todas as fontes prioritárias responderam dentro dos critérios operacionais."}
