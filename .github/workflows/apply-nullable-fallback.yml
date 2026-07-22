@@ -1,0 +1,54 @@
+name: Aplicar correção MET Norway
+
+on:
+  push:
+    branches:
+      - agent/fix-met-norway-missing-fields
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: agent/fix-met-norway-missing-fields
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Aplicar patch
+        run: python .github/scripts/apply-nullable-fallback.py
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Validar build
+        run: npm run build
+
+      - name: Validar tipos
+        run: npm run typecheck
+
+      - name: Validar lint
+        run: npm run lint
+
+      - name: Remover automação temporária
+        run: |
+          rm -f .github/scripts/apply-nullable-fallback.py
+          rm -f .github/workflows/apply-nullable-fallback.yml
+
+      - name: Publicar correção na branch
+        run: |
+          git config user.name "agenciamobi"
+          git config user.email "157939955+agenciamobi@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: preserva campos ausentes do MET Norway"
+          git push origin HEAD:agent/fix-met-norway-missing-fields
