@@ -30,14 +30,14 @@ jobs:
       - name: Compilar aplicação
         run: npm run build
 
-      - name: Iniciar servidor de produção
+      - name: Iniciar runtime SSR
         run: |
-          PORT=3000 HOST=127.0.0.1 node .output/server/index.mjs > /tmp/tempo-pelotas.log 2>&1 &
+          npm run dev -- --host 127.0.0.1 --port 3000 > /tmp/tempo-pelotas.log 2>&1 &
           echo $! > /tmp/tempo-pelotas.pid
 
-      - name: Aguardar servidor
+      - name: Aguardar runtime
         run: |
-          for attempt in {1..40}; do
+          for attempt in {1..60}; do
             if curl --fail --silent --show-error http://127.0.0.1:3000/ > /tmp/home.html; then
               exit 0
             fi
@@ -62,6 +62,18 @@ jobs:
           test -s /tmp/cameras.html
           grep -Eq "Câmeras|Laranjal|YouTube" /tmp/cameras.html
 
-      - name: Exibir diagnóstico do servidor
+      - name: Diagnosticar domínio publicado
+        continue-on-error: true
+        run: |
+          curl --fail --location --silent --show-error --max-time 30 \
+            https://mobitempopelotas.lovable.app/ > /tmp/public-home.html
+          printf 'Resposta pública: %s bytes\n' "$(wc -c < /tmp/public-home.html)"
+          if grep -q "Dados temporariamente indisponíveis" /tmp/public-home.html; then
+            echo "O domínio publicado ainda apresenta indisponibilidade meteorológica total."
+          else
+            echo "O domínio publicado não contém o estado de indisponibilidade total no HTML inicial."
+          fi
+
+      - name: Exibir diagnóstico do runtime
         if: always()
         run: cat /tmp/tempo-pelotas.log || true
