@@ -50,9 +50,11 @@ function createSummary(weather: AggregatedWeatherData) {
   }
 
   if (today) {
-    parts.push(
-      `para hoje, mínima de ${today.min} °C, máxima de ${today.max} °C e ${today.rainChance}% de chance de chuva`,
-    );
+    const rain =
+      today.rainChance === null
+        ? `${today.precipitationMm} mm de precipitação previstos`
+        : `${today.rainChance}% de chance de chuva`;
+    parts.push(`para hoje, mínima de ${today.min} °C, máxima de ${today.max} °C e ${rain}`);
   }
 
   const activeAlerts = weather.alerts.filter((alert) => alert.period === "active");
@@ -81,9 +83,11 @@ function createHighlights(weather: AggregatedWeatherData) {
     highlights.push(`Rajadas de até ${Math.round(current.windGust)} km/h.`);
   }
   if (today) {
-    highlights.push(
-      `Hoje: ${today.min} °C a ${today.max} °C, com ${today.rainChance}% de chance de chuva.`,
-    );
+    const rain =
+      today.rainChance === null
+        ? `${today.precipitationMm} mm de precipitação previstos`
+        : `${today.rainChance}% de chance de chuva`;
+    highlights.push(`Hoje: ${today.min} °C a ${today.max} °C, com ${rain}.`);
   }
 
   const cppmetToday = weather.officialForecast[0];

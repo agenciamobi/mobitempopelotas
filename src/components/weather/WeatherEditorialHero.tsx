@@ -194,12 +194,18 @@ export function WeatherEditorialHero({ data }: { data: WeatherIntelligenceData }
               </div>
               <div>
                 <dt>Chance máxima de chuva</dt>
-                <dd>{today.rainChance}%</dd>
+                <dd>{today.rainChance === null ? "Não informada" : `${today.rainChance}%`}</dd>
               </div>
               <div>
                 <dt>Rajada máxima prevista</dt>
                 <dd>
-                  {today.windGust} <small>km/h</small>
+                  {today.windGust === null ? (
+                    "Não informada"
+                  ) : (
+                    <>
+                      {today.windGust} <small>km/h</small>
+                    </>
+                  )}
                 </dd>
               </div>
             </dl>
@@ -278,7 +284,11 @@ export function WeatherEditorialHero({ data }: { data: WeatherIntelligenceData }
               <strong>
                 {today.min}° / {today.max}°
               </strong>
-              <span>{today.rainChance}% de chance de chuva</span>
+              <span>
+                {today.rainChance === null
+                  ? `${today.precipitationMm} mm previstos`
+                  : `${today.rainChance}% de chance de chuva`}
+              </span>
             </div>
           ) : null}
 
