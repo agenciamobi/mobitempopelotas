@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - agent/fix-open-meteo-runtime
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
