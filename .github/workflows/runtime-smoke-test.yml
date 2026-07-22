@@ -111,6 +111,20 @@ jobs:
           check_route "/alertas" "Alertas meteorológicos para Pelotas e região" "alertas"
           check_route "/situacao-hidrologica-pelotas" "Situação das águas no Laranjal" "aguas"
           check_route "/nivel-da-lagoa-dos-patos-laranjal" "Nível da Lagoa dos Patos na Estação Laranjal" "nivel-laranjal"
+          check_route "/metodologia" "De onde vêm os dados do Tempo Pelotas" "metodologia"
+
+          if grep -Fq "Página em migração" smoke-artifacts/metodologia.html; then
+            echo "ERRO: Metodologia ainda exibe o placeholder de migração" | tee -a "$LOG_FILE"
+            FAILED=1
+          elif ! grep -Fq "Quem fornece cada informação" smoke-artifacts/metodologia.html; then
+            echo "ERRO: Metodologia sem seção de fontes" | tee -a "$LOG_FILE"
+            FAILED=1
+          elif ! grep -Fq "Como evitamos apresentar certezas falsas" smoke-artifacts/metodologia.html; then
+            echo "ERRO: Metodologia sem regras de integridade" | tee -a "$LOG_FILE"
+            FAILED=1
+          else
+            echo "OK: Metodologia completa e sem placeholder" | tee -a "$LOG_FILE"
+          fi
 
           echo "Smoke test finalizado em $(date -u +'%Y-%m-%dT%H:%M:%SZ')" | tee -a "$LOG_FILE"
           exit "$FAILED"
