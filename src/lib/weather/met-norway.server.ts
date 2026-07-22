@@ -318,7 +318,9 @@ export async function fetchMetNorwayWeather(): Promise<WeatherHomeData> {
           message: issue.message,
         })),
       });
-      return createUnavailableWeather("O MET Norway respondeu com dados que não puderam ser processados.");
+      return createUnavailableWeather(
+        "O MET Norway respondeu com dados que não puderam ser processados.",
+      );
     }
 
     const points = parsed.data.properties.timeseries;
@@ -368,6 +370,8 @@ export async function fetchMetNorwayWeather(): Promise<WeatherHomeData> {
     console.error("[weather/met-norway] Falha ao carregar previsão", {
       message: error instanceof Error ? error.message : String(error),
     });
-    return createUnavailableWeather("A previsão de contingência também está temporariamente indisponível.");
+    return createUnavailableWeather(
+      "A previsão de contingência também está temporariamente indisponível.",
+    );
   }
 }

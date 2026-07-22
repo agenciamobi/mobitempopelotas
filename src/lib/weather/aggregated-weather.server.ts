@@ -1,6 +1,6 @@
 import { fetchOfficialWeatherSources } from "./official-sources.server";
 import type { EmbrapaObservation } from "./official-sources.types";
-import { fetchPelotasWeather } from "./open-meteo.server";
+import { fetchPelotasWeather } from "./weather-baseline.server";
 import type { CurrentWeather, DailyForecast, WeatherHomeData } from "./types";
 import type {
   AggregatedCurrentField,
@@ -37,7 +37,7 @@ const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
   embrapa: "Embrapa",
   inmet: "INMET",
   cppmet: "CPPMet",
-  "open-meteo": "Open-Meteo",
+  "open-meteo": "Modelo meteorológico",
 };
 
 function clockToMinutes(value: string | null) {
@@ -418,6 +418,7 @@ function createSources(
 
 function buildNotes(options: {
   currentSource: "embrapa" | "open-meteo" | null;
+  forecastProvider: string;
   sources: Record<WeatherSourceKey, WeatherSourceHealth>;
   discrepancies: WeatherDiscrepancy[];
 }) {
@@ -426,7 +427,7 @@ function buildNotes(options: {
   if (options.currentSource === "embrapa") {
     notes.push("Condições atuais priorizam a medição local da Embrapa.");
   } else if (options.currentSource === "open-meteo") {
-    notes.push("Condições atuais usam o modelo do Open-Meteo.");
+    notes.push(`Condições atuais usam ${options.forecastProvider}.`);
   }
   if (options.sources.embrapa.status === "stale") {
     notes.push("A leitura da Embrapa foi preservada como contexto, mas não substituiu o modelo.");
@@ -530,12 +531,14 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
       currentSource:
         currentSource === "embrapa" || currentSource === "open-meteo" ? currentSource : null,
       forecastSource: baseline.daily.length > 0 ? "open-meteo" : null,
+      forecastProvider: baseline.status === "live" ? baseline.source.name : null,
       degradedSources,
       observationAgeMinutes,
       discrepancies,
       notes: buildNotes({
         currentSource:
           currentSource === "embrapa" || currentSource === "open-meteo" ? currentSource : null,
+        forecastProvider: baseline.source.name,
         sources,
         discrepancies,
       }),

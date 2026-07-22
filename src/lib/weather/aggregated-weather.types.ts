@@ -64,6 +64,7 @@ export type AggregatedWeatherQuality = {
   confidence: WeatherConfidence;
   currentSource: "embrapa" | "open-meteo" | null;
   forecastSource: "open-meteo" | null;
+  forecastProvider: string | null;
   degradedSources: WeatherSourceKey[];
   observationAgeMinutes: number | null;
   discrepancies: WeatherDiscrepancy[];

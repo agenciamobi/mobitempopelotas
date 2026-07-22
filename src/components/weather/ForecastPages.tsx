@@ -310,7 +310,7 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
 
       <p className="forecast-source-note">
         Dados consolidados em {formatFetchedAt(weather.source.fetchedAt)} a partir de Embrapa,
-        INMET, CPPMet/UFPel e Open-Meteo.
+        INMET, CPPMet/UFPel e {weather.quality.forecastProvider ?? "modelo meteorológico"}.
       </p>
     </div>
   );
@@ -436,8 +436,9 @@ export function SevenDayForecastPage({ data }: { data: WeatherIntelligenceData }
       </div>
 
       <p className="forecast-source-note">
-        Previsão consolidada em {formatFetchedAt(weather.source.fetchedAt)}. O modelo principal é o
-        Open-Meteo, enriquecido com fontes oficiais e regionais quando disponíveis.
+        Previsão consolidada em {formatFetchedAt(weather.source.fetchedAt)}. O modelo principal é
+        {` ${weather.quality.forecastProvider ?? "o modelo meteorológico disponível"}`}, enriquecido
+        com fontes oficiais e regionais quando disponíveis.
       </p>
     </div>
   );

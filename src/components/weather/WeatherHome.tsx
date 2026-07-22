@@ -35,7 +35,7 @@ const sourceLabels: Record<WeatherSourceKey, string> = {
   embrapa: "Embrapa Clima Temperado",
   inmet: "INMET",
   cppmet: "CPPMet / UFPel",
-  "open-meteo": "Open-Meteo",
+  "open-meteo": "Modelo meteorológico",
 };
 
 function WeatherIcon({ name, size = 28 }: { name: WeatherIconName | null; size?: number }) {
@@ -259,8 +259,8 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
 
       <p className="weather-source-note">
         Dados consolidados por MOBI Tempo Pelotas a partir de Embrapa Clima Temperado, INMET,
-        CPPMet/UFPel e Open-Meteo. Consulta realizada em {formatFetchedAt(weather.source.fetchedAt)}
-        .
+        CPPMet/UFPel e {weather.quality.forecastProvider ?? "modelo meteorológico"}. Consulta
+        realizada em {formatFetchedAt(weather.source.fetchedAt)}.
         {degradedSources.length > 0
           ? ` Fontes com restrição: ${degradedSources.map((source) => sourceLabels[source]).join(", ")}.`
           : " Todas as fontes prioritárias responderam dentro dos critérios operacionais."}
