@@ -83,8 +83,10 @@
 .weather-editorial-photo {
   z-index: 1;
   background-image: image-set(
-    url("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Amanhecer_na_Praia_do_Laranjal.jpg/1920px-Amanhecer_na_Praia_do_Laranjal.jpg") 1x,
-    url("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Amanhecer_na_Praia_do_Laranjal.jpg/2560px-Amanhecer_na_Praia_do_Laranjal.jpg") 2x
+    url("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Amanhecer_na_Praia_do_Laranjal.jpg/1920px-Amanhecer_na_Praia_do_Laranjal.jpg")
+      1x,
+    url("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Amanhecer_na_Praia_do_Laranjal.jpg/2560px-Amanhecer_na_Praia_do_Laranjal.jpg")
+      2x
   );
   background-position: center 52%;
   background-size: cover;

@@ -71,9 +71,7 @@ function displayNumber(value: number | null, suffix: string) {
 function resolveHeroLevel(weather: WeatherIntelligenceData["weather"]): HeroLevel {
   const activeAlerts = weather.alerts.filter((alert) => alert.period === "active");
   if (
-    activeAlerts.some(
-      (alert) => alert.severity === "danger" || alert.severity === "great-danger",
-    )
+    activeAlerts.some((alert) => alert.severity === "danger" || alert.severity === "great-danger")
   ) {
     return "warning";
   }
@@ -136,7 +134,9 @@ function resolveHeroTitle(data: WeatherIntelligenceData, level: HeroLevel) {
 
 function statusLabel(level: HeroLevel, activeAlertCount: number) {
   if (level === "warning") {
-    return activeAlertCount === 1 ? "Aviso oficial ativo" : `${activeAlertCount} avisos oficiais ativos`;
+    return activeAlertCount === 1
+      ? "Aviso oficial ativo"
+      : `${activeAlertCount} avisos oficiais ativos`;
   }
   if (level === "attention") return "Monitoramento em atenção";
   return "Monitoramento atualizado";
@@ -280,7 +280,9 @@ export function WeatherEditorialHero({ data }: { data: WeatherIntelligenceData }
           ) : null}
 
           <div className="weather-editorial-quality">
-            <span className={`weather-editorial-confidence weather-editorial-confidence-${weather.quality.confidence}`}>
+            <span
+              className={`weather-editorial-confidence weather-editorial-confidence-${weather.quality.confidence}`}
+            >
               {weather.quality.confidence === "high" ? (
                 <CheckCircle2 aria-hidden="true" />
               ) : (
