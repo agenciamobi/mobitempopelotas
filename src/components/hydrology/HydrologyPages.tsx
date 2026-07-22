@@ -88,6 +88,17 @@ function formatDateTime(value: string | null) {
   }).format(date);
 }
 
+function formatReadingAge(value: number | null) {
+  if (value === null) return null;
+  if (value < 1) return "menos de 1 minuto";
+
+  const hours = Math.floor(value / 60);
+  const minutes = value % 60;
+  if (hours === 0) return `${minutes} min`;
+  if (minutes === 0) return `${hours} h`;
+  return `${hours} h ${minutes} min`;
+}
+
 function formatSigned(value: number | null, suffix: string) {
   if (value === null) return "—";
   const prefix = value > 0 ? "+" : "";
@@ -168,6 +179,7 @@ function Sparkline({ data }: { data: LaranjalLevelData }) {
 function SourceStatus({ level }: { level: LaranjalLevelData }) {
   const live = level.status === "live";
   const stale = level.status === "stale";
+  const age = formatReadingAge(level.ageMinutes);
 
   return (
     <div className={`hydrology-source-status hydrology-source-status-${level.status}`}>
@@ -183,13 +195,15 @@ function SourceStatus({ level }: { level: LaranjalLevelData }) {
           {live
             ? "Telemetria atualizada"
             : stale
-              ? "Última leitura atrasada"
+              ? "Sensor sem nova medição"
               : "Telemetria indisponível"}
         </strong>
         <span>
-          {level.updatedAt
+          {live && level.updatedAt
             ? `Medição registrada em ${formatDateTime(level.updatedAt)}`
-            : level.error || "O portal tentará consultar novamente automaticamente."}
+            : stale && level.updatedAt
+              ? `${age ? `Sem nova medição há ${age}. ` : ""}Última leitura em ${formatDateTime(level.updatedAt)}.`
+              : level.error || "O portal tentará consultar novamente automaticamente."}
         </span>
       </div>
     </div>
@@ -209,7 +223,11 @@ function LevelReading({ level }: { level: LaranjalLevelData }) {
       <div className="hydrology-level-heading">
         <div>
           <p className="hydrology-kicker">Estação Laranjal · UFPel</p>
-          <h2 id="hydrology-level-title">Leitura local da Lagoa dos Patos</h2>
+          <h2 id="hydrology-level-title">
+            {level.status === "stale"
+              ? "Última leitura conhecida da Lagoa dos Patos"
+              : "Leitura local da Lagoa dos Patos"}
+          </h2>
         </div>
         <SourceStatus level={level} />
       </div>
@@ -218,7 +236,11 @@ function LevelReading({ level }: { level: LaranjalLevelData }) {
         <div className="hydrology-level-value">
           <Waves aria-hidden="true" />
           <strong>{level.currentLevel === null ? "—" : level.currentLevel.toFixed(2)}</strong>
-          <span>metros na referência do sensor</span>
+          <span>
+            {level.status === "stale"
+              ? "metros na última leitura do sensor"
+              : "metros na referência do sensor"}
+          </span>
         </div>
         <div className="hydrology-trend">
           <TrendIcon aria-hidden="true" />
