@@ -1,0 +1,54 @@
+name: Formatar metodologia
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  format-and-validate:
+    if: github.head_ref == 'agent/migrate-methodology-page' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout da branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/migrate-methodology-page
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Formatar lote
+        run: |
+          npx prettier --write \
+            src/components/methodology/MethodologyPage.tsx \
+            src/components/methodology/MethodologyPage.css \
+            src/routes/metodologia.tsx
+
+      - name: Validar build
+        run: npm run build
+
+      - name: Validar tipos
+        run: npm run typecheck
+
+      - name: Validar lint
+        run: npm run lint
+
+      - name: Publicar formatação
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/methodology/MethodologyPage.tsx src/components/methodology/MethodologyPage.css src/routes/metodologia.tsx
+          git commit -m "style: formata página de metodologia"
+          git push origin HEAD:agent/migrate-methodology-page
