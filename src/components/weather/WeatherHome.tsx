@@ -1,22 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import {
   AlertTriangle,
-  CheckCircle2,
   Cloud,
   CloudLightning,
   CloudMoon,
   CloudRain,
   CloudSun,
-  Droplets,
-  Eye,
-  Gauge,
-  Info,
   Moon,
-  Navigation,
   ShieldAlert,
   Sun,
-  Sunrise,
-  Sunset,
   Wind,
   type LucideIcon,
 } from "lucide-react";
@@ -25,6 +17,7 @@ import type { WeatherSourceKey } from "@/lib/weather/aggregated-weather.types";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import type { WeatherIconName } from "@/lib/weather/types";
 
+import { WeatherEditorialHero } from "./WeatherEditorialHero";
 import "./WeatherHome.css";
 
 const iconMap: Record<WeatherIconName, LucideIcon> = {
@@ -44,12 +37,6 @@ const sourceLabels: Record<WeatherSourceKey, string> = {
   cppmet: "CPPMet / UFPel",
   "open-meteo": "Open-Meteo",
 };
-
-const confidenceLabels = {
-  high: "Alta confiança",
-  medium: "Confiança moderada",
-  low: "Baixa confiança",
-} as const;
 
 function WeatherIcon({ name, size = 28 }: { name: WeatherIconName | null; size?: number }) {
   const Icon = name ? iconMap[name] : Cloud;
@@ -73,14 +60,6 @@ function formatFetchedAt(value: string) {
   return formatDateTime(value) ?? "horário não informado";
 }
 
-function displayNumber(value: number | null, suffix: string) {
-  return value === null ? "—" : `${value}${suffix}`;
-}
-
-function sourceLabel(source: WeatherSourceKey | null) {
-  return source ? sourceLabels[source] : "fonte indisponível";
-}
-
 export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
   const weather = data.weather;
 
@@ -102,112 +81,14 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
     );
   }
 
-  const current = weather.current;
   const degradedSources = weather.quality.degradedSources;
   const activeAlerts = weather.alerts.filter((alert) => alert.period === "active");
   const upcomingAlerts = weather.alerts.filter((alert) => alert.period === "upcoming");
   const relevantAlerts = [...activeAlerts, ...upcomingAlerts].slice(0, 4);
-  const temperatureLabel =
-    current?.temperature === null || current?.temperature === undefined
-      ? "Temperatura indisponível"
-      : `${current.temperature} graus Celsius`;
 
   return (
     <div className="weather-home">
-      {current ? (
-        <section className="weather-current" aria-labelledby="weather-current-title">
-          <div className="weather-current-copy">
-            <p className="weather-kicker">Condições atuais</p>
-            <h1 id="weather-current-title">
-              Tempo agora em {current.city}, {current.state}
-            </h1>
-            <p className="weather-condition">
-              {current.condition ?? "Condição meteorológica em atualização"}
-            </p>
-            <p className="weather-update">
-              {current.observedAt
-                ? `Atualizado às ${current.observedAt}`
-                : "Horário em atualização"}
-              {" · "}
-              {sourceLabel(weather.quality.currentSource)}
-            </p>
-            <div
-              className="weather-quality-summary"
-              aria-label="Qualidade dos dados meteorológicos"
-            >
-              <span
-                className={`weather-confidence weather-confidence-${weather.quality.confidence}`}
-              >
-                {weather.quality.confidence === "high" ? (
-                  <CheckCircle2 aria-hidden="true" />
-                ) : (
-                  <Info aria-hidden="true" />
-                )}
-                {confidenceLabels[weather.quality.confidence]}
-              </span>
-              <span>Índice de qualidade: {weather.quality.score}/100</span>
-              {degradedSources.length > 0 ? (
-                <span>{degradedSources.length} fonte(s) com restrição</span>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="weather-temperature" aria-label={temperatureLabel}>
-            <WeatherIcon name={current.icon} size={58} />
-            <strong>{current.temperature === null ? "—" : `${current.temperature}°`}</strong>
-            <span>
-              {current.feelsLike === null
-                ? "Sensação indisponível"
-                : `Sensação de ${current.feelsLike}°`}
-            </span>
-          </div>
-        </section>
-      ) : null}
-
-      {current ? (
-        <section className="weather-metrics" aria-label="Detalhes das condições atuais">
-          <article>
-            <Droplets aria-hidden="true" />
-            <span>Umidade</span>
-            <strong>{displayNumber(current.humidity, "%")}</strong>
-          </article>
-          <article>
-            <Wind aria-hidden="true" />
-            <span>Vento</span>
-            <strong>{displayNumber(current.windSpeed, " km/h")}</strong>
-            <small>
-              {current.windGust === null
-                ? "Rajadas indisponíveis"
-                : `Rajadas de ${current.windGust} km/h`}
-            </small>
-          </article>
-          <article>
-            <Navigation aria-hidden="true" />
-            <span>Direção</span>
-            <strong>{current.windDirection ?? "—"}</strong>
-          </article>
-          <article>
-            <Gauge aria-hidden="true" />
-            <span>Pressão</span>
-            <strong>{displayNumber(current.pressure, " hPa")}</strong>
-          </article>
-          <article>
-            <Eye aria-hidden="true" />
-            <span>Visibilidade</span>
-            <strong>{displayNumber(current.visibilityKm, " km")}</strong>
-          </article>
-          <article>
-            <Sunrise aria-hidden="true" />
-            <span>Nascer do sol</span>
-            <strong>{current.sunrise ?? "—"}</strong>
-          </article>
-          <article>
-            <Sunset aria-hidden="true" />
-            <span>Pôr do sol</span>
-            <strong>{current.sunset ?? "—"}</strong>
-          </article>
-        </section>
-      ) : null}
+      <WeatherEditorialHero data={data} />
 
       <section className="weather-section weather-brief" aria-labelledby="weather-brief-title">
         <div className="weather-section-heading">
