@@ -1,0 +1,57 @@
+name: Diagnóstico de fallback histórico
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose-history-fallback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Consultar endpoints históricos
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p history-fallback-diagnostic
+          LOG="history-fallback-diagnostic/summary.log"
+          END_DATE="$(TZ=America/Sao_Paulo date -d 'yesterday' +%F)"
+          START_DATE="$(TZ=America/Sao_Paulo date -d "$END_DATE -29 days" +%F)"
+          QUERY="latitude=-31.7654&longitude=-52.3376&timezone=America%2FSao_Paulo&start_date=$START_DATE&end_date=$END_DATE&daily=temperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Cwind_gusts_10m_max"
+
+          request() {
+            local name="$1"
+            local url="$2"
+            local body="history-fallback-diagnostic/${name}.json"
+            local metrics
+            metrics="$(curl --silent --show-error --location --compressed --max-time 30 \
+              --user-agent 'MOBI-Tempo-Pelotas/1.0 (+https://agenciamobi.com.br)' \
+              --output "$body" \
+              --write-out '%{http_code}|%{time_total}|%{content_type}' \
+              "$url" || echo '000|30|')"
+            printf '%-30s %s\n' "$name" "$metrics" | tee -a "$LOG"
+            if [[ "${metrics%%|*}" == "200" ]]; then
+              jq -r 'if .daily then "dias=\(.daily.time | length), inicio=\(.daily.time[0]), fim=\(.daily.time[-1]), max=\(.daily.temperature_2m_max | length), min=\(.daily.temperature_2m_min | length), chuva=\(.daily.precipitation_sum | length), rajada=\(.daily.wind_gusts_10m_max | length)" else "sem objeto daily" end' "$body" | tee -a "$LOG"
+            else
+              head -c 800 "$body" | tee -a "$LOG" || true
+              echo | tee -a "$LOG"
+            fi
+          }
+
+          request "historical-forecast" "https://historical-forecast-api.open-meteo.com/v1/forecast?$QUERY"
+          request "archive-api" "https://archive-api.open-meteo.com/v1/archive?$QUERY"
+
+          echo "Período: $START_DATE a $END_DATE" | tee -a "$LOG"
+
+      - name: Publicar diagnóstico
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: history-fallback-diagnostic
+          path: history-fallback-diagnostic
+          if-no-files-found: error
+          retention-days: 2
