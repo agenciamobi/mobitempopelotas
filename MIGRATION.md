@@ -152,11 +152,10 @@ _legacy/
 ## Snapshot atual do legado
 
 - Repositório origem: `agenciamobi/tempopelotas` @ `main`
-- Commit canônico: `05cd2d268ad25c070718ecc170bd30e8ad181341`
-- Data UTC: `2026-07-22T00:14:00Z`
-- Método: ponte temporária autenticada → ZIP curado
-- SHA-256 do ZIP: `7714992dd24a2a2b2bdecac800d4640c0465ecd0bdb10ed0ca63c5477c52eac7`
-- Arquivos em `_legacy/`: `244`
+- Commit sincronizado: `05cd2d268ad25c070718ecc170bd30e8ad181341`
+- Data UTC: `2026-07-22T00:11:00Z`
+- Método: `git clone --depth 1` + `rsync` sanitizado
+- Arquivos em `_legacy/`: `249`
 - Detalhes e exclusões: ver `_legacy/SOURCE_SNAPSHOT.md`
 
 ## Matriz de migração
