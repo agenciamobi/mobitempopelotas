@@ -1,152 +1,128 @@
-# Matriz de Migração — Tempo Pelotas
+# Matriz completa de migração — Tempo Pelotas
 
-Inventário comparativo entre a origem em `_legacy/` (Next.js 16, commit
-`05cd2d26`, 2026-07-22) e a implementação nativa em `src/` (TanStack Start).
+Inventário comparativo entre:
 
-Legenda de status: **Migrado** · **Parcial** · **Não migrado** · **Revisar** · **Descartar**.
+- **Origem:** `_legacy/`, snapshot de `agenciamobi/tempopelotas@main`, commit `05cd2d268ad25c070718ecc170bd30e8ad181341`;
+- **Destino:** implementação nativa em `src/`, com TanStack Start, TanStack Router, React 19, Vite, Nitro e Supabase externo.
+
+## Legenda
+
+- **Migrado:** existe implementação nativa funcional no destino.
+- **Parcial:** existe base funcional, mas sem paridade com a origem.
+- **Não migrado:** existe somente no snapshot legado.
+- **Revisar:** deve ser reavaliado antes de portar ou manter.
+- **Descartar:** configuração específica do Next.js/Vercel que não deve ser portada.
 
 ## Resumo executivo
 
-| Domínio | Migrado | Parcial | Não migrado |
-| --- | --- | --- | --- |
-| Layout, header, footer, navegação | ~60% | header sem megamenu novo, sem estados de alerta | — |
-| Home (hero + editorial) | ~15% | apenas previsão Open-Meteo | dashboard editorial, hero CPPMet, banners, alertas |
-| Camada meteorológica (Open-Meteo) | ~40% | forecast base | Embrapa, INMET, CPPMet, insights, cameras, radar |
-| Hidrologia (Laranjal, Guaíba, Lagoon Network) | 0% | — | tudo |
-| REDEMET (radar/satélite/trovoadas) | 0% | — | tudo |
-| Câmeras / YouTube | 0% | — | tudo |
-| Histórico climático + snapshots Supabase | 0% | — | tudo |
-| Autenticação Supabase/Google | 0% | — | tudo |
-| APIs internas / cron / push / PWA | 0% | — | tudo |
-| SEO técnico (sitemap, robots, feed, JSON-LD, OG dinâmico) | ~10% | metas básicas | sitemap, robots, feed, pelotas.json, schema.org |
-| Rotas internas (placeholders vs. conteúdo real) | ~5% | 10 rotas placeholder criadas | conteúdo real de todas elas |
-| Observabilidade, LGPD, testes, deploy | 0% | — | tudo |
+| Domínio | Estimativa atual | Situação |
+| --- | ---: | --- |
+| Fundação, rotas e layout básico | 55% | Estrutura TanStack pronta; identidade e navegação ainda sem paridade |
+| Previsão meteorológica | 35% | Open-Meteo funcional; faltam fontes locais, alertas e sínteses |
+| Home editorial | 15% | Home mínima funcional; hero e blocos avançados não migrados |
+| Hidrologia | 0% | Todo o domínio ainda está no legado |
+| Radar, satélite, trovoadas e mapas | 0% | REDEMET e MapLibre ainda não migrados |
+| Câmeras | 0% | YouTube e contingências ainda não migrados |
+| Supabase, histórico e autenticação | 5% | Somente adaptador mock e configuração pública |
+| PWA, push e cron | 0% | Requer adaptação de runtime |
+| SEO técnico | 15% | Metadados básicos presentes; endpoints e dados estruturados ausentes |
+| Qualidade, observabilidade e LGPD | 5% | Build e typecheck funcionam; testes e governança pendentes |
 
-**Percentual global aproximado migrado: ~10%.**
+**Percentual global aproximado de paridade funcional: 10% a 15%.**
 
-### Novidades da origem em relação ao snapshot anterior deste projeto
+## Bloqueadores principais
 
-Explicitamente presentes em `_legacy/` e ausentes de `src/`:
+1. Separar rigorosamente código browser, código server-only e tarefas incompatíveis com o runtime Nitro adotado pelo Lovable.
+2. Instalar e configurar o SDK do Supabase externo com clientes distintos para navegador e servidor, sem criar banco paralelo no Lovable Cloud.
+3. Revisar migrations e RLS antes de ativar autenticação, histórico, snapshots ou push.
+4. Portar MapLibre apenas no cliente, com carregamento dinâmico e proteção contra SSR.
+5. Definir execução de cron e envio web-push em runtime compatível, provavelmente usando Supabase Edge Functions ou serviço externo.
+6. Manter todas as secrets exclusivamente em server functions ou runtime de backend.
 
-- **REDEMET/DECEA**: `lib/redemet.ts`, `redemet-last-good.ts`, `redemet-types.ts` e rotas `app/api/redemet/{radar,satellite,storms,image}`.
-- **CPPMet/UFPel no hero**: `lib/cppmet-forecast.ts`, `app/api/weather/cppmet` e integração no `weather-hero.tsx`.
-- **Banners Defesa Civil / alertas de segurança**: `lib/safety-banners.ts`, `components/safety-alerts.tsx`, CSS dedicados.
-- **Fallback de câmera do Laranjal**: `lib/youtube-latest-stream.ts` + rotas `app/api/cameras/*`.
-- **Regras semânticas de níveis de água**: `lib/water-level-state.ts`, `home-editorial-dashboard-semantic.tsx`.
-- **Auditoria CCMAR/FURG e diagnóstico de integrações**: `app/api/integrations/status`, docs em `_legacy/docs/`.
-- **Novo header + megamenu**: `site-header.tsx` reformulado, `header-megamenu-v25.css`, `header-auth-portal.tsx`.
-- **Ajustes da rota Amanhã**: `app/tempo-amanha-pelotas/page.tsx`.
-- **Login Google e área "Minha conta"**: `app/auth/*`, `app/entrar`, `app/minha-conta`, `components/google-login-card.tsx`, `components/auth-account-action.tsx`.
-- **Resumo IA com Gemini**: `lib/weather-ai-summary.ts`, `components/weather-ai-summary.tsx`.
+## Matriz operacional
 
-### Bloqueadores e dependências críticas
+| ID | Recurso | Status | Origem no snapshot | Destino atual ou planejado | Dependências / variáveis | Adaptação Next.js → TanStack Start/Nitro | Risco | Critério de aceite | Lote |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | ---: |
+| 01 | Layout global e identidade | Parcial | `_legacy/app/layout.tsx`, `_legacy/app/globals.css`, CSS de tema | `src/routes/__root.tsx`, `src/components/layout/SiteLayout.tsx`, `src/styles.css` | Nenhuma | Converter metadata/viewport e consolidar CSS global em tokens/componentes | Médio | Identidade visual, container, tipografia, foco e estados globais equivalentes | 3 |
+| 02 | Header desktop/mobile | Parcial | `_legacy/components/site-header.tsx` | `src/components/layout/Header.tsx` | Estado de alertas; futuramente sessão Supabase | Substituir `next/link`, adaptar navegação e estados ativos ao TanStack Router | Alto | Navegação funcional, acessível e responsiva, sem regressão de rotas | 3 |
+| 03 | Megamenu novo | Não migrado | `_legacy/components/site-header.tsx`, `_legacy/app/header-megamenu-v25.css` | `src/components/layout/Header.tsx` ou componente `MegaMenu.tsx` | Alertas e autenticação opcionais | Reimplementar interação, foco, `Escape`, clique externo e painel flutuante sem CSS legado cumulativo | Alto | Um painel por vez, teclado completo, desktop estável e mobile separado | 3 |
+| 04 | Footer editorial | Parcial | `_legacy/components/site-footer.tsx`, `_legacy/app/footer-*.css` | `src/components/layout/Footer.tsx` | Rotas existentes | Migrar grupos e links, removendo redundâncias do legado | Baixo | Todos os destinos válidos, fontes e créditos corretos, mobile consistente | 3 |
+| 05 | Home base | Parcial | `_legacy/app/page.tsx` | `src/routes/index.tsx`, `src/components/weather/WeatherHome.tsx` | Contratos meteorológicos | Loader SSR já existe; falta composição editorial completa | Alto | Home usa somente dados reais e possui todos os blocos prioritários | 3 |
+| 06 | Hero meteorológico dinâmico | Não migrado | `_legacy/components/weather-hero.tsx`, CSS do hero | `src/components/weather/WeatherHero.tsx` | Open-Meteo, CPPMet, INMET, Gemini opcional | Adaptar agregação server-side e remover dependências de componentes Next | Alto | Título dinâmico coerente, descrição CPPMet, métricas previstas e fallback seguro | 3 |
+| 07 | Previsão atual Open-Meteo | Migrado | `_legacy/lib/weather-service.ts`, `_legacy/lib/weather-data.ts` | `src/lib/weather/open-meteo.server.ts`, `weather.functions.ts`, `types.ts` | API pública Open-Meteo | Já adaptada para server function, timeout, cache e Zod | Baixo | Resposta validada, cache, timeout e indisponibilidade explícita | 2 |
+| 08 | Página “Hoje” | Parcial | `_legacy/app/tempo-hoje-pelotas/page.tsx` | `src/routes/tempo-hoje-pelotas.tsx` | Contrato unificado de previsão | Substituir placeholder por loader e componentes nativos | Médio | Hora a hora, chuva, vento e métricas do dia usando contrato compartilhado | 3 |
+| 09 | Página “Amanhã” | Não migrado | `_legacy/app/tempo-amanha-pelotas/page.tsx` | `src/routes/tempo-amanha-pelotas.tsx` | Open-Meteo, síntese determinística/Gemini | Criar rota TanStack e preservar destaque visual sem CSS frágil | Médio | Página indexável com previsão, destaque e fallback sem “síntese indisponível” | 3 |
+| 10 | Tendência e destaque de amanhã na Home | Não migrado | CSS `home-tomorrow-focus-v25.css`, componentes editoriais | `WeatherHome.tsx` ou `ForecastTrend.tsx` | Dados diários | Identificar amanhã por dados, não por data fixa ou seletor frágil | Médio | Primeiro dia destacado automaticamente e resumo abaixo responsivo | 3 |
+| 11 | Página “7 dias” | Parcial | `_legacy/app/previsao-7-dias-pelotas/page.tsx` | `src/routes/previsao-7-dias-pelotas.tsx` | Open-Meteo | Rota existe como placeholder; reutilizar contratos SSR | Baixo | Sete dias completos, sem duplicação de copy, links e metadados próprios | 3 |
+| 12 | Chuva e vento | Parcial | páginas e componentes do legado | `src/routes/chuva-em-pelotas.tsx`, `vento-em-pelotas.tsx` | Open-Meteo | Substituir placeholders por visões temáticas | Médio | Probabilidade, volume, períodos críticos, direção e rajadas coerentes | 3 |
+| 13 | Observação Embrapa | Não migrado | `_legacy/lib/embrapa-observation.ts`, API e página Embrapa | `src/lib/weather/embrapa.server.ts`, server function e rota | Fonte pública Embrapa | Portar parser, timeout e validação de atualidade; sem números fictícios | Alto | Medição local rotulada, timestamp original e descarte de dado atrasado conforme regra definida | 2 |
+| 14 | Alertas INMET | Não migrado | `_legacy/lib/inmet-alerts.ts`, API, painel e `/alertas` | `src/lib/weather/inmet.server.ts`, server function, componentes e rota | Fonte oficial INMET | Portar parser e filtro geográfico; cache controlado | Alto | Apenas alertas aplicáveis a Pelotas, severidade, vigência e fonte explícitas | 2 |
+| 15 | CPPMet/UFPel | Não migrado | `_legacy/lib/cppmet-forecast.ts`, `/api/weather/cppmet` | `src/lib/weather/cppmet.server.ts` | Site público CPPMet/UFPel | Substituir route handler Next por server function, sanitizar HTML e manter fingerprint | Alto | Texto do meteorologista no hero, atribuição e falha silenciosa segura | 2 |
+| 16 | Defesa Civil — banners preventivos | Não migrado | `_legacy/lib/safety-banners.ts`, `safety-alerts.tsx`, CSS | `src/lib/safety-banners.ts`, componente Home e seção `/alertas` | Links oficiais, SMS 40199, WhatsApp | Conteúdo editorial local; não transformar artigo em alerta ativo | Médio | Canais oficiais, dismiss por sessão, prioridade abaixo de alerta vigente | 3 |
+| 17 | Gemini — resumo meteorológico | Não migrado | `_legacy/lib/weather-ai-summary.ts`, componente e CSS | `src/lib/weather/gemini-summary.server.ts` | `GEMINI_API_KEY`, `GEMINI_MODEL` | Chamada somente no servidor; resposta estruturada, timeout e parser tolerante | Alto | JSON válido, cache, fallback determinístico e nenhuma chave no cliente | 2 |
+| 18 | Insights e regras editoriais | Não migrado | `_legacy/lib/weather-insights.ts` | `src/lib/weather/insights.ts` | Contratos normalizados | Portar funções puras, sem acoplamento visual | Médio | Chips, títulos e prioridades reproduzíveis por testes unitários | 2 |
+| 19 | REDEMET — cliente server-side | Não migrado | `_legacy/lib/redemet.ts`, `redemet-types.ts`, `redemet-last-good.ts` | `src/lib/redemet/*.server.ts` | `REDEMET_API_KEY`, base URL, área `cn`, produto `maxcappi` | Trocar API routes Next por server functions/rotas Nitro; validar streaming e cache | Alto | Chave privada, schemas válidos, timeout, último quadro e logs sanitizados | 5 |
+| 20 | REDEMET — radar de Canguçu | Não migrado | rotas `/api/redemet/radar` e `/image` | server route + componente de mapa | REDEMET | Proxy com allowlist, limite de tamanho e bounds geográficos | Alto | MaxCAPPI animado, horário, opacidade, legenda e fallback | 5 |
+| 21 | REDEMET — satélite | Não migrado | `/api/redemet/satellite` | server function + mapa | REDEMET | Normalizar URLs relativas e tipos de produto | Médio | Realçado, infravermelho e visível com timeline e atribuição | 5 |
+| 22 | REDEMET — trovoadas STSC | Não migrado | `/api/redemet/storms` | server function + camada MapLibre | REDEMET | Validar coordenadas, deduplicar e filtrar raio regional | Alto | Pontos regionais com recência, sem converter monitoramento em alerta oficial | 5 |
+| 23 | MapLibre e mapa regional | Não migrado | `_legacy/components/weather-map.tsx`, CSS/module | `src/components/maps/RegionalWeatherMap.tsx` | `maplibre-gl` | Importação client-only, `ClientOnly`/lazy e nenhuma execução no SSR | Alto | Sem erro de hidratação, responsivo, teclado e tela cheia | 5 |
+| 24 | Google Maps | Revisar | Somente variáveis e referências no legado | Nenhum consumo atual | chaves Maps públicas/servidor | Não portar enquanto não houver caso de uso aprovado | Baixo | Chaves restritas ou removidas; integração somente se necessária | 9 |
+| 25 | Câmera do Laranjal / YouTube | Não migrado | `weather-cameras.ts`, `youtube-latest-stream.ts`, APIs e página | `src/lib/cameras/*.server.ts`, rota e componente | `YOUTUBE_API_KEY`, handle e ID manual opcional | API como primária; descoberta pública e ID manual como contingência | Alto | Live reconhecida, replay separado, embed nocookie e diagnóstico sem secrets | 5 |
+| 26 | Hidrologia — Laranjal | Não migrado | `laranjal-level.ts`, API, página e cards | `src/lib/hydrology/laranjal.server.ts`, rota e componentes | telemetria UFPel/ThingsBoard | Portar fetch server-side, cache e série; não definir cota própria | Alto | Nível, timestamp, tendência recente e fonte; indisponibilidade explícita | 4 |
+| 27 | Regras semânticas de níveis | Não migrado | `_legacy/lib/water-level-state.ts`, CSS de cores | `src/lib/hydrology/water-level-state.ts` | Cota opcional por estação | Função pura central: vermelho na cota, laranja subindo, ciano baixando, neutro demais | Médio | Mesma regra em números, tags, bordas e gráficos, sem depender apenas da cor | 4 |
+| 28 | Rede CCMAR/FURG/Portos RS | Não migrado | `lagoon-monitoring-network.ts`, componentes e API | `src/lib/hydrology/lagoon-network.server.ts` | fontes FURG/Portos RS | Portar cálculo com janelas temporais tolerantes e controle de atraso | Alto | Estado atualizado/atrasado, cotas da fonte, variações confiáveis e sem faixa própria de atenção | 4 |
+| 29 | Guaíba e cidades regionais | Não migrado | `guaiba-monitor.ts`, `nivel-guaiba-*.ts`, APIs e card | `src/lib/hydrology/guaiba*.server.ts` | fontes públicas regionais | Portar normalização e cotas específicas; separar referências entre cidades | Alto | Porto Alegre e cidades com timestamps, tendências e referências corretas | 4 |
+| 30 | Página de situação hidrológica | Não migrado | `_legacy/app/situacao-hidrologica-pelotas/page.tsx` | `src/routes/situacao-hidrologica-pelotas.tsx` | Todos os serviços hidrológicos | Substituir placeholder e compor múltiplas fontes sem bloquear a página | Alto | Laranjal, rede da Lagoa e Guaíba com metodologias e fontes claras | 4 |
+| 31 | Histórico climático | Não migrado | `weather-history*.ts`, API, gráficos e página | `src/lib/weather/history.server.ts`, rota e charts | Supabase externo | Portar consultas e gráficos; definir retenção e agregação | Alto | Séries reais, timezone consistente, estados vazios e fonte documentada | 6 |
+| 32 | Snapshots meteorológicos | Não migrado | `weather-snapshot-store.ts`, cron e migration | server function/Edge Function + Supabase | `CRON_SECRET`, service role | Garantir idempotência, chave única e execução compatível | Alto | Snapshot periódico sem duplicação, logs e recuperação de falhas | 6 |
+| 33 | Supabase — cliente browser/server | Parcial | libs Supabase do legado | `src/lib/supabase/*` atualmente mock | URL, publishable key, service role server-only | Instalar SDK e separar clientes; nunca expor service role | Alto | Sessão browser funcional, operações server seguras e modo mock removível | 6 |
+| 34 | Banco, migrations e RLS | Não migrado | `_legacy/supabase/migrations/*` | Supabase externo oficial | acesso ao projeto Supabase | Revisar SQL antes de aplicar; não usar banco paralelo | Crítico | Migrations versionadas, RLS habilitada, policies testadas e rollback documentado | 6 |
+| 35 | Login Google e conta | Não migrado | `/auth/*`, `/entrar`, `/minha-conta`, componentes de auth | rotas TanStack e componentes nativos | Supabase Auth com provider Google | Adaptar callback, cookies/sessão SSR e redirects | Alto | Login, logout, callback, conta e proteção de dados funcionando | 7 |
+| 36 | APIs internas e diagnóstico | Não migrado | `_legacy/app/api/**`, `/api/integrations/status` | `createServerFn` e `src/routes/api/public/*` | variáveis de cada integração | Classificar RPC interno versus endpoint público; padronizar respostas | Alto | Status distingue configurado/operacional sem vazar secrets | 2–8 |
+| 37 | Cron | Não migrado | `/api/cron/push-daily`, `/api/cron/weather-snapshot` | rotas públicas assinadas ou Edge Functions | `CRON_SECRET`, `PUSH_ADMIN_SECRET` | Substituir Vercel Cron por scheduler compatível | Alto | Assinatura, idempotência, logs e execução observável | 8 |
+| 38 | Web push | Não migrado | `web-push-service.ts`, subscription store, APIs | Supabase Edge Function ou runtime Node compatível | VAPID public/private, subject | `web-push` pode ser incompatível com runtime; evitar service role no navegador | Crítico | Subscribe/unsubscribe, envio real, expiração e limpeza de inscrições | 8 |
+| 39 | PWA e offline | Não migrado | `manifest.ts`, `public/sw.js`, `pwa-manager.tsx`, `/offline` | manifest estático/dinâmico, SW Vite e rota | VAPID opcional | Reescrever integração Next; definir atualização segura do SW | Alto | Instalável, offline controlado, atualização sem cache quebrado | 8 |
+| 40 | Sitemap | Não migrado | `_legacy/app/sitemap.ts` | `src/routes/sitemap[.]xml.ts` ou server route equivalente | lista canônica de rotas | Gerar XML com headers e datas confiáveis | Médio | Todas as URLs públicas canônicas, sem rotas privadas ou duplicadas | 9 |
+| 41 | Robots | Não migrado | `_legacy/app/robots.ts` | `src/routes/robots[.]txt.ts` | URL de produção | Gerar texto no runtime ou arquivo público | Baixo | Sitemap referenciado e regras corretas por ambiente | 9 |
+| 42 | Canonicals | Parcial | metadata das páginas Next | `head()` das rotas TanStack | `SITE_URL` | Centralizar URL absoluta e evitar canonicals de preview | Médio | Toda rota indexável possui canonical único de produção | 9 |
+| 43 | Open Graph e Twitter Cards | Parcial | metadata e assets do legado | `head()` + assets em `public/` | URL pública e imagem social | Adaptar metadata por rota | Médio | Título, descrição, imagem, dimensões e URL corretos | 9 |
+| 44 | Schema.org | Não migrado | JSON-LD espalhado no legado | helpers e scripts por rota | dados meteorológicos e organização | Validar tipos WebSite, Organization, BreadcrumbList e Dataset/Weather quando aplicável | Médio | JSON-LD válido sem alegações indevidas ou dados inventados | 9 |
+| 45 | `pelotas.json`, feed e transparência | Não migrado | `/pelotas.json`, `/feed`, metodologia | rotas públicas Nitro | contratos agregados | Definir cache, content-type e versão do schema | Médio | JSON estável, feed válido e documentação das fontes | 9 |
+| 46 | PageSpeed API | Revisar | variável disponível, sem consumo funcional | Ferramenta administrativa futura | `GOOGLE_PAGESPEED_API_KEY` | Não incluir na experiência pública sem caso de uso | Baixo | Remover chave desnecessária ou criar diagnóstico restrito | 10 |
+| 47 | Acessibilidade | Revisar | skip link, ARIA e semântica em componentes legados | todos os componentes migrados | Nenhuma | Preservar foco, teclado, contraste e informação além da cor | Alto | WCAG 2.2 AA nos fluxos principais e testes de teclado | Contínuo |
+| 48 | Responsividade | Revisar | dezenas de CSS `mobile-*` e refinamentos | Tailwind e CSS por componente | Nenhuma | Não copiar cascata cumulativa; reconstruir mobile-first | Alto | 320 px a desktop sem overflow, cortes ou colunas comprimidas | Contínuo |
+| 49 | Observabilidade | Não migrado | logs pontuais no legado | logger server-side e endpoint de saúde | provedores futuros | Sanitizar erros e correlation IDs; nunca registrar secrets | Médio | Falhas de fontes rastreáveis, métricas básicas e logs úteis | 10 |
+| 50 | Segurança e LGPD | Revisar | práticas parciais no legado | políticas, consentimento e controles no novo app | Supabase/Auth/push | Revisar coleta, retenção, cookies, conta e exclusão de dados | Crítico | Avisos claros, mínimo de dados, direitos do titular e secrets protegidas | 7–10 |
+| 51 | Testes | Não migrado | diagnóstico Windy e validações manuais | Vitest, testes de contratos e smoke tests | ferramentas de teste | Testar funções puras e parsers sem depender sempre de APIs externas | Alto | Cobertura de normalização, estados de erro e rotas críticas | 10 |
+| 52 | Build, lint e typecheck | Parcial | workflows do legado | `.github/workflows/quality.yml` do novo projeto | Node/Bun conforme lockfile | Padronizar ordem build → typecheck → lint | Médio | Três comandos passam em ambiente limpo e CI fornece logs | 10 |
+| 53 | Deploy e domínio | Parcial | Vercel/Next (`vercel.json`, `next.config.ts`) | Lovable hosting/TanStack Start | secrets e domínio | Descartar config Vercel; validar runtime, headers, cache e redirects | Crítico | Preview validado, paridade funcional, DNS com rollback e zero perda SEO | 10 |
 
-1. **Runtime Worker**: várias libs em `_legacy/` assumem Node completo (`web-push`, `maplibre-gl` server-side, `fs.watch`, `child_process`). Cada porta precisa validar compatibilidade com Cloudflare Workers (ver `<server-runtime>`).
-2. **Supabase externo oficial**: SDK real ainda não instalado; toda a persistência (snapshots, push subscriptions, auth) depende disso.
-3. **Segredos**: REDEMET, Gemini, VAPID, YouTube, Supabase service role — armazenados no projeto Lovable, mas devem ser lidos somente em server functions.
-4. **PWA**: `next-pwa`/service worker precisa ser reescrito em cima do Vite plugin (`vite-plugin-pwa` ou service worker manual).
-5. **Cron**: `app/api/cron/*` do Next → server routes em `src/routes/api/public/*` com verificação de segredo.
+## Recursos desenvolvidos após o snapshot anterior e confirmados no novo `_legacy/`
 
-### Sequência de lotes recomendada
+- REDEMET: radar de Canguçu, satélite, trovoadas, proxy de imagens e último quadro válido;
+- CPPMet/UFPel integrado ao hero;
+- banners educativos da Defesa Civil;
+- fallback da câmera do Laranjal via página pública e ID manual;
+- regra semântica centralizada para cores dos níveis;
+- auditoria da rede CCMAR/FURG/Portos RS;
+- diagnóstico sanitizado das integrações;
+- novo header com megamenu;
+- página, resumo e destaque visual de amanhã;
+- autenticação Google via Supabase e área “Minha conta”;
+- sínteses meteorológicas com Gemini e fallback determinístico.
 
-1. **Lote 2 — Camada meteorológica completa**: portar Embrapa, INMET, CPPMet e insights; consolidar contratos em `src/lib/weather/`.
-2. **Lote 3 — Home real**: `home-editorial-dashboard` + `weather-hero` + `safety-alerts` + INMET panel.
-3. **Lote 4 — Hidrologia**: Laranjal, Guaíba, rede de monitoramento da Lagoa.
-4. **Lote 5 — REDEMET + Câmeras + Mapas** (após avaliar MapLibre no Worker).
-5. **Lote 6 — Supabase externo real**: cliente browser/server, migrations, RLS, snapshots e histórico.
-6. **Lote 7 — Auth Google + Minha conta**.
-7. **Lote 8 — Cron, push, PWA**.
-8. **Lote 9 — SEO técnico** (sitemap, robots, feed, pelotas.json, JSON-LD, OG dinâmico) + a11y + performance.
-9. **Lote 10 — Observabilidade, testes, deploy** e remoção de `_legacy/`.
+## Sequência de execução recomendada
 
----
+1. **Lote 2 — Fontes meteorológicas:** Embrapa, INMET, CPPMet, insights e Gemini, com contratos e testes.
+2. **Lote 3 — Home e páginas de previsão:** hero, alertas, Defesa Civil, Hoje, Amanhã, 7 dias, chuva e vento.
+3. **Lote 4 — Hidrologia:** Laranjal, regra semântica, CCMAR/FURG/Portos RS, Guaíba e situação hidrológica.
+4. **Lote 5 — REDEMET, mapas e câmeras:** cliente server-side, radar, satélite, STSC, MapLibre e YouTube.
+5. **Lote 6 — Supabase e histórico:** clientes reais, migrations/RLS, snapshots e histórico climático.
+6. **Lote 7 — Autenticação e LGPD:** Google, conta, sessão SSR, privacidade e direitos do usuário.
+7. **Lote 8 — PWA, push e cron:** manifest, service worker, inscrições, envio e scheduler.
+8. **Lote 9 — SEO e transparência:** sitemap, robots, canonicals, OG, Schema, JSON, feed e metodologia.
+9. **Lote 10 — Qualidade e corte:** testes, acessibilidade, performance, observabilidade, segurança, deploy, DNS e rollback.
 
-## Inventário detalhado
+## Regra de atualização
 
-Formato de cada linha: **Status | Origem → Destino | Deps/env | Incompat. Next→TanStack | Risco | Aceite | Lote**.
-
-### Layout e identidade
-- **Parcial** — `_legacy/app/layout.tsx`, `app/globals.css` e ~60 CSS de tema → `src/routes/__root.tsx`, `src/styles.css`. Deps: nenhum. Incompat: `metadata`/`viewport` do Next não existem (usar `head()` em cada rota). Risco: médio (perda de tokens). Aceite: tokens principais e reset presentes; head raiz com lang/theme-color. Lote: 3.
-- **Não migrado** — 60+ arquivos CSS temáticos (`home-editorial-*.css`, `mobile-*.css`, `theme-*.css`, `footer-*.css`, `header-megamenu-v25.css`, `home-cppmet-layout-water-audit.css`, `inmet-alerts.css`). Aceite: consolidar em módulos por componente ou `styles.css`. Lote: 3.
-
-### Header e megamenu
-- **Parcial** — `_legacy/components/site-header.tsx` (+ `header-auth-portal.tsx`, `header-megamenu-v25.css`) → `src/components/layout/Header.tsx`. Incompat: menu com dados de sessão (Supabase Auth) e estados de alerta agregando INMET/Defesa Civil. Risco: alto (UX central). Aceite: megamenu com as mesmas categorias, estados de alerta e portal de autenticação. Lote: 3 (visual) + 7 (auth).
-
-### Footer
-- **Parcial** — `_legacy/components/site-footer.tsx` + `footer-*.css` → `src/components/layout/Footer.tsx`. Incompat: links dinâmicos por rota. Aceite: mesmas seções e links do original. Lote: 3.
-
-### Home
-- **Parcial** — `_legacy/app/page.tsx`, `components/home-editorial-dashboard.tsx`, `home-editorial-dashboard-semantic.tsx`, `weather-hero.tsx`, `home-section-navigation.tsx`, `safety-alerts.tsx`, `inmet-alerts-panel.tsx` → `src/routes/index.tsx`, `src/components/weather/WeatherHome.tsx`. Deps: quase todos os libs meteorológicos e hidrológicos. Aceite: hero + dashboard editorial + banners de segurança + INMET, todos ligados a contratos reais. Lote: 3.
-
-### Previsão do tempo
-- **Migrado (base)** — Open-Meteo: `_legacy/lib/weather-service.ts`, `weather-data.ts` → `src/lib/weather/open-meteo.server.ts`, `weather.functions.ts`, `types.ts`. Aceite atual: previsão atual + horária + 7 dias em `WeatherHome`.
-- **Não migrado** — Embrapa: `_legacy/lib/embrapa-observation.ts` + `app/api/weather/embrapa` + `estacao-embrapa-pelotas/page.tsx` + `components/embrapa-observation-overview.tsx`. Aceite: observação recente com validação de atualidade (≤ 2h). Lote: 2.
-- **Não migrado** — INMET: `_legacy/lib/inmet-alerts.ts`, `app/api/alerts/inmet`, `app/alertas/page.tsx`, `components/inmet-alerts-panel.tsx`. Deps: XML/RSS INMET. Aceite: alertas atuais com filtro Pelotas + severidade. Lote: 2.
-- **Não migrado** — CPPMet/UFPel: `_legacy/lib/cppmet-forecast.ts`, `app/api/weather/cppmet`. Aceite: painel CPPMet no hero. Lote: 2.
-- **Não migrado** — Insights e AI summary: `_legacy/lib/weather-insights.ts`, `weather-ai-summary.ts`, `components/weather-ai-summary.tsx`. Deps: `GEMINI_API_KEY`. Aceite: resumo do dia com fallback textual. Lote: 2/6.
-- **Não migrado (conteúdo)** — Rotas `tempo-hoje-pelotas`, `tempo-amanha-pelotas`, `previsao-7-dias-pelotas`, `chuva-em-pelotas`, `vento-em-pelotas` estão como placeholders. Lote: 3.
-
-### Hidrologia
-- **Não migrado** — Laranjal: `_legacy/lib/laranjal-level.ts` + `app/api/hydrology/laranjal` + `nivel-da-lagoa-dos-patos-laranjal/page.tsx` + `components/laranjal-level-card.tsx`. Aceite: nível atual + tendência + alerta operacional. Lote: 4.
-- **Não migrado** — Guaíba: `_legacy/lib/guaiba-monitor.ts`, `nivel-guaiba-cities.ts`, `nivel-guaiba-regional.ts`, `app/api/hydrology/guaiba*`, `components/guaiba-level-card.tsx`. Lote: 4.
-- **Não migrado** — Rede Lagoa dos Patos (CCMAR/FURG/Portos RS): `_legacy/lib/lagoon-monitoring-network.ts`, `lagoon-level.ts`, `hydrology.ts`, `app/api/hydrology/lagoon-network`, `components/lagoon-*`, `pelotas-hydrology-widget*`. Deps: auditoria CCMAR/FURG. Lote: 4.
-- **Não migrado** — `water-level-state.ts` (semântica de níveis) e `situacao-hidrologica-pelotas/page.tsx`. Lote: 4.
-
-### REDEMET / radar / satélite / trovoadas
-- **Não migrado** — `_legacy/lib/redemet.ts`, `redemet-last-good.ts`, `redemet-types.ts`, `app/api/redemet/{radar,satellite,storms,image}`, `components/weather-map.tsx`, `weather-radar.ts`. Deps: `REDEMET_API_KEY`. Incompat: proxy de imagens grande; avaliar streaming no Worker. Risco: alto. Lote: 5.
-
-### Câmeras / YouTube
-- **Não migrado** — `_legacy/lib/weather-cameras.ts`, `youtube-latest-stream.ts`, `app/api/cameras/*`, `app/cameras-ao-vivo-pelotas/page.tsx`, `components/weather-camera-explorer.tsx`. Deps: `YOUTUBE_API_KEY`. Aceite: exibir live + fallback para gravação. Lote: 5.
-
-### Histórico climático + snapshots Supabase
-- **Não migrado** — `_legacy/lib/weather-history*.ts`, `weather-snapshot-store.ts`, `app/api/weather/history`, `app/historico-climatico-pelotas/page.tsx`, `components/weather-history-chart.tsx`, `weather-trend-chart.tsx`. Deps: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. Incompat: chamadas fetch diretas ao PostgREST — reusar client server. Lote: 6.
-
-### Mapas
-- **Não migrado** — `maplibre-gl` no legado (`weather-map.tsx`). Incompat: import só em client (`<ClientOnly>` + `React.lazy`). Lote: 5.
-
-### Gemini (IA)
-- **Não migrado** — `_legacy/lib/weather-ai-summary.ts`. Deps: `GEMINI_API_KEY`. Aceite: chamada server-only com timeout e fallback estático. Lote: 2/6.
-
-### Autenticação Supabase/Google
-- **Não migrado** — `_legacy/app/auth/*`, `app/entrar`, `app/minha-conta`, `components/google-login-card.tsx`, `header-auth-portal.tsx`, `auth-account-action.tsx`. Deps: Supabase publishable + Google OAuth. Incompat: callbacks do Next → server routes `src/routes/api/public/auth/*`. Lote: 7.
-
-### Banco / RLS
-- **Não migrado** — `_legacy/supabase/migrations/*` (snapshots meteorológicos, subscriptions push). Aceite: revisar e aplicar no Supabase externo oficial (não criar Lovable Cloud). Lote: 6.
-
-### APIs internas
-- **Não migrado** — `_legacy/app/api/**` (weather, hydrology, redemet, cameras, alerts, integrations/status, push, cron, pelotas.json, feed). Cada uma vira `createServerFn` (RPC interno) ou rota em `src/routes/api/public/*` (webhooks/cron/feed público). Lote: 2–8 conforme domínio.
-
-### Cron
-- **Não migrado** — `_legacy/app/api/cron/{push-daily,weather-snapshot}`. Deps: `PUSH_ADMIN_SECRET` + secret cron. Incompat: sem `vercel.json cron`; usar scheduler externo apontando para `/api/public/...`. Lote: 8.
-
-### Push / PWA
-- **Não migrado** — `_legacy/lib/web-push-service.ts`, `push-subscription-store.ts`, `app/api/push/*`, `components/pwa-manager.tsx`, `public/sw.js`, `app/manifest.ts`, `app/offline/page.tsx`. Deps: VAPID keys. Incompat: `web-push` requer Node crypto — verificar suporte no Worker; alternativa: enviar via edge function externa. Lote: 8.
-
-### SEO técnico
-- **Parcial** — metas por rota. Faltando:
-  - Sitemap (`_legacy/app/sitemap.ts`)
-  - Robots (`_legacy/app/robots.ts`)
-  - Canonicals dinâmicos
-  - Open Graph completo com imagens
-  - `application/ld+json` (WebSite, BreadcrumbList, WeatherReport)
-  - `_legacy/app/pelotas.json/route.ts` (endpoint de dados agregados)
-  - `_legacy/app/feed/route.ts` (RSS/Atom)
-  Lote: 9.
-
-### Acessibilidade
-- **Revisar** — origem tem `id="conteudo-principal" tabIndex={-1}`, links skip, ARIA em cards. Migrar junto de cada componente. Lote: 3+.
-
-### Responsividade
-- **Revisar** — muitos CSS `mobile-*.css`. Consolidar com Tailwind + breakpoints por componente. Lote: 3.
-
-### Observabilidade
-- **Não migrado** — nenhum sistema estruturado no legado; oportunidade de introduzir logs padronizados no Worker. Lote: 10.
-
-### Segurança / LGPD
-- **Revisar** — legado não tem página de política; auth com Google exige aviso LGPD e consentimento. Lote: 7/10.
-
-### Testes
-- **Não migrado** — legado tem apenas `scripts/windy-stations-diagnostic.mjs`. Introduzir Vitest para libs meteorológicas/hidrológicas. Lote: 10.
-
-### Deploy
-- **Descartar** — `_legacy/vercel.json`, `next.config.ts`, `proxy.ts`. Substituídos pela configuração Cloudflare/TanStack Start deste projeto. Lote: 10.
+Ao concluir cada lote, atualizar o status e o critério de aceite desta matriz com evidência nos arquivos de `src/`. A presença de um arquivo em `_legacy/` nunca deve ser considerada implementação concluída.
