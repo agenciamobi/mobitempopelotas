@@ -2,31 +2,27 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type {
+  GeoJSONSource,
   Map as MapLibreMap,
   Marker as MapLibreMarker,
-  RasterTileSource,
 } from "maplibre-gl";
 import type {
-  RegionalWeather,
-  WeatherIconName,
-} from "@/lib/weather-data";
-import {
-  RADAR_ATTRIBUTION,
-  RADAR_MAX_ZOOM,
-  RADAR_MIN_ZOOM,
-  SATELLITE_ATTRIBUTION,
-  SATELLITE_TILE_URL,
-  type RadarStatus,
-} from "@/lib/weather-radar";
+  RedemetImageLayerResponse,
+  RedemetSatelliteType,
+  RedemetStormLayerResponse,
+} from "@/lib/redemet-types";
+import type { RegionalWeather, WeatherIconName } from "@/lib/weather-data";
+import styles from "./weather-map.module.css";
 
 const MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 const PELOTAS_CENTER: [number, number] = [-52.3376, -31.7654];
-const SATELLITE_SOURCE_ID = "regional-satellite-source";
-const SATELLITE_LAYER_ID = "regional-satellite-layer";
-const RADAR_SOURCE_ID = "regional-radar-source";
-const RADAR_LAYER_ID = "regional-radar-layer";
-
-type MapMode = "map" | "satellite" | "radar";
+const CANGUCU_CENTER: [number, number] = [-52.6756, -31.3958];
+const IMAGE_SOURCE_ID = "redemet-image-source";
+const IMAGE_LAYER_ID = "redemet-image-layer";
+const STORMS_SOURCE_ID = "redemet-storms-source";
+const STORMS_GLOW_LAYER_ID = "redemet-storms-glow";
+const STORMS_LAYER_ID = "redemet-storms-points";
+const REFRESH_INTERVAL = 5 * 60 * 1_000;
 
 const conditionLabels: Record<WeatherIconName, string> = {
   sun: "Céu limpo",
@@ -39,50 +35,51 @@ const conditionLabels: Record<WeatherIconName, string> = {
   wind: "Vento",
 };
 
+type MapMode = "radar" | "satellite" | "storms";
+type ActiveLayer =
+  | { kind: "image"; data: RedemetImageLayerResponse }
+  | { kind: "storms"; data: RedemetStormLayerResponse };
+
 type WeatherMapProps = {
   regionalWeather: RegionalWeather[];
 };
 
-function createMarkerElement(item: RegionalWeather) {
-  const element = document.createElement("button");
-  element.type = "button";
-  element.className = "regional-map-marker";
-  element.dataset.condition = item.condition;
-  element.setAttribute(
-    "aria-label",
-    `${item.city}: ${item.temperature} graus, ${conditionLabels[item.condition]}`,
-  );
+const SATELLITE_OPTIONS: Array<{ value: RedemetSatelliteType; label: string }> = [
+  { value: "realcada", label: "Realçado" },
+  { value: "ir", label: "Infravermelho" },
+  { value: "vis", label: "Visível" },
+];
 
-  if (item.city === "Pelotas") {
-    element.classList.add("is-active");
-  }
+function formatUpdatedAt(value: string | null | undefined) {
+  if (!value) return "Horário indisponível";
 
-  const temperature = document.createElement("strong");
-  temperature.textContent = `${item.temperature}°`;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Horário indisponível";
 
-  const city = document.createElement("span");
-  city.textContent = item.city;
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
+}
 
-  element.append(temperature, city);
+function createLocationMarker(label: string, detail: string, variant: "pelotas" | "radar") {
+  const element = document.createElement("div");
+  element.className = `${styles.locationMarker} ${styles[variant]}`;
+  element.setAttribute("role", "img");
+  element.setAttribute("aria-label", `${label}: ${detail}`);
+
+  const strong = document.createElement("strong");
+  strong.textContent = label;
+
+  const span = document.createElement("span");
+  span.textContent = detail;
+
+  element.append(strong, span);
   return element;
-}
-
-function createPopupContent(item: RegionalWeather) {
-  const content = document.createElement("div");
-  content.className = "regional-map-popup";
-
-  const city = document.createElement("strong");
-  city.textContent = item.city;
-
-  const condition = document.createElement("span");
-  condition.textContent = `${item.temperature}° · ${conditionLabels[item.condition]}`;
-
-  content.append(city, condition);
-  return content;
-}
-
-function radarTileTemplate(timestamp: number) {
-  return `/api/weather/radar/tiles/${timestamp}/{z}/{x}/{y}`;
 }
 
 function PlayIcon({ playing }: { playing: boolean }) {
@@ -97,31 +94,51 @@ function PlayIcon({ playing }: { playing: boolean }) {
   );
 }
 
+function removeOperationalLayers(map: MapLibreMap) {
+  for (const layerId of [
+    IMAGE_LAYER_ID,
+    STORMS_LAYER_ID,
+    STORMS_GLOW_LAYER_ID,
+  ]) {
+    if (map.getLayer(layerId)) map.removeLayer(layerId);
+  }
+
+  for (const sourceId of [IMAGE_SOURCE_ID, STORMS_SOURCE_ID]) {
+    if (map.getSource(sourceId)) map.removeSource(sourceId);
+  }
+}
+
+function firstLabelLayer(map: MapLibreMap) {
+  return (map.getStyle().layers ?? []).find((layer) => layer.type === "symbol")?.id;
+}
+
 export function WeatherMap({ regionalWeather }: WeatherMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markersRef = useRef<MapLibreMarker[]>([]);
   const initializingRef = useRef(false);
-  const baseLayerVisibilityRef = useRef<Record<string, "visible" | "none">>({});
   const [isLoaded, setIsLoaded] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [mode, setMode] = useState<MapMode>("map");
-  const [radarStatus, setRadarStatus] = useState<RadarStatus | null>(null);
-  const [radarStatusLoading, setRadarStatusLoading] = useState(false);
+  const [hasMapError, setHasMapError] = useState(false);
+  const [mode, setMode] = useState<MapMode>("radar");
+  const [satelliteType, setSatelliteType] =
+    useState<RedemetSatelliteType>("realcada");
+  const [activeLayer, setActiveLayer] = useState<ActiveLayer | null>(null);
+  const [loadingLayer, setLoadingLayer] = useState(true);
   const [selectedFrameIndex, setSelectedFrameIndex] = useState(0);
-  const [radarPlaying, setRadarPlaying] = useState(false);
-  const [radarOpacity, setRadarOpacity] = useState(76);
+  const [playing, setPlaying] = useState(false);
+  const [opacity, setOpacity] = useState(78);
 
-  const temperatureRange = useMemo(() => {
-    const temperatures = regionalWeather.map((item) => item.temperature);
+  const frames = activeLayer?.data.frames ?? [];
+  const selectedFrame = frames[selectedFrameIndex] ?? null;
+  const available = Boolean(activeLayer?.data.available && selectedFrame);
 
-    return {
-      min: temperatures.length ? Math.min(...temperatures) : 0,
-      max: temperatures.length ? Math.max(...temperatures) : 0,
-    };
-  }, [regionalWeather]);
-
-  const selectedRadarFrame = radarStatus?.frames[selectedFrameIndex];
+  const layerEndpoint = useMemo(() => {
+    if (mode === "radar") return "/api/redemet/radar?frames=10";
+    if (mode === "satellite") {
+      return `/api/redemet/satellite?type=${satelliteType}&frames=10`;
+    }
+    return "/api/redemet/storms?frames=20";
+  }, [mode, satelliteType]);
 
   useEffect(() => {
     const container = mapContainerRef.current;
@@ -143,7 +160,7 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
           style: MAP_STYLE,
           center: PELOTAS_CENTER,
           zoom: 7.4,
-          minZoom: 6,
+          minZoom: 4,
           maxZoom: 13,
           cooperativeGestures: true,
         });
@@ -158,75 +175,29 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
           }),
           "bottom-right",
         );
+        map.addControl(new maplibregl.FullscreenControl(), "bottom-right");
 
-        const bounds = new maplibregl.LngLatBounds();
-
-        markersRef.current = regionalWeather.map((item) => {
-          bounds.extend([item.longitude, item.latitude]);
-
-          const popup = new maplibregl.Popup({
-            closeButton: false,
-            closeOnClick: true,
-            offset: 18,
-          }).setDOMContent(createPopupContent(item));
-
-          return new maplibregl.Marker({
-            element: createMarkerElement(item),
+        markersRef.current = [
+          new maplibregl.Marker({
+            element: createLocationMarker("Pelotas", "Centro do monitoramento", "pelotas"),
             anchor: "bottom",
           })
-            .setLngLat([item.longitude, item.latitude])
-            .setPopup(popup)
-            .addTo(map);
-        });
+            .setLngLat(PELOTAS_CENTER)
+            .addTo(map),
+          new maplibregl.Marker({
+            element: createLocationMarker("Canguçu", "Radar meteorológico", "radar"),
+            anchor: "bottom",
+          })
+            .setLngLat(CANGUCU_CENTER)
+            .addTo(map),
+        ];
 
         map.once("load", () => {
-          if (cancelled) return;
-
-          const styleLayers = map.getStyle().layers ?? [];
-          baseLayerVisibilityRef.current = Object.fromEntries(
-            styleLayers.map((layer) => [
-              layer.id,
-              map.getLayoutProperty(layer.id, "visibility") === "none"
-                ? "none"
-                : "visible",
-            ]),
-          );
-
-          map.addSource(SATELLITE_SOURCE_ID, {
-            type: "raster",
-            tiles: [SATELLITE_TILE_URL],
-            tileSize: 256,
-            minzoom: 0,
-            maxzoom: 19,
-            attribution: SATELLITE_ATTRIBUTION,
-          });
-          map.addLayer(
-            {
-              id: SATELLITE_LAYER_ID,
-              type: "raster",
-              source: SATELLITE_SOURCE_ID,
-              layout: { visibility: "none" },
-              paint: {
-                "raster-opacity": 1,
-                "raster-fade-duration": 120,
-              },
-            },
-            styleLayers[0]?.id,
-          );
-
-          if (!bounds.isEmpty()) {
-            map.fitBounds(bounds, {
-              padding: { top: 125, right: 70, bottom: 100, left: 70 },
-              maxZoom: 8.8,
-              duration: 0,
-            });
-          }
-
-          setIsLoaded(true);
+          if (!cancelled) setIsLoaded(true);
         });
       } catch (error) {
-        console.error("Falha ao inicializar o mapa regional:", error);
-        if (!cancelled) setHasError(true);
+        console.error("Falha ao inicializar o mapa REDEMET:", error);
+        if (!cancelled) setHasMapError(true);
       } finally {
         initializingRef.current = false;
       }
@@ -255,175 +226,238 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, [regionalWeather]);
+  }, []);
 
   useEffect(() => {
-    if (!isLoaded || radarStatus || radarStatusLoading) return;
+    if (!isLoaded) return;
 
     let cancelled = false;
-    setRadarStatusLoading(true);
 
-    fetch("/api/weather/radar/status", {
-      headers: { Accept: "application/json" },
-    })
-      .then(async (response) => {
-        if (!response.ok) throw new Error(`Radar respondeu com status ${response.status}`);
-        return (await response.json()) as RadarStatus;
-      })
-      .then((status) => {
+    const loadLayer = async (background = false) => {
+      if (!background) {
+        setLoadingLayer(true);
+        setPlaying(false);
+      }
+
+      try {
+        const response = await fetch(layerEndpoint, {
+          headers: { Accept: "application/json" },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Camada REDEMET respondeu com status ${response.status}`);
+        }
+
+        const payload = (await response.json()) as
+          | RedemetImageLayerResponse
+          | RedemetStormLayerResponse;
+
         if (cancelled) return;
-        setRadarStatus(status);
-        setSelectedFrameIndex(status.currentIndex);
-      })
-      .catch((error) => {
-        console.error("Falha ao consultar disponibilidade do radar:", error);
+
+        const nextLayer: ActiveLayer =
+          mode === "storms"
+            ? { kind: "storms", data: payload as RedemetStormLayerResponse }
+            : { kind: "image", data: payload as RedemetImageLayerResponse };
+
+        setActiveLayer(nextLayer);
+        setSelectedFrameIndex(nextLayer.data.currentIndex);
+      } catch (error) {
+        console.error("Falha ao carregar camada REDEMET:", error);
+
         if (!cancelled) {
-          setRadarStatus({
-            configured: false,
+          const errorMessage = "Não foi possível consultar a REDEMET neste momento.";
+          const base = {
+            configured: true,
             available: false,
-            provider: "OpenWeather",
-            product: "Global Precipitation Map Forecast",
+            provider: "REDEMET / DECEA" as const,
+            sourceLabel: "REDEMET / DECEA",
             frames: [],
             currentIndex: 0,
             updatedAt: new Date().toISOString(),
-            error: "Não foi possível consultar o radar neste momento.",
-          });
+            error: errorMessage,
+          };
+
+          setActiveLayer(
+            mode === "storms"
+              ? {
+                  kind: "storms",
+                  data: {
+                    ...base,
+                    product: "STSC — ocorrências de trovoada",
+                  },
+                }
+              : {
+                  kind: "image",
+                  data: {
+                    ...base,
+                    product:
+                      mode === "radar"
+                        ? "Radar meteorológico de Canguçu"
+                        : "Satélite meteorológico",
+                  },
+                },
+          );
+          setSelectedFrameIndex(0);
         }
-      })
-      .finally(() => {
-        if (!cancelled) setRadarStatusLoading(false);
-      });
+      } finally {
+        if (!cancelled && !background) setLoadingLayer(false);
+      }
+    };
+
+    void loadLayer();
+    const interval = window.setInterval(() => void loadLayer(true), REFRESH_INTERVAL);
 
     return () => {
       cancelled = true;
+      window.clearInterval(interval);
     };
-  }, [isLoaded, radarStatus, radarStatusLoading]);
+  }, [isLoaded, layerEndpoint, mode]);
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !isLoaded) return;
+    if (!map || !isLoaded || !map.isStyleLoaded()) return;
 
-    const showSatellite = mode === "satellite";
+    removeOperationalLayers(map);
 
-    for (const [layerId, originalVisibility] of Object.entries(
-      baseLayerVisibilityRef.current,
-    )) {
-      if (!map.getLayer(layerId)) continue;
-      map.setLayoutProperty(
-        layerId,
-        "visibility",
-        showSatellite ? "none" : originalVisibility,
-      );
-    }
+    if (!activeLayer?.data.available || !selectedFrame) return;
 
-    if (map.getLayer(SATELLITE_LAYER_ID)) {
-      map.setLayoutProperty(
-        SATELLITE_LAYER_ID,
-        "visibility",
-        showSatellite ? "visible" : "none",
-      );
-    }
+    const beforeLayerId = firstLabelLayer(map);
 
-    const shouldShowRadar =
-      mode === "radar" &&
-      Boolean(radarStatus?.available) &&
-      Boolean(selectedRadarFrame);
+    if (activeLayer.kind === "image") {
+      const frame = selectedFrame as RedemetImageLayerResponse["frames"][number];
+      const { west, south, east, north } = frame.bounds;
 
-    if (shouldShowRadar && selectedRadarFrame) {
-      if (!map.getSource(RADAR_SOURCE_ID)) {
-        map.addSource(RADAR_SOURCE_ID, {
+      map.addSource(IMAGE_SOURCE_ID, {
+        type: "image",
+        url: frame.imageUrl,
+        coordinates: [
+          [west, north],
+          [east, north],
+          [east, south],
+          [west, south],
+        ],
+      });
+      map.addLayer(
+        {
+          id: IMAGE_LAYER_ID,
           type: "raster",
-          tiles: [radarTileTemplate(selectedRadarFrame.timestamp)],
-          tileSize: 256,
-          minzoom: RADAR_MIN_ZOOM,
-          maxzoom: RADAR_MAX_ZOOM,
-          attribution: RADAR_ATTRIBUTION,
-        });
-      }
-
-      if (!map.getLayer(RADAR_LAYER_ID)) {
-        const labelLayerId = (map.getStyle().layers ?? []).find(
-          (layer) =>
-            layer.type === "symbol" &&
-            Object.prototype.hasOwnProperty.call(
-              baseLayerVisibilityRef.current,
-              layer.id,
-            ),
-        )?.id;
-
-        map.addLayer(
-          {
-            id: RADAR_LAYER_ID,
-            type: "raster",
-            source: RADAR_SOURCE_ID,
-            paint: {
-              "raster-opacity": radarOpacity / 100,
-              "raster-fade-duration": 0,
-            },
+          source: IMAGE_SOURCE_ID,
+          paint: {
+            "raster-opacity": opacity / 100,
+            "raster-fade-duration": 120,
           },
-          labelLayerId,
-        );
-      }
-
-      const radarSource = map.getSource(RADAR_SOURCE_ID) as
-        | RasterTileSource
-        | undefined;
-      radarSource?.setTiles([radarTileTemplate(selectedRadarFrame.timestamp)]);
-      map.setLayoutProperty(RADAR_LAYER_ID, "visibility", "visible");
-      map.setPaintProperty(RADAR_LAYER_ID, "raster-opacity", radarOpacity / 100);
-    } else if (map.getLayer(RADAR_LAYER_ID)) {
-      map.setLayoutProperty(RADAR_LAYER_ID, "visibility", "none");
-    }
-  }, [isLoaded, mode, radarOpacity, radarStatus, selectedRadarFrame]);
-
-  useEffect(() => {
-    if (
-      !radarPlaying ||
-      mode !== "radar" ||
-      !radarStatus?.available ||
-      radarStatus.frames.length < 2
-    ) {
+        },
+        beforeLayerId,
+      );
       return;
     }
 
+    const frame = selectedFrame as RedemetStormLayerResponse["frames"][number];
+    const featureCollection = {
+      type: "FeatureCollection" as const,
+      features: frame.points.map((point, index) => ({
+        type: "Feature" as const,
+        id: index,
+        properties: {},
+        geometry: {
+          type: "Point" as const,
+          coordinates: [point.longitude, point.latitude],
+        },
+      })),
+    };
+
+    map.addSource(STORMS_SOURCE_ID, {
+      type: "geojson",
+      data: featureCollection,
+    });
+    map.addLayer(
+      {
+        id: STORMS_GLOW_LAYER_ID,
+        type: "circle",
+        source: STORMS_SOURCE_ID,
+        paint: {
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 7, 10, 15],
+          "circle-color": "#F27035",
+          "circle-opacity": 0.2,
+          "circle-blur": 0.45,
+        },
+      },
+      beforeLayerId,
+    );
+    map.addLayer(
+      {
+        id: STORMS_LAYER_ID,
+        type: "circle",
+        source: STORMS_SOURCE_ID,
+        paint: {
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 5, 3.5, 10, 7],
+          "circle-color": "#F27035",
+          "circle-opacity": 0.92,
+          "circle-stroke-color": "#ffffff",
+          "circle-stroke-width": 1.4,
+        },
+      },
+      beforeLayerId,
+    );
+  }, [activeLayer, isLoaded, opacity, selectedFrame]);
+
+  useEffect(() => {
+    if (!playing || frames.length < 2 || !available) return;
+
     const interval = window.setInterval(() => {
       setSelectedFrameIndex((current) =>
-        current >= radarStatus.frames.length - 1 ? 0 : current + 1,
+        current >= frames.length - 1 ? 0 : current + 1,
       );
     }, 900);
 
     return () => window.clearInterval(interval);
-  }, [mode, radarPlaying, radarStatus]);
+  }, [available, frames.length, playing]);
+
+  useEffect(() => {
+    if (mode !== "storms" || activeLayer?.kind !== "storms") return;
+
+    const map = mapRef.current;
+    const source = map?.getSource(STORMS_SOURCE_ID) as GeoJSONSource | undefined;
+    if (!source || !selectedFrame) return;
+
+    const frame = selectedFrame as RedemetStormLayerResponse["frames"][number];
+    source.setData({
+      type: "FeatureCollection",
+      features: frame.points.map((point, index) => ({
+        type: "Feature",
+        id: index,
+        properties: {},
+        geometry: {
+          type: "Point",
+          coordinates: [point.longitude, point.latitude],
+        },
+      })),
+    });
+  }, [activeLayer, mode, selectedFrame]);
 
   const centerOnPelotas = () => {
-    mapRef.current?.easeTo({
-      center: PELOTAS_CENTER,
-      zoom: 9.3,
-      duration: 700,
-    });
+    mapRef.current?.easeTo({ center: PELOTAS_CENTER, zoom: 8.2, duration: 700 });
   };
 
   const selectMode = (nextMode: MapMode) => {
-    if (nextMode === "radar" && !radarStatus?.available) return;
     setMode(nextMode);
-
-    if (nextMode !== "radar") {
-      setRadarPlaying(false);
-    } else if (radarStatus) {
-      setSelectedFrameIndex(radarStatus.currentIndex);
-    }
+    setPlaying(false);
+    setActiveLayer(null);
+    setSelectedFrameIndex(0);
   };
 
-  const radarButtonTitle = radarStatusLoading
-    ? "Verificando se o radar está disponível"
-    : radarStatus?.error ?? "Mostrar a chuva no mapa";
+  const sourceDescription = activeLayer?.data.sourceLabel ?? "REDEMET / DECEA";
+  const selectedStormCount =
+    activeLayer?.kind === "storms" && selectedFrame
+      ? (selectedFrame as RedemetStormLayerResponse["frames"][number]).points.length
+      : null;
 
   return (
     <section className="map-panel" id="regiao" aria-labelledby="map-title">
       <div className="map-panel-heading">
         <div>
-          <span className="eyebrow">Pelotas e Zona Sul</span>
-          <h2 id="map-title">Tempo na região</h2>
+          <span className="eyebrow">REDEMET / DECEA</span>
+          <h2 id="map-title">Monitoramento meteorológico regional</h2>
         </div>
         <button
           className="map-control"
@@ -439,20 +473,20 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
       </div>
 
       <div
-        className={`map-canvas map-canvas--interactive map-canvas--${mode}`}
-        aria-label="Mapa com o tempo em Pelotas e cidades da Zona Sul"
+        className={`map-canvas map-canvas--interactive map-canvas--${mode} ${styles.canvas}`}
+        aria-label="Mapa meteorológico oficial da REDEMET para Pelotas e região"
       >
         <div ref={mapContainerRef} className="regional-map-engine" />
 
-        <div className="map-layer-switcher" aria-label="Escolha como deseja ver o mapa">
+        <div className="map-layer-switcher" aria-label="Escolha a camada meteorológica">
           <button
             type="button"
-            className={mode === "map" ? "is-active" : undefined}
-            aria-pressed={mode === "map"}
-            onClick={() => selectMode("map")}
+            className={mode === "radar" ? "is-active" : undefined}
+            aria-pressed={mode === "radar"}
+            onClick={() => selectMode("radar")}
             disabled={!isLoaded}
           >
-            Mapa
+            Radar
           </button>
           <button
             type="button"
@@ -465,102 +499,155 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
           </button>
           <button
             type="button"
-            className={mode === "radar" ? "is-active" : undefined}
-            aria-pressed={mode === "radar"}
-            onClick={() => selectMode("radar")}
-            disabled={!isLoaded || radarStatusLoading || !radarStatus?.available}
-            title={radarButtonTitle}
+            className={mode === "storms" ? "is-active" : undefined}
+            aria-pressed={mode === "storms"}
+            onClick={() => selectMode("storms")}
+            disabled={!isLoaded}
           >
-            Chuva
+            Trovoadas
           </button>
         </div>
 
-        {isLoaded && radarStatus && !radarStatus.available ? (
+        {mode === "satellite" ? (
+          <div className={styles.satelliteSwitcher} aria-label="Tipo de imagem de satélite">
+            {SATELLITE_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className={satelliteType === option.value ? styles.active : undefined}
+                aria-pressed={satelliteType === option.value}
+                onClick={() => {
+                  setSatelliteType(option.value);
+                  setPlaying(false);
+                  setActiveLayer(null);
+                }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
+        <div className={styles.sourceBadge} aria-live="polite">
+          <span className={available ? styles.liveDot : styles.neutralDot} aria-hidden="true" />
+          <div>
+            <strong>
+              {loadingLayer
+                ? "Consultando REDEMET"
+                : available
+                  ? "Dados atualizados"
+                  : "Camada indisponível"}
+            </strong>
+            <small>{sourceDescription}</small>
+          </div>
+        </div>
+
+        {!loadingLayer && activeLayer && !activeLayer.data.available ? (
           <div className="map-radar-unavailable" role="status">
-            <strong>Mapa de chuva indisponível</strong>
-            <span>{radarStatus.error}</span>
+            <strong>Camada temporariamente indisponível</strong>
+            <span>{activeLayer.data.error}</span>
           </div>
         ) : null}
 
         <div
-          className={`map-loading ${isLoaded ? "is-hidden" : ""} ${hasError ? "has-error" : ""}`}
+          className={`map-loading ${isLoaded ? "is-hidden" : ""} ${hasMapError ? "has-error" : ""}`}
           role="status"
           aria-live="polite"
         >
           <span aria-hidden="true" />
-          <strong>{hasError ? "Mapa temporariamente indisponível" : "Carregando mapa da região"}</strong>
+          <strong>
+            {hasMapError ? "Mapa temporariamente indisponível" : "Carregando monitoramento regional"}
+          </strong>
           <small>
-            {hasError
-              ? "As temperaturas continuam disponíveis ao lado."
+            {hasMapError
+              ? "As demais informações do portal continuam disponíveis."
               : "O mapa aparecerá em alguns instantes."}
           </small>
         </div>
 
-        {mode === "radar" && radarStatus?.available && selectedRadarFrame ? (
-          <div className="radar-player" aria-label="Movimento da chuva no mapa">
+        {available && activeLayer && selectedFrame ? (
+          <div className={`radar-player ${styles.player}`} aria-label="Controles da camada REDEMET">
             <div className="radar-player-topline">
               <button
                 className="radar-play-button"
                 type="button"
-                onClick={() => setRadarPlaying((playing) => !playing)}
-                aria-label={radarPlaying ? "Pausar movimento da chuva" : "Mostrar movimento da chuva"}
+                onClick={() => setPlaying((current) => !current)}
+                aria-label={playing ? "Pausar animação" : "Reproduzir animação"}
               >
-                <PlayIcon playing={radarPlaying} />
+                <PlayIcon playing={playing} />
               </button>
               <div className="radar-frame-status" aria-live="polite">
-                <span>{selectedRadarFrame.kind === "forecast" ? "Previsão" : "Registrado"}</span>
-                <strong>{selectedRadarFrame.label}</strong>
+                <span>
+                  {mode === "radar"
+                    ? "Radar de Canguçu"
+                    : mode === "satellite"
+                      ? "Imagem de satélite"
+                      : `${selectedStormCount ?? 0} ocorrências no quadro`}
+                </span>
+                <strong>{selectedFrame.label}</strong>
               </div>
-              <label className="radar-opacity-control">
-                <span>Deixar a chuva mais clara</span>
-                <input
-                  type="range"
-                  min="35"
-                  max="100"
-                  step="5"
-                  value={radarOpacity}
-                  onChange={(event) => setRadarOpacity(Number(event.target.value))}
-                />
-              </label>
+              {activeLayer.kind === "image" ? (
+                <label className="radar-opacity-control">
+                  <span>Opacidade</span>
+                  <input
+                    type="range"
+                    min="30"
+                    max="100"
+                    step="5"
+                    value={opacity}
+                    onChange={(event) => setOpacity(Number(event.target.value))}
+                  />
+                </label>
+              ) : (
+                <div className={styles.stormCounter}>
+                  <strong>{selectedStormCount ?? 0}</strong>
+                  <span>pontos detectados</span>
+                </div>
+              )}
             </div>
 
             <input
               className="radar-timeline"
               type="range"
               min="0"
-              max={radarStatus.frames.length - 1}
+              max={Math.max(0, frames.length - 1)}
               step="1"
               value={selectedFrameIndex}
-              aria-label="Escolher o horário da chuva no mapa"
+              aria-label="Escolher o horário da camada meteorológica"
               onChange={(event) => {
-                setRadarPlaying(false);
+                setPlaying(false);
                 setSelectedFrameIndex(Number(event.target.value));
               }}
             />
 
             <div className="radar-time-range" aria-hidden="true">
-              <span>{radarStatus.frames[0]?.label}</span>
-              <span>Agora</span>
-              <span>{radarStatus.frames.at(-1)?.label}</span>
+              <span>{frames[0]?.label}</span>
+              <span>Sequência observada</span>
+              <span>{frames.at(-1)?.label}</span>
             </div>
 
-            <div className="radar-intensity-legend">
-              <span>Chuva fraca</span>
-              <i aria-hidden="true" />
-              <span>Chuva forte</span>
-            </div>
+            {mode === "radar" ? (
+              <div className="radar-intensity-legend">
+                <span>Eco mais fraco</span>
+                <i aria-hidden="true" />
+                <span>Eco mais intenso</span>
+              </div>
+            ) : mode === "storms" ? (
+              <p className={styles.monitoringNote}>
+                Pontos indicam ocorrências detectadas pelo produto STSC. Não substituem alertas oficiais.
+              </p>
+            ) : null}
+
             <small className="radar-provider-note">
-              Chuva mostrada pelo OpenWeather · última hora e próximas 2 horas
+              {activeLayer.data.product} · {activeLayer.data.provider} · atualização {formatUpdatedAt(activeLayer.data.updatedAt)}
             </small>
           </div>
-        ) : (
-          <div className="map-legend" aria-label="Temperaturas mostradas no mapa">
-            <span>{temperatureRange.min}°</span>
-            <i aria-hidden="true" />
-            <span>{temperatureRange.max}°</span>
-          </div>
-        )}
+        ) : null}
       </div>
+
+      <p className={styles.disclaimer}>
+        As camadas mostram produtos meteorológicos oficiais para monitoramento. Consulte os avisos do INMET, da Defesa Civil e das autoridades locais em situações de risco.
+      </p>
 
       <ul className="regional-weather-accessible">
         {regionalWeather.map((item) => (

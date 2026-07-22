@@ -67,6 +67,43 @@ import "./home-editorial-clarity-v3.css";
 import "./home-visitor-copy-v4.css";
 import "./home-journey-refinement-v5.css";
 import "./home-grid-alignment-v6.css";
+import "./topic-editorial-home-visual.css";
+import "./topic-special-pages-refinement.css";
+import "./topic-special-pages-mobile-fix.css";
+import "./topic-weather-pages-refinement.css";
+import "./home-first-fold-operational-v3.css";
+// Camadas finais de interface e publicação da experiência editorial.
+import "./header-template-refinement.css";
+import "./header-template-refinement-v2.css";
+import "./home-hero-stripe-adaptation.css";
+import "./home-alert-flow-v7.css";
+import "./home-forecast-refinement-v8.css";
+import "./home-alert-flow-v9.css";
+import "./home-detail-navigation-v10.css";
+import "./home-detail-content-v10.css";
+import "./home-cohesion-v12.css";
+import "./home-cohesion-v12-content.css";
+import "./home-cohesion-v12-water.css";
+import "./home-navigation-v13.css";
+import "./home-next-days-cards-v14.css";
+import "./home-hero-cleanup-v16.css";
+import "./home-observation-refinement-v17.css";
+import "./home-water-refinement-v18.css";
+import "./home-explore-refinement-v19.css";
+import "./home-final-cohesion-v20.css";
+import "./home-operational-bridge-v21.css";
+import "./home-operational-bridge-v21-fix.css";
+import "./weather-ai-summary.css";
+import "./integrations-v22.css";
+import "./account-v24.css";
+import "./footer-editorial-v23.css";
+import "./footer-production-cleanup.css";
+import "./water-level-semantic-colors.css";
+import "./home-cppmet-layout-water-audit.css";
+import "./home-cppmet-final-fixes.css";
+import "./safety-alerts.css";
+import "./header-megamenu-v25.css";
+import "./home-tomorrow-focus-v25.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -107,11 +144,11 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    siteName: "TEMPO Pelotas",
-    title: "TEMPO Pelotas | Tempo, águas e segurança",
-    description:
-      "Acompanhe o tempo e a situação das águas em Pelotas e na Zona Sul do Rio Grande do Sul.",
     url: "/",
+    siteName: "TEMPO Pelotas",
+    title: "TEMPO Pelotas | Tempo e situação das águas em Pelotas, RS",
+    description:
+      "Previsão do tempo, chuva, vento, radar e nível da Lagoa dos Patos para Pelotas, RS.",
   },
   twitter: {
     card: "summary_large_image",
@@ -124,8 +161,8 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      "max-image-preview": "large",
       "max-snippet": -1,
+      "max-image-preview": "large",
       "max-video-preview": -1,
     },
   },

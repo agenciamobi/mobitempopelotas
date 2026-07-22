@@ -22,6 +22,9 @@ export const metadata: Metadata = {
 export default async function PrevisaoSeteDiasPage() {
   const weather = await getPelotasWeather();
   const highlights = getWeekHighlights(weather.daily);
+  const forecastDays = weather.daily.length;
+  const firstForecastDate = weather.daily[0]?.date ?? "hoje";
+  const lastForecastDate = weather.daily[weather.daily.length - 1]?.date ?? firstForecastDate;
   const itemListSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
@@ -40,6 +43,13 @@ export default async function PrevisaoSeteDiasPage() {
       title="Previsão do tempo para 7 dias em Pelotas"
       description="Confira as temperaturas, a chuva e o vento previstos para organizar sua semana."
       currentPath="/previsao-7-dias-pelotas"
+      heroStat={{
+        label: "Janela da previsão",
+        value: forecastDays,
+        detail: `${firstForecastDate} a ${lastForecastDate}`,
+        ariaLabel: `Previsão para ${forecastDays} dias, de ${firstForecastDate} a ${lastForecastDate}`,
+        tone: "forecast",
+      }}
     >
       <script
         type="application/ld+json"

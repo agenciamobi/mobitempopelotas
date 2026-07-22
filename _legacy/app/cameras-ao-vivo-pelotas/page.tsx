@@ -5,19 +5,18 @@ import { absoluteUrl } from "@/lib/site";
 import { getWeatherCameras } from "@/lib/weather-cameras";
 import { getPelotasWeather } from "@/lib/weather-service";
 
-export const revalidate = 600;
+export const revalidate = 300;
 
-export function generateMetadata(): Metadata {
-  const hasOnlineCamera = getWeatherCameras().some(
-    (camera) => camera.status === "online",
-  );
+export async function generateMetadata(): Promise<Metadata> {
+  const cameras = await getWeatherCameras();
+  const hasOnlineCamera = cameras.some((camera) => camera.status === "online");
 
   return {
     title: hasOnlineCamera
       ? "Câmeras ao vivo de Pelotas e Praia do Laranjal"
       : "Câmeras de Pelotas e Praia do Laranjal",
     description: hasOnlineCamera
-      ? "Acompanhe câmeras de Pelotas, Praia do Laranjal e Canal São Gonçalo para observar chuva, nuvens e visibilidade."
+      ? "Acompanhe a transmissão atual ou mais recente da Praia do Laranjal e as câmeras disponíveis em Pelotas."
       : "Veja os locais previstos para câmeras no Laranjal, Centro e Canal São Gonçalo.",
     alternates: { canonical: "/cameras-ao-vivo-pelotas" },
     robots: {
@@ -29,7 +28,7 @@ export function generateMetadata(): Metadata {
         ? "Câmeras ao vivo de Pelotas"
         : "Câmeras de Pelotas",
       description: hasOnlineCamera
-        ? "Veja imagens de diferentes pontos de Pelotas e acompanhe as condições do céu."
+        ? "Veja imagens da Praia do Laranjal e acompanhe as condições do céu."
         : "Locais previstos para observação do tempo em Pelotas.",
       url: "/cameras-ao-vivo-pelotas",
     },
@@ -37,9 +36,12 @@ export function generateMetadata(): Metadata {
 }
 
 export default async function CamerasAoVivoPelotasPage() {
-  const weather = await getPelotasWeather();
-  const cameras = getWeatherCameras();
+  const [weather, cameras] = await Promise.all([
+    getPelotasWeather(),
+    getWeatherCameras(),
+  ]);
   const onlineCount = cameras.filter((camera) => camera.status === "online").length;
+  const liveCount = cameras.filter((camera) => camera.broadcastStatus === "live").length;
 
   const itemListSchema = {
     "@context": "https://schema.org",
@@ -60,13 +62,26 @@ export default async function CamerasAoVivoPelotasPage() {
     <ForecastPageShell
       weather={weather}
       eyebrow="Veja Pelotas pelas câmeras"
-      title={onlineCount ? "Câmeras ao vivo de Pelotas" : "Câmeras de Pelotas"}
+      title={onlineCount ? "Câmeras de Pelotas e do Laranjal" : "Câmeras de Pelotas"}
       description={
         onlineCount
-          ? "Observe o céu, a visibilidade e a presença de chuva em diferentes pontos da cidade."
+          ? "Observe o céu, a visibilidade e a presença de chuva. No Laranjal, o portal mostra a transmissão ativa ou a gravação mais recente disponível no canal."
           : "As câmeras ainda não estão disponíveis. Os locais previstos são Laranjal, Centro e Canal São Gonçalo."
       }
       currentPath="/cameras-ao-vivo-pelotas"
+      heroStat={{
+        label: liveCount ? "Transmissões ao vivo agora" : "Câmeras disponíveis agora",
+        value: liveCount || onlineCount,
+        detail: liveCount
+          ? liveCount === 1
+            ? "ponto transmitindo ao vivo"
+            : "pontos transmitindo ao vivo"
+          : onlineCount === 1
+            ? "ponto com imagem disponível"
+            : "pontos com imagem disponível",
+        ariaLabel: `${liveCount || onlineCount} câmeras disponíveis em Pelotas`,
+        tone: "camera",
+      }}
     >
       <script
         type="application/ld+json"
@@ -84,7 +99,7 @@ export default async function CamerasAoVivoPelotasPage() {
         <article>
           <span>Disponíveis agora</span>
           <strong>{onlineCount}</strong>
-          <small>{onlineCount ? "Câmeras funcionando" : "Nenhuma câmera disponível no momento"}</small>
+          <small>{liveCount ? `${liveCount} ao vivo` : onlineCount ? "Inclui a última transmissão disponível" : "Nenhuma câmera disponível"}</small>
         </article>
         <article>
           <span>Temperatura agora</span>
@@ -128,8 +143,8 @@ export default async function CamerasAoVivoPelotasPage() {
           </article>
           <article>
             <span>03</span>
-            <h3>A imagem pode atrasar</h3>
-            <p>A câmera pode pausar, ficar fora do ar ou mostrar uma imagem com alguns segundos de atraso.</p>
+            <h3>Confira o estado da transmissão</h3>
+            <p>O player informa se a imagem está ao vivo ou se corresponde à gravação mais recente do canal.</p>
           </article>
         </div>
         <p className="data-note">

@@ -1,0 +1,263 @@
+.canvas {
+  min-height: 620px;
+  background: #e9eff2;
+}
+
+.locationMarker {
+  display: grid;
+  min-width: 108px;
+  gap: 2px;
+  padding: 9px 12px;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  border-radius: 16px 16px 16px 4px;
+  box-shadow: 0 12px 28px rgba(7, 30, 47, 0.22);
+  font-family: inherit;
+  line-height: 1.1;
+  pointer-events: none;
+}
+
+.locationMarker strong {
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.locationMarker span {
+  font-size: 0.56rem;
+  font-weight: 720;
+  opacity: 0.76;
+}
+
+.pelotas {
+  background: #071e2f;
+  color: #fff;
+}
+
+.radar {
+  border-color: rgba(24, 189, 205, 0.88);
+  background: rgba(255, 255, 255, 0.94);
+  color: #071e2f;
+}
+
+.satelliteSwitcher {
+  position: absolute;
+  z-index: 6;
+  top: 164px;
+  left: 24px;
+  display: flex;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.82);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 26px rgba(7, 30, 47, 0.14);
+  backdrop-filter: blur(15px);
+}
+
+.satelliteSwitcher button {
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #587080;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.6rem;
+  font-weight: 820;
+}
+
+.satelliteSwitcher button:hover,
+.satelliteSwitcher button:focus-visible {
+  background: #eef4f5;
+  color: #071e2f;
+  outline: none;
+}
+
+.satelliteSwitcher button.active {
+  background: #18bdcd;
+  color: #071e2f;
+}
+
+.sourceBadge {
+  position: absolute;
+  z-index: 6;
+  top: 22px;
+  right: 70px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  max-width: 260px;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 28px rgba(7, 30, 47, 0.14);
+  backdrop-filter: blur(15px);
+}
+
+.sourceBadge > span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.liveDot {
+  background: #18bdcd;
+  box-shadow: 0 0 0 5px rgba(24, 189, 205, 0.13);
+}
+
+.neutralDot {
+  background: #8798a2;
+  box-shadow: 0 0 0 5px rgba(135, 152, 162, 0.13);
+}
+
+.sourceBadge div {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.sourceBadge strong,
+.sourceBadge small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sourceBadge strong {
+  color: #071e2f;
+  font-size: 0.66rem;
+  font-weight: 880;
+}
+
+.sourceBadge small {
+  color: #647887;
+  font-size: 0.54rem;
+  font-weight: 700;
+}
+
+.player {
+  border-color: rgba(24, 189, 205, 0.22);
+}
+
+.stormCounter {
+  display: grid;
+  justify-items: end;
+  gap: 1px;
+}
+
+.stormCounter strong {
+  color: #f27035;
+  font-size: 1.18rem;
+  line-height: 1;
+}
+
+.stormCounter span {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.56rem;
+  font-weight: 720;
+}
+
+.monitoringNote {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.58rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.disclaimer {
+  margin: 12px 0 0;
+  color: #647887;
+  font-size: 0.7rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .canvas {
+    min-height: 580px;
+  }
+
+  .sourceBadge {
+    top: 18px;
+    right: 62px;
+  }
+
+  .satelliteSwitcher {
+    top: 152px;
+    left: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .canvas {
+    min-height: 560px;
+  }
+
+  .sourceBadge {
+    top: 14px;
+    right: 58px;
+    max-width: min(210px, calc(100% - 84px));
+  }
+
+  .sourceBadge small {
+    display: none;
+  }
+
+  .satelliteSwitcher {
+    top: 143px;
+    left: 12px;
+    max-width: calc(100% - 24px);
+    overflow-x: auto;
+  }
+
+  .satelliteSwitcher button {
+    flex: 0 0 auto;
+  }
+
+  .locationMarker {
+    min-width: 94px;
+    padding: 8px 10px;
+  }
+
+  .stormCounter {
+    grid-column: 1 / -1;
+    grid-template-columns: auto auto;
+    justify-content: start;
+    align-items: baseline;
+    gap: 6px;
+  }
+}
+
+@media (max-width: 420px) {
+  .canvas {
+    min-height: 540px;
+  }
+
+  .sourceBadge {
+    top: 10px;
+    right: 52px;
+    max-width: calc(100% - 70px);
+    padding: 7px 9px;
+  }
+
+  .sourceBadge strong {
+    font-size: 0.58rem;
+  }
+
+  .satelliteSwitcher {
+    right: 12px;
+  }
+
+  .satelliteSwitcher button {
+    flex: 1;
+    padding-inline: 7px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .satelliteSwitcher button {
+    transition: none;
+  }
+}

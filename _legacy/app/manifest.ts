@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 import { getWeatherCameras } from "@/lib/weather-cameras";
 
-export default function manifest(): MetadataRoute.Manifest {
-  const hasOnlineCamera = getWeatherCameras().some(
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const cameras = await getWeatherCameras();
+  const hasOnlineCamera = cameras.some(
     (camera) => camera.status === "online",
   );
   const shortcuts = [
@@ -27,7 +28,7 @@ export default function manifest(): MetadataRoute.Manifest {
     {
       name: "Nível da Lagoa dos Patos",
       short_name: "Lagoa",
-      description: "Abrir o medidor da Estação Laranjal.",
+      description: "Abrir o painel da Estação Laranjal da UFPel.",
       url: "/nivel-da-lagoa-dos-patos-laranjal",
     },
     ...(hasOnlineCamera

@@ -17,6 +17,13 @@ function CameraIcon() {
   );
 }
 
+function statusLabel(camera: WeatherCamera) {
+  if (camera.status !== "online") return "Ainda não disponível";
+  if (camera.broadcastStatus === "live") return "Ao vivo agora";
+  if (camera.broadcastStatus === "replay") return "Última transmissão";
+  return "Disponível";
+}
+
 export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
   const initialCamera = useMemo(
     () => cameras.find((camera) => camera.status === "online") ?? cameras[0],
@@ -45,19 +52,19 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
           </h2>
           <p>
             {hasOnlineCamera
-              ? "Escolha um local para observar o céu, a visibilidade e a presença de chuva. A câmera será aberta quando você tocar no botão."
+              ? "Escolha um local para observar o céu, a visibilidade e a presença de chuva. O estado informa quando a imagem é ao vivo ou corresponde à transmissão mais recente."
               : "As câmeras ainda não estão disponíveis. Os locais previstos são Laranjal, Centro e Canal São Gonçalo."}
           </p>
         </div>
         <div className="camera-live-summary" aria-live="polite">
           <span
-            className={`camera-status camera-status--${selectedCamera.status}`}
+            className={`camera-status camera-status--${selectedCamera.status}${selectedCamera.broadcastStatus ? ` is-${selectedCamera.broadcastStatus}` : ""}`}
           >
             <i aria-hidden="true" />
-            {selectedCamera.status === "online" ? "Disponível" : "Ainda não disponível"}
+            {statusLabel(selectedCamera)}
           </span>
           <strong>{selectedCamera.shortName}</strong>
-          <small>{selectedCamera.observation}</small>
+          <small>{selectedCamera.streamTitle ?? selectedCamera.observation}</small>
         </div>
       </div>
 
@@ -75,7 +82,7 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
               onClick={() => selectCamera(camera)}
             >
               <span>{camera.shortName}</span>
-              <small>{camera.status === "online" ? "Ao vivo" : "Em breve"}</small>
+              <small>{statusLabel(camera)}</small>
             </button>
           );
         })}
@@ -87,7 +94,7 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
             playerOpen ? (
               <iframe
                 src={selectedCamera.embedUrl}
-                title={selectedCamera.name}
+                title={selectedCamera.streamTitle ?? selectedCamera.name}
                 loading="lazy"
                 allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
                 allowFullScreen
@@ -103,8 +110,16 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
                 <span className="camera-launch-icon">
                   <CameraIcon />
                 </span>
-                <strong>Abrir câmera</strong>
-                <small>Toque para começar a assistir</small>
+                <strong>
+                  {selectedCamera.broadcastStatus === "replay"
+                    ? "Assistir última transmissão"
+                    : "Abrir câmera"}
+                </strong>
+                <small>
+                  {selectedCamera.broadcastStatus === "live"
+                    ? "Transmissão ao vivo no YouTube"
+                    : "Toque para começar a assistir"}
+                </small>
               </button>
             )
           ) : (
@@ -128,6 +143,11 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
           <span className="eyebrow">Local escolhido</span>
           <h3>{selectedCamera.name}</h3>
           <p>{selectedCamera.description}</p>
+          {selectedCamera.streamTitle ? (
+            <p className="camera-stream-title">
+              <strong>Transmissão:</strong> {selectedCamera.streamTitle}
+            </p>
+          ) : null}
           <dl>
             <div>
               <dt>Local</dt>
@@ -141,7 +161,7 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
             </div>
             <div>
               <dt>Disponibilidade</dt>
-              <dd>{selectedCamera.status === "online" ? "Câmera disponível" : "Câmera em breve"}</dd>
+              <dd>{statusLabel(selectedCamera)}</dd>
             </div>
           </dl>
           {selectedCamera.publicUrl ? (
@@ -151,7 +171,7 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
               target="_blank"
               rel="noreferrer"
             >
-              Abrir página da câmera
+              Abrir no provedor
               <span aria-hidden="true">↗</span>
             </a>
           ) : null}
@@ -159,33 +179,28 @@ export function WeatherCameraExplorer({ cameras }: WeatherCameraExplorerProps) {
       </div>
 
       <div className="camera-list" aria-label="Outras câmeras">
-        {cameras.map((camera) => {
-          const statusLabel =
-            camera.status === "online" ? "Disponível" : "Em breve";
-
-          return (
-            <button
-              id={camera.id}
-              type="button"
-              aria-label={`${camera.name}. ${statusLabel}. Selecionar ponto.`}
-              className={camera.id === selectedCamera.id ? "is-active" : undefined}
-              key={camera.id}
-              onClick={() => selectCamera(camera)}
-            >
-              <span className="camera-list-icon">
-                <CameraIcon />
-              </span>
-              <span>
-                <strong>{camera.shortName}</strong>
-                <small>{camera.area}</small>
-              </span>
-              <i
-                className={`camera-list-state camera-list-state--${camera.status}`}
-                aria-hidden="true"
-              />
-            </button>
-          );
-        })}
+        {cameras.map((camera) => (
+          <button
+            id={camera.id}
+            type="button"
+            aria-label={`${camera.name}. ${statusLabel(camera)}. Selecionar ponto.`}
+            className={camera.id === selectedCamera.id ? "is-active" : undefined}
+            key={camera.id}
+            onClick={() => selectCamera(camera)}
+          >
+            <span className="camera-list-icon">
+              <CameraIcon />
+            </span>
+            <span>
+              <strong>{camera.shortName}</strong>
+              <small>{camera.area}</small>
+            </span>
+            <i
+              className={`camera-list-state camera-list-state--${camera.status}`}
+              aria-hidden="true"
+            />
+          </button>
+        ))}
       </div>
     </section>
   );

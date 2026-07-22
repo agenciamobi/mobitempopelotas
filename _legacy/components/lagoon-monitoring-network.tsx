@@ -2,6 +2,11 @@ import type {
   LagoonMonitoringNetworkData,
   LagoonMonitoringObservation,
 } from "@/lib/lagoon-monitoring-network";
+import {
+  getWaterLevelTrendDirection,
+  getWaterLevelVisualState,
+  waterLevelStateClass,
+} from "@/lib/water-level-state";
 
 const CHART_WIDTH = 240;
 const CHART_HEIGHT = 54;
@@ -63,28 +68,29 @@ function getDistanceLabel(observation: LagoonMonitoringObservation) {
 
 function getTrend(observation: LagoonMonitoringObservation) {
   const rate = observation.trendCmPerHour;
+  const direction = getWaterLevelTrendDirection(rate);
 
-  if (rate === null) {
+  if (direction === "unavailable") {
     return {
-      direction: "unavailable" as const,
+      direction,
       symbol: "·",
       label: "Sem tendência",
       detail: "série insuficiente",
     };
   }
 
-  if (Math.abs(rate) < 0.1) {
+  if (direction === "stable") {
     return {
-      direction: "stable" as const,
+      direction,
       symbol: "→",
       label: "Estável",
       detail: "sem mudança relevante",
     };
   }
 
-  if (rate > 0) {
+  if (direction === "rising") {
     return {
-      direction: "rising" as const,
+      direction,
       symbol: "↑",
       label: "Subindo",
       detail: `${formatSigned(rate)} cm/h`,
@@ -92,10 +98,10 @@ function getTrend(observation: LagoonMonitoringObservation) {
   }
 
   return {
-    direction: "falling" as const,
+    direction,
     symbol: "↓",
     label: "Baixando",
-    detail: `${formatSigned(Math.abs(rate))} cm/h`,
+    detail: `${formatSigned(Math.abs(rate!))} cm/h`,
   };
 }
 
@@ -186,11 +192,17 @@ export function LagoonMonitoringNetwork({
             Math.min(observation.floodThresholdPercentage ?? 0, 100),
           );
           const trend = getTrend(observation);
+          const visualState = getWaterLevelVisualState({
+            rate: observation.trendCmPerHour,
+            available,
+            currentLevel: observation.currentLevelCm,
+            threshold: observation.floodLevelCm,
+          });
           const chart = compact ? null : buildChart(observation);
 
           return (
             <article
-              className={`lagoon-monitoring-card is-${observation.status} risk-${observation.risk}`}
+              className={`lagoon-monitoring-card is-${observation.status} risk-${observation.risk} ${waterLevelStateClass(visualState)}`}
               key={observation.station.id}
             >
               <div className="lagoon-monitoring-card-head">

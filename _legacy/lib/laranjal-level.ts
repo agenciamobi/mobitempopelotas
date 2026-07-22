@@ -85,7 +85,11 @@ function parseDistance(value: unknown) {
   if (!match?.[1]) return null;
 
   const distance = Number(match[1].replace(",", "."));
-  if (!Number.isFinite(distance) || distance < 0 || distance > SENSOR_REFERENCE_HEIGHT_METERS + 1) {
+  if (
+    !Number.isFinite(distance) ||
+    distance < 0 ||
+    distance > SENSOR_REFERENCE_HEIGHT_METERS + 1
+  ) {
     return null;
   }
 
@@ -200,7 +204,9 @@ export function normalizeLaranjalTelemetry(
     change1hCm: change1h ? round(change1h.centimeters, 1) : null,
     change6hCm: change6h ? round(change6h.centimeters, 1) : null,
     change24hCm: change24h ? round(change24h.centimeters, 1) : null,
-    periodAverage: round(values.reduce((sum, value) => sum + value, 0) / values.length),
+    periodAverage: round(
+      values.reduce((sum, value) => sum + value, 0) / values.length,
+    ),
     periodMinimum: round(Math.min(...values)),
     periodMaximum: round(Math.max(...values)),
     series: reduceSeries(points),
@@ -211,9 +217,10 @@ export function normalizeLaranjalTelemetry(
       url: LAGOON_LEVEL_SOURCE.dashboardUrl,
       fetchedAt: fetchedAt.toISOString(),
     },
-    error: ageMinutes > STALE_AFTER_MINUTES
-      ? "A última leitura disponível está atrasada."
-      : null,
+    error:
+      ageMinutes > STALE_AFTER_MINUTES
+        ? "A última leitura disponível está atrasada."
+        : null,
   };
 }
 
@@ -225,7 +232,10 @@ async function getPublicAccessToken() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ publicId: PUBLIC_CUSTOMER_ID }),
-    cache: "no-store",
+    next: {
+      revalidate: 300,
+      tags: ["laranjal-public-token"],
+    },
     signal: AbortSignal.timeout(8_000),
   });
 
@@ -266,7 +276,10 @@ export async function getLaranjalLevelData(): Promise<LaranjalLevelData> {
           Accept: "application/json",
           "X-Authorization": `Bearer ${token}`,
         },
-        cache: "no-store",
+        next: {
+          revalidate: 30,
+          tags: ["laranjal-level"],
+        },
         signal: AbortSignal.timeout(12_000),
       },
     );
@@ -287,4 +300,5 @@ export const LARANJAL_LEVEL_CONFIG = {
   publicCustomerId: PUBLIC_CUSTOMER_ID,
   sensorReferenceHeightMeters: SENSOR_REFERENCE_HEIGHT_METERS,
   sourceUrl: LAGOON_LEVEL_SOURCE.dashboardUrl,
+  mode: "telemetry",
 } as const;
