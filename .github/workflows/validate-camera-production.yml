@@ -1,0 +1,120 @@
+name: Validar câmeras publicadas
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate-camera-production:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Comparar canal e produção
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p camera-production-report
+          LOG="camera-production-report/summary.log"
+          USER_AGENT='Mozilla/5.0 (compatible; TempoPelotas/1.0; +https://agenciamobi.com.br)'
+
+          PAGE_STATUS="$(curl --silent --show-error --location --compressed --max-time 40 \
+            --user-agent "$USER_AGENT" \
+            --output camera-production-report/production.html \
+            --write-out '%{http_code}|%{time_total}' \
+            'https://mobitempopelotas.lovable.app/cameras-ao-vivo-pelotas')"
+          echo "Produção: $PAGE_STATUS" | tee "$LOG"
+          test "${PAGE_STATUS%%|*}" = "200"
+
+          STREAM_STATUS="$(curl --silent --show-error --location --compressed --max-time 30 \
+            --user-agent "$USER_AGENT" \
+            --output camera-production-report/streams.html \
+            --write-out '%{http_code}|%{time_total}' \
+            'https://www.youtube.com/@praiadolaranjal/streams')"
+          echo "YouTube streams: $STREAM_STATUS" | tee -a "$LOG"
+          test "${STREAM_STATUS%%|*}" = "200"
+
+          RSS_STATUS="$(curl --silent --show-error --location --compressed --max-time 30 \
+            --user-agent "$USER_AGENT" \
+            --output camera-production-report/feed.xml \
+            --write-out '%{http_code}|%{time_total}' \
+            'https://www.youtube.com/feeds/videos.xml?channel_id=UCqvFgdUJ7kuChDA7hbnz1ZA')"
+          echo "YouTube RSS: $RSS_STATUS" | tee -a "$LOG"
+          test "${RSS_STATUS%%|*}" = "200"
+
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          import sys
+          import html
+
+          root = Path('camera-production-report')
+          production = (root / 'production.html').read_text(encoding='utf-8', errors='ignore')
+          streams = (root / 'streams.html').read_text(encoding='utf-8', errors='ignore')
+          feed = (root / 'feed.xml').read_text(encoding='utf-8', errors='ignore')
+          log = root / 'summary.log'
+
+          required = [
+              'Câmeras do Laranjal e pontos previstos da cidade',
+              'Escolha um local para acompanhar',
+              'A imagem mostra o local, mas não mede o tempo',
+              'Centro',
+              'São Gonçalo',
+          ]
+          missing = [text for text in required if text not in production]
+          if missing:
+              raise SystemExit(f'Conteúdo ausente na produção: {missing}')
+          if 'Página em migração' in production:
+              raise SystemExit('A rota ainda exibe o placeholder de migração')
+          if 'youtube-nocookie.com/embed/' not in production:
+              raise SystemExit('O HTML publicado não contém embed com privacidade aprimorada')
+          if 'VideoObject' not in production:
+              raise SystemExit('O HTML publicado não contém JSON-LD VideoObject')
+
+          live_now = '"isLiveNow":true' in streams
+          entries = re.findall(r'<entry>([\s\S]*?)</entry>', feed)
+          camera_pattern = re.compile(r'(?:c[aâ]mera|laranjal|c[eé]u|clima)', re.I)
+          latest = None
+          for entry in entries:
+              video_match = re.search(r'<yt:videoId>([A-Za-z0-9_-]{11})</yt:videoId>', entry)
+              title_match = re.search(r'<title>([\s\S]*?)</title>', entry)
+              if not video_match or not title_match:
+                  continue
+              title = html.unescape(title_match.group(1)).strip()
+              if camera_pattern.search(title):
+                  latest = (video_match.group(1), title)
+                  break
+          if latest is None:
+              raise SystemExit('RSS sem vídeo recente relacionado à câmera')
+
+          video_id, title = latest
+          with log.open('a', encoding='utf-8') as handle:
+              handle.write(f'Canal ao vivo: {live_now}\n')
+              handle.write(f'Vídeo RSS: {video_id} · {title}\n')
+
+          if live_now:
+              if 'Ao vivo agora' not in production:
+                  raise SystemExit('Canal ao vivo, mas portal não sinalizou live')
+          else:
+              if 'Última transmissão' not in production:
+                  raise SystemExit('Canal sem live, mas portal não sinalizou replay')
+              if 'Ao vivo agora' in production:
+                  raise SystemExit('Portal apresentou live falsa quando o canal estava offline')
+              if video_id not in production:
+                  raise SystemExit(f'Portal não utilizou o replay mais recente do RSS: {video_id}')
+
+          with log.open('a', encoding='utf-8') as handle:
+              handle.write('Resultado: produção coerente com o estado público do canal.\n')
+          PY
+
+      - name: Publicar relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: camera-production-report
+          path: camera-production-report
+          if-no-files-found: error
+          retention-days: 2
