@@ -1,16 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MigrationPlaceholderPage } from "@/components/migration/MigrationPlaceholderPage";
+
+import { HydrologyOverviewPage } from "@/components/hydrology/HydrologyPages";
+import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
 import { createPageHead } from "@/lib/page-meta";
+import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 export const Route = createFileRoute("/situacao-hidrologica-pelotas")({
   head: () =>
     createPageHead(
-      "Situação hidrológica de Pelotas",
-      "Acompanhamento hidrológico de Pelotas e da região. Página em migração.",
+      "Situação das águas em Pelotas",
+      "Leitura da Estação Laranjal, evolução recente da Lagoa dos Patos e contexto meteorológico e regional para Pelotas.",
     ),
+  loader: async () => {
+    const [weather, level] = await Promise.all([
+      getWeatherIntelligence(),
+      getLaranjalLevelData(),
+    ]);
+    return { weather, level };
+  },
+  staleTime: 60 * 1_000,
   component: SituacaoHidrologicaPage,
 });
 
 function SituacaoHidrologicaPage() {
-  return <MigrationPlaceholderPage title="Situação hidrológica de Pelotas" />;
+  const data = Route.useLoaderData();
+  return <HydrologyOverviewPage weather={data.weather} level={data.level} />;
 }
