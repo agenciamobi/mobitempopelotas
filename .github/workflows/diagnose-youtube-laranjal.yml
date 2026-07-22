@@ -1,0 +1,113 @@
+name: Diagnóstico YouTube Laranjal
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose-youtube:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Consultar páginas públicas do canal
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p youtube-diagnostic
+          LOG="youtube-diagnostic/summary.log"
+          USER_AGENT="Mozilla/5.0 (compatible; TempoPelotas/1.0; +https://agenciamobi.com.br)"
+
+          request() {
+            local name="$1"
+            local url="$2"
+            local body="youtube-diagnostic/${name}.html"
+            local metrics
+            metrics="$(curl --silent --show-error --location --compressed --max-time 30 \
+              --user-agent "$USER_AGENT" \
+              --header 'Accept-Language: pt-BR,pt;q=0.9,en;q=0.7' \
+              --output "$body" \
+              --write-out '%{http_code}|%{time_total}|%{url_effective}|%{content_type}' \
+              "$url" || echo '000|30|'$url'|')"
+            printf '%-28s %s\n' "$name" "$metrics" | tee -a "$LOG"
+          }
+
+          request "streams" "https://www.youtube.com/@praiadolaranjal/streams"
+          request "live" "https://www.youtube.com/@praiadolaranjal/live"
+          request "channel" "https://www.youtube.com/@praiadolaranjal"
+
+          python - <<'PY'
+          from pathlib import Path
+          import html
+          import json
+          import re
+
+          root = Path('youtube-diagnostic')
+          report = []
+          channel_ids = []
+          candidates = []
+
+          for path in [root/'streams.html', root/'live.html', root/'channel.html']:
+              text = path.read_text(encoding='utf-8', errors='ignore') if path.exists() else ''
+              report.append(f'## {path.name} bytes={len(text)}')
+              for pattern in [r'"channelId":"(UC[A-Za-z0-9_-]{22})"', r'"browseId":"(UC[A-Za-z0-9_-]{22})"', r'channel_id=(UC[A-Za-z0-9_-]{22})']:
+                  for value in re.findall(pattern, text):
+                      if value not in channel_ids:
+                          channel_ids.append(value)
+              live_positions = [m.start() for m in re.finditer(r'"isLiveNow":true', text)]
+              report.append(f'isLiveNow=true: {len(live_positions)}')
+              for pos in live_positions[:10]:
+                  context = text[max(0, pos-15000):pos+3000]
+                  ids = re.findall(r'"videoId":"([A-Za-z0-9_-]{11})"', context)
+                  if ids:
+                      candidates.append({'source': path.name, 'status': 'live', 'videoId': ids[-1]})
+              for match in re.finditer(r'"videoId":"([A-Za-z0-9_-]{11})"', text):
+                  video_id = match.group(1)
+                  context = text[max(0, match.start()-2500):match.start()+5000]
+                  title_match = re.search(r'"title":\{"(?:simpleText":"((?:\\.|[^"\\])*)"|runs":\[\{"text":"((?:\\.|[^"\\])*)")', context)
+                  raw_title = next((value for value in (title_match.groups() if title_match else ()) if value), None)
+                  if raw_title:
+                      try:
+                          title = json.loads('"' + raw_title.replace('"', '\\"') + '"')
+                      except Exception:
+                          title = html.unescape(raw_title.replace('\\u0026', '&').replace('\\n', ' '))
+                  else:
+                      title = None
+                  candidate = {'source': path.name, 'status': 'unknown', 'videoId': video_id, 'title': title}
+                  if candidate not in candidates:
+                      candidates.append(candidate)
+                  if len(candidates) >= 30:
+                      break
+              report.append('')
+
+          report.append('channelIds: ' + ', '.join(channel_ids))
+          report.append('candidates:')
+          for item in candidates[:30]:
+              report.append(json.dumps(item, ensure_ascii=False))
+
+          (root/'parsed.log').write_text('\n'.join(report), encoding='utf-8')
+          (root/'channel-ids.txt').write_text('\n'.join(channel_ids), encoding='utf-8')
+          PY
+
+          if [[ -s youtube-diagnostic/channel-ids.txt ]]; then
+            CHANNEL_ID="$(head -n 1 youtube-diagnostic/channel-ids.txt)"
+            RSS_URL="https://www.youtube.com/feeds/videos.xml?channel_id=$CHANNEL_ID"
+            RSS_METRICS="$(curl --silent --show-error --location --compressed --max-time 30 \
+              --user-agent "$USER_AGENT" \
+              --output youtube-diagnostic/feed.xml \
+              --write-out '%{http_code}|%{time_total}|%{content_type}' \
+              "$RSS_URL" || echo '000|30|')"
+            echo "rss $CHANNEL_ID: $RSS_METRICS" | tee -a "$LOG"
+          fi
+
+      - name: Publicar diagnóstico
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-laranjal-diagnostic
+          path: youtube-diagnostic
+          if-no-files-found: error
+          retention-days: 2
