@@ -7,7 +7,7 @@ export type YouTubeCameraStream = {
   watchUrl: string;
   embedUrl: string;
   thumbnailUrl: string | null;
-  publishedAt: string;
+  publishedAt: string | null;
   source: "manual" | "api" | "public-page" | "rss";
 };
 
