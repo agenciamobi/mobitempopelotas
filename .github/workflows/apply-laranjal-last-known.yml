@@ -1,0 +1,76 @@
+name: Preservar última leitura do Laranjal
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  apply-and-validate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: agent/preserve-laranjal-last-known
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Aplicar ajuste
+        run: python .github/scripts/apply-laranjal-last-known.py
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Formatar arquivos alterados
+        run: |
+          npx prettier --write \
+            src/lib/hydrology/laranjal-level.server.ts \
+            src/components/hydrology/HydrologyPages.tsx
+
+      - name: Validar endpoint da última leitura
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE_URL="https://tb.labhidrosens.com"
+          PUBLIC_ID="0a869e80-d9e8-11f0-ac7c-456d9a25fe9a"
+          DEVICE_ID="a3e1d520-b438-11f0-ac7c-456d9a25fe9a"
+          TOKEN="$(curl --silent --show-error --max-time 15 \
+            --header 'Content-Type: application/json' \
+            --data "{\"publicId\":\"$PUBLIC_ID\"}" \
+            "$BASE_URL/api/auth/login/public" | jq -r '.token // empty')"
+          test "${#TOKEN}" -gt 20
+          END_TS="$(date +%s%3N)"
+          curl --silent --show-error --max-time 15 \
+            --header "X-Authorization: Bearer $TOKEN" \
+            "$BASE_URL/api/plugins/telemetry/DEVICE/$DEVICE_ID/values/timeseries?keys=payload&startTs=0&endTs=$END_TS&limit=50&agg=NONE&orderBy=DESC" \
+            > latest-telemetry.json
+          jq -e '.payload | any(.value | tostring | test("Distance"; "i"))' latest-telemetry.json >/dev/null
+          rm -f latest-telemetry.json
+
+      - name: Validar build
+        run: npm run build
+
+      - name: Validar tipos
+        run: npm run typecheck
+
+      - name: Validar lint
+        run: npm run lint
+
+      - name: Publicar ajuste na branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/hydrology/laranjal-level.server.ts src/components/hydrology/HydrologyPages.tsx
+          git commit -m "fix: preserva última leitura conhecida do Laranjal"
+          git push origin HEAD:agent/preserve-laranjal-last-known
