@@ -95,7 +95,8 @@ export function RainPage({ data }: { data: WeatherIntelligenceData }) {
   const weather = data.weather;
   const today = weather.daily[0];
 
-  if (!today && weather.hourly.length === 0) return <EmptyConditionPage label="Previsão de chuva" />;
+  if (!today && weather.hourly.length === 0)
+    return <EmptyConditionPage label="Previsão de chuva" />;
 
   const totalRain = weather.daily.reduce((total, day) => total + day.precipitationMm, 0);
   const rainiestDay = weather.daily.reduce(
@@ -129,7 +130,10 @@ export function RainPage({ data }: { data: WeatherIntelligenceData }) {
         data={data}
       />
 
-      <section className="condition-highlight condition-highlight-rain" aria-labelledby="rain-highlight-title">
+      <section
+        className="condition-highlight condition-highlight-rain"
+        aria-labelledby="rain-highlight-title"
+      >
         <div>
           <p className="condition-kicker">Resumo de hoje</p>
           <h2 id="rain-highlight-title">
@@ -181,7 +185,9 @@ export function RainPage({ data }: { data: WeatherIntelligenceData }) {
           <span>Próxima janela relevante</span>
           <strong>{nextWetHour?.time ?? "Sem janela próxima"}</strong>
           <small>
-            {nextWetHour ? `${nextWetHour.precipitationProbability}% de probabilidade` : "Abaixo de 40%"}
+            {nextWetHour
+              ? `${nextWetHour.precipitationProbability}% de probabilidade`
+              : "Abaixo de 40%"}
           </small>
         </article>
       </section>
@@ -313,7 +319,11 @@ export function WindPage({ data }: { data: WeatherIntelligenceData }) {
 
         <div className="condition-highlight-reading">
           <Wind aria-hidden="true" />
-          <strong>{current?.windSpeed === null || current?.windSpeed === undefined ? "—" : current.windSpeed}</strong>
+          <strong>
+            {current?.windSpeed === null || current?.windSpeed === undefined
+              ? "—"
+              : current.windSpeed}
+          </strong>
           <span>km/h agora</span>
         </div>
       </section>
@@ -342,7 +352,11 @@ export function WindPage({ data }: { data: WeatherIntelligenceData }) {
         <section className="condition-alert condition-alert-wind">
           <AlertTriangle aria-hidden="true" />
           <div>
-            <strong>{windLevel === "warning" ? "Atenção para rajadas fortes" : "Períodos de vento mais intenso"}</strong>
+            <strong>
+              {windLevel === "warning"
+                ? "Atenção para rajadas fortes"
+                : "Períodos de vento mais intenso"}
+            </strong>
             <span>
               Objetos soltos, estruturas leves e atividades ao ar livre podem exigir precaução.
             </span>
