@@ -1,0 +1,43 @@
+name: Formatação temporária das páginas de previsão
+
+on:
+  push:
+    branches:
+      - agent/migrate-forecast-pages
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: agent/migrate-forecast-pages
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Aplicar Prettier
+        run: npx prettier --write src/components/weather/ForecastPages.tsx src/components/weather/ForecastPages.css src/routes/tempo-hoje-pelotas.tsx src/routes/previsao-7-dias-pelotas.tsx
+
+      - name: Registrar formatação
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/weather/ForecastPages.tsx src/components/weather/ForecastPages.css src/routes/tempo-hoje-pelotas.tsx src/routes/previsao-7-dias-pelotas.tsx
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração de formatação."
+          else
+            git commit -m "style: formata páginas de previsão"
+            git push origin HEAD:agent/migrate-forecast-pages
+          fi
