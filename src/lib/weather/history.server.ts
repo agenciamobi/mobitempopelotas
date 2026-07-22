@@ -275,7 +275,8 @@ export async function fetchPelotasWeatherHistory(): Promise<WeatherHistoryData> 
     }
   }
 
-  const error = failures.length > 0 ? failures.join(" ") : "Falha desconhecida ao consultar o histórico.";
+  const error =
+    failures.length > 0 ? failures.join(" ") : "Falha desconhecida ao consultar o histórico.";
   console.error("[weather/history] Todas as fontes históricas falharam", { failures });
   return unavailable(error, fetchedAt);
 }
