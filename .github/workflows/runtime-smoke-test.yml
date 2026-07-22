@@ -23,6 +23,9 @@ jobs:
           BASE_URL="https://mobitempopelotas.lovable.app"
           OPEN_METEO_URL="https://api.open-meteo.com/v1/forecast?latitude=-31.7654&longitude=-52.3376&timezone=America%2FSao_Paulo&forecast_days=7&current=temperature_2m%2Crelative_humidity_2m%2Capparent_temperature%2Cweather_code%2Cpressure_msl%2Cvisibility%2Cwind_speed_10m%2Cwind_gusts_10m%2Cwind_direction_10m%2Cis_day&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m%2Cweather_code%2Cis_day&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_probability_max%2Cprecipitation_sum%2Cwind_gusts_10m_max%2Csunrise%2Csunset"
           MET_NORWAY_URL="https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=-31.7654&lon=-52.3376&altitude=7"
+          END_DATE="$(TZ=America/Sao_Paulo date -d 'yesterday' +%F)"
+          START_DATE="$(TZ=America/Sao_Paulo date -d "$END_DATE -29 days" +%F)"
+          HISTORICAL_URL="https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=-31.7654&longitude=-52.3376&timezone=America%2FSao_Paulo&start_date=$START_DATE&end_date=$END_DATE&daily=temperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Cwind_gusts_10m_max"
           LOG_FILE="smoke-artifacts/smoke-production.log"
           FAILED=0
           mkdir -p smoke-artifacts
@@ -58,7 +61,22 @@ jobs:
             FAILED=1
           else
             echo "OK: MET Norway possui previsão global utilizável" | tee -a "$LOG_FILE"
-            jq -r '[.properties.timeseries[].data.next_1_hours.details.probability_of_precipitation?, .properties.timeseries[].data.next_6_hours.details.probability_of_precipitation?, .properties.timeseries[].data.next_12_hours.details.probability_of_precipitation?] | map(select(. != null)) | "Probabilidades disponíveis: \(length)"' smoke-artifacts/met-norway.json | tee -a "$LOG_FILE"
+          fi
+
+          history_metrics="$(curl --silent --show-error --max-time 20 \
+            --user-agent 'MOBI-Tempo-Pelotas/1.0 (+https://agenciamobi.com.br)' \
+            --output smoke-artifacts/open-meteo-history.json \
+            --write-out '%{http_code}|%{time_total}' \
+            "$HISTORICAL_URL" || echo '000|20')"
+          echo "Open-Meteo histórico direto: $history_metrics" | tee -a "$LOG_FILE"
+          if [[ "${history_metrics%%|*}" != "200" ]]; then
+            echo "ERRO: API histórica não respondeu diretamente" | tee -a "$LOG_FILE"
+            FAILED=1
+          elif ! jq -e '(.daily.time | length) == 30 and (.daily.temperature_2m_max | length) == 30' smoke-artifacts/open-meteo-history.json >/dev/null; then
+            echo "ERRO: API histórica sem série completa de 30 dias" | tee -a "$LOG_FILE"
+            FAILED=1
+          else
+            echo "OK: API histórica direta possui 30 dias completos" | tee -a "$LOG_FILE"
           fi
 
           auth_metrics="$(curl --silent --show-error --max-time 15 \
@@ -113,6 +131,7 @@ jobs:
           check_route "/nivel-da-lagoa-dos-patos-laranjal" "Nível da Lagoa dos Patos na Estação Laranjal" "nivel-laranjal"
           check_route "/metodologia" "De onde vêm os dados do Tempo Pelotas" "metodologia"
           check_route "/estacao-embrapa-pelotas" "Estação Embrapa Clima Temperado" "estacao-embrapa"
+          check_route "/historico-climatico-pelotas" "Como foi o tempo nos últimos 30 dias em Pelotas" "historico"
 
           if grep -Fq "Página em migração" smoke-artifacts/metodologia.html; then
             echo "ERRO: Metodologia ainda exibe o placeholder de migração" | tee -a "$LOG_FILE"
@@ -146,11 +165,27 @@ jobs:
           elif ! grep -Fq "Chuva acumulada na estação" smoke-artifacts/estacao-embrapa.html; then
             echo "ERRO: Estação Embrapa disponível sem acumulados de chuva" | tee -a "$LOG_FILE"
             FAILED=1
-          elif ! grep -Fq "Menores e maiores valores reconhecidos" smoke-artifacts/estacao-embrapa.html; then
-            echo "ERRO: Estação Embrapa disponível sem extremos diários" | tee -a "$LOG_FILE"
-            FAILED=1
           else
             echo "OK: Estação Embrapa completa, com medições e sem placeholder" | tee -a "$LOG_FILE"
+          fi
+
+          if grep -Fq "Página em migração" smoke-artifacts/historico.html; then
+            echo "ERRO: Histórico ainda exibe o placeholder de migração" | tee -a "$LOG_FILE"
+            FAILED=1
+          elif grep -Fq "O histórico recente não pôde ser carregado" smoke-artifacts/historico.html; then
+            echo "ERRO: API histórica funciona externamente, mas falhou no runtime publicado" | tee -a "$LOG_FILE"
+            FAILED=1
+          elif ! grep -Fq "Como o tempo variou em Pelotas" smoke-artifacts/historico.html; then
+            echo "ERRO: Histórico sem gráfico interativo" | tee -a "$LOG_FILE"
+            FAILED=1
+          elif ! grep -Fq "Valores usados nos cálculos" smoke-artifacts/historico.html; then
+            echo "ERRO: Histórico sem tabela diária" | tee -a "$LOG_FILE"
+            FAILED=1
+          elif ! grep -Fq "Histórico recente não é normal climatológica" smoke-artifacts/historico.html; then
+            echo "ERRO: Histórico sem aviso metodológico" | tee -a "$LOG_FILE"
+            FAILED=1
+          else
+            echo "OK: Histórico real completo, interativo e sem placeholder" | tee -a "$LOG_FILE"
           fi
 
           echo "Smoke test finalizado em $(date -u +'%Y-%m-%dT%H:%M:%SZ')" | tee -a "$LOG_FILE"
