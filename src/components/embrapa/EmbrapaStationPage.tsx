@@ -79,17 +79,33 @@ function MetricCard({ icon: Icon, label, value, detail }: MetricCardProps) {
   );
 }
 
-function ExtremeValue({ label, observation, unit }: { label: string; observation: TimedObservation; unit: string }) {
+function ExtremeValue({
+  label,
+  observation,
+  unit,
+}: {
+  label: string;
+  observation: TimedObservation;
+  unit: string;
+}) {
   return (
     <div>
       <span>{label}</span>
       <strong>{displayValue(observation.value, unit)}</strong>
-      <small>{observation.time ? `Registrado às ${observation.time}` : "Horário não informado"}</small>
+      <small>
+        {observation.time ? `Registrado às ${observation.time}` : "Horário não informado"}
+      </small>
     </div>
   );
 }
 
-function SourceStatus({ status, error }: { status: "live" | "partial" | "unavailable"; error: string | null }) {
+function SourceStatus({
+  status,
+  error,
+}: {
+  status: "live" | "partial" | "unavailable";
+  error: string | null;
+}) {
   const Icon = status === "live" ? CheckCircle2 : status === "partial" ? Clock3 : Info;
 
   return (
@@ -158,7 +174,8 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
               <Gauge aria-hidden="true" /> 57 m de altitude
             </span>
             <span>
-              <RefreshCw aria-hidden="true" /> Consulta em {formatDateTime(observation.source.fetchedAt)}
+              <RefreshCw aria-hidden="true" /> Consulta em{" "}
+              {formatDateTime(observation.source.fetchedAt)}
             </span>
           </div>
         </div>
@@ -166,7 +183,9 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
         <aside className={`embrapa-primary-reading embrapa-primary-reading-${observation.status}`}>
           <span className="embrapa-primary-label">Temperatura medida</span>
           <strong>
-            {observation.current.temperature === null ? "—" : `${formatNumber(observation.current.temperature)}°`}
+            {observation.current.temperature === null
+              ? "—"
+              : `${formatNumber(observation.current.temperature)}°`}
           </strong>
           <p>
             {observation.current.feelsLike === null
@@ -193,7 +212,8 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
               </div>
               <p>
                 Os valores representam o ponto onde o equipamento está instalado. Centro, Laranjal,
-                áreas rurais e outros bairros podem apresentar condições diferentes no mesmo horário.
+                áreas rurais e outros bairros podem apresentar condições diferentes no mesmo
+                horário.
               </p>
             </div>
 
@@ -237,7 +257,10 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
             </div>
           </section>
 
-          <section className="embrapa-section embrapa-rain-section" aria-labelledby="embrapa-rain-title">
+          <section
+            className="embrapa-section embrapa-rain-section"
+            aria-labelledby="embrapa-rain-title"
+          >
             <div className="embrapa-section-heading">
               <div>
                 <p className="embrapa-kicker">Precipitação observada</p>
@@ -286,16 +309,32 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
                   <Thermometer aria-hidden="true" />
                   <h3>Temperatura do ar</h3>
                 </div>
-                <ExtremeValue label="Mínima" observation={observation.extremes.temperatureMin} unit=" °C" />
-                <ExtremeValue label="Máxima" observation={observation.extremes.temperatureMax} unit=" °C" />
+                <ExtremeValue
+                  label="Mínima"
+                  observation={observation.extremes.temperatureMin}
+                  unit=" °C"
+                />
+                <ExtremeValue
+                  label="Máxima"
+                  observation={observation.extremes.temperatureMax}
+                  unit=" °C"
+                />
               </article>
               <article>
                 <div className="embrapa-extreme-heading">
                   <Droplets aria-hidden="true" />
                   <h3>Umidade relativa</h3>
                 </div>
-                <ExtremeValue label="Mínima" observation={observation.extremes.humidityMin} unit="%" />
-                <ExtremeValue label="Máxima" observation={observation.extremes.humidityMax} unit="%" />
+                <ExtremeValue
+                  label="Mínima"
+                  observation={observation.extremes.humidityMin}
+                  unit="%"
+                />
+                <ExtremeValue
+                  label="Máxima"
+                  observation={observation.extremes.humidityMax}
+                  unit="%"
+                />
               </article>
               <article>
                 <div className="embrapa-extreme-heading">
@@ -317,7 +356,10 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
           </section>
         </>
       ) : (
-        <section className="embrapa-section embrapa-unavailable" aria-labelledby="embrapa-unavailable-title">
+        <section
+          className="embrapa-section embrapa-unavailable"
+          aria-labelledby="embrapa-unavailable-title"
+        >
           <Radio aria-hidden="true" />
           <div>
             <p className="embrapa-kicker">Fonte externa indisponível</p>
@@ -348,7 +390,11 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
         <div className="embrapa-context-grid">
           <article>
             <Activity aria-hidden="true" />
-            <h3>{usedAsCurrentSource ? "Fonte principal da condição atual" : "Fonte local de comparação"}</h3>
+            <h3>
+              {usedAsCurrentSource
+                ? "Fonte principal da condição atual"
+                : "Fonte local de comparação"}
+            </h3>
             <p>
               {usedAsCurrentSource
                 ? "As medições reconhecidas da Embrapa foram usadas como referência principal para a condição atual exibida pelo portal."
@@ -359,8 +405,8 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
             <Clock3 aria-hidden="true" />
             <h3>Consulta não é o mesmo que medição</h3>
             <p>
-              “Consulta em” registra quando o Tempo Pelotas acessou a fonte. O horário da medição só é
-              mostrado quando aparece explicitamente no monitor da estação.
+              “Consulta em” registra quando o Tempo Pelotas acessou a fonte. O horário da medição só
+              é mostrado quando aparece explicitamente no monitor da estação.
             </p>
           </article>
           <article>
@@ -375,9 +421,10 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
             <MapPin aria-hidden="true" />
             <h3>Representatividade espacial limitada</h3>
             <p>
-              A coordenada publicada é aproximadamente {formatNumber(observation.source.latitude, 2)}, {" "}
-              {formatNumber(observation.source.longitude, 2)}. Uma única estação não descreve todos os
-              microclimas do município.
+              A coordenada publicada é aproximadamente{" "}
+              {formatNumber(observation.source.latitude, 2)},{" "}
+              {formatNumber(observation.source.longitude, 2)}. Uma única estação não descreve todos
+              os microclimas do município.
             </p>
           </article>
         </div>
@@ -389,7 +436,12 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
           <h2>Consulte o dado original e compare com a previsão</h2>
         </div>
         <div>
-          <a className="embrapa-primary-action" href={observation.source.url} target="_blank" rel="noreferrer">
+          <a
+            className="embrapa-primary-action"
+            href={observation.source.url}
+            target="_blank"
+            rel="noreferrer"
+          >
             Monitor da Embrapa <ExternalLink aria-hidden="true" />
           </a>
           <Link className="embrapa-secondary-action" to="/tempo-hoje-pelotas">
