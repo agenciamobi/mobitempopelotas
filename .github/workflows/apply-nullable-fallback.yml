@@ -57,6 +57,18 @@ jobs:
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
 
+      - name: Formatar arquivos alterados
+        run: |
+          npx prettier --write \
+            src/lib/weather/types.ts \
+            src/lib/weather/met-norway.server.ts \
+            src/lib/weather/weather-intelligence.server.ts \
+            src/components/weather/WeatherHome.tsx \
+            src/components/weather/WeatherEditorialHero.tsx \
+            src/components/weather/ForecastPages.tsx \
+            src/components/weather/RainWindPages.tsx \
+            src/components/hydrology/HydrologyPages.tsx
+
       - name: Validar build
         run: npm run build
 
