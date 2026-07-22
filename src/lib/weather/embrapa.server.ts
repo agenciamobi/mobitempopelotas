@@ -209,6 +209,8 @@ export async function fetchEmbrapaObservation(): Promise<EmbrapaObservation> {
     if (!response.ok) throw new Error(`Embrapa respondeu com HTTP ${response.status}.`);
     return parseEmbrapaObservationHtml(await response.text());
   } catch (error) {
-    return unavailable(error instanceof Error ? error.message : "Falha desconhecida ao consultar a Embrapa.");
+    return unavailable(
+      error instanceof Error ? error.message : "Falha desconhecida ao consultar a Embrapa.",
+    );
   }
 }
