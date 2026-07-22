@@ -5,7 +5,7 @@ import type { GeminiWeatherStatus, WeatherBrief } from "./weather-intelligence.t
 
 const GEMINI_API_ROOT = "https://generativelanguage.googleapis.com/v1beta/models";
 const DEFAULT_MODEL = "gemini-3.5-flash-lite";
-const REQUEST_TIMEOUT_MS = 6_000;
+const REQUEST_TIMEOUT_MS = 1_200;
 const MAX_PROMPT_CHARACTERS = 12_000;
 
 const weatherBriefSchema = z.object({
@@ -53,7 +53,7 @@ function resolveModel() {
 
 function isGeminiEnabled() {
   const configured = readServerEnvironment("GEMINI_WEATHER_ENABLED")?.toLowerCase();
-  return configured !== "false" && configured !== "0" && configured !== "off";
+  return configured === "true" || configured === "1" || configured === "on";
 }
 
 function compactWeatherContext(weather: AggregatedWeatherData) {
