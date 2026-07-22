@@ -52,7 +52,9 @@ function AlertCard({ alert }: { alert: InmetAlert }) {
         </div>
 
         <h2>{alert.headline || alert.event}</h2>
-        <p>{alert.description || "O INMET não forneceu uma descrição detalhada para este aviso."}</p>
+        <p>
+          {alert.description || "O INMET não forneceu uma descrição detalhada para este aviso."}
+        </p>
 
         {alert.instruction ? (
           <div className="alerts-instruction">
@@ -115,7 +117,9 @@ export function WeatherAlertsPage({ data }: { data: WeatherIntelligenceData }) {
         <div className={`alerts-source-state alerts-source-state-${inmetSource.status}`}>
           {inmetSource.usable ? <CheckCircle2 aria-hidden="true" /> : <Info aria-hidden="true" />}
           <div>
-            <strong>{inmetSource.usable ? "Fonte oficial disponível" : "Fonte com restrição"}</strong>
+            <strong>
+              {inmetSource.usable ? "Fonte oficial disponível" : "Fonte com restrição"}
+            </strong>
             <span>
               {inmetSource.usable
                 ? `INMET consultado em ${formatDateTime(inmetSource.fetchedAt)}`
@@ -201,8 +205,8 @@ export function WeatherAlertsPage({ data }: { data: WeatherIntelligenceData }) {
           <h2 id="alerts-method-title">Como interpretar esta página</h2>
           <p>
             Os alertas são emitidos pelo INMET. O Tempo Pelotas filtra e organiza os avisos, mas não
-            substitui as orientações da Defesa Civil, do INMET ou das autoridades locais. Em situações
-            de risco, siga sempre as instruções oficiais.
+            substitui as orientações da Defesa Civil, do INMET ou das autoridades locais. Em
+            situações de risco, siga sempre as instruções oficiais.
           </p>
         </div>
       </section>
