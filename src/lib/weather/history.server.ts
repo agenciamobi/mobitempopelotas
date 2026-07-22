@@ -6,13 +6,25 @@ import type {
   WeatherHistoryData,
 } from "./history.types";
 
-const HISTORICAL_ENDPOINT = "https://historical-forecast-api.open-meteo.com/v1/forecast";
-const HISTORICAL_SOURCE_NAME = "Open-Meteo Historical Forecast";
-const HISTORICAL_SOURCE_URL = "https://open-meteo.com/en/docs/historical-forecast-api";
 const TIMEZONE = "America/Sao_Paulo";
 const REQUEST_TIMEOUT_MS = 10_000;
 const HISTORY_DAYS = 30;
 const PELOTAS = { latitude: -31.7654, longitude: -52.3376 } as const;
+
+const HISTORY_SOURCES = [
+  {
+    id: "historical-forecast",
+    name: "Open-Meteo Historical Forecast",
+    endpoint: "https://historical-forecast-api.open-meteo.com/v1/forecast",
+    url: "https://open-meteo.com/en/docs/historical-forecast-api",
+  },
+  {
+    id: "archive",
+    name: "Open-Meteo Archive",
+    endpoint: "https://archive-api.open-meteo.com/v1/archive",
+    url: "https://open-meteo.com/en/docs/historical-weather-api",
+  },
+] as const;
 
 const finiteNumber = z.number().finite();
 const nullableNumberArray = z.array(finiteNumber.nullable()).min(1);
@@ -42,6 +54,7 @@ const historicalResponseSchema = z
   });
 
 type HistoricalResponse = z.infer<typeof historicalResponseSchema>;
+type HistorySource = (typeof HISTORY_SOURCES)[number];
 
 function localDateString(date = new Date()) {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -152,14 +165,60 @@ function normalizeHistory(response: HistoricalResponse) {
   });
 }
 
+function createQueryParams() {
+  const today = localDateString();
+  const endDate = shiftDate(today, -1);
+  const startDate = shiftDate(endDate, -(HISTORY_DAYS - 1));
+
+  return new URLSearchParams({
+    latitude: String(PELOTAS.latitude),
+    longitude: String(PELOTAS.longitude),
+    timezone: TIMEZONE,
+    start_date: startDate,
+    end_date: endDate,
+    daily: [
+      "temperature_2m_max",
+      "temperature_2m_min",
+      "precipitation_sum",
+      "wind_gusts_10m_max",
+    ].join(","),
+  });
+}
+
+async function fetchHistorySource(source: HistorySource, params: URLSearchParams) {
+  const response = await fetch(`${source.endpoint}?${params}`, {
+    headers: {
+      Accept: "application/json",
+      "User-Agent": "MOBI-Tempo-Pelotas/1.0 (+https://agenciamobi.com.br)",
+    },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  });
+
+  if (!response.ok) {
+    throw new Error(`${source.name} respondeu com HTTP ${response.status}.`);
+  }
+
+  const parsed = historicalResponseSchema.safeParse(await response.json());
+  if (!parsed.success) {
+    throw new Error(`${source.name} respondeu com uma estrutura inesperada.`);
+  }
+
+  const days = normalizeHistory(parsed.data).slice(-HISTORY_DAYS);
+  if (days.length === 0) {
+    throw new Error(`${source.name} não devolveu dias válidos para Pelotas.`);
+  }
+
+  return days;
+}
+
 function unavailable(error: string, fetchedAt: string): WeatherHistoryData {
   return {
     status: "unavailable",
     days: [],
     summary: null,
     source: {
-      name: HISTORICAL_SOURCE_NAME,
-      url: HISTORICAL_SOURCE_URL,
+      name: "Open-Meteo Historical APIs",
+      url: HISTORY_SOURCES[0].url,
       fetchedAt,
       periodStart: null,
       periodEnd: null,
@@ -168,72 +227,55 @@ function unavailable(error: string, fetchedAt: string): WeatherHistoryData {
   };
 }
 
+function createHistoryData(
+  days: HistoricalWeatherDay[],
+  source: HistorySource,
+  fetchedAt: string,
+): WeatherHistoryData {
+  return {
+    status: days.length === HISTORY_DAYS ? "live" : "partial",
+    days,
+    summary: buildSummary(days),
+    source: {
+      name: source.name,
+      url: source.url,
+      fetchedAt,
+      periodStart: days[0]?.date ?? null,
+      periodEnd: days.at(-1)?.date ?? null,
+    },
+    error:
+      days.length === HISTORY_DAYS
+        ? null
+        : `${source.name} retornou apenas ${days.length} dos ${HISTORY_DAYS} dias solicitados.`,
+  };
+}
+
 export async function fetchPelotasWeatherHistory(): Promise<WeatherHistoryData> {
   const fetchedAt = new Date().toISOString();
+  const params = createQueryParams();
+  const failures: string[] = [];
 
-  try {
-    const today = localDateString();
-    const endDate = shiftDate(today, -1);
-    const startDate = shiftDate(endDate, -(HISTORY_DAYS - 1));
-    const params = new URLSearchParams({
-      latitude: String(PELOTAS.latitude),
-      longitude: String(PELOTAS.longitude),
-      timezone: TIMEZONE,
-      start_date: startDate,
-      end_date: endDate,
-      daily: [
-        "temperature_2m_max",
-        "temperature_2m_min",
-        "precipitation_sum",
-        "wind_gusts_10m_max",
-      ].join(","),
-    });
-
-    const response = await fetch(`${HISTORICAL_ENDPOINT}?${params}`, {
-      headers: {
-        Accept: "application/json",
-        "User-Agent": "MOBI-Tempo-Pelotas/1.0 (+https://agenciamobi.com.br)",
-      },
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Open-Meteo histórico respondeu com HTTP ${response.status}.`);
+  for (const source of HISTORY_SOURCES) {
+    try {
+      const days = await fetchHistorySource(source, params);
+      if (source.id !== HISTORY_SOURCES[0].id) {
+        console.warn("[weather/history] Fonte principal indisponível; contingência utilizada", {
+          source: source.name,
+          failures,
+        });
+      }
+      return createHistoryData(days, source, fetchedAt);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      failures.push(message);
+      console.warn("[weather/history] Fonte histórica indisponível", {
+        source: source.name,
+        message,
+      });
     }
-
-    const parsed = historicalResponseSchema.safeParse(await response.json());
-    if (!parsed.success) {
-      throw new Error("A fonte histórica respondeu com uma estrutura inesperada.");
-    }
-
-    const days = normalizeHistory(parsed.data).slice(-HISTORY_DAYS);
-    if (days.length === 0) {
-      throw new Error("A fonte histórica não devolveu dias válidos para Pelotas.");
-    }
-
-    return {
-      status: days.length === HISTORY_DAYS ? "live" : "partial",
-      days,
-      summary: buildSummary(days),
-      source: {
-        name: HISTORICAL_SOURCE_NAME,
-        url: HISTORICAL_SOURCE_URL,
-        fetchedAt,
-        periodStart: days[0]?.date ?? null,
-        periodEnd: days.at(-1)?.date ?? null,
-      },
-      error:
-        days.length === HISTORY_DAYS
-          ? null
-          : `A fonte retornou apenas ${days.length} dos ${HISTORY_DAYS} dias solicitados.`,
-    };
-  } catch (error) {
-    console.error("[weather/history] Falha ao consultar histórico", {
-      message: error instanceof Error ? error.message : String(error),
-    });
-    return unavailable(
-      error instanceof Error ? error.message : "Falha desconhecida ao consultar o histórico.",
-      fetchedAt,
-    );
   }
+
+  const error = failures.length > 0 ? failures.join(" ") : "Falha desconhecida ao consultar o histórico.";
+  console.error("[weather/history] Todas as fontes históricas falharam", { failures });
+  return unavailable(error, fetchedAt);
 }
