@@ -15,41 +15,42 @@ const PELOTAS = {
 } as const;
 
 const finiteNumber = z.number().finite();
-const finiteNumberArray = z.array(finiteNumber).min(1);
+const nullableFiniteNumber = finiteNumber.nullable();
+const nullableFiniteNumberArray = z.array(nullableFiniteNumber).min(1);
 const timeArray = z.array(z.string().min(1)).min(1);
 
 const openMeteoResponseSchema = z
   .object({
     current: z.object({
       time: z.string().min(1),
-      temperature_2m: finiteNumber,
-      relative_humidity_2m: finiteNumber,
-      apparent_temperature: finiteNumber,
-      weather_code: z.number().int(),
-      pressure_msl: finiteNumber,
-      visibility: finiteNumber.optional(),
-      wind_speed_10m: finiteNumber,
-      wind_gusts_10m: finiteNumber,
-      wind_direction_10m: finiteNumber,
-      is_day: z.number().int().min(0).max(1),
+      temperature_2m: nullableFiniteNumber,
+      relative_humidity_2m: nullableFiniteNumber,
+      apparent_temperature: nullableFiniteNumber,
+      weather_code: nullableFiniteNumber,
+      pressure_msl: nullableFiniteNumber,
+      visibility: nullableFiniteNumber.optional(),
+      wind_speed_10m: nullableFiniteNumber,
+      wind_gusts_10m: nullableFiniteNumber,
+      wind_direction_10m: nullableFiniteNumber,
+      is_day: nullableFiniteNumber,
     }),
     hourly: z.object({
       time: timeArray,
-      temperature_2m: finiteNumberArray,
-      precipitation_probability: finiteNumberArray,
-      wind_speed_10m: finiteNumberArray,
-      wind_gusts_10m: finiteNumberArray,
-      weather_code: finiteNumberArray,
-      is_day: finiteNumberArray,
+      temperature_2m: nullableFiniteNumberArray,
+      precipitation_probability: nullableFiniteNumberArray,
+      wind_speed_10m: nullableFiniteNumberArray,
+      wind_gusts_10m: nullableFiniteNumberArray,
+      weather_code: nullableFiniteNumberArray,
+      is_day: nullableFiniteNumberArray,
     }),
     daily: z.object({
       time: timeArray,
-      weather_code: finiteNumberArray,
-      temperature_2m_max: finiteNumberArray,
-      temperature_2m_min: finiteNumberArray,
-      precipitation_probability_max: finiteNumberArray,
-      precipitation_sum: finiteNumberArray,
-      wind_gusts_10m_max: finiteNumberArray,
+      weather_code: nullableFiniteNumberArray,
+      temperature_2m_max: nullableFiniteNumberArray,
+      temperature_2m_min: nullableFiniteNumberArray,
+      precipitation_probability_max: nullableFiniteNumberArray,
+      precipitation_sum: nullableFiniteNumberArray,
+      wind_gusts_10m_max: nullableFiniteNumberArray,
       sunrise: timeArray,
       sunset: timeArray,
     }),
@@ -86,7 +87,14 @@ type WeatherPresentation = {
   icon: WeatherIconName;
 };
 
-function weatherCodeToPresentation(code: number, isDay = true): WeatherPresentation {
+function weatherCodeToPresentation(
+  code: number | null | undefined,
+  isDay = true,
+): WeatherPresentation {
+  if (code === null || code === undefined) {
+    return { label: "Condição em atualização", icon: "cloud" };
+  }
+
   if (code === 0) {
     return {
       label: isDay ? "Céu limpo" : "Noite de céu limpo",
@@ -123,7 +131,9 @@ function weatherCodeToPresentation(code: number, isDay = true): WeatherPresentat
   return { label: "Tempo variável", icon: "cloud" };
 }
 
-function degreesToCompass(degrees: number) {
+function degreesToCompass(degrees: number | null | undefined) {
+  if (degrees === null || degrees === undefined) return null;
+
   const directions = [
     "N",
     "NNE",
@@ -147,7 +157,8 @@ function degreesToCompass(degrees: number) {
   return directions[Math.round(normalizedDegrees / 22.5) % directions.length];
 }
 
-function formatClock(value: string) {
+function formatClock(value: string | null | undefined) {
+  if (!value) return null;
   const [, time] = value.split("T");
   return time ? time.slice(0, 5) : value;
 }
@@ -175,39 +186,64 @@ function formatDate(date: string) {
     .replace(".", "");
 }
 
+function roundOrNull(value: number | null | undefined) {
+  return value === null || value === undefined ? null : Math.round(value);
+}
+
 function normalizeHourly(response: OpenMeteoResponse): HourlyForecast[] {
   const foundIndex = response.hourly.time.findIndex((time) => time >= response.current.time);
   const currentIndex = foundIndex === -1 ? 0 : foundIndex;
+  const items: HourlyForecast[] = [];
 
-  return response.hourly.time.slice(currentIndex, currentIndex + 7).map((time, offset) => {
+  for (let offset = 0; offset < 7; offset += 1) {
     const index = currentIndex + offset;
+    const time = response.hourly.time[index];
+    const temperature = response.hourly.temperature_2m[index];
+    if (!time || temperature === null || temperature === undefined) continue;
+
     const presentation = weatherCodeToPresentation(
       response.hourly.weather_code[index],
-      response.hourly.is_day[index] === 1,
+      response.hourly.is_day[index] !== 0,
     );
 
-    return {
-      time: offset === 0 ? "Agora" : `${formatClock(time).slice(0, 2)}h`,
-      temperature: Math.round(response.hourly.temperature_2m[index]),
-      precipitationProbability: Math.round(response.hourly.precipitation_probability[index] ?? 0),
+    items.push({
+      time: offset === 0 ? "Agora" : `${formatClock(time)?.slice(0, 2) ?? "--"}h`,
+      temperature: Math.round(temperature),
+      precipitationProbability: Math.round(
+        response.hourly.precipitation_probability[index] ?? 0,
+      ),
       windSpeed: Math.round(response.hourly.wind_speed_10m[index] ?? 0),
       windGust: Math.round(response.hourly.wind_gusts_10m[index] ?? 0),
       icon: presentation.icon,
-    };
-  });
+    });
+  }
+
+  return items;
 }
 
 function normalizeDaily(response: OpenMeteoResponse): DailyForecast[] {
-  return response.daily.time.map((date, index) => ({
-    weekday: formatDay(date, index),
-    date: formatDate(date),
-    min: Math.round(response.daily.temperature_2m_min[index]),
-    max: Math.round(response.daily.temperature_2m_max[index]),
-    rainChance: Math.round(response.daily.precipitation_probability_max[index] ?? 0),
-    precipitationMm: Number((response.daily.precipitation_sum[index] ?? 0).toFixed(1)),
-    windGust: Math.round(response.daily.wind_gusts_10m_max[index] ?? 0),
-    icon: weatherCodeToPresentation(response.daily.weather_code[index], true).icon,
-  }));
+  const items: DailyForecast[] = [];
+
+  response.daily.time.forEach((date, index) => {
+    const minimum = response.daily.temperature_2m_min[index];
+    const maximum = response.daily.temperature_2m_max[index];
+    if (minimum === null || minimum === undefined || maximum === null || maximum === undefined) {
+      return;
+    }
+
+    items.push({
+      weekday: formatDay(date, index),
+      date: formatDate(date),
+      min: Math.round(minimum),
+      max: Math.round(maximum),
+      rainChance: Math.round(response.daily.precipitation_probability_max[index] ?? 0),
+      precipitationMm: Number((response.daily.precipitation_sum[index] ?? 0).toFixed(1)),
+      windGust: Math.round(response.daily.wind_gusts_10m_max[index] ?? 0),
+      icon: weatherCodeToPresentation(response.daily.weather_code[index], true).icon,
+    });
+  });
+
+  return items;
 }
 
 function createUnavailableWeather(message: string): WeatherHomeData {
@@ -228,32 +264,52 @@ function createUnavailableWeather(message: string): WeatherHomeData {
 }
 
 function normalizeWeather(response: OpenMeteoResponse): WeatherHomeData {
-  const presentation = weatherCodeToPresentation(
+  const currentPresentation = weatherCodeToPresentation(
     response.current.weather_code,
-    response.current.is_day === 1,
+    response.current.is_day !== 0,
   );
+  const hasUsefulCurrent = [
+    response.current.temperature_2m,
+    response.current.relative_humidity_2m,
+    response.current.pressure_msl,
+    response.current.wind_speed_10m,
+  ].some((value) => value !== null && value !== undefined);
+  const current = hasUsefulCurrent
+    ? {
+        city: PELOTAS.city,
+        state: PELOTAS.state,
+        temperature: roundOrNull(response.current.temperature_2m),
+        feelsLike: roundOrNull(response.current.apparent_temperature),
+        condition: currentPresentation.label,
+        humidity: roundOrNull(response.current.relative_humidity_2m),
+        pressure: roundOrNull(response.current.pressure_msl),
+        windSpeed: roundOrNull(response.current.wind_speed_10m),
+        windGust: roundOrNull(response.current.wind_gusts_10m),
+        windDirection: degreesToCompass(response.current.wind_direction_10m),
+        visibilityKm:
+          response.current.visibility === null || response.current.visibility === undefined
+            ? null
+            : Math.round(response.current.visibility / 1_000),
+        sunrise: formatClock(response.daily.sunrise[0]),
+        sunset: formatClock(response.daily.sunset[0]),
+        observedAt: formatClock(response.current.time),
+        icon: currentPresentation.icon,
+      }
+    : null;
+  const hourly = normalizeHourly(response);
+  const daily = normalizeDaily(response);
+
+  if (!current && hourly.length === 0 && daily.length === 0) {
+    return createUnavailableWeather(
+      "O Open-Meteo respondeu, mas não forneceu uma previsão utilizável para Pelotas.",
+    );
+  }
 
   return {
     status: "live",
-    current: {
-      city: PELOTAS.city,
-      state: PELOTAS.state,
-      temperature: Math.round(response.current.temperature_2m),
-      feelsLike: Math.round(response.current.apparent_temperature),
-      condition: presentation.label,
-      humidity: Math.round(response.current.relative_humidity_2m),
-      pressure: Math.round(response.current.pressure_msl),
-      windSpeed: Math.round(response.current.wind_speed_10m),
-      windGust: Math.round(response.current.wind_gusts_10m),
-      windDirection: degreesToCompass(response.current.wind_direction_10m),
-      visibilityKm: Math.round((response.current.visibility ?? 10_000) / 1_000),
-      sunrise: formatClock(response.daily.sunrise[0]),
-      sunset: formatClock(response.daily.sunset[0]),
-      observedAt: formatClock(response.current.time),
-      icon: presentation.icon,
-    },
-    hourly: normalizeHourly(response),
-    daily: normalizeDaily(response),
+    current,
+    hourly,
+    daily,
     source: {
       name: "Open-Meteo",
       url: OPEN_METEO_URL,
@@ -306,13 +362,26 @@ function createForecastUrl() {
   return `${FORECAST_ENDPOINT}?${params.toString()}`;
 }
 
+function logOpenMeteoError(error: unknown) {
+  if (error instanceof Error) {
+    console.error("[weather/open-meteo] Falha ao carregar previsão", {
+      name: error.name,
+      message: error.message,
+    });
+    return;
+  }
+
+  console.error("[weather/open-meteo] Falha desconhecida ao carregar previsão", {
+    error: String(error),
+  });
+}
+
 export async function fetchPelotasWeather(): Promise<WeatherHomeData> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
     const response = await fetch(createForecastUrl(), {
-      cache: "no-store",
       headers: { Accept: "application/json" },
       signal: controller.signal,
     });
@@ -321,9 +390,23 @@ export async function fetchPelotasWeather(): Promise<WeatherHomeData> {
       throw new Error(`Open-Meteo respondeu com status ${response.status}`);
     }
 
-    return normalizeWeather(openMeteoResponseSchema.parse(await response.json()));
+    const payload: unknown = await response.json();
+    const parsed = openMeteoResponseSchema.safeParse(payload);
+    if (!parsed.success) {
+      console.error("[weather/open-meteo] Resposta inválida", {
+        issues: parsed.error.issues.slice(0, 12).map((issue) => ({
+          path: issue.path.join("."),
+          message: issue.message,
+        })),
+      });
+      return createUnavailableWeather(
+        "Os dados meteorológicos foram recebidos, mas não puderam ser processados.",
+      );
+    }
+
+    return normalizeWeather(parsed.data);
   } catch (error) {
-    console.error("Falha ao carregar a previsão meteorológica:", error);
+    logOpenMeteoError(error);
     return createUnavailableWeather(
       "Os dados meteorológicos estão temporariamente indisponíveis. Tente novamente em alguns minutos.",
     );
