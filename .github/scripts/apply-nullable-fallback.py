@@ -35,8 +35,8 @@ replace(
 )
 replace(
     "src/lib/weather/met-norway.server.ts",
-    "    const windSpeed = metersPerSecondToKilometersPerHour(details.wind_speed) ?? 0;\n    const windGust = metersPerSecondToKilometersPerHour(details.wind_speed_of_gust) ?? windSpeed;",
-    "    const windSpeed = Math.round(details.wind_speed * 3.6);\n    const windGust = metersPerSecondToKilometersPerHour(details.wind_speed_of_gust);",
+    "function normalizeHourly(points: MetPoint[]): HourlyForecast[] {\n  return points.slice(0, 7).map((point, index) => {\n    const details = point.data.instant.details;\n    const presentation = pointPresentation(point);\n    const windSpeed = metersPerSecondToKilometersPerHour(details.wind_speed) ?? 0;\n    const windGust = metersPerSecondToKilometersPerHour(details.wind_speed_of_gust) ?? windSpeed;",
+    "function normalizeHourly(points: MetPoint[]): HourlyForecast[] {\n  return points.slice(0, 7).map((point, index) => {\n    const details = point.data.instant.details;\n    const presentation = pointPresentation(point);\n    const windSpeed = Math.round(details.wind_speed * 3.6);\n    const windGust = metersPerSecondToKilometersPerHour(details.wind_speed_of_gust);",
 )
 replace(
     "src/lib/weather/met-norway.server.ts",
