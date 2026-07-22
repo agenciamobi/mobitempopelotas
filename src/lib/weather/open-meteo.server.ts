@@ -1,11 +1,6 @@
 import { z } from "zod";
 
-import type {
-  DailyForecast,
-  HourlyForecast,
-  WeatherHomeData,
-  WeatherIconName,
-} from "./types";
+import type { DailyForecast, HourlyForecast, WeatherHomeData, WeatherIconName } from "./types";
 
 const FORECAST_ENDPOINT = "https://api.open-meteo.com/v1/forecast";
 const OPEN_METEO_URL = "https://open-meteo.com/";
@@ -194,9 +189,7 @@ function normalizeHourly(response: OpenMeteoResponse): HourlyForecast[] {
     return {
       time: offset === 0 ? "Agora" : `${formatClock(time).slice(0, 2)}h`,
       temperature: Math.round(response.hourly.temperature_2m[index]),
-      precipitationProbability: Math.round(
-        response.hourly.precipitation_probability[index] ?? 0,
-      ),
+      precipitationProbability: Math.round(response.hourly.precipitation_probability[index] ?? 0),
       windSpeed: Math.round(response.hourly.wind_speed_10m[index] ?? 0),
       windGust: Math.round(response.hourly.wind_gusts_10m[index] ?? 0),
       icon: presentation.icon,

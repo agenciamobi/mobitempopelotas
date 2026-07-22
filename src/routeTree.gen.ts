@@ -9,49 +9,42 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VentoEmPelotasRouteImport } from './routes/vento-em-pelotas'
-import { Route as TempoHojePelotasRouteImport } from './routes/tempo-hoje-pelotas'
-import { Route as SituacaoHidrologicaPelotasRouteImport } from './routes/situacao-hidrologica-pelotas'
-import { Route as Previsao7DiasPelotasRouteImport } from './routes/previsao-7-dias-pelotas'
-import { Route as NivelDaLagoaDosPatosLaranjalRouteImport } from './routes/nivel-da-lagoa-dos-patos-laranjal'
-import { Route as MetodologiaRouteImport } from './routes/metodologia'
-import { Route as HistoricoClimaticoPelotasRouteImport } from './routes/historico-climatico-pelotas'
-import { Route as EstacaoEmbrapaPelotasRouteImport } from './routes/estacao-embrapa-pelotas'
-import { Route as ChuvaEmPelotasRouteImport } from './routes/chuva-em-pelotas'
-import { Route as CamerasAoVivoPelotasRouteImport } from './routes/cameras-ao-vivo-pelotas'
-import { Route as AlertasRouteImport } from './routes/alertas'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AlertasRouteImport } from './routes/alertas'
+import { Route as CamerasAoVivoPelotasRouteImport } from './routes/cameras-ao-vivo-pelotas'
+import { Route as ChuvaEmPelotasRouteImport } from './routes/chuva-em-pelotas'
+import { Route as EstacaoEmbrapaPelotasRouteImport } from './routes/estacao-embrapa-pelotas'
+import { Route as HistoricoClimaticoPelotasRouteImport } from './routes/historico-climatico-pelotas'
+import { Route as MetodologiaRouteImport } from './routes/metodologia'
+import { Route as NivelDaLagoaDosPatosLaranjalRouteImport } from './routes/nivel-da-lagoa-dos-patos-laranjal'
+import { Route as Previsao7DiasPelotasRouteImport } from './routes/previsao-7-dias-pelotas'
+import { Route as SituacaoHidrologicaPelotasRouteImport } from './routes/situacao-hidrologica-pelotas'
+import { Route as TempoHojePelotasRouteImport } from './routes/tempo-hoje-pelotas'
+import { Route as VentoEmPelotasRouteImport } from './routes/vento-em-pelotas'
 
-const VentoEmPelotasRoute = VentoEmPelotasRouteImport.update({
-  id: '/vento-em-pelotas',
-  path: '/vento-em-pelotas',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TempoHojePelotasRoute = TempoHojePelotasRouteImport.update({
-  id: '/tempo-hoje-pelotas',
-  path: '/tempo-hoje-pelotas',
+const AlertasRoute = AlertasRouteImport.update({
+  id: '/alertas',
+  path: '/alertas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SituacaoHidrologicaPelotasRoute =
-  SituacaoHidrologicaPelotasRouteImport.update({
-    id: '/situacao-hidrologica-pelotas',
-    path: '/situacao-hidrologica-pelotas',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const Previsao7DiasPelotasRoute = Previsao7DiasPelotasRouteImport.update({
-  id: '/previsao-7-dias-pelotas',
-  path: '/previsao-7-dias-pelotas',
+const CamerasAoVivoPelotasRoute = CamerasAoVivoPelotasRouteImport.update({
+  id: '/cameras-ao-vivo-pelotas',
+  path: '/cameras-ao-vivo-pelotas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NivelDaLagoaDosPatosLaranjalRoute =
-  NivelDaLagoaDosPatosLaranjalRouteImport.update({
-    id: '/nivel-da-lagoa-dos-patos-laranjal',
-    path: '/nivel-da-lagoa-dos-patos-laranjal',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const MetodologiaRoute = MetodologiaRouteImport.update({
-  id: '/metodologia',
-  path: '/metodologia',
+const ChuvaEmPelotasRoute = ChuvaEmPelotasRouteImport.update({
+  id: '/chuva-em-pelotas',
+  path: '/chuva-em-pelotas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EstacaoEmbrapaPelotasRoute = EstacaoEmbrapaPelotasRouteImport.update({
+  id: '/estacao-embrapa-pelotas',
+  path: '/estacao-embrapa-pelotas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoricoClimaticoPelotasRoute =
@@ -60,29 +53,36 @@ const HistoricoClimaticoPelotasRoute =
     path: '/historico-climatico-pelotas',
     getParentRoute: () => rootRouteImport,
   } as any)
-const EstacaoEmbrapaPelotasRoute = EstacaoEmbrapaPelotasRouteImport.update({
-  id: '/estacao-embrapa-pelotas',
-  path: '/estacao-embrapa-pelotas',
+const MetodologiaRoute = MetodologiaRouteImport.update({
+  id: '/metodologia',
+  path: '/metodologia',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ChuvaEmPelotasRoute = ChuvaEmPelotasRouteImport.update({
-  id: '/chuva-em-pelotas',
-  path: '/chuva-em-pelotas',
+const NivelDaLagoaDosPatosLaranjalRoute =
+  NivelDaLagoaDosPatosLaranjalRouteImport.update({
+    id: '/nivel-da-lagoa-dos-patos-laranjal',
+    path: '/nivel-da-lagoa-dos-patos-laranjal',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Previsao7DiasPelotasRoute = Previsao7DiasPelotasRouteImport.update({
+  id: '/previsao-7-dias-pelotas',
+  path: '/previsao-7-dias-pelotas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CamerasAoVivoPelotasRoute = CamerasAoVivoPelotasRouteImport.update({
-  id: '/cameras-ao-vivo-pelotas',
-  path: '/cameras-ao-vivo-pelotas',
+const SituacaoHidrologicaPelotasRoute =
+  SituacaoHidrologicaPelotasRouteImport.update({
+    id: '/situacao-hidrologica-pelotas',
+    path: '/situacao-hidrologica-pelotas',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const TempoHojePelotasRoute = TempoHojePelotasRouteImport.update({
+  id: '/tempo-hoje-pelotas',
+  path: '/tempo-hoje-pelotas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AlertasRoute = AlertasRouteImport.update({
-  id: '/alertas',
-  path: '/alertas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const VentoEmPelotasRoute = VentoEmPelotasRouteImport.update({
+  id: '/vento-em-pelotas',
+  path: '/vento-em-pelotas',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -191,74 +191,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/vento-em-pelotas': {
-      id: '/vento-em-pelotas'
-      path: '/vento-em-pelotas'
-      fullPath: '/vento-em-pelotas'
-      preLoaderRoute: typeof VentoEmPelotasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tempo-hoje-pelotas': {
-      id: '/tempo-hoje-pelotas'
-      path: '/tempo-hoje-pelotas'
-      fullPath: '/tempo-hoje-pelotas'
-      preLoaderRoute: typeof TempoHojePelotasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/situacao-hidrologica-pelotas': {
-      id: '/situacao-hidrologica-pelotas'
-      path: '/situacao-hidrologica-pelotas'
-      fullPath: '/situacao-hidrologica-pelotas'
-      preLoaderRoute: typeof SituacaoHidrologicaPelotasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/previsao-7-dias-pelotas': {
-      id: '/previsao-7-dias-pelotas'
-      path: '/previsao-7-dias-pelotas'
-      fullPath: '/previsao-7-dias-pelotas'
-      preLoaderRoute: typeof Previsao7DiasPelotasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/nivel-da-lagoa-dos-patos-laranjal': {
-      id: '/nivel-da-lagoa-dos-patos-laranjal'
-      path: '/nivel-da-lagoa-dos-patos-laranjal'
-      fullPath: '/nivel-da-lagoa-dos-patos-laranjal'
-      preLoaderRoute: typeof NivelDaLagoaDosPatosLaranjalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/metodologia': {
-      id: '/metodologia'
-      path: '/metodologia'
-      fullPath: '/metodologia'
-      preLoaderRoute: typeof MetodologiaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/historico-climatico-pelotas': {
-      id: '/historico-climatico-pelotas'
-      path: '/historico-climatico-pelotas'
-      fullPath: '/historico-climatico-pelotas'
-      preLoaderRoute: typeof HistoricoClimaticoPelotasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/estacao-embrapa-pelotas': {
-      id: '/estacao-embrapa-pelotas'
-      path: '/estacao-embrapa-pelotas'
-      fullPath: '/estacao-embrapa-pelotas'
-      preLoaderRoute: typeof EstacaoEmbrapaPelotasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chuva-em-pelotas': {
-      id: '/chuva-em-pelotas'
-      path: '/chuva-em-pelotas'
-      fullPath: '/chuva-em-pelotas'
-      preLoaderRoute: typeof ChuvaEmPelotasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cameras-ao-vivo-pelotas': {
-      id: '/cameras-ao-vivo-pelotas'
-      path: '/cameras-ao-vivo-pelotas'
-      fullPath: '/cameras-ao-vivo-pelotas'
-      preLoaderRoute: typeof CamerasAoVivoPelotasRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/alertas': {
@@ -268,11 +205,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlertasRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/cameras-ao-vivo-pelotas': {
+      id: '/cameras-ao-vivo-pelotas'
+      path: '/cameras-ao-vivo-pelotas'
+      fullPath: '/cameras-ao-vivo-pelotas'
+      preLoaderRoute: typeof CamerasAoVivoPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chuva-em-pelotas': {
+      id: '/chuva-em-pelotas'
+      path: '/chuva-em-pelotas'
+      fullPath: '/chuva-em-pelotas'
+      preLoaderRoute: typeof ChuvaEmPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/estacao-embrapa-pelotas': {
+      id: '/estacao-embrapa-pelotas'
+      path: '/estacao-embrapa-pelotas'
+      fullPath: '/estacao-embrapa-pelotas'
+      preLoaderRoute: typeof EstacaoEmbrapaPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/historico-climatico-pelotas': {
+      id: '/historico-climatico-pelotas'
+      path: '/historico-climatico-pelotas'
+      fullPath: '/historico-climatico-pelotas'
+      preLoaderRoute: typeof HistoricoClimaticoPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/metodologia': {
+      id: '/metodologia'
+      path: '/metodologia'
+      fullPath: '/metodologia'
+      preLoaderRoute: typeof MetodologiaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nivel-da-lagoa-dos-patos-laranjal': {
+      id: '/nivel-da-lagoa-dos-patos-laranjal'
+      path: '/nivel-da-lagoa-dos-patos-laranjal'
+      fullPath: '/nivel-da-lagoa-dos-patos-laranjal'
+      preLoaderRoute: typeof NivelDaLagoaDosPatosLaranjalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/previsao-7-dias-pelotas': {
+      id: '/previsao-7-dias-pelotas'
+      path: '/previsao-7-dias-pelotas'
+      fullPath: '/previsao-7-dias-pelotas'
+      preLoaderRoute: typeof Previsao7DiasPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/situacao-hidrologica-pelotas': {
+      id: '/situacao-hidrologica-pelotas'
+      path: '/situacao-hidrologica-pelotas'
+      fullPath: '/situacao-hidrologica-pelotas'
+      preLoaderRoute: typeof SituacaoHidrologicaPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tempo-hoje-pelotas': {
+      id: '/tempo-hoje-pelotas'
+      path: '/tempo-hoje-pelotas'
+      fullPath: '/tempo-hoje-pelotas'
+      preLoaderRoute: typeof TempoHojePelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vento-em-pelotas': {
+      id: '/vento-em-pelotas'
+      path: '/vento-em-pelotas'
+      fullPath: '/vento-em-pelotas'
+      preLoaderRoute: typeof VentoEmPelotasRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -295,3 +295,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
