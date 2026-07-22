@@ -229,8 +229,8 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
           <h1>De onde vêm os dados do Tempo Pelotas</h1>
           <p className="methodology-lead">
             O portal combina medições locais, alertas oficiais e modelos de previsão. Esta página
-            mostra a função de cada fonte, como os dados são verificados e quais limites precisam ser
-            considerados antes de tomar decisões.
+            mostra a função de cada fonte, como os dados são verificados e quais limites precisam
+            ser considerados antes de tomar decisões.
           </p>
         </div>
 
@@ -240,7 +240,9 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
             <span>Estado atual</span>
           </div>
           <strong>{weather.weather.quality.score}/100</strong>
-          <span className={`methodology-confidence methodology-confidence-${weather.weather.quality.confidence}`}>
+          <span
+            className={`methodology-confidence methodology-confidence-${weather.weather.quality.confidence}`}
+          >
             {confidence}
           </span>
           <dl>
@@ -264,8 +266,8 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
             <h2 id="methodology-sources-title">Quem fornece cada informação</h2>
           </div>
           <p>
-            O estado abaixo é calculado no carregamento desta página. Uma fonte pode estar funcionando,
-            parcialmente disponível, atrasada ou indisponível.
+            O estado abaixo é calculado no carregamento desta página. Uma fonte pode estar
+            funcionando, parcialmente disponível, atrasada ou indisponível.
           </p>
         </div>
 
@@ -278,7 +280,9 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
                   <span className="methodology-source-icon">
                     <Icon aria-hidden="true" />
                   </span>
-                  <span className={`methodology-source-status methodology-source-status-${source.status}`}>
+                  <span
+                    className={`methodology-source-status methodology-source-status-${source.status}`}
+                  >
                     <StatusIcon status={source.status} /> {statusLabels[source.status]}
                   </span>
                 </div>
@@ -296,7 +300,10 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
         </div>
       </section>
 
-      <section className="methodology-section methodology-pipeline" aria-labelledby="pipeline-title">
+      <section
+        className="methodology-section methodology-pipeline"
+        aria-labelledby="pipeline-title"
+      >
         <div className="methodology-section-heading">
           <div>
             <p className="methodology-kicker">Fluxo dos dados</p>
@@ -313,25 +320,37 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
             <span>01</span>
             <Database aria-hidden="true" />
             <h3>Coleta</h3>
-            <p>As fontes são consultadas no servidor com limite de tempo, cache e tratamento isolado de falhas.</p>
+            <p>
+              As fontes são consultadas no servidor com limite de tempo, cache e tratamento isolado
+              de falhas.
+            </p>
           </li>
           <li>
             <span>02</span>
             <FileCheck2 aria-hidden="true" />
             <h3>Normalização</h3>
-            <p>Datas, unidades e campos são convertidos para um contrato comum sem preencher o que não existe.</p>
+            <p>
+              Datas, unidades e campos são convertidos para um contrato comum sem preencher o que
+              não existe.
+            </p>
           </li>
           <li>
             <span>03</span>
             <Scale aria-hidden="true" />
             <h3>Comparação</h3>
-            <p>Medições locais e modelos são comparados para detectar idade, inconsistências e degradação.</p>
+            <p>
+              Medições locais e modelos são comparados para detectar idade, inconsistências e
+              degradação.
+            </p>
           </li>
           <li>
             <span>04</span>
             <Sparkles aria-hidden="true" />
             <h3>Publicação</h3>
-            <p>O resumo usa regras determinísticas e, quando habilitado, uma síntese textual sem alterar números.</p>
+            <p>
+              O resumo usa regras determinísticas e, quando habilitado, uma síntese textual sem
+              alterar números.
+            </p>
           </li>
         </ol>
       </section>
@@ -366,7 +385,9 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
         <div className="methodology-section-heading">
           <div>
             <p className="methodology-kicker">Leitura correta</p>
-            <h2 id="methodology-differences-title">Medição, previsão e interpretação não são a mesma coisa</h2>
+            <h2 id="methodology-differences-title">
+              Medição, previsão e interpretação não são a mesma coisa
+            </h2>
           </div>
         </div>
 
@@ -391,8 +412,8 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
             <Sparkles aria-hidden="true" />
             <h3>Interpretação</h3>
             <p>
-              É o texto que organiza os dados para leitura rápida. A síntese não substitui os números,
-              os avisos oficiais nem a avaliação de profissionais responsáveis.
+              É o texto que organiza os dados para leitura rápida. A síntese não substitui os
+              números, os avisos oficiais nem a avaliação de profissionais responsáveis.
             </p>
           </article>
         </div>
@@ -402,11 +423,13 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
         <AlertTriangle aria-hidden="true" />
         <div>
           <p className="methodology-kicker">Limite de uso</p>
-          <h2 id="methodology-warning-title">O portal não substitui autoridades e serviços de emergência</h2>
+          <h2 id="methodology-warning-title">
+            O portal não substitui autoridades e serviços de emergência
+          </h2>
           <p>
-            O Tempo Pelotas não determina evacuações, não garante que uma rua irá alagar e não consegue
-            assegurar disponibilidade contínua de sistemas externos. Em risco iminente, siga a Defesa
-            Civil, o INMET, órgãos municipais e demais autoridades responsáveis.
+            O Tempo Pelotas não determina evacuações, não garante que uma rua irá alagar e não
+            consegue assegurar disponibilidade contínua de sistemas externos. Em risco iminente,
+            siga a Defesa Civil, o INMET, órgãos municipais e demais autoridades responsáveis.
           </p>
         </div>
       </section>
