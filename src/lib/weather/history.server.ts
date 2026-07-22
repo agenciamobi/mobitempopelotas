@@ -295,10 +295,7 @@ function createNasaPowerQueryParams(endDate: string) {
   });
 }
 
-async function fetchOpenMeteoHistory(
-  source: OpenMeteoHistorySource,
-  params: URLSearchParams,
-) {
+async function fetchOpenMeteoHistory(source: OpenMeteoHistorySource, params: URLSearchParams) {
   const response = await fetch(`${source.endpoint}?${params}`, {
     headers: {
       Accept: "application/json",
@@ -378,7 +375,9 @@ function createHistoryData(
   const notes: string[] = [];
 
   if (days.length !== HISTORY_DAYS) {
-    notes.push(`${source.name} retornou apenas ${days.length} dos ${HISTORY_DAYS} dias solicitados.`);
+    notes.push(
+      `${source.name} retornou apenas ${days.length} dos ${HISTORY_DAYS} dias solicitados.`,
+    );
   }
   if (periodEnd && lagDays > 0) {
     notes.push(
@@ -386,7 +385,9 @@ function createHistoryData(
     );
   }
   if (source.id === NASA_POWER_SOURCE.id) {
-    notes.push("A NASA POWER não fornece rajadas compatíveis com este histórico; esse campo permanece não informado.");
+    notes.push(
+      "A NASA POWER não fornece rajadas compatíveis com este histórico; esse campo permanece não informado.",
+    );
   }
 
   return {
