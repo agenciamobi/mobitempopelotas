@@ -22,6 +22,7 @@ export type LaranjalLevelData = {
   status: LaranjalLevelStatus;
   currentLevel: number | null;
   updatedAt: string | null;
+  ageMinutes: number | null;
   trendCmPerHour: number | null;
   change1hCm: number | null;
   change6hCm: number | null;
@@ -54,6 +55,7 @@ function unavailableData(error: string): LaranjalLevelData {
     status: "unavailable",
     currentLevel: null,
     updatedAt: null,
+    ageMinutes: null,
     trendCmPerHour: null,
     change1hCm: null,
     change6hCm: null,
@@ -186,6 +188,7 @@ export function normalizeLaranjalTelemetry(
     status: stale ? "stale" : "live",
     currentLevel: current.level,
     updatedAt: current.timestamp,
+    ageMinutes: Math.round(ageMinutes),
     trendCmPerHour: trendSource
       ? round(trendSource.centimeters / trendSource.elapsedHours, 1)
       : null,
@@ -203,7 +206,7 @@ export function normalizeLaranjalTelemetry(
       url: LARANJAL_DASHBOARD_URL,
       fetchedAt: fetchedAt.toISOString(),
     },
-    error: stale ? "A última leitura disponível está atrasada." : null,
+    error: stale ? "A estação deixou de enviar novas medições." : null,
   };
 }
 
