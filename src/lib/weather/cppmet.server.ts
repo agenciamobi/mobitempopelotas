@@ -1,5 +1,3 @@
-import { createHash } from "node:crypto";
-
 import type { CppmetForecast, CppmetForecastItem } from "./official-sources.types";
 
 const SOURCE_URL = "https://wp.ufpel.edu.br/cppmet/";
@@ -106,6 +104,12 @@ function parseItem(text: string): CppmetForecastItem | null {
   };
 }
 
+async function sha256(value: string) {
+  const bytes = new TextEncoder().encode(value);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
 export function parseCppmetForecastHtml(html: string) {
   const normalized = decodeHtml(html);
   const heading = normalized.match(/Previs[aã]o\s+para\s+Pelotas/i);
@@ -162,13 +166,10 @@ export async function fetchCppmetForecast(): Promise<CppmetForecast> {
         lastError = "A estrutura da previsão do CPPMet não foi reconhecida.";
         continue;
       }
-      const fingerprint = createHash("sha256")
-        .update(items.map((item) => item.text).join("\n"))
-        .digest("hex");
       return {
         status: "live",
         items,
-        fingerprint,
+        fingerprint: await sha256(items.map((item) => item.text).join("\n")),
         source: {
           name: "CPPMet / UFPel",
           url: SOURCE_URL,
