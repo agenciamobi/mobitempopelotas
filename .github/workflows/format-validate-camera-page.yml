@@ -1,0 +1,90 @@
+name: Formatar e validar página de câmeras
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  format-and-validate:
+    if: github.head_ref == 'agent/migrate-camera-page' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout da branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/migrate-camera-page
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Formatar lote
+        run: |
+          npx prettier --write \
+            src/lib/cameras/cameras.types.ts \
+            src/lib/cameras/youtube.server.ts \
+            src/lib/cameras/cameras.server.ts \
+            src/lib/cameras/cameras.functions.ts \
+            src/components/cameras/CameraExplorer.tsx \
+            src/components/cameras/CameraPage.tsx \
+            src/components/cameras/CameraPage.css \
+            src/routes/cameras-ao-vivo-pelotas.tsx
+
+      - name: Validar canal público do Laranjal
+        shell: bash
+        run: |
+          set -euo pipefail
+          USER_AGENT='Mozilla/5.0 (compatible; TempoPelotas/1.0; +https://agenciamobi.com.br)'
+          STREAM_STATUS="$(curl --silent --show-error --location --compressed --max-time 30 \
+            --user-agent "$USER_AGENT" \
+            --output youtube-streams.html \
+            --write-out '%{http_code}' \
+            'https://www.youtube.com/@praiadolaranjal/streams')"
+          test "$STREAM_STATUS" = "200"
+          test "$(wc -c < youtube-streams.html)" -gt 50000
+
+          RSS_STATUS="$(curl --silent --show-error --location --compressed --max-time 30 \
+            --user-agent "$USER_AGENT" \
+            --output youtube-feed.xml \
+            --write-out '%{http_code}' \
+            'https://www.youtube.com/feeds/videos.xml?channel_id=UCqvFgdUJ7kuChDA7hbnz1ZA')"
+          test "$RSS_STATUS" = "200"
+          grep -Eq '<yt:videoId>[A-Za-z0-9_-]{11}</yt:videoId>' youtube-feed.xml
+          grep -Eiq '<title>[^<]*(Laranjal|Câmera|Camera|Clima|Céu)' youtube-feed.xml
+          rm youtube-streams.html youtube-feed.xml
+
+      - name: Validar build
+        run: npm run build
+
+      - name: Validar tipos
+        run: npm run typecheck
+
+      - name: Validar lint
+        run: npm run lint
+
+      - name: Publicar formatação
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/lib/cameras/cameras.types.ts \
+            src/lib/cameras/youtube.server.ts \
+            src/lib/cameras/cameras.server.ts \
+            src/lib/cameras/cameras.functions.ts \
+            src/components/cameras/CameraExplorer.tsx \
+            src/components/cameras/CameraPage.tsx \
+            src/components/cameras/CameraPage.css \
+            src/routes/cameras-ao-vivo-pelotas.tsx
+          git commit -m "style: formata página de câmeras"
+          git push origin HEAD:agent/migrate-camera-page
