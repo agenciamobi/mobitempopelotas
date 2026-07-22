@@ -1,0 +1,95 @@
+name: Corrigir revisão do histórico
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  fix-and-validate:
+    if: github.head_ref == 'agent/migrate-weather-history' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout da branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/migrate-weather-history
+          fetch-depth: 0
+
+      - name: Aplicar correções
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def replace(path: str, old: str, new: str) -> None:
+              file = Path(path)
+              text = file.read_text(encoding="utf-8")
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f"{path}: esperado 1 trecho, encontrado {count}: {old[:100]!r}")
+              file.write_text(text.replace(old, new, 1), encoding="utf-8")
+
+          replace(
+              "src/lib/weather/history.server.ts",
+              '''      status: days.length >= 25 ? "live" : "partial",''',
+              '''      status: days.length === HISTORY_DAYS ? "live" : "partial",''',
+          )
+          replace(
+              "src/lib/weather/history.server.ts",
+              '''      error:
+            days.length >= 25
+              ? null
+              : `A fonte retornou apenas ${days.length} dos ${HISTORY_DAYS} dias solicitados.`,''',
+              '''      error:
+            days.length === HISTORY_DAYS
+              ? null
+              : `A fonte retornou apenas ${days.length} dos ${HISTORY_DAYS} dias solicitados.`,''',
+          )
+          replace(
+              "src/components/history/WeatherHistoryChart.tsx",
+              '''        <div className="history-chart-tabs" role="tablist" aria-label="Variável do gráfico">''',
+              '''        <div className="history-chart-tabs" role="group" aria-label="Variável do gráfico">''',
+          )
+          replace(
+              "src/components/history/WeatherHistoryChart.tsx",
+              '''              role="tab"
+              aria-selected={metric === value}''',
+              '''              aria-pressed={metric === value}''',
+          )
+          PY
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Formatar arquivos
+        run: |
+          npx prettier --write \
+            src/lib/weather/history.server.ts \
+            src/components/history/WeatherHistoryChart.tsx
+
+      - name: Validar build
+        run: npm run build
+
+      - name: Validar tipos
+        run: npm run typecheck
+
+      - name: Validar lint
+        run: npm run lint
+
+      - name: Publicar correções
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/weather/history.server.ts src/components/history/WeatherHistoryChart.tsx
+          git commit -m "fix: trata série parcial e filtros acessíveis"
+          git push origin HEAD:agent/migrate-weather-history
