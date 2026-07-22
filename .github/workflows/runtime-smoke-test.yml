@@ -112,6 +112,7 @@ jobs:
           check_route "/situacao-hidrologica-pelotas" "Situação das águas no Laranjal" "aguas"
           check_route "/nivel-da-lagoa-dos-patos-laranjal" "Nível da Lagoa dos Patos na Estação Laranjal" "nivel-laranjal"
           check_route "/metodologia" "De onde vêm os dados do Tempo Pelotas" "metodologia"
+          check_route "/estacao-embrapa-pelotas" "Estação Embrapa Clima Temperado" "estacao-embrapa"
 
           if grep -Fq "Página em migração" smoke-artifacts/metodologia.html; then
             echo "ERRO: Metodologia ainda exibe o placeholder de migração" | tee -a "$LOG_FILE"
@@ -124,6 +125,22 @@ jobs:
             FAILED=1
           else
             echo "OK: Metodologia completa e sem placeholder" | tee -a "$LOG_FILE"
+          fi
+
+          if grep -Fq "Página em migração" smoke-artifacts/estacao-embrapa.html; then
+            echo "ERRO: Estação Embrapa ainda exibe o placeholder de migração" | tee -a "$LOG_FILE"
+            FAILED=1
+          elif ! grep -Fq "Chuva acumulada na estação" smoke-artifacts/estacao-embrapa.html; then
+            echo "ERRO: Estação Embrapa sem acumulados de chuva" | tee -a "$LOG_FILE"
+            FAILED=1
+          elif ! grep -Fq "Como estes dados entram no portal" smoke-artifacts/estacao-embrapa.html; then
+            echo "ERRO: Estação Embrapa sem contexto de proveniência" | tee -a "$LOG_FILE"
+            FAILED=1
+          elif ! grep -Eq "Leituras reconhecidas|Leitura parcial|Leitura atrasada|Medições indisponíveis" smoke-artifacts/estacao-embrapa.html; then
+            echo "ERRO: Estação Embrapa sem estado explícito da fonte" | tee -a "$LOG_FILE"
+            FAILED=1
+          else
+            echo "OK: Estação Embrapa completa, contextualizada e sem placeholder" | tee -a "$LOG_FILE"
           fi
 
           echo "Smoke test finalizado em $(date -u +'%Y-%m-%dT%H:%M:%SZ')" | tee -a "$LOG_FILE"
