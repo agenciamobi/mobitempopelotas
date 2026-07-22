@@ -47,7 +47,8 @@ const officialSources = [
   {
     name: "Sistema de Alerta de Eventos Críticos",
     organization: "Serviço Geológico do Brasil",
-    description: "Boletins, estações e referências oficiais para acompanhamento de eventos hidrológicos.",
+    description:
+      "Boletins, estações e referências oficiais para acompanhamento de eventos hidrológicos.",
     url: "https://www.sgb.gov.br/sace/",
   },
 ] as const;
@@ -55,19 +56,23 @@ const officialSources = [
 const hydrologyFlow = [
   {
     title: "Rios e Guaíba",
-    description: "Rios do centro e do norte do estado alimentam o Guaíba e influenciam o sistema regional.",
+    description:
+      "Rios do centro e do norte do estado alimentam o Guaíba e influenciam o sistema regional.",
   },
   {
     title: "Lagoa dos Patos",
-    description: "A água segue para a lagoa, que também recebe contribuições de outros rios e arroios.",
+    description:
+      "A água segue para a lagoa, que também recebe contribuições de outros rios e arroios.",
   },
   {
     title: "Canal São Gonçalo",
-    description: "Pelotas se relaciona com a Lagoa dos Patos e a Lagoa Mirim por meio desse sistema.",
+    description:
+      "Pelotas se relaciona com a Lagoa dos Patos e a Lagoa Mirim por meio desse sistema.",
   },
   {
     title: "Vento, chuva e saída oceânica",
-    description: "Vento, precipitação e escoamento em Rio Grande afetam a variação observada localmente.",
+    description:
+      "Vento, precipitação e escoamento em Rio Grande afetam a variação observada localmente.",
   },
 ] as const;
 
@@ -131,7 +136,11 @@ function Sparkline({ data }: { data: LaranjalLevelData }) {
 
   return (
     <div className="hydrology-chart">
-      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Variação do nível nas últimas 24 horas">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label="Variação do nível nas últimas 24 horas"
+      >
         <defs>
           <linearGradient id="hydrology-area" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="currentColor" stopOpacity="0.32" />
@@ -139,26 +148,11 @@ function Sparkline({ data }: { data: LaranjalLevelData }) {
           </linearGradient>
         </defs>
         <line x1={paddingX} y1={paddingY} x2={width - paddingX} y2={paddingY} />
-        <line
-          x1={paddingX}
-          y1={height / 2}
-          x2={width - paddingX}
-          y2={height / 2}
-        />
-        <line
-          x1={paddingX}
-          y1={height - paddingY}
-          x2={width - paddingX}
-          y2={height - paddingY}
-        />
+        <line x1={paddingX} y1={height / 2} x2={width - paddingX} y2={height / 2} />
+        <line x1={paddingX} y1={height - paddingY} x2={width - paddingX} y2={height - paddingY} />
         <path d={area} fill="url(#hydrology-area)" stroke="none" />
         <polyline points={points} fill="none" stroke="currentColor" strokeWidth="4" />
-        <circle
-          cx={coordinates.at(-1)?.x}
-          cy={coordinates.at(-1)?.y}
-          r="7"
-          fill="currentColor"
-        />
+        <circle cx={coordinates.at(-1)?.x} cy={coordinates.at(-1)?.y} r="7" fill="currentColor" />
       </svg>
       <div className="hydrology-chart-labels">
         <span>Há 24 horas</span>
@@ -186,7 +180,11 @@ function SourceStatus({ level }: { level: LaranjalLevelData }) {
       )}
       <div>
         <strong>
-          {live ? "Telemetria atualizada" : stale ? "Última leitura atrasada" : "Telemetria indisponível"}
+          {live
+            ? "Telemetria atualizada"
+            : stale
+              ? "Última leitura atrasada"
+              : "Telemetria indisponível"}
         </strong>
         <span>
           {level.updatedAt
@@ -248,15 +246,21 @@ function LevelReading({ level }: { level: LaranjalLevelData }) {
         </article>
         <article>
           <span>Mínima no período</span>
-          <strong>{level.periodMinimum === null ? "—" : `${level.periodMinimum.toFixed(2)} m`}</strong>
+          <strong>
+            {level.periodMinimum === null ? "—" : `${level.periodMinimum.toFixed(2)} m`}
+          </strong>
         </article>
         <article>
           <span>Média no período</span>
-          <strong>{level.periodAverage === null ? "—" : `${level.periodAverage.toFixed(2)} m`}</strong>
+          <strong>
+            {level.periodAverage === null ? "—" : `${level.periodAverage.toFixed(2)} m`}
+          </strong>
         </article>
         <article>
           <span>Máxima no período</span>
-          <strong>{level.periodMaximum === null ? "—" : `${level.periodMaximum.toFixed(2)} m`}</strong>
+          <strong>
+            {level.periodMaximum === null ? "—" : `${level.periodMaximum.toFixed(2)} m`}
+          </strong>
         </article>
       </div>
 
@@ -295,12 +299,18 @@ function WeatherWaterContext({ weather }: { weather: WeatherIntelligenceData }) 
           <CloudRain aria-hidden="true" />
           <span>Chuva prevista hoje</span>
           <strong>{today ? `${today.precipitationMm} mm` : "—"}</strong>
-          <small>{today ? `${today.rainChance}% de probabilidade` : "Previsão em atualização"}</small>
+          <small>
+            {today ? `${today.rainChance}% de probabilidade` : "Previsão em atualização"}
+          </small>
         </article>
         <article>
           <Wind aria-hidden="true" />
           <span>Vento agora</span>
-          <strong>{current?.windSpeed === null || current?.windSpeed === undefined ? "—" : `${current.windSpeed} km/h`}</strong>
+          <strong>
+            {current?.windSpeed === null || current?.windSpeed === undefined
+              ? "—"
+              : `${current.windSpeed} km/h`}
+          </strong>
           <small>Direção {current?.windDirection ?? "não informada"}</small>
         </article>
         <article>
@@ -312,7 +322,11 @@ function WeatherWaterContext({ weather }: { weather: WeatherIntelligenceData }) 
         <article>
           <Gauge aria-hidden="true" />
           <span>Pressão atmosférica</span>
-          <strong>{current?.pressure === null || current?.pressure === undefined ? "—" : `${current.pressure} hPa`}</strong>
+          <strong>
+            {current?.pressure === null || current?.pressure === undefined
+              ? "—"
+              : `${current.pressure} hPa`}
+          </strong>
           <small>Contexto meteorológico complementar</small>
         </article>
       </div>
@@ -406,8 +420,8 @@ export function HydrologyOverviewPage({
           <h2>Antes de tomar qualquer decisão</h2>
           <p>
             Não utilize uma única medição isolada como classificação de segurança. Confirme horário,
-            tendência e fonte, acompanhe os alertas oficiais e siga orientações da Defesa Civil e das
-            autoridades locais.
+            tendência e fonte, acompanhe os alertas oficiais e siga orientações da Defesa Civil e
+            das autoridades locais.
           </p>
         </div>
         <Link to="/alertas">

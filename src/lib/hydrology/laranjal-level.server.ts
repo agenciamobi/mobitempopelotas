@@ -86,11 +86,7 @@ function parseDistance(value: unknown) {
   if (!match?.[1]) return null;
 
   const distance = Number(match[1].replace(",", "."));
-  if (
-    !Number.isFinite(distance) ||
-    distance < 0 ||
-    distance > SENSOR_REFERENCE_HEIGHT_METERS + 1
-  ) {
+  if (!Number.isFinite(distance) || distance < 0 || distance > SENSOR_REFERENCE_HEIGHT_METERS + 1) {
     return null;
   }
 
