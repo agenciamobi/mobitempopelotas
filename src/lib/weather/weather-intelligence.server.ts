@@ -7,7 +7,7 @@ const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
   embrapa: "Embrapa",
   inmet: "INMET",
   cppmet: "CPPMet",
-  "open-meteo": "Open-Meteo",
+  "open-meteo": "Modelo meteorológico",
 };
 
 function withFinalPunctuation(value: string) {

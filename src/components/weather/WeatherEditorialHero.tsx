@@ -151,7 +151,10 @@ export function WeatherEditorialHero({ data }: { data: WeatherIntelligenceData }
   const title = resolveHeroTitle(data, level);
   const activeAlertCount = weather.alerts.filter((alert) => alert.period === "active").length;
   const description = cppmetToday?.summary || data.brief.summary;
-  const currentSource = weather.quality.currentSource === "embrapa" ? "Embrapa" : "Open-Meteo";
+  const currentSource =
+    weather.quality.currentSource === "embrapa"
+      ? "Embrapa"
+      : (weather.quality.forecastProvider ?? "Modelo meteorológico");
 
   return (
     <section
