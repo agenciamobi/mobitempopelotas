@@ -1,16 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { MigrationPlaceholderPage } from "@/components/migration/MigrationPlaceholderPage";
+
+import { EmbrapaStationPage } from "@/components/embrapa/EmbrapaStationPage";
 import { createPageHead } from "@/lib/page-meta";
+import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 export const Route = createFileRoute("/estacao-embrapa-pelotas")({
   head: () =>
     createPageHead(
-      "Estação Embrapa em Pelotas",
-      "Dados da estação meteorológica da Embrapa em Pelotas. Página em migração.",
+      "Estação meteorológica da Embrapa em Pelotas",
+      "Temperatura, umidade, pressão, vento, extremos e chuva acumulada consultados na Estação da Embrapa Clima Temperado em Pelotas.",
     ),
+  loader: () => getWeatherIntelligence(),
+  staleTime: 60 * 1_000,
   component: EstacaoEmbrapaPage,
 });
 
 function EstacaoEmbrapaPage() {
-  return <MigrationPlaceholderPage title="Estação Embrapa em Pelotas" />;
+  const data = Route.useLoaderData();
+  return <EmbrapaStationPage data={data} />;
 }
