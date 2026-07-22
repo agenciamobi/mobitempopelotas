@@ -1,0 +1,65 @@
+name: Smoke após fallback meteorológico
+
+on:
+  push:
+    branches:
+      - agent/runtime-smoke-test
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Validar produção
+        shell: bash
+        run: |
+          set -uo pipefail
+          BASE_URL="https://mobitempopelotas.lovable.app"
+          LOG="smoke-after-fallback.log"
+          FAILED=0
+
+          check() {
+            local path="$1"
+            local expected="$2"
+            local body="$(mktemp)"
+            local result
+            local status
+            local duration
+            result="$(curl -L --silent --show-error --max-time 30 --output "$body" --write-out '%{http_code}|%{time_total}' "$BASE_URL$path" || echo '000|30')"
+            status="${result%%|*}"
+            duration="${result##*|}"
+            printf '%-42s HTTP %-3s %ss\n' "$path" "$status" "$duration" | tee -a "$LOG"
+            if [[ "$status" != "200" ]] || ! grep -Fq "$expected" "$body"; then
+              echo "FALHA: conteúdo esperado não encontrado: $expected" | tee -a "$LOG"
+              FAILED=1
+            else
+              echo "OK" | tee -a "$LOG"
+            fi
+            if grep -Fq "Dados temporariamente indisponíveis" "$body"; then
+              echo "FALHA: estado de indisponibilidade total encontrado" | tee -a "$LOG"
+              FAILED=1
+            fi
+            rm -f "$body"
+          }
+
+          check "/" "Tempo e águas em Pelotas"
+          check "/tempo-hoje-pelotas" "Previsão de hoje"
+          check "/previsao-7-dias-pelotas" "Previsão do tempo para os próximos 7 dias"
+          check "/chuva-em-pelotas" "Quando e quanto pode chover"
+          check "/vento-em-pelotas" "Velocidade, direção e rajadas previstas"
+          check "/alertas" "Alertas meteorológicos para Pelotas e região"
+          check "/situacao-hidrologica-pelotas" "Situação das águas no Laranjal"
+          check "/nivel-da-lagoa-dos-patos-laranjal" "Nível da Lagoa dos Patos na Estação Laranjal"
+          exit "$FAILED"
+
+      - name: Publicar relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-after-fallback-report
+          path: smoke-after-fallback.log
+          if-no-files-found: error
+          retention-days: 2
