@@ -30,7 +30,7 @@ jobs:
           - name: Typecheck
             command: npm run build && npm run typecheck
           - name: Lint
-            command: npm run lint > lint-editorial.log 2>&1 || true
+            command: npm run lint
 
     steps:
       - name: Checkout
@@ -47,12 +47,3 @@ jobs:
 
       - name: Executar ${{ matrix.name }}
         run: ${{ matrix.command }}
-
-      - name: Publicar relatório do lint
-        if: matrix.name == 'Lint'
-        uses: actions/upload-artifact@v4
-        with:
-          name: lint-editorial-report
-          path: lint-editorial.log
-          if-no-files-found: error
-          retention-days: 1
