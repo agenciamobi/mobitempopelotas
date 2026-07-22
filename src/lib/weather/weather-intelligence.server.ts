@@ -103,7 +103,10 @@ function createCautions(weather: AggregatedWeatherData) {
   );
 
   if (activeAlerts.length > 0) {
-    const events = unique(activeAlerts.map((alert) => alert.event), 2).join(" e ");
+    const events = unique(
+      activeAlerts.map((alert) => alert.event),
+      2,
+    ).join(" e ");
     cautions.push(
       `Há ${activeAlerts.length} alerta${activeAlerts.length === 1 ? " ativo" : "s ativos"} do INMET${events ? `: ${events}` : ""}.`,
     );
@@ -122,7 +125,9 @@ function createCautions(weather: AggregatedWeatherData) {
     cautions.push("A confiança geral dos dados está baixa; consulte novamente em alguns minutos.");
   }
   if (weather.quality.degradedSources.length > 0) {
-    const sources = weather.quality.degradedSources.map((source) => SOURCE_LABELS[source]).join(", ");
+    const sources = weather.quality.degradedSources
+      .map((source) => SOURCE_LABELS[source])
+      .join(", ");
     cautions.push(`Fontes com restrição ou indisponibilidade: ${sources}.`);
   }
 
