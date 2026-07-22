@@ -58,7 +58,8 @@ jobs:
 
       - name: Validar rota de câmeras
         run: |
-          curl --fail --silent --show-error http://127.0.0.1:3000/cameras > /tmp/cameras.html
+          curl --fail --silent --show-error \
+            http://127.0.0.1:3000/cameras-ao-vivo-pelotas > /tmp/cameras.html
           test -s /tmp/cameras.html
           grep -Eq "Câmeras|Laranjal|YouTube" /tmp/cameras.html
 
