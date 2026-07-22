@@ -130,17 +130,27 @@ jobs:
           if grep -Fq "Página em migração" smoke-artifacts/estacao-embrapa.html; then
             echo "ERRO: Estação Embrapa ainda exibe o placeholder de migração" | tee -a "$LOG_FILE"
             FAILED=1
-          elif ! grep -Fq "Chuva acumulada na estação" smoke-artifacts/estacao-embrapa.html; then
-            echo "ERRO: Estação Embrapa sem acumulados de chuva" | tee -a "$LOG_FILE"
-            FAILED=1
           elif ! grep -Fq "Como estes dados entram no portal" smoke-artifacts/estacao-embrapa.html; then
             echo "ERRO: Estação Embrapa sem contexto de proveniência" | tee -a "$LOG_FILE"
             FAILED=1
           elif ! grep -Eq "Leituras reconhecidas|Leitura parcial|Leitura atrasada|Medições indisponíveis" smoke-artifacts/estacao-embrapa.html; then
             echo "ERRO: Estação Embrapa sem estado explícito da fonte" | tee -a "$LOG_FILE"
             FAILED=1
+          elif grep -Fq "Medições indisponíveis" smoke-artifacts/estacao-embrapa.html; then
+            if ! grep -Fq "As medições não puderam ser exibidas agora" smoke-artifacts/estacao-embrapa.html; then
+              echo "ERRO: Indisponibilidade da Embrapa sem explicação ao usuário" | tee -a "$LOG_FILE"
+              FAILED=1
+            else
+              echo "OK: Estação Embrapa completa, com indisponibilidade externa explícita" | tee -a "$LOG_FILE"
+            fi
+          elif ! grep -Fq "Chuva acumulada na estação" smoke-artifacts/estacao-embrapa.html; then
+            echo "ERRO: Estação Embrapa disponível sem acumulados de chuva" | tee -a "$LOG_FILE"
+            FAILED=1
+          elif ! grep -Fq "Menores e maiores valores reconhecidos" smoke-artifacts/estacao-embrapa.html; then
+            echo "ERRO: Estação Embrapa disponível sem extremos diários" | tee -a "$LOG_FILE"
+            FAILED=1
           else
-            echo "OK: Estação Embrapa completa, contextualizada e sem placeholder" | tee -a "$LOG_FILE"
+            echo "OK: Estação Embrapa completa, com medições e sem placeholder" | tee -a "$LOG_FILE"
           fi
 
           echo "Smoke test finalizado em $(date -u +'%Y-%m-%dT%H:%M:%SZ')" | tee -a "$LOG_FILE"
