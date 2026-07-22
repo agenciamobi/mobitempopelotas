@@ -269,7 +269,10 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
         </section>
       ) : null}
 
-      <section className="forecast-content-section forecast-guidance" aria-labelledby="today-guidance-title">
+      <section
+        className="forecast-content-section forecast-guidance"
+        aria-labelledby="today-guidance-title"
+      >
         <div className="forecast-section-heading">
           <div>
             <p className="forecast-kicker">Leitura do dia</p>
@@ -366,7 +369,10 @@ export function SevenDayForecastPage({ data }: { data: WeatherIntelligenceData }
 
         <div className="forecast-seven-day-list">
           {weather.daily.map((day, index) => (
-            <article key={`${day.weekday}-${day.date}`} className={index === 0 ? "is-today" : undefined}>
+            <article
+              key={`${day.weekday}-${day.date}`}
+              className={index === 0 ? "is-today" : undefined}
+            >
               <div className="forecast-day-name">
                 <strong>{day.weekday}</strong>
                 <span>{day.date}</span>
@@ -394,7 +400,10 @@ export function SevenDayForecastPage({ data }: { data: WeatherIntelligenceData }
       </section>
 
       {weather.officialForecast.length > 0 ? (
-        <section className="forecast-content-section forecast-regional" aria-labelledby="regional-title">
+        <section
+          className="forecast-content-section forecast-regional"
+          aria-labelledby="regional-title"
+        >
           <div className="forecast-section-heading">
             <div>
               <p className="forecast-kicker">Contexto regional</p>
