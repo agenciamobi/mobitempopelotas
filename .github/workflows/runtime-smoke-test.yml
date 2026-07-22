@@ -1,0 +1,80 @@
+name: Smoke test da produção
+
+on:
+  push:
+    branches:
+      - agent/runtime-smoke-test
+
+permissions:
+  contents: read
+
+jobs:
+  production-smoke-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Verificar rotas publicadas
+        shell: bash
+        run: |
+          set -uo pipefail
+          BASE_URL="https://mobitempopelotas.lovable.app"
+          LOG_FILE="smoke-production.log"
+          FAILED=0
+
+          check_route() {
+            local path="$1"
+            local expected="$2"
+            local body
+            local metrics
+            local status
+            local duration
+
+            body="$(mktemp)"
+            metrics="$(curl -L --silent --show-error --max-time 40 \
+              --output "$body" \
+              --write-out '%{http_code}|%{time_total}' \
+              "$BASE_URL$path" || echo '000|40')"
+            status="${metrics%%|*}"
+            duration="${metrics##*|}"
+
+            printf '%-42s HTTP %-3s %ss\n' "$path" "$status" "$duration" | tee -a "$LOG_FILE"
+
+            if [[ "$status" != "200" ]]; then
+              echo "ERRO: status inesperado em $path" | tee -a "$LOG_FILE"
+              FAILED=1
+            elif ! grep -Fq "$expected" "$body"; then
+              echo "ERRO: conteúdo esperado não encontrado: $expected" | tee -a "$LOG_FILE"
+              FAILED=1
+            else
+              echo "OK: conteúdo validado" | tee -a "$LOG_FILE"
+            fi
+
+            if [[ "$path" == "/" ]] && grep -Fq "Dados temporariamente indisponíveis" "$body"; then
+              echo "ERRO: Home entrou no estado de indisponibilidade total" | tee -a "$LOG_FILE"
+              FAILED=1
+            fi
+
+            rm -f "$body"
+          }
+
+          echo "Smoke test iniciado em $(date -u +'%Y-%m-%dT%H:%M:%SZ')" | tee "$LOG_FILE"
+          check_route "/" "Tempo e águas em Pelotas"
+          check_route "/tempo-hoje-pelotas" "Previsão de hoje"
+          check_route "/previsao-7-dias-pelotas" "Previsão do tempo para os próximos 7 dias"
+          check_route "/chuva-em-pelotas" "Quando e quanto pode chover"
+          check_route "/vento-em-pelotas" "Velocidade, direção e rajadas previstas"
+          check_route "/alertas" "Alertas meteorológicos para Pelotas e região"
+          check_route "/situacao-hidrologica-pelotas" "Situação das águas no Laranjal"
+          check_route "/nivel-da-lagoa-dos-patos-laranjal" "Nível da Lagoa dos Patos na Estação Laranjal"
+
+          echo "Smoke test finalizado em $(date -u +'%Y-%m-%dT%H:%M:%SZ')" | tee -a "$LOG_FILE"
+          exit "$FAILED"
+
+      - name: Publicar relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-production-report
+          path: smoke-production.log
+          if-no-files-found: error
+          retention-days: 2
