@@ -1,0 +1,261 @@
+/* Hero editorial alimentado pelo CPPMet. */
+.weather-hero-copy > h1:first-child {
+  margin-top: 0;
+}
+
+.weather-hero-description {
+  max-width: 760px;
+}
+
+.weather-hero-description-source {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  margin: -8px 0 24px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.weather-hero-description-source a {
+  color: inherit;
+  text-decoration-color: rgba(255, 255, 255, 0.38);
+  text-underline-offset: 3px;
+}
+
+.weather-hero-description-source a:hover,
+.weather-hero-description-source a:focus-visible {
+  color: #fff;
+  outline: none;
+}
+
+/* O resumo de amanhã pertence ao bloco dos próximos dias. */
+.home-next-days__tomorrow-summary {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.28fr) minmax(0, 1fr);
+  gap: clamp(20px, 4vw, 54px);
+  margin-top: 26px;
+  padding: clamp(22px, 3vw, 34px);
+  border: 1px solid rgba(7, 30, 47, 0.1);
+  border-left: 4px solid var(--brand-violet, #5e2ced);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(94, 44, 237, 0.09), transparent 18rem),
+    rgba(255, 255, 255, 0.8);
+  box-shadow: 0 16px 42px rgba(7, 30, 47, 0.07);
+}
+
+.home-next-days__tomorrow-summary > div {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+}
+
+.home-next-days__tomorrow-summary > div > span {
+  color: var(--brand-cyan-ink, #087985);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.home-next-days__tomorrow-summary > div > small {
+  color: var(--ink-soft, #5f7482);
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.home-next-days__tomorrow-summary h3 {
+  margin: 0 0 8px;
+  color: var(--ink, #071e2f);
+  font-size: clamp(1.2rem, 2vw, 1.7rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.home-next-days__tomorrow-summary p {
+  max-width: 880px;
+  margin: 0;
+  color: var(--ink-soft, #526979);
+  font-size: 0.93rem;
+  line-height: 1.65;
+}
+
+/*
+ * Auditoria semântica dos níveis.
+ * A classe é aplicada diretamente no card; não depende mais de :has().
+ */
+.home-water-table__rows article {
+  --home-water-state-accent: var(--water-level-unavailable);
+  box-shadow:
+    inset 4px 0 0 var(--home-water-state-accent),
+    0 10px 28px rgba(7, 30, 47, 0.055) !important;
+}
+
+.home-water-table__rows article.level-state--rising {
+  --home-water-state-accent: var(--water-level-rising);
+}
+
+.home-water-table__rows article.level-state--falling {
+  --home-water-state-accent: var(--water-level-falling);
+}
+
+.home-water-table__rows article.level-state--stable {
+  --home-water-state-accent: var(--water-level-stable);
+}
+
+.home-water-table__rows article.level-state--unavailable {
+  --home-water-state-accent: var(--water-level-unavailable);
+}
+
+.home-water-table__rows article.level-state--flood,
+.home-water-table__rows article.risk-flooding {
+  --home-water-state-accent: var(--water-level-flood);
+  border-color: rgba(217, 45, 32, 0.3);
+  background: linear-gradient(
+    90deg,
+    rgba(217, 45, 32, 0.08),
+    rgba(255, 255, 255, 0.94)
+  );
+}
+
+.home-water-table__rows article.level-state--rising > b,
+.home-water-table__rows article.level-state--rising > span {
+  color: var(--water-level-rising-ink);
+}
+
+.home-water-table__rows article.level-state--falling > b,
+.home-water-table__rows article.level-state--falling > span {
+  color: var(--water-level-falling-ink);
+}
+
+.home-water-table__rows article.level-state--stable > b,
+.home-water-table__rows article.level-state--stable > span {
+  color: var(--water-level-stable);
+}
+
+.home-water-table__rows article.level-state--unavailable > b,
+.home-water-table__rows article.level-state--unavailable > span,
+.home-water-table__rows article.level-state--unavailable > small {
+  color: var(--water-level-unavailable);
+}
+
+.home-water-table__rows article.level-state--flood > b,
+.home-water-table__rows article.level-state--flood > span,
+.home-water-table__rows article.level-state--flood > small {
+  color: var(--water-level-flood-ink);
+}
+
+.home-water-focus,
+.home-water-context {
+  --home-water-state-accent: var(--water-level-unavailable);
+  box-shadow: inset 4px 0 0 var(--home-water-state-accent) !important;
+}
+
+.home-water-focus.level-state--rising,
+.home-water-context.level-state--rising {
+  --home-water-state-accent: var(--water-level-rising);
+}
+
+.home-water-focus.level-state--falling,
+.home-water-context.level-state--falling {
+  --home-water-state-accent: var(--water-level-falling);
+}
+
+.home-water-focus.level-state--stable,
+.home-water-context.level-state--stable {
+  --home-water-state-accent: var(--water-level-stable);
+}
+
+.home-water-focus.level-state--unavailable,
+.home-water-context.level-state--unavailable {
+  --home-water-state-accent: var(--water-level-unavailable);
+}
+
+.home-water-focus.level-state--flood,
+.home-water-context.level-state--flood {
+  --home-water-state-accent: var(--water-level-flood);
+}
+
+.home-water-focus::before,
+.home-water-context::before {
+  background: var(--home-water-state-accent) !important;
+}
+
+.home-water-focus.level-state--flood .home-water-focus__reading,
+.home-water-focus.level-state--flood .home-water-trend,
+.home-water-context.level-state--flood > b,
+.home-water-context.level-state--flood > span {
+  color: #ff8a80;
+}
+
+/* Estados neutros explícitos nos demais widgets para impedir herança colorida. */
+.guaiba-level-card.level-state--stable::before {
+  background: var(--water-level-stable);
+}
+
+.guaiba-level-card.level-state--unavailable::before {
+  background: var(--water-level-unavailable);
+}
+
+.guaiba-level-card.level-state--stable .guaiba-level-value,
+.guaiba-level-card.level-state--stable .guaiba-mini-chart {
+  color: var(--water-level-stable);
+}
+
+.guaiba-level-card.level-state--unavailable .guaiba-level-value,
+.guaiba-level-card.level-state--unavailable .guaiba-mini-chart {
+  color: var(--water-level-unavailable);
+}
+
+.guaiba-trend--unavailable {
+  background: rgba(135, 151, 160, 0.12);
+  color: #667983;
+}
+
+.guaiba-city-links > a.level-state--stable::before {
+  background: var(--water-level-stable);
+  opacity: 1;
+}
+
+.guaiba-city-links > a.level-state--unavailable::before {
+  background: var(--water-level-unavailable);
+  opacity: 1;
+}
+
+.lagoon-monitoring-card.level-state--stable {
+  box-shadow: inset 0 3px 0 var(--water-level-stable);
+}
+
+.lagoon-monitoring-card.level-state--unavailable {
+  box-shadow: inset 0 3px 0 var(--water-level-unavailable);
+}
+
+.lagoon-monitoring-card.level-state--stable .lagoon-monitoring-reading,
+.lagoon-monitoring-card.level-state--stable .lagoon-monitoring-chart {
+  color: #b6c3ca;
+}
+
+.lagoon-monitoring-card.level-state--unavailable .lagoon-monitoring-reading,
+.lagoon-monitoring-card.level-state--unavailable .lagoon-monitoring-chart {
+  color: #9cabb3;
+}
+
+.lagoon-monitoring-trend.is-unavailable {
+  background: rgba(135, 151, 160, 0.15);
+  color: #b6c3ca;
+}
+
+@media (max-width: 760px) {
+  .home-next-days__tomorrow-summary {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 22px 20px;
+    border-radius: 18px;
+  }
+
+  .weather-hero-description-source {
+    margin-top: -2px;
+  }
+}

@@ -7,9 +7,19 @@ const pages = [
     description: "Veja como está o tempo agora e nas próximas horas.",
   },
   {
+    href: "/tempo-amanha-pelotas",
+    title: "Tempo amanhã",
+    description: "Confira máxima, mínima, chuva e rajadas para o próximo dia.",
+  },
+  {
     href: "/previsao-7-dias-pelotas",
     title: "Previsão de 7 dias",
     description: "Confira temperaturas, chuva e vento para a semana.",
+  },
+  {
+    href: "/clima-em-pelotas",
+    title: "Clima em Pelotas",
+    description: "Entenda previsão, observação e histórico meteorológico recente.",
   },
   {
     href: "/chuva-em-pelotas",
@@ -53,8 +63,8 @@ const pages = [
   },
   {
     href: "/alertas",
-    title: "Condições de atenção",
-    description: "Veja sinais de chuva forte, temporal e vento.",
+    title: "Avisos meteorológicos",
+    description: "Consulte avisos oficiais de chuva, temporal e vento.",
   },
 ];
 

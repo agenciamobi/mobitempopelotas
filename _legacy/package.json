@@ -11,6 +11,8 @@
     "windy:diagnose": "node scripts/windy-stations-diagnostic.mjs"
   },
   "dependencies": {
+    "@supabase/ssr": "0.12.3",
+    "@supabase/supabase-js": "2.110.7",
     "maplibre-gl": "5.24.0",
     "next": "16.2.10",
     "react": "19.2.7",

@@ -1,3 +1,9 @@
+import {
+  getLatestLaranjalStream,
+  YOUTUBE_LARANJAL_CHANNEL_URL,
+  type YouTubeStreamStatus,
+} from "@/lib/youtube-latest-stream";
+
 export type WeatherCameraStatus = "online" | "preparing";
 
 export type WeatherCamera = {
@@ -10,6 +16,8 @@ export type WeatherCamera = {
   latitude: number;
   longitude: number;
   status: WeatherCameraStatus;
+  broadcastStatus: YouTubeStreamStatus | null;
+  streamTitle: string | null;
   embedUrl: string | null;
   publicUrl: string | null;
   provider: string | null;
@@ -17,7 +25,12 @@ export type WeatherCamera = {
 
 type CameraDefinition = Omit<
   WeatherCamera,
-  "status" | "embedUrl" | "publicUrl" | "provider"
+  | "status"
+  | "broadcastStatus"
+  | "streamTitle"
+  | "embedUrl"
+  | "publicUrl"
+  | "provider"
 > & {
   embedEnv: keyof NodeJS.ProcessEnv;
   publicEnv: keyof NodeJS.ProcessEnv;
@@ -91,10 +104,19 @@ function normalizeProvider(value: string | undefined) {
   return provider ? provider.slice(0, 80) : null;
 }
 
-export function getWeatherCameras(): WeatherCamera[] {
+export async function getWeatherCameras(): Promise<WeatherCamera[]> {
+  const latestLaranjalStream = await getLatestLaranjalStream();
+
   return CAMERA_DEFINITIONS.map((camera) => {
-    const embedUrl = normalizeUrl(process.env[camera.embedEnv]);
-    const publicUrl = normalizeUrl(process.env[camera.publicEnv]);
+    const configuredEmbedUrl = normalizeUrl(process.env[camera.embedEnv]);
+    const configuredPublicUrl = normalizeUrl(process.env[camera.publicEnv]);
+    const isLaranjal = camera.id === "laranjal";
+    const youtubeStream = isLaranjal ? latestLaranjalStream : null;
+    const embedUrl = configuredEmbedUrl ?? youtubeStream?.embedUrl ?? null;
+    const publicUrl =
+      configuredPublicUrl ??
+      youtubeStream?.watchUrl ??
+      (isLaranjal ? YOUTUBE_LARANJAL_CHANNEL_URL : null);
 
     return {
       id: camera.id,
@@ -106,9 +128,13 @@ export function getWeatherCameras(): WeatherCamera[] {
       latitude: camera.latitude,
       longitude: camera.longitude,
       status: embedUrl ? "online" : "preparing",
+      broadcastStatus: youtubeStream?.status ?? null,
+      streamTitle: youtubeStream?.title ?? null,
       embedUrl,
       publicUrl,
-      provider: normalizeProvider(process.env[camera.providerEnv]),
+      provider:
+        normalizeProvider(process.env[camera.providerEnv]) ??
+        (youtubeStream ? "Praia do Laranjal · YouTube" : null),
     };
   });
 }

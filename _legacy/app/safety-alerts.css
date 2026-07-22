@@ -1,0 +1,224 @@
+.safety-alert-banner {
+  --safety-accent: #18bdcd;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  margin: 1.25rem auto 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--safety-accent) 28%, #d9e2e6);
+  border-left: 4px solid var(--safety-accent);
+  border-radius: 1.15rem;
+  background:
+    linear-gradient(115deg, color-mix(in srgb, var(--safety-accent) 9%, #fff), #fff 55%);
+  box-shadow: 0 14px 36px rgb(4 36 52 / 7%);
+}
+
+.safety-alert-banner--attention {
+  --safety-accent: #f27035;
+}
+
+.safety-alert-banner--severe {
+  --safety-accent: #d92d20;
+}
+
+.safety-alert-banner__icon,
+.safety-channel-card__icon {
+  display: grid;
+  place-items: center;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 0.9rem;
+  color: var(--safety-accent);
+  background: color-mix(in srgb, var(--safety-accent) 12%, #fff);
+}
+
+.safety-alert-banner__icon svg,
+.safety-channel-card__icon svg {
+  width: 1.45rem;
+  height: 1.45rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.safety-alert-banner__content {
+  min-width: 0;
+}
+
+.safety-alert-banner__content > span,
+.safety-channel-card > span {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: var(--safety-accent);
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.safety-alert-banner__content strong {
+  display: block;
+  color: #082235;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.safety-alert-banner__content p {
+  margin: 0.25rem 0 0;
+  color: #557083;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.safety-alert-banner__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.safety-alert-banner__actions a,
+.safety-channel-card > a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 2.7rem;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  color: #fff;
+  background: #082235;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.safety-alert-banner__actions button {
+  display: grid;
+  place-items: center;
+  width: 2.7rem;
+  height: 2.7rem;
+  border: 1px solid #d8e1e5;
+  border-radius: 999px;
+  color: #587080;
+  background: #fff;
+  cursor: pointer;
+  font-size: 1.25rem;
+}
+
+.safety-alert-banner__actions a:hover,
+.safety-channel-card > a:hover {
+  transform: translateY(-1px);
+}
+
+.safety-alert-banner__actions button:hover {
+  border-color: var(--safety-accent);
+  color: var(--safety-accent);
+}
+
+.safety-channels {
+  margin-top: clamp(2rem, 4vw, 4rem);
+  scroll-margin-top: 7rem;
+}
+
+.safety-channels__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.safety-channel-card {
+  --safety-accent: #18bdcd;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--safety-accent) 25%, #dce5e8);
+  border-top: 3px solid var(--safety-accent);
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(150deg, color-mix(in srgb, var(--safety-accent) 7%, #fff), #fff 50%);
+  box-shadow: 0 16px 40px rgb(4 36 52 / 6%);
+}
+
+.safety-channel-card--attention {
+  --safety-accent: #f27035;
+}
+
+.safety-channel-card--severe {
+  --safety-accent: #d92d20;
+}
+
+.safety-channel-card__icon {
+  margin-bottom: 1.1rem;
+}
+
+.safety-channel-card h3 {
+  margin: 0;
+  color: #082235;
+  font-size: 1.12rem;
+  line-height: 1.2;
+}
+
+.safety-channel-card p {
+  flex: 1;
+  margin: 0.7rem 0 1.1rem;
+  color: #5b7484;
+  font-size: 0.87rem;
+  line-height: 1.6;
+}
+
+.safety-channel-card > a {
+  align-self: flex-start;
+}
+
+.safety-channels__source {
+  margin: 1rem 0 0;
+  color: #667d8c;
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.safety-channels__source a {
+  color: #0b7184;
+  font-weight: 750;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+@media (max-width: 1050px) {
+  .safety-channels__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .safety-alert-banner {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    margin-inline: 0.85rem;
+  }
+
+  .safety-alert-banner__actions {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+  }
+
+  .safety-alert-banner__actions a {
+    flex: 1;
+  }
+
+  .safety-channels__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .safety-alert-banner__actions a,
+  .safety-channel-card > a {
+    transition: transform 160ms ease;
+  }
+}

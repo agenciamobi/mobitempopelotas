@@ -149,6 +149,25 @@ _legacy/
 - [ ] Validação do Supabase externo em produção
 - [ ] Remoção do `_legacy/` após conclusão e conferência final
 
+## Snapshot atual do legado
+
+- Repositório origem: `agenciamobi/tempopelotas` @ `main`
+- Commit sincronizado: `05cd2d268ad25c070718ecc170bd30e8ad181341`
+- Data UTC: `2026-07-22T00:11:00Z`
+- Detalhes e exclusões: ver `_legacy/SOURCE_SNAPSHOT.md`
+
+## Matriz de migração
+
+O inventário completo (status por domínio, origem → destino, dependências,
+incompatibilidades Next → TanStack, risco, critério de aceite e lote
+recomendado) vive em [`MIGRATION_MATRIX.md`](./MIGRATION_MATRIX.md). Este
+documento passa a registrar apenas o roteiro de alto nível; o detalhamento
+operacional fica na matriz.
+
 ## Próxima fatia
 
-A próxima implementação deve combinar a previsão do Open-Meteo com uma observação local validada da Embrapa, portar os alertas oficiais do INMET e substituir os placeholders das páginas Hoje e 7 dias por visões completas dos mesmos contratos normalizados.
+Com base na matriz, o próximo lote é a **camada meteorológica completa**
+(Lote 2): portar Embrapa (com validação de atualidade), alertas oficiais do
+INMET e o painel CPPMet/UFPel, consolidando contratos normalizados em
+`src/lib/weather/` e alimentando Home, "Hoje" e "7 dias" a partir dos mesmos
+tipos.

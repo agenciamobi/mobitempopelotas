@@ -1,0 +1,32 @@
+/* Homepage v12 — previsão, mapa e medições. */
+.site-shell--home-editorial .home-section-navigation+.home-story--forecast{padding-top:clamp(58px,6vw,88px)}
+.site-shell--home-editorial .home-story--forecast{padding-bottom:clamp(82px,8vw,122px)}
+.site-shell--home-editorial .home-story-heading{grid-template-columns:minmax(0,1fr) minmax(430px,.72fr);gap:clamp(42px,6vw,92px);margin-bottom:clamp(32px,4.5vw,54px)}
+.site-shell--home-editorial .home-today-facts>div{min-height:76px;border-color:rgba(7,30,47,.085)}
+.site-shell--home-editorial .home-today-facts dd{font-variant-numeric:tabular-nums}
+.site-shell--home-editorial .home-advisory-strip{grid-template-columns:auto minmax(235px,.48fr) minmax(0,1fr) auto;gap:18px;padding:17px 20px;border:1px solid rgba(7,30,47,.085);border-radius:17px;background:rgba(255,255,255,.62)}
+.site-shell--home-editorial .home-advisory-strip.is-attention,.site-shell--home-editorial .home-advisory-strip.is-warning{border-color:rgba(242,112,53,.18);background:linear-gradient(100deg,rgba(242,112,53,.075),transparent 54%),rgba(255,255,255,.72)}
+.site-shell--home-editorial .home-advisory-strip>a{display:inline-flex;min-height:38px;align-items:center;padding:0 14px;border-radius:999px;background:#071e2f;color:#fff;text-decoration:none;white-space:nowrap}
+.site-shell--home-editorial .home-forecast-window{border-color:rgba(7,30,47,.085);border-radius:18px;background:linear-gradient(120deg,rgba(24,189,205,.045),transparent 44%,rgba(94,44,237,.035)),rgba(255,255,255,.74);box-shadow:0 16px 44px rgba(7,30,47,.052)}
+.site-shell--home-editorial .home-forecast-window>div{min-height:108px;border-color:rgba(7,30,47,.075)}
+.site-shell--home-editorial .home-hourly-story{gap:10px;margin-top:16px}
+.site-shell--home-editorial .home-hourly-story article{min-height:242px;padding:17px;border-color:rgba(7,30,47,.085);border-radius:16px;background:rgba(255,255,255,.7);box-shadow:0 10px 28px rgba(7,30,47,.038)}
+.site-shell--home-editorial .home-hourly-story article.is-current{background:radial-gradient(circle at 100% 0,rgba(24,189,205,.105),transparent 9rem),rgba(255,255,255,.82);box-shadow:0 15px 38px rgba(24,189,205,.085)}
+.site-shell--home-editorial .home-next-days{grid-template-columns:minmax(155px,.26fr) minmax(0,1fr);gap:24px clamp(34px,5vw,66px);margin-top:clamp(52px,6vw,76px)}
+.site-shell--home-editorial .home-next-days__list{gap:10px}
+.site-shell--home-editorial .home-next-days__list article,.site-shell--home-editorial .home-next-days__list article:first-child,.site-shell--home-editorial .home-next-days__list article:nth-child(2),.site-shell--home-editorial .home-next-days__list article:nth-child(3),.site-shell--home-editorial .home-next-days__list article:last-child{min-height:252px;padding:18px;border-color:rgba(7,30,47,.085);border-radius:16px;background:rgba(255,255,255,.68);box-shadow:0 10px 28px rgba(7,30,47,.036)}
+.site-shell--home-editorial .home-map-story{isolation:isolate;grid-template-columns:minmax(270px,.36fr) minmax(0,1fr);gap:clamp(48px,6vw,92px);padding:clamp(88px,8vw,126px) 0}
+.site-shell--home-editorial .home-map-story:after{position:absolute;z-index:-1;inset:0 auto 0 50%;width:100vw;transform:translateX(-50%);background:radial-gradient(circle at 78% 16%,rgba(94,44,237,.055),transparent 28rem),radial-gradient(circle at 8% 84%,rgba(24,189,205,.075),transparent 30rem),linear-gradient(180deg,rgba(236,244,243,.72),rgba(244,248,247,.9));content:""}
+.site-shell--home-editorial .home-map-story__copy{padding-top:22px}
+.site-shell--home-editorial .home-map-story__hint{margin-top:24px;padding:14px 0 14px 16px;border-left:2px solid rgba(24,189,205,.55);background:transparent}
+.site-shell--home-editorial .home-map-story__frame{border-radius:28px;background:#e8efee;box-shadow:0 28px 78px rgba(7,30,47,.115)}
+.site-shell--home-editorial .home-map-story .map-canvas{min-height:540px}
+.site-shell--home-editorial .home-observation-story{grid-template-columns:minmax(300px,.72fr) minmax(0,1.18fr);gap:clamp(44px,7vw,106px);margin:clamp(82px,8vw,118px) 0;padding:clamp(42px,5vw,68px);border:1px solid rgba(255,255,255,.08);border-radius:30px;background:radial-gradient(circle at 96% -4%,rgba(94,44,237,.32),transparent 26rem),radial-gradient(circle at 4% 110%,rgba(24,189,205,.18),transparent 24rem),linear-gradient(135deg,#061b2b,#082c40 58%,#0a3c4f);box-shadow:0 30px 86px rgba(3,18,29,.17)}
+.site-shell--home-editorial .home-observation-story h2{max-width:620px;color:#fff;font-size:clamp(2.55rem,4vw,4.35rem)}
+.site-shell--home-editorial .home-observation-story__intro>p{color:rgba(255,255,255,.64)}
+.site-shell--home-editorial .home-observation-story__reading{grid-template-columns:minmax(170px,.52fr) minmax(0,1fr);gap:clamp(28px,4vw,58px)}
+.site-shell--home-editorial .home-observation-temperature strong{font-size:clamp(4.9rem,7vw,7.55rem)}
+@media(hover:hover) and (pointer:fine){.site-shell--home-editorial .home-advisory-strip>a:hover,.site-shell--home-editorial .home-advisory-strip>a:focus-visible{background:#5e2ced}}
+@media(max-width:1180px){.site-shell--home-editorial .home-story-heading{grid-template-columns:1fr;gap:28px}.site-shell--home-editorial .home-advisory-strip{grid-template-columns:auto minmax(0,1fr) auto}.site-shell--home-editorial .home-advisory-strip>p{grid-column:2/-1}.site-shell--home-editorial .home-map-story{grid-template-columns:minmax(235px,.38fr) minmax(0,1fr);gap:38px}}
+@media(max-width:900px){.site-shell--home-editorial .home-map-story{grid-template-columns:1fr}.site-shell--home-editorial .home-map-story__copy{position:static;padding-top:0}.site-shell--home-editorial .home-observation-story{grid-template-columns:1fr;gap:38px;padding:40px}}
+@media(max-width:680px){.site-shell--home-editorial .home-advisory-strip{grid-template-columns:auto minmax(0,1fr);padding:16px}.site-shell--home-editorial .home-advisory-strip>p,.site-shell--home-editorial .home-advisory-strip>a{grid-column:1/-1}.site-shell--home-editorial .home-advisory-strip>a{justify-content:center}.site-shell--home-editorial .home-next-days{grid-template-columns:1fr}.site-shell--home-editorial .home-map-story{padding-top:76px;padding-bottom:76px}.site-shell--home-editorial .home-map-story__frame{border-radius:20px}.site-shell--home-editorial .home-map-story .map-canvas{min-height:430px}.site-shell--home-editorial .home-observation-story{margin:72px 0;padding:30px 24px;border-radius:24px}.site-shell--home-editorial .home-observation-story__reading{grid-template-columns:1fr}}

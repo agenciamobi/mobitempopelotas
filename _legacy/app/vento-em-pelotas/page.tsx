@@ -19,6 +19,34 @@ export const metadata: Metadata = {
   },
 };
 
+const windDirectionDegrees: Record<string, number> = {
+  N: 0,
+  NNE: 22.5,
+  NE: 45,
+  ENE: 67.5,
+  E: 90,
+  L: 90,
+  ESE: 112.5,
+  LSE: 112.5,
+  SE: 135,
+  SSE: 157.5,
+  S: 180,
+  SSO: 202.5,
+  SSW: 202.5,
+  SO: 225,
+  SW: 225,
+  OSO: 247.5,
+  WSW: 247.5,
+  O: 270,
+  W: 270,
+  ONO: 292.5,
+  WNW: 292.5,
+  NO: 315,
+  NW: 315,
+  NNO: 337.5,
+  NNW: 337.5,
+};
+
 export default async function VentoEmPelotasPage() {
   const weather = await getPelotasWeather();
   const peakHour = weather.hourly.reduce<(typeof weather.hourly)[number] | undefined>(
@@ -31,6 +59,8 @@ export default async function VentoEmPelotasPage() {
       !selected || day.windGust > selected.windGust ? day : selected,
     undefined,
   );
+  const normalizedDirection = weather.current.windDirection.trim().toUpperCase();
+  const directionRotation = windDirectionDegrees[normalizedDirection] ?? 0;
 
   return (
     <ForecastPageShell
@@ -39,43 +69,52 @@ export default async function VentoEmPelotasPage() {
       title="Veja como está o vento agora"
       description="Acompanhe a velocidade, a direção e os horários em que as rajadas podem ficar mais fortes."
       currentPath="/vento-em-pelotas"
+      heroStat={{
+        label: "Vento agora",
+        value: `${weather.current.windSpeed} km/h`,
+        detail: `de ${weather.current.windDirection} · rajadas de ${weather.current.windGust} km/h`,
+        ariaLabel: `Vento de ${weather.current.windSpeed} quilômetros por hora, direção ${weather.current.windDirection}, com rajadas de ${weather.current.windGust} quilômetros por hora`,
+        tone: "wind",
+      }}
     >
-      <section className="wind-hero" aria-labelledby="wind-now-title">
+      <section className="wind-hero wind-context-band" aria-labelledby="wind-now-title">
         <div className="wind-hero-icon">
           <WeatherIcon name="wind" title="Vento em Pelotas" />
         </div>
         <div>
-          <span className="eyebrow">Agora</span>
-          <h2 id="wind-now-title">{weather.current.windSpeed} km/h</h2>
-          <p>Vento de {weather.current.windDirection}, com rajadas de até {weather.current.windGust} km/h.</p>
+          <span className="eyebrow">Direção e comportamento</span>
+          <h2 id="wind-now-title">Vento de {weather.current.windDirection}</h2>
+          <p>
+            A bússola indica a direção observada. As rajadas atuais chegam a {weather.current.windGust} km/h e podem variar rapidamente.
+          </p>
         </div>
         <div className="wind-direction" aria-label={`Direção do vento: ${weather.current.windDirection}`}>
           <span>N</span>
           <strong>{weather.current.windDirection}</strong>
-          <i aria-hidden="true">↑</i>
+          <i aria-hidden="true" style={{ transform: `rotate(${directionRotation}deg)` }}>↑</i>
         </div>
       </section>
 
-      <section className="topic-metrics" aria-label="Resumo do vento">
+      <section className="topic-metrics" aria-label="Pontos principais da previsão de vento">
         <article>
-          <span>Vento agora</span>
-          <strong>{weather.current.windSpeed} km/h</strong>
-          <small>Direção {weather.current.windDirection}</small>
-        </article>
-        <article>
-          <span>Rajada agora</span>
-          <strong>{weather.current.windGust} km/h</strong>
-          <small>Pico rápido do vento</small>
-        </article>
-        <article>
-          <span>Rajada mais forte nas próximas horas</span>
+          <span>Maior rajada nas próximas horas</span>
           <strong>{peakHour?.windGust ?? 0} km/h</strong>
           <small>{peakHour?.time ?? "Horário indisponível"}</small>
         </article>
         <article>
-          <span>Vento mais forte da semana</span>
+          <span>Vento nesse horário</span>
+          <strong>{peakHour?.windSpeed ?? weather.current.windSpeed} km/h</strong>
+          <small>Velocidade sustentada prevista</small>
+        </article>
+        <article>
+          <span>Rajada mais forte da semana</span>
           <strong>{peakDay?.windGust ?? 0} km/h</strong>
           <small>{peakDay?.weekday} · {peakDay?.date}</small>
+        </article>
+        <article>
+          <span>Temperatura no dia mais ventoso</span>
+          <strong>{peakDay?.max ?? weather.current.temperature}° / {peakDay?.min ?? weather.current.temperature}°</strong>
+          <small>Máxima e mínima previstas</small>
         </article>
       </section>
 
@@ -91,7 +130,11 @@ export default async function VentoEmPelotasPage() {
         </div>
         <div className="wind-hourly-grid">
           {weather.hourly.map((hour, index) => (
-            <article className={index === 0 ? "is-current" : ""} key={`${hour.time}-${index}`}>
+            <article
+              className={index === 0 ? "is-current" : ""}
+              key={`${hour.time}-${index}`}
+              aria-label={`${hour.time}: vento de ${hour.windSpeed} quilômetros por hora e rajadas de ${hour.windGust} quilômetros por hora`}
+            >
               <strong>{hour.time}</strong>
               <WeatherIcon name={hour.icon} title={`Condição às ${hour.time}`} />
               <dl>
@@ -110,7 +153,7 @@ export default async function VentoEmPelotasPage() {
             <h2 id="wind-week-title">Rajadas previstas para a semana</h2>
           </div>
         </div>
-        <div className="data-table" role="table" aria-label="Previsão semanal de rajadas">
+        <div className="data-table data-table--responsive" role="table" aria-label="Previsão semanal de rajadas">
           <div className="data-table-head" role="row">
             <span role="columnheader">Dia</span>
             <span role="columnheader">Rajada mais forte</span>
@@ -119,10 +162,10 @@ export default async function VentoEmPelotasPage() {
           </div>
           {weather.daily.map((day) => (
             <div className="data-table-row" role="row" key={`${day.weekday}-${day.date}`}>
-              <span role="cell"><strong>{day.weekday}</strong><small>{day.date}</small></span>
-              <span role="cell">{day.windGust} km/h</span>
-              <span role="cell">{day.max}° / {day.min}°</span>
-              <span role="cell"><WeatherIcon name={day.icon} title={`Condição em ${day.weekday}`} /></span>
+              <span role="cell" data-label="Dia"><strong>{day.weekday}</strong><small>{day.date}</small></span>
+              <span role="cell" data-label="Rajada mais forte">{day.windGust} km/h</span>
+              <span role="cell" data-label="Temperatura">{day.max}° / {day.min}°</span>
+              <span role="cell" data-label="Tempo"><WeatherIcon name={day.icon} title={`Condição em ${day.weekday}`} /></span>
             </div>
           ))}
         </div>

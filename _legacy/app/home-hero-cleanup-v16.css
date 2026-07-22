@@ -1,0 +1,40 @@
+/* Hero v16 — simplificação solicitada e nova escala tipográfica. */
+
+.site-shell--home-editorial .weather-hero-status,
+.site-shell--home-editorial .weather-hero-scroll {
+  display: none;
+}
+
+.site-shell--home-editorial .weather-hero-kicker {
+  margin-top: 0;
+}
+
+.site-shell--home-editorial .weather-hero h1 {
+  font-size: clamp(4.25rem, 5.85vw, 6.8rem);
+}
+
+@media (max-width: 1240px) {
+  .site-shell--home-editorial .weather-hero h1 {
+    font-size: clamp(3.85rem, 5.45vw, 5.5rem);
+  }
+}
+
+@media (max-width: 1040px) and (min-width: 901px) {
+  .site-shell--home-editorial .weather-hero h1 {
+    font-size: clamp(3.55rem, 5.25vw, 4.65rem);
+  }
+}
+
+@media (max-width: 900px) {
+  .site-shell--home-editorial .weather-hero h1 {
+    font-size: clamp(3.35rem, 10vw, 4.8rem);
+  }
+}
+
+@media (max-width: 620px) {
+  .site-shell--home-editorial .weather-hero h1 {
+    font-size: clamp(2.9rem, 12vw, 3.8rem);
+  }
+}
+
+/* Publicação consolidada da hero v16. */

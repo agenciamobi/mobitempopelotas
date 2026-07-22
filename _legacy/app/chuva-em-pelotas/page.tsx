@@ -41,25 +41,32 @@ export default async function ChuvaEmPelotasPage() {
       title="Quando pode chover e quanto é esperado"
       description="Veja a chance de chuva em cada horário e o volume previsto para hoje e para os próximos dias."
       currentPath="/chuva-em-pelotas"
+      heroStat={{
+        label: "Maior chance hoje",
+        value: `${today?.rainChance ?? 0}%`,
+        detail: `${formatMillimeters(today?.precipitation ?? 0)} mm previstos`,
+        ariaLabel: `Maior chance de chuva hoje: ${today?.rainChance ?? 0}%, com ${formatMillimeters(today?.precipitation ?? 0)} milímetros previstos`,
+        tone: "rain",
+      }}
     >
-      <section className="topic-metrics" aria-label="Resumo da chuva prevista">
+      <section className="topic-metrics" aria-label="Pontos principais da chuva prevista">
         <article>
-          <span>Maior chance hoje</span>
-          <strong>{today?.rainChance ?? 0}%</strong>
-          <small>Possibilidade de chuva durante o dia</small>
+          <span>Horário mais provável</span>
+          <strong>{peakHour?.time ?? "—"}</strong>
+          <small>{peakHour?.precipitation ?? 0}% de chance</small>
         </article>
         <article>
-          <span>Volume previsto hoje</span>
-          <strong>{formatMillimeters(today?.precipitation ?? 0)} mm</strong>
-          <small>Quanto pode chover no total</small>
+          <span>Temperatura nesse horário</span>
+          <strong>{peakHour?.temperature ?? weather.current.temperature}°C</strong>
+          <small>Condição prevista no pico</small>
         </article>
         <article>
-          <span>Horário com maior chance</span>
-          <strong>{peakHour?.precipitation ?? 0}%</strong>
-          <small>{peakHour?.time ?? "Horário indisponível"}</small>
+          <span>Rajadas nesse horário</span>
+          <strong>{peakHour?.windGust ?? weather.current.windGust} km/h</strong>
+          <small>Vento previsto no período</small>
         </article>
         <article>
-          <span>Dia com mais chuva na semana</span>
+          <span>Dia com mais volume</span>
           <strong>{formatMillimeters(wettestDay?.precipitation ?? 0)} mm</strong>
           <small>{wettestDay?.weekday} · {wettestDay?.date}</small>
         </article>
@@ -82,7 +89,15 @@ export default async function ChuvaEmPelotasPage() {
                 <strong>{hour.time}</strong>
                 <WeatherIcon name={hour.icon} title={`Condição às ${hour.time}`} />
               </div>
-              <div className="rain-progress" aria-label={`${hour.precipitation}% de chance de chuva`}>
+              <div
+                className="rain-progress"
+                role="meter"
+                aria-label={`Chance de chuva às ${hour.time}`}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={hour.precipitation}
+                aria-valuetext={`${hour.precipitation}%`}
+              >
                 <span style={{ width: `${Math.min(100, hour.precipitation)}%` }} />
               </div>
               <strong>{hour.precipitation}%</strong>
@@ -99,7 +114,7 @@ export default async function ChuvaEmPelotasPage() {
             <h2 id="rain-week-title">Chuva prevista para a semana</h2>
           </div>
         </div>
-        <div className="data-table" role="table" aria-label="Previsão semanal de chuva">
+        <div className="data-table data-table--responsive" role="table" aria-label="Previsão semanal de chuva">
           <div className="data-table-head" role="row">
             <span role="columnheader">Dia</span>
             <span role="columnheader">Chance de chuva</span>
@@ -108,10 +123,10 @@ export default async function ChuvaEmPelotasPage() {
           </div>
           {weather.daily.map((day) => (
             <div className="data-table-row" role="row" key={`${day.weekday}-${day.date}`}>
-              <span role="cell"><strong>{day.weekday}</strong><small>{day.date}</small></span>
-              <span role="cell">{day.rainChance}%</span>
-              <span role="cell">{formatMillimeters(day.precipitation)} mm</span>
-              <span role="cell"><WeatherIcon name={day.icon} title={`Condição em ${day.weekday}`} /></span>
+              <span role="cell" data-label="Dia"><strong>{day.weekday}</strong><small>{day.date}</small></span>
+              <span role="cell" data-label="Chance de chuva">{day.rainChance}%</span>
+              <span role="cell" data-label="Volume previsto">{formatMillimeters(day.precipitation)} mm</span>
+              <span role="cell" data-label="Tempo"><WeatherIcon name={day.icon} title={`Condição em ${day.weekday}`} /></span>
             </div>
           ))}
         </div>

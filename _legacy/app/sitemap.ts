@@ -5,7 +5,9 @@ import { getWeatherCameras } from "@/lib/weather-cameras";
 const baseRoutes = [
   { path: "/", priority: 1, changeFrequency: "hourly" },
   { path: "/tempo-hoje-pelotas", priority: 0.95, changeFrequency: "hourly" },
+  { path: "/tempo-amanha-pelotas", priority: 0.93, changeFrequency: "hourly" },
   { path: "/previsao-7-dias-pelotas", priority: 0.9, changeFrequency: "hourly" },
+  { path: "/clima-em-pelotas", priority: 0.84, changeFrequency: "daily" },
   { path: "/chuva-em-pelotas", priority: 0.85, changeFrequency: "hourly" },
   { path: "/vento-em-pelotas", priority: 0.85, changeFrequency: "hourly" },
   {
@@ -28,8 +30,9 @@ const baseRoutes = [
   { path: "/alertas", priority: 0.88, changeFrequency: "hourly" },
 ] as const;
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const hasOnlineCamera = getWeatherCameras().some(
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const cameras = await getWeatherCameras();
+  const hasOnlineCamera = cameras.some(
     (camera) => camera.status === "online",
   );
   const routes = hasOnlineCamera

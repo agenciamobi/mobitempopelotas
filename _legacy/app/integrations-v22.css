@@ -1,0 +1,316 @@
+.login-page {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 24px;
+  padding: 48px 20px;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(24, 189, 205, 0.14), transparent 32%),
+    radial-gradient(circle at 85% 20%, rgba(94, 44, 237, 0.12), transparent 30%),
+    #f7f9f7;
+}
+
+.login-page__brand {
+  display: block;
+  width: min(260px, 72vw);
+}
+
+.login-page__brand img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.login-card {
+  width: min(560px, 100%);
+  padding: clamp(28px, 5vw, 48px);
+  border: 1px solid rgba(7, 30, 47, 0.1);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 24px 70px rgba(7, 30, 47, 0.12);
+}
+
+.login-card h1 {
+  margin: 10px 0 16px;
+  color: #071e2f;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.login-card > p {
+  color: #526979;
+  line-height: 1.7;
+}
+
+.login-card button {
+  width: 100%;
+  min-height: 56px;
+  margin: 24px 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 1px solid rgba(7, 30, 47, 0.14);
+  border-radius: 16px;
+  background: #fff;
+  color: #071e2f;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.login-card button:hover:not(:disabled) {
+  border-color: #18bdcd;
+  transform: translateY(-1px);
+}
+
+.login-card button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.login-card button svg {
+  width: 22px;
+  height: 22px;
+  color: #1769e0;
+}
+
+.login-card small,
+.login-card__notice,
+.login-card__error {
+  display: block;
+  margin-top: 12px;
+  color: #647887;
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.login-card__error {
+  color: #b42318 !important;
+}
+
+.login-page__back {
+  color: #294657;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.header-account-form {
+  margin: 0;
+}
+
+.header-account-link {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid rgba(7, 30, 47, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #15384b;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.header-account-link > span {
+  width: 25px;
+  height: 25px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #5e2ced;
+  color: #fff;
+  font-size: 0.72rem;
+}
+
+.header-account-link.is-loading {
+  width: 70px;
+  opacity: 0.35;
+}
+
+.ufpel-hydrology-widget {
+  overflow: hidden;
+  border: 1px solid rgba(7, 30, 47, 0.1);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: 0 22px 56px rgba(7, 30, 47, 0.1);
+}
+
+.ufpel-hydrology-widget__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  padding: clamp(24px, 4vw, 38px);
+}
+
+.ufpel-hydrology-widget__header h2,
+.ufpel-hydrology-widget__header h3 {
+  margin: 8px 0 12px;
+  color: #071e2f;
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.ufpel-hydrology-widget__header p {
+  max-width: 720px;
+  margin: 0;
+  color: #5d7180;
+  line-height: 1.65;
+}
+
+.ufpel-hydrology-widget__header a {
+  flex: 0 0 auto;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: #071e2f;
+  color: #fff;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.ufpel-hydrology-widget__frame {
+  min-height: 520px;
+  border-top: 1px solid rgba(7, 30, 47, 0.08);
+  border-bottom: 1px solid rgba(7, 30, 47, 0.08);
+  background: #eef4f5;
+}
+
+.ufpel-hydrology-widget__frame iframe {
+  width: 100%;
+  height: 620px;
+  display: block;
+  border: 0;
+}
+
+.ufpel-hydrology-widget__attribution {
+  display: block;
+  padding: 16px clamp(24px, 4vw, 38px) 20px;
+  color: #667b88;
+  line-height: 1.55;
+}
+
+.home-water-focus--ufpel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0 !important;
+  overflow: hidden;
+  background: #fff !important;
+  color: #071e2f !important;
+}
+
+.home-water-focus--ufpel .home-water-focus__topline {
+  padding: 24px 24px 0;
+}
+
+.home-water-focus--ufpel .home-water-focus__topline b {
+  background: rgba(24, 189, 205, 0.12);
+  color: #087c88;
+}
+
+.home-water-focus__source-copy {
+  padding: 22px 24px 18px;
+}
+
+.home-water-focus__source-copy > strong {
+  display: block;
+  font-size: clamp(1.55rem, 2.4vw, 2.35rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.home-water-focus__source-copy p {
+  margin: 12px 0 0;
+  color: #5c7180;
+  line-height: 1.6;
+}
+
+.home-water-focus__ufpel-frame {
+  min-height: 380px;
+  border-top: 1px solid rgba(7, 30, 47, 0.08);
+  border-bottom: 1px solid rgba(7, 30, 47, 0.08);
+  background: #eef4f5;
+}
+
+.home-water-focus__ufpel-frame iframe {
+  width: 100%;
+  height: 440px;
+  display: block;
+  border: 0;
+}
+
+.home-water-focus--ufpel .home-water-focus__source-link {
+  margin: 18px 24px 24px;
+  align-self: flex-start;
+}
+
+.home-water-table__rows article[class] {
+  border-color: rgba(7, 30, 47, 0.09);
+}
+
+.home-water-table__rows .is-source-neutral {
+  color: #667b88;
+  font-size: 0.8rem;
+}
+
+.camera-status.is-live {
+  color: #087a43;
+}
+
+.camera-status.is-replay {
+  color: #5e2ced;
+}
+
+.camera-stream-title {
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #f2efff;
+  color: #3e2a83;
+  line-height: 1.5;
+}
+
+@media (max-width: 980px) {
+  .header-account-link {
+    display: none;
+  }
+
+  .ufpel-hydrology-widget__header {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .login-card {
+    padding: 26px 20px;
+    border-radius: 22px;
+  }
+
+  .ufpel-hydrology-widget {
+    border-radius: 20px;
+  }
+
+  .ufpel-hydrology-widget__frame,
+  .ufpel-hydrology-widget__frame iframe {
+    min-height: 460px;
+    height: 460px;
+  }
+
+  .home-water-focus__ufpel-frame,
+  .home-water-focus__ufpel-frame iframe {
+    min-height: 420px;
+    height: 420px;
+  }
+}

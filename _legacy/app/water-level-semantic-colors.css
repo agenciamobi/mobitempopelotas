@@ -1,0 +1,250 @@
+:root {
+  --water-level-falling: var(--brand-cyan, #18bdcd);
+  --water-level-falling-ink: #087985;
+  --water-level-rising: var(--brand-orange, #f27035);
+  --water-level-rising-ink: #a4431b;
+  --water-level-flood: #d92d20;
+  --water-level-flood-ink: #a31616;
+  --water-level-stable: #647985;
+  --water-level-unavailable: #8797a0;
+}
+
+/* Cards claros do Guaíba e do Laranjal. */
+.guaiba-level-card.level-state--falling::before {
+  background: var(--water-level-falling);
+}
+
+.guaiba-level-card.level-state--rising::before {
+  background: var(--water-level-rising);
+}
+
+.guaiba-level-card.level-state--flood::before {
+  background: var(--water-level-flood);
+}
+
+.guaiba-level-card.level-state--falling .guaiba-level-value,
+.guaiba-level-card.level-state--falling .guaiba-mini-chart {
+  color: var(--water-level-falling-ink);
+}
+
+.guaiba-level-card.level-state--rising .guaiba-level-value,
+.guaiba-level-card.level-state--rising .guaiba-mini-chart {
+  color: var(--water-level-rising-ink);
+}
+
+.guaiba-level-card.level-state--flood {
+  border-color: rgba(217, 45, 32, 0.3);
+  background:
+    radial-gradient(circle at 92% 0%, rgba(217, 45, 32, 0.15), transparent 15rem),
+    linear-gradient(155deg, rgba(255, 255, 255, 0.99), rgba(255, 245, 244, 0.97));
+}
+
+.guaiba-level-card.level-state--flood .guaiba-level-value,
+.guaiba-level-card.level-state--flood .guaiba-mini-chart {
+  color: var(--water-level-flood-ink);
+}
+
+.guaiba-trend--stable {
+  background: rgba(100, 121, 133, 0.11);
+  color: #526874;
+}
+
+.guaiba-trend--rising {
+  background: rgba(242, 112, 53, 0.13);
+  color: var(--water-level-rising-ink);
+}
+
+.guaiba-trend--falling {
+  background: rgba(24, 189, 205, 0.13);
+  color: var(--water-level-falling-ink);
+}
+
+.guaiba-level-card.level-state--flood .guaiba-trend {
+  background: rgba(217, 45, 32, 0.13);
+  color: var(--water-level-flood-ink);
+}
+
+.guaiba-level-card.level-state--flood .guaiba-reference-message {
+  border-left-color: var(--water-level-flood);
+  background: rgba(217, 45, 32, 0.07);
+}
+
+/* Diretório regional do Nível Guaíba. */
+.guaiba-city-links > a.level-state--falling::before {
+  background: var(--water-level-falling);
+  opacity: 1;
+}
+
+.guaiba-city-links > a.level-state--rising::before {
+  background: var(--water-level-rising);
+  opacity: 1;
+}
+
+.guaiba-city-links > a.level-state--flood::before {
+  background: var(--water-level-flood);
+  opacity: 1;
+}
+
+.guaiba-city-links > a.level-state--falling .guaiba-city-level,
+.guaiba-city-links > a.level-state--falling .guaiba-city-meta {
+  color: var(--water-level-falling-ink);
+}
+
+.guaiba-city-links > a.level-state--rising .guaiba-city-level,
+.guaiba-city-links > a.level-state--rising .guaiba-city-meta {
+  color: var(--water-level-rising-ink);
+}
+
+.guaiba-city-links > a.level-state--flood {
+  border-color: rgba(217, 45, 32, 0.3);
+  background: linear-gradient(135deg, rgba(217, 45, 32, 0.09), rgba(255, 255, 255, 0.94));
+}
+
+.guaiba-city-links > a.level-state--flood .guaiba-city-level,
+.guaiba-city-links > a.level-state--flood .guaiba-city-meta {
+  color: var(--water-level-flood-ink);
+}
+
+.guaiba-city-links > a.level-state--flood .guaiba-city-meta b {
+  background: rgba(217, 45, 32, 0.13);
+  color: var(--water-level-flood-ink);
+}
+
+/* Rede de monitoramento da Lagoa dos Patos em superfície escura. */
+.lagoon-monitoring-card.level-state--falling {
+  box-shadow: inset 0 3px 0 var(--water-level-falling);
+}
+
+.lagoon-monitoring-card.level-state--rising {
+  box-shadow: inset 0 3px 0 var(--water-level-rising);
+}
+
+.lagoon-monitoring-card.level-state--flood {
+  border-color: rgba(255, 96, 84, 0.48);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(217, 45, 32, 0.27), transparent 12rem),
+    rgba(255, 255, 255, 0.065);
+  box-shadow: inset 0 3px 0 #ff6257;
+}
+
+.lagoon-monitoring-card.level-state--falling .lagoon-monitoring-reading,
+.lagoon-monitoring-card.level-state--falling .lagoon-monitoring-chart {
+  color: #72e7ef;
+}
+
+.lagoon-monitoring-card.level-state--rising .lagoon-monitoring-reading,
+.lagoon-monitoring-card.level-state--rising .lagoon-monitoring-chart {
+  color: #ffb18d;
+}
+
+.lagoon-monitoring-card.level-state--flood .lagoon-monitoring-reading,
+.lagoon-monitoring-card.level-state--flood .lagoon-monitoring-chart {
+  color: #ff8a80;
+}
+
+.lagoon-monitoring-card.level-state--flood .lagoon-monitoring-card-head > span,
+.lagoon-monitoring-card.level-state--flood .lagoon-monitoring-trend {
+  background: rgba(217, 45, 32, 0.2);
+  color: #ffb0a9;
+}
+
+.lagoon-monitoring-card.level-state--flood .lagoon-monitoring-progress span {
+  background: linear-gradient(90deg, #ff8a80, var(--water-level-flood));
+}
+
+.lagoon-monitoring-card.level-state--rising .lagoon-monitoring-trend {
+  background: rgba(242, 112, 53, 0.16);
+  color: #ffb18d;
+}
+
+.lagoon-monitoring-card.level-state--falling .lagoon-monitoring-trend {
+  background: rgba(24, 189, 205, 0.15);
+  color: #72e7ef;
+}
+
+/* Resumo das águas na página inicial. */
+.home-water-trend.is-rising,
+.home-water-table__rows article > span.is-rising,
+.home-water-context > span.is-rising {
+  color: var(--water-level-rising-ink);
+}
+
+.home-water-trend.is-falling,
+.home-water-table__rows article > span.is-falling,
+.home-water-context > span.is-falling {
+  color: var(--water-level-falling-ink);
+}
+
+.home-water-trend.is-stable,
+.home-water-table__rows article > span.is-stable,
+.home-water-context > span.is-stable {
+  color: var(--water-level-stable);
+}
+
+.home-water-trend.is-rising {
+  border-color: rgba(242, 112, 53, 0.3);
+  background: rgba(242, 112, 53, 0.11);
+}
+
+.home-water-trend.is-falling {
+  border-color: rgba(24, 189, 205, 0.3);
+  background: rgba(24, 189, 205, 0.11);
+}
+
+.home-water-focus.level-state--rising,
+.home-water-table__rows article:has(> span.is-rising),
+.home-water-context.level-state--rising {
+  box-shadow: inset 4px 0 0 var(--water-level-rising);
+}
+
+.home-water-focus.level-state--falling,
+.home-water-table__rows article:has(> span.is-falling),
+.home-water-context.level-state--falling {
+  box-shadow: inset 4px 0 0 var(--water-level-falling);
+}
+
+.home-water-focus.level-state--rising .home-water-focus__reading,
+.home-water-focus.level-state--rising .home-water-trend {
+  color: #ffb18d;
+}
+
+.home-water-focus.level-state--falling .home-water-focus__reading,
+.home-water-focus.level-state--falling .home-water-trend {
+  color: #72e7ef;
+}
+
+.home-water-table__rows article:has(> span.is-rising) > b,
+.home-water-context.level-state--rising > b {
+  color: var(--water-level-rising-ink);
+}
+
+.home-water-table__rows article:has(> span.is-falling) > b,
+.home-water-context.level-state--falling > b {
+  color: var(--water-level-falling-ink);
+}
+
+.home-water-table__rows article.risk-flooding,
+.home-water-context.level-state--flood {
+  border-color: rgba(217, 45, 32, 0.3);
+  background: linear-gradient(90deg, rgba(217, 45, 32, 0.08), rgba(255, 255, 255, 0.9));
+  box-shadow: inset 4px 0 0 var(--water-level-flood);
+}
+
+.home-water-table__rows article.risk-flooding > b,
+.home-water-table__rows article.risk-flooding > span,
+.home-water-table__rows article.risk-flooding > small,
+.home-water-context.level-state--flood > b,
+.home-water-context.level-state--flood > span {
+  color: var(--water-level-flood-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guaiba-level-card,
+  .guaiba-city-links > a,
+  .lagoon-monitoring-card,
+  .home-water-focus,
+  .home-water-table__rows article,
+  .home-water-context {
+    transition: none !important;
+  }
+}

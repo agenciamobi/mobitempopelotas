@@ -1,6 +1,11 @@
 import type { GuaibaObservationData } from "@/lib/guaiba-monitor";
 import { NIVEL_GUAIBA_CITIES } from "@/lib/nivel-guaiba-cities";
 import type { NivelGuaibaCityObservation } from "@/lib/nivel-guaiba-regional";
+import {
+  getWaterLevelTrendDirection,
+  getWaterLevelVisualState,
+  waterLevelStateClass,
+} from "@/lib/water-level-state";
 
 const CHART_WIDTH = 520;
 const CHART_HEIGHT = 118;
@@ -51,37 +56,39 @@ function formatCompactUpdatedAt(value: string | null) {
 }
 
 function getTrend(rate: number | null) {
-  if (rate === null) {
+  const direction = getWaterLevelTrendDirection(rate);
+
+  if (direction === "unavailable") {
     return {
       label: "Sem comparação",
       detail: "faltam leituras anteriores",
-      direction: "unavailable" as const,
+      direction,
       symbol: "·",
     };
   }
 
-  if (Math.abs(rate) < 0.1) {
+  if (direction === "stable") {
     return {
       label: "Estável",
       detail: "sem mudança importante nas últimas horas",
-      direction: "stable" as const,
+      direction,
       symbol: "→",
     };
   }
 
-  if (rate > 0) {
+  if (direction === "rising") {
     return {
       label: "Subindo",
       detail: `${formatSigned(rate)} cm por hora`,
-      direction: "rising" as const,
+      direction,
       symbol: "↑",
     };
   }
 
   return {
     label: "Baixando",
-    detail: `${formatSigned(Math.abs(rate))} cm por hora`,
-    direction: "falling" as const,
+    detail: `${formatSigned(Math.abs(rate!))} cm por hora`,
+    direction,
     symbol: "↓",
   };
 }
@@ -143,13 +150,21 @@ type GuaibaLevelCardProps = {
 export function GuaibaLevelCard({ data, regional = [] }: GuaibaLevelCardProps) {
   const available = data.status !== "unavailable" && data.currentLevel !== null;
   const trend = getTrend(data.trendCmPerHour);
+  const visualState = getWaterLevelVisualState({
+    rate: data.trendCmPerHour,
+    available,
+    currentLevel: data.currentLevel,
+    threshold: data.floodReference,
+  });
   const chart = buildChartPath(data);
   const regionalBySlug = new Map(
     regional.map((observation) => [observation.city.slug, observation]),
   );
 
   return (
-    <article className={`guaiba-level-card guaiba-level-card--${data.status}`}>
+    <article
+      className={`guaiba-level-card guaiba-level-card--${data.status} ${waterLevelStateClass(visualState)}`}
+    >
       <div className="guaiba-level-card-header">
         <div>
           <span className="eyebrow">Uma das entradas de água da Lagoa dos Patos</span>
@@ -263,6 +278,12 @@ export function GuaibaLevelCard({ data, regional = [] }: GuaibaLevelCardProps) {
                 observation.currentLevel !== null,
               );
               const cityTrend = getTrend(observation?.trendCmPerHour ?? null);
+              const cityVisualState = getWaterLevelVisualState({
+                rate: observation?.trendCmPerHour ?? null,
+                available: cityAvailable,
+                currentLevel: city.isPrimary ? observation?.currentLevel ?? null : null,
+                threshold: city.isPrimary ? data.floodReference : null,
+              });
               const status = observation?.status ?? "unavailable";
 
               return (
@@ -272,7 +293,7 @@ export function GuaibaLevelCard({ data, regional = [] }: GuaibaLevelCardProps) {
                       ? `${city.name}: ${formatLevel(observation!.currentLevel)} metros, ${cityTrend.label}`
                       : `${city.name}: leitura indisponível`
                   }
-                  className={`${city.isPrimary ? "is-primary " : ""}is-${status}`.trim()}
+                  className={`${city.isPrimary ? "is-primary " : ""}is-${status} ${waterLevelStateClass(cityVisualState)}`.trim()}
                   href={city.url}
                   key={city.slug}
                   target="_blank"

@@ -66,21 +66,27 @@ export default async function TempoHojePelotasPage() {
         }}
       />
 
-      <section className="topic-current-card" aria-labelledby="today-current-title">
-        <div className="topic-current-icon">
+      <section className="today-observation-band" aria-labelledby="today-current-title">
+        <div className="today-observation-icon">
           <WeatherIcon name={current.icon} title={current.condition} />
         </div>
-        <div className="topic-current-temperature">
-          <span>{current.temperature}°</span>
+        <div className="today-observation-copy">
+          <span className="eyebrow">Condição observada</span>
+          <h2 id="today-current-title">{current.condition}</h2>
+          <p>
+            Temperatura de {current.temperature}°C e sensação térmica de {current.feelsLike}°C.
+          </p>
+        </div>
+        <dl className="today-temperature-range" aria-label="Temperaturas máxima e mínima previstas para hoje">
           <div>
-            <h2 id="today-current-title">{current.condition}</h2>
-            <p>Sensação térmica de {current.feelsLike}°C</p>
+            <dt>Máxima</dt>
+            <dd>{today?.max ?? current.temperature}°</dd>
           </div>
-        </div>
-        <div className="topic-current-range">
-          <span>Máxima <strong>{today?.max ?? current.temperature}°</strong></span>
-          <span>Mínima <strong>{today?.min ?? current.temperature}°</strong></span>
-        </div>
+          <div>
+            <dt>Mínima</dt>
+            <dd>{today?.min ?? current.temperature}°</dd>
+          </div>
+        </dl>
       </section>
 
       <section className="topic-metrics" aria-label="Resumo do tempo hoje">
@@ -102,12 +108,16 @@ export default async function TempoHojePelotasPage() {
         </div>
         <div className="topic-hourly-table">
           {hourly.map((hour, index) => (
-            <article className={index === 0 ? "is-current" : ""} key={`${hour.time}-${index}`}>
+            <article
+              className={index === 0 ? "is-current" : ""}
+              key={`${hour.time}-${index}`}
+              aria-label={`${hour.time}: ${hour.temperature} graus, ${hour.precipitation}% de chance de chuva e rajadas de ${hour.windGust} quilômetros por hora`}
+            >
               <strong>{hour.time}</strong>
               <WeatherIcon name={hour.icon} title={`Condição às ${hour.time}`} />
-              <span>{hour.temperature}°C</span>
-              <span>{hour.precipitation}% de chuva</span>
-              <span>Rajadas de {hour.windGust} km/h</span>
+              <span data-label="Temperatura">{hour.temperature}°C</span>
+              <span data-label="Chuva">{hour.precipitation}% de chuva</span>
+              <span data-label="Rajadas">{hour.windGust} km/h</span>
             </article>
           ))}
         </div>
