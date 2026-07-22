@@ -1,0 +1,69 @@
+name: Reparar dependências do build
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+concurrency:
+  group: repair-build-locks-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  repair-and-validate:
+    if: github.head_ref == 'agent/fix-lovable-build-deps'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout da branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Configurar Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Regenerar package-lock
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+
+      - name: Regenerar bun.lock
+        run: bun install --lockfile-only
+
+      - name: Validar instalação npm
+        run: |
+          rm -rf node_modules
+          npm ci --no-audit --no-fund
+          npm run typecheck
+          npm run lint
+          npm run build
+
+      - name: Validar build com dependências de produção no Bun
+        run: |
+          rm -rf node_modules
+          bun install --production --frozen-lockfile
+          bun run build
+
+      - name: Publicar lockfiles atualizados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json bun.lock
+          if git diff --cached --quiet; then
+            echo "Lockfiles já estão sincronizados."
+            exit 0
+          fi
+          git commit -m "chore: sincroniza lockfiles do build"
+          git push origin HEAD:${{ github.head_ref }}
