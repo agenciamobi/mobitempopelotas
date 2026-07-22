@@ -150,7 +150,11 @@ function Sparkline({ data }: { data: LaranjalLevelData }) {
       <svg
         viewBox={`0 0 ${width} ${height}`}
         role="img"
-        aria-label="Variação do nível nas últimas 24 horas"
+        aria-label={
+          data.status === "stale"
+            ? "Variação do nível nas 24 horas anteriores à última leitura"
+            : "Variação do nível nas últimas 24 horas"
+        }
       >
         <defs>
           <linearGradient id="hydrology-area" x1="0" y1="0" x2="0" y2="1">
@@ -166,11 +170,11 @@ function Sparkline({ data }: { data: LaranjalLevelData }) {
         <circle cx={coordinates.at(-1)?.x} cy={coordinates.at(-1)?.y} r="7" fill="currentColor" />
       </svg>
       <div className="hydrology-chart-labels">
-        <span>Há 24 horas</span>
+        <span>{data.status === "stale" ? "24 h antes da leitura" : "Há 24 horas"}</span>
         <strong>
           {minimum.toFixed(2)} m a {maximum.toFixed(2)} m
         </strong>
-        <span>Agora</span>
+        <span>{data.status === "stale" ? "Última leitura" : "Agora"}</span>
       </div>
     </div>
   );
