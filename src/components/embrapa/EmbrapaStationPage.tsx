@@ -41,6 +41,7 @@ type MetricCardProps = {
 const statusLabels = {
   live: "Leituras reconhecidas",
   partial: "Leitura parcial",
+  stale: "Leitura atrasada",
   unavailable: "Medições indisponíveis",
 } as const;
 
@@ -101,12 +102,12 @@ function ExtremeValue({
 
 function SourceStatus({
   status,
-  error,
+  reason,
 }: {
-  status: "live" | "partial" | "unavailable";
-  error: string | null;
+  status: "live" | "partial" | "stale" | "unavailable";
+  reason: string | null;
 }) {
-  const Icon = status === "live" ? CheckCircle2 : status === "partial" ? Clock3 : Info;
+  const Icon = status === "live" ? CheckCircle2 : status === "unavailable" ? Info : Clock3;
 
   return (
     <div className={`embrapa-source-status embrapa-source-status-${status}`} role="status">
@@ -118,7 +119,10 @@ function SourceStatus({
             ? "A página da estação respondeu e os principais campos foram reconhecidos."
             : status === "partial"
               ? "A fonte respondeu, mas alguns campos não puderam ser identificados."
-              : error || "Não foi possível consultar ou interpretar a página da estação."}
+              : status === "stale"
+                ? reason ||
+                  "A última leitura disponível está atrasada e não foi usada como condição atual."
+                : reason || "Não foi possível consultar ou interpretar a página da estação."}
         </span>
       </div>
     </div>
@@ -127,6 +131,8 @@ function SourceStatus({
 
 export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
   const observation = data.weather.observation;
+  const sourceHealth = data.weather.sources.embrapa;
+  const displayStatus = sourceHealth.status;
   const available = observation.status !== "unavailable";
   const usedAsCurrentSource = data.weather.quality.currentSource === "embrapa";
 
@@ -180,7 +186,7 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
           </div>
         </div>
 
-        <aside className={`embrapa-primary-reading embrapa-primary-reading-${observation.status}`}>
+        <aside className={`embrapa-primary-reading embrapa-primary-reading-${displayStatus}`}>
           <span className="embrapa-primary-label">Temperatura medida</span>
           <strong>
             {observation.current.temperature === null
@@ -200,7 +206,7 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
         </aside>
       </header>
 
-      <SourceStatus status={observation.status} error={observation.error} />
+      <SourceStatus status={displayStatus} reason={sourceHealth.reason} />
 
       {available ? (
         <>

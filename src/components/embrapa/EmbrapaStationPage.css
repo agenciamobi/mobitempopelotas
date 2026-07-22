@@ -109,7 +109,8 @@
   content: "";
 }
 
-.embrapa-primary-reading-partial::before {
+.embrapa-primary-reading-partial::before,
+.embrapa-primary-reading-stale::before {
   background: #f2a335;
 }
 
@@ -182,7 +183,8 @@
   color: #166534;
 }
 
-.embrapa-source-status-partial {
+.embrapa-source-status-partial,
+.embrapa-source-status-stale {
   border: 1px solid rgba(138, 89, 0, 0.14);
   background: #fff8e6;
   color: #815500;
