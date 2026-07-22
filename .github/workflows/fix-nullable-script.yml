@@ -1,0 +1,53 @@
+name: Corrigir patch MET Norway
+
+on:
+  push:
+    branches:
+      - agent/fix-met-norway-missing-fields
+
+permissions:
+  contents: write
+
+jobs:
+  fix-script:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: agent/fix-met-norway-missing-fields
+
+      - name: Tornar substituição horária específica
+        shell: python
+        run: |
+          from pathlib import Path
+
+          path = Path('.github/scripts/apply-nullable-fallback.py')
+          text = path.read_text(encoding='utf-8')
+
+          old = '''replace(
+              "src/lib/weather/met-norway.server.ts",
+              "    const windSpeed = metersPerSecondToKilometersPerHour(details.wind_speed) ?? 0;\\n    const windGust = metersPerSecondToKilometersPerHour(details.wind_speed_of_gust) ?? windSpeed;",
+              "    const windSpeed = Math.round(details.wind_speed * 3.6);\\n    const windGust = metersPerSecondToKilometersPerHour(details.wind_speed_of_gust);",
+          )'''
+
+          new = '''replace(
+              "src/lib/weather/met-norway.server.ts",
+              "function normalizeHourly(points: MetPoint[]): HourlyForecast[] {\\n  return points.slice(0, 7).map((point, index) => {\\n    const details = point.data.instant.details;\\n    const presentation = pointPresentation(point);\\n    const windSpeed = metersPerSecondToKilometersPerHour(details.wind_speed) ?? 0;\\n    const windGust = metersPerSecondToKilometersPerHour(details.wind_speed_of_gust) ?? windSpeed;",
+              "function normalizeHourly(points: MetPoint[]): HourlyForecast[] {\\n  return points.slice(0, 7).map((point, index) => {\\n    const details = point.data.instant.details;\\n    const presentation = pointPresentation(point);\\n    const windSpeed = Math.round(details.wind_speed * 3.6);\\n    const windGust = metersPerSecondToKilometersPerHour(details.wind_speed_of_gust);",
+          )'''
+
+          if text.count(old) != 1:
+              raise SystemExit(f'Bloco esperado não encontrado uma única vez: {text.count(old)}')
+
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+
+      - name: Registrar correção
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/scripts/apply-nullable-fallback.py
+          git commit -m "chore: diferencia normalização horária no patch"
+          git push origin HEAD:agent/fix-met-norway-missing-fields
