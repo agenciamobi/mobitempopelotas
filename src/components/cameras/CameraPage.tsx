@@ -40,9 +40,10 @@ export function CameraPage({ cameraData, weather }: CameraPageProps) {
   const liveCameras = onlineCameras.filter((camera) => camera.broadcastStatus === "live");
   const replayCameras = onlineCameras.filter((camera) => camera.broadcastStatus === "replay");
   const current = weather.weather.current;
-  const gustValues = [current?.windGust, ...weather.weather.hourly.map((hour) => hour.windGust)].filter(
-    (value): value is number => value !== null && value !== undefined,
-  );
+  const gustValues = [
+    current?.windGust,
+    ...weather.weather.hourly.map((hour) => hour.windGust),
+  ].filter((value): value is number => value !== null && value !== undefined);
   const strongestGust = gustValues.length > 0 ? Math.max(...gustValues) : null;
   const selectedVideo =
     liveCameras[0] ?? replayCameras[0] ?? onlineCameras.find((camera) => camera.embedUrl);
@@ -80,7 +81,9 @@ export function CameraPage({ cameraData, weather }: CameraPageProps) {
     <div className="camera-page">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(itemListSchema).replace(/</g, "\\u003c"),
+        }}
       />
       {videoSchema ? (
         <script
@@ -97,8 +100,8 @@ export function CameraPage({ cameraData, weather }: CameraPageProps) {
           <p className="camera-kicker">Observação visual de Pelotas</p>
           <h1>Câmeras do Laranjal e pontos previstos da cidade</h1>
           <p className="camera-lead">
-            Observe o céu, a visibilidade e as condições aparentes da orla. Quando não existe uma live
-            ativa, o portal identifica claramente a gravação pública mais recente do canal.
+            Observe o céu, a visibilidade e as condições aparentes da orla. Quando não existe uma
+            live ativa, o portal identifica claramente a gravação pública mais recente do canal.
           </p>
           <div className="camera-hero-meta">
             <span>
@@ -162,7 +165,9 @@ export function CameraPage({ cameraData, weather }: CameraPageProps) {
         <article>
           <Thermometer aria-hidden="true" />
           <span>Temperatura agora</span>
-          <strong>{current?.temperature === null || !current ? "—" : `${current.temperature} °C`}</strong>
+          <strong>
+            {current?.temperature === null || !current ? "—" : `${current.temperature} °C`}
+          </strong>
           <small>{current?.condition ?? "Condição em atualização"}</small>
         </article>
         <article>
@@ -192,19 +197,26 @@ export function CameraPage({ cameraData, weather }: CameraPageProps) {
             <Eye aria-hidden="true" />
             <span>01</span>
             <h3>Observe a visibilidade</h3>
-            <p>Neblina, chuva intensa e nuvens baixas podem esconder o horizonte e reduzir o contraste.</p>
+            <p>
+              Neblina, chuva intensa e nuvens baixas podem esconder o horizonte e reduzir o
+              contraste.
+            </p>
           </article>
           <article>
             <Cloud aria-hidden="true" />
             <span>02</span>
             <h3>Compare com a previsão</h3>
-            <p>A câmera cobre um único enquadramento. Consulte também chuva, vento e temperatura.</p>
+            <p>
+              A câmera cobre um único enquadramento. Consulte também chuva, vento e temperatura.
+            </p>
           </article>
           <article>
             <Radio aria-hidden="true" />
             <span>03</span>
             <h3>Confira o estado</h3>
-            <p>“Ao vivo” e “última transmissão” são situações diferentes e aparecem identificadas.</p>
+            <p>
+              “Ao vivo” e “última transmissão” são situações diferentes e aparecem identificadas.
+            </p>
           </article>
           <article>
             <ShieldCheck aria-hidden="true" />
@@ -217,8 +229,9 @@ export function CameraPage({ cameraData, weather }: CameraPageProps) {
         <div className="camera-responsibility-note">
           <AlertTriangle aria-hidden="true" />
           <p>
-            As imagens pertencem aos responsáveis indicados em cada câmera e podem ficar indisponíveis
-            sem aviso. O Tempo Pelotas não controla a transmissão nem garante continuidade do serviço.
+            As imagens pertencem aos responsáveis indicados em cada câmera e podem ficar
+            indisponíveis sem aviso. O Tempo Pelotas não controla a transmissão nem garante
+            continuidade do serviço.
           </p>
         </div>
       </section>

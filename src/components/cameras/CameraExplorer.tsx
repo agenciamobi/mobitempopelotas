@@ -1,13 +1,5 @@
 import { useMemo, useState } from "react";
-import {
-  Camera,
-  CirclePlay,
-  Clock3,
-  ExternalLink,
-  MapPin,
-  Radio,
-  VideoOff,
-} from "lucide-react";
+import { Camera, CirclePlay, Clock3, ExternalLink, MapPin, Radio, VideoOff } from "lucide-react";
 
 import type { WeatherCamera } from "@/lib/cameras/cameras.types";
 
@@ -40,8 +32,7 @@ export function CameraExplorer({ cameras }: CameraExplorerProps) {
   );
   const [selectedId, setSelectedId] = useState(initialCamera?.id ?? "");
   const [playerOpen, setPlayerOpen] = useState(false);
-  const selectedCamera =
-    cameras.find((camera) => camera.id === selectedId) ?? initialCamera;
+  const selectedCamera = cameras.find((camera) => camera.id === selectedId) ?? initialCamera;
 
   if (!selectedCamera) return null;
 
@@ -64,8 +55,8 @@ export function CameraExplorer({ cameras }: CameraExplorerProps) {
           <p className="camera-kicker">Pontos de observação</p>
           <h2 id="camera-explorer-title">Escolha um local para acompanhar</h2>
           <p>
-            O estado informa se a imagem está ao vivo, corresponde ao replay mais recente ou ainda não
-            possui uma fonte pública configurada.
+            O estado informa se a imagem está ao vivo, corresponde ao replay mais recente ou ainda
+            não possui uma fonte pública configurada.
           </p>
         </div>
         <div className="camera-current-selection" aria-live="polite">
@@ -222,7 +213,10 @@ export function CameraExplorer({ cameras }: CameraExplorerProps) {
               <strong>{camera.shortName}</strong>
               <small>{camera.area}</small>
             </span>
-            <i className={`camera-location-state camera-location-state-${camera.status}`} aria-hidden="true" />
+            <i
+              className={`camera-location-state camera-location-state-${camera.status}`}
+              aria-hidden="true"
+            />
           </button>
         ))}
       </div>

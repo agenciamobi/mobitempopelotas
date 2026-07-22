@@ -1,7 +1,4 @@
-import type {
-  YouTubeBroadcastStatus,
-  YouTubeCameraStream,
-} from "./cameras.types";
+import type { YouTubeBroadcastStatus, YouTubeCameraStream } from "./cameras.types";
 
 const YOUTUBE_API = "https://www.googleapis.com/youtube/v3";
 const YOUTUBE_ORIGIN = "https://www.youtube.com";
@@ -10,8 +7,7 @@ const REQUEST_TIMEOUT_MS = 8_000;
 const DEFAULT_CHANNEL_HANDLE = "@praiadolaranjal";
 const DEFAULT_CHANNEL_ID = "UCqvFgdUJ7kuChDA7hbnz1ZA";
 
-export const YOUTUBE_LARANJAL_CHANNEL_URL =
-  "https://www.youtube.com/@praiadolaranjal/streams";
+export const YOUTUBE_LARANJAL_CHANNEL_URL = "https://www.youtube.com/@praiadolaranjal/streams";
 
 const cameraTitlePattern = /(?:c[aâ]mera|laranjal|c[eé]u|clima)/i;
 
@@ -69,7 +65,10 @@ function decodeJsonText(value: string | undefined) {
   try {
     return JSON.parse(`"${value.replace(/"/g, '\\"')}"`) as string;
   } catch {
-    return value.replace(/\\u0026/g, "&").replace(/\\n/g, " ").trim();
+    return value
+      .replace(/\\u0026/g, "&")
+      .replace(/\\n/g, " ")
+      .trim();
   }
 }
 
@@ -189,21 +188,18 @@ async function fetchStreamFromApi(apiKey: string, handle: string) {
     )
     .sort(
       (a, b) =>
-        new Date(b.snippet!.publishedAt!).getTime() -
-        new Date(a.snippet!.publishedAt!).getTime(),
+        new Date(b.snippet!.publishedAt!).getTime() - new Date(a.snippet!.publishedAt!).getTime(),
     );
 
   const selected =
     streams.find(
       (video) =>
-        video.liveStreamingDetails?.actualStartTime &&
-        !video.liveStreamingDetails?.actualEndTime,
+        video.liveStreamingDetails?.actualStartTime && !video.liveStreamingDetails?.actualEndTime,
     ) ?? streams.find((video) => video.liveStreamingDetails?.actualEndTime);
   if (!selected) return null;
 
   const status: YouTubeBroadcastStatus =
-    selected.liveStreamingDetails?.actualStartTime &&
-    !selected.liveStreamingDetails?.actualEndTime
+    selected.liveStreamingDetails?.actualStartTime && !selected.liveStreamingDetails?.actualEndTime
       ? "live"
       : "replay";
 
@@ -231,12 +227,8 @@ function extractPublicLiveStream(html: string) {
     const videoIndex = context.lastIndexOf(`"videoId":"${videoId}"`);
     const titleContext = context.slice(Math.max(0, videoIndex - 3_000), videoIndex + 5_000);
     const title =
-      decodeJsonText(
-        titleContext.match(/"title":\{"runs":\[\{"text":"((?:\\.|[^"\\])*)"/)?.[1],
-      ) ??
-      decodeJsonText(
-        titleContext.match(/"title":\{"simpleText":"((?:\\.|[^"\\])*)"/)?.[1],
-      ) ??
+      decodeJsonText(titleContext.match(/"title":\{"runs":\[\{"text":"((?:\\.|[^"\\])*)"/)?.[1]) ??
+      decodeJsonText(titleContext.match(/"title":\{"simpleText":"((?:\\.|[^"\\])*)"/)?.[1]) ??
       "Praia do Laranjal ao vivo";
 
     if (!cameraTitlePattern.test(title)) continue;
@@ -259,8 +251,7 @@ async function fetchPublicLiveStream(handle: string) {
     headers: {
       Accept: "text/html,application/xhtml+xml",
       "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.7",
-      "User-Agent":
-        "Mozilla/5.0 (compatible; TempoPelotas/1.0; +https://agenciamobi.com.br)",
+      "User-Agent": "Mozilla/5.0 (compatible; TempoPelotas/1.0; +https://agenciamobi.com.br)",
     },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
@@ -285,8 +276,7 @@ function parseRssEntries(xml: string): RssEntry[] {
         title,
         publishedAt: entry.match(/<published>([^<]+)<\/published>/)?.[1] ?? null,
         thumbnailUrl:
-          entry.match(/<media:thumbnail[^>]+url="([^"]+)"/)?.[1]?.replace(/&amp;/g, "&") ??
-          null,
+          entry.match(/<media:thumbnail[^>]+url="([^"]+)"/)?.[1]?.replace(/&amp;/g, "&") ?? null,
       },
     ];
   });

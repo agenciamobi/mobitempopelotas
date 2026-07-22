@@ -1,11 +1,5 @@
-import type {
-  WeatherCamera,
-  WeatherCameraData,
-} from "./cameras.types";
-import {
-  getLatestLaranjalStream,
-  YOUTUBE_LARANJAL_CHANNEL_URL,
-} from "./youtube.server";
+import type { WeatherCamera, WeatherCameraData } from "./cameras.types";
+import { getLatestLaranjalStream, YOUTUBE_LARANJAL_CHANNEL_URL } from "./youtube.server";
 
 type CameraDefinition = Omit<
   WeatherCamera,
@@ -75,8 +69,7 @@ function normalizeUrl(value: string | undefined) {
   try {
     const url = new URL(value.trim());
     const localHttp =
-      url.protocol === "http:" &&
-      (url.hostname === "localhost" || url.hostname === "127.0.0.1");
+      url.protocol === "http:" && (url.hostname === "localhost" || url.hostname === "127.0.0.1");
     if (url.protocol !== "https:" && !localHttp) return null;
     return url.toString();
   } catch {
