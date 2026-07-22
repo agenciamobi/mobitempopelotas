@@ -214,7 +214,7 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
   };
 
   return (
-    <main className="methodology-page">
+    <div className="methodology-page">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema).replace(/</g, "\\u003c") }}
@@ -451,6 +451,6 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
           </Link>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
