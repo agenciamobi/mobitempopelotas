@@ -209,9 +209,7 @@ function normalizeHourly(response: OpenMeteoResponse): HourlyForecast[] {
     items.push({
       time: offset === 0 ? "Agora" : `${formatClock(time)?.slice(0, 2) ?? "--"}h`,
       temperature: Math.round(temperature),
-      precipitationProbability: Math.round(
-        response.hourly.precipitation_probability[index] ?? 0,
-      ),
+      precipitationProbability: Math.round(response.hourly.precipitation_probability[index] ?? 0),
       windSpeed: Math.round(response.hourly.wind_speed_10m[index] ?? 0),
       windGust: Math.round(response.hourly.wind_gusts_10m[index] ?? 0),
       icon: presentation.icon,
