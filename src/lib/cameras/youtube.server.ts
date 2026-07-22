@@ -55,8 +55,9 @@ function normalizeVideoId(value: string | undefined) {
   return videoId && /^[A-Za-z0-9_-]{11}$/.test(videoId) ? videoId : null;
 }
 
-function normalizeBroadcastStatus(value: string | undefined): YouTubeBroadcastStatus {
-  return value?.trim().toLowerCase() === "replay" ? "replay" : "live";
+function normalizeBroadcastStatus(value: string | undefined): YouTubeBroadcastStatus | null {
+  const status = value?.trim().toLowerCase();
+  return status === "live" || status === "replay" ? status : null;
 }
 
 function decodeJsonText(value: string | undefined) {
@@ -263,6 +264,36 @@ async function fetchPublicLiveStream(handle: string) {
   return extractPublicLiveStream(await response.text());
 }
 
+function publicPageConfirmsVideoLive(html: string, videoId: string) {
+  const marker = `"videoId":"${videoId}"`;
+  let position = html.indexOf(marker);
+
+  while (position >= 0) {
+    const context = html.slice(Math.max(0, position - 8_000), position + 8_000);
+    if (/"isLiveNow":true/.test(context)) return true;
+    position = html.indexOf(marker, position + marker.length);
+  }
+
+  return false;
+}
+
+async function isPublicVideoLive(videoId: string) {
+  const response = await fetch(`${YOUTUBE_ORIGIN}/watch?v=${videoId}`, {
+    headers: {
+      Accept: "text/html,application/xhtml+xml",
+      "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.7",
+      "User-Agent": "Mozilla/5.0 (compatible; TempoPelotas/1.0; +https://agenciamobi.com.br)",
+    },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Página do vídeo manual respondeu com HTTP ${response.status}.`);
+  }
+
+  return publicPageConfirmsVideoLive(await response.text(), videoId);
+}
+
 function parseRssEntries(xml: string): RssEntry[] {
   return [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].flatMap((match) => {
     const entry = match[1];
@@ -310,25 +341,55 @@ async function fetchLatestReplay(channelId: string) {
 }
 
 export async function getLatestLaranjalStream() {
+  const handle = process.env.YOUTUBE_CHANNEL_HANDLE?.trim() || DEFAULT_CHANNEL_HANDLE;
+  const channelId = process.env.YOUTUBE_CHANNEL_ID?.trim() || DEFAULT_CHANNEL_ID;
+  const apiKey = process.env.YOUTUBE_API_KEY?.trim();
   const manualVideoId = normalizeVideoId(process.env.YOUTUBE_LARANJAL_VIDEO_ID);
+  const manualStatus = normalizeBroadcastStatus(process.env.YOUTUBE_LARANJAL_VIDEO_STATUS);
+  const manualTitle = process.env.YOUTUBE_LARANJAL_VIDEO_TITLE?.trim() || "Praia do Laranjal";
+  let manualReplayFallback: YouTubeCameraStream | null = null;
+
   if (manualVideoId) {
-    return streamFromVideoId({
+    if (manualStatus === "replay") {
+      return streamFromVideoId({
+        videoId: manualVideoId,
+        title: manualTitle,
+        status: "replay",
+        publishedAt: null,
+        source: "manual",
+      });
+    }
+
+    try {
+      if (await isPublicVideoLive(manualVideoId)) {
+        return streamFromVideoId({
+          videoId: manualVideoId,
+          title: manualTitle,
+          status: "live",
+          publishedAt: null,
+          source: "manual",
+        });
+      }
+    } catch (error) {
+      console.warn("[cameras/youtube] Não foi possível confirmar o vídeo manual ao vivo", {
+        videoId: manualVideoId,
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+
+    manualReplayFallback = streamFromVideoId({
       videoId: manualVideoId,
-      title: process.env.YOUTUBE_LARANJAL_VIDEO_TITLE?.trim() || "Praia do Laranjal",
-      status: normalizeBroadcastStatus(process.env.YOUTUBE_LARANJAL_VIDEO_STATUS),
+      title: manualTitle,
+      status: "replay",
       publishedAt: null,
       source: "manual",
     });
   }
 
-  const handle = process.env.YOUTUBE_CHANNEL_HANDLE?.trim() || DEFAULT_CHANNEL_HANDLE;
-  const channelId = process.env.YOUTUBE_CHANNEL_ID?.trim() || DEFAULT_CHANNEL_ID;
-  const apiKey = process.env.YOUTUBE_API_KEY?.trim();
-
   if (apiKey) {
     try {
       const apiStream = await fetchStreamFromApi(apiKey, handle);
-      if (apiStream) return apiStream;
+      if (apiStream?.status === "live") return apiStream;
     } catch (error) {
       console.warn("[cameras/youtube] API indisponível; tentando página pública", {
         message: error instanceof Error ? error.message : String(error),
@@ -346,11 +407,13 @@ export async function getLatestLaranjalStream() {
   }
 
   try {
-    return await fetchLatestReplay(channelId);
+    const latestReplay = await fetchLatestReplay(channelId);
+    if (latestReplay) return latestReplay;
   } catch (error) {
     console.warn("[cameras/youtube] Feed público indisponível", {
       message: error instanceof Error ? error.message : String(error),
     });
-    return null;
   }
+
+  return manualReplayFallback;
 }
