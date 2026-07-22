@@ -21,9 +21,11 @@ jobs:
           LOG="history-fallback-diagnostic/summary.log"
           END_DATE="$(TZ=America/Sao_Paulo date -d 'yesterday' +%F)"
           START_DATE="$(TZ=America/Sao_Paulo date -d "$END_DATE -29 days" +%F)"
+          POWER_START="$(TZ=America/Sao_Paulo date -d "$END_DATE -89 days" +%Y%m%d)"
+          POWER_END="$(TZ=America/Sao_Paulo date -d "$END_DATE" +%Y%m%d)"
           QUERY="latitude=-31.7654&longitude=-52.3376&timezone=America%2FSao_Paulo&start_date=$START_DATE&end_date=$END_DATE&daily=temperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_sum%2Cwind_gusts_10m_max"
 
-          request() {
+          request_open_meteo() {
             local name="$1"
             local url="$2"
             local body="history-fallback-diagnostic/${name}.json"
@@ -42,10 +44,33 @@ jobs:
             fi
           }
 
-          request "historical-forecast" "https://historical-forecast-api.open-meteo.com/v1/forecast?$QUERY"
-          request "archive-api" "https://archive-api.open-meteo.com/v1/archive?$QUERY"
+          request_open_meteo "historical-forecast" "https://historical-forecast-api.open-meteo.com/v1/forecast?$QUERY"
+          request_open_meteo "archive-api" "https://archive-api.open-meteo.com/v1/archive?$QUERY"
 
-          echo "Período: $START_DATE a $END_DATE" | tee -a "$LOG"
+          POWER_URL="https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX%2CT2M_MIN%2CPRECTOTCORR&community=AG&longitude=-52.3376&latitude=-31.7654&start=$POWER_START&end=$POWER_END&format=JSON&time-standard=UTC"
+          POWER_BODY="history-fallback-diagnostic/nasa-power.json"
+          POWER_METRICS="$(curl --silent --show-error --location --compressed --max-time 60 \
+            --user-agent 'MOBI-Tempo-Pelotas/1.0 (+https://agenciamobi.com.br)' \
+            --output "$POWER_BODY" \
+            --write-out '%{http_code}|%{time_total}|%{content_type}' \
+            "$POWER_URL" || echo '000|60|')"
+          printf '%-30s %s\n' "nasa-power" "$POWER_METRICS" | tee -a "$LOG"
+          if [[ "${POWER_METRICS%%|*}" == "200" ]]; then
+            jq -r '
+              .properties.parameter as $p |
+              ($p.T2M_MAX | to_entries | map(select(.value != -999))) as $max |
+              ($p.T2M_MIN | to_entries | map(select(.value != -999))) as $min |
+              ($p.PRECTOTCORR | to_entries | map(select(.value != -999))) as $rain |
+              "max_validos=\($max | length), min_validos=\($min | length), chuva_valida=\($rain | length), primeiro=\($max[0].key // \"—\"), ultimo=\($max[-1].key // \"—\")"
+            ' "$POWER_BODY" | tee -a "$LOG"
+            jq -r '.header, .parameters' "$POWER_BODY" > history-fallback-diagnostic/nasa-power-metadata.json
+          else
+            head -c 1200 "$POWER_BODY" | tee -a "$LOG" || true
+            echo | tee -a "$LOG"
+          fi
+
+          echo "Open-Meteo: $START_DATE a $END_DATE" | tee -a "$LOG"
+          echo "NASA POWER solicitado: $POWER_START a $POWER_END" | tee -a "$LOG"
 
       - name: Publicar diagnóstico
         if: always()
