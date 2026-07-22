@@ -190,7 +190,11 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
                 <span>{hour.time}</span>
                 <WeatherIcon name={hour.icon} />
                 <strong>{hour.temperature}°</strong>
-                <small>{hour.precipitationProbability}% de chuva</small>
+                <small>
+                  {hour.precipitationProbability === null
+                    ? "Probabilidade não informada"
+                    : `${hour.precipitationProbability}% de chuva`}
+                </small>
               </article>
             ))}
           </div>
@@ -245,9 +249,17 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
                   <span>{day.date}</span>
                 </div>
                 <WeatherIcon name={day.icon} />
-                <span>{day.rainChance}% chuva</span>
+                <span>
+                  {day.rainChance === null
+                    ? "Chuva: probabilidade não informada"
+                    : `${day.rainChance}% chuva`}
+                </span>
                 <span>{day.precipitationMm} mm</span>
-                <span>Rajadas {day.windGust} km/h</span>
+                <span>
+                  {day.windGust === null
+                    ? "Rajadas não informadas"
+                    : `Rajadas ${day.windGust} km/h`}
+                </span>
                 <strong>
                   {day.min}° / {day.max}°
                 </strong>

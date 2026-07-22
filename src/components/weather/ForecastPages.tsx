@@ -181,7 +181,7 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
           </strong>
           <small>
             {today
-              ? `${today.rainChance}% de chance de chuva · ${today.precipitationMm} mm previstos`
+              ? `${today.rainChance === null ? "Probabilidade de chuva não informada" : `${today.rainChance}% de chance de chuva`} · ${today.precipitationMm} mm previstos`
               : "Previsão diária em atualização"}
           </small>
         </div>
@@ -261,7 +261,11 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
                 <span>{hour.time}</span>
                 <WeatherIcon name={hour.icon} />
                 <strong>{hour.temperature}°</strong>
-                <small>{hour.precipitationProbability}% chuva</small>
+                <small>
+                  {hour.precipitationProbability === null
+                    ? "Probabilidade não informada"
+                    : `${hour.precipitationProbability}% chuva`}
+                </small>
                 <small>{hour.windSpeed} km/h de vento</small>
               </article>
             ))}
@@ -323,12 +327,20 @@ export function SevenDayForecastPage({ data }: { data: WeatherIntelligenceData }
 
   const minimum = Math.min(...weather.daily.map((day) => day.min));
   const maximum = Math.max(...weather.daily.map((day) => day.max));
-  const rainiestDay = weather.daily.reduce((current, day) =>
-    day.rainChance > current.rainChance ? day : current,
-  );
-  const windiestDay = weather.daily.reduce((current, day) =>
-    day.windGust > current.windGust ? day : current,
-  );
+  const daysWithRainProbability = weather.daily.filter((day) => day.rainChance !== null);
+  const rainiestDay =
+    daysWithRainProbability.length > 0
+      ? daysWithRainProbability.reduce((current, day) =>
+          (day.rainChance ?? -1) > (current.rainChance ?? -1) ? day : current,
+        )
+      : null;
+  const daysWithGust = weather.daily.filter((day) => day.windGust !== null);
+  const windiestDay =
+    daysWithGust.length > 0
+      ? daysWithGust.reduce((current, day) =>
+          (day.windGust ?? -1) > (current.windGust ?? -1) ? day : current,
+        )
+      : null;
 
   return (
     <div className="forecast-page">
@@ -348,13 +360,21 @@ export function SevenDayForecastPage({ data }: { data: WeatherIntelligenceData }
         </article>
         <article>
           <span>Maior chance de chuva</span>
-          <strong>{rainiestDay.rainChance}%</strong>
-          <small>{rainiestDay.weekday}</small>
+          <strong>
+            {rainiestDay?.rainChance === null || !rainiestDay
+              ? "Não informada"
+              : `${rainiestDay.rainChance}%`}
+          </strong>
+          <small>{rainiestDay?.weekday ?? "Fonte sem probabilidade"}</small>
         </article>
         <article>
           <span>Rajada mais forte</span>
-          <strong>{windiestDay.windGust} km/h</strong>
-          <small>{windiestDay.weekday}</small>
+          <strong>
+            {windiestDay?.windGust === null || !windiestDay
+              ? "Não informada"
+              : `${windiestDay.windGust} km/h`}
+          </strong>
+          <small>{windiestDay?.weekday ?? "Fonte sem rajadas"}</small>
         </article>
       </section>
 
@@ -382,13 +402,19 @@ export function SevenDayForecastPage({ data }: { data: WeatherIntelligenceData }
               </span>
               <div className="forecast-day-data">
                 <span>
-                  <Droplets aria-hidden="true" /> {day.rainChance}% de chuva
+                  <Droplets aria-hidden="true" />{" "}
+                  {day.rainChance === null
+                    ? "Probabilidade não informada"
+                    : `${day.rainChance}% de chuva`}
                 </span>
                 <span>{day.precipitationMm} mm previstos</span>
               </div>
               <div className="forecast-day-data">
                 <span>
-                  <Wind aria-hidden="true" /> Rajadas de {day.windGust} km/h
+                  <Wind aria-hidden="true" />{" "}
+                  {day.windGust === null
+                    ? "Rajadas não informadas"
+                    : `Rajadas de ${day.windGust} km/h`}
                 </span>
               </div>
               <strong className="forecast-day-temperature">

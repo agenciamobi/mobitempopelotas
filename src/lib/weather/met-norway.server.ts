@@ -44,7 +44,7 @@ const metNorwaySchema = z.object({
                   air_temperature: finiteNumber,
                   relative_humidity: finiteNumber.optional(),
                   air_pressure_at_sea_level: finiteNumber.optional(),
-                  wind_speed: finiteNumber.optional(),
+                  wind_speed: finiteNumber,
                   wind_speed_of_gust: finiteNumber.optional(),
                   wind_from_direction: finiteNumber.optional(),
                 })
@@ -206,13 +206,8 @@ function metersPerSecondToKilometersPerHour(value: number | undefined) {
 }
 
 function precipitationProbability(point: MetPoint) {
-  const period = pointPeriod(point);
-  const explicit = period?.details?.probability_of_precipitation;
-  if (explicit !== undefined) return Math.max(0, Math.min(100, Math.round(explicit)));
-
-  const amount = period?.details?.precipitation_amount ?? 0;
-  const presentation = pointPresentation(point);
-  return amount > 0 || presentation.severity >= 4 ? 100 : 0;
+  const explicit = pointPeriod(point)?.details?.probability_of_precipitation;
+  return explicit === undefined ? null : Math.max(0, Math.min(100, Math.round(explicit)));
 }
 
 function precipitationAmount(point: MetPoint) {
@@ -223,8 +218,8 @@ function normalizeHourly(points: MetPoint[]): HourlyForecast[] {
   return points.slice(0, 7).map((point, index) => {
     const details = point.data.instant.details;
     const presentation = pointPresentation(point);
-    const windSpeed = metersPerSecondToKilometersPerHour(details.wind_speed) ?? 0;
-    const windGust = metersPerSecondToKilometersPerHour(details.wind_speed_of_gust) ?? windSpeed;
+    const windSpeed = Math.round(details.wind_speed * 3.6);
+    const windGust = metersPerSecondToKilometersPerHour(details.wind_speed_of_gust);
 
     return {
       time: index === 0 ? "Agora" : `${formatClock(point.time).slice(0, 2)}h`,
@@ -258,13 +253,13 @@ function normalizeDaily(points: MetPoint[]): DailyForecast[] {
     if (!group) continue;
 
     const details = point.data.instant.details;
-    const windSpeed = metersPerSecondToKilometersPerHour(details.wind_speed) ?? 0;
-    const windGust = metersPerSecondToKilometersPerHour(details.wind_speed_of_gust) ?? windSpeed;
+    const windGust = metersPerSecondToKilometersPerHour(details.wind_speed_of_gust);
+    const probability = precipitationProbability(point);
 
     group.temperatures.push(details.air_temperature);
     group.precipitation += precipitationAmount(point);
-    group.probabilities.push(precipitationProbability(point));
-    group.windGusts.push(windGust);
+    if (probability !== null) group.probabilities.push(probability);
+    if (windGust !== null) group.windGusts.push(windGust);
     group.presentations.push(pointPresentation(point));
   }
 
@@ -279,9 +274,9 @@ function normalizeDaily(points: MetPoint[]): DailyForecast[] {
       date: formatDate(group.date),
       min: Math.round(Math.min(...group.temperatures)),
       max: Math.round(Math.max(...group.temperatures)),
-      rainChance: Math.max(...group.probabilities, 0),
+      rainChance: group.probabilities.length > 0 ? Math.max(...group.probabilities) : null,
       precipitationMm: Number(group.precipitation.toFixed(1)),
-      windGust: Math.max(...group.windGusts, 0),
+      windGust: group.windGusts.length > 0 ? Math.max(...group.windGusts) : null,
       icon: presentation.icon,
     };
   });
@@ -347,7 +342,7 @@ export async function fetchMetNorwayWeather(): Promise<WeatherHomeData> {
             ? null
             : Math.round(details.air_pressure_at_sea_level),
         windSpeed,
-        windGust: windGust ?? windSpeed,
+        windGust,
         windDirection: degreesToCompass(details.wind_from_direction),
         visibilityKm: null,
         sunrise: null,

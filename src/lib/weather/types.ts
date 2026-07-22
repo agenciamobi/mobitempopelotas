@@ -30,9 +30,9 @@ export type CurrentWeather = {
 export type HourlyForecast = {
   time: string;
   temperature: number;
-  precipitationProbability: number;
+  precipitationProbability: number | null;
   windSpeed: number;
-  windGust: number;
+  windGust: number | null;
   icon: WeatherIconName;
 };
 
@@ -41,9 +41,9 @@ export type DailyForecast = {
   date: string;
   min: number;
   max: number;
-  rainChance: number;
+  rainChance: number | null;
   precipitationMm: number;
-  windGust: number;
+  windGust: number | null;
   icon: WeatherIconName;
 };
 

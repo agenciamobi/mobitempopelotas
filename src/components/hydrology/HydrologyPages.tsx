@@ -279,10 +279,11 @@ function LevelReading({ level }: { level: LaranjalLevelData }) {
 function WeatherWaterContext({ weather }: { weather: WeatherIntelligenceData }) {
   const current = weather.weather.current;
   const today = weather.weather.daily[0];
-  const maximumGust = Math.max(
-    current?.windGust ?? 0,
+  const gustValues = [
+    current?.windGust,
     ...weather.weather.hourly.map((hour) => hour.windGust),
-  );
+  ].filter((value): value is number => value !== null && value !== undefined);
+  const maximumGust = gustValues.length > 0 ? Math.max(...gustValues) : null;
 
   return (
     <section className="hydrology-weather-context" aria-labelledby="water-weather-title">
@@ -300,7 +301,11 @@ function WeatherWaterContext({ weather }: { weather: WeatherIntelligenceData }) 
           <span>Chuva prevista hoje</span>
           <strong>{today ? `${today.precipitationMm} mm` : "—"}</strong>
           <small>
-            {today ? `${today.rainChance}% de probabilidade` : "Previsão em atualização"}
+            {today
+              ? today.rainChance === null
+                ? "Probabilidade não informada pela fonte"
+                : `${today.rainChance}% de probabilidade`
+              : "Previsão em atualização"}
           </small>
         </article>
         <article>
@@ -316,7 +321,7 @@ function WeatherWaterContext({ weather }: { weather: WeatherIntelligenceData }) 
         <article>
           <Navigation aria-hidden="true" />
           <span>Maior rajada próxima</span>
-          <strong>{maximumGust} km/h</strong>
+          <strong>{maximumGust === null ? "—" : `${maximumGust} km/h`}</strong>
           <small>Vento pode deslocar água na lagoa</small>
         </article>
         <article>
