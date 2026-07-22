@@ -16,23 +16,50 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Verificar rotas publicadas
+      - name: Verificar fontes e rotas publicadas
         shell: bash
         run: |
           set -uo pipefail
           BASE_URL="https://mobitempopelotas.lovable.app"
-          LOG_FILE="smoke-production.log"
+          OPEN_METEO_URL="https://api.open-meteo.com/v1/forecast?latitude=-31.7654&longitude=-52.3376&timezone=America%2FSao_Paulo&forecast_days=7&current=temperature_2m%2Crelative_humidity_2m%2Capparent_temperature%2Cweather_code%2Cpressure_msl%2Cvisibility%2Cwind_speed_10m%2Cwind_gusts_10m%2Cwind_direction_10m%2Cis_day&hourly=temperature_2m%2Cprecipitation_probability%2Cwind_speed_10m%2Cwind_gusts_10m%2Cweather_code%2Cis_day&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_probability_max%2Cprecipitation_sum%2Cwind_gusts_10m_max%2Csunrise%2Csunset"
+          LOG_FILE="smoke-artifacts/smoke-production.log"
           FAILED=0
+          mkdir -p smoke-artifacts
+
+          echo "Smoke test iniciado em $(date -u +'%Y-%m-%dT%H:%M:%SZ')" | tee "$LOG_FILE"
+
+          source_metrics="$(curl --silent --show-error --max-time 20 \
+            --output smoke-artifacts/open-meteo.json \
+            --write-out '%{http_code}|%{time_total}' \
+            "$OPEN_METEO_URL" || echo '000|20')"
+          echo "Open-Meteo direto: $source_metrics" | tee -a "$LOG_FILE"
+          if [[ "${source_metrics%%|*}" != "200" ]]; then
+            echo "ERRO: Open-Meteo não respondeu diretamente" | tee -a "$LOG_FILE"
+            FAILED=1
+          elif ! jq -e '.current.temperature_2m != null and (.daily.time | length) > 0' smoke-artifacts/open-meteo.json >/dev/null; then
+            echo "ERRO: payload direto do Open-Meteo sem previsão utilizável" | tee -a "$LOG_FILE"
+            FAILED=1
+          else
+            echo "OK: Open-Meteo direto possui condições e previsão diária" | tee -a "$LOG_FILE"
+          fi
+
+          auth_metrics="$(curl --silent --show-error --max-time 15 \
+            --header 'Content-Type: application/json' \
+            --data '{\"publicId\":\"0a869e80-d9e8-11f0-ac7c-456d9a25fe9a\"}' \
+            --output smoke-artifacts/laranjal-auth.json \
+            --write-out '%{http_code}|%{time_total}' \
+            'https://tb.labhidrosens.com/api/auth/login/public' || echo '000|15')"
+          echo "LabHidroSens autenticação pública: $auth_metrics" | tee -a "$LOG_FILE"
 
           check_route() {
             local path="$1"
             local expected="$2"
-            local body
+            local slug="$3"
+            local body="smoke-artifacts/${slug}.html"
             local metrics
             local status
             local duration
 
-            body="$(mktemp)"
             metrics="$(curl -L --silent --show-error --max-time 40 \
               --output "$body" \
               --write-out '%{http_code}|%{time_total}' \
@@ -47,6 +74,8 @@ jobs:
               FAILED=1
             elif ! grep -Fq "$expected" "$body"; then
               echo "ERRO: conteúdo esperado não encontrado: $expected" | tee -a "$LOG_FILE"
+              echo "TÍTULO/H1 ENCONTRADO:" | tee -a "$LOG_FILE"
+              grep -Eo '<(title|h1)[^>]*>[^<]+' "$body" | head -n 6 | tee -a "$LOG_FILE" || true
               FAILED=1
             else
               echo "OK: conteúdo validado" | tee -a "$LOG_FILE"
@@ -56,19 +85,16 @@ jobs:
               echo "ERRO: Home entrou no estado de indisponibilidade total" | tee -a "$LOG_FILE"
               FAILED=1
             fi
-
-            rm -f "$body"
           }
 
-          echo "Smoke test iniciado em $(date -u +'%Y-%m-%dT%H:%M:%SZ')" | tee "$LOG_FILE"
-          check_route "/" "Tempo e águas em Pelotas"
-          check_route "/tempo-hoje-pelotas" "Previsão de hoje"
-          check_route "/previsao-7-dias-pelotas" "Previsão do tempo para os próximos 7 dias"
-          check_route "/chuva-em-pelotas" "Quando e quanto pode chover"
-          check_route "/vento-em-pelotas" "Velocidade, direção e rajadas previstas"
-          check_route "/alertas" "Alertas meteorológicos para Pelotas e região"
-          check_route "/situacao-hidrologica-pelotas" "Situação das águas no Laranjal"
-          check_route "/nivel-da-lagoa-dos-patos-laranjal" "Nível da Lagoa dos Patos na Estação Laranjal"
+          check_route "/" "Tempo e águas em Pelotas" "home"
+          check_route "/tempo-hoje-pelotas" "Previsão de hoje" "tempo-hoje"
+          check_route "/previsao-7-dias-pelotas" "Previsão do tempo para os próximos 7 dias" "sete-dias"
+          check_route "/chuva-em-pelotas" "Quando e quanto pode chover" "chuva"
+          check_route "/vento-em-pelotas" "Velocidade, direção e rajadas previstas" "vento"
+          check_route "/alertas" "Alertas meteorológicos para Pelotas e região" "alertas"
+          check_route "/situacao-hidrologica-pelotas" "Situação das águas no Laranjal" "aguas"
+          check_route "/nivel-da-lagoa-dos-patos-laranjal" "Nível da Lagoa dos Patos na Estação Laranjal" "nivel-laranjal"
 
           echo "Smoke test finalizado em $(date -u +'%Y-%m-%dT%H:%M:%SZ')" | tee -a "$LOG_FILE"
           exit "$FAILED"
@@ -78,6 +104,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: smoke-production-report
-          path: smoke-production.log
+          path: smoke-artifacts
           if-no-files-found: error
           retention-days: 2
