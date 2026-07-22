@@ -185,7 +185,7 @@ export function WeatherHistoryChart({ days }: WeatherHistoryChartProps) {
       </div>
 
       <div className="history-chart-controls">
-        <div className="history-chart-tabs" role="tablist" aria-label="Variável do gráfico">
+        <div className="history-chart-tabs" role="group" aria-label="Variável do gráfico">
           {(
             [
               ["temperature", "Temperatura"],
@@ -196,8 +196,7 @@ export function WeatherHistoryChart({ days }: WeatherHistoryChartProps) {
             <button
               key={value}
               type="button"
-              role="tab"
-              aria-selected={metric === value}
+              aria-pressed={metric === value}
               className={metric === value ? "is-active" : undefined}
               onClick={() => updateMetric(value)}
             >

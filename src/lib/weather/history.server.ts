@@ -212,7 +212,7 @@ export async function fetchPelotasWeatherHistory(): Promise<WeatherHistoryData> 
     }
 
     return {
-      status: days.length >= 25 ? "live" : "partial",
+      status: days.length === HISTORY_DAYS ? "live" : "partial",
       days,
       summary: buildSummary(days),
       source: {
@@ -223,7 +223,7 @@ export async function fetchPelotasWeatherHistory(): Promise<WeatherHistoryData> 
         periodEnd: days.at(-1)?.date ?? null,
       },
       error:
-        days.length >= 25
+        days.length === HISTORY_DAYS
           ? null
           : `A fonte retornou apenas ${days.length} dos ${HISTORY_DAYS} dias solicitados.`,
     };
