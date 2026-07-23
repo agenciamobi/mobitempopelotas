@@ -1,14 +1,15 @@
 # Capturas e verificações estruturais da homepage copiada da produção Vercel.
-# Execução temporária para comparar o transplante publicado nos mesmos viewports.
 name: Auditoria visual do transplante literal
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - agent/visual-exact-production
-      - agent/visual-exact-production-v2
+      - main
     paths:
+      - src/production/**
+      - src/routes/index.tsx
+      - src/components/layout/SiteLayout.tsx
       - scripts/visual-exact-production-audit.mjs
       - .github/workflows/visual-parity.yml
   pull_request:
