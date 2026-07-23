@@ -71,10 +71,7 @@ function markdownReport(results) {
     );
   }
 
-  lines.push(
-    "",
-    "As capturas PNG completas de cada ambiente e viewport estão no mesmo artefato.",
-  );
+  lines.push("", "As capturas PNG completas de cada ambiente e viewport estão no mesmo artefato.");
 
   return `${lines.join("\n")}\n`;
 }
@@ -87,51 +84,56 @@ async function auditPage(page, target, viewport) {
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.keyboard.press("Tab");
 
-  const audit = await page.evaluate(({ mobile, strictLayout }) => {
-    const root = document.documentElement;
-    const active = document.activeElement;
-    const skipLink = document.querySelector(".skip-link");
-    const skipRect = skipLink?.getBoundingClientRect() ?? null;
-    const mobileNavigation = document.querySelector(".production-mobile-navigation");
-    const footer = document.querySelector(".editorial-footer-shell");
-    const mobileNavigationStyle = mobileNavigation
-      ? window.getComputedStyle(mobileNavigation)
-      : null;
-    const footerStyle = footer ? window.getComputedStyle(footer) : null;
-    const navigationRect = mobileNavigation?.getBoundingClientRect() ?? null;
-    const navigationVisible = Boolean(
-      mobileNavigationStyle &&
+  const audit = await page.evaluate(
+    ({ mobile, strictLayout }) => {
+      const root = document.documentElement;
+      const active = document.activeElement;
+      const skipLink = document.querySelector(".skip-link");
+      const skipRect = skipLink?.getBoundingClientRect() ?? null;
+      const mobileNavigation = document.querySelector(".production-mobile-navigation");
+      const footer = document.querySelector(".editorial-footer-shell");
+      const mobileNavigationStyle = mobileNavigation
+        ? window.getComputedStyle(mobileNavigation)
+        : null;
+      const footerStyle = footer ? window.getComputedStyle(footer) : null;
+      const navigationRect = mobileNavigation?.getBoundingClientRect() ?? null;
+      const navigationVisible = Boolean(
+        mobileNavigationStyle &&
         mobileNavigationStyle.display !== "none" &&
         navigationRect &&
         navigationRect.height > 0,
-    );
-    const navigationHeight = navigationVisible && navigationRect ? navigationRect.height : 0;
-    const footerPaddingBottom = footerStyle ? Number.parseFloat(footerStyle.paddingBottom) || 0 : 0;
+      );
+      const navigationHeight = navigationVisible && navigationRect ? navigationRect.height : 0;
+      const footerPaddingBottom = footerStyle
+        ? Number.parseFloat(footerStyle.paddingBottom) || 0
+        : 0;
 
-    return {
-      title: document.title,
-      horizontalOverflow: Math.max(0, root.scrollWidth - root.clientWidth),
-      hasExplore: Boolean(document.querySelector("#explorar-portal")),
-      exploreHeading:
-        document.querySelector("#home-explore-portal-title")?.textContent?.trim() ?? null,
-      hasFooter: Boolean(footer),
-      skipLinkFocused: active === skipLink,
-      skipLinkVisible: Boolean(
-        skipRect &&
+      return {
+        title: document.title,
+        horizontalOverflow: Math.max(0, root.scrollWidth - root.clientWidth),
+        hasExplore: Boolean(document.querySelector("#explorar-portal")),
+        exploreHeading:
+          document.querySelector("#home-explore-portal-title")?.textContent?.trim() ?? null,
+        hasFooter: Boolean(footer),
+        skipLinkFocused: active === skipLink,
+        skipLinkVisible: Boolean(
+          skipRect &&
           skipRect.width > 0 &&
           skipRect.height > 0 &&
           skipRect.top >= 0 &&
           skipRect.left >= 0,
-      ),
-      navigationVisible,
-      navigationHeight,
-      footerPaddingBottom,
-      footerProtected:
-        mobile && strictLayout && navigationVisible
-          ? footerPaddingBottom >= navigationHeight
-          : null,
-    };
-  }, { mobile: viewport.mobile, strictLayout: target.strictLayout });
+        ),
+        navigationVisible,
+        navigationHeight,
+        footerPaddingBottom,
+        footerProtected:
+          mobile && strictLayout && navigationVisible
+            ? footerPaddingBottom >= navigationHeight
+            : null,
+      };
+    },
+    { mobile: viewport.mobile, strictLayout: target.strictLayout },
+  );
 
   const failures = [];
   if (audit.horizontalOverflow > 2) {
