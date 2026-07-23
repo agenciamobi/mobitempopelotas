@@ -64,11 +64,11 @@ export function Footer() {
           </div>
 
           <div className="editorial-footer-lead-aside">
-            <div className="editorial-footer-status">
+            <div className="editorial-footer-status" aria-label="Portal em operação">
               <span aria-hidden="true" />
               <div>
                 <small>Operação do portal</small>
-                <strong>Dados públicos consolidados</strong>
+                <strong>Fontes identificadas por seção</strong>
               </div>
             </div>
 
@@ -115,7 +115,7 @@ export function Footer() {
             <span>Fontes meteorológicas e locais</span>
             <p>
               Embrapa Clima Temperado · INMET · CPPMet/UFPel · Open-Meteo · REDEMET/DECEA ·
-              LabHidroSens/UFPel
+              LabHidroSens/UFPel · Nível Guaíba · FURG & Portos RS
             </p>
           </div>
 
