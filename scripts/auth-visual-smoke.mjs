@@ -66,7 +66,9 @@ try {
       if (!audit.hasLoginCard) throw new Error(`${route.name}: cartão editorial ausente.`);
       if (!audit.noindex) throw new Error(`${route.name}: meta robots não está como noindex.`);
       if (!audit.headingMatches) {
-        throw new Error(`${route.name}: título principal inesperado: ${audit.heading ?? "ausente"}.`);
+        throw new Error(
+          `${route.name}: título principal inesperado: ${audit.heading ?? "ausente"}.`,
+        );
       }
       if (audit.horizontalOverflow > 2) {
         throw new Error(`${route.name}: overflow horizontal de ${audit.horizontalOverflow}px.`);
