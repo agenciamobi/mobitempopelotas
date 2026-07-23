@@ -35,6 +35,7 @@ const footerGroups = [
       { label: "Estação Embrapa", href: "/estacao-embrapa-pelotas" },
       { label: "Histórico climático", href: "/historico-climatico-pelotas" },
       { label: "Metodologia e fontes", href: "/metodologia" },
+      { label: "Minha conta", href: "/minha-conta" },
     ],
   },
 ] as const;
@@ -183,6 +184,7 @@ export function SiteFooter({ source }: SiteFooterProps) {
 
           <nav className="editorial-footer__legal" aria-label="Transparência">
             <Link href="/metodologia">Metodologia</Link>
+            <Link href="/minha-conta">Conta e preferências</Link>
           </nav>
         </section>
 
