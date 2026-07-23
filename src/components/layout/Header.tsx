@@ -244,9 +244,7 @@ export function Header() {
                     type="button"
                     aria-expanded={isOpen}
                     aria-controls={`mega-menu-${menu.id}`}
-                    onClick={() =>
-                      setOpenMenu((current) => (current === menu.id ? null : menu.id))
-                    }
+                    onClick={() => setOpenMenu((current) => (current === menu.id ? null : menu.id))}
                     onFocus={() => setOpenMenu(menu.id)}
                   >
                     <span>{menu.label}</span>
