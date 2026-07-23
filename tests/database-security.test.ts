@@ -10,11 +10,7 @@ const serverOnlyTables = new Set([
 ]);
 
 function normalizeSql(sql: string) {
-  return sql
-    .replace(/--.*$/gm, " ")
-    .replace(/\s+/g, " ")
-    .trim()
-    .toLowerCase();
+  return sql.replace(/--.*$/gm, " ").replace(/\s+/g, " ").trim().toLowerCase();
 }
 
 async function readMigrations() {
@@ -87,18 +83,12 @@ test("descobre e examina todas as migrations SQL versionadas", async () => {
 
 test("perfis e preferências isolam cada conta com RLS e auth.uid", async () => {
   const migrations = await migrationsPromise;
-  const profiles = migration(
-    migrations,
-    "20260721091214_create_user_profiles.sql",
-  );
+  const profiles = migration(migrations, "20260721091214_create_user_profiles.sql");
   const secureProfileTrigger = migration(
     migrations,
     "20260721091245_secure_user_profile_trigger.sql",
   );
-  const preferences = migration(
-    migrations,
-    "20260721170503_create_user_preferences.sql",
-  );
+  const preferences = migration(migrations, "20260721170503_create_user_preferences.sql");
 
   assertIncludes(profiles, [
     "references auth.users(id) on delete cascade",
@@ -130,14 +120,8 @@ test("perfis e preferências isolam cada conta com RLS e auth.uid", async () => 
 
 test("snapshots e web push permanecem exclusivos do servidor", async () => {
   const migrations = await migrationsPromise;
-  const snapshots = migration(
-    migrations,
-    "20260723070000_create_weather_daily_snapshots.sql",
-  );
-  const push = migration(
-    migrations,
-    "20260723113000_create_web_push_subscriptions.sql",
-  );
+  const snapshots = migration(migrations, "20260723070000_create_weather_daily_snapshots.sql");
+  const push = migration(migrations, "20260723113000_create_web_push_subscriptions.sql");
 
   assertIncludes(snapshots, [
     "alter table public.weather_daily_snapshots enable row level security",
@@ -167,10 +151,7 @@ test("RPCs de conta exigem sessão e privilégios explícitos", async () => {
     migrations,
     "20260723105000_update_account_preferences_atomically.sql",
   );
-  const lgpd = migration(
-    migrations,
-    "20260723133000_add_account_lgpd_rights.sql",
-  );
+  const lgpd = migration(migrations, "20260723133000_add_account_lgpd_rights.sql");
 
   assertIncludes(atomicPreferences, [
     "security invoker set search_path = ''",
