@@ -1,4 +1,4 @@
-# Capturas e verificações estruturais reproduzíveis para a decisão final de cutover.
+# Rodada final publicada: rodapé claro, área segura móvel e paridade estrutural.
 name: Auditoria visual de paridade
 
 on:
