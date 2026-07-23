@@ -13,7 +13,7 @@ const PAGE_DESCRIPTION =
   "Leitura da Estação Laranjal, evolução recente da Lagoa dos Patos e contexto meteorológico e regional para Pelotas.";
 const PAGE_PATH = "/situacao-hidrologica-pelotas";
 
-export const Route = createFileRoute(PAGE_PATH)({
+export const Route = createFileRoute("/situacao-hidrologica-pelotas")({
   head: () =>
     createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
       createEditorialPageJsonLd({

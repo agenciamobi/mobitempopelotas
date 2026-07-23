@@ -10,7 +10,7 @@ const PAGE_DESCRIPTION =
   "Acompanhe produtos regionais da REDEMET/DECEA: radar meteorológico, imagens de satélite e ocorrências de trovoada próximas de Pelotas.";
 const PAGE_PATH = "/radar-e-satelite-pelotas";
 
-export const Route = createFileRoute(PAGE_PATH)({
+export const Route = createFileRoute("/radar-e-satelite-pelotas")({
   head: () =>
     createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
       createEditorialPageJsonLd({

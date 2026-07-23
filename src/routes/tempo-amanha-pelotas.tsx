@@ -10,7 +10,7 @@ const PAGE_DESCRIPTION =
   "Veja a previsão do tempo para amanhã em Pelotas, com máxima, mínima, chance de chuva, volume previsto e rajadas de vento.";
 const PAGE_PATH = "/tempo-amanha-pelotas";
 
-export const Route = createFileRoute(PAGE_PATH)({
+export const Route = createFileRoute("/tempo-amanha-pelotas")({
   head: () =>
     createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
       createEditorialPageJsonLd({

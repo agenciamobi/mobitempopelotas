@@ -10,7 +10,7 @@ const PAGE_DESCRIPTION =
   "Compare temperaturas máximas e mínimas, chuva e rajadas dos últimos 30 dias completos em Pelotas, com fonte e metodologia explícitas.";
 const PAGE_PATH = "/historico-climatico-pelotas";
 
-export const Route = createFileRoute(PAGE_PATH)({
+export const Route = createFileRoute("/historico-climatico-pelotas")({
   head: () =>
     createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
       createEditorialPageJsonLd({

@@ -10,7 +10,7 @@ const PAGE_DESCRIPTION =
   "Condições atuais e previsão por hora para hoje em Pelotas, com chuva, vento, temperatura e alertas oficiais.";
 const PAGE_PATH = "/tempo-hoje-pelotas";
 
-export const Route = createFileRoute(PAGE_PATH)({
+export const Route = createFileRoute("/tempo-hoje-pelotas")({
   head: () =>
     createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
       createEditorialPageJsonLd({

@@ -10,7 +10,7 @@ const PAGE_DESCRIPTION =
   "Temperatura, umidade, pressão, vento, extremos e chuva acumulada consultados na Estação da Embrapa Clima Temperado em Pelotas.";
 const PAGE_PATH = "/estacao-embrapa-pelotas";
 
-export const Route = createFileRoute(PAGE_PATH)({
+export const Route = createFileRoute("/estacao-embrapa-pelotas")({
   head: () =>
     createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
       createEditorialPageJsonLd({

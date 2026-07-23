@@ -10,7 +10,7 @@ const PAGE_DESCRIPTION =
   "Avisos meteorológicos oficiais do INMET para Pelotas e região, organizados por severidade e período.";
 const PAGE_PATH = "/alertas";
 
-export const Route = createFileRoute(PAGE_PATH)({
+export const Route = createFileRoute("/alertas")({
   head: () =>
     createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
       createEditorialPageJsonLd({

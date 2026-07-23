@@ -12,7 +12,7 @@ const PAGE_DESCRIPTION =
   "Origem dos dados meteorológicos e hidrológicos, estado das integrações, critérios de validação, contingências e limites do Tempo Pelotas.";
 const PAGE_PATH = "/metodologia";
 
-export const Route = createFileRoute(PAGE_PATH)({
+export const Route = createFileRoute("/metodologia")({
   head: () =>
     createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
       createEditorialPageJsonLd({

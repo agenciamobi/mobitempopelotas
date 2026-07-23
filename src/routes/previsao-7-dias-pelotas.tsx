@@ -10,7 +10,7 @@ const PAGE_DESCRIPTION =
   "Previsão meteorológica para os próximos sete dias em Pelotas, com temperaturas, chuva, vento e contexto regional.";
 const PAGE_PATH = "/previsao-7-dias-pelotas";
 
-export const Route = createFileRoute(PAGE_PATH)({
+export const Route = createFileRoute("/previsao-7-dias-pelotas")({
   head: () =>
     createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
       createEditorialPageJsonLd({

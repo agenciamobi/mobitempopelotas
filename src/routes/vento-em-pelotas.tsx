@@ -10,7 +10,7 @@ const PAGE_DESCRIPTION =
   "Velocidade, direção e rajadas de vento previstas para Pelotas nas próximas horas e nos próximos sete dias.";
 const PAGE_PATH = "/vento-em-pelotas";
 
-export const Route = createFileRoute(PAGE_PATH)({
+export const Route = createFileRoute("/vento-em-pelotas")({
   head: () =>
     createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
       createEditorialPageJsonLd({

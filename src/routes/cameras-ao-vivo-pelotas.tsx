@@ -11,7 +11,7 @@ const PAGE_DESCRIPTION =
   "Acompanhe a câmera da Praia do Laranjal, transmissões públicas recentes e pontos previstos de observação visual em Pelotas.";
 const PAGE_PATH = "/cameras-ao-vivo-pelotas";
 
-export const Route = createFileRoute(PAGE_PATH)({
+export const Route = createFileRoute("/cameras-ao-vivo-pelotas")({
   head: () =>
     createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
       createEditorialPageJsonLd({

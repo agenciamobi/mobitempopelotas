@@ -10,7 +10,7 @@ const PAGE_DESCRIPTION =
   "Previsão de chuva por hora, probabilidade e volume acumulado previsto para Pelotas nos próximos sete dias.";
 const PAGE_PATH = "/chuva-em-pelotas";
 
-export const Route = createFileRoute(PAGE_PATH)({
+export const Route = createFileRoute("/chuva-em-pelotas")({
   head: () =>
     createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
       createEditorialPageJsonLd({
