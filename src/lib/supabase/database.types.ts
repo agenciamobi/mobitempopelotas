@@ -6,6 +6,36 @@ export type Database = {
   };
   public: {
     Tables: {
+      account_consent_events: {
+        Row: {
+          channel: string;
+          created_at: string;
+          granted: boolean;
+          id: number;
+          policy_version: string;
+          source: string;
+          user_id: string;
+        };
+        Insert: {
+          channel: string;
+          created_at?: string;
+          granted: boolean;
+          id?: never;
+          policy_version: string;
+          source?: string;
+          user_id: string;
+        };
+        Update: {
+          channel?: string;
+          created_at?: string;
+          granted?: boolean;
+          id?: never;
+          policy_version?: string;
+          source?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           avatar_url: string | null;
@@ -113,6 +143,7 @@ export type Database = {
           topics: string[];
           updated_at: string;
           user_agent: string | null;
+          user_id: string | null;
         };
         Insert: {
           auth: string;
@@ -124,6 +155,7 @@ export type Database = {
           topics?: string[];
           updated_at?: string;
           user_agent?: string | null;
+          user_id?: string | null;
         };
         Update: {
           auth?: string;
@@ -135,6 +167,7 @@ export type Database = {
           topics?: string[];
           updated_at?: string;
           user_agent?: string | null;
+          user_id?: string | null;
         };
         Relationships: [];
       };
@@ -219,6 +252,7 @@ export type Database = {
   };
 };
 
+export type AccountConsentEvent = Database["public"]["Tables"]["account_consent_events"]["Row"];
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type UserPreferences = Database["public"]["Tables"]["user_preferences"]["Row"];
 export type WebPushDispatch = Database["public"]["Tables"]["web_push_dispatches"]["Row"];
