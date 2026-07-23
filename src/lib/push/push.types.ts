@@ -20,7 +20,7 @@ export type PushPayload = {
   urgency?: "very-low" | "low" | "normal" | "high";
   requireInteraction?: boolean;
   renotify?: boolean;
-  topic?: PushTopic;
+  topic: PushTopic;
 };
 
 export type PushDeliveryResult = {
