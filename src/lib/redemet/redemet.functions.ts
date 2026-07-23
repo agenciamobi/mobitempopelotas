@@ -2,11 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { setResponseHeaders } from "@tanstack/react-start/server";
 
 import { withRedemetLastGood } from "./redemet-last-good.server";
-import {
-  fetchRedemetRadar,
-  fetchRedemetSatellite,
-  fetchRedemetStorms,
-} from "./redemet.server";
+import { fetchRedemetRadar, fetchRedemetSatellite, fetchRedemetStorms } from "./redemet.server";
 import type { RedemetOverview } from "./redemet.types";
 
 export const getRedemetOverview = createServerFn({ method: "GET" }).handler(
