@@ -14,10 +14,7 @@ export const Route = createFileRoute("/")({
       "/",
     ),
   loader: async () => {
-    const [weather, laranjal] = await Promise.all([
-      getWeatherIntelligence(),
-      getLaranjalLevel(),
-    ]);
+    const [weather, laranjal] = await Promise.all([getWeatherIntelligence(), getLaranjalLevel()]);
 
     return { weather, laranjal };
   },
