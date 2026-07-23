@@ -2,19 +2,12 @@ name: Runtime Lovable
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - agent/redemet-home-methodology-runtime
-      - agent/hydrology-runtime-smoke
-  pull_request:
-    branches:
-      - main
 
 permissions:
   contents: read
 
 concurrency:
-  group: runtime-lovable-${{ github.ref }}
+  group: runtime-lovable-production
   cancel-in-progress: true
 
 jobs:
