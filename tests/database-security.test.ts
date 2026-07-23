@@ -56,13 +56,10 @@ function statements(sql: string) {
 }
 
 function hasExpectedAccountGuard(statement: string, ownerColumn: string) {
-  const compact = statement
-    .replace(/\s+/g, "")
-    .replace(/\(selectauth\.uid\(\)\)/g, "auth.uid()");
+  const compact = statement.replace(/\s+/g, "").replace(/\(selectauth\.uid\(\)\)/g, "auth.uid()");
 
   return (
-    compact.includes(`auth.uid()=${ownerColumn}`) ||
-    compact.includes(`${ownerColumn}=auth.uid()`)
+    compact.includes(`auth.uid()=${ownerColumn}`) || compact.includes(`${ownerColumn}=auth.uid()`)
   );
 }
 
@@ -119,14 +116,15 @@ function assertNoClientGrantOnServerOnlyTables(sql: string) {
 
     const exposedTables = targetClause
       .split(",")
-      .map((target) => target.trim().replace(/^public\./, "").replaceAll('"', ""))
+      .map((target) =>
+        target
+          .trim()
+          .replace(/^public\./, "")
+          .replaceAll('"', ""),
+      )
       .filter((table) => serverOnlyTables.has(table));
 
-    assert.deepEqual(
-      exposedTables,
-      [],
-      `Grant de cliente expõe tabelas server-only: ${statement}`,
-    );
+    assert.deepEqual(exposedTables, [], `Grant de cliente expõe tabelas server-only: ${statement}`);
   }
 }
 
@@ -144,7 +142,8 @@ function collectFunctionDefinitions(migrations: Map<string, string>, functionNam
 
       const delimiter = delimiterMatch[1];
       assert.ok(delimiter);
-      const opening = start + (delimiterMatch.index ?? 0) + delimiterMatch[0].lastIndexOf(delimiter);
+      const opening =
+        start + (delimiterMatch.index ?? 0) + delimiterMatch[0].lastIndexOf(delimiter);
       const closing = sql.indexOf(delimiter, opening + delimiter.length);
       assert.ok(closing >= 0, `Corpo da função ${functionName} incompleto em ${filename}`);
 
