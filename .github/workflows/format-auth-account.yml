@@ -1,0 +1,60 @@
+name: Formatar lote de autenticação
+
+on:
+  push:
+    branches:
+      - agent/auth-account-lgpd
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: format-auth-account-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format:
+    name: Aplicar Prettier
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Formatar arquivos do lote
+        run: |
+          npx prettier --write \
+            src/components/auth/AuthAccountAction.tsx \
+            src/components/auth/AccountPage.tsx \
+            src/components/auth/GoogleLoginCard.tsx \
+            src/lib/auth/account.functions.ts \
+            src/lib/auth/paths.ts \
+            src/lib/supabase/request-client.server.ts \
+            src/routes/auth/callback.ts \
+            src/routes/auth/signout.ts \
+            src/routes/entrar.tsx \
+            src/routes/minha-conta.tsx \
+            docs/auth-account.md
+
+      - name: Versionar formatação
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/auth src/lib/auth src/lib/supabase/request-client.server.ts src/routes/auth src/routes/entrar.tsx src/routes/minha-conta.tsx docs/auth-account.md
+          if git diff --cached --quiet; then
+            echo "Arquivos já estão formatados."
+          else
+            git commit -m "style: normaliza lote de autenticação"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
