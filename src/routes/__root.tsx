@@ -10,6 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { SiteLayout } from "@/components/layout/SiteLayout";
+import { PushNotificationsManager } from "@/components/pwa/PushNotificationsManager";
 import { PwaManager } from "@/components/pwa/PwaManager";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 import {
@@ -142,6 +143,7 @@ function RootComponent() {
       <SiteLayout>
         <Outlet />
       </SiteLayout>
+      <PushNotificationsManager />
       <PwaManager />
     </QueryClientProvider>
   );
