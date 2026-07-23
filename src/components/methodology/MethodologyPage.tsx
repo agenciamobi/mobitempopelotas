@@ -12,6 +12,7 @@ import {
   FileCheck2,
   Gauge,
   Info,
+  Radar,
   Radio,
   RefreshCw,
   Scale,
@@ -22,6 +23,7 @@ import {
 } from "lucide-react";
 
 import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
+import type { RedemetOverview } from "@/lib/redemet/redemet.types";
 import type { WeatherSourceHealthStatus } from "@/lib/weather/aggregated-weather.types";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 
@@ -30,6 +32,7 @@ import "./MethodologyPage.css";
 type MethodologyPageProps = {
   weather: WeatherIntelligenceData;
   level: LaranjalLevelData;
+  redemet: RedemetOverview;
 };
 
 type SourceDisplayStatus = WeatherSourceHealthStatus | LaranjalLevelData["status"];
@@ -110,7 +113,42 @@ function formatDateTime(value: string | null) {
   }).format(date);
 }
 
-function createSourceCards(weather: WeatherIntelligenceData, level: LaranjalLevelData) {
+function redemetSourceCard(redemet: RedemetOverview): SourceCard {
+  const products = [redemet.radar, redemet.satellite, redemet.storms];
+  const configured = products.filter((source) => source.configured).length;
+  const available = products.filter((source) => source.available).length;
+  const timestamps = products
+    .map((source) => new Date(source.updatedAt).getTime())
+    .filter(Number.isFinite);
+  const fetchedAt = timestamps.length
+    ? new Date(Math.max(...timestamps)).toISOString()
+    : new Date().toISOString();
+  const status: SourceDisplayStatus =
+    available === products.length ? "live" : available > 0 ? "partial" : "unavailable";
+
+  return {
+    id: "redemet",
+    name: "Radar, satélite e trovoadas",
+    organization: "REDEMET / DECEA",
+    role: "Observação meteorológica regional",
+    description:
+      available > 0
+        ? `${available} de ${products.length} produtos responderam nesta consulta. Radar e satélite são exibidos como observação complementar; STSC informa ocorrências de trovoada sem classificar risco local.`
+        : configured === products.length
+          ? "A integração está configurada no servidor, mas os produtos não entregaram quadros utilizáveis nesta consulta. Nenhuma imagem ou ocorrência é estimada pelo portal."
+          : "A integração server-side está preparada, mas ainda não foi reconhecida integralmente pelo ambiente de execução.",
+    status,
+    fetchedAt,
+    url: "https://redemet.decea.mil.br/",
+    icon: Radar,
+  };
+}
+
+function createSourceCards(
+  weather: WeatherIntelligenceData,
+  level: LaranjalLevelData,
+  redemet: RedemetOverview,
+) {
   const sourceHealth = weather.weather.sources;
   const forecastProvider = weather.weather.quality.forecastProvider ?? "Open-Meteo / MET Norway";
   const usesMetNorway = forecastProvider.toLocaleLowerCase("pt-BR").includes("norway");
@@ -152,6 +190,7 @@ function createSourceCards(weather: WeatherIntelligenceData, level: LaranjalLeve
       url: "https://wp.ufpel.edu.br/cppmet/",
       icon: Radio,
     },
+    redemetSourceCard(redemet),
     {
       id: "forecast",
       name: forecastProvider,
@@ -190,8 +229,8 @@ function StatusIcon({ status }: { status: SourceDisplayStatus }) {
   return <Info aria-hidden="true" />;
 }
 
-export function MethodologyPage({ weather, level }: MethodologyPageProps) {
-  const cards = createSourceCards(weather, level);
+export function MethodologyPage({ weather, level, redemet }: MethodologyPageProps) {
+  const cards = createSourceCards(weather, level, redemet);
   const operationalSources = cards.filter((source) => source.status === "live").length;
   const degradedSources = cards.filter(
     (source) => source.status === "partial" || source.status === "stale",
@@ -228,9 +267,9 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
           <p className="methodology-kicker">Transparência operacional</p>
           <h1>De onde vêm os dados do Tempo Pelotas</h1>
           <p className="methodology-lead">
-            O portal combina medições locais, alertas oficiais e modelos de previsão. Esta página
-            mostra a função de cada fonte, como os dados são verificados e quais limites precisam
-            ser considerados antes de tomar decisões.
+            O portal combina medições locais, alertas oficiais, observação regional e modelos de
+            previsão. Esta página mostra a função de cada fonte, como os dados são verificados e quais
+            limites precisam ser considerados antes de tomar decisões.
           </p>
         </div>
 
@@ -330,8 +369,8 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
             <FileCheck2 aria-hidden="true" />
             <h3>Normalização</h3>
             <p>
-              Datas, unidades e campos são convertidos para um contrato comum sem preencher o que
-              não existe.
+              Datas, unidades e campos são convertidos para um contrato comum sem preencher o que não
+              existe.
             </p>
           </li>
           <li>
@@ -412,8 +451,8 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
             <Sparkles aria-hidden="true" />
             <h3>Interpretação</h3>
             <p>
-              É o texto que organiza os dados para leitura rápida. A síntese não substitui os
-              números, os avisos oficiais nem a avaliação de profissionais responsáveis.
+              É o texto que organiza os dados para leitura rápida. A síntese não substitui os números,
+              os avisos oficiais nem a avaliação de profissionais responsáveis.
             </p>
           </article>
         </div>
@@ -428,8 +467,8 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
           </h2>
           <p>
             O Tempo Pelotas não determina evacuações, não garante que uma rua irá alagar e não
-            consegue assegurar disponibilidade contínua de sistemas externos. Em risco iminente,
-            siga a Defesa Civil, o INMET, órgãos municipais e demais autoridades responsáveis.
+            consegue assegurar disponibilidade contínua de sistemas externos. Em risco iminente, siga
+            a Defesa Civil, o INMET, órgãos municipais e demais autoridades responsáveis.
           </p>
         </div>
       </section>
@@ -442,6 +481,9 @@ export function MethodologyPage({ weather, level }: MethodologyPageProps) {
         <div>
           <Link className="methodology-primary-action" to="/tempo-hoje-pelotas">
             Previsão de hoje <ArrowRight aria-hidden="true" />
+          </Link>
+          <Link className="methodology-secondary-action" to="/radar-e-satelite-pelotas">
+            Radar e satélite
           </Link>
           <Link className="methodology-secondary-action" to="/situacao-hidrologica-pelotas">
             Situação das águas
