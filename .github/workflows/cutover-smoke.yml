@@ -1,3 +1,4 @@
+# Validação manual e auditável do domínio público antes e depois do cutover.
 name: Smoke test de cutover
 
 on:
