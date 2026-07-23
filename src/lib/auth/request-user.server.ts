@@ -9,6 +9,13 @@ export type VerifiedRequestUser = {
   responseHeaders: Headers;
 };
 
+function isMissingSessionError(error: { name?: string; message?: string }) {
+  return (
+    error.name === "AuthSessionMissingError" ||
+    error.message?.toLowerCase().includes("auth session missing") === true
+  );
+}
+
 export async function getVerifiedRequestUser(request: Request): Promise<VerifiedRequestUser> {
   const config = getSupabaseServerConfig();
   if (!config.isPublicConfigured) {
@@ -18,7 +25,10 @@ export async function getVerifiedRequestUser(request: Request): Promise<Verified
   const { client, responseHeaders } = createSupabaseRequestClient(request);
   const {
     data: { user },
+    error,
   } = await client.auth.getUser();
+
+  if (error && !isMissingSessionError(error)) throw error;
 
   return {
     configured: true,
