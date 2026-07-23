@@ -9,6 +9,7 @@ import type { RedemetOverview } from "@/lib/redemet/redemet.types";
 import type { WeatherSourceKey } from "@/lib/weather/aggregated-weather.types";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 
+import { HomeExplorePortal } from "./HomeExplorePortal";
 import { HomeForecastStory } from "./HomeForecastStory";
 import { HomeLocalMonitoring } from "./HomeLocalMonitoring";
 import { HomeOperationalNavigation } from "./HomeOperationalNavigation";
@@ -173,6 +174,8 @@ export function WeatherHome({
           ? ` Fontes com restrição: ${degradedSources.map((source) => sourceLabels[source]).join(", ")}.`
           : " Todas as fontes meteorológicas prioritárias responderam dentro dos critérios operacionais."}
       </p>
+
+      <HomeExplorePortal />
     </div>
   );
 }
