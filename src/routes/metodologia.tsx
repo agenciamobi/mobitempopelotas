@@ -4,15 +4,22 @@ import { MethodologyPage } from "@/components/methodology/MethodologyPage";
 import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
 import { createPageHead } from "@/lib/page-meta";
 import { getRedemetOverview } from "@/lib/redemet/redemet.functions";
+import { createBreadcrumbListJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
+
+const PAGE_TITLE = "Metodologia e fontes do Tempo Pelotas";
+const PAGE_DESCRIPTION =
+  "Origem dos dados meteorológicos e hidrológicos, estado das integrações, critérios de validação, contingências e limites do Tempo Pelotas.";
+const PAGE_PATH = "/metodologia";
 
 export const Route = createFileRoute("/metodologia")({
   head: () =>
-    createPageHead(
-      "Metodologia e fontes do Tempo Pelotas",
-      "Origem dos dados meteorológicos e hidrológicos, estado das integrações, critérios de validação, contingências e limites do Tempo Pelotas.",
-      "/metodologia",
-    ),
+    createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
+      createBreadcrumbListJsonLd([
+        { name: "Início", path: "/" },
+        { name: "Metodologia e fontes", path: PAGE_PATH },
+      ]),
+    ]),
   loader: async () => {
     const [weather, level, redemet] = await Promise.all([
       getWeatherIntelligence(),

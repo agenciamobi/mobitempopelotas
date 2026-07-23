@@ -1,6 +1,12 @@
 import { absoluteUrl, SITE_NAME, SOCIAL_IMAGE_URL } from "./site-config";
+import { createStructuredDataScripts } from "./structured-data";
 
-export function createPageHead(title: string, description: string, canonicalPath: string) {
+export function createPageHead(
+  title: string,
+  description: string,
+  canonicalPath: string,
+  structuredData: readonly unknown[] = [],
+) {
   const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
   const canonicalUrl = absoluteUrl(canonicalPath);
 
@@ -23,5 +29,6 @@ export function createPageHead(title: string, description: string, canonicalPath
       { name: "twitter:image", content: SOCIAL_IMAGE_URL },
     ],
     links: [{ rel: "canonical", href: canonicalUrl }],
+    ...(structuredData.length > 0 ? { scripts: createStructuredDataScripts(structuredData) } : {}),
   };
 }
