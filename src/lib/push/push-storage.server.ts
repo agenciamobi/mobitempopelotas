@@ -73,10 +73,11 @@ export async function savePushSubscription(
   subscription: StoredPushSubscription,
   userAgent: string | null,
   topics: readonly PushTopic[],
-  userId: string | null = null,
+  userId?: string | null,
 ) {
   const client = requirePushStorage();
   const now = new Date().toISOString();
+  const accountFields = userId === undefined ? {} : { user_id: userId };
   const { error } = await client
     .from("web_push_subscriptions")
     .upsert(
@@ -86,7 +87,7 @@ export async function savePushSubscription(
         p256dh: subscription.keys.p256dh,
         auth: subscription.keys.auth,
         user_agent: userAgent?.slice(0, 500) ?? null,
-        user_id: userId,
+        ...accountFields,
         topics: normalizeTopics(topics),
         updated_at: now,
         last_seen_at: now,
