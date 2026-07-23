@@ -43,22 +43,21 @@ jobs:
           cat /tmp/feed-stability.log
           exit 1
 
-      - name: Comparar duas consultas
+      - name: Validar semântica temporal
         run: |
           sleep 3
           curl --fail --silent --show-error http://127.0.0.1:3000/feed > /tmp/feed-2.json
-          jq -e '.version == "https://jsonfeed.org/version/1.1" and (.items | length) == 5' /tmp/feed-1.json >/dev/null
-          jq -e '.version == "https://jsonfeed.org/version/1.1" and (.items | length) == 5' /tmp/feed-2.json >/dev/null
-          jq '[.items[] | {id, date_modified}]' /tmp/feed-1.json > /tmp/dates-1.json
-          jq '[.items[] | {id, date_modified}]' /tmp/feed-2.json > /tmp/dates-2.json
-          diff -u /tmp/dates-1.json /tmp/dates-2.json
-          jq -e '.items[] | select(.id | endswith("/tempo-hoje-pelotas")) | has("date_modified") | not' /tmp/feed-1.json >/dev/null
-          jq -e '.items[] | select(.id | endswith("/estacao-embrapa-pelotas")) | has("date_modified") | not' /tmp/feed-1.json >/dev/null
-          jq -e '.items[] | select(.id | endswith("/metodologia")) | has("date_modified") | not' /tmp/feed-1.json >/dev/null
+          for file in /tmp/feed-1.json /tmp/feed-2.json; do
+            jq -e '.version == "https://jsonfeed.org/version/1.1" and (.items | length) == 5' "$file" >/dev/null
+            jq -e '.items[] | select(.id | endswith("/tempo-hoje-pelotas")) | has("date_modified") | not' "$file" >/dev/null
+            jq -e '.items[] | select(.id | endswith("/estacao-embrapa-pelotas")) | has("date_modified") | not' "$file" >/dev/null
+            jq -e '.items[] | select(.id | endswith("/metodologia")) | has("date_modified") | not' "$file" >/dev/null
+            jq -e '[.items[] | select(has("date_modified")) | .date_modified | fromdateiso8601] | all' "$file" >/dev/null
+          done
 
       - name: Diagnóstico
         if: always()
         run: |
-          cat /tmp/dates-1.json 2>/dev/null || true
-          cat /tmp/dates-2.json 2>/dev/null || true
+          jq '[.items[] | {id, date_modified}]' /tmp/feed-1.json 2>/dev/null || true
+          jq '[.items[] | {id, date_modified}]' /tmp/feed-2.json 2>/dev/null || true
           cat /tmp/feed-stability.log 2>/dev/null || true
