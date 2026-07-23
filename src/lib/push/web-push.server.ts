@@ -36,6 +36,12 @@ type VapidConfiguration = {
   subject: string;
 };
 
+type ActiveVapidConfiguration = {
+  publicKey: string;
+  privateKey: string;
+  subject: string;
+};
+
 function normalizedEnvironmentValue(value: string | undefined) {
   const normalized = value?.trim();
   return normalized ? normalized : null;
@@ -76,6 +82,24 @@ function validateVapidKeys(publicKey: string | null, privateKey: string | null) 
   } catch {
     return false;
   }
+}
+
+function getActiveVapidConfig(): ActiveVapidConfiguration {
+  const vapid = getVapidConfig();
+  if (
+    !vapid.publicKey ||
+    !vapid.privateKey ||
+    !validateVapidSubject(vapid.subject) ||
+    !validateVapidKeys(vapid.publicKey, vapid.privateKey)
+  ) {
+    throw new Error("A configuração VAPID não é válida.");
+  }
+
+  return {
+    publicKey: vapid.publicKey,
+    privateKey: vapid.privateKey,
+    subject: vapid.subject,
+  };
 }
 
 export function getPushConfigurationStatus(): PushConfigurationStatus {
@@ -182,7 +206,7 @@ function createEncryptionMaterial(subscription: StoredPushSubscription, payload:
   ]);
 }
 
-function createVapidAuthorization(endpoint: string, vapid: Required<VapidConfiguration>) {
+function createVapidAuthorization(endpoint: string, vapid: ActiveVapidConfiguration) {
   const publicBytes = decodeBase64Url(vapid.publicKey);
   const privateBytes = decodeBase64Url(vapid.privateKey);
   const audience = new URL(endpoint).origin;
@@ -221,7 +245,7 @@ async function sendNotification(
   subscription: StoredPushSubscription,
   payload: PushPayload,
   body: string,
-  vapid: Required<VapidConfiguration>,
+  vapid: ActiveVapidConfiguration,
 ) {
   const encryptedBody = createEncryptionMaterial(subscription, body);
   const response = await fetch(subscription.endpoint, {
@@ -261,7 +285,7 @@ export async function broadcastPushNotification(
     throw new Error(`Notificações web push não configuradas: ${status.missing.join(", ")}`);
   }
 
-  const vapid = getVapidConfig() as Required<VapidConfiguration>;
+  const vapid = getActiveVapidConfig();
   const subscriptions = await listPushSubscriptions(payload.topic);
   const body = notificationBody(payload);
   const result: PushDeliveryResult = {
