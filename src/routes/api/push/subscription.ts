@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 import {
+  isAllowedPushEndpoint,
+  isReasonableJsonRequest,
   isSameOriginRequest,
   pushJsonResponse,
 } from "@/lib/push/push-http.server";
@@ -13,8 +15,14 @@ import {
 import { PUSH_TOPICS } from "@/lib/push/push.types";
 import { getPushConfigurationStatus } from "@/lib/push/web-push.server";
 
+const endpointSchema = z
+  .string()
+  .url()
+  .max(2_048)
+  .refine(isAllowedPushEndpoint, "Provedor de notificações não permitido.");
+
 const subscriptionSchema = z.object({
-  endpoint: z.string().url().startsWith("https://").max(2_048),
+  endpoint: endpointSchema,
   expirationTime: z.number().finite().nullable().optional(),
   keys: z.object({
     p256dh: z.string().min(16).max(512),
@@ -30,17 +38,27 @@ const createSubscriptionSchema = z.object({
 });
 
 const deleteSubscriptionSchema = z.object({
-  endpoint: z.string().url().startsWith("https://").max(2_048),
+  endpoint: endpointSchema,
 });
 
 async function parseJson(request: Request) {
   return request.json().catch(() => null);
 }
 
-async function subscribe(request: Request) {
+function validateBrowserRequest(request: Request) {
   if (!isSameOriginRequest(request)) {
     return pushJsonResponse({ success: false, error: "Origem não permitida." }, 403);
   }
+  if (!isReasonableJsonRequest(request)) {
+    return pushJsonResponse({ success: false, error: "Corpo JSON inválido ou muito grande." }, 415);
+  }
+
+  return null;
+}
+
+async function subscribe(request: Request) {
+  const requestError = validateBrowserRequest(request);
+  if (requestError) return requestError;
 
   const configuration = getPushConfigurationStatus();
   if (!configuration.enabled) {
@@ -83,9 +101,8 @@ async function subscribe(request: Request) {
 }
 
 async function unsubscribe(request: Request) {
-  if (!isSameOriginRequest(request)) {
-    return pushJsonResponse({ success: false, error: "Origem não permitida." }, 403);
-  }
+  const requestError = validateBrowserRequest(request);
+  if (requestError) return requestError;
 
   if (!getPushStorageStatus().configured) {
     return pushJsonResponse(
