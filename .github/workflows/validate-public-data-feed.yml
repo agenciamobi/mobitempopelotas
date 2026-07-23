@@ -49,10 +49,9 @@ jobs:
             src/lib/public-portal.server.ts \
             src/routes/feed.ts \
             src/routes/__root.tsx
-          for file in "src/routes/pelotas[.]json.ts"; do
-            npx prettier --stdin-filepath "$file" < "$file" > "$file.formatted"
-            mv "$file.formatted" "$file"
-          done
+          file="src/routes/pelotas[.]json.ts"
+          npx prettier --stdin-filepath "$file" < "$file" > "$file.formatted"
+          mv "$file.formatted" "$file"
 
       - name: Validar build
         run: npm run build
@@ -85,41 +84,57 @@ jobs:
           grep -q 'type="application/feed+json"' /tmp/home.html
           grep -q 'href="https://mobitempopelotas.lovable.app/feed"' /tmp/home.html
 
-      - name: Validar pelotas.json
+      - name: Baixar pelotas.json
         run: |
           curl --fail --silent --show-error --max-time 60 \
             --dump-header /tmp/pelotas.headers \
             http://127.0.0.1:3000/pelotas.json > /tmp/pelotas.json
+          test -s /tmp/pelotas.json
+          jq -e . /tmp/pelotas.json >/dev/null
+
+      - name: Validar headers do pelotas.json
+        run: |
+          cat /tmp/pelotas.headers
           grep -qi '^content-type: application/json' /tmp/pelotas.headers
           grep -qi '^access-control-allow-origin: \*$' /tmp/pelotas.headers
-          jq -e '
-            .schema_version == "2.0" and
-            .location.city == "Pelotas" and
-            .location.timezone == "America/Sao_Paulo" and
-            (.weather | has("current")) and
-            (.weather | has("daily")) and
-            (.weather | has("quality")) and
-            (.weather.observed.embrapa | has("error") | not) and
-            (.hydrology.local_level.laranjal | has("error") | not) and
-            .links.feed == "https://mobitempopelotas.lovable.app/feed" and
-            .links.public_data == "https://mobitempopelotas.lovable.app/pelotas.json"
-          ' /tmp/pelotas.json >/dev/null
 
-      - name: Validar JSON Feed
+      - name: Validar contrato base do pelotas.json
+        run: |
+          jq -e '.schema_version == "2.0"' /tmp/pelotas.json >/dev/null
+          jq -e '.location.city == "Pelotas"' /tmp/pelotas.json >/dev/null
+          jq -e '.location.timezone == "America/Sao_Paulo"' /tmp/pelotas.json >/dev/null
+          jq -e '.weather | has("current") and has("daily") and has("quality")' /tmp/pelotas.json >/dev/null
+          jq -e '.hydrology.local_level | has("laranjal")' /tmp/pelotas.json >/dev/null
+
+      - name: Validar segurança e links do pelotas.json
+        run: |
+          jq -e '.weather.observed.embrapa | has("error") | not' /tmp/pelotas.json >/dev/null
+          jq -e '.hydrology.local_level.laranjal | has("error") | not' /tmp/pelotas.json >/dev/null
+          jq -e '.links.feed == "https://mobitempopelotas.lovable.app/feed"' /tmp/pelotas.json >/dev/null
+          jq -e '.links.public_data == "https://mobitempopelotas.lovable.app/pelotas.json"' /tmp/pelotas.json >/dev/null
+
+      - name: Baixar JSON Feed
         run: |
           curl --fail --silent --show-error --max-time 60 \
             --dump-header /tmp/feed.headers \
             http://127.0.0.1:3000/feed > /tmp/feed.json
+          test -s /tmp/feed.json
+          jq -e . /tmp/feed.json >/dev/null
+
+      - name: Validar headers do JSON Feed
+        run: |
+          cat /tmp/feed.headers
           grep -qi '^content-type: application/feed+json' /tmp/feed.headers
           grep -qi '^access-control-allow-origin: \*$' /tmp/feed.headers
-          jq -e '
-            .version == "https://jsonfeed.org/version/1.1" and
-            .title == "Tempo Pelotas" and
-            .feed_url == "https://mobitempopelotas.lovable.app/feed" and
-            (.items | length) == 5 and
-            ([.items[].id] | unique | length) == 5 and
-            ([.items[] | has("content_text")] | all)
-          ' /tmp/feed.json >/dev/null
+
+      - name: Validar contrato do JSON Feed
+        run: |
+          jq -e '.version == "https://jsonfeed.org/version/1.1"' /tmp/feed.json >/dev/null
+          jq -e '.title == "Tempo Pelotas"' /tmp/feed.json >/dev/null
+          jq -e '.feed_url == "https://mobitempopelotas.lovable.app/feed"' /tmp/feed.json >/dev/null
+          jq -e '(.items | length) == 5' /tmp/feed.json >/dev/null
+          jq -e '([.items[].id] | unique | length) == 5' /tmp/feed.json >/dev/null
+          jq -e '([.items[] | has("content_text")] | all)' /tmp/feed.json >/dev/null
 
       - name: Publicar formatação e route tree
         run: |
@@ -129,11 +144,17 @@ jobs:
           git commit -m "feat: publica dados estruturados e feed JSON"
           git push origin HEAD:agent/public-data-feed
 
-      - name: Exibir diagnóstico
-        if: failure()
-        run: |
-          cat /tmp/tempo-pelotas-public-data.log 2>/dev/null || true
-          cat /tmp/pelotas.headers 2>/dev/null || true
-          cat /tmp/pelotas.json 2>/dev/null || true
-          cat /tmp/feed.headers 2>/dev/null || true
-          cat /tmp/feed.json 2>/dev/null || true
+      - name: Publicar artefatos de diagnóstico
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-data-feed-diagnostics
+          path: |
+            /tmp/home.html
+            /tmp/pelotas.headers
+            /tmp/pelotas.json
+            /tmp/feed.headers
+            /tmp/feed.json
+            /tmp/tempo-pelotas-public-data.log
+          if-no-files-found: warn
+          retention-days: 3
