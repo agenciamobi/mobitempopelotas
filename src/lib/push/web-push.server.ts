@@ -27,8 +27,15 @@ export type PushConfigurationStatus = {
   missing: string[];
 };
 
+export type PushBroadcastProgress = {
+  processed: number;
+  batchSize: number;
+  result: PushDeliveryResult;
+};
+
 export type PushBroadcastOptions = {
   beforeBatch?: (context: { processed: number; batchSize: number }) => Promise<void>;
+  afterBatch?: (progress: PushBroadcastProgress) => void | Promise<void>;
 };
 
 type VapidConfiguration = {
@@ -303,8 +310,6 @@ export async function broadcastPushNotification(
   let processed = 0;
 
   for await (const subscriptions of iteratePushSubscriptionPages(payload.topic)) {
-    result.total += subscriptions.length;
-
     for (let index = 0; index < subscriptions.length; index += DELIVERY_BATCH_SIZE) {
       const batch = subscriptions.slice(index, index + DELIVERY_BATCH_SIZE);
       await options.beforeBatch?.({ processed, batchSize: batch.length });
@@ -341,6 +346,12 @@ export async function broadcastPushNotification(
       );
 
       processed += batch.length;
+      result.total += batch.length;
+      await options.afterBatch?.({
+        processed,
+        batchSize: batch.length,
+        result: { ...result },
+      });
     }
   }
 
