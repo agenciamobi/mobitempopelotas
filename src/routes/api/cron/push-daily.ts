@@ -9,6 +9,7 @@ import {
   releasePushDispatch,
   renewPushDispatch,
 } from "@/lib/push/push-storage.server";
+import type { PushDeliveryResult } from "@/lib/push/push.types";
 import { broadcastPushNotification, getPushConfigurationStatus } from "@/lib/push/web-push.server";
 import type { InmetAlert } from "@/lib/weather/official-sources.types";
 import { fetchWeatherIntelligence } from "@/lib/weather/weather-intelligence.server";
@@ -58,26 +59,18 @@ function formatAlertExpiry(value: string | null) {
 }
 
 function buildWeatherSummary(weather: Awaited<ReturnType<typeof fetchWeatherIntelligence>>) {
-  const parts: string[] = [];
-  const current = weather.weather.current;
   const today = weather.weather.daily[0];
+  if (!today) return null;
 
-  if (current?.temperature !== null && current?.temperature !== undefined) {
-    const condition = current.condition ? `, ${current.condition.toLowerCase()}` : "";
-    parts.push(`Agora: ${formatNumber(current.temperature)} °C${condition}`);
-  }
+  const rain =
+    today.rainChance === null
+      ? `${formatNumber(today.precipitationMm, 1)} mm de chuva previstos`
+      : `${formatNumber(today.rainChance)}% de chance de chuva`;
 
-  if (today) {
-    const rain =
-      today.rainChance === null
-        ? `${formatNumber(today.precipitationMm, 1)} mm de chuva previstos`
-        : `${formatNumber(today.rainChance)}% de chance de chuva`;
-    parts.push(
-      `Hoje: mínima de ${formatNumber(today.min)} °C, máxima de ${formatNumber(today.max)} °C e ${rain}`,
-    );
-  }
-
-  return parts.length > 0 ? `${parts.join(". ")}.`.slice(0, 240) : null;
+  return `Previsão para hoje: mínima de ${formatNumber(today.min)} °C, máxima de ${formatNumber(today.max)} °C e ${rain}.`.slice(
+    0,
+    240,
+  );
 }
 
 function buildOfficialAlertBody(alerts: InmetAlert[]) {
@@ -156,6 +149,7 @@ async function sendDailySummary(request: Request) {
   let fingerprint = `resumo-diario-${date}`;
   let leaseToken: string | null = null;
   let deliveryCompleted = false;
+  let lastCompletedProgress: PushDeliveryResult | null = null;
 
   try {
     const weather = await fetchWeatherIntelligence();
@@ -206,6 +200,9 @@ async function sendDailySummary(request: Request) {
       },
       {
         beforeBatch: () => renewPushDispatch(activeFingerprint, activeLeaseToken),
+        afterBatch: ({ result: progressResult }) => {
+          lastCompletedProgress = progressResult;
+        },
       },
     );
     deliveryCompleted = true;
@@ -230,7 +227,18 @@ async function sendDailySummary(request: Request) {
     });
   } catch (error) {
     if (leaseToken && !deliveryCompleted) {
-      await releasePushDispatch(fingerprint, leaseToken).catch(() => undefined);
+      if (lastCompletedProgress && lastCompletedProgress.total > 0) {
+        await recordPushDispatch(fingerprint, leaseToken, "Envio interrompido após entrega parcial", lastCompletedProgress).catch(
+          (recordError) => {
+            console.error("[push/cron] Não foi possível fechar o envio parcial", {
+              message:
+                recordError instanceof Error ? recordError.message : String(recordError),
+            });
+          },
+        );
+      } else {
+        await releasePushDispatch(fingerprint, leaseToken).catch(() => undefined);
+      }
     }
     console.error("[push/cron] Falha no resumo diário", {
       message: error instanceof Error ? error.message : String(error),
