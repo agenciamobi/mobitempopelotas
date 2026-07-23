@@ -1,0 +1,221 @@
+name: Verificar acessibilidade em produção
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.head_ref == 'agent/verify-accessibility-production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Aguardar publicação
+        run: sleep 25
+
+      - name: Verificar navegador disponível
+        run: |
+          google-chrome --version
+          chromedriver --version
+
+      - name: Iniciar ChromeDriver
+        run: |
+          chromedriver --port=9515 --allowed-ips=127.0.0.1 > /tmp/chromedriver.log 2>&1 &
+          for attempt in {1..30}; do
+            if curl --silent --fail http://127.0.0.1:9515/status > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/chromedriver.log
+          exit 1
+
+      - name: Validar navegação e foco
+        run: |
+          cat > /tmp/verify-accessibility.mjs <<'NODE'
+          import { writeFile } from "node:fs/promises";
+
+          const webdriver = "http://127.0.0.1:9515";
+          const elementKey = "element-6066-11e4-a52e-4f735466cecf";
+
+          async function request(path, method = "GET", body) {
+            const response = await fetch(`${webdriver}${path}`, {
+              method,
+              headers: body ? { "Content-Type": "application/json" } : undefined,
+              body: body ? JSON.stringify(body) : undefined,
+            });
+            const payload = await response.json();
+            if (!response.ok || payload.value?.error) {
+              throw new Error(`${method} ${path}: ${JSON.stringify(payload)}`);
+            }
+            return payload.value;
+          }
+
+          const session = await request("/session", "POST", {
+            capabilities: {
+              alwaysMatch: {
+                browserName: "chrome",
+                "goog:chromeOptions": {
+                  args: [
+                    "--headless=new",
+                    "--no-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--window-size=1280,900",
+                  ],
+                },
+              },
+            },
+          });
+          const sessionId = session.sessionId;
+
+          async function execute(script, args = []) {
+            return request(`/session/${sessionId}/execute/sync`, "POST", { script, args });
+          }
+
+          async function sendTab() {
+            await request(`/session/${sessionId}/actions`, "POST", {
+              actions: [
+                {
+                  type: "key",
+                  id: "keyboard",
+                  actions: [
+                    { type: "keyDown", value: "\uE004" },
+                    { type: "keyUp", value: "\uE004" },
+                  ],
+                },
+              ],
+            });
+            await request(`/session/${sessionId}/actions`, "DELETE");
+          }
+
+          try {
+            await request(`/session/${sessionId}/url`, "POST", {
+              url: "https://mobitempopelotas.lovable.app/",
+            });
+
+            for (let attempt = 0; attempt < 30; attempt += 1) {
+              const ready = await execute("return document.readyState === 'complete'");
+              if (ready) break;
+              await new Promise((resolve) => setTimeout(resolve, 500));
+            }
+
+            const structure = await execute(`
+              return {
+                skipHref: document.querySelector('.skip-link')?.getAttribute('href') ?? null,
+                mainId: document.querySelector('main')?.id ?? null,
+                mainTabIndex: document.querySelector('main')?.getAttribute('tabindex') ?? null,
+                live: document.querySelector('[aria-live="polite"]') !== null,
+              };
+            `);
+            if (
+              structure.skipHref !== "#conteudo-principal" ||
+              structure.mainId !== "conteudo-principal" ||
+              structure.mainTabIndex !== "-1" ||
+              !structure.live
+            ) {
+              throw new Error(`Estrutura acessível inválida: ${JSON.stringify(structure)}`);
+            }
+
+            await sendTab();
+            const initialFocus = await execute(`
+              const active = document.activeElement;
+              const style = active ? getComputedStyle(active) : null;
+              return {
+                className: active?.className ?? null,
+                outlineWidth: style?.outlineWidth ?? null,
+                transform: style?.transform ?? null,
+              };
+            `);
+            if (!String(initialFocus.className).includes("skip-link")) {
+              throw new Error(`Primeiro foco não chegou ao skip link: ${JSON.stringify(initialFocus)}`);
+            }
+
+            const link = await request(`/session/${sessionId}/element`, "POST", {
+              using: "css selector",
+              value: '.desktop-navigation a[href="/tempo-hoje-pelotas"]',
+            });
+            await request(`/session/${sessionId}/element/${link[elementKey]}/click`, "POST", {});
+
+            for (let attempt = 0; attempt < 30; attempt += 1) {
+              const pathname = await execute("return location.pathname");
+              if (pathname === "/tempo-hoje-pelotas") break;
+              await new Promise((resolve) => setTimeout(resolve, 500));
+            }
+            await new Promise((resolve) => setTimeout(resolve, 750));
+
+            const routeState = await execute(`
+              return {
+                pathname: location.pathname,
+                activeId: document.activeElement?.id ?? null,
+                announcement: document.querySelector('[aria-live="polite"]')?.textContent?.trim() ?? '',
+                currentLinks: Array.from(document.querySelectorAll('a[aria-current="page"]')).map((item) => item.getAttribute('href')),
+              };
+            `);
+            if (routeState.pathname !== "/tempo-hoje-pelotas") {
+              throw new Error(`Navegação não concluída: ${JSON.stringify(routeState)}`);
+            }
+            if (routeState.activeId !== "conteudo-principal") {
+              throw new Error(`Foco não chegou ao conteúdo principal: ${JSON.stringify(routeState)}`);
+            }
+            if (!routeState.announcement.startsWith("Página carregada:")) {
+              throw new Error(`Rota não foi anunciada: ${JSON.stringify(routeState)}`);
+            }
+            if (!routeState.currentLinks.includes("/tempo-hoje-pelotas")) {
+              throw new Error(`aria-current não foi atualizado: ${JSON.stringify(routeState)}`);
+            }
+
+            await request(`/session/${sessionId}/goog/cdp/execute`, "POST", {
+              cmd: "Emulation.setEmulatedMedia",
+              params: {
+                features: [{ name: "prefers-reduced-motion", value: "reduce" }],
+              },
+            });
+            const motionState = await execute(`
+              return {
+                reduced: matchMedia('(prefers-reduced-motion: reduce)').matches,
+                scrollBehavior: getComputedStyle(document.documentElement).scrollBehavior,
+              };
+            `);
+            if (!motionState.reduced || motionState.scrollBehavior !== "auto") {
+              throw new Error(`Movimento reduzido não aplicado: ${JSON.stringify(motionState)}`);
+            }
+
+            await sendTab();
+            const keyboardFocus = await execute(`
+              const active = document.activeElement;
+              const style = active ? getComputedStyle(active) : null;
+              return {
+                tag: active?.tagName ?? null,
+                outlineWidth: style?.outlineWidth ?? null,
+                outlineStyle: style?.outlineStyle ?? null,
+              };
+            `);
+            if (Number.parseFloat(keyboardFocus.outlineWidth ?? "0") < 2) {
+              throw new Error(`Indicador de foco insuficiente: ${JSON.stringify(keyboardFocus)}`);
+            }
+
+            const report = { structure, initialFocus, routeState, motionState, keyboardFocus };
+            await writeFile("/tmp/accessibility-production-report.json", `${JSON.stringify(report, null, 2)}\n`);
+            console.log(JSON.stringify(report, null, 2));
+          } finally {
+            await request(`/session/${sessionId}`, "DELETE").catch(() => undefined);
+          }
+          NODE
+
+          node /tmp/verify-accessibility.mjs
+
+      - name: Publicar relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-production-report
+          path: |
+            /tmp/accessibility-production-report.json
+            /tmp/chromedriver.log
+          if-no-files-found: warn
+          retention-days: 3
