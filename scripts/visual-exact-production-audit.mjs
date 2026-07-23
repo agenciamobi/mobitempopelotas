@@ -28,7 +28,7 @@ async function waitForLovableDeployment() {
   for (let attempt = 1; attempt <= 24; attempt += 1) {
     try {
       const response = await fetch(lovableUrl, {
-        headers: { "User-Agent": "TempoPelotas-Exact-VisualAudit/2.0" },
+        headers: { "User-Agent": "TempoPelotas-Exact-VisualAudit/3.0" },
         signal: AbortSignal.timeout(20_000),
       });
       const html = await response.text();
@@ -87,7 +87,7 @@ function reportMarkdown(results) {
     );
   }
 
-  lines.push("", "As capturas PNG e os HTMLs de diagnóstico estão neste artefato.");
+  lines.push("", "As capturas PNG, HTMLs e a cascata efetiva estão neste artefato.");
   return `${lines.join("\n")}\n`;
 }
 
@@ -104,10 +104,80 @@ async function auditPage(page, target, viewport) {
       const skipLink = document.querySelector(".skip-link");
       const skipRect = skipLink?.getBoundingClientRect() ?? null;
       const mobileNavigation = document.querySelector(".mobile-tab-bar");
-      const mobileStyle = mobileNavigation ? window.getComputedStyle(mobileNavigation) : null;
-      const mobileRect = mobileNavigation?.getBoundingClientRect() ?? null;
+      const firstTab = mobileNavigation?.querySelector("a") ?? null;
+      const firstIcon = mobileNavigation?.querySelector(".mobile-tab-icon") ?? null;
+      const firstSvg = mobileNavigation?.querySelector(".mobile-tab-icon svg") ?? null;
       const footer = document.querySelector(".site-footer-v3");
       const footerPanel = document.querySelector(".editorial-footer");
+
+      const styleSnapshot = (element, properties) => {
+        if (!element) return null;
+        const style = window.getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        return {
+          rect: {
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height,
+            top: rect.top,
+            right: rect.right,
+            bottom: rect.bottom,
+            left: rect.left,
+          },
+          properties: Object.fromEntries(properties.map((property) => [property, style.getPropertyValue(property)])),
+        };
+      };
+
+      const collectMatchingRules = (element) => {
+        if (!element) return [];
+        const matches = [];
+
+        const visitRules = (rules, source, conditions = []) => {
+          for (const rule of Array.from(rules ?? [])) {
+            if (rule.type === CSSRule.STYLE_RULE) {
+              try {
+                if (element.matches(rule.selectorText)) {
+                  matches.push({
+                    source,
+                    selector: rule.selectorText,
+                    cssText: rule.style.cssText,
+                    conditions,
+                  });
+                }
+              } catch {
+                // Seletores experimentais podem não ser aceitos por Element.matches.
+              }
+              continue;
+            }
+
+            if ("cssRules" in rule) {
+              const condition =
+                rule.conditionText ?? rule.name ?? rule.media?.mediaText ?? rule.cssText?.slice(0, 120) ?? "grupo";
+              visitRules(rule.cssRules, source, [...conditions, condition]);
+            }
+          }
+        };
+
+        for (const sheet of Array.from(document.styleSheets)) {
+          const source = sheet.href ?? "inline";
+          try {
+            visitRules(sheet.cssRules, source);
+          } catch (error) {
+            matches.push({
+              source,
+              selector: "[folha inacessível]",
+              cssText: error instanceof Error ? error.message : String(error),
+              conditions: [],
+            });
+          }
+        }
+
+        return matches;
+      };
+
+      const mobileStyle = mobileNavigation ? window.getComputedStyle(mobileNavigation) : null;
+      const mobileRect = mobileNavigation?.getBoundingClientRect() ?? null;
       const footerStyle = footer ? window.getComputedStyle(footer) : null;
       const footerPanelStyle = footerPanel ? window.getComputedStyle(footerPanel) : null;
       const navigationVisible = Boolean(
@@ -117,6 +187,26 @@ async function auditPage(page, target, viewport) {
       const footerPaddingBottom = footerStyle
         ? Number.parseFloat(footerStyle.paddingBottom) || 0
         : 0;
+      const commonProperties = [
+        "display",
+        "position",
+        "width",
+        "height",
+        "min-width",
+        "min-height",
+        "max-width",
+        "max-height",
+        "grid-template-columns",
+        "grid-template-rows",
+        "padding-top",
+        "padding-right",
+        "padding-bottom",
+        "padding-left",
+        "box-sizing",
+        "overflow",
+        "font-size",
+        "line-height",
+      ];
 
       return {
         title: document.title,
@@ -144,6 +234,33 @@ async function auditPage(page, target, viewport) {
         footerPaddingBottom,
         footerProtected:
           mobile && navigationVisible ? footerPaddingBottom >= navigationHeight : null,
+        cascade: {
+          stylesheets: Array.from(document.styleSheets).map((sheet) => ({
+            href: sheet.href,
+            disabled: sheet.disabled,
+            media: sheet.media.mediaText,
+            ruleCount: (() => {
+              try {
+                return sheet.cssRules.length;
+              } catch {
+                return null;
+              }
+            })(),
+          })),
+          navigation: styleSnapshot(mobileNavigation, commonProperties),
+          firstTab: styleSnapshot(firstTab, commonProperties),
+          firstIcon: styleSnapshot(firstIcon, commonProperties),
+          firstSvg: styleSnapshot(firstSvg, [
+            ...commonProperties,
+            "fill",
+            "stroke",
+            "stroke-width",
+          ]),
+          navigationRules: collectMatchingRules(mobileNavigation),
+          firstTabRules: collectMatchingRules(firstTab),
+          firstIconRules: collectMatchingRules(firstIcon),
+          firstSvgRules: collectMatchingRules(firstSvg),
+        },
       };
     },
     { mobile: viewport.mobile },
