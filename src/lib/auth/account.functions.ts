@@ -142,34 +142,22 @@ export const saveAccountPreferences = createServerFn({ method: "POST" })
 
     const avatarUrl =
       metadataText(user.user_metadata?.avatar_url) ?? metadataText(user.user_metadata?.picture);
-    const [profileResult, preferencesResult] = await Promise.all([
-      client.from("profiles").upsert(
-        {
-          id: user.id,
-          email: user.email ?? null,
-          display_name: data.displayName || null,
-          avatar_url: avatarUrl,
-        },
-        { onConflict: "id" },
-      ),
-      client.from("user_preferences").upsert(
-        {
-          user_id: user.id,
-          weather_alerts: data.weatherAlerts,
-          water_alerts: data.waterAlerts,
-          daily_summary: data.dailySummary,
-          community_updates: data.communityUpdates,
-        },
-        { onConflict: "user_id" },
-      ),
-    ]);
+    const { error } = await client.rpc("update_account_preferences", {
+      p_display_name: data.displayName,
+      p_email: user.email ?? null,
+      p_avatar_url: avatarUrl,
+      p_weather_alerts: data.weatherAlerts,
+      p_water_alerts: data.waterAlerts,
+      p_daily_summary: data.dailySummary,
+      p_community_updates: data.communityUpdates,
+    });
 
     applyPrivateResponseHeaders(responseHeaders);
 
-    if (profileResult.error || preferencesResult.error) {
-      console.error("[account] Falha ao atualizar preferências", {
-        profile: profileResult.error?.message,
-        preferences: preferencesResult.error?.message,
+    if (error) {
+      console.error("[account] Falha ao atualizar perfil e preferências", {
+        message: error.message,
+        code: error.code,
       });
       return { ok: false as const, code: "storage" as const };
     }
