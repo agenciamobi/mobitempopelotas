@@ -1,0 +1,98 @@
+name: Preservar canonical www
+
+on:
+  push:
+    branches:
+      - agent/preserve-www-canonical
+
+permissions:
+  contents: write
+
+jobs:
+  update-and-validate:
+    if: ${{ !contains(github.event.head_commit.message, '[www-canonical]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/preserve-www-canonical
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Atualizar smoke test, workflow e runbook
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          script_path = Path("scripts/cutover-smoke.mjs")
+          script = script_path.read_text()
+          script = script.replace(
+              '"https://tempopelotas.com.br";',
+              '"https://www.tempopelotas.com.br";',
+              1,
+          )
+          script_path.write_text(script)
+
+          workflow_path = Path(".github/workflows/cutover-smoke.yml")
+          workflow = workflow_path.read_text().replace(
+              "https://tempopelotas.com.br",
+              "https://www.tempopelotas.com.br",
+          )
+          workflow_path.write_text(workflow)
+
+          doc_path = Path("docs/PRODUCTION_CUTOVER.md")
+          doc = doc_path.read_text()
+          doc = doc.replace(
+              "Este documento controla a migração de `tempopelotas.com.br` da produção Vercel para a publicação Lovable.",
+              "Este documento controla a migração de `www.tempopelotas.com.br` da produção Vercel para a publicação Lovable. O domínio raiz `tempopelotas.com.br` deve continuar redirecionando permanentemente para o host canônico com `www`.",
+          )
+          doc = doc.replace(
+              "A existência deste runbook **não autoriza a troca de DNS**.",
+              "A produção atual já utiliza `www.tempopelotas.com.br` em canonicals e redireciona o domínio raiz para `www`. Essa estratégia deve ser preservada para não combinar a troca de infraestrutura com uma migração de host.\n\nA existência deste runbook **não autoriza a troca de DNS**.",
+          )
+          doc = doc.replace(
+              "- [ ] Adicionar `tempopelotas.com.br` no painel de domínio personalizado do projeto.\n- [ ] Definir a estratégia para `www.tempopelotas.com.br`: redirecionar para o domínio principal ou configurar como alias.",
+              "- [ ] Adicionar `www.tempopelotas.com.br` no painel de domínio personalizado do projeto e defini-lo como domínio principal.\n- [ ] Adicionar `tempopelotas.com.br` como alias e configurar redirecionamento permanente para `https://www.tempopelotas.com.br`.",
+          )
+          doc = doc.replace(
+              "https://tempopelotas.com.br",
+              "https://www.tempopelotas.com.br",
+          )
+          doc = doc.replace(
+              "- [ ] `www` redireciona ou funciona conforme a estratégia definida;",
+              "- [ ] o domínio raiz redireciona permanentemente para `www`;",
+          )
+          doc = doc.replace(
+              "- [ ] `www` tratado;",
+              "- [ ] `www` ativo como principal e domínio raiz redirecionando;",
+          )
+          doc_path.write_text(doc)
+          PY
+
+      - name: Formatar arquivos
+        run: |
+          npx prettier --write \
+            src/lib/site-config.ts \
+            scripts/cutover-smoke.mjs \
+            .github/workflows/cutover-smoke.yml \
+            docs/PRODUCTION_CUTOVER.md
+
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm run lint
+
+      - name: Publicar alteração validada
+        run: |
+          rm .github/workflows/preserve-www-canonical.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "[www-canonical] preserva host canônico da produção"
+          git push origin HEAD:agent/preserve-www-canonical
