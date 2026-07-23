@@ -2,17 +2,24 @@
 
 Este documento controla a substituição do ambiente de produção atual pelo projeto TanStack Start publicado no Lovable.
 
+## Origens envolvidas
+
+- Domínio canônico definitivo: `https://tempopelotas.com.br`.
+- Alias a preservar ou redirecionar: `https://www.tempopelotas.com.br`.
+- Produção atual para rollback: projeto `tempopelotas` na Vercel.
+- Nova hospedagem validada: `https://mobitempopelotas.lovable.app`.
+
 ## Condições obrigatórias antes do DNS
 
-- [ ] A branch `main` está sincronizada com o projeto Lovable.
-- [ ] O workflow `Qualidade` passou com build, TypeScript e ESLint.
-- [ ] O preview publicado foi testado em desktop e celular.
-- [ ] `VITE_SITE_URL` está configurada com a origem definitiva do portal, sem barra final.
+- [x] A branch `main` está sincronizada com o projeto Lovable.
+- [x] O workflow `Qualidade` passou com build, TypeScript e ESLint.
+- [ ] O preview publicado foi testado em desktop e celular após a configuração do domínio canônico.
+- [x] O fallback de `VITE_SITE_URL` no código usa `https://tempopelotas.com.br`, sem barra final.
 - [ ] As variáveis já utilizadas em produção foram conferidas no Lovable, sem copiar segredos para variáveis `VITE_*`.
-- [ ] A página `/tempo-amanha-pelotas` responde com dados reais ou estado de indisponibilidade explícito.
-- [ ] `/clima-em-pelotas` responde com redirecionamento permanente para `/historico-climatico-pelotas`.
-- [ ] A câmera do Laranjal diferencia transmissão ao vivo de replay.
-- [ ] A Estação Laranjal diferencia leitura atual de última leitura conhecida.
+- [x] A página `/tempo-amanha-pelotas` responde com dados reais ou estado de indisponibilidade explícito.
+- [x] `/clima-em-pelotas` responde com redirecionamento permanente para `/historico-climatico-pelotas`.
+- [x] A câmera do Laranjal diferencia transmissão ao vivo de replay.
+- [x] A Estação Laranjal diferencia leitura atual de última leitura conhecida.
 
 ## Rotas que devem responder antes do corte
 
@@ -36,23 +43,25 @@ Este documento controla a substituição do ambiente de produção atual pelo pr
 
 ## SEO e continuidade de URLs
 
-- [ ] Canonical de cada rota aponta para o domínio definitivo.
-- [ ] `og:url` e imagens sociais usam URLs absolutas válidas.
-- [ ] O sitemap lista as 13 páginas públicas indexáveis.
-- [ ] O robots referencia o sitemap no domínio definitivo.
-- [ ] `/clima-em-pelotas` não permanece no sitemap e redireciona com HTTP 301.
+- [ ] Canonical de cada rota aponta para `https://tempopelotas.com.br` na versão publicada.
+- [ ] `og:url` usa o domínio definitivo e as imagens sociais possuem URL absoluta válida.
+- [x] O sitemap lista as 13 páginas públicas indexáveis.
+- [ ] O robots referencia `https://tempopelotas.com.br/sitemap.xml` na versão publicada.
+- [x] `/clima-em-pelotas` não permanece no sitemap e redireciona com HTTP 301.
 - [ ] Search Console recebe o sitemap definitivo após o corte.
 - [ ] Analytics e pixels existentes foram testados, quando aplicáveis.
 
 ## Procedimento de DNS
 
-1. Reduzir o TTL do registro atual antes da janela de corte, quando o provedor permitir.
-2. Adicionar o domínio personalizado no Lovable e copiar exatamente os registros solicitados pela plataforma.
-3. Não remover o ambiente anterior antes da validação completa do domínio novo.
-4. Alterar os registros DNS na janela escolhida.
-5. Confirmar emissão e validade do certificado HTTPS.
-6. Validar `www` e domínio raiz conforme a estratégia adotada, mantendo apenas uma origem canônica.
-7. Repetir os testes de rotas, APIs públicas, câmera e telemetria no domínio definitivo.
+1. Adicionar `tempopelotas.com.br` e `www.tempopelotas.com.br` como domínios personalizados no projeto `mobitempopelotas` do Lovable.
+2. Copiar exatamente os registros DNS solicitados pelo Lovable antes de remover qualquer associação da Vercel.
+3. Reduzir o TTL dos registros atuais, quando o provedor permitir.
+4. Manter o projeto Vercel e seus deployments disponíveis durante a janela de rollback.
+5. Alterar primeiro os registros solicitados pelo Lovable e aguardar a validação do domínio.
+6. Confirmar emissão e validade do certificado HTTPS.
+7. Definir `tempopelotas.com.br` como origem canônica; `www` deve redirecionar para o domínio raiz.
+8. Repetir os testes de rotas, APIs públicas, câmera e telemetria no domínio definitivo.
+9. Remover os domínios personalizados da Vercel somente após a nova origem estar validada e estável.
 
 ## Validação após o corte
 
@@ -69,7 +78,7 @@ Este documento controla a substituição do ambiente de produção atual pelo pr
 
 Caso exista bloqueador real após o corte:
 
-1. restaurar os registros DNS anteriores;
+1. restaurar os registros DNS anteriores da Vercel;
 2. manter o Lovable publicado para diagnóstico sem apontar o domínio principal;
 3. registrar a rota, fonte ou integração que falhou;
 4. corrigir em branch isolada e exigir workflow verde;

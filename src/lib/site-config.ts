@@ -1,4 +1,4 @@
-const DEFAULT_SITE_URL = "https://mobitempopelotas.lovable.app";
+const DEFAULT_SITE_URL = "https://tempopelotas.com.br";
 
 export const SITE_NAME = "Tempo Pelotas";
 export const SITE_TITLE = "Tempo Pelotas | Previsão do tempo em Pelotas e região";
