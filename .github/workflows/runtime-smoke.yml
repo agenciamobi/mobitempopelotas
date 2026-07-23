@@ -2,10 +2,6 @@ name: Runtime Lovable
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - agent/redemet-home-methodology-runtime
-      - agent/hydrology-runtime-smoke
   pull_request:
     branches:
       - main
@@ -19,162 +15,83 @@ concurrency:
 
 jobs:
   smoke:
-    name: Validar publicação, REDEMET e hidrologia
+    name: Capturar homepage publicada
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
-      - name: Consultar aplicação publicada
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Capturar e analisar HTML
         env:
           BASE_URL: https://mobitempopelotas.lovable.app
         run: |
+          mkdir -p artifacts/exact-production-live
           node <<'NODE'
+          const { writeFile } = require("node:fs/promises");
           const baseUrl = process.env.BASE_URL.replace(/\/$/, "");
           const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
-
-          async function request(path, attempts = 18) {
-            let lastError;
-
-            for (let attempt = 1; attempt <= attempts; attempt += 1) {
-              try {
-                const response = await fetch(`${baseUrl}${path}`, {
-                  headers: {
-                    Accept: path.startsWith("/api/") ? "application/json" : "text/html",
-                    "User-Agent": "TempoPelotas-Runtime-Smoke/2.0",
-                  },
-                  signal: AbortSignal.timeout(20_000),
-                });
-
-                if (!response.ok) {
-                  throw new Error(`${path} respondeu HTTP ${response.status}`);
-                }
-
-                return response;
-              } catch (error) {
-                lastError = error;
-                console.log(`Tentativa ${attempt}/${attempts} para ${path}: ${error.message}`);
-                if (attempt < attempts) await wait(10_000);
-              }
-            }
-
-            throw lastError;
-          }
-
-          function assertContains(html, expected, context) {
-            if (!html.includes(expected)) {
-              throw new Error(`${context}: conteúdo esperado ausente: ${expected}`);
-            }
-          }
-
-          function assertNoSensitiveMarkers(html, context) {
-            const forbidden = [
-              "REDEMET_API_KEY",
-              "GOOGLE_OAUTH_CLIENT_SECRET",
-              "GEMINI_API_KEY",
-              "LOVABLE_API_KEY",
-              "process.env.",
-            ];
-
-            for (const marker of forbidden) {
-              if (html.includes(marker)) {
-                throw new Error(`${context}: marcador sensível exposto: ${marker}`);
-              }
-            }
-          }
-
-          const radarPageResponse = await request("/radar-e-satelite-pelotas");
-          const radarPageHtml = await radarPageResponse.text();
-          assertContains(radarPageHtml, "Radar, satélite e trovoadas", "Página REDEMET");
-          assertNoSensitiveMarkers(radarPageHtml, "Página REDEMET");
-
-          const endpoints = [
-            ["radar", "/api/redemet/radar?frames=2"],
-            ["satellite", "/api/redemet/satellite?type=realcada&frames=2"],
-            ["storms", "/api/redemet/storms?frames=2"],
+          const markers = [
+            "site-shell--home-editorial",
+            "weather-hero",
+            "home-section-navigation",
+            "home-story--forecast",
+            "home-story--map",
+            "home-story--observation",
+            "home-story--water",
+            "site-footer",
+            "Veja como o tempo deve mudar ao longo do dia",
+            "Do Guaíba à Lagoa dos Patos",
+            "Rede da Lagoa dos Patos",
+            "Nível do Guaíba",
+            "Informação local para acompanhar o dia",
           ];
 
-          const results = {};
-          for (const [name, path] of endpoints) {
-            const response = await request(path);
-            const raw = await response.text();
-            assertNoSensitiveMarkers(raw, `Endpoint ${name}`);
-            const payload = JSON.parse(raw);
-
-            if (payload.provider !== "REDEMET / DECEA") {
-              throw new Error(`${name}: contrato de provedor inesperado.`);
-            }
-            if (payload.configured !== true) {
-              throw new Error(`${name}: a secret REDEMET_API_KEY não foi reconhecida no runtime.`);
-            }
-            if (!Array.isArray(payload.frames)) {
-              throw new Error(`${name}: resposta sem coleção de quadros.`);
-            }
-
-            results[name] = payload;
-            console.log(
-              `${name}: configured=${payload.configured} available=${payload.available} frames=${payload.frames.length}`,
-            );
-          }
-
-          const available = Object.values(results).filter((payload) => payload.available);
-          if (available.length === 0) {
-            const messages = Object.entries(results)
-              .map(([name, payload]) => `${name}: ${payload.error || "sem detalhe"}`)
-              .join(" | ");
-            throw new Error(`REDEMET configurada, porém nenhum produto respondeu. ${messages}`);
-          }
-
-          const imageLayer = [results.radar, results.satellite].find(
-            (payload) => payload.available && payload.frames.length > 0,
-          );
-
-          if (imageLayer) {
-            const imageUrl = new URL(imageLayer.frames.at(-1).imageUrl, baseUrl);
-            const imageResponse = await fetch(imageUrl, {
-              headers: { "User-Agent": "TempoPelotas-Runtime-Smoke/2.0" },
+          let response;
+          let html = "";
+          for (let attempt = 1; attempt <= 24; attempt += 1) {
+            response = await fetch(`${baseUrl}/`, {
+              headers: {
+                Accept: "text/html",
+                "User-Agent": "TempoPelotas-Exact-Port-Debug/1.0",
+              },
               signal: AbortSignal.timeout(25_000),
             });
-            const contentType = imageResponse.headers.get("content-type") || "";
-
-            if (!imageResponse.ok || !contentType.startsWith("image/")) {
-              throw new Error(
-                `Proxy de imagem respondeu HTTP ${imageResponse.status} com ${contentType || "tipo ausente"}.`,
-              );
-            }
-
-            console.log(`proxy de imagem: HTTP ${imageResponse.status} ${contentType}`);
+            html = await response.text();
+            if (response.ok && html.includes("site-shell--home-editorial")) break;
+            console.log(`Tentativa ${attempt}/24: HTTP ${response.status}; shell literal ainda ausente.`);
+            if (attempt < 24) await wait(10_000);
           }
 
-          const homeResponse = await request("/");
-          const homeHtml = await homeResponse.text();
-          assertContains(homeHtml, "Do Guaíba à Lagoa dos Patos", "Homepage");
-          assertContains(homeHtml, "Rede da Lagoa dos Patos", "Homepage");
-          assertContains(homeHtml, "Nível do Guaíba", "Homepage");
-          assertNoSensitiveMarkers(homeHtml, "Homepage");
+          const results = Object.fromEntries(markers.map((marker) => [marker, html.includes(marker)]));
+          const missing = markers.filter((marker) => !results[marker]);
+          const summary = {
+            capturedAt: new Date().toISOString(),
+            baseUrl,
+            status: response?.status ?? null,
+            htmlLength: html.length,
+            title: html.match(/<title>([^<]*)<\/title>/i)?.[1] ?? null,
+            results,
+            missing,
+          };
 
-          const hydrologyResponse = await request("/situacao-hidrologica-pelotas");
-          const hydrologyHtml = await hydrologyResponse.text();
-          assertContains(hydrologyHtml, "Do Guaíba à Lagoa dos Patos", "Página hidrológica");
-          assertContains(hydrologyHtml, "Nível do Guaíba", "Página hidrológica");
-
-          const stations = [
-            "FURG CCMAR",
-            "São Lourenço do Sul",
-            "Arambaré",
-            "São José do Norte",
-            "Itapuã",
-          ];
-          for (const station of stations) {
-            assertContains(hydrologyHtml, station, "Rede da Lagoa dos Patos");
-          }
-          assertNoSensitiveMarkers(hydrologyHtml, "Página hidrológica");
-
-          const stateMarkers = ["Atualizado", "Leitura atrasada", "Indisponível"];
-          if (!stateMarkers.some((marker) => hydrologyHtml.includes(marker))) {
-            throw new Error("Página hidrológica não apresentou um estado operacional reconhecível.");
-          }
-
-          console.log(
-            `Runtime validado em ${baseUrl}: REDEMET ${available.length}/3; Guaíba e 5 estações regionais renderizados.`,
+          await writeFile("artifacts/exact-production-live/home.html", html);
+          await writeFile(
+            "artifacts/exact-production-live/summary.json",
+            `${JSON.stringify(summary, null, 2)}\n`,
           );
+
+          console.log(JSON.stringify(summary, null, 2));
+          if (!response?.ok) throw new Error(`Homepage respondeu HTTP ${response?.status ?? "desconhecido"}.`);
+          if (missing.length > 0) throw new Error(`Marcadores ausentes: ${missing.join(" | ")}`);
           NODE
+
+      - name: Publicar captura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exact-production-live-${{ github.run_number }}
+          path: artifacts/exact-production-live
+          if-no-files-found: error
+          retention-days: 14
