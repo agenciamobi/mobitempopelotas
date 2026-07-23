@@ -79,9 +79,7 @@ function buildOfficialAlertBody(alerts: InmetAlert[]) {
 
   const event = primary.event.trim() || primary.headline.trim() || "Aviso meteorológico";
   const expiresAt = formatAlertExpiry(primary.expiresAt);
-  const parts = [
-    normalizedSentence(`Aviso oficial do INMET — ${primary.severityLabel}: ${event}`),
-  ];
+  const parts = [normalizedSentence(`Aviso oficial do INMET — ${primary.severityLabel}: ${event}`)];
 
   if (expiresAt) parts.push(`Vigente até ${expiresAt}.`);
   const instruction = normalizedSentence(primary.instruction);
@@ -95,7 +93,12 @@ function buildOfficialAlertBody(alerts: InmetAlert[]) {
 
 function alertFingerprint(alerts: InmetAlert[]) {
   return createHash("sha256")
-    .update(alerts.map((alert) => alert.id).sort().join("|"))
+    .update(
+      alerts
+        .map((alert) => alert.id)
+        .sort()
+        .join("|"),
+    )
     .digest("hex")
     .slice(0, 16);
 }
@@ -146,7 +149,9 @@ async function sendDailySummary(request: Request) {
     const title = hasOfficialAlert
       ? `INMET: ${event} em Pelotas`.slice(0, 90)
       : "Previsão de hoje em Pelotas";
-    const body = hasOfficialAlert ? buildOfficialAlertBody(pelotasAlerts) : buildWeatherSummary(weather);
+    const body = hasOfficialAlert
+      ? buildOfficialAlertBody(pelotasAlerts)
+      : buildWeatherSummary(weather);
 
     if (!body) {
       return pushJsonResponse({

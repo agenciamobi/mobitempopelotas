@@ -114,6 +114,7 @@ export function PushNotificationsManager() {
     if (!isOpen) return;
 
     const previousElement = document.activeElement as HTMLElement | null;
+    const launcherElement = launcherRef.current;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
@@ -150,7 +151,7 @@ export function PushNotificationsManager() {
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
-      window.requestAnimationFrame(() => (previousElement ?? launcherRef.current)?.focus());
+      window.requestAnimationFrame(() => (previousElement ?? launcherElement)?.focus());
     };
   }, [isOpen]);
 

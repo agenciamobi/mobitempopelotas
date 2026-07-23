@@ -305,8 +305,17 @@ export async function broadcastPushNotification(payload: PushPayload): Promise<P
         } catch (error) {
           const statusCode = deliveryStatusCode(error);
           if (statusCode === 404 || statusCode === 410) {
-            await deletePushSubscription(subscription.endpoint).catch(() => undefined);
-            result.removed += 1;
+            try {
+              await deletePushSubscription(subscription.endpoint);
+              result.removed += 1;
+            } catch (cleanupError) {
+              result.failed += 1;
+              console.error("[push] Endpoint expirado, mas a inscrição não foi removida", {
+                statusCode,
+                message:
+                  cleanupError instanceof Error ? cleanupError.message : String(cleanupError),
+              });
+            }
             return;
           }
 
