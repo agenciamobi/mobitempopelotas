@@ -19,14 +19,12 @@ function createSitemap() {
     <changefreq>${route.changeFrequency}</changefreq>
     <priority>${route.priority.toFixed(1)}</priority>
   </url>`,
-  ).join("
-");
+  ).join("\n");
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls}
-</urlset>
-`;
+</urlset>\n`;
 }
 
 export const Route = createFileRoute("/sitemap.xml")({
