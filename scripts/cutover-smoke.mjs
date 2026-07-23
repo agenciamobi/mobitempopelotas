@@ -238,10 +238,7 @@ const report = {
   failed: results.filter((result) => result.status === "failed").length,
   results,
 };
-await writeFile(
-  path.join(outputDirectory, "report.json"),
-  `${JSON.stringify(report, null, 2)}\n`,
-);
+await writeFile(path.join(outputDirectory, "report.json"), `${JSON.stringify(report, null, 2)}\n`);
 
 console.log(`\nResultado: ${report.passed} aprovados; ${report.failed} reprovados.`);
 console.log(`Relatório: ${path.join(outputDirectory, "report.json")}`);
