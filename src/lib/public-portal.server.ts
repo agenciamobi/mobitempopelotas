@@ -16,10 +16,12 @@ function formatMetric(value: number | null, unit: string) {
 }
 
 function latestTimestamp(values: Array<string | null>) {
-  return values
-    .filter((value): value is string => value !== null)
-    .sort()
-    .at(-1) ?? null;
+  return (
+    values
+      .filter((value): value is string => value !== null)
+      .sort()
+      .at(-1) ?? null
+  );
 }
 
 function publicEmbrapaObservation(
