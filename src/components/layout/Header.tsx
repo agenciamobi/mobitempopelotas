@@ -27,17 +27,41 @@ const megaMenus = [
       {
         title: "Planeje o dia",
         links: [
-          { label: "Previsão de hoje", to: "/tempo-hoje-pelotas", description: "Detalhes por hora e condições do dia." },
-          { label: "Tempo amanhã", to: "/tempo-amanha-pelotas", description: "Chuva, temperaturas e rajadas do próximo dia." },
-          { label: "Próximos 7 dias", to: "/previsao-7-dias-pelotas", description: "Tendência completa para a semana." },
+          {
+            label: "Previsão de hoje",
+            to: "/tempo-hoje-pelotas",
+            description: "Detalhes por hora e condições do dia.",
+          },
+          {
+            label: "Tempo amanhã",
+            to: "/tempo-amanha-pelotas",
+            description: "Chuva, temperaturas e rajadas do próximo dia.",
+          },
+          {
+            label: "Próximos 7 dias",
+            to: "/previsao-7-dias-pelotas",
+            description: "Tendência completa para a semana.",
+          },
         ],
       },
       {
         title: "Entenda a previsão",
         links: [
-          { label: "Chuva em Pelotas", to: "/chuva-em-pelotas", description: "Probabilidade, volume e períodos mais críticos." },
-          { label: "Vento e rajadas", to: "/vento-em-pelotas", description: "Direção, velocidade e rajadas previstas." },
-          { label: "Histórico climático", to: "/historico-climatico-pelotas", description: "Contexto e comportamento recente do tempo." },
+          {
+            label: "Chuva em Pelotas",
+            to: "/chuva-em-pelotas",
+            description: "Probabilidade, volume e períodos mais críticos.",
+          },
+          {
+            label: "Vento e rajadas",
+            to: "/vento-em-pelotas",
+            description: "Direção, velocidade e rajadas previstas.",
+          },
+          {
+            label: "Histórico climático",
+            to: "/historico-climatico-pelotas",
+            description: "Contexto e comportamento recente do tempo.",
+          },
         ],
       },
     ],
@@ -61,15 +85,31 @@ const megaMenus = [
       {
         title: "Medições locais",
         links: [
-          { label: "Estação Embrapa", to: "/estacao-embrapa-pelotas", description: "Dados observados na estação de Pelotas." },
-          { label: "Câmeras ao vivo", to: "/cameras-ao-vivo-pelotas", description: "Imagens locais e estado da transmissão." },
+          {
+            label: "Estação Embrapa",
+            to: "/estacao-embrapa-pelotas",
+            description: "Dados observados na estação de Pelotas.",
+          },
+          {
+            label: "Câmeras ao vivo",
+            to: "/cameras-ao-vivo-pelotas",
+            description: "Imagens locais e estado da transmissão.",
+          },
         ],
       },
       {
         title: "Histórico e transparência",
         links: [
-          { label: "Histórico climático", to: "/historico-climatico-pelotas", description: "Compare temperatura, chuva e vento recentes." },
-          { label: "Fontes e metodologia", to: "/metodologia", description: "Origem, limites e atualização dos dados." },
+          {
+            label: "Histórico climático",
+            to: "/historico-climatico-pelotas",
+            description: "Compare temperatura, chuva e vento recentes.",
+          },
+          {
+            label: "Fontes e metodologia",
+            to: "/metodologia",
+            description: "Origem, limites e atualização dos dados.",
+          },
         ],
       },
     ],
@@ -88,15 +128,31 @@ const megaMenus = [
       {
         title: "Acompanhamento hídrico",
         links: [
-          { label: "Situação das águas", to: "/situacao-hidrologica-pelotas", description: "Laranjal e estações da Lagoa dos Patos." },
-          { label: "Nível no Laranjal", to: "/nivel-da-lagoa-dos-patos-laranjal", description: "Medição, tendência e última leitura conhecida." },
+          {
+            label: "Situação das águas",
+            to: "/situacao-hidrologica-pelotas",
+            description: "Laranjal e estações da Lagoa dos Patos.",
+          },
+          {
+            label: "Nível no Laranjal",
+            to: "/nivel-da-lagoa-dos-patos-laranjal",
+            description: "Medição, tendência e última leitura conhecida.",
+          },
         ],
       },
       {
         title: "Segurança e contexto",
         links: [
-          { label: "Avisos oficiais", to: "/alertas", description: "Alertas meteorológicos vigentes para Pelotas." },
-          { label: "Como os dados são usados", to: "/metodologia", description: "Critérios, fontes e limitações das leituras." },
+          {
+            label: "Avisos oficiais",
+            to: "/alertas",
+            description: "Alertas meteorológicos vigentes para Pelotas.",
+          },
+          {
+            label: "Como os dados são usados",
+            to: "/metodologia",
+            description: "Critérios, fontes e limitações das leituras.",
+          },
         ],
       },
     ],
@@ -168,7 +224,9 @@ export function Header() {
                   className={`mega-navigation-item${isOpen ? " is-open" : ""}`}
                   key={menu.id}
                   onMouseEnter={() => setOpenMenu(menu.id)}
-                  onMouseLeave={() => setOpenMenu((current) => (current === menu.id ? null : current))}
+                  onMouseLeave={() =>
+                    setOpenMenu((current) => (current === menu.id ? null : current))
+                  }
                   onBlur={(event) => {
                     if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
                       setOpenMenu((current) => (current === menu.id ? null : current));
@@ -186,7 +244,9 @@ export function Header() {
                     type="button"
                     aria-expanded={isOpen}
                     aria-controls={`mega-menu-${menu.id}`}
-                    onClick={() => setOpenMenu((current) => (current === menu.id ? null : menu.id))}
+                    onClick={() =>
+                      setOpenMenu((current) => (current === menu.id ? null : menu.id))
+                    }
                     onFocus={() => setOpenMenu(menu.id)}
                   >
                     <span>{menu.label}</span>
@@ -201,7 +261,10 @@ export function Header() {
                     aria-hidden={!isOpen}
                   >
                     <div className="mega-navigation-surface">
-                      <Link className={`mega-navigation-feature is-${menu.id}`} to={menu.featured.to}>
+                      <Link
+                        className={`mega-navigation-feature is-${menu.id}`}
+                        to={menu.featured.to}
+                      >
                         <small>{menu.featured.eyebrow}</small>
                         <strong>{menu.featured.label}</strong>
                         <span>{menu.featured.description}</span>
@@ -246,7 +309,9 @@ export function Header() {
               to="/alertas"
               aria-current={alertsActive ? "page" : undefined}
             >
-              <span className="production-alert-icon" aria-hidden="true">!</span>
+              <span className="production-alert-icon" aria-hidden="true">
+                !
+              </span>
               <span>
                 <small>Avisos oficiais</small>
                 <strong>Consultar</strong>
