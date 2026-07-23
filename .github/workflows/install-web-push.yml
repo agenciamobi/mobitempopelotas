@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   prepare:
-    name: Instalar e formatar
+    name: Instalar, documentar e formatar
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -37,10 +37,108 @@ jobs:
           npm install --save-exact web-push@3.6.7 --no-audit --no-fund
           npm install --save-dev --save-exact @types/web-push@3.6.4 --no-audit --no-fund
 
+      - name: Atualizar matriz e plano de migração
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          def replace_once(content: str, old: str, new: str, label: str) -> str:
+              if old not in content:
+                  raise SystemExit(f"Trecho não encontrado: {label}")
+              return content.replace(old, new, 1)
+
+          matrix_path = Path("MIGRATION_MATRIX.md")
+          matrix = matrix_path.read_text(encoding="utf-8")
+          replacements = [
+              (
+                  "| Supabase, histórico e autenticação | 50% | SDK, clientes, migrations, histórico persistente e snapshots implementados; aplicação de RLS, validação externa e autenticação ainda pendentes |",
+                  "| Supabase, histórico e autenticação | 75% | SDK, clientes, migrations, histórico, snapshots, login Google e conta implementados; aplicação das migrations e validação externa permanecem pendentes |",
+                  "resumo Supabase",
+              ),
+              (
+                  "| PWA, push e cron | 55% | PWA, offline e rota assinada/idempotente de snapshots concluídos; scheduler e web push ainda pendentes |",
+                  "| PWA, push e cron | 90% | PWA, offline, inscrições web push, envio protegido e crons idempotentes implementados; falta configurar o scheduler definitivo |",
+                  "resumo PWA",
+              ),
+              (
+                  "| Qualidade, observabilidade e LGPD | 70% | CI, auditoria visual e tratamento de erros ativos; faltam testes unitários, auditorias finais e fluxos LGPD autenticados |",
+                  "| Qualidade, observabilidade e LGPD | 78% | CI, auditoria visual, conta opcional, consentimento push e tratamento de erros ativos; faltam direitos completos do titular, testes e auditorias finais |",
+                  "resumo qualidade",
+              ),
+              (
+                  "**Percentual global aproximado de paridade funcional: 84% a 88%.**",
+                  "**Percentual global aproximado de paridade funcional: 90% a 93%.**",
+                  "percentual global",
+              ),
+              (
+                  "3. Adaptar autenticação Google, callback PKCE e sessão SSR ao TanStack Start/Nitro.",
+                  "3. Configurar o provedor Google e validar callback PKCE, cookies e sessão SSR em preview e produção.",
+                  "bloqueador auth",
+              ),
+              (
+                  "4. Definir e configurar o scheduler definitivo para a rota assinada de snapshots e para o futuro envio web push.",
+                  "4. Definir e configurar o scheduler definitivo para snapshots meteorológicos e resumo diário web push.",
+                  "bloqueador scheduler",
+              ),
+              (
+                  "| 35 | Login Google e conta | Não migrado | `/auth/*`, `/entrar`, `/minha-conta`, componentes | rotas TanStack e componentes nativos | Supabase Auth Google | Callback PKCE, cookies e redirects SSR | Alto | Login, logout, callback, conta e proteção de dados funcionando | 7 |",
+                  "| 35 | Login Google e conta | Migrado | `/auth/*`, `/entrar`, `/minha-conta`, componentes | `src/routes/auth/`, `src/routes/entrar.tsx`, `src/routes/minha-conta.tsx`, `src/components/auth/` | Supabase Auth Google | Callback PKCE, cookies SSR, redirects internos e atualização transacional | Alto | Login, logout, callback, conta e proteção de dados implementados; validação externa pendente | 7 |",
+                  "linha login",
+              ),
+              (
+                  "| 37 | Cron | Parcial | rotas Vercel Cron | `src/routes/api/cron/weather-snapshot.ts` e scheduler externo planejado | `CRON_SECRET`, `PUSH_ADMIN_SECRET` | Rota assinada e idempotente implementada; agendamento definitivo pendente | Alto | Autenticação, idempotência, logs e execução observável | 8 |",
+                  "| 37 | Cron | Parcial | rotas Vercel Cron | `src/routes/api/cron/weather-snapshot.ts`, `src/routes/api/cron/push-daily.ts` | `CRON_SECRET`, `PUSH_ADMIN_SECRET` | Rotas assinadas, timeout e reserva atômica implementados; agendamento definitivo pendente | Alto | Autenticação, idempotência, logs e execução observável | 8 |",
+                  "linha cron",
+              ),
+              (
+                  "| 38 | Web push | Não migrado | serviço, store e APIs do legado | Supabase Edge Function ou runtime Node | VAPID public/private e subject | Evitar secret ou service role no navegador | Crítico | Subscribe, unsubscribe, envio, expiração e limpeza | 8 |",
+                  "| 38 | Web push | Migrado | serviço, store e APIs do legado | `src/lib/push/`, `src/routes/api/push/`, `src/components/pwa/PushNotificationsManager.tsx`, `public/sw.js` | VAPID, Supabase administrativo e secrets de cron/admin | Runtime Node, service worker e APIs TanStack; nenhuma secret no navegador | Crítico | Subscribe, unsubscribe, assuntos, envio, expiração, limpeza e idempotência implementados | 8 |",
+                  "linha web push",
+              ),
+              (
+                  "| 39 | PWA e offline | Migrado | manifesto, service worker, manager e offline | `public/manifest.webmanifest`, `public/sw.js`, `public/offline.html`, `src/components/pwa/` | Nenhuma; VAPID apenas para push futuro | Integração Vite/TanStack reescrita | Médio | Instalável, offline seguro, atualização controlada e cache resiliente | 8 |",
+                  "| 39 | PWA e offline | Migrado | manifesto, service worker, manager e offline | `public/manifest.webmanifest`, `public/sw.js`, `public/offline.html`, `src/components/pwa/` | VAPID somente no fluxo push | Integração Vite/TanStack com instalação, atualização, push e fallback offline | Médio | Instalável, notificações consentidas, offline seguro, atualização controlada e cache resiliente | 8 |",
+                  "linha PWA",
+              ),
+              (
+                  "- snapshots meteorológicos idempotentes com rota de captura protegida por segredo.",
+                  "- snapshots meteorológicos idempotentes com rota de captura protegida por segredo;\n- autenticação Google, conta e preferências com cookies SSR e atualização transacional;\n- notificações web push por assunto, envio administrativo protegido e cron diário idempotente.",
+                  "recursos adicionados",
+              ),
+              (
+                  "2. **Executar Lote 7 — autenticação e LGPD:** Google, callback PKCE, conta, preferências, sessão SSR e direitos do usuário.\n3. **Concluir Lote 8 — push e cron:** inscrições, envio, scheduler, idempotência e observabilidade.",
+                  "2. **Concluir LGPD da conta:** exportação, exclusão confirmada, retenção e registro de consentimentos.\n3. **Operacionalizar Lote 8:** aplicar migrations push, gerar VAPID, configurar scheduler, logs e alertas de falha.",
+                  "sequência atualizada",
+              ),
+          ]
+          for old, new, label in replacements:
+              matrix = replace_once(matrix, old, new, label)
+          matrix_path.write_text(matrix, encoding="utf-8")
+
+          migration_path = Path("MIGRATION.md")
+          migration = migration_path.read_text(encoding="utf-8")
+          migration = replace_once(
+              migration,
+              "- [ ] Inscrições push\n- [ ] Envio push em runtime compatível",
+              "- [x] Inscrições push\n- [x] Envio push em runtime Node compatível",
+              "checklist push",
+          )
+          migration = replace_once(
+              migration,
+              "O próximo bloco é o **Lote 7 — autenticação, conta e LGPD**:\n\n1. adaptar login Google e callback PKCE para TanStack Start/Nitro com sessão SSR;\n2. implementar entrada, saída, área de conta e proteção de rotas sem expor dados pessoais no navegador;\n3. conectar preferências meteorológicas à tabela já versionada, com RLS e textos claros para o visitante;\n4. implementar os fluxos de consulta, atualização e exclusão de dados previstos pela LGPD;\n5. somente depois concluir inscrições web push, envio, scheduler e observabilidade operacional.",
+              "O próximo bloco é o **fechamento operacional e LGPD**:\n\n1. aplicar e validar migrations, RLS, autenticação Google e web push no Supabase oficial;\n2. configurar os schedulers de snapshots e resumo diário, com logs e alertas de falha;\n3. implementar exportação e exclusão confirmada da conta, retenção e auditoria de consentimento;\n4. concluir testes automatizados, WCAG 2.2 AA, Core Web Vitals e revisão de segurança;\n5. executar o plano de deploy, DNS e rollback antes de remover `_legacy/`.",
+              "próxima fatia",
+          )
+          migration_path.write_text(migration, encoding="utf-8")
+          PY
+
       - name: Formatar lote
         run: |
           npx prettier --write \
             .env.example \
+            MIGRATION.md \
+            MIGRATION_MATRIX.md \
+            docs/web-push.md \
             public/sw.js \
             src/components/pwa/PushNotificationsManager.tsx \
             src/components/pwa/push-notifications.css \
@@ -51,14 +149,14 @@ jobs:
             src/routes/api/cron/push-daily.ts \
             supabase/migrations/20260723113000_create_web_push_subscriptions.sql
 
-      - name: Versionar dependências e formatação
+      - name: Versionar dependências, documentação e formatação
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json .env.example public/sw.js src supabase/migrations/20260723113000_create_web_push_subscriptions.sql
+          git add package.json package-lock.json .env.example MIGRATION.md MIGRATION_MATRIX.md docs/web-push.md public/sw.js src supabase/migrations/20260723113000_create_web_push_subscriptions.sql
           if git diff --cached --quiet; then
             echo "Nenhuma alteração adicional."
           else
-            git commit -m "chore: instala dependências e formata lote push"
+            git commit -m "chore: instala dependências e finaliza lote push"
             git push origin HEAD:${GITHUB_REF_NAME}
           fi
