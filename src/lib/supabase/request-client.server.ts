@@ -71,7 +71,9 @@ function serializeResponseCookie(cookie: SupabaseCookieToSet) {
 }
 
 export function createSupabaseRequestClient(request: Request) {
-  const cookieJar = new Map(parseRequestCookies(request).map((cookie) => [cookie.name, cookie.value]));
+  const cookieJar = new Map(
+    parseRequestCookies(request).map((cookie) => [cookie.name, cookie.value]),
+  );
   const responseHeaders = new Headers();
 
   const client = createSupabaseServerClient({

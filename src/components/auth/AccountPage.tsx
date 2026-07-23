@@ -1,10 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 
-import {
-  saveAccountPreferences,
-  type AccountSnapshot,
-} from "@/lib/auth/account.functions";
+import { saveAccountPreferences, type AccountSnapshot } from "@/lib/auth/account.functions";
 import { SiteFooter } from "@/production/components/site-footer";
 import { SiteHeader } from "@/production/components/site-header";
 import type { WeatherData } from "@/production/lib/weather-data";

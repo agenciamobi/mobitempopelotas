@@ -35,19 +35,17 @@ function MinhaContaPage() {
     return (
       <main className="login-page" id="conteudo-principal">
         <Link className="login-page__brand" to="/" aria-label="Voltar ao Tempo Pelotas">
-          <img
-            src="/brand/tempo-pelotas-header"
-            alt="Tempo Pelotas"
-            width={11349}
-            height={1552}
-          />
+          <img src="/brand/tempo-pelotas-header" alt="Tempo Pelotas" width={11349} height={1552} />
         </Link>
         <section className="login-card" aria-labelledby="account-unavailable-title">
           <span className="eyebrow">Conta Tempo Pelotas</span>
-          <h1 id="account-unavailable-title">A área de conta ainda não está ativa neste ambiente</h1>
+          <h1 id="account-unavailable-title">
+            A área de conta ainda não está ativa neste ambiente
+          </h1>
           <p>
             A configuração do Supabase externo precisa ser concluída antes do login. A previsão, os
-            alertas, as imagens meteorológicas e a situação das águas seguem disponíveis normalmente.
+            alertas, as imagens meteorológicas e a situação das águas seguem disponíveis
+            normalmente.
           </p>
         </section>
         <Link className="login-page__back" to="/">

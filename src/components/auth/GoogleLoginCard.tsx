@@ -1,10 +1,7 @@
 import { useState } from "react";
 
 import { safeNextPath } from "@/lib/auth/paths";
-import {
-  getSupabaseBrowserClient,
-  isSupabaseBrowserConfigured,
-} from "@/lib/supabase/client";
+import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from "@/lib/supabase/client";
 
 const AUTH_ERRORS: Record<string, string> = {
   configuracao: "A autenticação está temporariamente indisponível neste ambiente.",
@@ -32,13 +29,7 @@ function GoogleIcon() {
   );
 }
 
-export function GoogleLoginCard({
-  nextPath,
-  errorCode,
-}: {
-  nextPath: string;
-  errorCode?: string;
-}) {
+export function GoogleLoginCard({ nextPath, errorCode }: { nextPath: string; errorCode?: string }) {
   const configured = isSupabaseBrowserConfigured();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(
