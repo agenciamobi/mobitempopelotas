@@ -7,6 +7,26 @@ import {
 } from "@/lib/supabase/server-client.server";
 
 const QUERY_TIMEOUT_MS = 3_500;
+const EXPORT_PAGE_SIZE = 500;
+
+type AccountAdminClient = ReturnType<typeof createSupabaseAdminClient>;
+
+type ConsentExportRow = {
+  channel: string;
+  granted: boolean;
+  source: string;
+  policy_version: string;
+  created_at: string;
+};
+
+type NotificationDeviceExportRow = {
+  endpoint: string;
+  user_agent: string | null;
+  topics: string[];
+  created_at: string;
+  updated_at: string;
+  last_seen_at: string;
+};
 
 function timeoutSignal() {
   return AbortSignal.timeout(QUERY_TIMEOUT_MS);
@@ -20,6 +40,66 @@ function jsonHeaders(base = new Headers()) {
   base.set("X-Content-Type-Options", "nosniff");
   base.set("X-Robots-Tag", "noindex, nofollow");
   return base;
+}
+
+async function loadConsentHistory(admin: AccountAdminClient, userId: string) {
+  const records: ConsentExportRow[] = [];
+  let offset = 0;
+
+  while (true) {
+    const { data, error, count } = await admin
+      .from("account_consent_events")
+      .select("id,channel,granted,source,policy_version,created_at", { count: "exact" })
+      .eq("user_id", userId)
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true })
+      .range(offset, offset + EXPORT_PAGE_SIZE - 1)
+      .abortSignal(timeoutSignal());
+
+    if (error) {
+      throw new Error(`Falha ao consultar histórico de consentimentos: ${error.message}`);
+    }
+
+    const page = data ?? [];
+    for (const record of page) {
+      records.push({
+        channel: record.channel,
+        granted: record.granted,
+        source: record.source,
+        policy_version: record.policy_version,
+        created_at: record.created_at,
+      });
+    }
+
+    offset += page.length;
+    if (page.length === 0 || (typeof count === "number" && offset >= count)) return records;
+  }
+}
+
+async function loadNotificationDevices(admin: AccountAdminClient, userId: string) {
+  const records: NotificationDeviceExportRow[] = [];
+  let offset = 0;
+
+  while (true) {
+    const { data, error, count } = await admin
+      .from("web_push_subscriptions")
+      .select("endpoint,user_agent,topics,created_at,updated_at,last_seen_at", { count: "exact" })
+      .eq("user_id", userId)
+      .order("created_at", { ascending: true })
+      .order("endpoint", { ascending: true })
+      .range(offset, offset + EXPORT_PAGE_SIZE - 1)
+      .abortSignal(timeoutSignal());
+
+    if (error) {
+      throw new Error(`Falha ao consultar aparelhos de notificação: ${error.message}`);
+    }
+
+    const page = data ?? [];
+    records.push(...page);
+    offset += page.length;
+
+    if (page.length === 0 || (typeof count === "number" && offset >= count)) return records;
+  }
 }
 
 async function exportAccountData(request: Request) {
@@ -49,35 +129,27 @@ async function exportAccountData(request: Request) {
     }
 
     const admin = createSupabaseAdminClient();
-    const [profileResult, preferencesResult, consentResult, pushResult] = await Promise.all([
-      admin
-        .from("profiles")
-        .select("email,display_name,avatar_url,created_at,updated_at")
-        .eq("id", account.user.id)
-        .abortSignal(timeoutSignal())
-        .maybeSingle(),
-      admin
-        .from("user_preferences")
-        .select("weather_alerts,water_alerts,daily_summary,community_updates,created_at,updated_at")
-        .eq("user_id", account.user.id)
-        .abortSignal(timeoutSignal())
-        .maybeSingle(),
-      admin
-        .from("account_consent_events")
-        .select("channel,granted,source,policy_version,created_at")
-        .eq("user_id", account.user.id)
-        .order("created_at", { ascending: true })
-        .abortSignal(timeoutSignal()),
-      admin
-        .from("web_push_subscriptions")
-        .select("endpoint,user_agent,topics,created_at,updated_at,last_seen_at")
-        .eq("user_id", account.user.id)
-        .order("created_at", { ascending: true })
-        .abortSignal(timeoutSignal()),
-    ]);
+    const [profileResult, preferencesResult, consentHistory, notificationDevices] =
+      await Promise.all([
+        admin
+          .from("profiles")
+          .select("email,display_name,avatar_url,created_at,updated_at")
+          .eq("id", account.user.id)
+          .abortSignal(timeoutSignal())
+          .maybeSingle(),
+        admin
+          .from("user_preferences")
+          .select(
+            "weather_alerts,water_alerts,daily_summary,community_updates,created_at,updated_at",
+          )
+          .eq("user_id", account.user.id)
+          .abortSignal(timeoutSignal())
+          .maybeSingle(),
+        loadConsentHistory(admin, account.user.id),
+        loadNotificationDevices(admin, account.user.id),
+      ]);
 
-    const error =
-      profileResult.error ?? preferencesResult.error ?? consentResult.error ?? pushResult.error;
+    const error = profileResult.error ?? preferencesResult.error;
     if (error) {
       console.error("[account/export] Falha ao consultar dados da conta", {
         code: error.code,
@@ -102,15 +174,8 @@ async function exportAccountData(request: Request) {
         profile: profileResult.data,
         preferences: preferencesResult.data,
       },
-      consent_history: consentResult.data ?? [],
-      notification_devices: (pushResult.data ?? []).map((subscription) => ({
-        endpoint: subscription.endpoint,
-        user_agent: subscription.user_agent,
-        topics: subscription.topics,
-        created_at: subscription.created_at,
-        updated_at: subscription.updated_at,
-        last_seen_at: subscription.last_seen_at,
-      })),
+      consent_history: consentHistory,
+      notification_devices: notificationDevices,
       security_note:
         "Chaves criptográficas de entrega e credenciais de sessão não fazem parte da exportação por segurança.",
     };
