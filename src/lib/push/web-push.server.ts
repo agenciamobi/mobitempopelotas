@@ -7,10 +7,7 @@ import {
   sign,
 } from "node:crypto";
 
-import {
-  fetchAllowedPushEndpoint,
-  isAllowedPushEndpoint,
-} from "./push-http.server";
+import { fetchAllowedPushEndpoint, isAllowedPushEndpoint } from "./push-http.server";
 import {
   deletePushSubscription,
   getPushStorageStatus,
@@ -45,10 +42,7 @@ export type PushBroadcastProgress = {
 
 export type PushBroadcastOptions = {
   consentPreference?: PushConsentPreference;
-  beforeBatch?: (context: {
-    processed: number;
-    batchSize: number;
-  }) => Promise<void>;
+  beforeBatch?: (context: { processed: number; batchSize: number }) => Promise<void>;
   afterBatch?: (progress: PushBroadcastProgress) => void | Promise<void>;
 };
 
@@ -87,11 +81,7 @@ function decodeBase64Url(value: string) {
 
 function encodeBase64Url(value: Buffer | Uint8Array | string) {
   const buffer = typeof value === "string" ? Buffer.from(value) : Buffer.from(value);
-  return buffer
-    .toString("base64")
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_");
+  return buffer.toString("base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
 }
 
 function validateVapidSubject(subject: string) {
@@ -104,11 +94,7 @@ function validateVapidKeys(publicKey: string | null, privateKey: string | null) 
   try {
     const publicBytes = decodeBase64Url(publicKey);
     const privateBytes = decodeBase64Url(privateKey);
-    return (
-      publicBytes.length === 65 &&
-      publicBytes[0] === 4 &&
-      privateBytes.length === 32
-    );
+    return publicBytes.length === 65 && publicBytes[0] === 4 && privateBytes.length === 32;
   } catch {
     return false;
   }
@@ -166,9 +152,7 @@ function notificationBody(payload: PushPayload) {
   });
 }
 
-function defaultConsentPreference(
-  topic: PushPayload["topic"],
-): PushConsentPreference | undefined {
+function defaultConsentPreference(topic: PushPayload["topic"]): PushConsentPreference | undefined {
   switch (topic) {
     case "weather":
       return "weather_alerts";
@@ -185,11 +169,7 @@ function hkdfExtract(salt: Buffer, inputKeyMaterial: Buffer) {
   return createHmac("sha256", salt).update(inputKeyMaterial).digest();
 }
 
-function hkdfExpand(
-  pseudoRandomKey: Buffer,
-  info: Buffer,
-  length: number,
-) {
+function hkdfExpand(pseudoRandomKey: Buffer, info: Buffer, length: number) {
   const blocks: Buffer[] = [];
   let previous = Buffer.alloc(0);
   let currentLength = 0;
@@ -207,10 +187,7 @@ function hkdfExpand(
   return Buffer.concat(blocks).subarray(0, length);
 }
 
-function createEncryptionMaterial(
-  subscription: StoredPushSubscription,
-  payload: string,
-) {
+function createEncryptionMaterial(subscription: StoredPushSubscription, payload: string) {
   const userPublicKey = decodeBase64Url(subscription.keys.p256dh);
   const authSecret = decodeBase64Url(subscription.keys.auth);
 
@@ -218,9 +195,7 @@ function createEncryptionMaterial(
     throw new Error("A chave pública da inscrição web push é inválida.");
   }
   if (authSecret.length < 8) {
-    throw new Error(
-      "O segredo de autenticação da inscrição web push é inválido.",
-    );
+    throw new Error("O segredo de autenticação da inscrição web push é inválido.");
   }
 
   const serverKey = createECDH("prime256v1");
@@ -242,25 +217,10 @@ function createEncryptionMaterial(
     Buffer.from("Content-Encoding: aes128gcm\0", "utf8"),
     16,
   );
-  const nonce = hkdfExpand(
-    pseudoRandomKey,
-    Buffer.from("Content-Encoding: nonce\0", "utf8"),
-    12,
-  );
-  const plaintext = Buffer.concat([
-    Buffer.from(payload, "utf8"),
-    Buffer.from([2]),
-  ]);
-  const cipher = createCipheriv(
-    "aes-128-gcm",
-    contentEncryptionKey,
-    nonce,
-  );
-  const ciphertext = Buffer.concat([
-    cipher.update(plaintext),
-    cipher.final(),
-    cipher.getAuthTag(),
-  ]);
+  const nonce = hkdfExpand(pseudoRandomKey, Buffer.from("Content-Encoding: nonce\0", "utf8"), 12);
+  const plaintext = Buffer.concat([Buffer.from(payload, "utf8"), Buffer.from([2])]);
+  const cipher = createCipheriv("aes-128-gcm", contentEncryptionKey, nonce);
+  const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final(), cipher.getAuthTag()]);
   const recordSize = Buffer.alloc(4);
   recordSize.writeUInt32BE(RECORD_SIZE, 0);
 
@@ -273,16 +233,11 @@ function createEncryptionMaterial(
   ]);
 }
 
-function createVapidAuthorization(
-  endpoint: string,
-  vapid: ActiveVapidConfiguration,
-) {
+function createVapidAuthorization(endpoint: string, vapid: ActiveVapidConfiguration) {
   const publicBytes = decodeBase64Url(vapid.publicKey);
   const privateBytes = decodeBase64Url(vapid.privateKey);
   const audience = new URL(endpoint).origin;
-  const header = encodeBase64Url(
-    JSON.stringify({ typ: "JWT", alg: "ES256" }),
-  );
+  const header = encodeBase64Url(JSON.stringify({ typ: "JWT", alg: "ES256" }));
   const claims = encodeBase64Url(
     JSON.stringify({
       aud: audience,
@@ -310,9 +265,7 @@ function createVapidAuthorization(
 }
 
 function normalizedTopic(value: string) {
-  return (
-    value.replace(/[^A-Za-z0-9_-]/g, "-").slice(0, 32) || "tempo-pelotas"
-  );
+  return value.replace(/[^A-Za-z0-9_-]/g, "-").slice(0, 32) || "tempo-pelotas";
 }
 
 function pushDeliveryError(message: string, statusCode: number) {
@@ -372,9 +325,7 @@ export async function broadcastPushNotification(
 
   const status = getPushConfigurationStatus();
   if (!status.enabled) {
-    throw new Error(
-      `Notificações web push não configuradas: ${status.missing.join(", ")}`,
-    );
+    throw new Error(`Notificações web push não configuradas: ${status.missing.join(", ")}`);
   }
 
   const vapid = getActiveVapidConfig();
@@ -385,8 +336,7 @@ export async function broadcastPushNotification(
     failed: 0,
     removed: 0,
   };
-  const consentPreference =
-    options.consentPreference ?? defaultConsentPreference(payload.topic);
+  const consentPreference = options.consentPreference ?? defaultConsentPreference(payload.topic);
   if (!consentPreference) {
     throw new Error("Toda notificação precisa de uma categoria de consentimento.");
   }
@@ -396,11 +346,7 @@ export async function broadcastPushNotification(
     payload.topic,
     consentPreference,
   )) {
-    for (
-      let index = 0;
-      index < subscriptions.length;
-      index += DELIVERY_BATCH_SIZE
-    ) {
+    for (let index = 0; index < subscriptions.length; index += DELIVERY_BATCH_SIZE) {
       const batch = subscriptions.slice(index, index + DELIVERY_BATCH_SIZE);
       await options.beforeBatch?.({ processed, batchSize: batch.length });
 
@@ -417,16 +363,11 @@ export async function broadcastPushNotification(
                 result.removed += 1;
               } catch (cleanupError) {
                 result.failed += 1;
-                console.error(
-                  "[push] Endpoint expirado, mas a inscrição não foi removida",
-                  {
-                    statusCode,
-                    message:
-                      cleanupError instanceof Error
-                        ? cleanupError.message
-                        : String(cleanupError),
-                  },
-                );
+                console.error("[push] Endpoint expirado, mas a inscrição não foi removida", {
+                  statusCode,
+                  message:
+                    cleanupError instanceof Error ? cleanupError.message : String(cleanupError),
+                });
               }
               return;
             }

@@ -18,22 +18,17 @@ export const PUSH_RESPONSE_HEADERS = {
 } as const;
 
 export type LimitedJsonResult =
-  | { ok: true; value: unknown }
-  | { ok: false; status: 400 | 413 | 415; error: string };
+  { ok: true; value: unknown } | { ok: false; status: 400 | 413 | 415; error: string };
 
 type HeadersWithSetCookie = Headers & {
   getSetCookie?: () => string[];
 };
 
-type PushFetch = (
-  input: RequestInfo | URL,
-  init?: RequestInit,
-) => Promise<Response>;
+type PushFetch = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
 
 function appendResponseHeaders(target: Headers, source: HeadersInit) {
   const sourceHeaders = source instanceof Headers ? source : new Headers(source);
-  const setCookies =
-    (sourceHeaders as HeadersWithSetCookie).getSetCookie?.() ?? [];
+  const setCookies = (sourceHeaders as HeadersWithSetCookie).getSetCookie?.() ?? [];
 
   sourceHeaders.forEach((value, key) => {
     if (key.toLowerCase() !== "set-cookie") target.append(key, value);
@@ -48,11 +43,7 @@ function appendResponseHeaders(target: Headers, source: HeadersInit) {
   if (fallbackSetCookie) target.append("Set-Cookie", fallbackSetCookie);
 }
 
-export function pushJsonResponse(
-  body: unknown,
-  status = 200,
-  additionalHeaders?: HeadersInit,
-) {
+export function pushJsonResponse(body: unknown, status = 200, additionalHeaders?: HeadersInit) {
   const headers = new Headers(PUSH_RESPONSE_HEADERS);
   if (additionalHeaders) appendResponseHeaders(headers, additionalHeaders);
 
@@ -73,9 +64,7 @@ export function isSameOriginRequest(request: Request) {
   }
 }
 
-export async function readLimitedJson(
-  request: Request,
-): Promise<LimitedJsonResult> {
+export async function readLimitedJson(request: Request): Promise<LimitedJsonResult> {
   const contentType = request.headers.get("content-type")?.toLowerCase() ?? "";
   if (!contentType.startsWith("application/json")) {
     return {
@@ -183,25 +172,15 @@ export async function fetchAllowedPushEndpoint(
   return response;
 }
 
-export function hasBearerSecret(
-  request: Request,
-  secret: string | undefined,
-) {
+export function hasBearerSecret(request: Request, secret: string | undefined) {
   const normalized = secret?.trim();
-  return (
-    Boolean(normalized) &&
-    request.headers.get("authorization") === `Bearer ${normalized}`
-  );
+  return Boolean(normalized) && request.headers.get("authorization") === `Bearer ${normalized}`;
 }
 
 export function safeInternalPath(value: unknown, fallback = "/") {
   if (typeof value !== "string") return fallback;
   const candidate = value.trim();
-  if (
-    !candidate.startsWith("/") ||
-    candidate.startsWith("//") ||
-    candidate.includes("\\")
-  ) {
+  if (!candidate.startsWith("/") || candidate.startsWith("//") || candidate.includes("\\")) {
     return fallback;
   }
 
