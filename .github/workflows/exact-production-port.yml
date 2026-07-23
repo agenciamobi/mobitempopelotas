@@ -1,0 +1,561 @@
+name: Transplante literal da produção
+
+on:
+  push:
+    branches:
+      - agent/exact-production-port
+
+permissions:
+  contents: write
+
+jobs:
+  port:
+    if: ${{ !contains(github.event.head_commit.message, '[exact-production-port]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/exact-production-port
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Copiar componentes e estilos da produção
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          root = Path('.')
+          production = root / 'src' / 'production'
+          components = production / 'components'
+          lib = production / 'lib'
+          compat = production / 'compat'
+          adapters = production / 'adapters'
+          for directory in (components, lib, compat, adapters):
+              directory.mkdir(parents=True, exist_ok=True)
+
+          component_files = [
+              'site-header.tsx',
+              'weather-hero.tsx',
+              'weather-icon.tsx',
+              'home-section-navigation.tsx',
+              'inmet-alerts-panel.tsx',
+              'safety-alerts.tsx',
+              'site-footer.tsx',
+              'home-editorial-dashboard.tsx',
+              'home-editorial-dashboard-semantic.tsx',
+              'weather-map.tsx',
+              'weather-map.module.css',
+          ]
+
+          replacements = {
+              'import Link from "next/link";': 'import Link from "@/production/compat/NextLink";',
+              'import { usePathname } from "next/navigation";': 'import { usePathname } from "@/production/compat/navigation";',
+              '"@/components/weather-icon"': '"@/production/components/weather-icon"',
+              '"@/components/weather-map"': '"@/production/components/weather-map"',
+              '"@/components/home-editorial-dashboard"': '"@/production/components/home-editorial-dashboard"',
+              '"@/lib/weather-data"': '"@/production/lib/weather-data"',
+              '"@/lib/weather-insights"': '"@/production/lib/weather-insights"',
+              '"@/lib/cppmet-forecast"': '"@/production/lib/cppmet-forecast"',
+              '"@/lib/inmet-alerts"': '"@/production/lib/inmet-alerts"',
+              '"@/lib/safety-banners"': '"@/production/lib/safety-banners"',
+              '"@/lib/embrapa-observation"': '"@/production/lib/embrapa-observation"',
+              '"@/lib/guaiba-monitor"': '"@/production/lib/guaiba-monitor"',
+              '"@/lib/lagoon-monitoring-network"': '"@/production/lib/lagoon-monitoring-network"',
+              '"@/lib/laranjal-level"': '"@/production/lib/laranjal-level"',
+              '"@/lib/weather-ai-summary"': '"@/production/lib/weather-ai-summary"',
+              '"@/lib/water-level-state"': '"@/production/lib/water-level-state"',
+              '"@/lib/redemet-types"': '"@/production/lib/redemet-types"',
+          }
+
+          for filename in component_files:
+              source = root / '_legacy' / 'components' / filename
+              target = components / filename
+              text = source.read_text()
+              for old, new in replacements.items():
+                  text = text.replace(old, new)
+              target.write_text(text)
+
+          for filename in ['weather-data.ts', 'weather-insights.ts', 'water-level-state.ts', 'redemet-types.ts', 'safety-banners.ts']:
+              source = root / '_legacy' / 'lib' / filename
+              target = lib / filename
+              text = source.read_text().replace('"@/lib/weather-data"', '"@/production/lib/weather-data"')
+              target.write_text(text)
+
+          legacy_css = (root / '_legacy' / 'app' / 'globals.css').read_text()
+          legacy_css = legacy_css.replace('@import "tailwindcss";\n\n', '', 1)
+          (production / 'production.css').write_text(legacy_css)
+
+          (compat / 'NextLink.tsx').write_text('''import type { AnchorHTMLAttributes, ReactNode } from "react";
+
+type LegacyHref = string | { pathname?: string; query?: Record<string, unknown>; hash?: string };
+
+type LegacyLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & {
+  href: LegacyHref;
+  children?: ReactNode;
+  prefetch?: boolean;
+  replace?: boolean;
+  scroll?: boolean;
+};
+
+function resolveHref(href: LegacyHref) {
+  if (typeof href === "string") return href;
+  const pathname = href.pathname ?? "/";
+  const search = href.query ? `?${new URLSearchParams(Object.entries(href.query).map(([key, value]) => [key, String(value)])).toString()}` : "";
+  const hash = href.hash ? `#${href.hash.replace(/^#/, "")}` : "";
+  return `${pathname}${search}${hash}`;
+}
+
+export default function NextLink({ href, prefetch: _prefetch, replace: _replace, scroll: _scroll, ...props }: LegacyLinkProps) {
+  return <a href={resolveHref(href)} {...props} />;
+}
+''')
+
+          (compat / 'navigation.ts').write_text('''import { useRouterState } from "@tanstack/react-router";
+
+export function usePathname() {
+  return useRouterState({ select: (state) => state.location.pathname });
+}
+''')
+
+          (lib / 'cppmet-forecast.ts').write_text('''export type CppmetForecastItem = {
+  day: string;
+  summary: string;
+  minimum: number | null;
+  maximum: number | null;
+  text: string;
+};
+''')
+
+          (lib / 'weather-ai-summary.ts').write_text('''export type ForecastNarrative = {
+  headline: string;
+  summary: string;
+};
+
+export type WeatherAiSummaries = {
+  status: "generated" | "unavailable";
+  today: ForecastNarrative | null;
+  tomorrow: ForecastNarrative | null;
+  generatedAt: string | null;
+  model: string | null;
+};
+''')
+
+          (lib / 'inmet-alerts.ts').write_text('''export type InmetAlertSeverity = "potential" | "danger" | "great-danger" | "unknown";
+export type InmetAlertRelevance = "pelotas" | "regional" | "state";
+export type InmetAlertPeriod = "active" | "upcoming";
+
+export type InmetAlert = {
+  id: string;
+  event: string;
+  headline: string;
+  description: string;
+  instruction: string;
+  severity: InmetAlertSeverity;
+  severityLabel: string;
+  relevance: InmetAlertRelevance;
+  period: InmetAlertPeriod;
+  startsAt: string | null;
+  expiresAt: string | null;
+  sentAt: string | null;
+  areas: string[];
+  municipalities: string[];
+  municipalityCodes: string[];
+  officialUrl: string;
+};
+
+export type InmetAlertsData = {
+  status: "live" | "unavailable";
+  alerts: InmetAlert[];
+  counts: { total: number; pelotas: number; regional: number; state: number };
+  source: { name: string; feedUrl: string; portalUrl: string; fetchedAt: string };
+  error: string | null;
+};
+''')
+
+          (lib / 'embrapa-observation.ts').write_text('''export type TimedObservation = { value: number | null; time: string | null };
+
+export type EmbrapaObservationData = {
+  status: "live" | "partial" | "unavailable";
+  current: {
+    temperature: number | null;
+    humidity: number | null;
+    feelsLike: number | null;
+    dewPoint: number | null;
+    pressure: number | null;
+    pressureTrend: string | null;
+    windDirection: string | null;
+    windSpeed: number | null;
+    sunrise: string | null;
+    sunset: string | null;
+  };
+  extremes: {
+    temperatureMin: TimedObservation;
+    temperatureMax: TimedObservation;
+    humidityMin: TimedObservation;
+    humidityMax: TimedObservation;
+    dewPointMin: TimedObservation;
+    dewPointMax: TimedObservation;
+    windSpeedMax: TimedObservation;
+  };
+  accumulated: {
+    rainDaily: number | null;
+    rainMonthly: number | null;
+    rainAnnual: number | null;
+    evapotranspirationDaily: number | null;
+    evapotranspirationMonthly: number | null;
+    evapotranspirationAnnual: number | null;
+  };
+  source: {
+    name: string;
+    station: string;
+    url: string;
+    latitude: number;
+    longitude: number;
+    altitude: number;
+    fetchedAt: string;
+    observationTime: string | null;
+  };
+  error: string | null;
+};
+''')
+
+          (lib / 'guaiba-monitor.ts').write_text('''export type { GuaibaObservationData } from "@/lib/hydrology/guaiba.server";
+''')
+          (lib / 'lagoon-monitoring-network.ts').write_text('''export type {
+  LagoonMonitoringNetworkData,
+  LagoonMonitoringObservation,
+} from "@/lib/hydrology/lagoon-network.server";
+''')
+          (lib / 'laranjal-level.ts').write_text('''export type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
+''')
+
+          (adapters / 'home.ts').write_text('''import type { GuaibaObservationData } from "@/lib/hydrology/guaiba.server";
+import type { LagoonMonitoringNetworkData } from "@/lib/hydrology/lagoon-network.server";
+import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
+import type { AggregatedWeatherData } from "@/lib/weather/aggregated-weather.types";
+import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
+import type { EmbrapaObservationData } from "@/production/lib/embrapa-observation";
+import type { InmetAlertsData } from "@/production/lib/inmet-alerts";
+import type { WeatherAiSummaries } from "@/production/lib/weather-ai-summary";
+import type { WeatherData } from "@/production/lib/weather-data";
+
+function finite(value: number | null | undefined, fallback = 0) {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function formatUpdatedAt(value: string | null | undefined) {
+  if (!value) return "Horário não informado";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+export function toProductionWeatherData(data: AggregatedWeatherData): WeatherData {
+  const current = data.current;
+  const today = data.daily[0];
+  const temperature = finite(current?.temperature, finite(today?.max));
+  const observedAt = current?.observedAt ?? data.source.fetchedAt;
+
+  return {
+    current: {
+      city: current?.city ?? "Pelotas",
+      state: current?.state ?? "RS",
+      temperature,
+      feelsLike: finite(current?.feelsLike, temperature),
+      condition: current?.condition ?? data.message ?? "Condições em atualização",
+      humidity: finite(current?.humidity),
+      pressure: finite(current?.pressure),
+      windSpeed: finite(current?.windSpeed),
+      windGust: finite(current?.windGust, finite(current?.windSpeed)),
+      windDirection: current?.windDirection ?? "Indisponível",
+      visibility: finite(current?.visibilityKm),
+      sunrise: current?.sunrise ?? "—",
+      sunset: current?.sunset ?? "—",
+      updatedAt: formatUpdatedAt(observedAt),
+      icon: current?.icon ?? today?.icon ?? "cloud",
+      source: {
+        name: data.quality.currentSource === "embrapa" ? "Embrapa Clima Temperado" : data.quality.forecastProvider ?? "MOBI Tempo Pelotas",
+        url: data.quality.currentSource === "embrapa" ? data.observation.source.url : "/metodologia",
+        kind: data.quality.currentSource === "embrapa" ? "observation" : "forecast",
+        observedAt: data.observation.source.observationTime ?? observedAt,
+      },
+    },
+    hourly: data.hourly.map((hour) => ({
+      time: hour.time,
+      temperature: hour.temperature,
+      precipitation: hour.precipitationProbability ?? 0,
+      windSpeed: hour.windSpeed,
+      windGust: hour.windGust ?? hour.windSpeed,
+      icon: hour.icon,
+    })),
+    daily: data.daily.map((day) => ({
+      weekday: day.weekday,
+      date: day.date,
+      min: day.min,
+      max: day.max,
+      rainChance: day.rainChance ?? 0,
+      precipitation: day.precipitationMm,
+      windGust: day.windGust ?? 0,
+      icon: day.icon,
+    })),
+    regional: current
+      ? [
+          {
+            city: "Pelotas",
+            temperature,
+            condition: current.icon ?? "cloud",
+            latitude: -31.7654,
+            longitude: -52.3376,
+          },
+        ]
+      : [],
+    source: {
+      name: "MOBI Tempo Pelotas",
+      url: "/metodologia",
+      isFallback: data.status !== "live",
+      observationName: data.observation.source.name,
+      observationUrl: data.observation.source.url,
+      forecastName: data.quality.forecastProvider ?? "Modelo meteorológico",
+      forecastUrl: "/metodologia",
+    },
+  };
+}
+
+export function toProductionObservation(data: AggregatedWeatherData): EmbrapaObservationData {
+  const observation = data.observation;
+  const empty = { value: null, time: null };
+  return {
+    ...observation,
+    extremes: {
+      ...observation.extremes,
+      dewPointMin: empty,
+      dewPointMax: empty,
+    },
+    accumulated: {
+      ...observation.accumulated,
+      evapotranspirationDaily: null,
+      evapotranspirationMonthly: null,
+      evapotranspirationAnnual: null,
+    },
+  };
+}
+
+export function toProductionAlerts(data: AggregatedWeatherData): InmetAlertsData {
+  const alerts = data.alerts;
+  return {
+    status: data.sources.inmet.usable ? "live" : "unavailable",
+    alerts,
+    counts: {
+      total: alerts.length,
+      pelotas: alerts.filter((alert) => alert.relevance === "pelotas").length,
+      regional: alerts.filter((alert) => alert.relevance === "regional").length,
+      state: alerts.filter((alert) => alert.relevance === "state").length,
+    },
+    source: {
+      name: "INMET",
+      feedUrl: "https://apiprevmet3.inmet.gov.br/avisos/ativos",
+      portalUrl: "https://alertas2.inmet.gov.br/",
+      fetchedAt: data.sources.inmet.fetchedAt,
+    },
+    error: data.sources.inmet.reason,
+  };
+}
+
+export function toProductionSummaries(data: WeatherIntelligenceData): WeatherAiSummaries {
+  return {
+    status: data.intelligence.origin === "gemini" ? "generated" : "unavailable",
+    today: { headline: data.brief.headline, summary: data.brief.summary },
+    tomorrow: null,
+    generatedAt: data.intelligence.generatedAt,
+    model: data.intelligence.model,
+  };
+}
+
+export type ProductionHomeHydrology = {
+  laranjal: LaranjalLevelData;
+  guaiba: GuaibaObservationData;
+  lagoon: LagoonMonitoringNetworkData;
+};
+''')
+
+          (production / 'ProductionHome.tsx').write_text('''import type { GuaibaObservationData } from "@/lib/hydrology/guaiba.server";
+import type { LagoonMonitoringNetworkData } from "@/lib/hydrology/lagoon-network.server";
+import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
+import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
+import {
+  toProductionAlerts,
+  toProductionObservation,
+  toProductionSummaries,
+  toProductionWeatherData,
+} from "@/production/adapters/home";
+import { HomeEditorialDashboard } from "@/production/components/home-editorial-dashboard-semantic";
+import { HomeSectionNavigation } from "@/production/components/home-section-navigation";
+import { InmetAlertsPanel } from "@/production/components/inmet-alerts-panel";
+import { SafetyAlertBanner } from "@/production/components/safety-alerts";
+import { SiteFooter } from "@/production/components/site-footer";
+import { SiteHeader } from "@/production/components/site-header";
+import { WeatherHero } from "@/production/components/weather-hero";
+import { getFeaturedSafetyBanner } from "@/production/lib/safety-banners";
+import { getWeatherAdvisory, type AdvisoryLevel } from "@/production/lib/weather-insights";
+import "maplibre-gl/dist/maplibre-gl.css";
+import "./production.css";
+
+const advisoryRank: Record<AdvisoryLevel, number> = { normal: 0, attention: 1, warning: 2 };
+
+export function ProductionHome({
+  data,
+  laranjal,
+  guaiba,
+  lagoon,
+}: {
+  data: WeatherIntelligenceData;
+  laranjal: LaranjalLevelData;
+  guaiba: GuaibaObservationData;
+  lagoon: LagoonMonitoringNetworkData;
+}) {
+  const weather = toProductionWeatherData(data.weather);
+  const summaries = toProductionSummaries(data);
+  const observation = toProductionObservation(data.weather);
+  const inmetAlerts = toProductionAlerts(data.weather);
+  const advisory = getWeatherAdvisory(weather);
+  const pelotasOfficialAlerts = inmetAlerts.alerts.filter((alert) => alert.relevance === "pelotas");
+  const officialLevel: AdvisoryLevel = pelotasOfficialAlerts.some(
+    (alert) => alert.severity === "danger" || alert.severity === "great-danger",
+  )
+    ? "warning"
+    : pelotasOfficialAlerts.some((alert) => alert.severity === "potential")
+      ? "attention"
+      : "normal";
+  const headerLevel =
+    advisoryRank[officialLevel] > advisoryRank[advisory.level] ? officialLevel : advisory.level;
+  const featuredSafetyBanner = getFeaturedSafetyBanner(pelotasOfficialAlerts.length > 0);
+  const cppmetToday = data.weather.officialForecast[0] ?? null;
+  const mainClassName =
+    pelotasOfficialAlerts.length > 0
+      ? "home-editorial-main has-official-alerts"
+      : "home-editorial-main";
+
+  return (
+    <div className="site-shell site-shell--home site-shell--home-editorial">
+      <SiteHeader advisoryLevel={headerLevel} variant="hero" />
+      <WeatherHero
+        weather={weather}
+        advisoryLevel={headerLevel}
+        officialAlertCount={pelotasOfficialAlerts.length}
+        cppmetForecast={
+          cppmetToday
+            ? { item: cppmetToday, sourceUrl: "https://wp.ufpel.edu.br/cppmet/" }
+            : null
+        }
+      />
+
+      <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
+        <InmetAlertsPanel data={inmetAlerts} variant="home" />
+        <SafetyAlertBanner banner={featuredSafetyBanner} />
+        <HomeSectionNavigation />
+        <HomeEditorialDashboard
+          weather={weather}
+          summaries={summaries}
+          advisoryLevel={headerLevel}
+          observation={observation}
+          laranjal={laranjal}
+          guaiba={guaiba}
+          lagoon={lagoon}
+        />
+      </main>
+
+      <SiteFooter source={weather.source} />
+    </div>
+  );
+}
+''')
+
+          route_path = root / 'src' / 'routes' / 'index.tsx'
+          route_path.write_text('''import { createFileRoute } from "@tanstack/react-router";
+
+import { ProductionHome } from "@/production/ProductionHome";
+import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
+import { getLagoonMonitoringNetwork } from "@/lib/hydrology/lagoon-network.functions";
+import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
+import { createPageHead } from "@/lib/page-meta";
+import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
+
+export const Route = createFileRoute("/")({
+  head: () =>
+    createPageHead(
+      "Tempo Pelotas — Previsão do tempo em Pelotas",
+      "Condições atuais, alertas oficiais e previsão meteorológica consolidada para Pelotas, Rio Grande do Sul.",
+      "/",
+    ),
+  loader: async () => {
+    const [weather, laranjal, guaiba, lagoon] = await Promise.all([
+      getWeatherIntelligence(),
+      getLaranjalLevelData(),
+      getGuaibaObservation(),
+      getLagoonMonitoringNetwork(),
+    ]);
+
+    return { weather, laranjal, guaiba, lagoon };
+  },
+  staleTime: 60 * 1_000,
+  component: HomePage,
+});
+
+function HomePage() {
+  const { weather, laranjal, guaiba, lagoon } = Route.useLoaderData();
+  return <ProductionHome data={weather} laranjal={laranjal} guaiba={guaiba} lagoon={lagoon} />;
+}
+''')
+
+          layout_path = root / 'src' / 'components' / 'layout' / 'SiteLayout.tsx'
+          layout = layout_path.read_text()
+          marker = '  return (\n    <div className="site-shell">'
+          replacement = '''  if (pathname === "/") {
+    return (
+      <>
+        <div className="visually-hidden" aria-live="polite" aria-atomic="true">
+          {announcement}
+        </div>
+        {children}
+      </>
+    );
+  }
+
+  return (
+    <div className="site-shell">'''
+          if marker not in layout:
+              raise SystemExit('Marcador do SiteLayout não encontrado')
+          layout_path.write_text(layout.replace(marker, replacement, 1))
+          PY
+
+      - name: Instalar MapLibre usado pela produção
+        run: npm install maplibre-gl@5.24.0 --save --no-audit --no-fund
+
+      - name: Formatar e validar
+        run: |
+          npx prettier --write src/production src/routes/index.tsx src/components/layout/SiteLayout.tsx package.json package-lock.json
+          npm run build
+          npm run typecheck
+          npm run lint
+
+      - name: Commitar transplante validado
+        run: |
+          rm .github/workflows/exact-production-port.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "[exact-production-port] porta homepage literal da produção"
+          git push origin HEAD:agent/exact-production-port
