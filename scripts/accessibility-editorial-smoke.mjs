@@ -64,18 +64,14 @@ function markdownReport(results) {
   }
 
   const warnings = results.flatMap((result) =>
-    result.warnings.map(
-      (warning) => `- ${result.route} ${result.viewport}: ${warning}`,
-    ),
+    result.warnings.map((warning) => `- ${result.route} ${result.viewport}: ${warning}`),
   );
   if (warnings.length > 0) {
     lines.push("", "## Avisos não bloqueantes", "", ...warnings);
   }
 
   const failures = results.flatMap((result) =>
-    result.failures.map(
-      (failure) => `- ${result.route} ${result.viewport}: ${failure}`,
-    ),
+    result.failures.map((failure) => `- ${result.route} ${result.viewport}: ${failure}`),
   );
   if (failures.length > 0) {
     lines.push("", "## Falhas bloqueantes", "", ...failures);
@@ -115,7 +111,9 @@ async function computedAccessibleNames(session) {
   const accessibleNameByBackend = new Map();
   for (const node of nodes) {
     if (!node.backendDOMNodeId || node.ignored) continue;
-    const name = String(node.name?.value ?? "").replace(/\s+/g, " ").trim();
+    const name = String(node.name?.value ?? "")
+      .replace(/\s+/g, " ")
+      .trim();
     const existing = accessibleNameByBackend.get(node.backendDOMNodeId) ?? "";
     if (!existing || name) {
       accessibleNameByBackend.set(node.backendDOMNodeId, name);
@@ -154,25 +152,19 @@ function buildFailures(audit) {
     failures.push(`IDs duplicados: ${audit.duplicateIds.join(", ")}`);
   }
   if (audit.unnamedInteractive.length > 0) {
-    failures.push(
-      `controles sem nome acessível: ${audit.unnamedInteractive.join(", ")}`,
-    );
+    failures.push(`controles sem nome acessível: ${audit.unnamedInteractive.join(", ")}`);
   }
   if (audit.unlabelledFields.length > 0) {
     failures.push(`campos sem rótulo: ${audit.unlabelledFields.join(", ")}`);
   }
   if (audit.imagesWithoutAlt.length > 0) {
-    failures.push(
-      `imagens sem atributo alt: ${audit.imagesWithoutAlt.join(", ")}`,
-    );
+    failures.push(`imagens sem atributo alt: ${audit.imagesWithoutAlt.join(", ")}`);
   }
   if (audit.horizontalOverflow > 2) {
     failures.push(`overflow horizontal de ${audit.horizontalOverflow}px`);
   }
   if (audit.headingJumps.length > 0) {
-    warnings.push(
-      `saltos na hierarquia de títulos: ${audit.headingJumps.join("; ")}`,
-    );
+    warnings.push(`saltos na hierarquia de títulos: ${audit.headingJumps.join("; ")}`);
   }
 
   return { failures, warnings };
@@ -195,13 +187,10 @@ try {
     try {
       for (const route of routes) {
         try {
-          const response = await page.goto(
-            new URL(route.path, baseUrl).toString(),
-            {
-              waitUntil: "domcontentloaded",
-              timeout: 60_000,
-            },
-          );
+          const response = await page.goto(new URL(route.path, baseUrl).toString(), {
+            waitUntil: "domcontentloaded",
+            timeout: 60_000,
+          });
 
           if (!response?.ok()) {
             throw new Error(
@@ -209,9 +198,7 @@ try {
             );
           }
 
-          await page
-            .waitForLoadState("networkidle", { timeout: 15_000 })
-            .catch(() => undefined);
+          await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => undefined);
           await page.waitForTimeout(500);
 
           await page.evaluate(() => window.scrollTo(0, 0));
@@ -219,8 +206,7 @@ try {
           await page.waitForTimeout(100);
 
           const domAudit = await page.evaluate(() => {
-            const normalizedText = (value) =>
-              value?.replace(/\s+/g, " ").trim() ?? "";
+            const normalizedText = (value) => value?.replace(/\s+/g, " ").trim() ?? "";
             const visible = (element) => {
               if (!(element instanceof HTMLElement)) return false;
               if (element.getAttribute("aria-hidden") === "true") return false;
@@ -258,9 +244,7 @@ try {
                 }
 
                 const normalizedClip = style.clip.replace(/\s+/g, "").toLowerCase();
-                const normalizedClipPath = style.clipPath
-                  .replace(/\s+/g, "")
-                  .toLowerCase();
+                const normalizedClipPath = style.clipPath.replace(/\s+/g, "").toLowerCase();
                 if (
                   normalizedClip === "rect(0px,0px,0px,0px)" ||
                   normalizedClip === "rect(0,0,0,0)" ||
@@ -281,14 +265,8 @@ try {
                 return false;
               }
 
-              const x = Math.min(
-                window.innerWidth - 1,
-                Math.max(0, rect.left + rect.width / 2),
-              );
-              const y = Math.min(
-                window.innerHeight - 1,
-                Math.max(0, rect.top + rect.height / 2),
-              );
+              const x = Math.min(window.innerWidth - 1, Math.max(0, rect.left + rect.width / 2));
+              const y = Math.min(window.innerHeight - 1, Math.max(0, rect.top + rect.height / 2));
               const hit = document.elementFromPoint(x, y);
               return Boolean(hit && (hit === element || element.contains(hit)));
             };
@@ -296,13 +274,8 @@ try {
               const tag = element.tagName.toLowerCase();
               const id = element.id ? `#${element.id}` : "";
               const className =
-                typeof element.className === "string" &&
-                element.className.trim()
-                  ? `.${element.className
-                      .trim()
-                      .split(/\s+/)
-                      .slice(0, 2)
-                      .join(".")}`
+                typeof element.className === "string" && element.className.trim()
+                  ? `.${element.className.trim().split(/\s+/).slice(0, 2).join(".")}`
                   : "";
               return `${tag}${id}${className}`;
             };
@@ -335,9 +308,7 @@ try {
                 'a[href], button, input:not([type="hidden"]), select, textarea, [role="button"], [role="link"]',
               ),
             )
-              .filter(
-                (element) => visible(element) && !element.matches(":disabled"),
-              )
+              .filter((element) => visible(element) && !element.matches(":disabled"))
               .map((element) => ({
                 marker: mark(element),
                 description: describe(element),
@@ -358,9 +329,7 @@ try {
               .filter((image) => !image.hasAttribute("alt"))
               .map(describe);
 
-            const headings = Array.from(
-              document.querySelectorAll("h1, h2, h3, h4, h5, h6"),
-            )
+            const headings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"))
               .filter(visible)
               .map((heading) => ({
                 level: Number(heading.tagName.slice(1)),
@@ -377,19 +346,13 @@ try {
               }
             }
 
-            const skipLink = document.querySelector(
-              '.skip-link[href="#conteudo-principal"]',
-            );
+            const skipLink = document.querySelector('.skip-link[href="#conteudo-principal"]');
             const skipLinkVisible = Boolean(
-              skipLink &&
-                document.activeElement === skipLink &&
-                visuallyExposed(skipLink),
+              skipLink && document.activeElement === skipLink && visuallyExposed(skipLink),
             );
 
             const root = document.documentElement;
-            const h1Elements = Array.from(
-              document.querySelectorAll("h1"),
-            ).filter(visible);
+            const h1Elements = Array.from(document.querySelectorAll("h1")).filter(visible);
             const main = document.querySelector("main#conteudo-principal");
 
             return {
@@ -399,9 +362,7 @@ try {
               h1Text: normalizedText(h1Elements[0]?.textContent),
               mainCount: document.querySelectorAll("main").length,
               hasLandmarks: Boolean(
-                document.querySelector("header") &&
-                  main &&
-                  document.querySelector("footer"),
+                document.querySelector("header") && main && document.querySelector("footer"),
               ),
               skipLinkVisible,
               duplicateIds,
@@ -409,10 +370,7 @@ try {
               fieldCandidates,
               imagesWithoutAlt,
               headingJumps,
-              horizontalOverflow: Math.max(
-                0,
-                root.scrollWidth - root.clientWidth,
-              ),
+              horizontalOverflow: Math.max(0, root.scrollWidth - root.clientWidth),
             };
           });
 
@@ -440,13 +398,8 @@ try {
           });
         } catch (error) {
           const message = error instanceof Error ? error.message : String(error);
-          const screenshot = path.join(
-            outputDirectory,
-            `${route.name}-${viewport.name}-erro.png`,
-          );
-          await page
-            .screenshot({ path: screenshot, fullPage: true })
-            .catch(() => undefined);
+          const screenshot = path.join(outputDirectory, `${route.name}-${viewport.name}-erro.png`);
+          await page.screenshot({ path: screenshot, fullPage: true }).catch(() => undefined);
 
           results.push({
             route: route.name,
@@ -469,23 +422,13 @@ try {
 
 await writeFile(
   path.join(outputDirectory, "report.json"),
-  `${JSON.stringify(
-    { baseUrl, generatedAt: new Date().toISOString(), results },
-    null,
-    2,
-  )}\n`,
+  `${JSON.stringify({ baseUrl, generatedAt: new Date().toISOString(), results }, null, 2)}\n`,
   "utf8",
 );
-await writeFile(
-  path.join(outputDirectory, "README.md"),
-  markdownReport(results),
-  "utf8",
-);
+await writeFile(path.join(outputDirectory, "README.md"), markdownReport(results), "utf8");
 
 const failures = results.flatMap((result) =>
-  result.failures.map(
-    (failure) => `${result.route} ${result.viewport}: ${failure}`,
-  ),
+  result.failures.map((failure) => `${result.route} ${result.viewport}: ${failure}`),
 );
 
 for (const result of results) {
@@ -495,11 +438,7 @@ for (const result of results) {
 }
 
 if (failures.length > 0) {
-  throw new Error(
-    `Falhas no smoke de acessibilidade editorial:\n- ${failures.join("\n- ")}`,
-  );
+  throw new Error(`Falhas no smoke de acessibilidade editorial:\n- ${failures.join("\n- ")}`);
 }
 
-console.log(
-  `Smoke de acessibilidade editorial concluído: ${results.length} verificações.`,
-);
+console.log(`Smoke de acessibilidade editorial concluído: ${results.length} verificações.`);
