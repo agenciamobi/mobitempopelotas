@@ -7,14 +7,17 @@ import { Header } from "./Header";
 
 type SiteLayoutProps = {
   children: ReactNode;
+  forceShell?: boolean;
 };
+
+const standaloneRoutes = new Set(["/", "/entrar", "/minha-conta", "/privacidade-e-dados"]);
 
 function pageAnnouncement() {
   const title = document.title.split("|")[0]?.trim();
   return title ? `Página carregada: ${title}` : "Página carregada";
 }
 
-export function SiteLayout({ children }: SiteLayoutProps) {
+export function SiteLayout({ children, forceShell = false }: SiteLayoutProps) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const mainRef = useRef<HTMLElement>(null);
   const firstRender = useRef(true);
@@ -27,14 +30,20 @@ export function SiteLayout({ children }: SiteLayoutProps) {
     }
 
     const frame = window.requestAnimationFrame(() => {
-      mainRef.current?.focus({ preventScroll: true });
+      const routeMain = mainRef.current ?? document.getElementById("conteudo-principal");
+
+      if (routeMain && !routeMain.hasAttribute("tabindex")) {
+        routeMain.tabIndex = -1;
+      }
+
+      routeMain?.focus({ preventScroll: true });
       setAnnouncement(pageAnnouncement());
     });
 
     return () => window.cancelAnimationFrame(frame);
   }, [pathname]);
 
-  if (pathname === "/") {
+  if (!forceShell && standaloneRoutes.has(pathname)) {
     return (
       <>
         <div className="visually-hidden" aria-live="polite" aria-atomic="true">

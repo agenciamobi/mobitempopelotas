@@ -11,6 +11,8 @@ on:
       - public/**
       - scripts/visual-parity-audit.mjs
       - scripts/auth-visual-smoke.mjs
+      - scripts/accessibility-editorial-smoke.mjs
+      - scripts/accessibility-failure-screenshots.mjs
       - vite.config.ts
       - tsconfig*.json
       - eslint.config.js
@@ -30,6 +32,8 @@ jobs:
     name: Comparar produção e revisão
     runs-on: ubuntu-latest
     timeout-minutes: 24
+    container:
+      image: mcr.microsoft.com/playwright:v1.55.0-noble
 
     steps:
       - name: Checkout da revisão
@@ -44,16 +48,16 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      - name: Validar build, tipos e lint
+      - name: Validar build, testes, tipos e lint
         run: |
+          npm run test:contracts
           npm run build
+          ROUTE_TREE_REQUIRED=1 npm run test:routes
           npm run typecheck
           npm run lint
 
-      - name: Instalar Playwright para auditoria
-        run: |
-          npm install --no-save --package-lock=false playwright@1.55.0
-          npx playwright install --with-deps chromium
+      - name: Preparar Playwright para auditoria
+        run: npm install --no-save --package-lock=false playwright@1.55.0
 
       - name: Iniciar a revisão local
         run: |
@@ -100,6 +104,21 @@ jobs:
         env:
           CANDIDATE_URL: http://127.0.0.1:4173
         run: node scripts/auth-visual-smoke.mjs
+
+      - name: Auditar acessibilidade editorial
+        env:
+          CANDIDATE_URL: http://127.0.0.1:4173
+        run: |
+          set +e
+          node scripts/accessibility-editorial-smoke.mjs
+          audit_status=$?
+          set -e
+
+          if [ "$audit_status" -ne 0 ]; then
+            node scripts/accessibility-failure-screenshots.mjs || true
+          fi
+
+          exit "$audit_status"
 
       - name: Exibir log da aplicação em caso de falha
         if: failure()
