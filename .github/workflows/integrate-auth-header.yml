@@ -1,0 +1,60 @@
+name: Integrar conta ao cabeçalho
+
+on:
+  push:
+    branches:
+      - agent/auth-account-lgpd
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: integrate-auth-header-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  patch:
+    name: Aplicar integração do header
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Conectar ação de conta
+        run: |
+          python <<'PY'
+          from pathlib import Path
+
+          path = Path("src/production/components/site-header.tsx")
+          content = path.read_text(encoding="utf-8")
+
+          import_line = 'import { AuthAccountAction } from "@/components/auth/AuthAccountAction";\n'
+          anchor = 'import Link from "@/production/compat/NextLink";\n'
+          if import_line not in content:
+              content = content.replace(anchor, import_line + anchor, 1)
+
+          component = '          <AuthAccountAction />\n\n'
+          actions_anchor = '        <div className="site-header-actions">\n'
+          if component not in content:
+              content = content.replace(actions_anchor, actions_anchor + component, 1)
+
+          path.write_text(content, encoding="utf-8")
+          PY
+
+      - name: Formatar arquivo
+        run: npx prettier --write src/production/components/site-header.tsx
+
+      - name: Versionar integração
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/production/components/site-header.tsx
+          if git diff --cached --quiet; then
+            echo "Integração já aplicada."
+          else
+            git commit -m "feat: exibe acesso à conta no cabeçalho"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
