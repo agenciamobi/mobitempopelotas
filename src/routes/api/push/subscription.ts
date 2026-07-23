@@ -3,9 +3,9 @@ import { z } from "zod";
 
 import {
   isAllowedPushEndpoint,
-  isReasonableJsonRequest,
   isSameOriginRequest,
   pushJsonResponse,
+  readLimitedJson,
 } from "@/lib/push/push-http.server";
 import {
   deletePushSubscription,
@@ -41,16 +41,9 @@ const deleteSubscriptionSchema = z.object({
   endpoint: endpointSchema,
 });
 
-async function parseJson(request: Request) {
-  return request.json().catch(() => null);
-}
-
 function validateBrowserRequest(request: Request) {
   if (!isSameOriginRequest(request)) {
     return pushJsonResponse({ success: false, error: "Origem não permitida." }, 403);
-  }
-  if (!isReasonableJsonRequest(request)) {
-    return pushJsonResponse({ success: false, error: "Corpo JSON inválido ou muito grande." }, 415);
   }
 
   return null;
@@ -71,7 +64,12 @@ async function subscribe(request: Request) {
     );
   }
 
-  const parsed = createSubscriptionSchema.safeParse(await parseJson(request));
+  const body = await readLimitedJson(request);
+  if (!body.ok) {
+    return pushJsonResponse({ success: false, error: body.error }, body.status);
+  }
+
+  const parsed = createSubscriptionSchema.safeParse(body.value);
   if (!parsed.success) {
     return pushJsonResponse({ success: false, error: "Inscrição inválida." }, 400);
   }
@@ -114,7 +112,12 @@ async function unsubscribe(request: Request) {
     );
   }
 
-  const parsed = deleteSubscriptionSchema.safeParse(await parseJson(request));
+  const body = await readLimitedJson(request);
+  if (!body.ok) {
+    return pushJsonResponse({ success: false, error: body.error }, body.status);
+  }
+
+  const parsed = deleteSubscriptionSchema.safeParse(body.value);
   if (!parsed.success) {
     return pushJsonResponse({ success: false, error: "Inscrição inválida." }, 400);
   }
