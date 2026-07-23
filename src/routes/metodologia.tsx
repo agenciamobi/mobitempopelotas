@@ -10,6 +10,7 @@ export const Route = createFileRoute("/metodologia")({
     createPageHead(
       "Metodologia e fontes do Tempo Pelotas",
       "Origem dos dados meteorológicos e hidrológicos, estado das integrações, critérios de validação, contingências e limites do Tempo Pelotas.",
+      "/metodologia",
     ),
   loader: async () => {
     const [weather, level] = await Promise.all([getWeatherIntelligence(), getLaranjalLevelData()]);

@@ -10,6 +10,7 @@ export const Route = createFileRoute("/nivel-da-lagoa-dos-patos-laranjal")({
     createPageHead(
       "Nível da Lagoa dos Patos no Laranjal",
       "Telemetria pública da Estação Laranjal, evolução do nível nas últimas 24 horas e contexto meteorológico para Pelotas.",
+      "/nivel-da-lagoa-dos-patos-laranjal",
     ),
   loader: async () => {
     const [weather, level] = await Promise.all([getWeatherIntelligence(), getLaranjalLevelData()]);

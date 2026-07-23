@@ -11,13 +11,14 @@ import { useEffect, type ReactNode } from "react";
 
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
+import {
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TITLE,
+  SOCIAL_IMAGE_URL,
+  createWebsiteJsonLd,
+} from "@/lib/site-config";
 import appCss from "../styles.css?url";
-
-const siteTitle = "Tempo Pelotas | Previsão do tempo em Pelotas e região";
-const siteDescription =
-  "Previsão do tempo, condições atuais, chuva, vento e informações meteorológicas de Pelotas e da Zona Sul do Rio Grande do Sul.";
-const socialImage =
-  "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3f08c889-e910-4b95-8e86-5c37fa31c1c8/id-preview-9ab27e4f--d63df7b2-45db-4890-823c-87629dab73a1.lovable.app-1784525496143.png";
 
 function NotFoundComponent() {
   return (
@@ -73,20 +74,30 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: siteTitle },
-      { name: "description", content: siteDescription },
-      { property: "og:title", content: siteTitle },
-      { property: "og:description", content: siteDescription },
+      { title: SITE_TITLE },
+      { name: "description", content: SITE_DESCRIPTION },
+      { property: "og:title", content: SITE_TITLE },
+      { property: "og:description", content: SITE_DESCRIPTION },
       { property: "og:type", content: "website" },
       { property: "og:locale", content: "pt_BR" },
-      { property: "og:image", content: socialImage },
+      { property: "og:site_name", content: SITE_NAME },
+      { property: "og:image", content: SOCIAL_IMAGE_URL },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: siteTitle },
-      { name: "twitter:description", content: siteDescription },
-      { name: "twitter:image", content: socialImage },
+      { name: "twitter:title", content: SITE_TITLE },
+      { name: "twitter:description", content: SITE_DESCRIPTION },
+      { name: "twitter:image", content: SOCIAL_IMAGE_URL },
       { name: "theme-color", content: "#071e2f" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", href: "/favicon.ico" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(createWebsiteJsonLd()),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,

@@ -9,6 +9,7 @@ export const Route = createFileRoute("/tempo-hoje-pelotas")({
     createPageHead(
       "Tempo hoje em Pelotas",
       "Condições atuais e previsão por hora para hoje em Pelotas, com chuva, vento, temperatura e alertas oficiais.",
+      "/tempo-hoje-pelotas",
     ),
   loader: () => getWeatherIntelligence(),
   staleTime: 5 * 60 * 1_000,
