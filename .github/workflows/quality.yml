@@ -40,22 +40,22 @@ jobs:
         run: npm run build
 
       - name: TypeScript
+        run: npm run typecheck
+
+      - name: ESLint
         shell: bash
         run: |
-          mkdir -p artifacts/typecheck
+          mkdir -p artifacts/lint
           set +e
-          npm run typecheck 2>&1 | tee artifacts/typecheck/output.log
+          npm run lint 2>&1 | tee artifacts/lint/output.log
           status=${PIPESTATUS[0]}
           exit "$status"
 
-      - name: Publicar diagnóstico TypeScript
+      - name: Publicar diagnóstico ESLint
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: typecheck-${{ github.run_number }}
-          path: artifacts/typecheck
+          name: lint-${{ github.run_number }}
+          path: artifacts/lint
           if-no-files-found: warn
           retention-days: 2
-
-      - name: ESLint
-        run: npm run lint
