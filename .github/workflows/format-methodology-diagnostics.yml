@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - agent/redemet-methodology-status
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
