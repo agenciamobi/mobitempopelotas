@@ -155,7 +155,7 @@ _legacy/
 - [x] Build de produção sem erros no CI
 - [x] Contratos automatizados para níveis, HTTP/push, rotas públicas e segurança das migrations
 - [x] Auditoria visual automatizada em desktop e mobile
-- [x] Smoke automatizado de acessibilidade nas rotas públicas críticas
+- [ ] Integrar e validar o smoke automatizado de acessibilidade das rotas públicas críticas
 - [ ] Auditoria completa de acessibilidade WCAG 2.2 AA, incluindo revisão manual
 - [ ] Testes reais de RLS, OAuth, exportação, exclusão, cron e web push no Supabase oficial
 - [ ] Auditoria de Core Web Vitals em produção
