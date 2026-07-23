@@ -152,7 +152,10 @@ test("aprova ambiente coerente sem expor credenciais no relatório ou console", 
   assert.equal(outcome.report.mode, "production");
   assert.equal(outcome.report.canonicalSiteUrl, CANONICAL_SITE_URL);
   assert.equal(outcome.report.failed, 0);
-  assert.equal(outcome.report.checks.every((check) => check.status === "passed"), true);
+  assert.equal(
+    outcome.report.checks.every((check) => check.status === "passed"),
+    true,
+  );
 
   const observableOutput = `${outcome.stdout}\n${outcome.stderr}\n${JSON.stringify(outcome.report)}`;
   const sensitiveValues = [
