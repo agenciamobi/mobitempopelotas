@@ -78,8 +78,7 @@ export async function fetchPublicPortalSnapshot() {
       },
     },
     hydrology: {
-      status:
-        laranjalLevel.status === "unavailable" ? "unavailable" : "contextual-monitoring",
+      status: laranjalLevel.status === "unavailable" ? "unavailable" : "contextual-monitoring",
       local_level: {
         laranjal: publicLaranjalLevel(laranjalLevel),
         interpretation:
@@ -114,9 +113,10 @@ export function createPublicJsonFeed(snapshot: PublicPortalSnapshot) {
   const laranjal = snapshot.hydrology.local_level.laranjal;
   const activeAlerts = snapshot.weather.alerts.filter((alert) => alert.period === "active");
 
-  const currentTitle = current?.temperature === null || current?.temperature === undefined
-    ? snapshot.summary.headline
-    : `Tempo em Pelotas: ${current.temperature} °C${current.condition ? ` e ${current.condition.toLowerCase()}` : ""}`;
+  const currentTitle =
+    current?.temperature === null || current?.temperature === undefined
+      ? snapshot.summary.headline
+      : `Tempo em Pelotas: ${current.temperature} °C${current.condition ? ` e ${current.condition.toLowerCase()}` : ""}`;
   const forecastDetails = today
     ? ` Hoje, mínima de ${today.min} °C, máxima de ${today.max} °C e ${today.rainChance === null ? `${today.precipitationMm} mm de precipitação previstos` : `${today.rainChance}% de chance de chuva`}.`
     : "";
@@ -152,7 +152,10 @@ export function createPublicJsonFeed(snapshot: PublicPortalSnapshot) {
       {
         id: absoluteUrl("/alertas"),
         url: absoluteUrl("/alertas"),
-        title: activeAlerts.length > 0 ? "Alertas meteorológicos ativos" : "Monitoramento de alertas oficiais",
+        title:
+          activeAlerts.length > 0
+            ? "Alertas meteorológicos ativos"
+            : "Monitoramento de alertas oficiais",
         content_text: alertText,
         date_modified: snapshot.generated_at,
         tags: ["INMET", "alertas", "Pelotas", "Defesa Civil"],
