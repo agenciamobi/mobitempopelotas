@@ -110,15 +110,10 @@ test("direitos LGPD mantêm histórico próprio e RPC autenticada", async () => 
 });
 
 test("migrations sensíveis não concedem privilégios totais aos clientes", async () => {
-  const migrations = await Promise.all(
-    Object.values(migrationPaths).map(readMigration),
-  );
+  const migrations = await Promise.all(Object.values(migrationPaths).map(readMigration));
 
   for (const sql of migrations) {
     assertNoBroadClientGrant(sql);
-    assert.doesNotMatch(
-      sql,
-      /grant\s+execute\s+on\s+function\s+[^;]+\s+to\s+anon\b/,
-    );
+    assert.doesNotMatch(sql, /grant\s+execute\s+on\s+function\s+[^;]+\s+to\s+anon\b/);
   }
 });
