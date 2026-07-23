@@ -6,18 +6,13 @@ import path from "node:path";
 import { chromium } from "playwright";
 
 const outputDirectory = path.resolve("artifacts/visual-parity");
-const productionUrl =
-  process.env.PRODUCTION_URL ?? "https://www.tempopelotas.com.br";
+const productionUrl = process.env.PRODUCTION_URL ?? "https://www.tempopelotas.com.br";
 const candidateUrl =
-  process.env.CANDIDATE_URL ??
-  process.env.LOVABLE_URL ??
-  "https://mobitempopelotas.lovable.app";
+  process.env.CANDIDATE_URL ?? process.env.LOVABLE_URL ?? "https://mobitempopelotas.lovable.app";
 const candidateName = process.env.CANDIDATE_NAME ?? "revisao";
 const expectedCandidateMarker =
-  process.env.EXPECTED_CANDIDATE_MARKER ??
-  "Encontre o que precisa acompanhar";
-const shouldWaitForCandidate =
-  process.env.WAIT_FOR_CANDIDATE_DEPLOYMENT !== "false";
+  process.env.EXPECTED_CANDIDATE_MARKER ?? "Encontre o que precisa acompanhar";
+const shouldWaitForCandidate = process.env.WAIT_FOR_CANDIDATE_DEPLOYMENT !== "false";
 const auditRevision = process.env.AUDIT_REVISION ?? "não informada";
 
 const viewports = [
@@ -42,8 +37,7 @@ const targets = [
   },
 ];
 
-const wait = (milliseconds) =>
-  new Promise((resolve) => setTimeout(resolve, milliseconds));
+const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 async function waitForCandidateDeployment() {
   if (!shouldWaitForCandidate) return;
@@ -67,9 +61,7 @@ async function waitForCandidateDeployment() {
       lastStatus = error instanceof Error ? error.message : String(error);
     }
 
-    console.log(
-      `Aguardando revisão (${attempt}/24): ${lastStatus}; marcador ainda ausente.`,
-    );
+    console.log(`Aguardando revisão (${attempt}/24): ${lastStatus}; marcador ainda ausente.`);
     if (attempt < 24) await wait(10_000);
   }
 
@@ -97,10 +89,7 @@ function markdownReport(results) {
     );
   }
 
-  lines.push(
-    "",
-    "As capturas PNG completas de cada ambiente e viewport estão no mesmo artefato.",
-  );
+  lines.push("", "As capturas PNG completas de cada ambiente e viewport estão no mesmo artefato.");
 
   return `${lines.join("\n")}\n`;
 }
@@ -116,14 +105,10 @@ async function auditPage(page, target, viewport) {
   }
 
   if (!response.ok()) {
-    throw new Error(
-      `${target.name}: homepage respondeu HTTP ${response.status()}.`,
-    );
+    throw new Error(`${target.name}: homepage respondeu HTTP ${response.status()}.`);
   }
 
-  await page
-    .waitForLoadState("networkidle", { timeout: 15_000 })
-    .catch(() => undefined);
+  await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => undefined);
   await page.waitForTimeout(2_000);
 
   await page.evaluate(() => window.scrollTo(0, 0));
@@ -139,77 +124,58 @@ async function auditPage(page, target, viewport) {
       const mobileNavigation = document.querySelector(".mobile-tab-bar");
       const footer = document.querySelector(".site-footer-v3");
       const footerPanel = document.querySelector(".editorial-footer");
-      const brand = document.querySelector(
-        "img.brand-logo, .editorial-footer__brand img",
-      );
+      const brand = document.querySelector("img.brand-logo, .editorial-footer__brand img");
       const mobileNavigationStyle = mobileNavigation
         ? window.getComputedStyle(mobileNavigation)
         : null;
       const footerStyle = footer ? window.getComputedStyle(footer) : null;
-      const footerPanelStyle = footerPanel
-        ? window.getComputedStyle(footerPanel)
-        : null;
+      const footerPanelStyle = footerPanel ? window.getComputedStyle(footerPanel) : null;
       const footerBackground = footerPanelStyle?.backgroundColor ?? null;
-      const navigationRect =
-        mobileNavigation?.getBoundingClientRect() ?? null;
+      const navigationRect = mobileNavigation?.getBoundingClientRect() ?? null;
       const navigationVisible = Boolean(
         mobileNavigationStyle &&
-          mobileNavigationStyle.display !== "none" &&
-          navigationRect &&
-          navigationRect.height > 0,
+        mobileNavigationStyle.display !== "none" &&
+        navigationRect &&
+        navigationRect.height > 0,
       );
-      const navigationHeight =
-        navigationVisible && navigationRect ? navigationRect.height : 0;
+      const navigationHeight = navigationVisible && navigationRect ? navigationRect.height : 0;
       const footerPaddingBottom = footerStyle
         ? Number.parseFloat(footerStyle.paddingBottom) || 0
         : 0;
-      const weatherUnavailable = Boolean(
-        document.querySelector(".production-weather-unavailable"),
-      );
+      const weatherUnavailable = Boolean(document.querySelector(".production-weather-unavailable"));
       const hasWeatherState = Boolean(
-        document.querySelector(
-          ".weather-hero, .production-weather-unavailable",
-        ),
+        document.querySelector(".weather-hero, .production-weather-unavailable"),
       );
       const hasCoreStructure = Boolean(
         document.querySelector(".site-shell--home-editorial") &&
-          document.querySelector("#conteudo-principal") &&
-          hasWeatherState &&
-          footer &&
-          footerPanel,
+        document.querySelector("#conteudo-principal") &&
+        hasWeatherState &&
+        footer &&
+        footerPanel,
       );
       const brandImage = brand instanceof HTMLImageElement ? brand : null;
 
       return {
         httpStatus,
         title: document.title,
-        horizontalOverflow: Math.max(
-          0,
-          root.scrollWidth - root.clientWidth,
-        ),
+        horizontalOverflow: Math.max(0, root.scrollWidth - root.clientWidth),
         hasCoreStructure,
         hasWeatherState,
         weatherUnavailable,
         hasExplore: Boolean(document.querySelector("#explorar-portal")),
         exploreHeading:
-          document
-            .querySelector("#home-explore-portal-title")
-            ?.textContent?.trim() ?? null,
+          document.querySelector("#home-explore-portal-title")?.textContent?.trim() ?? null,
         hasFooter: Boolean(footer),
         footerBackground,
-        footerLight: strictLayout
-          ? footerBackground === "rgb(248, 250, 248)"
-          : null,
-        brandLoaded: Boolean(
-          brandImage?.complete && brandImage.naturalWidth > 0,
-        ),
+        footerLight: strictLayout ? footerBackground === "rgb(248, 250, 248)" : null,
+        brandLoaded: Boolean(brandImage?.complete && brandImage.naturalWidth > 0),
         skipLinkFocused: active === skipLink,
         skipLinkVisible: Boolean(
           skipRect &&
-            skipRect.width > 0 &&
-            skipRect.height > 0 &&
-            skipRect.top >= 0 &&
-            skipRect.left >= 0,
+          skipRect.width > 0 &&
+          skipRect.height > 0 &&
+          skipRect.top >= 0 &&
+          skipRect.left >= 0,
         ),
         navigationVisible,
         navigationHeight,
@@ -236,25 +202,16 @@ async function auditPage(page, target, viewport) {
   if (audit.horizontalOverflow > 2) {
     failures.push(`overflow horizontal de ${audit.horizontalOverflow}px`);
   }
-  if (
-    target.expectExplore &&
-    !audit.hasExplore &&
-    !audit.weatherUnavailable
-  ) {
+  if (target.expectExplore && !audit.hasExplore && !audit.weatherUnavailable) {
     failures.push("seção de exploração ausente");
   }
   if (target.strictLayout && !audit.hasFooter) {
     failures.push("rodapé editorial ausente");
   }
   if (target.strictLayout && audit.footerLight !== true) {
-    failures.push(
-      `rodapé publicado não está claro: ${audit.footerBackground ?? "cor ausente"}`,
-    );
+    failures.push(`rodapé publicado não está claro: ${audit.footerBackground ?? "cor ausente"}`);
   }
-  if (
-    target.strictLayout &&
-    (!audit.skipLinkFocused || !audit.skipLinkVisible)
-  ) {
+  if (target.strictLayout && (!audit.skipLinkFocused || !audit.skipLinkVisible)) {
     failures.push("skip link não recebeu foco visível");
   }
   if (audit.footerProtected === false) {
@@ -349,15 +306,11 @@ await writeFile(
     2,
   )}\n`,
 );
-await writeFile(
-  path.join(outputDirectory, "README.md"),
-  markdownReport(results),
-);
+await writeFile(path.join(outputDirectory, "README.md"), markdownReport(results));
 
 const failures = results.flatMap((result) =>
   result.failures.map(
-    (failure) =>
-      `${result.target} ${result.viewport.width}×${result.viewport.height}: ${failure}`,
+    (failure) => `${result.target} ${result.viewport.width}×${result.viewport.height}: ${failure}`,
   ),
 );
 
