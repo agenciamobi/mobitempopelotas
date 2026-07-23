@@ -118,8 +118,8 @@ export function Footer() {
           <div className="editorial-footer-guidance">
             <span aria-hidden="true">i</span>
             <p>
-              Em situações de risco, siga os comunicados da Defesa Civil, do INMET e das
-              autoridades locais.
+              Em situações de risco, siga os comunicados da Defesa Civil, do INMET e das autoridades
+              locais.
             </p>
           </div>
 
