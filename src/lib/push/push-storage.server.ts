@@ -14,7 +14,7 @@ import {
 } from "./push.types";
 
 const QUERY_TIMEOUT_MS = 3_500;
-const MAX_SUBSCRIPTIONS = 10_000;
+const PUSH_SUBSCRIPTION_PAGE_SIZE = 500;
 const CLAIM_LEASE_SECONDS = 15 * 60;
 
 export type PushStorageStatus = {
@@ -107,22 +107,35 @@ export async function deletePushSubscription(endpoint: string) {
   if (error) throw new Error(`Falha ao remover inscrição web push: ${error.message}`);
 }
 
-export async function listPushSubscriptions(topic?: PushTopic): Promise<StoredPushSubscription[]> {
+export async function* iteratePushSubscriptionPages(
+  topic?: PushTopic,
+): AsyncGenerator<StoredPushSubscription[]> {
   const client = requirePushStorage();
-  let query = client
-    .from("web_push_subscriptions")
-    .select(
-      "endpoint,expiration_time,p256dh,auth,user_agent,topics,created_at,updated_at,last_seen_at",
-    )
-    .order("updated_at", { ascending: false })
-    .limit(MAX_SUBSCRIPTIONS);
+  let endpointCursor: string | null = null;
 
-  if (topic) query = query.contains("topics", [topic]);
+  while (true) {
+    let query = client
+      .from("web_push_subscriptions")
+      .select(
+        "endpoint,expiration_time,p256dh,auth,user_agent,topics,created_at,updated_at,last_seen_at",
+      )
+      .order("endpoint", { ascending: true })
+      .limit(PUSH_SUBSCRIPTION_PAGE_SIZE);
 
-  const { data, error } = await query.abortSignal(timeoutSignal());
-  if (error) throw new Error(`Falha ao consultar inscrições web push: ${error.message}`);
+    if (topic) query = query.contains("topics", [topic]);
+    if (endpointCursor) query = query.gt("endpoint", endpointCursor);
 
-  return (data ?? []).map(rowToSubscription);
+    const { data, error } = await query.abortSignal(timeoutSignal());
+    if (error) throw new Error(`Falha ao consultar inscrições web push: ${error.message}`);
+
+    const page = (data ?? []).map(rowToSubscription);
+    if (page.length === 0) return;
+
+    yield page;
+    endpointCursor = page.at(-1)?.endpoint ?? null;
+
+    if (!endpointCursor || page.length < PUSH_SUBSCRIPTION_PAGE_SIZE) return;
+  }
 }
 
 export async function claimPushDispatch(fingerprint: string, title: string) {
@@ -139,6 +152,22 @@ export async function claimPushDispatch(fingerprint: string, title: string) {
 
   if (error) throw new Error(`Falha ao reservar envio web push: ${error.message}`);
   return data ? leaseToken : null;
+}
+
+export async function renewPushDispatch(fingerprint: string, leaseToken: string) {
+  const client = requirePushStorage();
+  const { data, error } = await client
+    .from("web_push_dispatches")
+    .update({ claimed_at: new Date().toISOString() })
+    .eq("fingerprint", fingerprint)
+    .eq("lease_token", leaseToken)
+    .eq("status", "claimed")
+    .select("fingerprint")
+    .abortSignal(timeoutSignal())
+    .maybeSingle();
+
+  if (error) throw new Error(`Falha ao renovar a reserva do envio web push: ${error.message}`);
+  if (!data) throw new Error("A reserva do envio web push não está mais ativa.");
 }
 
 export async function releasePushDispatch(fingerprint: string, leaseToken: string) {
