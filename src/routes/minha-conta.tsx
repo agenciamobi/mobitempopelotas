@@ -3,7 +3,6 @@ import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { AccountPage } from "@/components/auth/AccountPage";
 import { getAccountSnapshot } from "@/lib/auth/account.functions";
 import { absoluteUrl, SITE_NAME } from "@/lib/site-config";
-import "@/production/production-styles";
 
 export const Route = createFileRoute("/minha-conta")({
   head: () => ({
