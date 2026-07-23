@@ -149,7 +149,7 @@ async function sendDailySummary(request: Request) {
   let fingerprint = `resumo-diario-${date}`;
   let leaseToken: string | null = null;
   let deliveryCompleted = false;
-  let lastCompletedProgress: PushDeliveryResult | null = null;
+  const progressState: { latest: PushDeliveryResult | null } = { latest: null };
 
   try {
     const weather = await fetchWeatherIntelligence();
@@ -201,7 +201,7 @@ async function sendDailySummary(request: Request) {
       {
         beforeBatch: () => renewPushDispatch(activeFingerprint, activeLeaseToken),
         afterBatch: ({ result: progressResult }) => {
-          lastCompletedProgress = progressResult;
+          progressState.latest = progressResult;
         },
       },
     );
@@ -227,15 +227,18 @@ async function sendDailySummary(request: Request) {
     });
   } catch (error) {
     if (leaseToken && !deliveryCompleted) {
-      if (lastCompletedProgress && lastCompletedProgress.total > 0) {
-        await recordPushDispatch(fingerprint, leaseToken, "Envio interrompido após entrega parcial", lastCompletedProgress).catch(
-          (recordError) => {
-            console.error("[push/cron] Não foi possível fechar o envio parcial", {
-              message:
-                recordError instanceof Error ? recordError.message : String(recordError),
-            });
-          },
-        );
+      const partialResult = progressState.latest;
+      if (partialResult && partialResult.total > 0) {
+        await recordPushDispatch(
+          fingerprint,
+          leaseToken,
+          "Envio interrompido após entrega parcial",
+          partialResult,
+        ).catch((recordError) => {
+          console.error("[push/cron] Não foi possível fechar o envio parcial", {
+            message: recordError instanceof Error ? recordError.message : String(recordError),
+          });
+        });
       } else {
         await releasePushDispatch(fingerprint, leaseToken).catch(() => undefined);
       }
