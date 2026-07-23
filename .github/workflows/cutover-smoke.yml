@@ -15,6 +15,19 @@ on:
       - scripts/cutover-smoke.mjs
       - .github/workflows/cutover-smoke.yml
       - docs/PRODUCTION_CUTOVER.md
+  pull_request:
+    branches:
+      - main
+    paths:
+      - scripts/cutover-smoke.mjs
+      - .github/workflows/cutover-smoke.yml
+      - docs/PRODUCTION_CUTOVER.md
+      - src/lib/site-config.ts
+      - src/lib/public-routes.ts
+      - src/routes/robots[.]txt.ts
+      - src/routes/sitemap[.]xml.ts
+      - src/routes/feed.ts
+      - src/routes/pelotas[.]json.ts
 
 permissions:
   contents: read
