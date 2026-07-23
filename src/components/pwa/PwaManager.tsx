@@ -71,8 +71,9 @@ export function PwaManager() {
     const fullscreenQuery = window.matchMedia("(display-mode: fullscreen)");
     const updateInstalledState = () => setIsInstalled(isStandaloneMode());
     const userAgent = navigator.userAgent.toLowerCase();
+    const isTouchEnabledMac = userAgent.includes("macintosh") && navigator.maxTouchPoints > 1;
 
-    setIsIos(/iphone|ipad|ipod/.test(userAgent));
+    setIsIos(/iphone|ipad|ipod/.test(userAgent) || isTouchEnabledMac);
     updateInstalledState();
     standaloneQuery.addEventListener("change", updateInstalledState);
     fullscreenQuery.addEventListener("change", updateInstalledState);
