@@ -37,6 +37,11 @@ revoke all on table public.account_consent_events from authenticated;
 grant select on table public.account_consent_events to authenticated;
 grant select, insert, update, delete on table public.account_consent_events to service_role;
 
+revoke all on sequence public.account_consent_events_id_seq from public;
+revoke all on sequence public.account_consent_events_id_seq from anon;
+revoke all on sequence public.account_consent_events_id_seq from authenticated;
+grant usage, select on sequence public.account_consent_events_id_seq to service_role;
+
 create or replace function public.update_account_preferences(
   p_display_name text,
   p_email text,
