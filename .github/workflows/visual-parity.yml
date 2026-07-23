@@ -1,21 +1,20 @@
-# Capturas e verificações estruturais reproduzíveis para a decisão final de cutover.
+# Audita a revisão realmente alterada pelo pull request contra a produção de referência.
 name: Auditoria visual de paridade
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - agent/visual-parity-audit
-    paths:
-      - scripts/visual-parity-audit.mjs
-      - .github/workflows/visual-parity.yml
   pull_request:
     branches:
       - main
     paths:
-      - src/components/**
-      - src/styles.css
+      - src/**
+      - public/**
       - scripts/visual-parity-audit.mjs
+      - vite.config.ts
+      - tsconfig*.json
+      - eslint.config.js
+      - package.json
+      - package-lock.json
       - .github/workflows/visual-parity.yml
 
 permissions:
@@ -27,29 +26,85 @@ concurrency:
 
 jobs:
   screenshots:
-    name: Comparar Vercel e Lovable
+    name: Comparar produção e revisão
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 24
 
     steps:
-      - name: Checkout
+      - name: Checkout da revisão
         uses: actions/checkout@v4
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 24
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Validar build, tipos e lint
+        run: |
+          npm run build
+          npm run typecheck
+          npm run lint
 
       - name: Instalar Playwright para auditoria
         run: |
           npm install --no-save --package-lock=false playwright@1.55.0
           npx playwright install --with-deps chromium
 
+      - name: Iniciar a revisão local
+        run: |
+          npm run dev -- --host 127.0.0.1 --port 4173 > /tmp/tempo-pelotas-preview.log 2>&1 &
+          echo $! > /tmp/tempo-pelotas-preview.pid
+
+          node <<'NODE'
+          const url = "http://127.0.0.1:4173";
+          const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+          let lastError = "servidor ainda não respondeu";
+
+          for (let attempt = 1; attempt <= 36; attempt += 1) {
+            try {
+              const response = await fetch(url, { signal: AbortSignal.timeout(10_000) });
+              const html = await response.text();
+
+              if (response.ok && html.includes("site-shell--home-editorial")) {
+                console.log(`Revisão local disponível na tentativa ${attempt}.`);
+                process.exit(0);
+              }
+
+              lastError = `HTTP ${response.status}; shell esperado ausente`;
+            } catch (error) {
+              lastError = error instanceof Error ? error.message : String(error);
+            }
+
+            console.log(`Aguardando revisão local (${attempt}/36): ${lastError}`);
+            await wait(5_000);
+          }
+
+          throw new Error(`A revisão local não ficou disponível: ${lastError}`);
+          NODE
+
       - name: Capturar e validar viewports
         env:
-          PRODUCTION_URL: https://tempopelotas.com.br
-          LOVABLE_URL: https://mobitempopelotas.lovable.app
+          PRODUCTION_URL: https://www.tempopelotas.com.br
+          CANDIDATE_URL: http://127.0.0.1:4173
+          CANDIDATE_NAME: revisao-${{ github.event.pull_request.number || 'manual' }}
+          WAIT_FOR_CANDIDATE_DEPLOYMENT: "false"
+          AUDIT_REVISION: ${{ github.sha }}
         run: node scripts/visual-parity-audit.mjs
+
+      - name: Exibir log da aplicação em caso de falha
+        if: failure()
+        run: cat /tmp/tempo-pelotas-preview.log || true
+
+      - name: Encerrar aplicação local
+        if: always()
+        run: |
+          if [ -f /tmp/tempo-pelotas-preview.pid ]; then
+            kill "$(cat /tmp/tempo-pelotas-preview.pid)" || true
+          fi
 
       - name: Publicar relatório e capturas
         if: always()
@@ -57,5 +112,5 @@ jobs:
         with:
           name: visual-parity-${{ github.run_number }}
           path: artifacts/visual-parity
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 14

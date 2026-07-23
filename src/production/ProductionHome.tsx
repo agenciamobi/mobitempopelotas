@@ -2,6 +2,7 @@ import type { GuaibaObservationData } from "@/lib/hydrology/guaiba.server";
 import type { LagoonMonitoringNetworkData } from "@/lib/hydrology/lagoon-network.server";
 import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
+import { HomeExplorePortal } from "@/components/weather/HomeExplorePortal";
 import {
   toProductionAlerts,
   toProductionObservation,
@@ -45,8 +46,8 @@ export function ProductionHome({
   lagoon: LagoonMonitoringNetworkData;
 }) {
   const hasUsableWeather = Boolean(
-    data.weather.current?.temperature !== null ||
-    data.weather.observation.current.temperature !== null ||
+    data.weather.current?.temperature != null ||
+    data.weather.observation.current.temperature != null ||
     data.weather.hourly.length > 0 ||
     data.weather.daily.length > 0,
   );
@@ -64,7 +65,12 @@ export function ProductionHome({
             <h1 id="weather-unavailable-title">Dados temporariamente indisponíveis</h1>
             <p>{data.weather.message ?? data.brief.summary}</p>
             <p>O portal continuará consultando automaticamente as fontes meteorológicas.</p>
+            <p>
+              Enquanto a previsão não atualiza, use os atalhos abaixo para consultar águas, câmeras,
+              avisos e metodologia.
+            </p>
           </section>
+          <HomeExplorePortal />
         </main>
         <SiteFooter source={unavailableSource} />
       </div>

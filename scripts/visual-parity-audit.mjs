@@ -1,12 +1,19 @@
+/* global process, fetch, AbortSignal, console, document, window, HTMLImageElement, setTimeout */
+
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { chromium } from "playwright";
 
 const outputDirectory = path.resolve("artifacts/visual-parity");
-const productionUrl = process.env.PRODUCTION_URL ?? "https://tempopelotas.com.br";
-const lovableUrl = process.env.LOVABLE_URL ?? "https://mobitempopelotas.lovable.app";
-const expectedLovableMarker = "Encontre o que precisa acompanhar";
+const productionUrl = process.env.PRODUCTION_URL ?? "https://www.tempopelotas.com.br";
+const candidateUrl =
+  process.env.CANDIDATE_URL ?? process.env.LOVABLE_URL ?? "https://mobitempopelotas.lovable.app";
+const candidateName = process.env.CANDIDATE_NAME ?? "revisao";
+const expectedCandidateMarker =
+  process.env.EXPECTED_CANDIDATE_MARKER ?? "Encontre o que precisa acompanhar";
+const shouldWaitForCandidate = process.env.WAIT_FOR_CANDIDATE_DEPLOYMENT !== "false";
+const auditRevision = process.env.AUDIT_REVISION ?? "não informada";
 
 const viewports = [
   { name: "desktop-1440", width: 1440, height: 1200, mobile: false },
@@ -16,40 +23,50 @@ const viewports = [
 ];
 
 const targets = [
-  { name: "producao-vercel", url: productionUrl, expectExplore: true, strictLayout: false },
-  { name: "lovable", url: lovableUrl, expectExplore: true, strictLayout: true },
+  {
+    name: "producao-vercel",
+    url: productionUrl,
+    expectExplore: true,
+    strictLayout: false,
+  },
+  {
+    name: candidateName,
+    url: candidateUrl,
+    expectExplore: true,
+    strictLayout: true,
+  },
 ];
 
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-async function waitForLovableDeployment() {
+async function waitForCandidateDeployment() {
+  if (!shouldWaitForCandidate) return;
+
   let lastStatus = "sem resposta";
 
   for (let attempt = 1; attempt <= 24; attempt += 1) {
     try {
-      const response = await fetch(lovableUrl, {
-        headers: { "User-Agent": "TempoPelotas-VisualAudit/1.0" },
+      const response = await fetch(candidateUrl, {
+        headers: { "User-Agent": "TempoPelotas-VisualAudit/2.0" },
         signal: AbortSignal.timeout(20_000),
       });
       const html = await response.text();
       lastStatus = `HTTP ${response.status}`;
 
-      if (response.ok && html.includes(expectedLovableMarker)) {
-        console.log(`Publicação Lovable reconhecida na tentativa ${attempt}.`);
+      if (response.ok && html.includes(expectedCandidateMarker)) {
+        console.log(`Revisão reconhecida na tentativa ${attempt}.`);
         return;
       }
     } catch (error) {
       lastStatus = error instanceof Error ? error.message : String(error);
     }
 
-    console.log(
-      `Aguardando publicação Lovable (${attempt}/24): ${lastStatus}; marcador ainda ausente.`,
-    );
+    console.log(`Aguardando revisão (${attempt}/24): ${lastStatus}; marcador ainda ausente.`);
     if (attempt < 24) await wait(10_000);
   }
 
   throw new Error(
-    `A publicação Lovable não apresentou o marcador esperado: ${expectedLovableMarker}. Último estado: ${lastStatus}.`,
+    `A revisão não apresentou o marcador esperado: ${expectedCandidateMarker}. Último estado: ${lastStatus}.`,
   );
 }
 
@@ -58,16 +75,17 @@ function markdownReport(results) {
     "# Auditoria visual de paridade",
     "",
     `- Produção Vercel: ${productionUrl}`,
-    `- Publicação Lovable: ${lovableUrl}`,
+    `- Revisão auditada: ${candidateUrl}`,
+    `- SHA: ${auditRevision}`,
     `- Executada em: ${new Date().toISOString()}`,
     "",
-    "| Ambiente | Viewport | Overflow horizontal | Exploração | Skip link | Rodapé claro | Rodapé protegido |",
-    "|---|---:|---:|---:|---:|---:|---:|",
+    "| Ambiente | Viewport | HTTP | Overflow | Estrutura | Marca | Estado | Exploração | Skip link | Rodapé claro | Área móvel segura |",
+    "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
   ];
 
   for (const result of results) {
     lines.push(
-      `| ${result.target} | ${result.viewport.width}×${result.viewport.height} | ${result.audit.horizontalOverflow}px | ${result.audit.hasExplore ? "sim" : "não"} | ${result.audit.skipLinkVisible ? "sim" : "não"} | ${result.audit.footerLight === null ? "n/a" : result.audit.footerLight ? "sim" : "não"} | ${result.audit.footerProtected === null ? "n/a" : result.audit.footerProtected ? "sim" : "não"} |`,
+      `| ${result.target} | ${result.viewport.width}×${result.viewport.height} | ${result.audit.httpStatus} | ${result.audit.horizontalOverflow}px | ${result.audit.hasCoreStructure ? "sim" : "não"} | ${result.audit.brandLoaded ? "sim" : "não"} | ${result.audit.weatherUnavailable ? "contingência" : "dados"} | ${result.audit.hasExplore ? "sim" : "não"} | ${result.audit.skipLinkVisible ? "sim" : "não"} | ${result.audit.footerLight === null ? "n/a" : result.audit.footerLight ? "sim" : "não"} | ${result.audit.footerProtected === null ? "n/a" : result.audit.footerProtected ? "sim" : "não"} |`,
     );
   }
 
@@ -77,7 +95,19 @@ function markdownReport(results) {
 }
 
 async function auditPage(page, target, viewport) {
-  await page.goto(target.url, { waitUntil: "domcontentloaded", timeout: 60_000 });
+  const response = await page.goto(target.url, {
+    waitUntil: "domcontentloaded",
+    timeout: 60_000,
+  });
+
+  if (!response) {
+    throw new Error(`${target.name}: navegação concluída sem resposta HTTP.`);
+  }
+
+  if (!response.ok()) {
+    throw new Error(`${target.name}: homepage respondeu HTTP ${response.status()}.`);
+  }
+
   await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => undefined);
   await page.waitForTimeout(2_000);
 
@@ -86,14 +116,15 @@ async function auditPage(page, target, viewport) {
   await page.waitForTimeout(150);
 
   const audit = await page.evaluate(
-    ({ mobile, strictLayout }) => {
+    ({ mobile, strictLayout, httpStatus }) => {
       const root = document.documentElement;
       const active = document.activeElement;
       const skipLink = document.querySelector(".skip-link");
       const skipRect = skipLink?.getBoundingClientRect() ?? null;
-      const mobileNavigation = document.querySelector(".production-mobile-navigation");
-      const footer = document.querySelector(".editorial-footer-shell");
+      const mobileNavigation = document.querySelector(".mobile-tab-bar");
+      const footer = document.querySelector(".site-footer-v3");
       const footerPanel = document.querySelector(".editorial-footer");
+      const brand = document.querySelector("img.brand-logo, .editorial-footer__brand img");
       const mobileNavigationStyle = mobileNavigation
         ? window.getComputedStyle(mobileNavigation)
         : null;
@@ -111,16 +142,33 @@ async function auditPage(page, target, viewport) {
       const footerPaddingBottom = footerStyle
         ? Number.parseFloat(footerStyle.paddingBottom) || 0
         : 0;
+      const weatherUnavailable = Boolean(document.querySelector(".production-weather-unavailable"));
+      const hasWeatherState = Boolean(
+        document.querySelector(".weather-hero, .production-weather-unavailable"),
+      );
+      const hasCoreStructure = Boolean(
+        document.querySelector(".site-shell--home-editorial") &&
+        document.querySelector("#conteudo-principal") &&
+        hasWeatherState &&
+        footer &&
+        footerPanel,
+      );
+      const brandImage = brand instanceof HTMLImageElement ? brand : null;
 
       return {
+        httpStatus,
         title: document.title,
         horizontalOverflow: Math.max(0, root.scrollWidth - root.clientWidth),
+        hasCoreStructure,
+        hasWeatherState,
+        weatherUnavailable,
         hasExplore: Boolean(document.querySelector("#explorar-portal")),
         exploreHeading:
           document.querySelector("#home-explore-portal-title")?.textContent?.trim() ?? null,
         hasFooter: Boolean(footer),
         footerBackground,
         footerLight: strictLayout ? footerBackground === "rgb(248, 250, 248)" : null,
+        brandLoaded: Boolean(brandImage?.complete && brandImage.naturalWidth > 0),
         skipLinkFocused: active === skipLink,
         skipLinkVisible: Boolean(
           skipRect &&
@@ -138,14 +186,23 @@ async function auditPage(page, target, viewport) {
             : null,
       };
     },
-    { mobile: viewport.mobile, strictLayout: target.strictLayout },
+    {
+      mobile: viewport.mobile,
+      strictLayout: target.strictLayout,
+      httpStatus: response.status(),
+    },
   );
 
   const failures = [];
+  if (!audit.title) failures.push("documento sem título");
+  if (!audit.hasCoreStructure) {
+    failures.push("estrutura principal da homepage ausente");
+  }
+  if (!audit.brandLoaded) failures.push("logotipo editorial não carregou");
   if (audit.horizontalOverflow > 2) {
     failures.push(`overflow horizontal de ${audit.horizontalOverflow}px`);
   }
-  if (target.expectExplore && !audit.hasExplore) {
+  if (target.expectExplore && !audit.hasExplore && !audit.weatherUnavailable) {
     failures.push("seção de exploração ausente");
   }
   if (target.strictLayout && !audit.hasFooter) {
@@ -167,7 +224,7 @@ async function auditPage(page, target, viewport) {
 }
 
 await mkdir(outputDirectory, { recursive: true });
-await waitForLovableDeployment();
+await waitForCandidateDeployment();
 
 const browser = await chromium.launch({ headless: true });
 const results = [];
@@ -181,25 +238,56 @@ try {
         reducedMotion: "reduce",
       });
       const page = await context.newPage();
-      const { audit, failures } = await auditPage(page, target, viewport);
-      const screenshotName = `${target.name}--${viewport.name}.png`;
 
-      await page.screenshot({
-        path: path.join(outputDirectory, screenshotName),
-        fullPage: true,
-        animations: "disabled",
-      });
+      try {
+        const { audit, failures } = await auditPage(page, target, viewport);
+        const screenshotName = `${target.name}--${viewport.name}.png`;
 
-      results.push({
-        target: target.name,
-        url: target.url,
-        viewport,
-        screenshot: screenshotName,
-        audit,
-        failures,
-      });
+        await page.screenshot({
+          path: path.join(outputDirectory, screenshotName),
+          fullPage: true,
+          animations: "disabled",
+        });
 
-      await context.close();
+        results.push({
+          target: target.name,
+          url: target.url,
+          viewport,
+          screenshot: screenshotName,
+          audit,
+          failures,
+        });
+      } catch (error) {
+        const screenshotName = `${target.name}--${viewport.name}--erro.png`;
+        await page
+          .screenshot({
+            path: path.join(outputDirectory, screenshotName),
+            fullPage: true,
+            animations: "disabled",
+          })
+          .catch(() => undefined);
+
+        results.push({
+          target: target.name,
+          url: target.url,
+          viewport,
+          screenshot: screenshotName,
+          audit: {
+            httpStatus: 0,
+            horizontalOverflow: 0,
+            hasCoreStructure: false,
+            brandLoaded: false,
+            weatherUnavailable: false,
+            hasExplore: false,
+            skipLinkVisible: false,
+            footerLight: null,
+            footerProtected: null,
+          },
+          failures: [error instanceof Error ? error.message : String(error)],
+        });
+      } finally {
+        await context.close();
+      }
     }
   }
 } finally {
@@ -208,7 +296,15 @@ try {
 
 await writeFile(
   path.join(outputDirectory, "report.json"),
-  `${JSON.stringify({ generatedAt: new Date().toISOString(), results }, null, 2)}\n`,
+  `${JSON.stringify(
+    {
+      generatedAt: new Date().toISOString(),
+      revision: auditRevision,
+      results,
+    },
+    null,
+    2,
+  )}\n`,
 );
 await writeFile(path.join(outputDirectory, "README.md"), markdownReport(results));
 
@@ -220,7 +316,7 @@ const failures = results.flatMap((result) =>
 
 for (const result of results) {
   console.log(
-    `${result.target} ${result.viewport.width}×${result.viewport.height}: overflow=${result.audit.horizontalOverflow}px explore=${result.audit.hasExplore} skip=${result.audit.skipLinkVisible} footerLight=${result.audit.footerLight} footerProtected=${result.audit.footerProtected}`,
+    `${result.target} ${result.viewport.width}×${result.viewport.height}: HTTP=${result.audit.httpStatus} overflow=${result.audit.horizontalOverflow}px core=${result.audit.hasCoreStructure} brand=${result.audit.brandLoaded} unavailable=${result.audit.weatherUnavailable} explore=${result.audit.hasExplore} skip=${result.audit.skipLinkVisible} footerLight=${result.audit.footerLight} footerProtected=${result.audit.footerProtected}`,
   );
 }
 
