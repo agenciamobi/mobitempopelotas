@@ -1,7 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { getVerifiedRequestUser } from "@/lib/auth/request-user.server";
-import { createSupabaseAdminClient } from "@/lib/supabase/server-client.server";
+import {
+  createSupabaseAdminClient,
+  getSupabaseServerConfig,
+} from "@/lib/supabase/server-client.server";
+
+const QUERY_TIMEOUT_MS = 3_500;
+
+function timeoutSignal() {
+  return AbortSignal.timeout(QUERY_TIMEOUT_MS);
+}
 
 function jsonHeaders(base = new Headers()) {
   base.set("Cache-Control", "private, no-store, max-age=0");
@@ -32,28 +41,39 @@ async function exportAccountData(request: Request) {
       });
     }
 
+    if (!getSupabaseServerConfig().isAdminConfigured) {
+      return new Response(
+        JSON.stringify({ success: false, error: "A exportação ainda não está disponível." }),
+        { status: 503, headers },
+      );
+    }
+
     const admin = createSupabaseAdminClient();
     const [profileResult, preferencesResult, consentResult, pushResult] = await Promise.all([
       admin
         .from("profiles")
         .select("email,display_name,avatar_url,created_at,updated_at")
         .eq("id", account.user.id)
+        .abortSignal(timeoutSignal())
         .maybeSingle(),
       admin
         .from("user_preferences")
         .select("weather_alerts,water_alerts,daily_summary,community_updates,created_at,updated_at")
         .eq("user_id", account.user.id)
+        .abortSignal(timeoutSignal())
         .maybeSingle(),
       admin
         .from("account_consent_events")
         .select("channel,granted,source,policy_version,created_at")
         .eq("user_id", account.user.id)
-        .order("created_at", { ascending: true }),
+        .order("created_at", { ascending: true })
+        .abortSignal(timeoutSignal()),
       admin
         .from("web_push_subscriptions")
         .select("endpoint,user_agent,topics,created_at,updated_at,last_seen_at")
         .eq("user_id", account.user.id)
-        .order("created_at", { ascending: true }),
+        .order("created_at", { ascending: true })
+        .abortSignal(timeoutSignal()),
     ]);
 
     const error =
