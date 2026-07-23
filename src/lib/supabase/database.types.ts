@@ -63,6 +63,57 @@ export type Database = {
         };
         Relationships: [];
       };
+      weather_daily_snapshots: {
+        Row: {
+          city: string;
+          created_at: string;
+          latitude: number;
+          location_slug: string;
+          longitude: number;
+          observed_date: string;
+          precipitation: number | null;
+          source_name: string;
+          source_updated_at: string | null;
+          state: string;
+          temperature_max: number;
+          temperature_min: number;
+          updated_at: string;
+          wind_gust: number | null;
+        };
+        Insert: {
+          city: string;
+          created_at?: string;
+          latitude: number;
+          location_slug: string;
+          longitude: number;
+          observed_date: string;
+          precipitation?: number | null;
+          source_name: string;
+          source_updated_at?: string | null;
+          state: string;
+          temperature_max: number;
+          temperature_min: number;
+          updated_at?: string;
+          wind_gust?: number | null;
+        };
+        Update: {
+          city?: string;
+          created_at?: string;
+          latitude?: number;
+          location_slug?: string;
+          longitude?: number;
+          observed_date?: string;
+          precipitation?: number | null;
+          source_name?: string;
+          source_updated_at?: string | null;
+          state?: string;
+          temperature_max?: number;
+          temperature_min?: number;
+          updated_at?: string;
+          wind_gust?: number | null;
+        };
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };
@@ -73,3 +124,5 @@ export type Database = {
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type UserPreferences = Database["public"]["Tables"]["user_preferences"]["Row"];
+export type WeatherDailySnapshot =
+  Database["public"]["Tables"]["weather_daily_snapshots"]["Row"];
