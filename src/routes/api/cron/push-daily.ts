@@ -7,12 +7,19 @@ import {
   claimPushDispatch,
   recordPushDispatch,
   releasePushDispatch,
+  renewPushDispatch,
 } from "@/lib/push/push-storage.server";
 import { broadcastPushNotification, getPushConfigurationStatus } from "@/lib/push/web-push.server";
 import type { InmetAlert } from "@/lib/weather/official-sources.types";
 import { fetchWeatherIntelligence } from "@/lib/weather/weather-intelligence.server";
 
 const TIMEZONE = "America/Sao_Paulo";
+const ALERT_SEVERITY_RANK: Record<InmetAlert["severity"], number> = {
+  "great-danger": 3,
+  danger: 2,
+  potential: 1,
+  unknown: 0,
+};
 
 function localDateKey(date = new Date()) {
   return new Intl.DateTimeFormat("en-CA", {
@@ -103,6 +110,17 @@ function alertFingerprint(alerts: InmetAlert[]) {
     .slice(0, 16);
 }
 
+function sortPelotasAlertsBySeverity(alerts: InmetAlert[]) {
+  return [...alerts].sort((left, right) => {
+    const severityDifference = ALERT_SEVERITY_RANK[right.severity] - ALERT_SEVERITY_RANK[left.severity];
+    if (severityDifference !== 0) return severityDifference;
+
+    const rightSentAt = right.sentAt ? Date.parse(right.sentAt) : 0;
+    const leftSentAt = left.sentAt ? Date.parse(left.sentAt) : 0;
+    return rightSentAt - leftSentAt;
+  });
+}
+
 async function sendDailySummary(request: Request) {
   const cronSecret = process.env.CRON_SECRET?.trim();
   if (!cronSecret) {
@@ -140,8 +158,10 @@ async function sendDailySummary(request: Request) {
 
   try {
     const weather = await fetchWeatherIntelligence();
-    const pelotasAlerts = weather.weather.alerts.filter(
-      (alert) => alert.period === "active" && alert.relevance === "pelotas",
+    const pelotasAlerts = sortPelotasAlertsBySeverity(
+      weather.weather.alerts.filter(
+        (alert) => alert.period === "active" && alert.relevance === "pelotas",
+      ),
     );
     const hasOfficialAlert = pelotasAlerts.length > 0;
     const primaryAlert = pelotasAlerts[0];
@@ -170,21 +190,28 @@ async function sendDailySummary(request: Request) {
       return pushJsonResponse({ success: true, skipped: true, reason: "already-sent" });
     }
 
-    const result = await broadcastPushNotification({
-      title,
-      body,
-      url: hasOfficialAlert ? "/alertas" : "/",
-      tag: hasOfficialAlert ? `inmet-pelotas-${date}` : `previsao-${date}`,
-      urgency: hasOfficialAlert ? "high" : "normal",
-      requireInteraction: hasOfficialAlert,
-      renotify: hasOfficialAlert,
-      topic: "weather",
-    });
+    const activeFingerprint = fingerprint;
+    const activeLeaseToken = leaseToken;
+    const result = await broadcastPushNotification(
+      {
+        title,
+        body,
+        url: hasOfficialAlert ? "/alertas" : "/",
+        tag: hasOfficialAlert ? `inmet-pelotas-${date}` : `previsao-${date}`,
+        urgency: hasOfficialAlert ? "high" : "normal",
+        requireInteraction: hasOfficialAlert,
+        renotify: hasOfficialAlert,
+        topic: "weather",
+      },
+      {
+        beforeBatch: () => renewPushDispatch(activeFingerprint, activeLeaseToken),
+      },
+    );
     deliveryCompleted = true;
 
     let dispatchRecorded = true;
     try {
-      await recordPushDispatch(fingerprint, leaseToken, title, result);
+      await recordPushDispatch(activeFingerprint, activeLeaseToken, title, result);
     } catch (error) {
       dispatchRecorded = false;
       console.error("[push/cron] Entrega concluída, mas métricas não foram atualizadas", {
