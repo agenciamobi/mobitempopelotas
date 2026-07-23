@@ -1,6 +1,6 @@
 /* global self, caches, fetch, Response, URL */
 
-const CACHE_VERSION = "tempo-pelotas-v1";
+const CACHE_VERSION = "tempo-pelotas-v2";
 const APP_SHELL_CACHE = `${CACHE_VERSION}-app-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_FALLBACK_URL = "/offline.html";
@@ -105,4 +105,58 @@ self.addEventListener("fetch", (event) => {
   if (isStaticAsset) {
     event.respondWith(staleWhileRevalidate(request, event));
   }
+});
+
+self.addEventListener("push", (event) => {
+  let data = {};
+
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { body: event.data ? event.data.text() : "" };
+  }
+
+  const title = data.title || "Tempo Pelotas";
+  const options = {
+    body: data.body || "Há uma nova informação para Pelotas.",
+    icon: data.icon || "/brand/tempo-pelotas-icon.svg",
+    badge: data.badge || "/brand/tempo-pelotas-icon.svg",
+    tag: data.tag || "tempo-pelotas",
+    renotify: Boolean(data.renotify),
+    requireInteraction: Boolean(data.requireInteraction),
+    data: {
+      url: typeof data.url === "string" ? data.url : "/",
+      receivedAt: Date.now(),
+    },
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  let destination = new URL("/", self.location.origin);
+  try {
+    const candidate = new URL(event.notification.data?.url || "/", self.location.origin);
+    if (candidate.origin === self.location.origin) destination = candidate;
+  } catch {
+    destination = new URL("/", self.location.origin);
+  }
+
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then(async (clients) => {
+      for (const client of clients) {
+        if (client.url === destination.href && "focus" in client) return client.focus();
+      }
+
+      const sameOriginClient = clients.find((client) => client.url.startsWith(self.location.origin));
+      if (sameOriginClient && "navigate" in sameOriginClient) {
+        await sameOriginClient.navigate(destination.href);
+        return sameOriginClient.focus();
+      }
+
+      return self.clients.openWindow(destination.href);
+    }),
+  );
 });
