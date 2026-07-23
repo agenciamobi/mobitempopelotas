@@ -63,10 +63,13 @@ type ReadinessOutcome = {
 function generateVapidPair() {
   const keyAgreement = createECDH("prime256v1");
   keyAgreement.generateKeys();
+  const rawPrivateKey = keyAgreement.getPrivateKey();
+  const privateKey = Buffer.alloc(32);
+  rawPrivateKey.copy(privateKey, privateKey.length - rawPrivateKey.length);
 
   return {
     publicKey: keyAgreement.getPublicKey(undefined, "uncompressed").toString("base64url"),
-    privateKey: keyAgreement.getPrivateKey().toString("base64url"),
+    privateKey: privateKey.toString("base64url"),
   };
 }
 
