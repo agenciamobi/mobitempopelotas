@@ -50,14 +50,21 @@ function validateBrowserRequest(request: Request) {
   return null;
 }
 
-async function optionalAccountContext(request: Request) {
+async function optionalAccountContext(request: Request): Promise<{
+  userId: string | null | undefined;
+  responseHeaders: Headers;
+}> {
   try {
-    return await getVerifiedRequestUser(request);
+    const account = await getVerifiedRequestUser(request);
+    return {
+      userId: account.configured ? (account.user?.id ?? null) : undefined,
+      responseHeaders: account.responseHeaders,
+    };
   } catch (error) {
     console.warn("[push/subscription] Não foi possível verificar a conta opcional", {
       message: error instanceof Error ? error.message : String(error),
     });
-    return { configured: true, user: null, responseHeaders: new Headers() };
+    return { userId: undefined, responseHeaders: new Headers() };
   }
 }
 
@@ -98,7 +105,7 @@ async function subscribe(request: Request) {
       },
       request.headers.get("user-agent"),
       parsed.data.topics,
-      account.user?.id ?? null,
+      account.userId,
     );
 
     return pushJsonResponse({ success: true }, 200, account.responseHeaders);
