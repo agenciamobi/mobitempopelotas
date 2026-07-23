@@ -36,16 +36,6 @@ jobs:
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
 
-      - name: Gerar diagnóstico de formatação
-        run: npx prettier --write tests/database-security.test.ts
-
-      - name: Publicar diagnóstico de formatação
-        uses: actions/upload-artifact@v4
-        with:
-          name: database-security-effective-prettier
-          path: tests/database-security.test.ts
-          retention-days: 1
-
       - name: Contratos rápidos
         run: npm run test:contracts
 
