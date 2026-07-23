@@ -8,12 +8,19 @@ on:
         required: true
         default: https://tempopelotas.com.br
         type: string
+  push:
+    branches:
+      - agent/production-cutover-runbook
+    paths:
+      - scripts/cutover-smoke.mjs
+      - .github/workflows/cutover-smoke.yml
+      - docs/PRODUCTION_CUTOVER.md
 
 permissions:
   contents: read
 
 concurrency:
-  group: cutover-smoke-${{ inputs.base_url }}
+  group: cutover-smoke-${{ github.ref }}-${{ inputs.base_url }}
   cancel-in-progress: false
 
 jobs:
@@ -33,7 +40,7 @@ jobs:
 
       - name: Executar smoke test
         env:
-          BASE_URL: ${{ inputs.base_url }}
+          BASE_URL: ${{ inputs.base_url || 'https://tempopelotas.com.br' }}
         run: node scripts/cutover-smoke.mjs
 
       - name: Publicar relatório
