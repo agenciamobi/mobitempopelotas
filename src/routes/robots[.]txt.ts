@@ -10,8 +10,7 @@ function createRobotsTxt() {
     "Disallow: /_server/",
     `Sitemap: ${absoluteUrl("/sitemap.xml")}`,
     "",
-  ].join("
-");
+  ].join("\n");
 }
 
 export const Route = createFileRoute("/robots.txt")({
