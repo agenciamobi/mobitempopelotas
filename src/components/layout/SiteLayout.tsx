@@ -34,6 +34,17 @@ export function SiteLayout({ children }: SiteLayoutProps) {
     return () => window.cancelAnimationFrame(frame);
   }, [pathname]);
 
+  if (pathname === "/") {
+    return (
+      <>
+        <div className="visually-hidden" aria-live="polite" aria-atomic="true">
+          {announcement}
+        </div>
+        {children}
+      </>
+    );
+  }
+
   return (
     <div className="site-shell">
       <div className="visually-hidden" aria-live="polite" aria-atomic="true">
