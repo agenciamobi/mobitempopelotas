@@ -118,8 +118,8 @@ export function HomeLocalMonitoring({
           <h2 id="home-local-monitoring-title">O que está sendo medido em Pelotas agora</h2>
         </div>
         <p>
-          Compare a previsão com a estação meteorológica da Embrapa e acompanhe a leitura pública
-          do nível da Lagoa dos Patos no Laranjal.
+          Compare a previsão com a estação meteorológica da Embrapa e acompanhe a leitura pública do
+          nível da Lagoa dos Patos no Laranjal.
         </p>
       </header>
 
@@ -155,9 +155,7 @@ export function HomeLocalMonitoring({
                       : `Consulta em ${formatDateTime(observation.source.fetchedAt)}`}
                   </small>
                   <strong>{formatNumber(observation.current.temperature)}°</strong>
-                  <span>
-                    Sensação de {formatNumber(observation.current.feelsLike)} °C
-                  </span>
+                  <span>Sensação de {formatNumber(observation.current.feelsLike)} °C</span>
                 </div>
                 <Gauge aria-hidden="true" />
               </div>
@@ -216,8 +214,8 @@ export function HomeLocalMonitoring({
             <span>Praia do Laranjal</span>
             <h3>Acompanhe o nível da água no ponto local</h3>
             <p>
-              A telemetria pública ajuda a observar subida, queda ou estabilidade sem criar uma
-              cota de risco própria para o portal.
+              A telemetria pública ajuda a observar subida, queda ou estabilidade sem criar uma cota
+              de risco própria para o portal.
             </p>
           </div>
 
