@@ -100,7 +100,8 @@ export async function listWeatherSnapshots(limit = 30): Promise<HistoricalWeathe
   if (!status.configured) return [];
 
   const client = createSupabaseAdminClient();
-  const safeLimit = Math.max(1, Math.min(Math.trunc(limit), 3650));
+  const normalizedLimit = Number.isFinite(limit) ? Math.trunc(limit) : 30;
+  const safeLimit = Math.max(1, Math.min(normalizedLimit, 3650));
   const { data, error } = await client
     .from("weather_daily_snapshots")
     .select("*")
