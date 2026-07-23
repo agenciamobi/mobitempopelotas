@@ -26,6 +26,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
@@ -37,7 +39,7 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Finalizar correções do Codex
-        if: github.event_name == 'push' && github.ref == 'refs/heads/agent/web-push-notifications'
+        if: github.event_name == 'pull_request' && github.head_ref == 'agent/web-push-notifications'
         run: |
           node scripts/finalize-push-codex.mjs
           npx prettier --write \
@@ -53,7 +55,7 @@ jobs:
           git add public/sw.js src/components/pwa/PushNotificationsManager.tsx src/lib/push src/lib/supabase/database.types.ts src/routes/api/cron/push-daily.ts src/routes/api/push supabase/migrations/20260723113000_create_web_push_subscriptions.sql
           if ! git diff --cached --quiet; then
             git commit -m "fix: aplica recomendações da revisão web push"
-            git push origin HEAD:${GITHUB_REF_NAME}
+            git push origin HEAD:${{ github.head_ref }}
           fi
 
       - name: Build de produção
