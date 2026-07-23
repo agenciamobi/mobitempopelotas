@@ -63,6 +63,81 @@ export type Database = {
         };
         Relationships: [];
       };
+      web_push_dispatches: {
+        Row: {
+          claimed_at: string;
+          completed_at: string | null;
+          failed_count: number;
+          fingerprint: string;
+          lease_token: string;
+          removed_count: number;
+          sent_at: string;
+          sent_count: number;
+          status: string;
+          title: string;
+        };
+        Insert: {
+          claimed_at?: string;
+          completed_at?: string | null;
+          failed_count?: number;
+          fingerprint: string;
+          lease_token: string;
+          removed_count?: number;
+          sent_at?: string;
+          sent_count?: number;
+          status?: string;
+          title: string;
+        };
+        Update: {
+          claimed_at?: string;
+          completed_at?: string | null;
+          failed_count?: number;
+          fingerprint?: string;
+          lease_token?: string;
+          removed_count?: number;
+          sent_at?: string;
+          sent_count?: number;
+          status?: string;
+          title?: string;
+        };
+        Relationships: [];
+      };
+      web_push_subscriptions: {
+        Row: {
+          auth: string;
+          created_at: string;
+          endpoint: string;
+          expiration_time: number | null;
+          last_seen_at: string;
+          p256dh: string;
+          topics: string[];
+          updated_at: string;
+          user_agent: string | null;
+        };
+        Insert: {
+          auth: string;
+          created_at?: string;
+          endpoint: string;
+          expiration_time?: number | null;
+          last_seen_at?: string;
+          p256dh: string;
+          topics?: string[];
+          updated_at?: string;
+          user_agent?: string | null;
+        };
+        Update: {
+          auth?: string;
+          created_at?: string;
+          endpoint?: string;
+          expiration_time?: number | null;
+          last_seen_at?: string;
+          p256dh?: string;
+          topics?: string[];
+          updated_at?: string;
+          user_agent?: string | null;
+        };
+        Relationships: [];
+      };
       weather_daily_snapshots: {
         Row: {
           city: string;
@@ -117,6 +192,15 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: {
+      claim_web_push_dispatch: {
+        Args: {
+          p_fingerprint: string;
+          p_lease_token: string;
+          p_stale_after_seconds?: number;
+          p_title: string;
+        };
+        Returns: boolean;
+      };
       update_account_preferences: {
         Args: {
           p_avatar_url: string | null;
@@ -137,4 +221,6 @@ export type Database = {
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type UserPreferences = Database["public"]["Tables"]["user_preferences"]["Row"];
+export type WebPushDispatch = Database["public"]["Tables"]["web_push_dispatches"]["Row"];
+export type WebPushSubscription = Database["public"]["Tables"]["web_push_subscriptions"]["Row"];
 export type WeatherDailySnapshot = Database["public"]["Tables"]["weather_daily_snapshots"]["Row"];
