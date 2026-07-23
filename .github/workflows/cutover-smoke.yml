@@ -1,0 +1,46 @@
+name: Smoke test de cutover
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: URL pública que deve ser validada
+        required: true
+        default: https://tempopelotas.com.br
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cutover-smoke-${{ inputs.base_url }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validar domínio público
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Executar smoke test
+        env:
+          BASE_URL: ${{ inputs.base_url }}
+        run: node scripts/cutover-smoke.mjs
+
+      - name: Publicar relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cutover-smoke-${{ github.run_number }}
+          path: artifacts/cutover-smoke
+          if-no-files-found: error
+          retention-days: 30
