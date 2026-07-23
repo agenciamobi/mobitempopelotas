@@ -4,8 +4,7 @@ import path from "node:path";
 
 const CANONICAL_SITE_URL = "https://www.tempopelotas.com.br";
 const GEMINI_ENABLED_VALUES = new Set(["true", "1", "on"]);
-const PLACEHOLDER_PATTERN =
-  /(change[-_ ]?me|placeholder|example|your[-_ ]|todo|replace[-_ ]?me)/i;
+const PLACEHOLDER_PATTERN = /(change[-_ ]?me|placeholder|example|your[-_ ]|todo|replace[-_ ]?me)/i;
 const REQUIRED_TEMPLATE_KEYS = [
   "VITE_SUPABASE_MODE",
   "SUPABASE_MODE",
@@ -109,11 +108,7 @@ function validateVapidKeyPair(publicKey, privateKey) {
   const publicBytes = decodeBase64Url(publicKey);
   const privateBytes = decodeBase64Url(privateKey);
 
-  if (
-    publicBytes?.length !== 65 ||
-    publicBytes[0] !== 4 ||
-    privateBytes?.length !== 32
-  ) {
+  if (publicBytes?.length !== 65 || publicBytes[0] !== 4 || privateBytes?.length !== 32) {
     return false;
   }
 
@@ -164,8 +159,7 @@ function validateTemplate(values) {
     `VITE_SITE_URL deve usar ${CANONICAL_SITE_URL}`,
   );
 
-  const safeDefaultMode =
-    values.VITE_SUPABASE_MODE === "mock" && values.SUPABASE_MODE === "mock";
+  const safeDefaultMode = values.VITE_SUPABASE_MODE === "mock" && values.SUPABASE_MODE === "mock";
   addCheck(
     "Modo seguro por padrão",
     safeDefaultMode,
@@ -197,8 +191,7 @@ function validateProduction(values) {
   );
 
   const externalMode =
-    value("SUPABASE_MODE") === "external" &&
-    value("VITE_SUPABASE_MODE") === "external";
+    value("SUPABASE_MODE") === "external" && value("VITE_SUPABASE_MODE") === "external";
   addCheck(
     "Supabase externo habilitado",
     externalMode,
@@ -217,9 +210,9 @@ function validateProduction(values) {
   const serverPublicKey = value("SUPABASE_PUBLISHABLE_KEY");
   const publishableKeysMatch = Boolean(
     publicKey &&
-      serverPublicKey &&
-      publicKey === serverPublicKey &&
-      !looksLikePlaceholder(publicKey),
+    serverPublicKey &&
+    publicKey === serverPublicKey &&
+    !looksLikePlaceholder(publicKey),
   );
   addCheck(
     "Publishable key do Supabase",
@@ -227,8 +220,7 @@ function validateProduction(values) {
     "as publishable keys pública e server-side devem existir e ser idênticas",
   );
 
-  const adminKey =
-    value("SUPABASE_SECRET_KEY") ?? value("SUPABASE_SERVICE_ROLE_KEY");
+  const adminKey = value("SUPABASE_SECRET_KEY") ?? value("SUPABASE_SERVICE_ROLE_KEY");
   const adminKeyIsValid = Boolean(
     adminKey && !looksLikePlaceholder(adminKey) && adminKey !== publicKey,
   );
@@ -266,11 +258,7 @@ function validateProduction(values) {
   const redemetIsConfigured = Boolean(
     value("REDEMET_API_KEY") && isHttpsUrl(value("REDEMET_API_BASE_URL")),
   );
-  addCheck(
-    "REDEMET",
-    redemetIsConfigured,
-    "a chave deve existir e a URL base deve usar HTTPS",
-  );
+  addCheck("REDEMET", redemetIsConfigured, "a chave deve existir e a URL base deve usar HTTPS");
 
   const geminiFlag = value("GEMINI_WEATHER_ENABLED")?.toLowerCase() ?? "";
   const geminiEnabled = GEMINI_ENABLED_VALUES.has(geminiFlag);
@@ -285,9 +273,7 @@ function validateProduction(values) {
       : "síntese Gemini desabilitada ou não exigida",
   );
 
-  validateForbiddenClientKeys(values, (environment, key) =>
-    Boolean(normalize(environment[key])),
-  );
+  validateForbiddenClientKeys(values, (environment, key) => Boolean(normalize(environment[key])));
 }
 
 const values =
@@ -311,9 +297,7 @@ const reportPath = path.join(outputDirectory, "report.json");
 const reportContent = `${JSON.stringify(report, null, 2)}\n`;
 await writeFile(reportPath, reportContent);
 
-console.log(
-  `\nResultado: ${report.passed} aprovados; ${report.failed} reprovados.`,
-);
+console.log(`\nResultado: ${report.passed} aprovados; ${report.failed} reprovados.`);
 console.log(`Relatório sanitizado: ${reportPath}`);
 
 if (report.failed > 0) process.exitCode = 1;
