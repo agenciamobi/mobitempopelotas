@@ -1,0 +1,125 @@
+name: Runtime Lovable
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/redemet-home-methodology-runtime
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: runtime-lovable-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Validar publicação e REDEMET
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+
+    steps:
+      - name: Consultar aplicação publicada
+        env:
+          BASE_URL: https://mobitempopelotas.lovable.app
+        run: |
+          node <<'NODE'
+          const baseUrl = process.env.BASE_URL.replace(/\/$/, "");
+          const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+          async function request(path, attempts = 12) {
+            let lastError;
+
+            for (let attempt = 1; attempt <= attempts; attempt += 1) {
+              try {
+                const response = await fetch(`${baseUrl}${path}`, {
+                  headers: {
+                    Accept: path.startsWith("/api/") ? "application/json" : "text/html",
+                    "User-Agent": "TempoPelotas-Runtime-Smoke/1.0",
+                  },
+                  signal: AbortSignal.timeout(20_000),
+                });
+
+                if (!response.ok) {
+                  throw new Error(`${path} respondeu HTTP ${response.status}`);
+                }
+
+                return response;
+              } catch (error) {
+                lastError = error;
+                console.log(`Tentativa ${attempt}/${attempts} para ${path}: ${error.message}`);
+                if (attempt < attempts) await wait(10_000);
+              }
+            }
+
+            throw lastError;
+          }
+
+          const pageResponse = await request("/radar-e-satelite-pelotas");
+          const pageHtml = await pageResponse.text();
+          if (!pageHtml.includes("Radar, satélite e trovoadas")) {
+            throw new Error("A página REDEMET publicada não contém o conteúdo esperado.");
+          }
+
+          const endpoints = [
+            ["radar", "/api/redemet/radar?frames=2"],
+            ["satellite", "/api/redemet/satellite?type=realcada&frames=2"],
+            ["storms", "/api/redemet/storms?frames=2"],
+          ];
+
+          const results = {};
+          for (const [name, path] of endpoints) {
+            const response = await request(path);
+            const payload = await response.json();
+
+            if (payload.provider !== "REDEMET / DECEA") {
+              throw new Error(`${name}: contrato de provedor inesperado.`);
+            }
+            if (payload.configured !== true) {
+              throw new Error(`${name}: a secret REDEMET_API_KEY não foi reconhecida no runtime.`);
+            }
+            if (!Array.isArray(payload.frames)) {
+              throw new Error(`${name}: resposta sem coleção de quadros.`);
+            }
+
+            results[name] = payload;
+            console.log(
+              `${name}: configured=${payload.configured} available=${payload.available} frames=${payload.frames.length}`,
+            );
+          }
+
+          const available = Object.values(results).filter((payload) => payload.available);
+          if (available.length === 0) {
+            const messages = Object.entries(results)
+              .map(([name, payload]) => `${name}: ${payload.error || "sem detalhe"}`)
+              .join(" | ");
+            throw new Error(`REDEMET configurada, porém nenhum produto respondeu. ${messages}`);
+          }
+
+          const imageLayer = [results.radar, results.satellite].find(
+            (payload) => payload.available && payload.frames.length > 0,
+          );
+
+          if (imageLayer) {
+            const imageUrl = new URL(imageLayer.frames.at(-1).imageUrl, baseUrl);
+            const imageResponse = await fetch(imageUrl, {
+              headers: { "User-Agent": "TempoPelotas-Runtime-Smoke/1.0" },
+              signal: AbortSignal.timeout(25_000),
+            });
+            const contentType = imageResponse.headers.get("content-type") || "";
+
+            if (!imageResponse.ok || !contentType.startsWith("image/")) {
+              throw new Error(
+                `Proxy de imagem respondeu HTTP ${imageResponse.status} com ${contentType || "tipo ausente"}.`,
+              );
+            }
+
+            console.log(`proxy de imagem: HTTP ${imageResponse.status} ${contentType}`);
+          }
+
+          console.log(`Runtime validado em ${baseUrl}. Produtos disponíveis: ${available.length}/3.`);
+          NODE
