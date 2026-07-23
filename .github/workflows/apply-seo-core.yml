@@ -59,7 +59,11 @@ jobs:
             src/routes/nivel-da-lagoa-dos-patos-laranjal.tsx
 
       - name: Formatar endpoints SEO
-        run: find src/routes -maxdepth 1 -type f \( -name 'sitemap*xml.ts' -o -name 'robots*txt.ts' \) -print0 | xargs -0 npx prettier --write
+        run: |
+          for file in "src/routes/sitemap[.]xml.ts" "src/routes/robots[.]txt.ts"; do
+            npx prettier --stdin-filepath "$file" < "$file" > "$file.formatted"
+            mv "$file.formatted" "$file"
+          done
 
       - name: Validar build
         run: npm run build
