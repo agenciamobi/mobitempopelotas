@@ -28,7 +28,7 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 | Supabase, histórico e autenticação | 80% | Clientes, migrations, snapshots, Google OAuth, PKCE, cookies SSR, conta e direitos do titular implementados; aplicação e validação no projeto externo permanecem pendentes |
 | PWA, push e cron | 85% | PWA, offline, snapshots e Web Push nativo concluídos; schedulers e testes externos por navegador permanecem pendentes |
 | SEO técnico e transparência | 98% | Canonicals, Open Graph, Twitter Cards, sitemap, robots, Schema editorial, feed e endpoint público implementados |
-| Qualidade, observabilidade e LGPD | 90% | CI, contratos críticos, auditoria visual, smoke de acessibilidade, exportação, exclusão, consentimentos e política pública implementados; faltam validações externas e auditorias finais |
+| Qualidade, observabilidade e LGPD | 88% | CI, contratos críticos, auditoria visual, exportação, exclusão, consentimentos e política pública implementados; smoke de acessibilidade e validações externas ainda precisam ser integrados |
 
 **Percentual global aproximado de paridade funcional: 90% a 93%.**
 
@@ -38,7 +38,7 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 2. Aplicar e testar RLS para perfis, preferências, consentimentos, snapshots e inscrições push com usuários anônimos e autenticados.
 3. Validar Google OAuth, callback PKCE, cookies SSR, exportação e exclusão em preview e produção.
 4. Definir e configurar os schedulers definitivos para snapshots e resumo Web Push.
-5. Concluir WCAG 2.2 AA, Core Web Vitals, observabilidade, configuração de produção e plano de rollback.
+5. Integrar o smoke de acessibilidade e concluir WCAG 2.2 AA, Core Web Vitals, observabilidade, produção e rollback.
 6. Manter todas as secrets exclusivamente em módulos `*.server.ts`, server functions, rotas de servidor ou Edge Functions.
 
 ## Matriz operacional
@@ -78,7 +78,7 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 | 31 | Histórico climático | Migrado | `weather-history*.ts`, API, gráficos e página | `src/lib/weather/history.server.ts`, `src/lib/weather/history-with-snapshots.server.ts`, rota e gráficos | Open-Meteo histórico e Supabase externo | Consulta externa combinada com arquivo próprio; sem dados simulados | Alto | Séries reais, timezone consistente, estados vazios, fallback e fonte documentada | 6 |
 | 32 | Snapshots meteorológicos | Migrado | `weather-snapshot-store.ts`, cron e migration | `src/lib/weather/weather-snapshot-store.server.ts`, `src/routes/api/cron/weather-snapshot.ts`, migration Supabase | `CRON_SECRET`, secret administrativa e scheduler | Upsert server-only, chave composta e rota assinada | Alto | Snapshot periódico sem duplicação, resposta sanitizada e recuperação por arquivo próprio | 6 |
 | 33 | Supabase — clientes browser/server | Parcial | libs Supabase do legado | `src/lib/supabase/client.ts`, `src/lib/supabase/server-client.server.ts`, `src/lib/supabase/request-client.server.ts` | URL, publishable key e secret server-only | SDK, PKCE, cookies SSR e clientes separados implementados; modo mock preservado | Alto | Configuração real validada em preview e sessão SSR testada | 6–7 |
-| 34 | Banco, migrations e RLS | Parcial | `_legacy/supabase/migrations/*` | `supabase/migrations/`, contratos em `tests/database-security.test.ts` e projeto externo oficial | Acesso ao projeto Supabase | Perfis, preferências, consentimentos, snapshots e push versionados; contratos estáticos protegem RLS, cascatas e privilégios; aplicação real pendente | Crítico | Histórico conferido, migrations aplicadas, RLS testada entre contas e rollback documentado | 6–10 |
+| 34 | Banco, migrations e RLS | Parcial | `_legacy/supabase/migrations/*` | `supabase/migrations/`, contratos em `tests/database-security.test.ts` e projeto externo oficial | Acesso ao projeto Supabase | Todas as migrations SQL são descobertas pelo contrato; RLS, cascatas, funções e grants server-only são protegidos; aplicação real pendente | Crítico | Histórico conferido, migrations aplicadas, RLS testada entre contas e rollback documentado | 6–10 |
 | 35 | Login Google e conta | Parcial | `/auth/*`, `/entrar`, `/minha-conta`, componentes | `src/routes/auth/`, `src/routes/entrar.tsx`, `src/routes/minha-conta.tsx`, `src/lib/auth/` | Supabase Auth Google e chaves publicáveis | Callback PKCE, cookies SSR, logout, preferências, exportação e exclusão adaptados ao TanStack | Alto | Fluxos testados no Supabase externo, sem cache compartilhado ou redirect aberto | 7 |
 | 36 | APIs internas e diagnóstico | Parcial | `_legacy/app/api/**`, diagnóstico de integrações | server functions e rotas públicas em `src/routes/` | Variáveis de cada integração | Endpoints públicos, conta e RPCs classificados; validação externa continua necessária | Médio | Status distingue configurado/operacional sem vazar secrets | 2–8 |
 | 37 | Cron | Parcial | rotas Vercel Cron | rotas em `src/routes/api/cron/` e scheduler externo planejado | `CRON_SECRET`, `PUSH_ADMIN_SECRET` | Rotas assinadas e idempotentes implementadas; agendamento definitivo pendente | Alto | Autenticação, idempotência, logs e execução observável | 8 |
@@ -91,11 +91,11 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 | 44 | Schema.org | Migrado | JSON-LD espalhado no legado | `src/lib/structured-data.ts`, `src/lib/site-config.ts` e heads das rotas | Dados editoriais e meteorológicos | WebSite global por `@id`, WebPage e BreadcrumbList centralizados | Médio | JSON-LD válido, sem entidades duplicadas ou alegações indevidas | 9 |
 | 45 | `pelotas.json`, feed e transparência | Migrado | endpoints e metodologia | `src/routes/pelotas[.]json.ts`, `src/routes/feed.ts`, metodologia e privacidade | Contratos atuais | Schema, JSON Feed, CORS, cache e política pública explícitos | Baixo | JSON estável, feed válido e fontes e dados documentados | 9 |
 | 46 | PageSpeed API | Revisar | Variável sem consumo funcional | Ferramenta administrativa futura | `GOOGLE_PAGESPEED_API_KEY` | Não incluir sem caso de uso | Baixo | Chave removida ou diagnóstico restrito | 10 |
-| 47 | Acessibilidade | Parcial | Semântica e CSS legados | layout, headers, PWA, conta, componentes e `scripts/accessibility-editorial-smoke.mjs` | Chromium no CI | Foco, skip link, teclado, ARIA, movimento reduzido e 11 rotas públicas auditados em desktop e 320 px | Médio | Smoke bloqueante verde e auditoria manual WCAG 2.2 AA concluída nos fluxos principais | Contínuo |
+| 47 | Acessibilidade | Parcial | Semântica e CSS legados | layout, headers, PWA, conta e componentes | Nenhuma | Foco, skip link, teclado, ARIA e movimento reduzido implementados parcialmente; smoke público ainda em revisão separada | Médio | Integrar smoke bloqueante e concluir auditoria manual WCAG 2.2 AA | Contínuo |
 | 48 | Responsividade | Parcial | CSS mobile cumulativo | CSS/componentes reconstruídos mobile-first | Nenhuma | Sem copiar cascata legada | Médio | 320 px a desktop sem overflow ou cortes | Contínuo |
 | 49 | Observabilidade | Parcial | Logs pontuais | tratamento de erro, logs sanitizados e auditorias | Provedor futuro | Erros externos diferenciados e secrets omitidas | Médio | Correlation IDs, saúde e métricas básicas | 10 |
 | 50 | Segurança e LGPD | Parcial | Práticas parciais do legado | RLS, configuração server-only, `/privacidade-e-dados`, direitos na conta e contratos SQL | Supabase/Auth/push | Minimização, consentimentos versionados, exportação, exclusão, cascata e privilégios protegidos no repositório | Crítico | Aplicar migrations e testar isolamento, exportação, exclusão e retenção no ambiente oficial | 7–10 |
-| 51 | Testes | Parcial | Validações manuais | runner nativo Node, contratos, árvore de rotas, smoke Playwright e auditoria visual | Node 24 e Chromium no CI | Níveis, HTTP/push, rotas públicas, migrations e acessibilidade crítica cobertos; RLS e integrações externas ainda exigem testes reais | Alto | Contratos verdes, RLS entre contas, OAuth, cron e push reais validados | 10 |
+| 51 | Testes | Parcial | Validações manuais | runner nativo Node, contratos, árvore de rotas e auditoria visual | Node 24 e Chromium no CI | Níveis, HTTP/push, rotas públicas e todas as migrations SQL cobertos; acessibilidade, RLS e integrações externas ainda exigem validação | Alto | Contratos verdes, smoke de acessibilidade integrado, RLS entre contas, OAuth, cron e push reais validados | 10 |
 | 52 | Build, lint e typecheck | Migrado | Workflows do legado | `.github/workflows/quality.yml` | Node 24 e lockfile | Ordem build → typecheck → lint padronizada | Baixo | Três comandos verdes em ambiente limpo | 10 |
 | 53 | Deploy e domínio | Parcial | Vercel/Next | Hosting TanStack/Lovable | Secrets e domínio | Configuração Vercel descartada; preview e auditoria ativos | Crítico | Produção validada, DNS com rollback e zero perda SEO | 10 |
 
@@ -119,14 +119,14 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 - Web Push nativo com VAPID, paginação, leases e avisos oficiais separados da previsão;
 - dados estruturados editoriais com WebSite, WebPage e BreadcrumbList conectados por `@id`;
 - conta com preferências, consentimentos versionados, exportação, exclusão e política pública de retenção;
-- contratos automatizados para níveis, HTTP/push, rotas públicas e segurança das migrations;
-- smoke de acessibilidade editorial em 11 rotas críticas, desktop e mobile estreito.
+- contratos automatizados para níveis, HTTP/push, rotas públicas e todas as migrations SQL versionadas.
 
 ## Sequência de execução atualizada
 
-1. **Operacionalizar Supabase e autenticação:** conferir histórico, aplicar migrations, regenerar tipos e testar RLS, Google OAuth, cookies SSR e direitos do titular.
-2. **Operacionalizar Web Push e cron:** configurar VAPID definitivo, schedulers, logs, alertas e testes reais de navegador.
-3. **Concluir o Lote 10 — corte:** WCAG 2.2 AA, Core Web Vitals, observabilidade, segurança, deploy, DNS e rollback.
+1. **Integrar o lote de acessibilidade:** concluir o smoke público em revisão separada sem regressão no tema editorial.
+2. **Operacionalizar Supabase e autenticação:** conferir histórico, aplicar migrations, regenerar tipos e testar RLS, Google OAuth, cookies SSR e direitos do titular.
+3. **Operacionalizar Web Push e cron:** configurar VAPID definitivo, schedulers, logs, alertas e testes reais de navegador.
+4. **Concluir o Lote 10 — corte:** WCAG 2.2 AA, Core Web Vitals, observabilidade, segurança, deploy, DNS e rollback.
 
 ## Regra de atualização
 
