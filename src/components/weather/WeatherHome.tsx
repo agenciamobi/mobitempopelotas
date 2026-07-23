@@ -17,6 +17,7 @@ import type { WeatherSourceKey } from "@/lib/weather/aggregated-weather.types";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import type { WeatherIconName } from "@/lib/weather/types";
 
+import { HomeOperationalNavigation } from "./HomeOperationalNavigation";
 import { WeatherEditorialHero } from "./WeatherEditorialHero";
 import "./WeatherHome.css";
 
@@ -89,6 +90,7 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
   return (
     <div className="weather-home">
       <WeatherEditorialHero data={data} />
+      <HomeOperationalNavigation data={data} />
 
       <section className="weather-section weather-brief" aria-labelledby="weather-brief-title">
         <div className="weather-section-heading">
@@ -175,7 +177,7 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
       ) : null}
 
       {weather.hourly.length > 0 ? (
-        <section className="weather-section" aria-labelledby="hourly-title">
+        <section id="previsao-hoje" className="weather-section" aria-labelledby="hourly-title">
           <div className="weather-section-heading">
             <div>
               <p className="weather-kicker">Próximas horas</p>
@@ -232,7 +234,7 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
       ) : null}
 
       {weather.daily.length > 0 ? (
-        <section className="weather-section" aria-labelledby="daily-title">
+        <section id="tendencia" className="weather-section" aria-labelledby="daily-title">
           <div className="weather-section-heading">
             <div>
               <p className="weather-kicker">Previsão estendida</p>
