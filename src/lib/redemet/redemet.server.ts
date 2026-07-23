@@ -21,10 +21,7 @@ const SATELLITE_LABELS: Record<RedemetSatelliteType, string> = {
   vis: "Satélite visível",
 };
 
-const ALLOWED_API_HOSTS = new Set([
-  "api-redemet.decea.mil.br",
-  "api-redemet.decea.gov.br",
-]);
+const ALLOWED_API_HOSTS = new Set(["api-redemet.decea.mil.br", "api-redemet.decea.gov.br"]);
 
 const ALLOWED_IMAGE_HOSTS = new Set([
   "api-redemet.decea.mil.br",
@@ -371,9 +368,7 @@ function distanceKm(
   const secondLatitude = toRadians(second.latitude);
   const calculation =
     Math.sin(latitudeDelta / 2) ** 2 +
-    Math.cos(firstLatitude) *
-      Math.cos(secondLatitude) *
-      Math.sin(longitudeDelta / 2) ** 2;
+    Math.cos(firstLatitude) * Math.cos(secondLatitude) * Math.sin(longitudeDelta / 2) ** 2;
 
   return 2 * earthRadiusKm * Math.asin(Math.sqrt(calculation));
 }
@@ -437,7 +432,11 @@ export async function fetchRedemetRadar(frameCount = 10): Promise<RedemetImageLa
   const sourceLabel = "Radar de Canguçu / RS";
 
   if (!apiKey()) {
-    return emptyImageLayer(product, sourceLabel, "Integração REDEMET aguardando configuração da chave.");
+    return emptyImageLayer(
+      product,
+      sourceLabel,
+      "Integração REDEMET aguardando configuração da chave.",
+    );
   }
 
   try {
@@ -486,7 +485,11 @@ export async function fetchRedemetSatellite(
   const sourceLabel = "Satélite meteorológico REDEMET";
 
   if (!apiKey()) {
-    return emptyImageLayer(product, sourceLabel, "Integração REDEMET aguardando configuração da chave.");
+    return emptyImageLayer(
+      product,
+      sourceLabel,
+      "Integração REDEMET aguardando configuração da chave.",
+    );
   }
 
   try {
