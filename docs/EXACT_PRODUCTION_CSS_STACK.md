@@ -9,3 +9,7 @@ O único trecho removido é o `@import "tailwindcss"` de `globals.css`, porque o
 ## Objetivo
 
 Evitar reconstruções ou aproximações visuais e manter a homepage Lovable alinhada à produção Vercel em desktop, tablet e mobile.
+
+## Sincronização
+
+Este registro acompanha o lote da pilha CSS e força um novo evento de sincronização entre a `main` do GitHub e o projeto Lovable.
