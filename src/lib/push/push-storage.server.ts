@@ -125,8 +125,8 @@ export async function hasPushDispatch(fingerprint: string) {
     .from("web_push_dispatches")
     .select("fingerprint")
     .eq("fingerprint", fingerprint)
-    .maybeSingle()
-    .abortSignal(timeoutSignal());
+    .abortSignal(timeoutSignal())
+    .maybeSingle();
 
   if (error) throw new Error(`Falha ao consultar histórico de envios: ${error.message}`);
   return Boolean(data);
