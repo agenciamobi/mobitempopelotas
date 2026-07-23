@@ -15,6 +15,13 @@ function formatMetric(value: number | null, unit: string) {
   return value === null ? "indisponível" : `${value}${unit}`;
 }
 
+function latestTimestamp(values: Array<string | null>) {
+  return values
+    .filter((value): value is string => value !== null)
+    .sort()
+    .at(-1) ?? null;
+}
+
 function publicEmbrapaObservation(
   observation: Awaited<ReturnType<typeof fetchWeatherIntelligence>>["weather"]["observation"],
 ) {
@@ -112,6 +119,9 @@ export function createPublicJsonFeed(snapshot: PublicPortalSnapshot) {
   const embrapa = snapshot.weather.observed.embrapa;
   const laranjal = snapshot.hydrology.local_level.laranjal;
   const activeAlerts = snapshot.weather.alerts.filter((alert) => alert.period === "active");
+  const alertModifiedAt = latestTimestamp(
+    activeAlerts.map((alert) => alert.sentAt ?? alert.startsAt),
+  );
 
   const currentTitle =
     current?.temperature === null || current?.temperature === undefined
@@ -146,7 +156,6 @@ export function createPublicJsonFeed(snapshot: PublicPortalSnapshot) {
         url: absoluteUrl("/tempo-hoje-pelotas"),
         title: currentTitle,
         content_text: `${snapshot.summary.summary}${forecastDetails}`,
-        date_modified: snapshot.generated_at,
         tags: ["tempo", "Pelotas", "previsão", "chuva", "vento"],
       },
       {
@@ -157,7 +166,7 @@ export function createPublicJsonFeed(snapshot: PublicPortalSnapshot) {
             ? "Alertas meteorológicos ativos"
             : "Monitoramento de alertas oficiais",
         content_text: alertText,
-        date_modified: snapshot.generated_at,
+        ...(alertModifiedAt ? { date_modified: alertModifiedAt } : {}),
         tags: ["INMET", "alertas", "Pelotas", "Defesa Civil"],
       },
       {
@@ -165,7 +174,6 @@ export function createPublicJsonFeed(snapshot: PublicPortalSnapshot) {
         url: absoluteUrl("/estacao-embrapa-pelotas"),
         title: "Observação meteorológica da Embrapa em Pelotas",
         content_text: embrapaText,
-        date_modified: embrapa.source.fetchedAt,
         tags: ["Embrapa", "observação", "Pelotas", "chuva medida"],
       },
       {
@@ -173,7 +181,7 @@ export function createPublicJsonFeed(snapshot: PublicPortalSnapshot) {
         url: absoluteUrl("/nivel-da-lagoa-dos-patos-laranjal"),
         title: "Nível da Lagoa dos Patos na Estação Laranjal",
         content_text: `${laranjalText} Acompanhe a tendência local junto com o contexto meteorológico e as orientações oficiais.`,
-        date_modified: laranjal.updated_at ?? laranjal.source.fetchedAt,
+        ...(laranjal.updated_at ? { date_modified: laranjal.updated_at } : {}),
         tags: ["hidrologia", "Lagoa dos Patos", "Laranjal", "Pelotas"],
       },
       {
@@ -182,7 +190,6 @@ export function createPublicJsonFeed(snapshot: PublicPortalSnapshot) {
         title: "Metodologia e fontes do Tempo Pelotas",
         content_text:
           "Consulte as fontes, regras de validação, contingências, limitações e critérios de confiança utilizados pelo portal.",
-        date_modified: snapshot.generated_at,
         tags: ["metodologia", "dados abertos", "fontes", "transparência"],
       },
     ],
