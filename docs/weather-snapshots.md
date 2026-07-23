@@ -61,7 +61,7 @@ O preenchimento grava a série histórica real disponível, atualmente limitada 
 
 1. O servidor consulta o arquivo próprio quando o Supabase externo está configurado.
 2. Em seguida, consulta Open-Meteo Historical Forecast, Open-Meteo Archive e NASA POWER conforme a cadeia de contingência existente.
-3. Registros próprios substituem a mesma data da fonte externa e podem preencher lacunas.
+3. Para datas presentes nas duas origens, a resposta externa atual prevalece. O arquivo próprio preenche somente datas ausentes na série externa.
 4. Se todas as fontes externas falharem, o portal exibe somente os dias já arquivados e identifica a série como parcial.
 5. Se não houver fonte externa nem arquivo próprio, a página permanece indisponível sem criar números demonstrativos.
 
