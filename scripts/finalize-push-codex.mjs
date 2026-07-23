@@ -2,10 +2,12 @@ import { readFile, writeFile } from "node:fs/promises";
 
 async function replaceOnce(path, oldValue, newValue) {
   const content = await readFile(path, "utf8");
+  if (content.includes(newValue)) return false;
   if (!content.includes(oldValue)) {
     throw new Error(`Trecho esperado não encontrado em ${path}`);
   }
   await writeFile(path, content.replace(oldValue, newValue), "utf8");
+  return true;
 }
 
 await replaceOnce(
