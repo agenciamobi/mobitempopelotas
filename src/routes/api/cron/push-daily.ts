@@ -199,6 +199,7 @@ async function sendDailySummary(request: Request) {
         topic: "weather",
       },
       {
+        consentPreference: hasOfficialAlert ? "weather_alerts" : "daily_summary",
         beforeBatch: () => renewPushDispatch(activeFingerprint, activeLeaseToken),
         afterBatch: ({ result: progressResult }) => {
           progressState.latest = progressResult;
