@@ -185,7 +185,9 @@ function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
           <strong>{layer.available && selectedFrame ? count : "—"}</strong>
           <span>{count === 1 ? "ponto detectado" : "pontos detectados"}</span>
           <small>
-            {selectedFrame ? formatDateTime(selectedFrame.observedAt) : layer.error || layer.sourceLabel}
+            {selectedFrame
+              ? formatDateTime(selectedFrame.observedAt)
+              : layer.error || layer.sourceLabel}
           </small>
         </div>
       </div>
@@ -208,8 +210,8 @@ function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
       <div className="redemet-storm-warning">
         <AlertTriangle aria-hidden="true" />
         <p>
-          Para decisões de segurança, confirme a situação em <Link to="/alertas">Avisos oficiais</Link>
-          e nos canais das autoridades.
+          Para decisões de segurança, confirme a situação em{" "}
+          <Link to="/alertas">Avisos oficiais</Link> e nos canais das autoridades.
         </p>
       </div>
     </article>
