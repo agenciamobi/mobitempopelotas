@@ -8,6 +8,7 @@ import type { HistoricalWeatherDay } from "./history.types";
 
 const LOCATION_SLUG = "pelotas-rs";
 const TIMEZONE = "America/Sao_Paulo";
+const SNAPSHOT_READ_TIMEOUT_MS = 3_500;
 const PELOTAS = {
   city: "Pelotas",
   state: "RS",
@@ -107,7 +108,8 @@ export async function listWeatherSnapshots(limit = 30): Promise<HistoricalWeathe
     .select("*")
     .eq("location_slug", LOCATION_SLUG)
     .order("observed_date", { ascending: false })
-    .limit(safeLimit);
+    .limit(safeLimit)
+    .abortSignal(AbortSignal.timeout(SNAPSHOT_READ_TIMEOUT_MS));
 
   if (error) {
     throw new Error(`Falha ao consultar o arquivo meteorológico: ${error.message}`);
