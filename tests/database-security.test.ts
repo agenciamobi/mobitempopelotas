@@ -8,6 +8,11 @@ const serverOnlyTables = new Set([
   "web_push_subscriptions",
   "web_push_dispatches",
 ]);
+const accountTables = new Map([
+  ["profiles", "id"],
+  ["user_preferences", "user_id"],
+  ["account_consent_events", "user_id"],
+]);
 
 function normalizeSql(sql: string) {
   return sql.replace(/--.*$/gm, " ").replace(/\s+/g, " ").trim().toLowerCase();
@@ -43,26 +48,130 @@ function assertIncludes(sql: string, fragments: string[]) {
   }
 }
 
-function assertNoAnonymousPolicy(sql: string) {
-  assert.doesNotMatch(sql, /create\s+policy\s+[^;]+\s+to\s+anon\b/);
+function statements(sql: string) {
+  return sql
+    .split(";")
+    .map((statement) => statement.trim())
+    .filter(Boolean);
+}
+
+function hasExpectedAccountGuard(statement: string, ownerColumn: string) {
+  const compact = statement
+    .replace(/\s+/g, "")
+    .replace(/\(selectauth\.uid\(\)\)/g, "auth.uid()")
+    .replace(/[()]/g, "");
+
+  return (
+    compact.includes(`auth.uid()=${ownerColumn}`) ||
+    compact.includes(`${ownerColumn}=auth.uid()`)
+  );
+}
+
+function assertPoliciesRemainAccountScoped(sql: string) {
+  for (const statement of statements(sql)) {
+    if (!statement.startsWith("create policy ")) continue;
+
+    const tableMatch = statement.match(
+      /^create\s+policy\s+(?:"[^"]+"|[a-z0-9_]+)\s+on\s+(?:table\s+)?public\.([a-z0-9_]+)\b/,
+    );
+    assert.ok(tableMatch, `Policy sem tabela pública reconhecida: ${statement}`);
+
+    const table = tableMatch[1] ?? "";
+    assert.ok(
+      !serverOnlyTables.has(table),
+      `Tabela server-only não pode ter policy de cliente: ${table}`,
+    );
+
+    const ownerColumn = accountTables.get(table);
+    if (!ownerColumn) continue;
+
+    assert.match(
+      statement,
+      /\bto\s+authenticated\b/,
+      `Policy de ${table} deve ser exclusiva de authenticated: ${statement}`,
+    );
+    assert.ok(
+      hasExpectedAccountGuard(statement, ownerColumn),
+      `Policy de ${table} não restringe o registro por auth.uid(): ${statement}`,
+    );
+    assert.doesNotMatch(
+      statement,
+      /\b(?:using|with\s+check)\s*\(\s*true\s*\)/,
+      `Policy permissiva detectada em ${table}: ${statement}`,
+    );
+  }
 }
 
 function assertNoClientGrantOnServerOnlyTables(sql: string) {
-  // prettier-ignore
-  const grantPattern = /grant\s+[^;]+?\s+on\s+(?:table\s+)?public\.([a-z0-9_]+)\s+to\s+([^;]+);/g;
+  for (const statement of statements(sql)) {
+    if (!statement.startsWith("grant ")) continue;
 
-  for (const match of sql.matchAll(grantPattern)) {
-    const table = match[1] ?? "";
-    const roles = match[2] ?? "";
-
-    if (!serverOnlyTables.has(table)) {
-      continue;
-    }
+    const roles = statement.match(/\bto\s+(.+)$/)?.[1] ?? "";
+    if (!/\b(?:public|anon|authenticated)\b/.test(roles)) continue;
 
     assert.doesNotMatch(
+      statement,
+      /\bon\s+all\s+tables\s+in\s+schema\s+public\b/,
+      `Grant de schema expõe tabelas server-only: ${statement}`,
+    );
+
+    const targetClause = statement.match(/^grant\s+.+?\s+on\s+(?:table\s+)?(.+?)\s+to\s+/)?.[1];
+    if (!targetClause || /^(?:function|sequence|schema)\b/.test(targetClause)) continue;
+
+    const exposedTables = targetClause
+      .split(",")
+      .map((target) => target.trim().replace(/^public\./, "").replaceAll('"', ""))
+      .filter((table) => serverOnlyTables.has(table));
+
+    assert.deepEqual(
+      exposedTables,
+      [],
+      `Grant de cliente expõe tabelas server-only: ${statement}`,
+    );
+  }
+}
+
+function collectFunctionDefinitions(migrations: Map<string, string>, functionName: string) {
+  const definitions: Array<{ filename: string; definition: string }> = [];
+  const needle = `create or replace function public.${functionName}`;
+
+  for (const [filename, sql] of migrations) {
+    let start = sql.indexOf(needle);
+
+    while (start >= 0) {
+      const remainder = sql.slice(start);
+      const delimiterMatch = remainder.match(/\bas\s+(\$[a-z0-9_]*\$)/);
+      assert.ok(delimiterMatch, `Delimitador da função ${functionName} ausente em ${filename}`);
+
+      const delimiter = delimiterMatch[1];
+      assert.ok(delimiter);
+      const opening = start + (delimiterMatch.index ?? 0) + delimiterMatch[0].lastIndexOf(delimiter);
+      const closing = sql.indexOf(delimiter, opening + delimiter.length);
+      assert.ok(closing >= 0, `Corpo da função ${functionName} incompleto em ${filename}`);
+
+      definitions.push({
+        filename,
+        definition: sql.slice(start, closing + delimiter.length),
+      });
+      start = sql.indexOf(needle, closing + delimiter.length);
+    }
+  }
+
+  return definitions;
+}
+
+function assertFunctionIsNotPublic(sql: string, functionName: string) {
+  const grantPattern = new RegExp(
+    String.raw`grant\s+execute\s+on\s+function\s+public\.${functionName}\s*\([^;]*\)\s+to\s+([^;]+);`,
+    "g",
+  );
+
+  for (const match of sql.matchAll(grantPattern)) {
+    const roles = match[1] ?? "";
+    assert.doesNotMatch(
       roles,
-      /\b(?:public|anon|authenticated)\b/,
-      `A tabela server-only ${table} concedeu privilégio a cliente: ${roles}`,
+      /\b(?:public|anon)\b/,
+      `A função ${functionName} foi exposta a ${roles}`,
     );
   }
 }
@@ -72,13 +181,13 @@ test("descobre e examina todas as migrations SQL versionadas", async () => {
   const allSql = [...migrations.values()].join(" ");
 
   assert.ok(migrations.size >= 7, "O inventário de migrations ficou incompleto.");
-  assertNoAnonymousPolicy(allSql);
+  assertPoliciesRemainAccountScoped(allSql);
   assertNoClientGrantOnServerOnlyTables(allSql);
   assert.doesNotMatch(
     allSql,
     /alter\s+table\s+public\.[a-z0-9_]+\s+disable\s+row\s+level\s+security/,
   );
-  assert.doesNotMatch(allSql, /grant\s+execute\s+on\s+function\s+[^;]+\s+to\s+anon\b/);
+  assertFunctionIsNotPublic(allSql, "update_account_preferences");
 });
 
 test("perfis e preferências isolam cada conta com RLS e auth.uid", async () => {
@@ -145,35 +254,22 @@ test("snapshots e web push permanecem exclusivos do servidor", async () => {
   assertNoClientGrantOnServerOnlyTables(`${snapshots} ${push}`);
 });
 
-test("RPCs de conta exigem sessão e privilégios explícitos", async () => {
+test("a definição efetiva da RPC de conta exige sessão e search_path seguro", async () => {
   const migrations = await migrationsPromise;
-  const atomicPreferences = migration(
-    migrations,
-    "20260723105000_update_account_preferences_atomically.sql",
+  const allSql = [...migrations.values()].join(" ");
+  const definitions = collectFunctionDefinitions(migrations, "update_account_preferences");
+  const latest = definitions.at(-1);
+
+  assert.ok(latest, "A função update_account_preferences não foi versionada.");
+  assertIncludes(latest.definition, [
+    "security definer",
+    "set search_path = ''",
+    "current_user_id uuid := (select auth.uid())",
+    "if current_user_id is null then raise exception 'authentication required'",
+  ]);
+  assert.match(
+    allSql,
+    /grant\s+execute\s+on\s+function\s+public\.update_account_preferences\s*\([^;]*\)\s+to\s+authenticated;/,
   );
-  const lgpd = migration(migrations, "20260723133000_add_account_lgpd_rights.sql");
-
-  assertIncludes(atomicPreferences, [
-    "security invoker set search_path = ''",
-    "current_user_id uuid := (select auth.uid())",
-    "if current_user_id is null then raise exception 'authentication required'",
-    "revoke all on function public.update_account_preferences( text, text, text, boolean, boolean, boolean, boolean ) from public",
-    "revoke all on function public.update_account_preferences( text, text, text, boolean, boolean, boolean, boolean ) from anon",
-    "grant execute on function public.update_account_preferences( text, text, text, boolean, boolean, boolean, boolean ) to authenticated",
-  ]);
-
-  assertIncludes(lgpd, [
-    "add column if not exists user_id uuid references auth.users(id) on delete cascade",
-    "alter table public.account_consent_events enable row level security",
-    "using ((select auth.uid()) = user_id)",
-    "revoke all on table public.account_consent_events from public",
-    "revoke all on table public.account_consent_events from anon",
-    "grant select on table public.account_consent_events to authenticated",
-    "grant select, insert, update, delete on table public.account_consent_events to service_role",
-    "revoke all on sequence public.account_consent_events_id_seq from authenticated",
-    "security definer set search_path = ''",
-    "current_user_id uuid := (select auth.uid())",
-    "if current_user_id is null then raise exception 'authentication required'",
-    "grant execute on function public.update_account_preferences( text, text, text, boolean, boolean, boolean, boolean ) to authenticated",
-  ]);
+  assertFunctionIsNotPublic(allSql, "update_account_preferences");
 });
