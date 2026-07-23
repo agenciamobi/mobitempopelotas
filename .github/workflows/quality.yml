@@ -40,24 +40,7 @@ jobs:
         run: npm run build
 
       - name: TypeScript
-        id: typecheck
-        continue-on-error: true
-        run: |
-          set -o pipefail
-          npm run typecheck 2>&1 | tee typecheck-report.txt
-
-      - name: Publicar diagnóstico do TypeScript
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: typecheck-hydrology-consolidation
-          path: typecheck-report.txt
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Falhar quando o TypeScript falhar
-        if: steps.typecheck.outcome == 'failure'
-        run: exit 1
+        run: npm run typecheck
 
       - name: ESLint
         run: npm run lint
