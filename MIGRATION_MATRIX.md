@@ -25,22 +25,21 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 | Hidrologia | 90% | Laranjal, Lagoa dos Patos, rede regional, Guaíba, tendências e metodologia integrados; validação contínua das fontes permanece necessária |
 | Radar, satélite, trovoadas e mapas | 90% | REDEMET e MapLibre implementados com configuração server-side e estados explícitos de indisponibilidade |
 | Câmeras | 90% | YouTube, descoberta de live, replay, ID manual e contingências implementados |
-| Supabase, histórico e autenticação | 30% | SDK, clientes separados e migrations iniciais versionados; histórico persistido, aplicação de RLS e autenticação ainda pendentes |
-| PWA, push e cron | 45% | PWA e offline concluídos; snapshots agendados, web push e scheduler ainda pendentes |
+| Supabase, histórico e autenticação | 50% | SDK, clientes, migrations, histórico persistente e snapshots implementados; aplicação de RLS, validação externa e autenticação ainda pendentes |
+| PWA, push e cron | 55% | PWA, offline e rota assinada/idempotente de snapshots concluídos; scheduler e web push ainda pendentes |
 | SEO técnico e transparência | 95% | Canonicals, Open Graph, Twitter Cards, sitemap, robots, Schema global, feed e endpoint público implementados |
 | Qualidade, observabilidade e LGPD | 70% | CI, auditoria visual e tratamento de erros ativos; faltam testes unitários, auditorias finais e fluxos LGPD autenticados |
 
-**Percentual global aproximado de paridade funcional: 80% a 85%.**
+**Percentual global aproximado de paridade funcional: 84% a 88%.**
 
 ## Bloqueadores principais
 
 1. Confirmar o projeto Supabase externo oficial, histórico de migrations e variáveis de ambiente antes de habilitar o modo externo.
 2. Aplicar e testar RLS para perfis, preferências, snapshots e inscrições push com usuários anônimos e autenticados.
-3. Implementar snapshots meteorológicos idempotentes e histórico climático real, sem recorrer a dados demonstrativos.
-4. Adaptar autenticação Google, callback PKCE e sessão SSR ao TanStack Start/Nitro.
-5. Definir runtime compatível para cron e envio web push, preferencialmente Supabase Edge Functions ou serviço externo controlado.
-6. Concluir testes automatizados, WCAG 2.2 AA, Core Web Vitals, configuração de produção e plano de rollback.
-7. Manter todas as secrets exclusivamente em módulos `*.server.ts`, server functions, rotas de servidor ou Edge Functions.
+3. Adaptar autenticação Google, callback PKCE e sessão SSR ao TanStack Start/Nitro.
+4. Definir e configurar o scheduler definitivo para a rota assinada de snapshots e para o futuro envio web push.
+5. Concluir testes automatizados, WCAG 2.2 AA, Core Web Vitals, configuração de produção e plano de rollback.
+6. Manter todas as secrets exclusivamente em módulos `*.server.ts`, server functions, rotas de servidor ou Edge Functions.
 
 ## Matriz operacional
 
@@ -76,13 +75,13 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 | 28 | Rede CCMAR/FURG/Portos RS | Migrado | serviços e componentes regionais | `src/lib/hydrology/lagoon-network.server.ts` | Fontes FURG/Portos RS | Janelas tolerantes e controle de atraso | Alto | Atualizado/atrasado, referências e variações confiáveis | 4 |
 | 29 | Guaíba e cidades regionais | Migrado | monitores e APIs regionais | `src/lib/hydrology/guaiba.server.ts` e módulos relacionados | Fontes públicas regionais | Normalização e referências específicas | Alto | Cidades e estações com timestamps e tendências corretas | 4 |
 | 30 | Página de situação hidrológica | Migrado | `_legacy/app/situacao-hidrologica-pelotas/page.tsx` | `src/routes/situacao-hidrologica-pelotas.tsx` | Serviços hidrológicos | Composição tolerante a falhas parciais | Médio | Laranjal, Lagoa e Guaíba com metodologia e fontes claras | 4 |
-| 31 | Histórico climático | Parcial | `weather-history*.ts`, API, gráficos e página | `src/lib/weather/history.server.ts`, rota e gráficos | Open-Meteo histórico e Supabase externo | Consulta externa funciona; persistência própria ainda pendente | Alto | Séries reais, timezone consistente, estados vazios e fonte documentada | 6 |
-| 32 | Snapshots meteorológicos | Não migrado | `weather-snapshot-store.ts`, cron e migration | server function/Edge Function + Supabase | Secret administrativa e scheduler | Idempotência, chave única e runtime compatível | Alto | Snapshot periódico sem duplicação, logs e recuperação de falhas | 6 |
+| 31 | Histórico climático | Migrado | `weather-history*.ts`, API, gráficos e página | `src/lib/weather/history.server.ts`, `src/lib/weather/history-with-snapshots.server.ts`, rota e gráficos | Open-Meteo histórico e Supabase externo | Consulta externa combinada com arquivo próprio; sem dados simulados | Alto | Séries reais, timezone consistente, estados vazios, fallback e fonte documentada | 6 |
+| 32 | Snapshots meteorológicos | Migrado | `weather-snapshot-store.ts`, cron e migration | `src/lib/weather/weather-snapshot-store.server.ts`, `src/routes/api/cron/weather-snapshot.ts`, migration Supabase | `CRON_SECRET`, secret administrativa e scheduler | Upsert server-only, chave composta e rota assinada | Alto | Snapshot periódico sem duplicação, resposta sanitizada e recuperação por arquivo próprio | 6 |
 | 33 | Supabase — clientes browser/server | Parcial | libs Supabase do legado | `src/lib/supabase/client.ts`, `src/lib/supabase/server-client.server.ts` | URL, publishable key e secret server-only | SDK instalado, clientes separados e modo mock preservado | Alto | Configuração real validada em preview e sessão SSR testada | 6 |
-| 34 | Banco, migrations e RLS | Parcial | `_legacy/supabase/migrations/*` | `supabase/migrations/` e projeto externo oficial | Acesso ao projeto Supabase | Perfis e preferências versionados; aplicação e testes pendentes | Crítico | Histórico conferido, RLS testada e rollback documentado | 6 |
+| 34 | Banco, migrations e RLS | Parcial | `_legacy/supabase/migrations/*` | `supabase/migrations/` e projeto externo oficial | Acesso ao projeto Supabase | Perfis, preferências e snapshots versionados; aplicação e testes pendentes | Crítico | Histórico conferido, RLS testada e rollback documentado | 6 |
 | 35 | Login Google e conta | Não migrado | `/auth/*`, `/entrar`, `/minha-conta`, componentes | rotas TanStack e componentes nativos | Supabase Auth Google | Callback PKCE, cookies e redirects SSR | Alto | Login, logout, callback, conta e proteção de dados funcionando | 7 |
 | 36 | APIs internas e diagnóstico | Parcial | `_legacy/app/api/**`, diagnóstico de integrações | server functions e rotas públicas em `src/routes/` | Variáveis de cada integração | Endpoints públicos e RPCs parcialmente classificados | Médio | Status distingue configurado/operacional sem vazar secrets | 2–8 |
-| 37 | Cron | Não migrado | rotas Vercel Cron | Edge Functions ou rotas assinadas | `CRON_SECRET`, `PUSH_ADMIN_SECRET` | Scheduler compatível e assinatura | Alto | Idempotência, logs e execução observável | 8 |
+| 37 | Cron | Parcial | rotas Vercel Cron | `src/routes/api/cron/weather-snapshot.ts` e scheduler externo planejado | `CRON_SECRET`, `PUSH_ADMIN_SECRET` | Rota assinada e idempotente implementada; agendamento definitivo pendente | Alto | Autenticação, idempotência, logs e execução observável | 8 |
 | 38 | Web push | Não migrado | serviço, store e APIs do legado | Supabase Edge Function ou runtime Node | VAPID public/private e subject | Evitar secret ou service role no navegador | Crítico | Subscribe, unsubscribe, envio, expiração e limpeza | 8 |
 | 39 | PWA e offline | Migrado | manifesto, service worker, manager e offline | `public/manifest.webmanifest`, `public/sw.js`, `public/offline.html`, `src/components/pwa/` | Nenhuma; VAPID apenas para push futuro | Integração Vite/TanStack reescrita | Médio | Instalável, offline seguro, atualização controlada e cache resiliente | 8 |
 | 40 | Sitemap | Migrado | `_legacy/app/sitemap.ts` | `src/routes/sitemap[.]xml.ts`, `src/lib/public-routes.ts` | `VITE_SITE_URL` | Server route com XML e cache | Baixo | URLs canônicas sem rotas privadas ou duplicadas | 9 |
@@ -114,11 +113,13 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 - sínteses meteorológicas com Gemini e fallback determinístico;
 - mapa regional MapLibre e páginas temáticas;
 - PWA instalável, offline seguro e atualização controlada;
-- SDK Supabase, clientes separados e migrations iniciais versionadas.
+- SDK Supabase, clientes separados e migrations iniciais versionadas;
+- histórico climático combinado com arquivo próprio e fallback editorial;
+- snapshots meteorológicos idempotentes com rota de captura protegida por segredo.
 
 ## Sequência de execução atualizada
 
-1. **Concluir Lote 6 — histórico e snapshots:** schema, RLS, persistência, retenção e página histórica real.
+1. **Operacionalizar Lote 6:** conferir o histórico do Supabase oficial, aplicar migrations, testar RLS e configurar o scheduler de snapshots.
 2. **Executar Lote 7 — autenticação e LGPD:** Google, callback PKCE, conta, preferências, sessão SSR e direitos do usuário.
 3. **Concluir Lote 8 — push e cron:** inscrições, envio, scheduler, idempotência e observabilidade.
 4. **Fechar Lote 9 — Schema específico:** BreadcrumbList, Dataset/WeatherObservations quando factualmente aplicáveis.
