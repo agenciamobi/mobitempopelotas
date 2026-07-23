@@ -2,10 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, CloudLightning, Radar, Satellite } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
-import type {
-  RedemetImageLayerResponse,
-  RedemetOverview,
-} from "@/lib/redemet/redemet.types";
+import type { RedemetImageLayerResponse, RedemetOverview } from "@/lib/redemet/redemet.types";
 
 import "./HomeRegionalObservation.css";
 
@@ -49,7 +46,8 @@ export function HomeRegionalObservation({ data }: { data: RedemetOverview }) {
 
   const layer = mode === "radar" ? data.radar : data.satellite;
   const frame = layer.frames[layer.currentIndex] ?? layer.frames.at(-1) ?? null;
-  const latestStormFrame = data.storms.frames[data.storms.currentIndex] ?? data.storms.frames.at(-1);
+  const latestStormFrame =
+    data.storms.frames[data.storms.currentIndex] ?? data.storms.frames.at(-1);
   const stormCount = latestStormFrame?.points.length ?? null;
   const availableProducts = useMemo(
     () => [data.radar, data.satellite, data.storms].filter((source) => source.available).length,
@@ -128,7 +126,9 @@ export function HomeRegionalObservation({ data }: { data: RedemetOverview }) {
                 <strong>{layer.product}</strong>
                 <span>{layer.sourceLabel}</span>
               </div>
-              <time dateTime={frame.observedAt ?? undefined}>{formatDateTime(frame.observedAt)}</time>
+              <time dateTime={frame.observedAt ?? undefined}>
+                {formatDateTime(frame.observedAt)}
+              </time>
             </figcaption>
           </figure>
         ) : (
