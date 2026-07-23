@@ -1,4 +1,4 @@
-name: Aplicar núcleo de SEO
+name: Validar núcleo de SEO
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  apply-and-validate:
+  validate:
     if: github.head_ref == 'agent/seo-core' && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -26,17 +26,6 @@ jobs:
         with:
           node-version: 22
           cache: npm
-
-      - name: Aplicar implementação
-        run: python .github/scripts/apply-seo-core.py
-
-      - name: Publicar snapshot de diagnóstico
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .env.example MIGRATION_MATRIX.md src
-          git commit -m "chore: publica snapshot do núcleo SEO"
-          git push origin HEAD:agent/seo-core
 
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
@@ -124,10 +113,16 @@ jobs:
           grep -q '^Allow: /$' /tmp/robots.txt
           grep -q '^Sitemap: https://mobitempopelotas.lovable.app/sitemap.xml$' /tmp/robots.txt
 
-      - name: Publicar arquivos formatados
+      - name: Publicar formatação na branch
         run: |
-          git add .env.example MIGRATION_MATRIX.md src
-          git commit -m "feat: adiciona núcleo de SEO técnico"
+          if git diff --quiet; then
+            echo "Nenhuma alteração de formatação pendente."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src
+          git commit -m "style: formata núcleo de SEO técnico"
           git push origin HEAD:agent/seo-core
 
       - name: Exibir diagnóstico
