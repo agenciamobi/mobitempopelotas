@@ -1,0 +1,64 @@
+name: Preparar lote web push
+
+on:
+  push:
+    branches:
+      - agent/web-push-notifications
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: install-web-push-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prepare:
+    name: Instalar e formatar
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependências atuais
+        run: npm ci --no-audit --no-fund
+
+      - name: Adicionar web-push
+        run: |
+          npm install --save-exact web-push@3.6.7 --no-audit --no-fund
+          npm install --save-dev --save-exact @types/web-push@3.6.4 --no-audit --no-fund
+
+      - name: Formatar lote
+        run: |
+          npx prettier --write \
+            .env.example \
+            public/sw.js \
+            src/components/pwa/PushNotificationsManager.tsx \
+            src/components/pwa/push-notifications.css \
+            src/lib/push/*.ts \
+            src/lib/supabase/database.types.ts \
+            src/routes/__root.tsx \
+            src/routes/api/push/*.ts \
+            src/routes/api/cron/push-daily.ts \
+            supabase/migrations/20260723113000_create_web_push_subscriptions.sql
+
+      - name: Versionar dependências e formatação
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json .env.example public/sw.js src supabase/migrations/20260723113000_create_web_push_subscriptions.sql
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração adicional."
+          else
+            git commit -m "chore: instala dependências e formata lote push"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
