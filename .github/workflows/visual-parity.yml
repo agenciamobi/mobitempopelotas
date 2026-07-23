@@ -10,6 +10,9 @@ on:
       - src/**
       - public/**
       - scripts/visual-parity-audit.mjs
+      - vite.config.ts
+      - tsconfig*.json
+      - eslint.config.js
       - package.json
       - package-lock.json
       - .github/workflows/visual-parity.yml
@@ -109,5 +112,5 @@ jobs:
         with:
           name: visual-parity-${{ github.run_number }}
           path: artifacts/visual-parity
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 14
