@@ -18,6 +18,8 @@ import { Route as HistoricoClimaticoPelotasRouteImport } from './routes/historic
 import { Route as MetodologiaRouteImport } from './routes/metodologia'
 import { Route as NivelDaLagoaDosPatosLaranjalRouteImport } from './routes/nivel-da-lagoa-dos-patos-laranjal'
 import { Route as Previsao7DiasPelotasRouteImport } from './routes/previsao-7-dias-pelotas'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SituacaoHidrologicaPelotasRouteImport } from './routes/situacao-hidrologica-pelotas'
 import { Route as TempoHojePelotasRouteImport } from './routes/tempo-hoje-pelotas'
 import { Route as VentoEmPelotasRouteImport } from './routes/vento-em-pelotas'
@@ -69,6 +71,16 @@ const Previsao7DiasPelotasRoute = Previsao7DiasPelotasRouteImport.update({
   path: '/previsao-7-dias-pelotas',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SituacaoHidrologicaPelotasRoute =
   SituacaoHidrologicaPelotasRouteImport.update({
     id: '/situacao-hidrologica-pelotas',
@@ -96,6 +108,8 @@ export interface FileRoutesByFullPath {
   '/metodologia': typeof MetodologiaRoute
   '/nivel-da-lagoa-dos-patos-laranjal': typeof NivelDaLagoaDosPatosLaranjalRoute
   '/previsao-7-dias-pelotas': typeof Previsao7DiasPelotasRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/situacao-hidrologica-pelotas': typeof SituacaoHidrologicaPelotasRoute
   '/tempo-hoje-pelotas': typeof TempoHojePelotasRoute
   '/vento-em-pelotas': typeof VentoEmPelotasRoute
@@ -110,6 +124,8 @@ export interface FileRoutesByTo {
   '/metodologia': typeof MetodologiaRoute
   '/nivel-da-lagoa-dos-patos-laranjal': typeof NivelDaLagoaDosPatosLaranjalRoute
   '/previsao-7-dias-pelotas': typeof Previsao7DiasPelotasRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/situacao-hidrologica-pelotas': typeof SituacaoHidrologicaPelotasRoute
   '/tempo-hoje-pelotas': typeof TempoHojePelotasRoute
   '/vento-em-pelotas': typeof VentoEmPelotasRoute
@@ -125,6 +141,8 @@ export interface FileRoutesById {
   '/metodologia': typeof MetodologiaRoute
   '/nivel-da-lagoa-dos-patos-laranjal': typeof NivelDaLagoaDosPatosLaranjalRoute
   '/previsao-7-dias-pelotas': typeof Previsao7DiasPelotasRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/situacao-hidrologica-pelotas': typeof SituacaoHidrologicaPelotasRoute
   '/tempo-hoje-pelotas': typeof TempoHojePelotasRoute
   '/vento-em-pelotas': typeof VentoEmPelotasRoute
@@ -141,6 +159,8 @@ export interface FileRouteTypes {
     | '/metodologia'
     | '/nivel-da-lagoa-dos-patos-laranjal'
     | '/previsao-7-dias-pelotas'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/situacao-hidrologica-pelotas'
     | '/tempo-hoje-pelotas'
     | '/vento-em-pelotas'
@@ -155,6 +175,8 @@ export interface FileRouteTypes {
     | '/metodologia'
     | '/nivel-da-lagoa-dos-patos-laranjal'
     | '/previsao-7-dias-pelotas'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/situacao-hidrologica-pelotas'
     | '/tempo-hoje-pelotas'
     | '/vento-em-pelotas'
@@ -169,6 +191,8 @@ export interface FileRouteTypes {
     | '/metodologia'
     | '/nivel-da-lagoa-dos-patos-laranjal'
     | '/previsao-7-dias-pelotas'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/situacao-hidrologica-pelotas'
     | '/tempo-hoje-pelotas'
     | '/vento-em-pelotas'
@@ -184,6 +208,8 @@ export interface RootRouteChildren {
   MetodologiaRoute: typeof MetodologiaRoute
   NivelDaLagoaDosPatosLaranjalRoute: typeof NivelDaLagoaDosPatosLaranjalRoute
   Previsao7DiasPelotasRoute: typeof Previsao7DiasPelotasRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SituacaoHidrologicaPelotasRoute: typeof SituacaoHidrologicaPelotasRoute
   TempoHojePelotasRoute: typeof TempoHojePelotasRoute
   VentoEmPelotasRoute: typeof VentoEmPelotasRoute
@@ -254,6 +280,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Previsao7DiasPelotasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/situacao-hidrologica-pelotas': {
       id: '/situacao-hidrologica-pelotas'
       path: '/situacao-hidrologica-pelotas'
@@ -288,6 +328,8 @@ const rootRouteChildren: RootRouteChildren = {
   MetodologiaRoute: MetodologiaRoute,
   NivelDaLagoaDosPatosLaranjalRoute: NivelDaLagoaDosPatosLaranjalRoute,
   Previsao7DiasPelotasRoute: Previsao7DiasPelotasRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SituacaoHidrologicaPelotasRoute: SituacaoHidrologicaPelotasRoute,
   TempoHojePelotasRoute: TempoHojePelotasRoute,
   VentoEmPelotasRoute: VentoEmPelotasRoute,
