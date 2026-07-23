@@ -1,0 +1,35 @@
+name: Formatar lote LGPD
+
+on:
+  push:
+    branches:
+      - agent/account-lgpd-rights
+    paths:
+      - .github/workflows/format-account-lgpd.yml
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/account-lgpd-rights
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Aplicar Prettier
+        run: |
+          npx prettier --write \
+            src/lib/push/push-http.server.ts \
+            src/routes/api/account/export.ts \
+            src/routes/privacidade-e-dados.tsx
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/push/push-http.server.ts src/routes/api/account/export.ts src/routes/privacidade-e-dados.tsx
+          git commit -m "style: formata lote LGPD" || true
+          git push origin HEAD:agent/account-lgpd-rights
