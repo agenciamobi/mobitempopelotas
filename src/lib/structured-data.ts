@@ -1,4 +1,4 @@
-import { absoluteUrl, SITE_NAME } from "./site-config";
+import { absoluteUrl, WEBSITE_JSON_LD_ID } from "./site-config";
 
 export type BreadcrumbJsonLdItem = {
   name: string;
@@ -70,11 +70,7 @@ export function createEditorialPageJsonLd(options: EditorialPageJsonLdOptions) {
         name: options.name,
         description: options.description,
         url: pageUrl,
-        isPartOf: {
-          "@type": "WebSite",
-          name: SITE_NAME,
-          url: absoluteUrl("/"),
-        },
+        isPartOf: { "@id": WEBSITE_JSON_LD_ID },
         inLanguage: "pt-BR",
         breadcrumb: { "@id": breadcrumbId },
         ...(about.length > 0
