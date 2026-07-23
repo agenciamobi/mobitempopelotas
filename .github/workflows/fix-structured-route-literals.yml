@@ -1,0 +1,56 @@
+name: Corrigir literais das rotas estruturadas
+
+on:
+  push:
+    branches:
+      - agent/structured-data-schema
+    paths:
+      - .github/workflows/fix-structured-route-literals.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/structured-data-schema
+      - name: Restaurar literais exigidos pelo gerador TanStack
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          routes = {
+              "src/routes/alertas.tsx": "/alertas",
+              "src/routes/cameras-ao-vivo-pelotas.tsx": "/cameras-ao-vivo-pelotas",
+              "src/routes/chuva-em-pelotas.tsx": "/chuva-em-pelotas",
+              "src/routes/estacao-embrapa-pelotas.tsx": "/estacao-embrapa-pelotas",
+              "src/routes/historico-climatico-pelotas.tsx": "/historico-climatico-pelotas",
+              "src/routes/metodologia.tsx": "/metodologia",
+              "src/routes/nivel-da-lagoa-dos-patos-laranjal.tsx": "/nivel-da-lagoa-dos-patos-laranjal",
+              "src/routes/previsao-7-dias-pelotas.tsx": "/previsao-7-dias-pelotas",
+              "src/routes/radar-e-satelite-pelotas.tsx": "/radar-e-satelite-pelotas",
+              "src/routes/situacao-hidrologica-pelotas.tsx": "/situacao-hidrologica-pelotas",
+              "src/routes/tempo-amanha-pelotas.tsx": "/tempo-amanha-pelotas",
+              "src/routes/tempo-hoje-pelotas.tsx": "/tempo-hoje-pelotas",
+              "src/routes/vento-em-pelotas.tsx": "/vento-em-pelotas",
+          }
+
+          for filename, route in routes.items():
+              path = Path(filename)
+              content = path.read_text(encoding="utf-8")
+              updated = content.replace(
+                  "createFileRoute(PAGE_PATH)",
+                  f'createFileRoute("{route}")',
+              )
+              if updated == content:
+                  raise SystemExit(f"Padrão não encontrado em {filename}")
+              path.write_text(updated, encoding="utf-8")
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/routes
+          git commit -m "fix: usa literais nas rotas com dados estruturados"
+          git push origin HEAD:agent/structured-data-schema
