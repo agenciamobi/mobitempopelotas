@@ -116,7 +116,20 @@ export type Database = {
       };
     };
     Views: { [_ in never]: never };
-    Functions: { [_ in never]: never };
+    Functions: {
+      update_account_preferences: {
+        Args: {
+          p_avatar_url: string | null;
+          p_community_updates: boolean;
+          p_daily_summary: boolean;
+          p_display_name: string;
+          p_email: string | null;
+          p_water_alerts: boolean;
+          p_weather_alerts: boolean;
+        };
+        Returns: undefined;
+      };
+    };
     Enums: { [_ in never]: never };
     CompositeTypes: { [_ in never]: never };
   };
