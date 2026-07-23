@@ -36,6 +36,28 @@ jobs:
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
 
+      - name: Corrigir extensão do logotipo
+        run: |
+          cp public/brand/tempo-pelotas-header public/brand/tempo-pelotas-header.svg
+          sed -i 's#/brand/tempo-pelotas-header"#/brand/tempo-pelotas-header.svg"#g' \
+            src/production/components/site-header.tsx \
+            src/production/components/site-footer.tsx
+          npx prettier --write \
+            src/production/components/site-header.tsx \
+            src/production/components/site-footer.tsx \
+            public/brand/tempo-pelotas-header.svg
+
+      - name: Publicar arquivos corrigidos
+        uses: actions/upload-artifact@v4
+        with:
+          name: corrected-brand-files
+          path: |
+            src/production/components/site-header.tsx
+            src/production/components/site-footer.tsx
+            public/brand/tempo-pelotas-header.svg
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Build de produção
         run: npm run build
 
