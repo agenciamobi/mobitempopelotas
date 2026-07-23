@@ -17,6 +17,10 @@ export const PUSH_RESPONSE_HEADERS = {
   "X-Robots-Tag": "noindex, nofollow",
 } as const;
 
+export type LimitedJsonResult =
+  | { ok: true; value: unknown }
+  | { ok: false; status: 400 | 413 | 415; error: string };
+
 export function pushJsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -35,12 +39,58 @@ export function isSameOriginRequest(request: Request) {
   }
 }
 
-export function isReasonableJsonRequest(request: Request) {
+export async function readLimitedJson(request: Request): Promise<LimitedJsonResult> {
   const contentType = request.headers.get("content-type")?.toLowerCase() ?? "";
-  if (!contentType.startsWith("application/json")) return false;
+  if (!contentType.startsWith("application/json")) {
+    return { ok: false, status: 415, error: "O corpo deve ser enviado como JSON." };
+  }
 
-  const contentLength = Number(request.headers.get("content-length"));
-  return !Number.isFinite(contentLength) || contentLength <= MAX_PUSH_JSON_BYTES;
+  const contentLength = request.headers.get("content-length");
+  if (contentLength !== null) {
+    const declaredBytes = Number(contentLength);
+    if (!Number.isFinite(declaredBytes) || declaredBytes < 0) {
+      return { ok: false, status: 400, error: "O tamanho declarado do corpo é inválido." };
+    }
+    if (declaredBytes > MAX_PUSH_JSON_BYTES) {
+      return { ok: false, status: 413, error: "O corpo JSON excede o limite permitido." };
+    }
+  }
+
+  if (!request.body) return { ok: true, value: null };
+
+  const reader = request.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      if (!value) continue;
+
+      totalBytes += value.byteLength;
+      if (totalBytes > MAX_PUSH_JSON_BYTES) {
+        await reader.cancel("Corpo JSON acima do limite.").catch(() => undefined);
+        return { ok: false, status: 413, error: "O corpo JSON excede o limite permitido." };
+      }
+
+      chunks.push(value);
+    }
+
+    const bytes = new Uint8Array(totalBytes);
+    let offset = 0;
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset);
+      offset += chunk.byteLength;
+    }
+
+    const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+    return { ok: true, value: text.trim() ? JSON.parse(text) : null };
+  } catch {
+    return { ok: false, status: 400, error: "O corpo JSON é inválido." };
+  } finally {
+    reader.releaseLock();
+  }
 }
 
 export function isAllowedPushEndpoint(value: string) {
