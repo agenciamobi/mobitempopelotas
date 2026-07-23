@@ -8,8 +8,8 @@ import type { InmetAlertsData } from "@/production/lib/inmet-alerts";
 import type { WeatherAiSummaries } from "@/production/lib/weather-ai-summary";
 import type { WeatherData } from "@/production/lib/weather-data";
 
-function finite(value: number | null | undefined, fallback = 0) {
-  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+function firstFinite(...values: Array<number | null | undefined>) {
+  return values.find((value): value is number => typeof value === "number" && Number.isFinite(value)) ?? null;
 }
 
 function formatUpdatedAt(value: string | null | undefined) {
@@ -27,25 +27,33 @@ function formatUpdatedAt(value: string | null | undefined) {
 
 export function toProductionWeatherData(data: AggregatedWeatherData): WeatherData {
   const current = data.current;
+  const observation = data.observation.current;
   const today = data.daily[0];
-  const temperature = finite(current?.temperature, finite(today?.max));
-  const observedAt = current?.observedAt ?? data.source.fetchedAt;
+  const temperature =
+    firstFinite(current?.temperature, observation.temperature, today?.max, today?.min) ?? 0;
+  const feelsLike =
+    firstFinite(current?.feelsLike, observation.feelsLike, temperature) ?? temperature;
+  const humidity = firstFinite(current?.humidity, observation.humidity) ?? 0;
+  const pressure = firstFinite(current?.pressure, observation.pressure) ?? 0;
+  const windSpeed = firstFinite(current?.windSpeed, observation.windSpeed) ?? 0;
+  const windGust = firstFinite(current?.windGust, current?.windSpeed, observation.windSpeed) ?? 0;
+  const observedAt = current?.observedAt ?? data.observation.source.observationTime ?? data.source.fetchedAt;
 
   return {
     current: {
       city: current?.city ?? "Pelotas",
       state: current?.state ?? "RS",
       temperature,
-      feelsLike: finite(current?.feelsLike, temperature),
+      feelsLike,
       condition: current?.condition ?? data.message ?? "Condições em atualização",
-      humidity: finite(current?.humidity),
-      pressure: finite(current?.pressure),
-      windSpeed: finite(current?.windSpeed),
-      windGust: finite(current?.windGust, finite(current?.windSpeed)),
-      windDirection: current?.windDirection ?? "Indisponível",
-      visibility: finite(current?.visibilityKm),
-      sunrise: current?.sunrise ?? "—",
-      sunset: current?.sunset ?? "—",
+      humidity,
+      pressure,
+      windSpeed,
+      windGust,
+      windDirection: current?.windDirection ?? observation.windDirection ?? "Indisponível",
+      visibility: firstFinite(current?.visibilityKm) ?? -1,
+      sunrise: current?.sunrise ?? observation.sunrise ?? "—",
+      sunset: current?.sunset ?? observation.sunset ?? "—",
       updatedAt: formatUpdatedAt(observedAt),
       icon: current?.icon ?? today?.icon ?? "cloud",
       source: {
