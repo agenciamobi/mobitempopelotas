@@ -311,6 +311,7 @@ export function Header() {
             <Link
               className={`production-alert-link${alertsActive ? " is-active" : ""}`}
               to="/alertas"
+              aria-label="Consultar avisos oficiais"
               aria-current={alertsActive ? "page" : undefined}
             >
               <span className="production-alert-icon" aria-hidden="true">
