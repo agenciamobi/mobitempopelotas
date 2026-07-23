@@ -83,6 +83,7 @@ async function auditPage(page, target, viewport) {
 
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.keyboard.press("Tab");
+  await page.waitForTimeout(150);
 
   const audit = await page.evaluate(
     ({ mobile, strictLayout }) => {
@@ -99,9 +100,9 @@ async function auditPage(page, target, viewport) {
       const navigationRect = mobileNavigation?.getBoundingClientRect() ?? null;
       const navigationVisible = Boolean(
         mobileNavigationStyle &&
-        mobileNavigationStyle.display !== "none" &&
-        navigationRect &&
-        navigationRect.height > 0,
+          mobileNavigationStyle.display !== "none" &&
+          navigationRect &&
+          navigationRect.height > 0,
       );
       const navigationHeight = navigationVisible && navigationRect ? navigationRect.height : 0;
       const footerPaddingBottom = footerStyle
@@ -118,10 +119,10 @@ async function auditPage(page, target, viewport) {
         skipLinkFocused: active === skipLink,
         skipLinkVisible: Boolean(
           skipRect &&
-          skipRect.width > 0 &&
-          skipRect.height > 0 &&
-          skipRect.top >= 0 &&
-          skipRect.left >= 0,
+            skipRect.width > 0 &&
+            skipRect.height > 0 &&
+            skipRect.top >= 0 &&
+            skipRect.left >= 0,
         ),
         navigationVisible,
         navigationHeight,
