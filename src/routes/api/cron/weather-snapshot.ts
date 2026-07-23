@@ -137,7 +137,8 @@ async function backfillSnapshots(request: Request) {
         {
           success: false,
           backfill: false,
-          error: "O preenchimento foi interrompido porque nenhuma série histórica real está disponível.",
+          error:
+            "O preenchimento foi interrompido porque nenhuma série histórica real está disponível.",
         },
         503,
       );

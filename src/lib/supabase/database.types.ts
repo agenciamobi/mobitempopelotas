@@ -124,5 +124,4 @@ export type Database = {
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type UserPreferences = Database["public"]["Tables"]["user_preferences"]["Row"];
-export type WeatherDailySnapshot =
-  Database["public"]["Tables"]["weather_daily_snapshots"]["Row"];
+export type WeatherDailySnapshot = Database["public"]["Tables"]["weather_daily_snapshots"]["Row"];

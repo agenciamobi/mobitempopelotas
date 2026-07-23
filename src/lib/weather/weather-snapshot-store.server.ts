@@ -15,10 +15,8 @@ const PELOTAS = {
   longitude: -52.3376,
 } as const;
 
-type WeatherSnapshotRow =
-  Database["public"]["Tables"]["weather_daily_snapshots"]["Row"];
-type WeatherSnapshotInsert =
-  Database["public"]["Tables"]["weather_daily_snapshots"]["Insert"];
+type WeatherSnapshotRow = Database["public"]["Tables"]["weather_daily_snapshots"]["Row"];
+type WeatherSnapshotInsert = Database["public"]["Tables"]["weather_daily_snapshots"]["Insert"];
 
 export type WeatherSnapshotStorageStatus = {
   configured: boolean;
