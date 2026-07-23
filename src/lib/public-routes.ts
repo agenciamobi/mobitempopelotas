@@ -7,6 +7,7 @@ export type PublicRouteEntry = {
 export const PUBLIC_ROUTES: PublicRouteEntry[] = [
   { path: "/", changeFrequency: "hourly", priority: 1 },
   { path: "/tempo-hoje-pelotas", changeFrequency: "hourly", priority: 0.9 },
+  { path: "/tempo-amanha-pelotas", changeFrequency: "hourly", priority: 0.9 },
   { path: "/previsao-7-dias-pelotas", changeFrequency: "daily", priority: 0.9 },
   { path: "/chuva-em-pelotas", changeFrequency: "hourly", priority: 0.8 },
   { path: "/vento-em-pelotas", changeFrequency: "hourly", priority: 0.8 },
