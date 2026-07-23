@@ -36,9 +36,7 @@ export function getSupabaseServerConfig(): SupabaseServerConfig {
     process.env.SUPABASE_MODE === "external" || process.env.VITE_SUPABASE_MODE === "external"
       ? "external"
       : "mock";
-  const url = normalizeEnvironmentValue(
-    process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL,
-  );
+  const url = normalizeEnvironmentValue(process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL);
   const publishableKey = normalizeEnvironmentValue(
     process.env.SUPABASE_PUBLISHABLE_KEY ??
       process.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
