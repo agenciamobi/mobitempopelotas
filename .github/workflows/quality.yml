@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
@@ -26,8 +26,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
@@ -37,25 +35,6 @@ jobs:
 
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
-
-      - name: Finalizar correções do Codex
-        if: github.event_name == 'pull_request' && github.head_ref == 'agent/web-push-notifications'
-        run: |
-          node scripts/finalize-push-codex.mjs
-          npx prettier --write \
-            public/sw.js \
-            src/components/pwa/PushNotificationsManager.tsx \
-            src/lib/push/*.ts \
-            src/lib/supabase/database.types.ts \
-            src/routes/api/cron/push-daily.ts \
-            src/routes/api/push/*.ts
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add public/sw.js src/components/pwa/PushNotificationsManager.tsx src/lib/push src/lib/supabase/database.types.ts src/routes/api/cron/push-daily.ts src/routes/api/push supabase/migrations/20260723113000_create_web_push_subscriptions.sql
-          if ! git diff --cached --quiet; then
-            git commit -m "fix: aplica recomendações da revisão web push"
-            git push origin HEAD:${{ github.head_ref }}
-          fi
 
       - name: Build de produção
         run: npm run build
