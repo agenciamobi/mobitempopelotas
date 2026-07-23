@@ -52,10 +52,8 @@ function assertNoAnonymousPolicy(sql: string) {
 }
 
 function assertNoClientGrantOnServerOnlyTables(sql: string) {
-  const grantPattern = new RegExp(
-    String.raw`grant\s+[^;]+?\s+on\s+(?:table\s+)?public\.([a-z0-9_]+)\s+to\s+([^;]+);`,
-    "g",
-  );
+  // prettier-ignore
+  const grantPattern = /grant\s+[^;]+?\s+on\s+(?:table\s+)?public\.([a-z0-9_]+)\s+to\s+([^;]+);/g;
 
   for (const match of sql.matchAll(grantPattern)) {
     const table = match[1] ?? "";
