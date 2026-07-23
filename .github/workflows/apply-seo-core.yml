@@ -39,21 +39,7 @@ jobs:
             src/lib/site-config.ts \
             src/lib/public-routes.ts \
             src/lib/page-meta.ts \
-            src/routes/__root.tsx \
-            src/routes/index.tsx \
-            src/routes/alertas.tsx \
-            src/routes/metodologia.tsx \
-            src/routes/vento-em-pelotas.tsx \
-            src/routes/chuva-em-pelotas.tsx \
-            src/routes/tempo-hoje-pelotas.tsx \
-            src/routes/cameras-ao-vivo-pelotas.tsx \
-            src/routes/estacao-embrapa-pelotas.tsx \
-            src/routes/previsao-7-dias-pelotas.tsx \
-            src/routes/historico-climatico-pelotas.tsx \
-            src/routes/situacao-hidrologica-pelotas.tsx \
-            src/routes/nivel-da-lagoa-dos-patos-laranjal.tsx \
-            'src/routes/sitemap[.]xml.ts' \
-            'src/routes/robots[.]txt.ts'
+            src/routes
 
       - name: Validar build
         run: npm run build
