@@ -18,15 +18,22 @@ export const PUSH_RESPONSE_HEADERS = {
 } as const;
 
 export type LimitedJsonResult =
-  { ok: true; value: unknown } | { ok: false; status: 400 | 413 | 415; error: string };
+  | { ok: true; value: unknown }
+  | { ok: false; status: 400 | 413 | 415; error: string };
 
 type HeadersWithSetCookie = Headers & {
   getSetCookie?: () => string[];
 };
 
+type PushFetch = (
+  input: RequestInfo | URL,
+  init?: RequestInit,
+) => Promise<Response>;
+
 function appendResponseHeaders(target: Headers, source: HeadersInit) {
   const sourceHeaders = source instanceof Headers ? source : new Headers(source);
-  const setCookies = (sourceHeaders as HeadersWithSetCookie).getSetCookie?.() ?? [];
+  const setCookies =
+    (sourceHeaders as HeadersWithSetCookie).getSetCookie?.() ?? [];
 
   sourceHeaders.forEach((value, key) => {
     if (key.toLowerCase() !== "set-cookie") target.append(key, value);
@@ -41,7 +48,11 @@ function appendResponseHeaders(target: Headers, source: HeadersInit) {
   if (fallbackSetCookie) target.append("Set-Cookie", fallbackSetCookie);
 }
 
-export function pushJsonResponse(body: unknown, status = 200, additionalHeaders?: HeadersInit) {
+export function pushJsonResponse(
+  body: unknown,
+  status = 200,
+  additionalHeaders?: HeadersInit,
+) {
   const headers = new Headers(PUSH_RESPONSE_HEADERS);
   if (additionalHeaders) appendResponseHeaders(headers, additionalHeaders);
 
@@ -62,20 +73,34 @@ export function isSameOriginRequest(request: Request) {
   }
 }
 
-export async function readLimitedJson(request: Request): Promise<LimitedJsonResult> {
+export async function readLimitedJson(
+  request: Request,
+): Promise<LimitedJsonResult> {
   const contentType = request.headers.get("content-type")?.toLowerCase() ?? "";
   if (!contentType.startsWith("application/json")) {
-    return { ok: false, status: 415, error: "O corpo deve ser enviado como JSON." };
+    return {
+      ok: false,
+      status: 415,
+      error: "O corpo deve ser enviado como JSON.",
+    };
   }
 
   const contentLength = request.headers.get("content-length");
   if (contentLength !== null) {
     const declaredBytes = Number(contentLength);
     if (!Number.isFinite(declaredBytes) || declaredBytes < 0) {
-      return { ok: false, status: 400, error: "O tamanho declarado do corpo é inválido." };
+      return {
+        ok: false,
+        status: 400,
+        error: "O tamanho declarado do corpo é inválido.",
+      };
     }
     if (declaredBytes > MAX_PUSH_JSON_BYTES) {
-      return { ok: false, status: 413, error: "O corpo JSON excede o limite permitido." };
+      return {
+        ok: false,
+        status: 413,
+        error: "O corpo JSON excede o limite permitido.",
+      };
     }
   }
 
@@ -94,7 +119,11 @@ export async function readLimitedJson(request: Request): Promise<LimitedJsonResu
       totalBytes += value.byteLength;
       if (totalBytes > MAX_PUSH_JSON_BYTES) {
         await reader.cancel("Corpo JSON acima do limite.").catch(() => undefined);
-        return { ok: false, status: 413, error: "O corpo JSON excede o limite permitido." };
+        return {
+          ok: false,
+          status: 413,
+          error: "O corpo JSON excede o limite permitido.",
+        };
       }
 
       chunks.push(value);
@@ -133,15 +162,46 @@ export function isAllowedPushEndpoint(value: string) {
   }
 }
 
-export function hasBearerSecret(request: Request, secret: string | undefined) {
+export async function fetchAllowedPushEndpoint(
+  endpoint: string,
+  init: RequestInit,
+  fetcher: PushFetch = fetch,
+) {
+  if (!isAllowedPushEndpoint(endpoint)) {
+    throw new Error("Destino de web push não permitido.");
+  }
+
+  const response = await fetcher(endpoint, {
+    ...init,
+    redirect: "error",
+  });
+
+  if (response.redirected) {
+    throw new Error("O provedor web push tentou redirecionar a entrega.");
+  }
+
+  return response;
+}
+
+export function hasBearerSecret(
+  request: Request,
+  secret: string | undefined,
+) {
   const normalized = secret?.trim();
-  return Boolean(normalized) && request.headers.get("authorization") === `Bearer ${normalized}`;
+  return (
+    Boolean(normalized) &&
+    request.headers.get("authorization") === `Bearer ${normalized}`
+  );
 }
 
 export function safeInternalPath(value: unknown, fallback = "/") {
   if (typeof value !== "string") return fallback;
   const candidate = value.trim();
-  if (!candidate.startsWith("/") || candidate.startsWith("//") || candidate.includes("\\")) {
+  if (
+    !candidate.startsWith("/") ||
+    candidate.startsWith("//") ||
+    candidate.includes("\\")
+  ) {
     return fallback;
   }
 
