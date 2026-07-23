@@ -26,7 +26,10 @@ function assertIncludes(sql: string, fragments: string[]) {
 }
 
 function assertNoBroadClientGrant(sql: string) {
-  assert.doesNotMatch(sql, /grant\s+all(?:\s+privileges)?\s+on\s+[^;]+\s+to\s+(?:public|anon|authenticated)/);
+  assert.doesNotMatch(
+    sql,
+    /grant\s+all(?:\s+privileges)?\s+on\s+[^;]+\s+to\s+(?:public|anon|authenticated)/,
+  );
   assert.doesNotMatch(sql, /create\s+policy\s+[^;]+\s+to\s+anon\b/);
 }
 
@@ -107,10 +110,15 @@ test("direitos LGPD mantêm histórico próprio e RPC autenticada", async () => 
 });
 
 test("migrations sensíveis não concedem privilégios totais aos clientes", async () => {
-  const migrations = await Promise.all(Object.values(migrationPaths).map(readMigration));
+  const migrations = await Promise.all(
+    Object.values(migrationPaths).map(readMigration),
+  );
 
   for (const sql of migrations) {
     assertNoBroadClientGrant(sql);
-    assert.doesNotMatch(sql, /grant\s+execute\s+on\s+function\s+[^;]+\s+to\s+anon\b/);
+    assert.doesNotMatch(
+      sql,
+      /grant\s+execute\s+on\s+function\s+[^;]+\s+to\s+anon\b/,
+    );
   }
 });
