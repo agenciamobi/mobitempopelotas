@@ -31,19 +31,29 @@ function normalizeEnvironmentValue(value: string | undefined) {
   return normalized ? normalized : null;
 }
 
+function firstEnvironmentValue(...values: Array<string | undefined>) {
+  for (const value of values) {
+    const normalized = normalizeEnvironmentValue(value);
+    if (normalized) return normalized;
+  }
+
+  return null;
+}
+
 export function getSupabaseServerConfig(): SupabaseServerConfig {
   const mode =
     process.env.SUPABASE_MODE === "external" || process.env.VITE_SUPABASE_MODE === "external"
       ? "external"
       : "mock";
-  const url = normalizeEnvironmentValue(process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL);
-  const publishableKey = normalizeEnvironmentValue(
-    process.env.SUPABASE_PUBLISHABLE_KEY ??
-      process.env.VITE_SUPABASE_PUBLISHABLE_KEY ??
-      process.env.VITE_SUPABASE_ANON_KEY,
+  const url = firstEnvironmentValue(process.env.SUPABASE_URL, process.env.VITE_SUPABASE_URL);
+  const publishableKey = firstEnvironmentValue(
+    process.env.SUPABASE_PUBLISHABLE_KEY,
+    process.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    process.env.VITE_SUPABASE_ANON_KEY,
   );
-  const secretKey = normalizeEnvironmentValue(
-    process.env.SUPABASE_SECRET_KEY ?? process.env.SUPABASE_SERVICE_ROLE_KEY,
+  const secretKey = firstEnvironmentValue(
+    process.env.SUPABASE_SECRET_KEY,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
   );
 
   return {
