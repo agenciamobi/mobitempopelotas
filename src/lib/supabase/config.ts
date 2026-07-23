@@ -5,16 +5,25 @@ function normalizeEnvironmentValue(value: string | undefined) {
   return normalized ? normalized : null;
 }
 
+function firstEnvironmentValue(...values: Array<string | undefined>) {
+  for (const value of values) {
+    const normalized = normalizeEnvironmentValue(value);
+    if (normalized) return normalized;
+  }
+
+  return null;
+}
+
 const requestedMode: SupabaseRuntimeMode =
   import.meta.env.VITE_SUPABASE_MODE === "external" ? "external" : "mock";
 
-const url = normalizeEnvironmentValue(import.meta.env.VITE_SUPABASE_URL);
-const publishableKey = normalizeEnvironmentValue(
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? import.meta.env.VITE_SUPABASE_ANON_KEY,
+const url = firstEnvironmentValue(import.meta.env.VITE_SUPABASE_URL);
+const configuredPublishableKey = firstEnvironmentValue(
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
 );
-const usesLegacyAnonKey = Boolean(
-  !import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY && import.meta.env.VITE_SUPABASE_ANON_KEY,
-);
+const legacyAnonKey = firstEnvironmentValue(import.meta.env.VITE_SUPABASE_ANON_KEY);
+const publishableKey = configuredPublishableKey ?? legacyAnonKey;
+const usesLegacyAnonKey = !configuredPublishableKey && Boolean(legacyAnonKey);
 const isConfigured = Boolean(url && publishableKey);
 
 export const supabaseConfig = Object.freeze({
