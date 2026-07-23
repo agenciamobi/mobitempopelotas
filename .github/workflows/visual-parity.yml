@@ -31,6 +31,8 @@ jobs:
     name: Comparar produção e revisão
     runs-on: ubuntu-latest
     timeout-minutes: 24
+    container:
+      image: mcr.microsoft.com/playwright:v1.55.0-noble
 
     steps:
       - name: Checkout da revisão
@@ -53,10 +55,8 @@ jobs:
           npm run typecheck
           npm run lint
 
-      - name: Instalar Playwright para auditoria
-        run: |
-          npm install --no-save --package-lock=false playwright@1.55.0
-          npx playwright install --with-deps chromium
+      - name: Preparar Playwright para auditoria
+        run: npm install --no-save --package-lock=false playwright@1.55.0
 
       - name: Iniciar a revisão local
         run: |
