@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { GoogleLoginCard } from "@/components/auth/GoogleLoginCard";
 import { safeNextPath } from "@/lib/auth/paths";
 import { absoluteUrl, SITE_NAME } from "@/lib/site-config";
-import "@/production/production-styles";
 
 function validateSearch(search: Record<string, unknown>) {
   return {
@@ -38,9 +37,6 @@ function EntrarPage() {
         <img src="/brand/tempo-pelotas-header" alt="Tempo Pelotas" width={11349} height={1552} />
       </Link>
       <GoogleLoginCard nextPath={nextPath} errorCode={search.erro} />
-      <Link className="login-page__back" to="/">
-        ← Voltar para a previsão
-      </Link>
     </main>
   );
 }
