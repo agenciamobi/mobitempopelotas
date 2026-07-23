@@ -21,7 +21,7 @@ jobs:
   smoke:
     name: Validar publicação, REDEMET e hidrologia
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Consultar aplicação publicada
@@ -177,4 +177,88 @@ jobs:
           console.log(
             `Runtime validado em ${baseUrl}: REDEMET ${available.length}/3; Guaíba e 5 estações regionais renderizados.`,
           );
+          NODE
+
+      - name: Confirmar contratos canônicos com www
+        env:
+          BASE_URL: https://mobitempopelotas.lovable.app
+          CANONICAL_ORIGIN: https://www.tempopelotas.com.br
+        run: |
+          node <<'NODE'
+          const baseUrl = process.env.BASE_URL.replace(/\/$/, "");
+          const canonicalOrigin = process.env.CANONICAL_ORIGIN.replace(/\/$/, "");
+          const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+          function assert(condition, message) {
+            if (!condition) throw new Error(message);
+          }
+
+          function canonicalFromHtml(html) {
+            const tags = html.match(/<link\b[^>]*>/gi) ?? [];
+            const tag = tags.find((candidate) => /\brel=["']canonical["']/i.test(candidate));
+            return tag?.match(/\bhref=["']([^"']+)["']/i)?.[1] ?? null;
+          }
+
+          async function fetchText(path, accept = "*/*") {
+            const response = await fetch(`${baseUrl}${path}`, {
+              headers: {
+                Accept: accept,
+                "User-Agent": "TempoPelotas-Canonical-Smoke/1.0",
+              },
+              signal: AbortSignal.timeout(25_000),
+            });
+            const text = await response.text();
+            assert(response.ok, `${path} respondeu HTTP ${response.status}`);
+            return text;
+          }
+
+          let homeHtml = "";
+          let canonical = null;
+          for (let attempt = 1; attempt <= 24; attempt += 1) {
+            homeHtml = await fetchText("/", "text/html");
+            canonical = canonicalFromHtml(homeHtml);
+            if (canonical === `${canonicalOrigin}/`) break;
+
+            console.log(
+              `Aguardando publicação canônica (${attempt}/24): ${canonical || "canonical ausente"}`,
+            );
+            if (attempt < 24) await wait(10_000);
+          }
+
+          assert(canonical === `${canonicalOrigin}/`, `Canonical da homepage incorreto: ${canonical}`);
+
+          const todayHtml = await fetchText("/tempo-hoje-pelotas", "text/html");
+          assert(
+            canonicalFromHtml(todayHtml) === `${canonicalOrigin}/tempo-hoje-pelotas`,
+            `Canonical de tempo hoje incorreto: ${canonicalFromHtml(todayHtml)}`,
+          );
+
+          const robots = await fetchText("/robots.txt", "text/plain");
+          assert(
+            robots.includes(`Sitemap: ${canonicalOrigin}/sitemap.xml`),
+            "robots.txt não aponta para o sitemap com www",
+          );
+
+          const sitemap = await fetchText("/sitemap.xml", "application/xml,text/xml");
+          assert(
+            sitemap.includes(`<loc>${canonicalOrigin}/</loc>`),
+            "sitemap não contém a homepage com www",
+          );
+          assert(
+            sitemap.includes(`<loc>${canonicalOrigin}/radar-e-satelite-pelotas</loc>`),
+            "sitemap não contém a rota REDEMET com www",
+          );
+
+          const feed = JSON.parse(await fetchText("/feed", "application/feed+json,application/json"));
+          assert(feed.home_page_url === `${canonicalOrigin}/`, "home_page_url do feed incorreta");
+          assert(feed.feed_url === `${canonicalOrigin}/feed`, "feed_url incorreta");
+
+          const publicData = JSON.parse(await fetchText("/pelotas.json", "application/json"));
+          assert(publicData.links?.home === `${canonicalOrigin}/`, "home de pelotas.json incorreta");
+          assert(
+            publicData.links?.public_data === `${canonicalOrigin}/pelotas.json`,
+            "public_data de pelotas.json incorreta",
+          );
+
+          console.log(`Contratos publicados confirmados com host canônico ${canonicalOrigin}.`);
           NODE
