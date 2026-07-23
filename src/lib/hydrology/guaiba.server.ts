@@ -194,7 +194,10 @@ export async function fetchGuaibaObservation(): Promise<GuaibaObservationData> {
     console.error("[hydrology/guaiba] Falha ao consultar a fonte", {
       message: error instanceof Error ? error.message : String(error),
     });
-    return unavailableObservation("O nível do Guaíba está temporariamente indisponível.", fetchedAt);
+    return unavailableObservation(
+      "O nível do Guaíba está temporariamente indisponível.",
+      fetchedAt,
+    );
   }
 }
 

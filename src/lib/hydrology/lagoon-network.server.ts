@@ -1,5 +1,4 @@
-export const LAGOON_MONITORING_SOURCE_URL =
-  "https://monitoramentolagoadospatos.com.br/";
+export const LAGOON_MONITORING_SOURCE_URL = "https://monitoramentolagoadospatos.com.br/";
 export const LAGOON_MONITORING_API_URL = "https://api-medidas-porto-7bni.onrender.com";
 
 const REQUEST_TIMEOUT_MS = 8_000;
@@ -141,9 +140,7 @@ function parseSourceTimestamp(value: unknown) {
   if (typeof value !== "string" || !value.trim()) return null;
 
   const trimmed = value.trim();
-  const localWallClock = trimmed.match(
-    /^(20\d{2}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?)Z$/,
-  );
+  const localWallClock = trimmed.match(/^(20\d{2}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?)Z$/);
   const parsed = new Date(localWallClock ? `${localWallClock[1]}-03:00` : trimmed);
 
   return Number.isNaN(parsed.getTime()) ? null : parsed;
@@ -312,9 +309,7 @@ async function getStationObservation(
     currentLevelCm: current.levelCm,
     updatedAt: current.timestamp,
     ageMinutes: Math.round(ageMinutes),
-    trendCmPerHour: trendSource
-      ? round(trendSource.centimeters / trendSource.elapsedHours)
-      : null,
+    trendCmPerHour: trendSource ? round(trendSource.centimeters / trendSource.elapsedHours) : null,
     change1hCm: change1h ? round(change1h.centimeters) : null,
     change6hCm: change6h ? round(change6h.centimeters) : null,
     change24hCm: change24h ? round(change24h.centimeters) : null,

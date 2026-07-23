@@ -166,12 +166,8 @@ export function WeatherHome({
 
       <p className="weather-source-note">
         Dados consolidados por MOBI Tempo Pelotas a partir de Embrapa Clima Temperado, INMET,
-        CPPMet/UFPel, REDEMET/DECEA, LabHidroSens/UFPel, Nível Guaíba, FURG & Portos RS e{
-          " "
-        }
-        {weather.quality.forecastProvider ?? "modelo meteorológico"}. Consulta realizada em{
-          " "
-        }
+        CPPMet/UFPel, REDEMET/DECEA, LabHidroSens/UFPel, Nível Guaíba, FURG & Portos RS e{" "}
+        {weather.quality.forecastProvider ?? "modelo meteorológico"}. Consulta realizada em{" "}
         {formatFetchedAt(weather.source.fetchedAt)}.
         {degradedSources.length > 0
           ? ` Fontes com restrição: ${degradedSources.map((source) => sourceLabels[source]).join(", ")}.`

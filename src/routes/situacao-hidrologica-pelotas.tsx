@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { HydrologyOverviewPage } from "@/components/hydrology/HydrologyPages";
+import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
+import { getLagoonMonitoringNetwork } from "@/lib/hydrology/lagoon-network.functions";
 import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
 import { createPageHead } from "@/lib/page-meta";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
@@ -13,8 +15,13 @@ export const Route = createFileRoute("/situacao-hidrologica-pelotas")({
       "/situacao-hidrologica-pelotas",
     ),
   loader: async () => {
-    const [weather, level] = await Promise.all([getWeatherIntelligence(), getLaranjalLevelData()]);
-    return { weather, level };
+    const [weather, level, guaiba, lagoon] = await Promise.all([
+      getWeatherIntelligence(),
+      getLaranjalLevelData(),
+      getGuaibaObservation(),
+      getLagoonMonitoringNetwork(),
+    ]);
+    return { weather, level, guaiba, lagoon };
   },
   staleTime: 60 * 1_000,
   component: SituacaoHidrologicaPage,
@@ -22,5 +29,12 @@ export const Route = createFileRoute("/situacao-hidrologica-pelotas")({
 
 function SituacaoHidrologicaPage() {
   const data = Route.useLoaderData();
-  return <HydrologyOverviewPage weather={data.weather} level={data.level} />;
+  return (
+    <HydrologyOverviewPage
+      weather={data.weather}
+      level={data.level}
+      guaiba={data.guaiba}
+      lagoon={data.lagoon}
+    />
+  );
 }

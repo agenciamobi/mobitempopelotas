@@ -9,68 +9,63 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VentoEmPelotasRouteImport } from './routes/vento-em-pelotas'
-import { Route as TempoHojePelotasRouteImport } from './routes/tempo-hoje-pelotas'
-import { Route as SituacaoHidrologicaPelotasRouteImport } from './routes/situacao-hidrologica-pelotas'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
-import { Route as Previsao7DiasPelotasRouteImport } from './routes/previsao-7-dias-pelotas'
-import { Route as PelotasDotjsonRouteImport } from './routes/pelotas[.]json'
-import { Route as NivelDaLagoaDosPatosLaranjalRouteImport } from './routes/nivel-da-lagoa-dos-patos-laranjal'
-import { Route as MetodologiaRouteImport } from './routes/metodologia'
-import { Route as HistoricoClimaticoPelotasRouteImport } from './routes/historico-climatico-pelotas'
-import { Route as FeedRouteImport } from './routes/feed'
-import { Route as EstacaoEmbrapaPelotasRouteImport } from './routes/estacao-embrapa-pelotas'
-import { Route as ChuvaEmPelotasRouteImport } from './routes/chuva-em-pelotas'
-import { Route as CamerasAoVivoPelotasRouteImport } from './routes/cameras-ao-vivo-pelotas'
-import { Route as AlertasRouteImport } from './routes/alertas'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AlertasRouteImport } from './routes/alertas'
+import { Route as CamerasAoVivoPelotasRouteImport } from './routes/cameras-ao-vivo-pelotas'
+import { Route as ChuvaEmPelotasRouteImport } from './routes/chuva-em-pelotas'
+import { Route as ClimaEmPelotasRouteImport } from './routes/clima-em-pelotas'
+import { Route as EstacaoEmbrapaPelotasRouteImport } from './routes/estacao-embrapa-pelotas'
+import { Route as FeedRouteImport } from './routes/feed'
+import { Route as HistoricoClimaticoPelotasRouteImport } from './routes/historico-climatico-pelotas'
+import { Route as MetodologiaRouteImport } from './routes/metodologia'
+import { Route as NivelDaLagoaDosPatosLaranjalRouteImport } from './routes/nivel-da-lagoa-dos-patos-laranjal'
+import { Route as PelotasDotjsonRouteImport } from './routes/pelotas[.]json'
+import { Route as Previsao7DiasPelotasRouteImport } from './routes/previsao-7-dias-pelotas'
+import { Route as RadarESatelitePelotasRouteImport } from './routes/radar-e-satelite-pelotas'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SituacaoHidrologicaPelotasRouteImport } from './routes/situacao-hidrologica-pelotas'
+import { Route as TempoAmanhaPelotasRouteImport } from './routes/tempo-amanha-pelotas'
+import { Route as TempoHojePelotasRouteImport } from './routes/tempo-hoje-pelotas'
+import { Route as VentoEmPelotasRouteImport } from './routes/vento-em-pelotas'
+import { Route as ApiRedemetImageRouteImport } from './routes/api/redemet/image'
+import { Route as ApiRedemetRadarRouteImport } from './routes/api/redemet/radar'
+import { Route as ApiRedemetSatelliteRouteImport } from './routes/api/redemet/satellite'
+import { Route as ApiRedemetStormsRouteImport } from './routes/api/redemet/storms'
 
-const VentoEmPelotasRoute = VentoEmPelotasRouteImport.update({
-  id: '/vento-em-pelotas',
-  path: '/vento-em-pelotas',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TempoHojePelotasRoute = TempoHojePelotasRouteImport.update({
-  id: '/tempo-hoje-pelotas',
-  path: '/tempo-hoje-pelotas',
+const AlertasRoute = AlertasRouteImport.update({
+  id: '/alertas',
+  path: '/alertas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SituacaoHidrologicaPelotasRoute =
-  SituacaoHidrologicaPelotasRouteImport.update({
-    id: '/situacao-hidrologica-pelotas',
-    path: '/situacao-hidrologica-pelotas',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
+const CamerasAoVivoPelotasRoute = CamerasAoVivoPelotasRouteImport.update({
+  id: '/cameras-ao-vivo-pelotas',
+  path: '/cameras-ao-vivo-pelotas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
-  id: '/robots.txt',
-  path: '/robots.txt',
+const ChuvaEmPelotasRoute = ChuvaEmPelotasRouteImport.update({
+  id: '/chuva-em-pelotas',
+  path: '/chuva-em-pelotas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Previsao7DiasPelotasRoute = Previsao7DiasPelotasRouteImport.update({
-  id: '/previsao-7-dias-pelotas',
-  path: '/previsao-7-dias-pelotas',
+const ClimaEmPelotasRoute = ClimaEmPelotasRouteImport.update({
+  id: '/clima-em-pelotas',
+  path: '/clima-em-pelotas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PelotasDotjsonRoute = PelotasDotjsonRouteImport.update({
-  id: '/pelotas.json',
-  path: '/pelotas.json',
+const EstacaoEmbrapaPelotasRoute = EstacaoEmbrapaPelotasRouteImport.update({
+  id: '/estacao-embrapa-pelotas',
+  path: '/estacao-embrapa-pelotas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const NivelDaLagoaDosPatosLaranjalRoute =
-  NivelDaLagoaDosPatosLaranjalRouteImport.update({
-    id: '/nivel-da-lagoa-dos-patos-laranjal',
-    path: '/nivel-da-lagoa-dos-patos-laranjal',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const MetodologiaRoute = MetodologiaRouteImport.update({
-  id: '/metodologia',
-  path: '/metodologia',
+const FeedRoute = FeedRouteImport.update({
+  id: '/feed',
+  path: '/feed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoricoClimaticoPelotasRoute =
@@ -79,34 +74,81 @@ const HistoricoClimaticoPelotasRoute =
     path: '/historico-climatico-pelotas',
     getParentRoute: () => rootRouteImport,
   } as any)
-const FeedRoute = FeedRouteImport.update({
-  id: '/feed',
-  path: '/feed',
+const MetodologiaRoute = MetodologiaRouteImport.update({
+  id: '/metodologia',
+  path: '/metodologia',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EstacaoEmbrapaPelotasRoute = EstacaoEmbrapaPelotasRouteImport.update({
-  id: '/estacao-embrapa-pelotas',
-  path: '/estacao-embrapa-pelotas',
+const NivelDaLagoaDosPatosLaranjalRoute =
+  NivelDaLagoaDosPatosLaranjalRouteImport.update({
+    id: '/nivel-da-lagoa-dos-patos-laranjal',
+    path: '/nivel-da-lagoa-dos-patos-laranjal',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PelotasDotjsonRoute = PelotasDotjsonRouteImport.update({
+  id: '/pelotas.json',
+  path: '/pelotas.json',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ChuvaEmPelotasRoute = ChuvaEmPelotasRouteImport.update({
-  id: '/chuva-em-pelotas',
-  path: '/chuva-em-pelotas',
+const Previsao7DiasPelotasRoute = Previsao7DiasPelotasRouteImport.update({
+  id: '/previsao-7-dias-pelotas',
+  path: '/previsao-7-dias-pelotas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CamerasAoVivoPelotasRoute = CamerasAoVivoPelotasRouteImport.update({
-  id: '/cameras-ao-vivo-pelotas',
-  path: '/cameras-ao-vivo-pelotas',
+const RadarESatelitePelotasRoute = RadarESatelitePelotasRouteImport.update({
+  id: '/radar-e-satelite-pelotas',
+  path: '/radar-e-satelite-pelotas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AlertasRoute = AlertasRouteImport.update({
-  id: '/alertas',
-  path: '/alertas',
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SituacaoHidrologicaPelotasRoute =
+  SituacaoHidrologicaPelotasRouteImport.update({
+    id: '/situacao-hidrologica-pelotas',
+    path: '/situacao-hidrologica-pelotas',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const TempoAmanhaPelotasRoute = TempoAmanhaPelotasRouteImport.update({
+  id: '/tempo-amanha-pelotas',
+  path: '/tempo-amanha-pelotas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TempoHojePelotasRoute = TempoHojePelotasRouteImport.update({
+  id: '/tempo-hoje-pelotas',
+  path: '/tempo-hoje-pelotas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VentoEmPelotasRoute = VentoEmPelotasRouteImport.update({
+  id: '/vento-em-pelotas',
+  path: '/vento-em-pelotas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRedemetImageRoute = ApiRedemetImageRouteImport.update({
+  id: '/api/redemet/image',
+  path: '/api/redemet/image',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRedemetRadarRoute = ApiRedemetRadarRouteImport.update({
+  id: '/api/redemet/radar',
+  path: '/api/redemet/radar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRedemetSatelliteRoute = ApiRedemetSatelliteRouteImport.update({
+  id: '/api/redemet/satellite',
+  path: '/api/redemet/satellite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRedemetStormsRoute = ApiRedemetStormsRouteImport.update({
+  id: '/api/redemet/storms',
+  path: '/api/redemet/storms',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -115,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/alertas': typeof AlertasRoute
   '/cameras-ao-vivo-pelotas': typeof CamerasAoVivoPelotasRoute
   '/chuva-em-pelotas': typeof ChuvaEmPelotasRoute
+  '/clima-em-pelotas': typeof ClimaEmPelotasRoute
   '/estacao-embrapa-pelotas': typeof EstacaoEmbrapaPelotasRoute
   '/feed': typeof FeedRoute
   '/historico-climatico-pelotas': typeof HistoricoClimaticoPelotasRoute
@@ -122,17 +165,24 @@ export interface FileRoutesByFullPath {
   '/nivel-da-lagoa-dos-patos-laranjal': typeof NivelDaLagoaDosPatosLaranjalRoute
   '/pelotas.json': typeof PelotasDotjsonRoute
   '/previsao-7-dias-pelotas': typeof Previsao7DiasPelotasRoute
+  '/radar-e-satelite-pelotas': typeof RadarESatelitePelotasRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/situacao-hidrologica-pelotas': typeof SituacaoHidrologicaPelotasRoute
+  '/tempo-amanha-pelotas': typeof TempoAmanhaPelotasRoute
   '/tempo-hoje-pelotas': typeof TempoHojePelotasRoute
   '/vento-em-pelotas': typeof VentoEmPelotasRoute
+  '/api/redemet/image': typeof ApiRedemetImageRoute
+  '/api/redemet/radar': typeof ApiRedemetRadarRoute
+  '/api/redemet/satellite': typeof ApiRedemetSatelliteRoute
+  '/api/redemet/storms': typeof ApiRedemetStormsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/alertas': typeof AlertasRoute
   '/cameras-ao-vivo-pelotas': typeof CamerasAoVivoPelotasRoute
   '/chuva-em-pelotas': typeof ChuvaEmPelotasRoute
+  '/clima-em-pelotas': typeof ClimaEmPelotasRoute
   '/estacao-embrapa-pelotas': typeof EstacaoEmbrapaPelotasRoute
   '/feed': typeof FeedRoute
   '/historico-climatico-pelotas': typeof HistoricoClimaticoPelotasRoute
@@ -140,11 +190,17 @@ export interface FileRoutesByTo {
   '/nivel-da-lagoa-dos-patos-laranjal': typeof NivelDaLagoaDosPatosLaranjalRoute
   '/pelotas.json': typeof PelotasDotjsonRoute
   '/previsao-7-dias-pelotas': typeof Previsao7DiasPelotasRoute
+  '/radar-e-satelite-pelotas': typeof RadarESatelitePelotasRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/situacao-hidrologica-pelotas': typeof SituacaoHidrologicaPelotasRoute
+  '/tempo-amanha-pelotas': typeof TempoAmanhaPelotasRoute
   '/tempo-hoje-pelotas': typeof TempoHojePelotasRoute
   '/vento-em-pelotas': typeof VentoEmPelotasRoute
+  '/api/redemet/image': typeof ApiRedemetImageRoute
+  '/api/redemet/radar': typeof ApiRedemetRadarRoute
+  '/api/redemet/satellite': typeof ApiRedemetSatelliteRoute
+  '/api/redemet/storms': typeof ApiRedemetStormsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -152,6 +208,7 @@ export interface FileRoutesById {
   '/alertas': typeof AlertasRoute
   '/cameras-ao-vivo-pelotas': typeof CamerasAoVivoPelotasRoute
   '/chuva-em-pelotas': typeof ChuvaEmPelotasRoute
+  '/clima-em-pelotas': typeof ClimaEmPelotasRoute
   '/estacao-embrapa-pelotas': typeof EstacaoEmbrapaPelotasRoute
   '/feed': typeof FeedRoute
   '/historico-climatico-pelotas': typeof HistoricoClimaticoPelotasRoute
@@ -159,11 +216,17 @@ export interface FileRoutesById {
   '/nivel-da-lagoa-dos-patos-laranjal': typeof NivelDaLagoaDosPatosLaranjalRoute
   '/pelotas.json': typeof PelotasDotjsonRoute
   '/previsao-7-dias-pelotas': typeof Previsao7DiasPelotasRoute
+  '/radar-e-satelite-pelotas': typeof RadarESatelitePelotasRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/situacao-hidrologica-pelotas': typeof SituacaoHidrologicaPelotasRoute
+  '/tempo-amanha-pelotas': typeof TempoAmanhaPelotasRoute
   '/tempo-hoje-pelotas': typeof TempoHojePelotasRoute
   '/vento-em-pelotas': typeof VentoEmPelotasRoute
+  '/api/redemet/image': typeof ApiRedemetImageRoute
+  '/api/redemet/radar': typeof ApiRedemetRadarRoute
+  '/api/redemet/satellite': typeof ApiRedemetSatelliteRoute
+  '/api/redemet/storms': typeof ApiRedemetStormsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -172,6 +235,7 @@ export interface FileRouteTypes {
     | '/alertas'
     | '/cameras-ao-vivo-pelotas'
     | '/chuva-em-pelotas'
+    | '/clima-em-pelotas'
     | '/estacao-embrapa-pelotas'
     | '/feed'
     | '/historico-climatico-pelotas'
@@ -179,17 +243,24 @@ export interface FileRouteTypes {
     | '/nivel-da-lagoa-dos-patos-laranjal'
     | '/pelotas.json'
     | '/previsao-7-dias-pelotas'
+    | '/radar-e-satelite-pelotas'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/situacao-hidrologica-pelotas'
+    | '/tempo-amanha-pelotas'
     | '/tempo-hoje-pelotas'
     | '/vento-em-pelotas'
+    | '/api/redemet/image'
+    | '/api/redemet/radar'
+    | '/api/redemet/satellite'
+    | '/api/redemet/storms'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/alertas'
     | '/cameras-ao-vivo-pelotas'
     | '/chuva-em-pelotas'
+    | '/clima-em-pelotas'
     | '/estacao-embrapa-pelotas'
     | '/feed'
     | '/historico-climatico-pelotas'
@@ -197,17 +268,24 @@ export interface FileRouteTypes {
     | '/nivel-da-lagoa-dos-patos-laranjal'
     | '/pelotas.json'
     | '/previsao-7-dias-pelotas'
+    | '/radar-e-satelite-pelotas'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/situacao-hidrologica-pelotas'
+    | '/tempo-amanha-pelotas'
     | '/tempo-hoje-pelotas'
     | '/vento-em-pelotas'
+    | '/api/redemet/image'
+    | '/api/redemet/radar'
+    | '/api/redemet/satellite'
+    | '/api/redemet/storms'
   id:
     | '__root__'
     | '/'
     | '/alertas'
     | '/cameras-ao-vivo-pelotas'
     | '/chuva-em-pelotas'
+    | '/clima-em-pelotas'
     | '/estacao-embrapa-pelotas'
     | '/feed'
     | '/historico-climatico-pelotas'
@@ -215,11 +293,17 @@ export interface FileRouteTypes {
     | '/nivel-da-lagoa-dos-patos-laranjal'
     | '/pelotas.json'
     | '/previsao-7-dias-pelotas'
+    | '/radar-e-satelite-pelotas'
     | '/robots.txt'
     | '/sitemap.xml'
     | '/situacao-hidrologica-pelotas'
+    | '/tempo-amanha-pelotas'
     | '/tempo-hoje-pelotas'
     | '/vento-em-pelotas'
+    | '/api/redemet/image'
+    | '/api/redemet/radar'
+    | '/api/redemet/satellite'
+    | '/api/redemet/storms'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -227,6 +311,7 @@ export interface RootRouteChildren {
   AlertasRoute: typeof AlertasRoute
   CamerasAoVivoPelotasRoute: typeof CamerasAoVivoPelotasRoute
   ChuvaEmPelotasRoute: typeof ChuvaEmPelotasRoute
+  ClimaEmPelotasRoute: typeof ClimaEmPelotasRoute
   EstacaoEmbrapaPelotasRoute: typeof EstacaoEmbrapaPelotasRoute
   FeedRoute: typeof FeedRoute
   HistoricoClimaticoPelotasRoute: typeof HistoricoClimaticoPelotasRoute
@@ -234,111 +319,26 @@ export interface RootRouteChildren {
   NivelDaLagoaDosPatosLaranjalRoute: typeof NivelDaLagoaDosPatosLaranjalRoute
   PelotasDotjsonRoute: typeof PelotasDotjsonRoute
   Previsao7DiasPelotasRoute: typeof Previsao7DiasPelotasRoute
+  RadarESatelitePelotasRoute: typeof RadarESatelitePelotasRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SituacaoHidrologicaPelotasRoute: typeof SituacaoHidrologicaPelotasRoute
+  TempoAmanhaPelotasRoute: typeof TempoAmanhaPelotasRoute
   TempoHojePelotasRoute: typeof TempoHojePelotasRoute
   VentoEmPelotasRoute: typeof VentoEmPelotasRoute
+  ApiRedemetImageRoute: typeof ApiRedemetImageRoute
+  ApiRedemetRadarRoute: typeof ApiRedemetRadarRoute
+  ApiRedemetSatelliteRoute: typeof ApiRedemetSatelliteRoute
+  ApiRedemetStormsRoute: typeof ApiRedemetStormsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/vento-em-pelotas': {
-      id: '/vento-em-pelotas'
-      path: '/vento-em-pelotas'
-      fullPath: '/vento-em-pelotas'
-      preLoaderRoute: typeof VentoEmPelotasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tempo-hoje-pelotas': {
-      id: '/tempo-hoje-pelotas'
-      path: '/tempo-hoje-pelotas'
-      fullPath: '/tempo-hoje-pelotas'
-      preLoaderRoute: typeof TempoHojePelotasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/situacao-hidrologica-pelotas': {
-      id: '/situacao-hidrologica-pelotas'
-      path: '/situacao-hidrologica-pelotas'
-      fullPath: '/situacao-hidrologica-pelotas'
-      preLoaderRoute: typeof SituacaoHidrologicaPelotasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/robots.txt': {
-      id: '/robots.txt'
-      path: '/robots.txt'
-      fullPath: '/robots.txt'
-      preLoaderRoute: typeof RobotsDottxtRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/previsao-7-dias-pelotas': {
-      id: '/previsao-7-dias-pelotas'
-      path: '/previsao-7-dias-pelotas'
-      fullPath: '/previsao-7-dias-pelotas'
-      preLoaderRoute: typeof Previsao7DiasPelotasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/pelotas.json': {
-      id: '/pelotas.json'
-      path: '/pelotas.json'
-      fullPath: '/pelotas.json'
-      preLoaderRoute: typeof PelotasDotjsonRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/nivel-da-lagoa-dos-patos-laranjal': {
-      id: '/nivel-da-lagoa-dos-patos-laranjal'
-      path: '/nivel-da-lagoa-dos-patos-laranjal'
-      fullPath: '/nivel-da-lagoa-dos-patos-laranjal'
-      preLoaderRoute: typeof NivelDaLagoaDosPatosLaranjalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/metodologia': {
-      id: '/metodologia'
-      path: '/metodologia'
-      fullPath: '/metodologia'
-      preLoaderRoute: typeof MetodologiaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/historico-climatico-pelotas': {
-      id: '/historico-climatico-pelotas'
-      path: '/historico-climatico-pelotas'
-      fullPath: '/historico-climatico-pelotas'
-      preLoaderRoute: typeof HistoricoClimaticoPelotasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/feed': {
-      id: '/feed'
-      path: '/feed'
-      fullPath: '/feed'
-      preLoaderRoute: typeof FeedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/estacao-embrapa-pelotas': {
-      id: '/estacao-embrapa-pelotas'
-      path: '/estacao-embrapa-pelotas'
-      fullPath: '/estacao-embrapa-pelotas'
-      preLoaderRoute: typeof EstacaoEmbrapaPelotasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chuva-em-pelotas': {
-      id: '/chuva-em-pelotas'
-      path: '/chuva-em-pelotas'
-      fullPath: '/chuva-em-pelotas'
-      preLoaderRoute: typeof ChuvaEmPelotasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cameras-ao-vivo-pelotas': {
-      id: '/cameras-ao-vivo-pelotas'
-      path: '/cameras-ao-vivo-pelotas'
-      fullPath: '/cameras-ao-vivo-pelotas'
-      preLoaderRoute: typeof CamerasAoVivoPelotasRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/alertas': {
@@ -348,11 +348,151 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AlertasRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/cameras-ao-vivo-pelotas': {
+      id: '/cameras-ao-vivo-pelotas'
+      path: '/cameras-ao-vivo-pelotas'
+      fullPath: '/cameras-ao-vivo-pelotas'
+      preLoaderRoute: typeof CamerasAoVivoPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chuva-em-pelotas': {
+      id: '/chuva-em-pelotas'
+      path: '/chuva-em-pelotas'
+      fullPath: '/chuva-em-pelotas'
+      preLoaderRoute: typeof ChuvaEmPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clima-em-pelotas': {
+      id: '/clima-em-pelotas'
+      path: '/clima-em-pelotas'
+      fullPath: '/clima-em-pelotas'
+      preLoaderRoute: typeof ClimaEmPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/estacao-embrapa-pelotas': {
+      id: '/estacao-embrapa-pelotas'
+      path: '/estacao-embrapa-pelotas'
+      fullPath: '/estacao-embrapa-pelotas'
+      preLoaderRoute: typeof EstacaoEmbrapaPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed': {
+      id: '/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/historico-climatico-pelotas': {
+      id: '/historico-climatico-pelotas'
+      path: '/historico-climatico-pelotas'
+      fullPath: '/historico-climatico-pelotas'
+      preLoaderRoute: typeof HistoricoClimaticoPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/metodologia': {
+      id: '/metodologia'
+      path: '/metodologia'
+      fullPath: '/metodologia'
+      preLoaderRoute: typeof MetodologiaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nivel-da-lagoa-dos-patos-laranjal': {
+      id: '/nivel-da-lagoa-dos-patos-laranjal'
+      path: '/nivel-da-lagoa-dos-patos-laranjal'
+      fullPath: '/nivel-da-lagoa-dos-patos-laranjal'
+      preLoaderRoute: typeof NivelDaLagoaDosPatosLaranjalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pelotas.json': {
+      id: '/pelotas.json'
+      path: '/pelotas.json'
+      fullPath: '/pelotas.json'
+      preLoaderRoute: typeof PelotasDotjsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/previsao-7-dias-pelotas': {
+      id: '/previsao-7-dias-pelotas'
+      path: '/previsao-7-dias-pelotas'
+      fullPath: '/previsao-7-dias-pelotas'
+      preLoaderRoute: typeof Previsao7DiasPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/radar-e-satelite-pelotas': {
+      id: '/radar-e-satelite-pelotas'
+      path: '/radar-e-satelite-pelotas'
+      fullPath: '/radar-e-satelite-pelotas'
+      preLoaderRoute: typeof RadarESatelitePelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/situacao-hidrologica-pelotas': {
+      id: '/situacao-hidrologica-pelotas'
+      path: '/situacao-hidrologica-pelotas'
+      fullPath: '/situacao-hidrologica-pelotas'
+      preLoaderRoute: typeof SituacaoHidrologicaPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tempo-amanha-pelotas': {
+      id: '/tempo-amanha-pelotas'
+      path: '/tempo-amanha-pelotas'
+      fullPath: '/tempo-amanha-pelotas'
+      preLoaderRoute: typeof TempoAmanhaPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tempo-hoje-pelotas': {
+      id: '/tempo-hoje-pelotas'
+      path: '/tempo-hoje-pelotas'
+      fullPath: '/tempo-hoje-pelotas'
+      preLoaderRoute: typeof TempoHojePelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vento-em-pelotas': {
+      id: '/vento-em-pelotas'
+      path: '/vento-em-pelotas'
+      fullPath: '/vento-em-pelotas'
+      preLoaderRoute: typeof VentoEmPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/redemet/image': {
+      id: '/api/redemet/image'
+      path: '/api/redemet/image'
+      fullPath: '/api/redemet/image'
+      preLoaderRoute: typeof ApiRedemetImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/redemet/radar': {
+      id: '/api/redemet/radar'
+      path: '/api/redemet/radar'
+      fullPath: '/api/redemet/radar'
+      preLoaderRoute: typeof ApiRedemetRadarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/redemet/satellite': {
+      id: '/api/redemet/satellite'
+      path: '/api/redemet/satellite'
+      fullPath: '/api/redemet/satellite'
+      preLoaderRoute: typeof ApiRedemetSatelliteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/redemet/storms': {
+      id: '/api/redemet/storms'
+      path: '/api/redemet/storms'
+      fullPath: '/api/redemet/storms'
+      preLoaderRoute: typeof ApiRedemetStormsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -363,6 +503,7 @@ const rootRouteChildren: RootRouteChildren = {
   AlertasRoute: AlertasRoute,
   CamerasAoVivoPelotasRoute: CamerasAoVivoPelotasRoute,
   ChuvaEmPelotasRoute: ChuvaEmPelotasRoute,
+  ClimaEmPelotasRoute: ClimaEmPelotasRoute,
   EstacaoEmbrapaPelotasRoute: EstacaoEmbrapaPelotasRoute,
   FeedRoute: FeedRoute,
   HistoricoClimaticoPelotasRoute: HistoricoClimaticoPelotasRoute,
@@ -370,11 +511,17 @@ const rootRouteChildren: RootRouteChildren = {
   NivelDaLagoaDosPatosLaranjalRoute: NivelDaLagoaDosPatosLaranjalRoute,
   PelotasDotjsonRoute: PelotasDotjsonRoute,
   Previsao7DiasPelotasRoute: Previsao7DiasPelotasRoute,
+  RadarESatelitePelotasRoute: RadarESatelitePelotasRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   SituacaoHidrologicaPelotasRoute: SituacaoHidrologicaPelotasRoute,
+  TempoAmanhaPelotasRoute: TempoAmanhaPelotasRoute,
   TempoHojePelotasRoute: TempoHojePelotasRoute,
   VentoEmPelotasRoute: VentoEmPelotasRoute,
+  ApiRedemetImageRoute: ApiRedemetImageRoute,
+  ApiRedemetRadarRoute: ApiRedemetRadarRoute,
+  ApiRedemetSatelliteRoute: ApiRedemetSatelliteRoute,
+  ApiRedemetStormsRoute: ApiRedemetStormsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

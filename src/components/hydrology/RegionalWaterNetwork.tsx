@@ -110,7 +110,9 @@ function GuaibaPanel({ data, full }: { data: GuaibaObservationData; full: boolea
         <div>
           <span>Uma das entradas da Lagoa dos Patos</span>
           <h3>Nível do Guaíba</h3>
-          <p>{data.location} · {data.station}</p>
+          <p>
+            {data.location} · {data.station}
+          </p>
         </div>
         <small>
           <i aria-hidden="true" />
@@ -202,13 +204,11 @@ export function RegionalWaterNetwork({
       <header className="regional-water-heading">
         <div>
           <span>Contexto regional das águas</span>
-          <h2 id={`regional-water-title-${variant}`}>
-            Do Guaíba à Lagoa dos Patos
-          </h2>
+          <h2 id={`regional-water-title-${variant}`}>Do Guaíba à Lagoa dos Patos</h2>
         </div>
         <p>
-          Acompanhe pontos entre o norte e o sul da lagoa. Cada régua possui referência própria e não
-          deve ser comparada diretamente com outra estação.
+          Acompanhe pontos entre o norte e o sul da lagoa. Cada régua possui referência própria e
+          não deve ser comparada diretamente com outra estação.
         </p>
       </header>
 
@@ -284,7 +284,9 @@ export function RegionalWaterNetwork({
                           </div>
                         ) : null}
                       </dl>
-                      {full ? <p className="regional-water-role">{observation.station.role}</p> : null}
+                      {full ? (
+                        <p className="regional-water-role">{observation.station.role}</p>
+                      ) : null}
                     </>
                   ) : (
                     <div className="regional-water-unavailable" role="status">
@@ -305,9 +307,7 @@ export function RegionalWaterNetwork({
           </div>
 
           <footer className="regional-water-lagoon-footer">
-            <span>
-              Última atualização regional: {formatDateTime(lagoon.latestUpdatedAt)}
-            </span>
+            <span>Última atualização regional: {formatDateTime(lagoon.latestUpdatedAt)}</span>
             <a href={lagoon.source.url} target="_blank" rel="noreferrer">
               Abrir rede original <ExternalLink aria-hidden="true" />
             </a>
