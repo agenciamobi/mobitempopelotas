@@ -44,8 +44,7 @@ jobs:
             src/production/components/site-footer.tsx
           npx prettier --write \
             src/production/components/site-header.tsx \
-            src/production/components/site-footer.tsx \
-            public/brand/tempo-pelotas-header.svg
+            src/production/components/site-footer.tsx
 
       - name: Publicar arquivos corrigidos
         uses: actions/upload-artifact@v4
