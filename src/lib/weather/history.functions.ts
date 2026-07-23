@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { setResponseHeaders } from "@tanstack/react-start/server";
 
-import { fetchPelotasWeatherHistory } from "./history.server";
+import { fetchPelotasWeatherHistoryWithSnapshots } from "./history-with-snapshots.server";
 
 export const getPelotasWeatherHistory = createServerFn({ method: "GET" }).handler(async () => {
   setResponseHeaders(
@@ -11,5 +11,5 @@ export const getPelotasWeatherHistory = createServerFn({ method: "GET" }).handle
     }),
   );
 
-  return fetchPelotasWeatherHistory();
+  return fetchPelotasWeatherHistoryWithSnapshots();
 });
