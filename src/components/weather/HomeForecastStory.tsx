@@ -57,7 +57,11 @@ function tomorrowHeadline(chance: number | null) {
   return "Amanhã tende a ter menor chance de chuva";
 }
 
-function tomorrowDescription(chance: number | null, precipitation: number, windGust: number | null) {
+function tomorrowDescription(
+  chance: number | null,
+  precipitation: number,
+  windGust: number | null,
+) {
   const rainText =
     chance === null
       ? `${formatNumber(precipitation)} mm previstos pelo modelo`
@@ -90,7 +94,11 @@ export function HomeForecastStory({ data }: { data: WeatherIntelligenceData }) {
   if (!today || (visibleHours.length === 0 && nextDays.length === 0)) return null;
 
   return (
-    <section className="home-forecast-story" id="previsao-hoje" aria-labelledby="home-forecast-title">
+    <section
+      className="home-forecast-story"
+      id="previsao-hoje"
+      aria-labelledby="home-forecast-title"
+    >
       <header className="home-forecast-heading">
         <div>
           <span className="home-forecast-eyebrow">Previsão hora a hora</span>
@@ -125,7 +133,9 @@ export function HomeForecastStory({ data }: { data: WeatherIntelligenceData }) {
               <strong>{visibleHours.length} horários</strong>
               <span>{forecastWindow}</span>
             </div>
-            <div className={`rain-${rainReading(peakHour?.precipitationProbability ?? null).level}`}>
+            <div
+              className={`rain-${rainReading(peakHour?.precipitationProbability ?? null).level}`}
+            >
               <small>Maior chance de chuva</small>
               <strong>{rainReading(peakHour?.precipitationProbability ?? null).chance}%</strong>
               <span>{peakHour ? `por volta de ${peakHour.time}` : "sem horário disponível"}</span>
