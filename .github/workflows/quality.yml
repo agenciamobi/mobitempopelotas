@@ -36,6 +36,24 @@ jobs:
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
 
+      - name: Formatar arquivos alterados para diagnóstico
+        run: |
+          npx prettier --write \
+            scripts/visual-parity-audit.mjs \
+            src/production/ProductionHome.tsx \
+            .github/workflows/visual-parity.yml
+
+      - name: Publicar arquivos formatados
+        uses: actions/upload-artifact@v4
+        with:
+          name: formatted-pr-files
+          path: |
+            scripts/visual-parity-audit.mjs
+            src/production/ProductionHome.tsx
+            .github/workflows/visual-parity.yml
+          if-no-files-found: error
+          retention-days: 1
+
       - name: Build de produção
         run: npm run build
 
