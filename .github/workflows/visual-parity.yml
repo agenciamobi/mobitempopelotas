@@ -1,4 +1,5 @@
 # Capturas e verificações estruturais da homepage copiada da produção Vercel.
+# Execução temporária para comparar o transplante publicado nos mesmos viewports.
 name: Auditoria visual do transplante literal
 
 on:
