@@ -14,7 +14,13 @@ import {
   iteratePushSubscriptionPages,
   type PushConsentPreference,
 } from "./push-storage.server";
-import type { PushDeliveryResult, PushPayload, StoredPushSubscription } from "./push.types";
+import {
+  PUSH_TOPICS,
+  type PushDeliveryResult,
+  type PushPayload,
+  type PushTopic,
+  type StoredPushSubscription,
+} from "./push.types";
 
 const DELIVERY_BATCH_SIZE = 50;
 const DELIVERY_TIMEOUT_MS = 12_000;
@@ -309,6 +315,10 @@ export async function broadcastPushNotification(
   payload: PushPayload,
   options: PushBroadcastOptions = {},
 ): Promise<PushDeliveryResult> {
+  if (!PUSH_TOPICS.includes(payload.topic as PushTopic)) {
+    throw new Error("Toda notificação precisa informar um tópico válido.");
+  }
+
   const status = getPushConfigurationStatus();
   if (!status.enabled) {
     throw new Error(`Notificações web push não configuradas: ${status.missing.join(", ")}`);
