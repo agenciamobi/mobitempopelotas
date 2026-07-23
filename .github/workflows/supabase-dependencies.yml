@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: supabase-dependencies-${{ github.ref }}
@@ -31,6 +31,18 @@ jobs:
 
       - name: Instalar dependências Supabase fixadas
         run: npm install --save-exact @supabase/supabase-js@latest @supabase/ssr@latest --no-audit --no-fund
+
+      - name: Versionar package e lockfile
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          if git diff --cached --quiet; then
+            echo "Dependências já estão atualizadas."
+          else
+            git commit -m "build: fixa dependências Supabase"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
 
       - name: Publicar package e lockfile
         uses: actions/upload-artifact@v4
