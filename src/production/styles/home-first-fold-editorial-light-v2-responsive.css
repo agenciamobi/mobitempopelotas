@@ -1,0 +1,25 @@
+/* Editorial Light — responsividade da primeira dobra. */
+@media(max-width:900px){
+.site-shell--home-editorial .site-header--hero{width:100%;min-height:64px}
+.site-shell--home-editorial .weather-hero{min-height:auto;border-radius:21px;box-shadow:0 12px 36px rgba(7,30,47,.065)}
+.site-shell--home-editorial .weather-hero-photo,.site-shell--home-editorial .weather-hero-overlay{inset:10px 10px auto;width:auto;height:218px;border-radius:16px}
+.site-shell--home-editorial .weather-hero-content{grid-template-columns:1fr;gap:25px;padding:254px 22px 23px}
+.site-shell--home-editorial .weather-hero-copy{max-width:680px;padding-left:0;border-left:0}
+.site-shell--home-editorial .weather-hero-kicker{margin-top:0}
+.site-shell--home-editorial .weather-hero h1{font-size:clamp(2.75rem,10vw,4.25rem)}
+.site-shell--home-editorial .weather-hero-now{width:100%;margin:0;border-color:rgba(7,30,47,.085);background:#f8fbfa;box-shadow:none;backdrop-filter:none}
+.site-shell--home-editorial .weather-hero-scroll,.site-shell--home-editorial .weather-hero-credit{display:none}
+}
+@media(max-width:620px){
+.site-shell--home-editorial .weather-hero-photo,.site-shell--home-editorial .weather-hero-overlay{height:182px}
+.site-shell--home-editorial .weather-hero-content{padding:213px 16px 16px}
+.site-shell--home-editorial .weather-hero h1{font-size:clamp(2.45rem,11.7vw,3.35rem)}
+.site-shell--home-editorial .weather-hero-description{margin-top:17px;font-size:.85rem;line-height:1.56}
+.site-shell--home-editorial .weather-hero-actions{margin-top:21px}
+.site-shell--home-editorial .weather-hero-primary{width:100%}
+.site-shell--home-editorial .weather-hero-now{padding:15px;border-radius:16px}
+.site-shell--home-editorial .weather-hero-visual{grid-template-columns:82px minmax(0,1fr);min-height:140px;padding:15px 0 13px}
+.site-shell--home-editorial .weather-hero-icon svg{width:81px}
+.site-shell--home-editorial .weather-hero-temperature>strong{font-size:clamp(3.9rem,20vw,5.15rem)}
+.site-shell--home-editorial .weather-hero-metric{min-height:53px;grid-template-columns:23px minmax(0,1fr);padding:9px 7px}
+}

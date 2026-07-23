@@ -1,0 +1,327 @@
+/*
+ * Clareza editorial v3.
+ * Corrige vazios de composição e torna tabelas meteorológicas e hidrológicas autoexplicativas.
+ */
+
+/* Próximos dias: quatro colunas reais, sem grande vazio lateral. */
+.site-shell--home-editorial .home-next-days {
+  grid-template-columns: 1fr;
+  gap: 22px;
+  margin-top: clamp(42px, 5vw, 68px);
+}
+
+.site-shell--home-editorial .home-next-days__heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid var(--home-line);
+}
+
+.site-shell--home-editorial .home-next-days__heading > strong {
+  font-size: clamp(1.45rem, 2vw, 1.9rem);
+}
+
+.site-shell--home-editorial .home-next-days__list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 0;
+  border-bottom: 1px solid var(--home-line);
+}
+
+.site-shell--home-editorial .home-next-days__list article {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "date temperature"
+    "icon rain";
+  gap: 22px 16px;
+  min-height: 148px;
+  align-content: space-between;
+  padding: 23px clamp(16px, 1.8vw, 25px);
+  border-right: 1px solid var(--home-line);
+  border-bottom: 0;
+}
+
+.site-shell--home-editorial .home-next-days__list article:first-child {
+  padding-left: 0;
+}
+
+.site-shell--home-editorial .home-next-days__list article:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.site-shell--home-editorial .home-next-days__list article > div {
+  grid-area: date;
+  display: grid;
+  align-content: start;
+  gap: 5px;
+}
+
+.site-shell--home-editorial .home-next-days__list article > div strong {
+  font-size: 1.04rem;
+}
+
+.site-shell--home-editorial .home-next-days__list article > div span {
+  font-size: 0.82rem;
+}
+
+.site-shell--home-editorial .home-next-days__list article svg {
+  grid-area: icon;
+  width: 42px;
+  height: 42px;
+  align-self: end;
+}
+
+.site-shell--home-editorial .home-next-days__list article > span {
+  grid-area: rain;
+  align-self: end;
+  justify-self: end;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.site-shell--home-editorial .home-next-days__list article > b {
+  grid-area: temperature;
+  justify-self: end;
+  font-size: 1.18rem;
+}
+
+.site-shell--home-editorial .home-next-days__list article > b small {
+  font-size: 0.9rem;
+}
+
+.site-shell--home-editorial .home-inline-links {
+  grid-column: auto;
+  justify-content: flex-end;
+  padding-top: 2px;
+}
+
+/* Rede da Lagoa: cabeçalho explícito e alinhamento consistente. */
+.site-shell--home-editorial .home-water-table__columns {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 92px minmax(145px, 0.75fr) 86px;
+  gap: 18px;
+  align-items: center;
+  min-height: 46px;
+  padding: 0;
+  border-bottom: 1px solid var(--home-line);
+  color: var(--home-muted);
+  font-size: 0.7rem;
+  font-weight: 820;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.site-shell--home-editorial .home-water-table__columns span:last-child {
+  text-align: right;
+}
+
+.site-shell--home-editorial .home-water-table__rows article,
+.site-shell--home-editorial .home-water-context {
+  min-height: 92px;
+}
+
+.site-shell--home-editorial .home-water-table__rows article > div strong,
+.site-shell--home-editorial .home-water-context > div strong {
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.site-shell--home-editorial .home-water-table__rows article > div span,
+.site-shell--home-editorial .home-water-context > div span {
+  margin-top: 3px;
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.site-shell--home-editorial .home-water-table__rows article > b,
+.site-shell--home-editorial .home-water-context > b {
+  font-size: 1.08rem;
+}
+
+.site-shell--home-editorial .home-water-table__rows article > span,
+.site-shell--home-editorial .home-water-context > span {
+  font-size: 0.81rem;
+  line-height: 1.4;
+}
+
+.site-shell--home-editorial .home-water-table__rows article > small,
+.site-shell--home-editorial .home-water-context > small {
+  font-size: 0.73rem;
+  font-weight: 720;
+}
+
+.site-shell--home-editorial .home-water-table__rows article:hover {
+  background: rgba(24, 189, 205, 0.035);
+}
+
+.site-shell--home-editorial .home-water-context {
+  margin-top: 20px;
+  padding-right: 18px;
+  padding-left: 18px;
+}
+
+/* Avisos oficiais: área e riscos em blocos de leitura mais curtos. */
+.inmet-alert-card {
+  gap: 17px;
+  padding: 24px 26px 24px 30px;
+}
+
+.inmet-alert-card__topline {
+  justify-content: flex-start;
+  gap: 9px;
+}
+
+.inmet-alert-card__heading {
+  align-items: center;
+}
+
+.inmet-alert-card__heading > div {
+  gap: 8px;
+  max-width: 900px;
+}
+
+.inmet-alert-area {
+  width: fit-content;
+  max-width: 100%;
+  padding: 10px 13px;
+  border-radius: 11px;
+  background: rgba(7, 30, 47, 0.045);
+  color: #405b68;
+}
+
+.inmet-alert-description {
+  max-width: 980px;
+  color: #405b68;
+}
+
+.inmet-alert-card details {
+  max-width: 980px;
+}
+
+.inmet-alert-card > a {
+  margin-top: 1px;
+}
+
+@media (max-width: 980px) {
+  .site-shell--home-editorial .home-next-days__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-shell--home-editorial .home-next-days__list article:nth-child(2) {
+    border-right: 0;
+  }
+
+  .site-shell--home-editorial .home-next-days__list article:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--home-line);
+  }
+
+  .site-shell--home-editorial .home-next-days__list article:first-child,
+  .site-shell--home-editorial .home-next-days__list article:nth-child(3) {
+    padding-left: 0;
+  }
+
+  .site-shell--home-editorial .home-next-days__list article:nth-child(2),
+  .site-shell--home-editorial .home-next-days__list article:last-child {
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-shell--home-editorial .home-next-days__heading {
+    display: grid;
+    justify-content: stretch;
+  }
+
+  .site-shell--home-editorial .home-inline-links {
+    justify-content: flex-start;
+  }
+
+  .site-shell--home-editorial .home-water-table__columns {
+    display: none;
+  }
+
+  .site-shell--home-editorial .home-water-table__rows article,
+  .site-shell--home-editorial .home-water-context {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "station level"
+      "trend state";
+    gap: 12px 18px;
+    min-height: 104px;
+    align-content: center;
+    padding: 16px 0;
+  }
+
+  .site-shell--home-editorial .home-water-table__rows article > div,
+  .site-shell--home-editorial .home-water-context > div {
+    grid-area: station;
+  }
+
+  .site-shell--home-editorial .home-water-table__rows article > b,
+  .site-shell--home-editorial .home-water-context > b {
+    grid-area: level;
+    justify-self: end;
+  }
+
+  .site-shell--home-editorial .home-water-table__rows article > span,
+  .site-shell--home-editorial .home-water-context > span {
+    grid-area: trend;
+  }
+
+  .site-shell--home-editorial .home-water-table__rows article > small,
+  .site-shell--home-editorial .home-water-context > small {
+    grid-area: state;
+    justify-self: end;
+  }
+
+  .site-shell--home-editorial .home-water-context {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  .inmet-alert-card__heading {
+    display: grid;
+    align-items: start;
+  }
+
+  .inmet-alert-event {
+    order: -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .site-shell--home-editorial .home-next-days__list {
+    grid-template-columns: 1fr;
+  }
+
+  .site-shell--home-editorial .home-next-days__list article,
+  .site-shell--home-editorial .home-next-days__list article:first-child,
+  .site-shell--home-editorial .home-next-days__list article:nth-child(2),
+  .site-shell--home-editorial .home-next-days__list article:nth-child(3),
+  .site-shell--home-editorial .home-next-days__list article:last-child {
+    grid-template-columns: minmax(0, 1fr) 42px minmax(80px, auto) auto;
+    grid-template-areas: "date icon rain temperature";
+    min-height: 82px;
+    align-content: center;
+    padding: 13px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--home-line);
+  }
+
+  .site-shell--home-editorial .home-next-days__list article:last-child {
+    border-bottom: 0;
+  }
+
+  .site-shell--home-editorial .home-next-days__list article svg,
+  .site-shell--home-editorial .home-next-days__list article > span,
+  .site-shell--home-editorial .home-next-days__list article > b {
+    align-self: center;
+  }
+
+  .inmet-alert-card {
+    padding: 21px 17px 21px 22px;
+  }
+}

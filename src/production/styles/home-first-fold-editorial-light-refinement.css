@@ -1,0 +1,41 @@
+/* Ajustes finais da primeira dobra Editorial Light. */
+
+.site-shell--home-editorial .weather-hero-status--normal {
+  display: none;
+}
+
+.site-shell--home-editorial .weather-hero-status--normal + .weather-hero-kicker {
+  margin-top: 0;
+}
+
+.site-shell--home-editorial .weather-hero-secondary {
+  min-height: auto;
+  padding: 7px 3px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--fold-purple-deep);
+  text-decoration: underline;
+  text-decoration-color: rgba(94, 44, 237, 0.36);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+}
+
+.site-shell--home-editorial .weather-hero-secondary:hover,
+.site-shell--home-editorial .weather-hero-secondary:focus-visible {
+  border: 0;
+  background: transparent;
+  color: var(--fold-purple);
+  text-decoration-color: var(--fold-cyan);
+}
+
+.site-shell--home-editorial .weather-hero-now {
+  box-shadow: 0 20px 46px rgba(7, 30, 47, 0.16);
+}
+
+@media (max-width: 620px) {
+  .site-shell--home-editorial .weather-hero-secondary {
+    width: fit-content;
+    justify-self: start;
+  }
+}

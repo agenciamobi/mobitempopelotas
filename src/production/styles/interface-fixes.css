@@ -1,0 +1,121 @@
+.header-action.header-action--attention,
+.header-action.header-action--attention:hover,
+.header-action.header-action--attention:focus-visible,
+.header-action.header-action--attention.is-active {
+  background: #ef8f47;
+  color: white;
+  box-shadow: 0 10px 26px rgba(239, 143, 71, 0.28);
+}
+
+.header-action.header-action--warning,
+.header-action.header-action--warning:hover,
+.header-action.header-action--warning:focus-visible,
+.header-action.header-action--warning.is-active {
+  background: #d94d42;
+  color: white;
+  box-shadow: 0 10px 28px rgba(217, 77, 66, 0.3);
+}
+
+.header-action--attention .header-action-dot,
+.header-action--warning .header-action-dot {
+  background: white;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2);
+}
+
+.home-lagoon-frame {
+  height: 780px;
+}
+
+.lagoon-dashboard-main .lagoon-dashboard-frame {
+  min-height: 780px;
+}
+
+@media (min-width: 901px) {
+  .hourly-section {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .hourly-list {
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    overflow-x: hidden;
+    padding-bottom: 0;
+  }
+
+  .hourly-list article {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 1180px) {
+  .home-lagoon-frame {
+    height: calc(clamp(640px, 64vw, 720px) + 60px);
+  }
+
+  .lagoon-dashboard-main .lagoon-dashboard-frame {
+    min-height: 740px;
+  }
+}
+
+@media (max-width: 980px) {
+  .lagoon-dashboard-main .lagoon-dashboard-frame {
+    min-height: 780px;
+  }
+}
+
+@media (max-width: 900px) {
+  .hourly-section {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .hourly-list {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .hourly-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .home-lagoon-frame {
+    height: calc(min(780px, 92vh) + 60px);
+    min-height: 720px;
+  }
+}
+
+@media (max-width: 760px) {
+  .lagoon-dashboard-main .lagoon-dashboard-frame {
+    min-height: 680px;
+    height: calc(min(760px, 92vh) + 60px);
+  }
+}
+
+@media (max-width: 640px) {
+  .home-lagoon-frame {
+    height: calc(min(720px, 90vh) + 60px);
+    min-height: 680px;
+  }
+}
+
+@media (max-width: 430px) {
+  .home-lagoon-frame {
+    height: 720px;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .lagoon-dashboard-main .lagoon-dashboard-frame {
+    min-height: 720px;
+    height: 720px;
+  }
+}

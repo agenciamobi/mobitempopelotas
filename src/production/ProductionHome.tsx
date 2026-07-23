@@ -19,7 +19,7 @@ import { getFeaturedSafetyBanner } from "@/production/lib/safety-banners";
 import type { WeatherData } from "@/production/lib/weather-data";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/production/lib/weather-insights";
 import "maplibre-gl/dist/maplibre-gl.css";
-import "./production.css";
+import "./production-styles";
 
 const advisoryRank: Record<AdvisoryLevel, number> = { normal: 0, attention: 1, warning: 2 };
 

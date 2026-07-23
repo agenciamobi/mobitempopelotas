@@ -1,0 +1,236 @@
+/*
+ * Jornada da homepage v5.
+ * Melhora as dobras de mapa, observação, águas e navegação final.
+ */
+
+.site-shell--home-editorial .home-map-story__copy {
+  align-self: center;
+}
+
+.site-shell--home-editorial .home-map-story__hint {
+  max-width: 430px;
+  margin: 22px 0 0;
+  padding: 15px 17px;
+  border-left: 3px solid var(--brand-cyan, #18bdcd);
+  background: rgba(24, 189, 205, 0.055);
+  color: #355766;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.site-shell--home-editorial .home-map-story__hint strong {
+  color: #15394c;
+}
+
+.site-shell--home-editorial .home-observation-temperature small {
+  max-width: 230px;
+  line-height: 1.45;
+  letter-spacing: 0.03em;
+  text-transform: none;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dl > div {
+  min-height: 104px;
+  gap: 9px;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dt {
+  max-width: 150px;
+  font-size: 0.79rem;
+  line-height: 1.4;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dd {
+  font-size: clamp(1.34rem, 1.75vw, 1.65rem);
+}
+
+.site-shell--home-editorial .home-water-table__columns {
+  grid-template-columns: minmax(180px, 1fr) 110px minmax(180px, 0.9fr) 150px;
+  min-height: 52px;
+  font-size: 0.78rem;
+}
+
+.site-shell--home-editorial .home-water-table__rows article,
+.site-shell--home-editorial .home-water-context {
+  grid-template-columns: minmax(180px, 1fr) 110px minmax(180px, 0.9fr) 150px;
+  min-height: 98px;
+}
+
+.site-shell--home-editorial .home-water-table__rows article > small,
+.site-shell--home-editorial .home-water-context > small {
+  max-width: 150px;
+  justify-self: end;
+  font-size: 0.79rem;
+  line-height: 1.45;
+}
+
+.site-shell--home-editorial .home-water-story__footer p {
+  font-size: 0.94rem;
+  line-height: 1.65;
+}
+
+.site-shell--home-editorial .home-explore-story {
+  grid-template-columns: minmax(290px, 0.46fr) minmax(0, 1fr);
+  gap: clamp(54px, 8vw, 132px);
+}
+
+.site-shell--home-editorial .home-explore-story > header {
+  align-self: start;
+  position: sticky;
+  top: 110px;
+}
+
+.site-shell--home-editorial .home-explore-story > header > p {
+  max-width: 390px;
+  margin: 24px 0 0;
+  color: #4d6976;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.site-shell--home-editorial .home-explore-groups {
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-top: 1px solid var(--home-line);
+}
+
+.site-shell--home-editorial .home-explore-groups > section {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.58fr) minmax(220px, 0.78fr) minmax(250px, 1fr);
+  gap: 28px;
+  align-items: start;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--home-line);
+}
+
+.site-shell--home-editorial .home-explore-groups h3 {
+  margin: 0;
+  color: #0a2a3e;
+  font-size: 1.12rem;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+  text-transform: none;
+}
+
+.site-shell--home-editorial .home-explore-groups > section > p {
+  margin: 0;
+  color: #58717d;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.site-shell--home-editorial .home-explore-groups > section > div {
+  border-top: 0;
+}
+
+.site-shell--home-editorial .home-explore-groups a {
+  min-height: 46px;
+  border-top: 1px solid var(--home-line);
+  border-bottom: 0;
+  font-size: 0.93rem;
+}
+
+.site-shell--home-editorial .home-explore-groups a:last-child {
+  border-bottom: 1px solid var(--home-line);
+}
+
+@media (max-width: 1180px) {
+  .site-shell--home-editorial .home-water-table__columns,
+  .site-shell--home-editorial .home-water-table__rows article,
+  .site-shell--home-editorial .home-water-context {
+    grid-template-columns: minmax(160px, 1fr) 100px minmax(150px, 0.82fr) 130px;
+  }
+
+  .site-shell--home-editorial .home-explore-groups > section {
+    grid-template-columns: minmax(170px, 0.55fr) minmax(210px, 0.75fr) minmax(230px, 1fr);
+  }
+}
+
+@media (max-width: 980px) {
+  .site-shell--home-editorial .home-map-story__copy {
+    display: block;
+  }
+
+  .site-shell--home-editorial .home-map-story__hint {
+    max-width: 620px;
+  }
+
+  .site-shell--home-editorial .home-water-table__columns {
+    display: none;
+  }
+
+  .site-shell--home-editorial .home-water-table__rows article,
+  .site-shell--home-editorial .home-water-context {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px 20px;
+    min-height: 116px;
+    padding: 18px 0;
+  }
+
+  .site-shell--home-editorial .home-water-table__rows article > span,
+  .site-shell--home-editorial .home-water-context > span {
+    grid-column: 1;
+  }
+
+  .site-shell--home-editorial .home-water-table__rows article > small,
+  .site-shell--home-editorial .home-water-context > small {
+    grid-column: 2;
+    grid-row: 2;
+    display: block;
+    align-self: center;
+  }
+
+  .site-shell--home-editorial .home-explore-story {
+    grid-template-columns: 1fr;
+    gap: 42px;
+  }
+
+  .site-shell--home-editorial .home-explore-story > header {
+    position: static;
+  }
+
+  .site-shell--home-editorial .home-explore-groups > section {
+    grid-template-columns: minmax(170px, 0.65fr) minmax(0, 1fr);
+  }
+
+  .site-shell--home-editorial .home-explore-groups > section > div {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 620px) {
+  .site-shell--home-editorial .home-map-story__hint {
+    margin-top: 18px;
+    font-size: 0.88rem;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading dl > div {
+    min-height: 92px;
+  }
+
+  .site-shell--home-editorial .home-water-table__rows article,
+  .site-shell--home-editorial .home-water-context {
+    min-height: 122px;
+  }
+
+  .site-shell--home-editorial .home-water-table__rows article > small,
+  .site-shell--home-editorial .home-water-context > small {
+    max-width: 130px;
+    font-size: 0.74rem;
+  }
+
+  .site-shell--home-editorial .home-explore-story > header > p {
+    font-size: 0.98rem;
+  }
+
+  .site-shell--home-editorial .home-explore-groups > section {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 24px 0;
+  }
+
+  .site-shell--home-editorial .home-explore-groups > section > div {
+    grid-column: auto;
+    margin-top: 6px;
+  }
+}

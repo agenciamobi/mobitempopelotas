@@ -1,0 +1,394 @@
+/*
+ * Primeira dobra da home.
+ * O header deve parecer parte do hero, sem barra, cápsula ou placa independente.
+ */
+
+@media (min-width: 901px) {
+  .site-shell--home > .site-header--hero {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    left: 18px;
+    z-index: 40;
+    display: grid;
+    grid-template-columns: minmax(170px, 1fr) auto minmax(170px, 1fr);
+    align-items: center;
+    min-height: 94px;
+    padding: 0 clamp(28px, 3vw, 52px);
+    border: 0;
+    border-radius: 42px 42px 0 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .site-shell--home > .site-header--hero::before {
+    display: none;
+    content: none;
+  }
+
+  .site-header--hero .brand {
+    justify-self: start;
+    min-width: 0;
+    min-height: 52px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .site-header--hero .brand-logo {
+    display: block;
+    width: clamp(168px, 12.25vw, 204px);
+    max-width: 100%;
+    max-height: 33px;
+    object-fit: contain;
+    object-position: left center;
+    filter: brightness(0) invert(1) drop-shadow(0 3px 14px rgba(0, 0, 0, 0.3));
+  }
+
+  .site-header--hero .main-nav {
+    justify-self: center;
+    display: inline-flex;
+    gap: clamp(5px, 0.5vw, 9px);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .site-header--hero .main-nav a {
+    position: relative;
+    display: inline-flex;
+    min-height: 46px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 clamp(11px, 1vw, 16px);
+    border-radius: 0;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.76);
+    font-size: 0.78rem;
+    font-weight: 770;
+    letter-spacing: -0.01em;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.38);
+    transition: color 160ms ease, opacity 160ms ease;
+  }
+
+  .site-header--hero .main-nav a::after {
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    content: "";
+    opacity: 0;
+    transform: translateX(-50%) scale(0.45);
+    transition: opacity 160ms ease, transform 160ms ease;
+  }
+
+  .site-header--hero .main-nav a:hover,
+  .site-header--hero .main-nav a:focus-visible,
+  .site-header--hero .main-nav a.is-active {
+    background: transparent;
+    color: white;
+    box-shadow: none;
+    outline: none;
+  }
+
+  .site-header--hero .main-nav a:hover::after,
+  .site-header--hero .main-nav a:focus-visible::after,
+  .site-header--hero .main-nav a.is-active::after {
+    opacity: 0.92;
+    transform: translateX(-50%) scale(1);
+  }
+
+  .site-header--hero .header-action {
+    justify-self: end;
+    display: inline-flex;
+    min-width: 122px;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 0 18px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 12px;
+    background: rgba(6, 28, 44, 0.72);
+    box-shadow: 0 16px 34px rgba(2, 13, 23, 0.22);
+    color: white;
+    font-size: 0.78rem;
+    font-weight: 830;
+    backdrop-filter: blur(16px) saturate(135%);
+  }
+
+  .site-header--hero .header-action::after {
+    margin-left: 3px;
+    content: "→";
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .site-header--hero .header-action-icon {
+    display: none;
+  }
+
+  .site-header--hero .header-action-dot {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 auto;
+  }
+
+  .site-header--hero .header-action--attention {
+    border-color: rgba(255, 222, 168, 0.38);
+    background: #e88b2d;
+    color: #1c1208;
+  }
+
+  .site-header--hero .header-action--warning {
+    border-color: rgba(255, 220, 214, 0.38);
+    background: #ef5d50;
+    color: white;
+  }
+
+  .site-header--hero .header-action--attention .header-action-dot,
+  .site-header--hero .header-action--warning .header-action-dot {
+    background: white;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.16);
+  }
+
+  .site-header--hero .header-action:hover,
+  .site-header--hero .header-action:focus-visible {
+    filter: brightness(1.06);
+    transform: translateY(-1px);
+    outline: none;
+  }
+
+  .site-shell--home > .weather-hero {
+    min-height: min(830px, calc(100svh - 36px));
+    margin-top: 0;
+    border-radius: 42px;
+  }
+
+  /* Escurecimento localizado somente no topo, sem criar uma barra de header. */
+  .site-shell--home > .weather-hero::before {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    left: 0;
+    width: auto;
+    height: 148px;
+    border-radius: 42px 42px 0 0;
+    background: linear-gradient(
+      180deg,
+      rgba(2, 14, 24, 0.48) 0%,
+      rgba(2, 14, 24, 0.2) 52%,
+      transparent 100%
+    );
+    content: "";
+    pointer-events: none;
+  }
+
+  .site-shell--home .weather-hero-content {
+    grid-template-columns: minmax(0, 1.02fr) minmax(410px, 0.82fr);
+    gap: clamp(42px, 4.5vw, 78px);
+    padding-top: 150px;
+    padding-right: clamp(52px, 5.4vw, 96px);
+    padding-bottom: 116px;
+    padding-left: clamp(82px, 9.8vw, 178px);
+  }
+
+  .site-shell--home .weather-hero-copy {
+    max-width: 680px;
+  }
+
+  .site-shell--home .weather-hero-status {
+    min-height: 40px;
+    padding: 9px 14px;
+  }
+
+  .site-shell--home .weather-hero-kicker {
+    margin-top: 25px;
+  }
+
+  .site-shell--home .weather-hero h1 {
+    max-width: 680px;
+    font-size: clamp(3.45rem, 4.15vw, 5rem);
+    line-height: 0.965;
+    letter-spacing: -0.058em;
+  }
+
+  .site-shell--home .weather-hero-description {
+    max-width: 600px;
+    margin-top: 23px;
+  }
+
+  .site-shell--home .weather-hero-actions {
+    margin-top: 29px;
+  }
+
+  .site-shell--home .weather-hero-now {
+    align-self: center;
+    width: min(100%, 505px);
+    transform: translateY(12px);
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1240px) {
+  .site-shell--home > .site-header--hero {
+    grid-template-columns: minmax(150px, 1fr) auto minmax(125px, 1fr);
+    padding-inline: 24px;
+  }
+
+  .site-header--hero .brand-logo {
+    width: clamp(148px, 13vw, 174px);
+  }
+
+  .site-header--hero .main-nav {
+    gap: 1px;
+  }
+
+  .site-header--hero .main-nav a {
+    min-height: 44px;
+    padding-inline: 9px;
+    font-size: 0.71rem;
+  }
+
+  .site-header--hero .header-action {
+    min-width: 106px;
+    min-height: 48px;
+    padding-inline: 14px;
+    font-size: 0.72rem;
+  }
+
+  .site-shell--home .weather-hero-content {
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.78fr);
+    padding-right: 36px;
+    padding-left: clamp(50px, 6vw, 84px);
+  }
+}
+
+@media (max-width: 900px) {
+  .site-shell--home > .site-header--hero {
+    position: absolute;
+    top: 10px;
+    right: var(--mobile-gutter, 10px);
+    left: var(--mobile-gutter, 10px);
+    z-index: 45;
+    grid-template-columns: minmax(0, 1fr) auto;
+    min-height: calc(70px + env(safe-area-inset-top));
+    padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .site-shell--home > .site-header--hero::before {
+    display: none;
+    content: none;
+  }
+
+  .site-shell--home .site-header--hero .brand {
+    justify-self: start;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0;
+    background: transparent;
+  }
+
+  .site-shell--home .site-header--hero .brand-logo {
+    width: clamp(138px, 40vw, 162px);
+    max-height: 26px;
+    object-fit: contain;
+    object-position: left center;
+    filter: brightness(0) invert(1) drop-shadow(0 3px 13px rgba(0, 0, 0, 0.42));
+  }
+
+  .site-shell--home .site-header--hero .header-action {
+    width: 46px;
+    min-width: 46px;
+    height: 46px;
+    min-height: 46px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 14px;
+    background: rgba(5, 24, 38, 0.66);
+    box-shadow: 0 12px 28px rgba(2, 13, 23, 0.24);
+    color: white;
+    backdrop-filter: blur(14px) saturate(130%);
+  }
+
+  .site-shell--home .site-header--hero .header-action::after {
+    display: none;
+    content: none;
+  }
+
+  .site-shell--home .site-header--hero .header-action--attention {
+    border-color: rgba(255, 222, 170, 0.4);
+    background: #e88b2d;
+    color: #1d130b;
+  }
+
+  .site-shell--home .site-header--hero .header-action--warning {
+    border-color: rgba(255, 220, 214, 0.4);
+    background: #ef5d50;
+    color: white;
+  }
+
+  .site-shell--home > .weather-hero {
+    margin-top: 10px;
+    border-radius: 28px;
+  }
+
+  .site-shell--home > .weather-hero::before {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    left: 0;
+    width: auto;
+    height: calc(126px + env(safe-area-inset-top));
+    border-radius: 28px 28px 0 0;
+    background: linear-gradient(
+      180deg,
+      rgba(2, 14, 24, 0.62) 0%,
+      rgba(2, 14, 24, 0.25) 58%,
+      transparent 100%
+    );
+    content: "";
+    pointer-events: none;
+  }
+
+  .site-shell--home .weather-hero-content {
+    padding-top: calc(104px + env(safe-area-inset-top));
+  }
+}
+
+@media (max-width: 420px) {
+  .site-shell--home > .site-header--hero {
+    padding-inline: 14px;
+  }
+
+  .site-shell--home .site-header--hero .brand-logo {
+    width: clamp(132px, 42vw, 150px);
+  }
+
+  .site-shell--home .site-header--hero .header-action {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    min-height: 44px;
+    border-radius: 13px;
+  }
+}

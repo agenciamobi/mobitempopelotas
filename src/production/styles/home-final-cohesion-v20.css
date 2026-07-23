@@ -1,0 +1,17 @@
+/* Homepage v20 — coesão transversal entre as seções e o rodapé. */
+.site-shell--home-editorial{--home-flow-space:clamp(72px,7vw,108px);--home-flow-copy:560px}
+.site-shell--home-editorial .home-editorial-main{padding-bottom:0}
+.site-shell--home-editorial :is(.home-story-heading h2,.home-map-story h2,.home-observation-story h2,.home-explore-story h2){text-wrap:balance}
+.site-shell--home-editorial :is(.home-story-heading>p,.home-map-story__copy>p,.home-observation-story__intro>p,.home-explore-story>header>p){max-width:var(--home-flow-copy);text-wrap:pretty}
+.site-shell--home-editorial :is(.home-story-heading .eyebrow,.home-map-story__copy>.eyebrow,.home-observation-story__intro>.eyebrow,.home-explore-story>header>.eyebrow){margin-bottom:12px;line-height:1.3}
+.site-shell--home-editorial .home-section-navigation+.home-story--forecast{padding-top:clamp(54px,5vw,76px)}
+.site-shell--home-editorial .home-story--forecast{padding-bottom:clamp(54px,5.2vw,78px)}
+.site-shell--home-editorial .home-map-story{padding-top:clamp(72px,6.5vw,98px);padding-bottom:clamp(66px,6vw,90px)}
+.site-shell--home-editorial .home-observation-story{margin:clamp(22px,2.8vw,38px) 0 clamp(36px,4.2vw,62px)}
+.site-shell--home-editorial .home-story--water{padding-top:clamp(72px,6.8vw,104px);padding-bottom:clamp(66px,6.2vw,94px)}
+.site-shell--home-editorial .home-explore-story{padding-top:clamp(72px,6.8vw,104px);padding-bottom:clamp(54px,5.5vw,82px)}
+.site-shell--home-editorial :is(.home-inline-links a,.home-observation-story__intro>a,.home-water-focus>a,.home-water-story__footer>a,.home-explore-groups a){transition:border-color 160ms ease,background-color 160ms ease,color 160ms ease,transform 160ms ease}
+.site-shell--home-editorial :is(.home-inline-links a,.home-observation-story__intro>a,.home-water-focus>a,.home-water-story__footer>a,.home-explore-groups a):focus-visible{outline:3px solid rgba(24,189,205,.34);outline-offset:4px}
+.site-shell--home-editorial .site-footer-v2{margin-top:0;padding-top:clamp(12px,1.8vw,26px);background:linear-gradient(180deg,rgba(255,255,255,.56),rgba(244,248,247,.94) 52%,#f1f5f4)}
+@media(max-width:900px){.site-shell--home-editorial{--home-flow-copy:640px}.site-shell--home-editorial .home-observation-story{margin-top:24px;margin-bottom:44px}.site-shell--home-editorial .home-story--water,.site-shell--home-editorial .home-explore-story{padding-top:76px;padding-bottom:76px}}
+@media(max-width:620px){.site-shell--home-editorial .home-story--forecast{padding-bottom:56px}.site-shell--home-editorial .home-map-story{padding-top:66px;padding-bottom:58px}.site-shell--home-editorial .home-observation-story{margin:18px 0 34px}.site-shell--home-editorial .home-story--water,.site-shell--home-editorial .home-explore-story{padding-top:68px;padding-bottom:68px}.site-shell--home-editorial .site-footer-v2{padding-top:8px}}

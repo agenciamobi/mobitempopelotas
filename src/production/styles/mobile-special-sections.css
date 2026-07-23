@@ -1,0 +1,202 @@
+@media (max-width: 900px) {
+  .camera-overview,
+  .camera-explorer,
+  .camera-explorer-heading,
+  .camera-stage,
+  .camera-frame,
+  .camera-details,
+  .camera-list,
+  .camera-guidance-grid,
+  .lagoon-dashboard-layout,
+  .lagoon-dashboard-main,
+  .lagoon-dashboard-aside,
+  .lagoon-side-metrics,
+  .radar-panel,
+  .radar-map-shell,
+  .map-panel,
+  .map-panel-heading,
+  .map-canvas,
+  .guaiba-mini-chart,
+  .laranjal-mini-chart {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .camera-explorer-heading,
+  .camera-stage,
+  .lagoon-dashboard-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .camera-explorer-heading > *,
+  .camera-stage > *,
+  .camera-list button > *,
+  .camera-frame-label > *,
+  .lagoon-dashboard-layout > *,
+  .lagoon-side-metrics article > *,
+  .map-panel-heading > *,
+  .guaiba-mini-chart > * {
+    min-width: 0;
+  }
+
+  .camera-frame,
+  .camera-frame iframe,
+  .lagoon-dashboard-frame,
+  .lagoon-dashboard-frame iframe,
+  .map-canvas,
+  .maplibregl-map,
+  .maplibregl-canvas-container,
+  .maplibregl-canvas {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .camera-selector,
+  .camera-list,
+  .camera-guidance-grid,
+  .camera-overview,
+  .lagoon-dashboard-aside {
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .camera-selector {
+    width: auto;
+    max-width: none;
+  }
+
+  .camera-live-summary {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .camera-frame-label {
+    max-width: calc(100% - 20px);
+  }
+
+  .camera-frame-label span,
+  .camera-frame-label small,
+  .camera-details dd,
+  .camera-details p,
+  .lagoon-station-card strong,
+  .lagoon-station-card small,
+  .lagoon-reading-card p,
+  .lagoon-original-link strong,
+  .lagoon-original-link small {
+    overflow-wrap: anywhere;
+  }
+
+  .lagoon-dashboard-main .lagoon-dashboard-frame {
+    height: clamp(560px, 82dvh, 720px);
+    min-height: 0;
+  }
+
+  .guaiba-mini-chart {
+    overflow: hidden;
+  }
+
+  .guaiba-mini-chart svg,
+  .laranjal-mini-chart svg {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .guaiba-chart-range,
+  .guaiba-chart-labels {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .guaiba-chart-range span,
+  .guaiba-chart-range strong,
+  .guaiba-chart-labels span {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .camera-overview,
+  .camera-selector,
+  .camera-list,
+  .camera-guidance-grid,
+  .lagoon-dashboard-aside {
+    scroll-padding-inline: 2px;
+  }
+
+  .camera-explorer {
+    margin-inline: 0;
+    padding-inline: 14px;
+  }
+
+  .camera-selector {
+    margin-inline: -14px;
+    padding-inline: 14px;
+  }
+
+  .camera-frame {
+    aspect-ratio: 4 / 5;
+    min-height: 0;
+  }
+
+  .camera-frame-label {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .camera-frame-label small {
+    max-width: 100%;
+    white-space: normal;
+  }
+
+  .lagoon-dashboard-main .lagoon-dashboard-frame {
+    height: clamp(560px, 78dvh, 660px);
+  }
+
+  .lagoon-dashboard-aside {
+    width: 100%;
+  }
+
+  .lagoon-station-card,
+  .lagoon-side-metrics,
+  .lagoon-reading-card,
+  .lagoon-original-link {
+    min-width: min(84vw, 286px);
+  }
+
+  .guaiba-chart-range {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+  }
+
+  .guaiba-chart-range span:last-child {
+    text-align: right;
+  }
+}
+
+@media (max-width: 420px) {
+  .camera-frame {
+    aspect-ratio: 1 / 1.28;
+  }
+
+  .camera-launch,
+  .camera-placeholder {
+    padding-inline: 18px;
+  }
+
+  .lagoon-dashboard-main .lagoon-dashboard-frame {
+    height: 620px;
+  }
+
+  .guaiba-chart-range {
+    gap: 5px;
+    font-size: 0.52rem;
+  }
+
+  .guaiba-chart-range strong {
+    font-size: 0.55rem;
+  }
+}

@@ -1,0 +1,780 @@
+:root {
+  --theme-border: rgba(7, 30, 47, 0.085);
+  --theme-border-strong: rgba(7, 30, 47, 0.14);
+  --theme-surface: rgba(255, 255, 255, 0.9);
+  --theme-surface-solid: #ffffff;
+  --theme-shadow: 0 20px 56px rgba(7, 30, 47, 0.085);
+  --theme-shadow-strong: 0 28px 78px rgba(7, 30, 47, 0.13);
+  --theme-radius-xl: 36px;
+  --theme-radius-lg: 28px;
+}
+
+body {
+  background:
+    radial-gradient(circle at 82% -8%, rgba(83, 200, 218, 0.18), transparent 32rem),
+    radial-gradient(circle at -10% 42%, rgba(94, 44, 237, 0.055), transparent 30rem),
+    linear-gradient(180deg, #f5f8f7 0%, #edf3f3 48%, #f5f7f5 100%);
+}
+
+.site-shell--home {
+  position: relative;
+  max-width: 1760px;
+}
+
+.site-shell--home > .weather-hero,
+.site-shell--home > .dashboard-layout,
+.site-shell--home > .embrapa-observation-home,
+.site-shell--home > .hydrology-home,
+.site-shell--home > .home-weather-navigation,
+.site-shell--home > .site-footer {
+  width: 100%;
+}
+
+/* Header e hero formam uma única composição. */
+@media (min-width: 901px) {
+  .site-shell--home > .site-header--hero {
+    top: 18px;
+    right: 18px;
+    left: 18px;
+    min-height: 92px;
+    padding: 0 clamp(24px, 2.2vw, 38px);
+  }
+
+  .site-shell--home > .site-header--hero::before {
+    position: absolute;
+    z-index: -1;
+    inset: -2px -2px 0;
+    border-radius: 40px 40px 0 0;
+    background: linear-gradient(
+      180deg,
+      rgba(2, 15, 25, 0.3) 0%,
+      rgba(2, 15, 25, 0.08) 64%,
+      transparent 100%
+    );
+    content: "";
+    pointer-events: none;
+  }
+
+  .site-header--hero .brand-logo {
+    width: clamp(164px, 12vw, 198px);
+    max-height: 32px;
+  }
+
+  .site-header--hero .main-nav {
+    gap: clamp(14px, 1.5vw, 26px);
+    margin-left: clamp(16px, 2.5vw, 48px);
+  }
+
+  .site-header--hero .main-nav a {
+    padding-block: 15px;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.8rem;
+    font-weight: 780;
+  }
+
+  .site-header--hero .header-action {
+    min-height: 52px;
+    padding-inline: 21px;
+    border-radius: 14px;
+    font-size: 0.78rem;
+  }
+
+  .site-shell--home > .weather-hero {
+    min-height: min(820px, calc(100svh - 36px));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 42px;
+    box-shadow: 0 34px 90px rgba(7, 30, 47, 0.2);
+  }
+
+  .site-shell--home .weather-hero-content {
+    padding-top: 142px;
+    padding-right: clamp(54px, 5.6vw, 98px);
+    padding-bottom: 118px;
+    padding-left: clamp(76px, 9.5vw, 168px);
+  }
+
+  .site-shell--home .weather-hero-copy {
+    max-width: 690px;
+  }
+
+  .site-shell--home .weather-hero h1 {
+    max-width: 690px;
+    font-size: clamp(3.45rem, 4.2vw, 5.05rem);
+    line-height: 0.965;
+  }
+
+  .site-shell--home .weather-hero-description {
+    max-width: 610px;
+    font-size: clamp(0.98rem, 1.04vw, 1.08rem);
+  }
+
+  .site-shell--home .weather-hero-now {
+    width: min(100%, 510px);
+    border-color: rgba(255, 255, 255, 0.17);
+    background:
+      linear-gradient(150deg, rgba(6, 24, 39, 0.78), rgba(9, 47, 65, 0.46)),
+      rgba(4, 20, 33, 0.18);
+    box-shadow: 0 30px 76px rgba(2, 13, 23, 0.3);
+  }
+
+  .site-shell--home .weather-hero-metric {
+    border-color: rgba(255, 255, 255, 0.11);
+    background: rgba(255, 255, 255, 0.075);
+  }
+}
+
+.weather-hero-primary,
+.weather-hero-secondary,
+.embrapa-primary-action,
+.embrapa-secondary-action,
+.hydrology-primary-action,
+.hydrology-secondary-action {
+  letter-spacing: -0.01em;
+}
+
+.weather-hero-primary,
+.embrapa-primary-action,
+.hydrology-primary-action {
+  box-shadow: 0 14px 32px rgba(7, 30, 47, 0.15);
+}
+
+/* Segunda dobra: mapa e previsão com a mesma linguagem visual. */
+.dashboard-layout--after-hero {
+  grid-template-columns: minmax(390px, 0.43fr) minmax(0, 0.57fr);
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.dashboard-layout--after-hero .map-panel,
+.dashboard-layout--after-hero .hourly-section,
+.dashboard-layout--after-hero .weekly-section,
+.dashboard-layout--after-hero .trend-chart,
+.dashboard-layout--after-hero .alert-card {
+  border: 1px solid var(--theme-border);
+  box-shadow: var(--theme-shadow);
+}
+
+.dashboard-layout--after-hero .map-panel,
+.dashboard-layout--after-hero .hourly-section,
+.dashboard-layout--after-hero .weekly-section,
+.dashboard-layout--after-hero .trend-chart {
+  border-radius: var(--theme-radius-xl);
+}
+
+.dashboard-layout--after-hero .map-panel {
+  min-height: calc(100vh - 124px);
+  background: #dfeae7;
+}
+
+.dashboard-layout--after-hero .map-panel-heading {
+  padding: 30px 30px 46px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.98) 0%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.dashboard-layout--after-hero .map-panel-heading h2,
+.dashboard-layout--after-hero .section-heading h2,
+.dashboard-layout--after-hero .trend-chart-heading h2 {
+  font-size: clamp(1.7rem, 2.2vw, 2.35rem);
+  letter-spacing: -0.055em;
+}
+
+.dashboard-layout--after-hero .map-control {
+  width: 46px;
+  height: 46px;
+  border-color: var(--theme-border);
+  border-radius: 15px;
+  box-shadow: 0 10px 24px rgba(7, 30, 47, 0.08);
+}
+
+.dashboard-layout--after-hero .map-layer-switcher {
+  top: 118px;
+  left: 28px;
+  border-color: rgba(255, 255, 255, 0.84);
+  border-radius: 17px;
+  box-shadow: 0 12px 30px rgba(7, 30, 47, 0.12);
+}
+
+.dashboard-layout--after-hero .map-layer-switcher button {
+  min-height: 39px;
+  padding-inline: 13px;
+}
+
+.dashboard-layout--after-hero .weather-content {
+  gap: 16px;
+}
+
+.dashboard-layout--after-hero .hourly-section,
+.dashboard-layout--after-hero .weekly-section,
+.dashboard-layout--after-hero .trend-chart {
+  padding: clamp(25px, 2.7vw, 36px);
+  background: var(--theme-surface);
+  backdrop-filter: blur(18px);
+}
+
+.dashboard-layout--after-hero .section-heading {
+  margin-bottom: 22px;
+}
+
+.dashboard-layout--after-hero .sun-times > span {
+  min-width: 108px;
+  padding: 11px 13px;
+  border: 1px solid rgba(7, 30, 47, 0.045);
+  background: rgba(232, 241, 239, 0.86);
+}
+
+.dashboard-layout--after-hero .hourly-list {
+  gap: 8px;
+}
+
+.dashboard-layout--after-hero .hourly-list article {
+  min-width: 104px;
+  padding: 17px 10px;
+  border-color: rgba(7, 30, 47, 0.075);
+  border-radius: 20px;
+  background: rgba(250, 252, 251, 0.82);
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.dashboard-layout--after-hero .hourly-list article.is-current {
+  background:
+    radial-gradient(circle at 78% 20%, rgba(255, 201, 75, 0.18), transparent 7rem),
+    linear-gradient(145deg, #071e2f, #103d55);
+  box-shadow: 0 14px 30px rgba(7, 30, 47, 0.18);
+}
+
+.dashboard-layout--after-hero .trend-chart-canvas {
+  border-color: rgba(7, 30, 47, 0.07);
+  background:
+    radial-gradient(circle at 72% 12%, var(--chart-soft), transparent 18rem),
+    linear-gradient(180deg, rgba(251, 253, 252, 0.98), rgba(243, 248, 247, 0.96));
+}
+
+.dashboard-layout--after-hero .trend-chart-tabs {
+  border-color: rgba(7, 30, 47, 0.07);
+  background: rgba(232, 241, 239, 0.8);
+}
+
+.dashboard-layout--after-hero .alert-card {
+  overflow: hidden;
+  padding: 24px 26px;
+  border-radius: 26px;
+}
+
+.dashboard-layout--after-hero .alert-card--normal {
+  background: linear-gradient(120deg, #e8f7ef 0%, #f8fcfa 100%);
+}
+
+.dashboard-layout--after-hero .alert-card--attention {
+  background: linear-gradient(120deg, #fff0d9 0%, #fffaf4 100%);
+}
+
+.dashboard-layout--after-hero .alert-card--warning {
+  background: linear-gradient(120deg, #ffe4df 0%, #fff7f5 100%);
+}
+
+.dashboard-layout--after-hero .alert-card > a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 16px;
+  background: rgba(255, 255, 255, 0.56);
+}
+
+.dashboard-layout--after-hero .daily-list {
+  gap: 6px;
+}
+
+.dashboard-layout--after-hero .daily-list article {
+  min-height: 74px;
+  border-color: rgba(7, 30, 47, 0.075);
+  border-radius: 17px;
+  background: rgba(255, 255, 255, 0.64);
+}
+
+.dashboard-layout--after-hero .daily-list article.is-today {
+  background: linear-gradient(110deg, rgba(83, 200, 218, 0.12), rgba(232, 241, 239, 0.9));
+}
+
+/* Seção Embrapa: observação local com caráter técnico e editorial. */
+.embrapa-observation-home {
+  position: relative;
+  isolation: isolate;
+  margin-top: 18px;
+  overflow: hidden;
+  padding: clamp(28px, 4vw, 48px);
+  border-color: var(--theme-border);
+  border-radius: 40px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(242, 112, 53, 0.15), transparent 27rem),
+    radial-gradient(circle at 4% 100%, rgba(24, 189, 205, 0.1), transparent 25rem),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.97), rgba(244, 248, 246, 0.94));
+  box-shadow: var(--theme-shadow);
+}
+
+.embrapa-observation-home::before {
+  position: absolute;
+  z-index: -1;
+  top: -160px;
+  right: -120px;
+  width: 430px;
+  height: 430px;
+  border: 1px solid rgba(242, 112, 53, 0.09);
+  border-radius: 50%;
+  box-shadow: 0 0 0 70px rgba(242, 112, 53, 0.025), 0 0 0 140px rgba(24, 189, 205, 0.018);
+  content: "";
+}
+
+.embrapa-observation-intro {
+  gap: 34px;
+}
+
+.embrapa-stage-label,
+.hydrology-stage-label {
+  min-height: 32px;
+  align-items: center;
+  padding: 7px 12px;
+  border: 1px solid rgba(7, 30, 47, 0.05);
+  letter-spacing: 0.075em;
+}
+
+.embrapa-observation-intro h2,
+.hydrology-home-intro h2 {
+  max-width: 900px;
+  font-size: clamp(2.25rem, 4.25vw, 4.15rem);
+  letter-spacing: -0.068em;
+}
+
+.embrapa-observation-intro p {
+  max-width: 740px;
+  font-size: clamp(0.92rem, 1.05vw, 1rem);
+}
+
+.embrapa-primary-action,
+.embrapa-secondary-action,
+.hydrology-primary-action,
+.hydrology-secondary-action {
+  min-height: 50px;
+  padding-inline: 17px;
+  border-radius: 14px;
+}
+
+.embrapa-observation-grid {
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.embrapa-current-card,
+.embrapa-observation-metrics article,
+.embrapa-station-context {
+  border-color: rgba(7, 30, 47, 0.08);
+  box-shadow: 0 16px 38px rgba(7, 30, 47, 0.05);
+}
+
+.embrapa-current-card {
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 92% 12%, rgba(242, 112, 53, 0.14), transparent 16rem),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.99), rgba(247, 247, 242, 0.94));
+}
+
+.embrapa-temperature-reading > span {
+  color: #0b2f45;
+}
+
+.embrapa-primary-metrics > div {
+  border: 1px solid rgba(7, 30, 47, 0.045);
+  background: rgba(7, 30, 47, 0.035);
+}
+
+.embrapa-observation-metrics article {
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.embrapa-station-context {
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(83, 200, 218, 0.13), transparent 15rem),
+    rgba(247, 251, 250, 0.9);
+}
+
+.embrapa-station-map {
+  border-radius: 22px;
+}
+
+/* Águas: bloco escuro para criar contraste e fechar a narrativa da home. */
+.hydrology-home {
+  margin: 18px 0 0;
+  padding: clamp(30px, 4vw, 52px);
+  border-color: rgba(255, 255, 255, 0.1);
+  border-radius: 42px;
+  background:
+    radial-gradient(circle at 88% 0%, rgba(83, 200, 218, 0.22), transparent 28rem),
+    radial-gradient(circle at 0% 100%, rgba(94, 44, 237, 0.15), transparent 30rem),
+    linear-gradient(145deg, #061b2b 0%, #092f46 58%, #0d5266 100%);
+  box-shadow: 0 30px 80px rgba(7, 30, 47, 0.19);
+  color: white;
+}
+
+.hydrology-home::before {
+  position: absolute;
+  z-index: -1;
+  right: -220px;
+  bottom: -280px;
+  width: 700px;
+  height: 700px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  box-shadow: 0 0 0 80px rgba(255, 255, 255, 0.02), 0 0 0 160px rgba(255, 255, 255, 0.012);
+  content: "";
+}
+
+.hydrology-home .hydrology-stage-label {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.hydrology-home .eyebrow {
+  color: #82e0eb;
+}
+
+.hydrology-home-intro p {
+  max-width: 820px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.hydrology-home .hydrology-primary-action {
+  background: #f6c94f;
+  color: #071e2f;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+}
+
+.hydrology-home .hydrology-secondary-action {
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.07);
+  color: white;
+}
+
+.hydrology-flow {
+  gap: 12px;
+  margin-block: 36px 24px;
+}
+
+.hydrology-flow li {
+  min-height: 150px;
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.065);
+  backdrop-filter: blur(12px);
+}
+
+.hydrology-flow-number {
+  background: #77d9e6;
+  color: #071e2f;
+}
+
+.hydrology-flow strong {
+  color: white;
+}
+
+.hydrology-flow p {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.hydrology-flow-arrow {
+  border-color: rgba(255, 255, 255, 0.13);
+  background: #092a3e;
+  color: #85dfeb;
+}
+
+.hydrology-home-grid {
+  gap: 16px;
+}
+
+.hydrology-home .hydrology-sgb-link {
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 14px 34px rgba(2, 14, 24, 0.22);
+}
+
+.hydrology-community-note {
+  border-color: rgba(255, 213, 149, 0.22);
+  background: rgba(255, 243, 222, 0.09);
+  backdrop-filter: blur(12px);
+}
+
+.hydrology-community-note strong {
+  color: #ffd28c;
+}
+
+.hydrology-community-note p {
+  color: rgba(255, 255, 255, 0.68);
+}
+
+/* Navegação editorial e fechamento. */
+.home-weather-navigation {
+  margin-top: 18px;
+}
+
+.home-weather-navigation .related-weather {
+  overflow: hidden;
+  padding: clamp(28px, 4vw, 44px);
+  border: 1px solid var(--theme-border);
+  border-radius: 38px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(83, 200, 218, 0.13), transparent 22rem),
+    rgba(255, 255, 255, 0.84);
+  box-shadow: var(--theme-shadow);
+}
+
+.home-weather-navigation .related-weather-grid {
+  gap: 10px;
+}
+
+.home-weather-navigation .related-weather-grid a {
+  border-color: rgba(7, 30, 47, 0.075);
+  background: rgba(255, 255, 255, 0.72);
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.home-weather-navigation .related-weather-grid a i {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-soft);
+  color: var(--ink);
+}
+
+.site-shell--home > .site-footer {
+  margin-top: 18px;
+  padding: 34px 30px 24px;
+  border: 1px solid var(--theme-border);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.64);
+  box-shadow: 0 14px 38px rgba(7, 30, 47, 0.05);
+  backdrop-filter: blur(16px);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dashboard-layout--after-hero .hourly-list article:hover,
+  .home-weather-navigation .related-weather-grid a:hover {
+    border-color: rgba(23, 152, 177, 0.24);
+    box-shadow: 0 14px 28px rgba(7, 30, 47, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .embrapa-current-card:hover,
+  .embrapa-observation-metrics article:hover,
+  .embrapa-station-context:hover {
+    box-shadow: 0 22px 48px rgba(7, 30, 47, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .embrapa-current-card,
+  .embrapa-observation-metrics article,
+  .embrapa-station-context {
+    transition: transform 180ms ease, box-shadow 180ms ease;
+  }
+}
+
+@media (max-width: 1280px) and (min-width: 901px) {
+  .dashboard-layout--after-hero {
+    grid-template-columns: minmax(340px, 0.39fr) minmax(0, 0.61fr);
+  }
+
+  .site-shell--home .weather-hero-content {
+    padding-left: clamp(50px, 6vw, 82px);
+  }
+
+  .hydrology-home-intro,
+  .embrapa-observation-intro {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, auto);
+  }
+}
+
+@media (max-width: 900px) {
+  body {
+    background:
+      radial-gradient(circle at 90% -4%, rgba(83, 200, 218, 0.16), transparent 20rem),
+      linear-gradient(180deg, #eef4f4 0%, #f4f7f5 100%);
+  }
+
+  .site-shell--home > .weather-hero {
+    box-shadow: 0 22px 54px rgba(7, 30, 47, 0.18);
+  }
+
+  .dashboard-layout--after-hero {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .dashboard-layout--after-hero .map-panel,
+  .dashboard-layout--after-hero .hourly-section,
+  .dashboard-layout--after-hero .weekly-section,
+  .dashboard-layout--after-hero .trend-chart,
+  .dashboard-layout--after-hero .alert-card {
+    border-radius: 24px;
+    box-shadow: 0 12px 34px rgba(7, 30, 47, 0.075);
+  }
+
+  .dashboard-layout--after-hero .map-panel {
+    position: relative;
+    top: auto;
+    min-height: 420px;
+  }
+
+  .dashboard-layout--after-hero .map-panel-heading {
+    padding: 22px 18px 42px;
+  }
+
+  .dashboard-layout--after-hero .map-layer-switcher {
+    top: 98px;
+    left: 16px;
+  }
+
+  .dashboard-layout--after-hero .hourly-section,
+  .dashboard-layout--after-hero .weekly-section,
+  .dashboard-layout--after-hero .trend-chart {
+    padding: 22px 16px;
+  }
+
+  .dashboard-layout--after-hero .alert-card {
+    padding: 16px 14px;
+  }
+
+  .embrapa-observation-home,
+  .hydrology-home,
+  .home-weather-navigation .related-weather {
+    border-radius: 28px;
+  }
+
+  .embrapa-observation-home,
+  .hydrology-home {
+    margin-top: 10px;
+  }
+
+  .embrapa-observation-home {
+    padding: 22px 14px 16px;
+  }
+
+  .embrapa-observation-home::before,
+  .hydrology-home::before {
+    display: none;
+  }
+
+  .embrapa-observation-intro h2,
+  .hydrology-home-intro h2 {
+    font-size: clamp(2.05rem, 9.5vw, 3.25rem);
+  }
+
+  .hydrology-home {
+    padding: 22px 14px 18px;
+  }
+
+  .hydrology-home-intro p {
+    font-size: 0.91rem;
+    line-height: 1.64;
+  }
+
+  .hydrology-flow {
+    margin-block: 26px 18px;
+  }
+
+  .hydrology-flow li {
+    min-height: 158px;
+  }
+
+  .home-weather-navigation {
+    margin-top: 10px;
+  }
+
+  .home-weather-navigation .related-weather {
+    padding: 22px 14px;
+  }
+
+  .site-shell--home > .site-footer {
+    margin-top: 10px;
+    border-radius: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-layout--after-hero .sun-times {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .dashboard-layout--after-hero .sun-times > span {
+    min-width: 0;
+  }
+
+  .dashboard-layout--after-hero .trend-chart-heading {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-layout--after-hero .trend-chart-value {
+    justify-items: start;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .dashboard-layout--after-hero .trend-chart-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    border-radius: 16px;
+  }
+
+  .dashboard-layout--after-hero .trend-chart-tabs button {
+    min-width: 0;
+    padding-inline: 8px;
+  }
+
+  .hydrology-community-note {
+    grid-template-columns: 1fr;
+  }
+
+  .site-shell--home > .site-footer {
+    padding: 22px 16px;
+  }
+}
+
+@media (max-width: 420px) {
+  .dashboard-layout--after-hero .map-panel,
+  .dashboard-layout--after-hero .hourly-section,
+  .dashboard-layout--after-hero .weekly-section,
+  .dashboard-layout--after-hero .trend-chart,
+  .dashboard-layout--after-hero .alert-card {
+    border-radius: 22px;
+  }
+
+  .embrapa-observation-home,
+  .hydrology-home,
+  .home-weather-navigation .related-weather {
+    border-radius: 24px;
+  }
+
+  .embrapa-stage-label,
+  .hydrology-stage-label {
+    font-size: 0.61rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-layout--after-hero .hourly-list article,
+  .home-weather-navigation .related-weather-grid a,
+  .embrapa-current-card,
+  .embrapa-observation-metrics article,
+  .embrapa-station-context {
+    transition: none;
+  }
+}

@@ -1,0 +1,37 @@
+@media (max-width: 900px) {
+  .current-weather {
+    order: 1;
+  }
+
+  .hourly-section {
+    order: 2;
+  }
+
+  .trend-chart {
+    order: 3;
+  }
+
+  .alert-card {
+    order: 4;
+  }
+
+  .weekly-section {
+    order: 5;
+  }
+
+  .map-panel {
+    order: 6;
+  }
+}
+
+@media (max-width: 640px) {
+  .alert-card > a {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .topic-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

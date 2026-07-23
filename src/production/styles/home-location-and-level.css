@@ -1,0 +1,169 @@
+.embrapa-station-context {
+  min-height: 430px;
+}
+
+.embrapa-station-map {
+  position: relative;
+  min-height: 150px;
+  margin-top: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(7, 30, 47, 0.09);
+  border-radius: 20px;
+  background: #dfeae8;
+}
+
+.embrapa-station-map iframe {
+  display: block;
+  width: 100%;
+  height: 150px;
+  border: 0;
+  filter: saturate(0.72) contrast(0.96);
+}
+
+.embrapa-station-map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 48%, rgba(5, 29, 44, 0.68) 100%);
+}
+
+.embrapa-station-map > a {
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  bottom: 10px;
+  left: 10px;
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 8px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 15px;
+  background: rgba(7, 30, 47, 0.88);
+  color: white;
+  box-shadow: 0 10px 24px rgba(7, 30, 47, 0.24);
+  backdrop-filter: blur(12px);
+}
+
+.embrapa-station-map > a > svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: #8fe4ed;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.embrapa-station-map > a > span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.embrapa-station-map > a strong {
+  font-size: 0.72rem;
+}
+
+.embrapa-station-map > a small {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.6rem;
+}
+
+.embrapa-station-map > a b {
+  font-size: 0.85rem;
+}
+
+.embrapa-station-context dl {
+  margin-top: 14px;
+}
+
+.hydrology-home-grid > .pelotas-hydrology-widget--home {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.hydrology-home-grid > .pelotas-hydrology-widget--home .laranjal-level-card {
+  height: 100%;
+}
+
+.hydrology-home-grid > .pelotas-hydrology-widget--home .guaiba-level-card-header h3 {
+  margin: 7px 0 4px;
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+}
+
+.hydrology-home-grid > .pelotas-hydrology-widget--home .guaiba-level-value strong {
+  font-size: clamp(3.8rem, 6.5vw, 5.8rem);
+}
+
+@media (max-width: 1280px) {
+  .embrapa-observation-grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(270px, 0.72fr);
+  }
+
+  .embrapa-station-context {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 0.75fr);
+    column-gap: 26px;
+    min-height: 0;
+  }
+
+  .embrapa-station-context > .eyebrow,
+  .embrapa-station-context > h3,
+  .embrapa-station-context > p,
+  .embrapa-station-context > dl,
+  .embrapa-station-context > .embrapa-source-note {
+    grid-column: 1;
+  }
+
+  .embrapa-station-map {
+    grid-column: 2;
+    grid-row: 1 / 6;
+    min-height: 100%;
+    margin-top: 0;
+  }
+
+  .embrapa-station-map iframe {
+    height: 100%;
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 1080px) {
+  .hydrology-home-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hydrology-context-column {
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 0.45fr);
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 760px) {
+  .embrapa-station-context {
+    display: flex;
+    min-height: 0;
+  }
+
+  .embrapa-station-map {
+    width: 100%;
+    min-height: 170px;
+    margin-top: 15px;
+  }
+
+  .embrapa-station-map iframe {
+    min-height: 170px;
+  }
+
+  .hydrology-context-column {
+    grid-template-columns: 1fr;
+  }
+}
