@@ -12,6 +12,7 @@ on:
       - scripts/visual-parity-audit.mjs
       - scripts/auth-visual-smoke.mjs
       - scripts/accessibility-editorial-smoke.mjs
+      - scripts/accessibility-failure-screenshots.mjs
       - vite.config.ts
       - tsconfig*.json
       - eslint.config.js
@@ -107,7 +108,17 @@ jobs:
       - name: Auditar acessibilidade editorial
         env:
           CANDIDATE_URL: http://127.0.0.1:4173
-        run: node scripts/accessibility-editorial-smoke.mjs
+        run: |
+          set +e
+          node scripts/accessibility-editorial-smoke.mjs
+          audit_status=$?
+          set -e
+
+          if [ "$audit_status" -ne 0 ]; then
+            node scripts/accessibility-failure-screenshots.mjs || true
+          fi
+
+          exit "$audit_status"
 
       - name: Exibir log da aplicação em caso de falha
         if: failure()
