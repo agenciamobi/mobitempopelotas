@@ -10,6 +10,7 @@ on:
       - src/**
       - public/**
       - scripts/visual-parity-audit.mjs
+      - scripts/auth-visual-smoke.mjs
       - vite.config.ts
       - tsconfig*.json
       - eslint.config.js
@@ -94,6 +95,11 @@ jobs:
           WAIT_FOR_CANDIDATE_DEPLOYMENT: "false"
           AUDIT_REVISION: ${{ github.sha }}
         run: node scripts/visual-parity-audit.mjs
+
+      - name: Auditar entrada e conta
+        env:
+          CANDIDATE_URL: http://127.0.0.1:4173
+        run: node scripts/auth-visual-smoke.mjs
 
       - name: Exibir log da aplicação em caso de falha
         if: failure()
