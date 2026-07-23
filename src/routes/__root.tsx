@@ -25,7 +25,7 @@ import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
   return (
-    <SiteLayout>
+    <SiteLayout forceShell>
       <section className="status-page" aria-labelledby="not-found-title">
         <p className="status-kicker">Erro 404</p>
         <h1 id="not-found-title">Página não encontrada</h1>
@@ -47,7 +47,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   }, [error]);
 
   return (
-    <SiteLayout>
+    <SiteLayout forceShell>
       <section className="status-page" aria-labelledby="error-title">
         <p className="status-kicker">Erro inesperado</p>
         <h1 id="error-title">Não foi possível carregar esta página</h1>
