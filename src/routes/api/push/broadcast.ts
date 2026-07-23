@@ -1,7 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-import { hasBearerSecret, pushJsonResponse, safeInternalPath } from "@/lib/push/push-http.server";
+import {
+  hasBearerSecret,
+  pushJsonResponse,
+  readLimitedJson,
+  safeInternalPath,
+} from "@/lib/push/push-http.server";
 import { PUSH_TOPICS } from "@/lib/push/push.types";
 import { broadcastPushNotification } from "@/lib/push/web-push.server";
 
@@ -35,7 +40,12 @@ async function broadcast(request: Request) {
     return pushJsonResponse({ success: false, error: "Não autorizado." }, 401);
   }
 
-  const parsed = payloadSchema.safeParse(await request.json().catch(() => null));
+  const body = await readLimitedJson(request);
+  if (!body.ok) {
+    return pushJsonResponse({ success: false, error: body.error }, body.status);
+  }
+
+  const parsed = payloadSchema.safeParse(body.value);
   if (!parsed.success) {
     return pushJsonResponse(
       { success: false, error: "Informe título, mensagem e parâmetros válidos." },
