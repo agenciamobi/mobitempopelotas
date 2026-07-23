@@ -1,6 +1,7 @@
+import { createHash } from "node:crypto";
+
 import { createFileRoute } from "@tanstack/react-router";
 
-import { fetchLaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
 import { hasBearerSecret, pushJsonResponse } from "@/lib/push/push-http.server";
 import {
   claimPushDispatch,
@@ -8,6 +9,7 @@ import {
   releasePushDispatch,
 } from "@/lib/push/push-storage.server";
 import { broadcastPushNotification, getPushConfigurationStatus } from "@/lib/push/web-push.server";
+import type { InmetAlert } from "@/lib/weather/official-sources.types";
 import { fetchWeatherIntelligence } from "@/lib/weather/weather-intelligence.server";
 
 const TIMEZONE = "America/Sao_Paulo";
@@ -28,10 +30,27 @@ function formatNumber(value: number, digits = 0) {
   }).format(value);
 }
 
-function buildWeatherSummary(
-  weather: Awaited<ReturnType<typeof fetchWeatherIntelligence>>,
-  laranjal: Awaited<ReturnType<typeof fetchLaranjalLevelData>>,
-) {
+function normalizedSentence(value: string) {
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+  return /[.!?]$/.test(normalized) ? normalized : `${normalized}.`;
+}
+
+function formatAlertExpiry(value: string | null) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: TIMEZONE,
+    day: "2-digit",
+    month: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function buildWeatherSummary(weather: Awaited<ReturnType<typeof fetchWeatherIntelligence>>) {
   const parts: string[] = [];
   const current = weather.weather.current;
   const today = weather.weather.daily[0];
@@ -51,11 +70,34 @@ function buildWeatherSummary(
     );
   }
 
-  if (laranjal.currentLevel !== null) {
-    parts.push(`Nível observado no Laranjal: ${formatNumber(laranjal.currentLevel, 2)} m`);
+  return parts.length > 0 ? `${parts.join(". ")}.`.slice(0, 240) : null;
+}
+
+function buildOfficialAlertBody(alerts: InmetAlert[]) {
+  const primary = alerts[0];
+  if (!primary) return "Consulte a vigência e as orientações do aviso oficial no portal.";
+
+  const event = primary.event.trim() || primary.headline.trim() || "Aviso meteorológico";
+  const expiresAt = formatAlertExpiry(primary.expiresAt);
+  const parts = [
+    normalizedSentence(`Aviso oficial do INMET — ${primary.severityLabel}: ${event}`),
+  ];
+
+  if (expiresAt) parts.push(`Vigente até ${expiresAt}.`);
+  const instruction = normalizedSentence(primary.instruction);
+  if (instruction) parts.push(instruction);
+  if (alerts.length > 1) {
+    parts.push(`Há mais ${alerts.length - 1} aviso${alerts.length === 2 ? "" : "s"} para Pelotas.`);
   }
 
-  return parts.length > 0 ? `${parts.join(". ")}.`.slice(0, 240) : null;
+  return parts.join(" ").slice(0, 240);
+}
+
+function alertFingerprint(alerts: InmetAlert[]) {
+  return createHash("sha256")
+    .update(alerts.map((alert) => alert.id).sort().join("|"))
+    .digest("hex")
+    .slice(0, 16);
 }
 
 async function sendDailySummary(request: Request) {
@@ -89,21 +131,24 @@ async function sendDailySummary(request: Request) {
   }
 
   const date = localDateKey();
-  const fingerprint = `resumo-diario-${date}`;
-  let claimed = false;
+  let fingerprint = `resumo-diario-${date}`;
+  let leaseToken: string | null = null;
   let deliveryCompleted = false;
 
   try {
-    const [weather, laranjal] = await Promise.all([
-      fetchWeatherIntelligence(),
-      fetchLaranjalLevelData(),
-    ]);
-    const activeAlerts = weather.weather.alerts.filter((alert) => alert.period === "active");
-    const title =
-      activeAlerts.length > 0 ? "INMET: aviso oficial para Pelotas" : "Previsão de hoje em Pelotas";
-    const summary = buildWeatherSummary(weather, laranjal);
+    const weather = await fetchWeatherIntelligence();
+    const pelotasAlerts = weather.weather.alerts.filter(
+      (alert) => alert.period === "active" && alert.relevance === "pelotas",
+    );
+    const hasOfficialAlert = pelotasAlerts.length > 0;
+    const primaryAlert = pelotasAlerts[0];
+    const event = primaryAlert?.event.trim() || primaryAlert?.headline.trim() || "aviso oficial";
+    const title = hasOfficialAlert
+      ? `INMET: ${event} em Pelotas`.slice(0, 90)
+      : "Previsão de hoje em Pelotas";
+    const body = hasOfficialAlert ? buildOfficialAlertBody(pelotasAlerts) : buildWeatherSummary(weather);
 
-    if (!summary && activeAlerts.length === 0) {
+    if (!body) {
       return pushJsonResponse({
         success: true,
         skipped: true,
@@ -111,32 +156,30 @@ async function sendDailySummary(request: Request) {
       });
     }
 
-    claimed = await claimPushDispatch(fingerprint, title);
-    if (!claimed) {
+    if (hasOfficialAlert) {
+      fingerprint = `inmet-pelotas-${date}-${alertFingerprint(pelotasAlerts)}`;
+    }
+
+    leaseToken = await claimPushDispatch(fingerprint, title);
+    if (!leaseToken) {
       return pushJsonResponse({ success: true, skipped: true, reason: "already-sent" });
     }
 
-    const alertContext =
-      activeAlerts.length === 1
-        ? "Há 1 aviso oficial ativo. "
-        : activeAlerts.length > 1
-          ? `Há ${activeAlerts.length} avisos oficiais ativos. `
-          : "";
     const result = await broadcastPushNotification({
       title,
-      body: `${alertContext}${summary ?? "Consulte os detalhes no portal."}`.slice(0, 240),
-      url: activeAlerts.length > 0 ? "/alertas" : "/",
-      tag: `previsao-${date}`,
-      urgency: activeAlerts.length > 0 ? "high" : "normal",
-      requireInteraction: activeAlerts.length > 0,
-      renotify: activeAlerts.length > 0,
+      body,
+      url: hasOfficialAlert ? "/alertas" : "/",
+      tag: hasOfficialAlert ? `inmet-pelotas-${date}` : `previsao-${date}`,
+      urgency: hasOfficialAlert ? "high" : "normal",
+      requireInteraction: hasOfficialAlert,
+      renotify: hasOfficialAlert,
       topic: "weather",
     });
     deliveryCompleted = true;
 
     let dispatchRecorded = true;
     try {
-      await recordPushDispatch(fingerprint, title, result);
+      await recordPushDispatch(fingerprint, leaseToken, title, result);
     } catch (error) {
       dispatchRecorded = false;
       console.error("[push/cron] Entrega concluída, mas métricas não foram atualizadas", {
@@ -147,13 +190,14 @@ async function sendDailySummary(request: Request) {
     return pushJsonResponse({
       success: true,
       date,
-      officialAlerts: activeAlerts.length,
+      kind: hasOfficialAlert ? "official-alert" : "weather-summary",
+      officialAlerts: pelotasAlerts.length,
       dispatchRecorded,
       ...result,
     });
   } catch (error) {
-    if (claimed && !deliveryCompleted) {
-      await releasePushDispatch(fingerprint).catch(() => undefined);
+    if (leaseToken && !deliveryCompleted) {
+      await releasePushDispatch(fingerprint, leaseToken).catch(() => undefined);
     }
     console.error("[push/cron] Falha no resumo diário", {
       message: error instanceof Error ? error.message : String(error),
