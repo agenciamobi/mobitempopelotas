@@ -1,0 +1,60 @@
+name: Auditoria visual de paridade
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/visual-parity-audit
+    paths:
+      - scripts/visual-parity-audit.mjs
+      - .github/workflows/visual-parity.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - src/components/**
+      - src/styles.css
+      - scripts/visual-parity-audit.mjs
+      - .github/workflows/visual-parity.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visual-parity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    name: Comparar Vercel e Lovable
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Instalar Playwright para auditoria
+        run: |
+          npm install --no-save --package-lock=false playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Capturar e validar viewports
+        env:
+          PRODUCTION_URL: https://tempopelotas.com.br
+          LOVABLE_URL: https://mobitempopelotas.lovable.app
+        run: node scripts/visual-parity-audit.mjs
+
+      - name: Publicar relatório e capturas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-parity-${{ github.run_number }}
+          path: artifacts/visual-parity
+          if-no-files-found: error
+          retention-days: 14
