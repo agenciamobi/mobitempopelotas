@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { GoogleLoginCard } from "@/components/auth/GoogleLoginCard";
 import { safeNextPath } from "@/lib/auth/paths";
 import { absoluteUrl, SITE_NAME } from "@/lib/site-config";
-import "@/production/production-styles";
 
 function validateSearch(search: Record<string, unknown>) {
   return {

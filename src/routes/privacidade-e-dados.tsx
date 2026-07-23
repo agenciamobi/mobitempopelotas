@@ -5,7 +5,6 @@ import { createEditorialPageJsonLd } from "@/lib/structured-data";
 import { SiteFooter } from "@/production/components/site-footer";
 import { SiteHeader } from "@/production/components/site-header";
 import type { WeatherData } from "@/production/lib/weather-data";
-import "@/production/production-styles";
 
 const PAGE_TITLE = "Privacidade, dados e retenção no Tempo Pelotas";
 const PAGE_DESCRIPTION =

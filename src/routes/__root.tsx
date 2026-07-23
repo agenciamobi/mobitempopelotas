@@ -7,6 +7,7 @@ import {
   createRootRouteWithContext,
   useRouter,
 } from "@tanstack/react-router";
+import mapLibreCss from "maplibre-gl/dist/maplibre-gl.css?url";
 import { useEffect, type ReactNode } from "react";
 
 import { SiteLayout } from "@/components/layout/SiteLayout";
@@ -21,6 +22,7 @@ import {
   absoluteUrl,
   createWebsiteJsonLd,
 } from "@/lib/site-config";
+import productionCss from "@/production/production-styles.css?url";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -97,6 +99,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "stylesheet", href: mapLibreCss },
+      { rel: "stylesheet", href: productionCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", href: "/favicon.ico" },
       { rel: "icon", href: "/brand/tempo-pelotas-icon.svg", type: "image/svg+xml" },
