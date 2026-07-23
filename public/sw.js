@@ -2,7 +2,6 @@ const CACHE_VERSION = "tempo-pelotas-v1";
 const APP_SHELL_CACHE = `${CACHE_VERSION}-app-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const APP_SHELL_URLS = [
-  "/",
   "/offline.html",
   "/manifest.webmanifest",
   "/brand/tempo-pelotas-icon.svg",
@@ -42,19 +41,11 @@ self.addEventListener("message", (event) => {
   }
 });
 
-async function networkFirst(request) {
+async function onlineOnlyNavigation(request) {
   try {
-    const response = await fetch(request);
-
-    if (response.ok) {
-      const cache = await caches.open(RUNTIME_CACHE);
-      await cache.put(request, response.clone());
-    }
-
-    return response;
+    return await fetch(request);
   } catch {
-    const cached = await caches.match(request);
-    return cached || (await caches.match("/offline.html")) || Response.error();
+    return (await caches.match("/offline.html")) || Response.error();
   }
 }
 
@@ -85,7 +76,7 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname.startsWith("/api/")) return;
 
   if (request.mode === "navigate") {
-    event.respondWith(networkFirst(request));
+    event.respondWith(onlineOnlyNavigation(request));
     return;
   }
 
