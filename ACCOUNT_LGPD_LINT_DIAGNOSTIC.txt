@@ -1,0 +1,39 @@
+
+> lint
+> eslint .
+
+
+/home/runner/work/mobitempopelotas/mobitempopelotas/src/components/ui/badge.tsx
+  32:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mobitempopelotas/mobitempopelotas/src/components/ui/button.tsx
+  49:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mobitempopelotas/mobitempopelotas/src/components/ui/form.tsx
+  163:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mobitempopelotas/mobitempopelotas/src/components/ui/navigation-menu.tsx
+  111:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mobitempopelotas/mobitempopelotas/src/components/ui/sidebar.tsx
+  743:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mobitempopelotas/mobitempopelotas/src/components/ui/toggle.tsx
+  42:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/runner/work/mobitempopelotas/mobitempopelotas/src/lib/push/push-http.server.ts
+  21:3  error  Replace `|·{·ok:·true;·value:·unknown·}⏎·` with `{·ok:·true;·value:·unknown·}`  prettier/prettier
+
+/home/runner/work/mobitempopelotas/mobitempopelotas/src/routes/api/account/export.ts
+  37:12  error  Replace `.from("profiles").select("email,display_name,avatar_url,created_at,updated_at").eq("id",·account.user.id)` with `⏎········.from("profiles")⏎········.select("email,display_name,avatar_url,created_at,updated_at")⏎········.eq("id",·account.user.id)⏎········`  prettier/prettier
+  95:17  error  Replace `⏎······"Content-Disposition",⏎······`attachment;·filename="tempo-pelotas-dados-${date}.json"`,⏎····` with `"Content-Disposition",·`attachment;·filename="tempo-pelotas-dados-${date}.json"``                                                                     prettier/prettier
+
+/home/runner/work/mobitempopelotas/mobitempopelotas/src/routes/privacidade-e-dados.tsx
+   97:19  error  Replace `perfil,·preferências·e·histórico·de·consentimentos·permanecem·enquanto·a·conta·estiver·ativa;` with `⏎················perfil,·preferências·e·histórico·de·consentimentos·permanecem·enquanto·a·conta⏎················estiver·ativa;⏎··············`      prettier/prettier
+  100:19  error  Replace `inscrições·anônimas·permanecem·no·aparelho·até·desativação·ou·até·o·provedor·indicar·expiração;` with `⏎················inscrições·anônimas·permanecem·no·aparelho·até·desativação·ou·até·o·provedor·indicar⏎················expiração;⏎··············`  prettier/prettier
+
+✖ 11 problems (5 errors, 6 warnings)
+  5 errors and 0 warnings potentially fixable with the `--fix` option.
+
+
+exit_code=1
