@@ -1,0 +1,56 @@
+name: Diagnóstico de formatação
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - scripts/visual-parity-audit.mjs
+      - src/production/ProductionHome.tsx
+      - .github/workflows/visual-parity.yml
+      - .github/workflows/format-diagnostic.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: format-diagnostic-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format:
+    name: Gerar arquivos formatados
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout da revisão
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Formatar arquivos alterados
+        run: |
+          npx prettier --write \
+            scripts/visual-parity-audit.mjs \
+            src/production/ProductionHome.tsx \
+            .github/workflows/visual-parity.yml
+
+      - name: Publicar arquivos formatados
+        uses: actions/upload-artifact@v4
+        with:
+          name: formatted-pr-files
+          path: |
+            scripts/visual-parity-audit.mjs
+            src/production/ProductionHome.tsx
+            .github/workflows/visual-parity.yml
+          if-no-files-found: error
+          retention-days: 1
