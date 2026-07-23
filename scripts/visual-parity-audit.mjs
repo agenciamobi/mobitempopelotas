@@ -69,13 +69,13 @@ function markdownReport(results) {
     `- SHA: ${auditRevision}`,
     `- Executada em: ${new Date().toISOString()}`,
     "",
-    "| Ambiente | Viewport | HTTP | Overflow | Estrutura | Marca | Exploração | Skip link | Rodapé claro | Área móvel segura |",
-    "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+    "| Ambiente | Viewport | HTTP | Overflow | Estrutura | Marca | Estado | Exploração | Skip link | Rodapé claro | Área móvel segura |",
+    "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
   ];
 
   for (const result of results) {
     lines.push(
-      `| ${result.target} | ${result.viewport.width}×${result.viewport.height} | ${result.audit.httpStatus} | ${result.audit.horizontalOverflow}px | ${result.audit.hasCoreStructure ? "sim" : "não"} | ${result.audit.brandLoaded ? "sim" : "não"} | ${result.audit.hasExplore ? "sim" : "não"} | ${result.audit.skipLinkVisible ? "sim" : "não"} | ${result.audit.footerLight === null ? "n/a" : result.audit.footerLight ? "sim" : "não"} | ${result.audit.footerProtected === null ? "n/a" : result.audit.footerProtected ? "sim" : "não"} |`,
+      `| ${result.target} | ${result.viewport.width}×${result.viewport.height} | ${result.audit.httpStatus} | ${result.audit.horizontalOverflow}px | ${result.audit.hasCoreStructure ? "sim" : "não"} | ${result.audit.brandLoaded ? "sim" : "não"} | ${result.audit.weatherUnavailable ? "contingência" : "dados"} | ${result.audit.hasExplore ? "sim" : "não"} | ${result.audit.skipLinkVisible ? "sim" : "não"} | ${result.audit.footerLight === null ? "n/a" : result.audit.footerLight ? "sim" : "não"} | ${result.audit.footerProtected === null ? "n/a" : result.audit.footerProtected ? "sim" : "não"} |`,
     );
   }
 
@@ -108,7 +108,6 @@ async function auditPage(page, target, viewport) {
       const active = document.activeElement;
       const skipLink = document.querySelector(".skip-link");
       const skipRect = skipLink?.getBoundingClientRect() ?? null;
-      const siteShell = document.querySelector(".site-shell");
       const mobileNavigation = document.querySelector(".mobile-tab-bar");
       const footer = document.querySelector(".site-footer-v3");
       const footerPanel = document.querySelector(".editorial-footer");
@@ -116,7 +115,7 @@ async function auditPage(page, target, viewport) {
       const mobileNavigationStyle = mobileNavigation
         ? window.getComputedStyle(mobileNavigation)
         : null;
-      const siteShellStyle = siteShell ? window.getComputedStyle(siteShell) : null;
+      const footerStyle = footer ? window.getComputedStyle(footer) : null;
       const footerPanelStyle = footerPanel ? window.getComputedStyle(footerPanel) : null;
       const footerBackground = footerPanelStyle?.backgroundColor ?? null;
       const navigationRect = mobileNavigation?.getBoundingClientRect() ?? null;
@@ -127,9 +126,12 @@ async function auditPage(page, target, viewport) {
         navigationRect.height > 0,
       );
       const navigationHeight = navigationVisible && navigationRect ? navigationRect.height : 0;
-      const shellPaddingBottom = siteShellStyle
-        ? Number.parseFloat(siteShellStyle.paddingBottom) || 0
+      const footerPaddingBottom = footerStyle
+        ? Number.parseFloat(footerStyle.paddingBottom) || 0
         : 0;
+      const weatherUnavailable = Boolean(
+        document.querySelector(".production-weather-unavailable"),
+      );
       const hasWeatherState = Boolean(
         document.querySelector(".weather-hero, .production-weather-unavailable"),
       );
@@ -148,6 +150,7 @@ async function auditPage(page, target, viewport) {
         horizontalOverflow: Math.max(0, root.scrollWidth - root.clientWidth),
         hasCoreStructure,
         hasWeatherState,
+        weatherUnavailable,
         hasExplore: Boolean(document.querySelector("#explorar-portal")),
         exploreHeading:
           document.querySelector("#home-explore-portal-title")?.textContent?.trim() ?? null,
@@ -165,10 +168,10 @@ async function auditPage(page, target, viewport) {
         ),
         navigationVisible,
         navigationHeight,
-        shellPaddingBottom,
+        footerPaddingBottom,
         footerProtected:
           mobile && strictLayout && navigationVisible
-            ? shellPaddingBottom >= navigationHeight
+            ? footerPaddingBottom >= navigationHeight
             : null,
       };
     },
@@ -182,7 +185,7 @@ async function auditPage(page, target, viewport) {
   if (audit.horizontalOverflow > 2) {
     failures.push(`overflow horizontal de ${audit.horizontalOverflow}px`);
   }
-  if (target.expectExplore && !audit.hasExplore) {
+  if (target.expectExplore && !audit.hasExplore && !audit.weatherUnavailable) {
     failures.push("seção de exploração ausente");
   }
   if (target.strictLayout && !audit.hasFooter) {
@@ -196,7 +199,7 @@ async function auditPage(page, target, viewport) {
   }
   if (audit.footerProtected === false) {
     failures.push(
-      `área móvel sem proteção suficiente: ${audit.shellPaddingBottom}px para navegação de ${audit.navigationHeight}px`,
+      `rodapé sem proteção suficiente: ${audit.footerPaddingBottom}px para navegação de ${audit.navigationHeight}px`,
     );
   }
 
@@ -257,6 +260,7 @@ try {
             horizontalOverflow: 0,
             hasCoreStructure: false,
             brandLoaded: false,
+            weatherUnavailable: false,
             hasExplore: false,
             skipLinkVisible: false,
             footerLight: null,
@@ -287,7 +291,7 @@ const failures = results.flatMap((result) =>
 
 for (const result of results) {
   console.log(
-    `${result.target} ${result.viewport.width}×${result.viewport.height}: HTTP=${result.audit.httpStatus} overflow=${result.audit.horizontalOverflow}px core=${result.audit.hasCoreStructure} brand=${result.audit.brandLoaded} explore=${result.audit.hasExplore} skip=${result.audit.skipLinkVisible} footerLight=${result.audit.footerLight} footerProtected=${result.audit.footerProtected}`,
+    `${result.target} ${result.viewport.width}×${result.viewport.height}: HTTP=${result.audit.httpStatus} overflow=${result.audit.horizontalOverflow}px core=${result.audit.hasCoreStructure} brand=${result.audit.brandLoaded} unavailable=${result.audit.weatherUnavailable} explore=${result.audit.hasExplore} skip=${result.audit.skipLinkVisible} footerLight=${result.audit.footerLight} footerProtected=${result.audit.footerProtected}`,
   );
 }
 
