@@ -76,5 +76,8 @@ test("indisponibilidade prevalece quando não há cota de cheia", () => {
 test("gera classe visual previsível para o tema editorial", () => {
   assert.equal(waterLevelStateClass("flood"), "level-state--flood");
   assert.equal(waterLevelStateClass("stable"), "level-state--stable");
-  assert.equal(waterLevelStateClass("unavailable"), "level-state--unavailable");
+  assert.equal(
+    waterLevelStateClass("unavailable"),
+    "level-state--unavailable",
+  );
 });
