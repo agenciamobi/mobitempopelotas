@@ -12,7 +12,10 @@ import {
 
 test("aceita somente endpoints HTTPS de provedores push conhecidos", () => {
   assert.equal(isAllowedPushEndpoint("https://fcm.googleapis.com/fcm/send/abc"), true);
-  assert.equal(isAllowedPushEndpoint("https://updates.push.services.mozilla.com/wpush/v2/abc"), true);
+  assert.equal(
+    isAllowedPushEndpoint("https://updates.push.services.mozilla.com/wpush/v2/abc"),
+    true,
+  );
   assert.equal(isAllowedPushEndpoint("https://web.push.apple.com/Q123"), true);
   assert.equal(isAllowedPushEndpoint("https://wns.notify.windows.com/?token=abc"), true);
 
@@ -26,7 +29,10 @@ test("aceita somente endpoints HTTPS de provedores push conhecidos", () => {
 
 test("mantém apenas caminhos internos seguros", () => {
   assert.equal(safeInternalPath("/alertas"), "/alertas");
-  assert.equal(safeInternalPath(" /situacao-hidrologica-pelotas?origem=push "), "/situacao-hidrologica-pelotas?origem=push");
+  assert.equal(
+    safeInternalPath(" /situacao-hidrologica-pelotas?origem=push "),
+    "/situacao-hidrologica-pelotas?origem=push",
+  );
   assert.equal(safeInternalPath("https://example.com"), "/");
   assert.equal(safeInternalPath("//example.com"), "/");
   assert.equal(safeInternalPath("/alertas\\externo"), "/");
