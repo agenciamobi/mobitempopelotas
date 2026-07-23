@@ -1,6 +1,7 @@
 import { useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
+import "./accessibility.css";
 import { Footer } from "./Footer";
 import { Header } from "./Header";
 
@@ -39,12 +40,7 @@ export function SiteLayout({ children }: SiteLayoutProps) {
         {announcement}
       </div>
       <Header />
-      <main
-        ref={mainRef}
-        id="conteudo-principal"
-        className="site-main"
-        tabIndex={-1}
-      >
+      <main ref={mainRef} id="conteudo-principal" className="site-main" tabIndex={-1}>
         <div className="site-container">{children}</div>
       </main>
       <Footer />
