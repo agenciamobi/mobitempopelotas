@@ -61,9 +61,9 @@ function mergeHistoryDays(
   externalDays: HistoricalWeatherDay[],
   storedDays: HistoricalWeatherDay[],
 ) {
-  const daysByDate = new Map(externalDays.map((day) => [day.date, day]));
+  const daysByDate = new Map(storedDays.map((day) => [day.date, day]));
 
-  for (const day of storedDays) {
+  for (const day of externalDays) {
     daysByDate.set(day.date, day);
   }
 
@@ -115,6 +115,8 @@ export async function fetchPelotasWeatherHistoryWithSnapshots(): Promise<Weather
 
   if (storedDays.length === 0) return externalHistory;
 
+  const externalDates = new Set(externalHistory.days.map((day) => day.date));
+  const archivedGapCount = storedDays.filter((day) => !externalDates.has(day.date)).length;
   const days = mergeHistoryDays(externalHistory.days, storedDays);
   if (days.length === 0) return externalHistory;
 
@@ -124,7 +126,10 @@ export async function fetchPelotasWeatherHistoryWithSnapshots(): Promise<Weather
     summary: buildSummary(days),
     source: {
       ...externalHistory.source,
-      name: `Arquivo próprio do Tempo Pelotas + ${externalHistory.source.name}`,
+      name:
+        archivedGapCount > 0
+          ? `Arquivo próprio do Tempo Pelotas + ${externalHistory.source.name}`
+          : externalHistory.source.name,
       periodStart: days[0]?.date ?? externalHistory.source.periodStart,
       periodEnd: days.at(-1)?.date ?? externalHistory.source.periodEnd,
     },
