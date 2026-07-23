@@ -48,8 +48,7 @@ jobs:
             src/lib/push/*.ts \
             src/lib/supabase/database.types.ts \
             src/routes/api/cron/push-daily.ts \
-            src/routes/api/push/*.ts \
-            supabase/migrations/20260723113000_create_web_push_subscriptions.sql
+            src/routes/api/push/*.ts
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/sw.js src/components/pwa/PushNotificationsManager.tsx src/lib/push src/lib/supabase/database.types.ts src/routes/api/cron/push-daily.ts src/routes/api/push supabase/migrations/20260723113000_create_web_push_subscriptions.sql
