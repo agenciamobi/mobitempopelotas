@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - agent/visual-exact-production
+      - agent/visual-exact-production-v2
     paths:
       - scripts/visual-exact-production-audit.mjs
       - .github/workflows/visual-parity.yml
