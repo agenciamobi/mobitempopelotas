@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import {
   createSupabaseAdminClient,
   getSupabaseServerConfig,
@@ -13,6 +15,7 @@ import {
 
 const QUERY_TIMEOUT_MS = 3_500;
 const MAX_SUBSCRIPTIONS = 10_000;
+const CLAIM_LEASE_SECONDS = 15 * 60;
 
 export type PushStorageStatus = {
   configured: boolean;
@@ -122,44 +125,30 @@ export async function listPushSubscriptions(topic?: PushTopic): Promise<StoredPu
   return (data ?? []).map(rowToSubscription);
 }
 
-export async function hasPushDispatch(fingerprint: string) {
-  const client = requirePushStorage();
-  const { data, error } = await client
-    .from("web_push_dispatches")
-    .select("fingerprint")
-    .eq("fingerprint", fingerprint)
-    .abortSignal(timeoutSignal())
-    .maybeSingle();
-
-  if (error) throw new Error(`Falha ao consultar histórico de envios: ${error.message}`);
-  return Boolean(data);
-}
-
 export async function claimPushDispatch(fingerprint: string, title: string) {
   const client = requirePushStorage();
-  const { error } = await client
-    .from("web_push_dispatches")
-    .insert({
-      fingerprint,
-      title,
-      sent_count: 0,
-      failed_count: 0,
-      removed_count: 0,
-      sent_at: new Date().toISOString(),
+  const leaseToken = randomUUID();
+  const { data, error } = await client
+    .rpc("claim_web_push_dispatch", {
+      p_fingerprint: fingerprint,
+      p_title: title,
+      p_lease_token: leaseToken,
+      p_stale_after_seconds: CLAIM_LEASE_SECONDS,
     })
     .abortSignal(timeoutSignal());
 
-  if (error?.code === "23505") return false;
   if (error) throw new Error(`Falha ao reservar envio web push: ${error.message}`);
-  return true;
+  return data ? leaseToken : null;
 }
 
-export async function releasePushDispatch(fingerprint: string) {
+export async function releasePushDispatch(fingerprint: string, leaseToken: string) {
   const client = requirePushStorage();
   const { error } = await client
     .from("web_push_dispatches")
     .delete()
     .eq("fingerprint", fingerprint)
+    .eq("lease_token", leaseToken)
+    .eq("status", "claimed")
     .abortSignal(timeoutSignal());
 
   if (error) throw new Error(`Falha ao liberar envio web push: ${error.message}`);
@@ -167,21 +156,30 @@ export async function releasePushDispatch(fingerprint: string) {
 
 export async function recordPushDispatch(
   fingerprint: string,
+  leaseToken: string,
   title: string,
   result: PushDeliveryResult,
 ) {
   const client = requirePushStorage();
-  const { error } = await client
+  const completedAt = new Date().toISOString();
+  const { data, error } = await client
     .from("web_push_dispatches")
     .update({
       title,
+      status: "completed",
+      completed_at: completedAt,
       sent_count: result.sent,
       failed_count: result.failed,
       removed_count: result.removed,
-      sent_at: new Date().toISOString(),
+      sent_at: completedAt,
     })
     .eq("fingerprint", fingerprint)
-    .abortSignal(timeoutSignal());
+    .eq("lease_token", leaseToken)
+    .eq("status", "claimed")
+    .select("fingerprint")
+    .abortSignal(timeoutSignal())
+    .maybeSingle();
 
   if (error) throw new Error(`Falha ao registrar envio web push: ${error.message}`);
+  if (!data) throw new Error("A reserva do envio web push expirou antes da conclusão.");
 }
