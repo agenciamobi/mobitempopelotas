@@ -54,13 +54,4 @@ jobs:
         run: npm run typecheck
 
       - name: ESLint
-        run: npm run lint -- --format json --output-file artifacts/eslint-report.json
-
-      - name: Publicar diagnóstico temporário do ESLint
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: eslint-report
-          path: artifacts/eslint-report.json
-          if-no-files-found: ignore
-          retention-days: 1
+        run: npm run lint
