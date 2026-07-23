@@ -1,0 +1,49 @@
+name: Aplicar guarda interna de consentimento push
+
+on:
+  push:
+    branches:
+      - agent/fix-lgpd-export-and-push-consent
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: agent/fix-lgpd-export-and-push-consent
+          fetch-depth: 0
+
+      - name: Aplicar guarda de runtime
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("src/lib/push/web-push.server.ts")
+          content = path.read_text(encoding="utf-8")
+          old = '''  const consentPreference = options.consentPreference ?? defaultConsentPreference(payload.topic);
+          let processed = 0;
+          '''
+          new = '''  const consentPreference = options.consentPreference ?? defaultConsentPreference(payload.topic);
+          if (!consentPreference) {
+            throw new Error("Toda notificação precisa de uma categoria de consentimento.");
+          }
+          let processed = 0;
+          '''
+          if old not in content:
+              raise SystemExit("Trecho esperado não encontrado; nenhuma alteração aplicada.")
+          path.write_text(content.replace(old, new, 1), encoding="utf-8")
+          PY
+
+      - name: Registrar alteração
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/lib/push/web-push.server.ts
+          git commit -m "fix: rejeitar push sem categoria de consentimento"
+          git push origin HEAD:agent/fix-lgpd-export-and-push-consent
