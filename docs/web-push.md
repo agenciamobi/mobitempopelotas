@@ -138,6 +138,10 @@ O scheduler deve:
 
 Antes da produção, documentar retenção e executar limpeza periódica de inscrições sem atividade por período definido pela política do portal.
 
+## Validação do lote
+
+O lote deve permanecer em rascunho até que dependências, build, TypeScript, ESLint, auditoria visual e revisão automatizada estejam verdes no mesmo head.
+
 ## Checklist de produção
 
 1. aplicar a migration no projeto Supabase oficial;
