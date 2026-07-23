@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
@@ -35,37 +35,6 @@ jobs:
 
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
-
-      - name: Finalizar lote web push
-        if: github.event_name == 'push' && github.ref == 'refs/heads/agent/web-push-notifications'
-        run: |
-          python <<'PY'
-          from pathlib import Path
-
-          path = Path("src/components/pwa/PushNotificationsManager.tsx")
-          content = path.read_text(encoding="utf-8")
-          old = '''    const previousElement = document.activeElement as HTMLElement | null;
-    const previousOverflow = document.body.style.overflow;'''
-          new = '''    const previousElement = document.activeElement as HTMLElement | null;
-    const launcherElement = launcherRef.current;
-    const previousOverflow = document.body.style.overflow;'''
-          if old not in content:
-              raise SystemExit("Trecho inicial do efeito não encontrado")
-          content = content.replace(old, new, 1)
-          old_cleanup = '''      window.requestAnimationFrame(() => (previousElement ?? launcherRef.current)?.focus());'''
-          new_cleanup = '''      window.requestAnimationFrame(() => (previousElement ?? launcherElement)?.focus());'''
-          if old_cleanup not in content:
-              raise SystemExit("Trecho de limpeza do efeito não encontrado")
-          path.write_text(content.replace(old_cleanup, new_cleanup, 1), encoding="utf-8")
-          PY
-          npx prettier --write src/components/pwa/PushNotificationsManager.tsx
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/components/pwa/PushNotificationsManager.tsx
-          if ! git diff --cached --quiet; then
-            git commit -m "fix: estabiliza retorno de foco dos avisos"
-            git push origin HEAD:${GITHUB_REF_NAME}
-          fi
 
       - name: Build de produção
         run: npm run build
