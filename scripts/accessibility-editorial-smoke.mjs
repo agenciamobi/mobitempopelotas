@@ -67,9 +67,7 @@ try {
       });
 
       if (!response?.ok()) {
-        throw new Error(
-          `${route.name} respondeu HTTP ${response?.status() ?? "desconhecido"}.`,
-        );
+        throw new Error(`${route.name} respondeu HTTP ${response?.status() ?? "desconhecido"}.`);
       }
 
       await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => undefined);
@@ -141,9 +139,10 @@ try {
           return `${tag}${id}${className}`;
         };
 
-        const allIds = Array.from(document.querySelectorAll("[id]"), (element) => element.id).filter(
-          Boolean,
-        );
+        const allIds = Array.from(
+          document.querySelectorAll("[id]"),
+          (element) => element.id,
+        ).filter(Boolean);
         const idCounts = new Map();
         for (const id of allIds) idCounts.set(id, (idCounts.get(id) ?? 0) + 1);
         const duplicateIds = Array.from(idCounts.entries())
@@ -160,7 +159,9 @@ try {
           .map(describe);
 
         const fields = Array.from(
-          document.querySelectorAll('input:not([type="hidden"]):not([type="button"]):not([type="submit"]), select, textarea'),
+          document.querySelectorAll(
+            'input:not([type="hidden"]):not([type="button"]):not([type="submit"]), select, textarea',
+          ),
         ).filter(visible);
         const unlabelledFields = fields
           .filter((element) => {
@@ -198,11 +199,11 @@ try {
         const activeRect = active instanceof HTMLElement ? active.getBoundingClientRect() : null;
         const skipLinkVisible = Boolean(
           active === skipLink &&
-            activeRect &&
-            activeRect.width > 0 &&
-            activeRect.height > 0 &&
-            activeRect.top >= 0 &&
-            activeRect.left >= 0,
+          activeRect &&
+          activeRect.width > 0 &&
+          activeRect.height > 0 &&
+          activeRect.top >= 0 &&
+          activeRect.left >= 0,
         );
 
         const root = document.documentElement;
@@ -215,7 +216,9 @@ try {
           h1Count: h1Elements.length,
           h1Text: normalizedText(h1Elements[0]?.textContent),
           mainCount: document.querySelectorAll("main").length,
-          hasLandmarks: Boolean(document.querySelector("header") && main && document.querySelector("footer")),
+          hasLandmarks: Boolean(
+            document.querySelector("header") && main && document.querySelector("footer"),
+          ),
           skipLinkVisible,
           duplicateIds,
           unnamedInteractive,
@@ -228,7 +231,8 @@ try {
 
       const failures = [];
       const warnings = [];
-      if (!audit.language.toLowerCase().startsWith("pt")) failures.push("idioma do documento não é português");
+      if (!audit.language.toLowerCase().startsWith("pt"))
+        failures.push("idioma do documento não é português");
       if (!audit.title) failures.push("documento sem título");
       if (audit.mainCount !== 1) failures.push(`quantidade de landmarks main: ${audit.mainCount}`);
       if (!audit.hasLandmarks) failures.push("header, main ou footer editorial ausente");
