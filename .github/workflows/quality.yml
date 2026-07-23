@@ -11,58 +11,13 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  format-accessibility:
-    name: Formatar revisão de acessibilidade
-    if: >-
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/agent/accessibility-editorial-smoke' &&
-      github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout do branch
-        uses: actions/checkout@v4
-        with:
-          ref: agent/accessibility-editorial-smoke
-          fetch-depth: 0
-
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Instalar dependências
-        run: npm ci --no-audit --no-fund
-
-      - name: Aplicar Prettier
-        run: >-
-          npx prettier --write
-          scripts/accessibility-editorial-smoke.mjs
-          .github/workflows/visual-parity.yml
-          .github/workflows/quality.yml
-
-      - name: Registrar formatação
-        run: |
-          if git diff --quiet; then
-            echo "O escopo já está formatado."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add \
-            scripts/accessibility-editorial-smoke.mjs \
-            .github/workflows/visual-parity.yml \
-            .github/workflows/quality.yml
-          git commit -m "style: formatar revisão do smoke de acessibilidade"
-          git push origin HEAD:agent/accessibility-editorial-smoke
-
   validate:
     name: Testes, build, rotas, typecheck e lint
     runs-on: ubuntu-latest
