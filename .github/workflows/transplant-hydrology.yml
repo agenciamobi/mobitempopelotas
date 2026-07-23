@@ -79,3 +79,5 @@ jobs:
           git add -A
           git commit -m "[hydrology-v2] integra rede regional sobre a main atual"
           git push origin HEAD:agent/hydrology-regional-network-v2
+
+# retry: workflow já presente antes deste push
