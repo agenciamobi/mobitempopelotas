@@ -73,6 +73,7 @@ export async function savePushSubscription(
   subscription: StoredPushSubscription,
   userAgent: string | null,
   topics: readonly PushTopic[],
+  userId: string | null = null,
 ) {
   const client = requirePushStorage();
   const now = new Date().toISOString();
@@ -85,6 +86,7 @@ export async function savePushSubscription(
         p256dh: subscription.keys.p256dh,
         auth: subscription.keys.auth,
         user_agent: userAgent?.slice(0, 500) ?? null,
+        user_id: userId,
         topics: normalizeTopics(topics),
         updated_at: now,
         last_seen_at: now,
@@ -117,7 +119,7 @@ export async function* iteratePushSubscriptionPages(
     let query = client
       .from("web_push_subscriptions")
       .select(
-        "endpoint,expiration_time,p256dh,auth,user_agent,topics,created_at,updated_at,last_seen_at",
+        "endpoint,expiration_time,p256dh,auth,user_agent,user_id,topics,created_at,updated_at,last_seen_at",
       )
       .order("endpoint", { ascending: true })
       .limit(PUSH_SUBSCRIPTION_PAGE_SIZE);
