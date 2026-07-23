@@ -4,7 +4,7 @@ import {
   createSupabaseAdminClient,
   getSupabaseServerConfig,
 } from "@/lib/supabase/server-client.server";
-import type { UserPreference, WebPushSubscription } from "@/lib/supabase/database.types";
+import type { UserPreferences, WebPushSubscription } from "@/lib/supabase/database.types";
 
 import {
   PUSH_TOPICS,
@@ -30,7 +30,7 @@ export type PushConsentPreference =
   | "community_updates";
 
 type PushPreferenceSnapshot = Pick<
-  UserPreference,
+  UserPreferences,
   | "user_id"
   | "weather_alerts"
   | "water_alerts"
