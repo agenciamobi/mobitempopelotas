@@ -2,6 +2,35 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const CANONICAL_SITE_URL = "https://www.tempopelotas.com.br";
+const PLACEHOLDER_PATTERN =
+  /(change[-_ ]?me|placeholder|example|your[-_ ]|todo|replace[-_ ]?me)/i;
+const REQUIRED_TEMPLATE_KEYS = [
+  "VITE_SUPABASE_MODE",
+  "SUPABASE_MODE",
+  "VITE_SUPABASE_URL",
+  "VITE_SUPABASE_PUBLISHABLE_KEY",
+  "SUPABASE_URL",
+  "SUPABASE_PUBLISHABLE_KEY",
+  "SUPABASE_SECRET_KEY",
+  "CRON_SECRET",
+  "VAPID_PUBLIC_KEY",
+  "VAPID_PRIVATE_KEY",
+  "VAPID_SUBJECT",
+  "PUSH_ADMIN_SECRET",
+  "REDEMET_API_KEY",
+  "REDEMET_API_BASE_URL",
+  "VITE_SITE_URL",
+];
+const FORBIDDEN_CLIENT_KEYS = [
+  "VITE_SUPABASE_SECRET_KEY",
+  "VITE_SUPABASE_SERVICE_ROLE_KEY",
+  "VITE_VAPID_PRIVATE_KEY",
+  "VITE_CRON_SECRET",
+  "VITE_PUSH_ADMIN_SECRET",
+  "VITE_REDEMET_API_KEY",
+  "VITE_GEMINI_API_KEY",
+];
+
 const mode = process.argv.includes("--example") ? "example" : "production";
 const outputDirectory = path.resolve("artifacts/runtime-readiness");
 const checks = [];
@@ -22,7 +51,10 @@ function parseDotenv(content) {
     if (separator < 1) continue;
 
     const key = line.slice(0, separator).trim();
-    const value = line.slice(separator + 1).trim().replace(/^(["'])(.*)\1$/, "$2");
+    const value = line
+      .slice(separator + 1)
+      .trim()
+      .replace(/^(["'])(.*)\1$/, "$2");
     values[key] = value;
   }
 
@@ -53,7 +85,11 @@ function isHttpsUrl(value) {
 
 function isValidVapidSubject(value) {
   if (!value) return false;
-  if (value.startsWith("mailto:")) return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.slice(7));
+
+  if (value.startsWith("mailto:")) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.slice(7));
+  }
+
   return isHttpsUrl(value);
 }
 
@@ -69,33 +105,33 @@ function decodedBase64UrlLength(value) {
 
 function looksLikePlaceholder(value) {
   if (!value) return true;
-  return /(change[-_ ]?me|placeholder|example|your[-_ ]|todo|replace[-_ ]?me)/i.test(value);
+  return PLACEHOLDER_PATTERN.test(value);
+}
+
+function formatMissing(keys) {
+  return keys.length === 0 ? "nenhuma" : keys.join(", ");
+}
+
+function validateForbiddenClientKeys(values, hasValue) {
+  const exposed = FORBIDDEN_CLIENT_KEYS.filter((key) => hasValue(values, key));
+  const passed = exposed.length === 0;
+  const details = passed
+    ? "nenhum segredo server-only usa prefixo VITE_"
+    : `variáveis inseguras: ${exposed.join(", ")}`;
+
+  addCheck("Segredos fora do bundle cliente", passed, details);
 }
 
 function validateTemplate(values) {
-  const requiredDeclarations = [
-    "VITE_SUPABASE_MODE",
-    "SUPABASE_MODE",
-    "VITE_SUPABASE_URL",
-    "VITE_SUPABASE_PUBLISHABLE_KEY",
-    "SUPABASE_URL",
-    "SUPABASE_PUBLISHABLE_KEY",
-    "SUPABASE_SECRET_KEY",
-    "CRON_SECRET",
-    "VAPID_PUBLIC_KEY",
-    "VAPID_PRIVATE_KEY",
-    "VAPID_SUBJECT",
-    "PUSH_ADMIN_SECRET",
-    "REDEMET_API_KEY",
-    "REDEMET_API_BASE_URL",
-    "VITE_SITE_URL",
-  ];
+  const missing = REQUIRED_TEMPLATE_KEYS.filter((key) => !hasKey(values, key));
+  const declarationsComplete = missing.length === 0;
 
-  const missing = requiredDeclarations.filter((key) => !hasKey(values, key));
   addCheck(
     "Declarações obrigatórias",
-    missing.length === 0,
-    missing.length === 0 ? "todas as variáveis operacionais estão documentadas" : `ausentes: ${missing.join(", ")}`,
+    declarationsComplete,
+    declarationsComplete
+      ? "todas as variáveis operacionais estão documentadas"
+      : `ausentes: ${formatMissing(missing)}`,
   );
 
   addCheck(
@@ -104,9 +140,11 @@ function validateTemplate(values) {
     `VITE_SITE_URL deve usar ${CANONICAL_SITE_URL}`,
   );
 
+  const safeDefaultMode =
+    values.VITE_SUPABASE_MODE === "mock" && values.SUPABASE_MODE === "mock";
   addCheck(
     "Modo seguro por padrão",
-    values.VITE_SUPABASE_MODE === "mock" && values.SUPABASE_MODE === "mock",
+    safeDefaultMode,
     "o template deve permanecer em mock até a validação do Supabase oficial",
   );
 
@@ -122,21 +160,7 @@ function validateTemplate(values) {
     "VAPID_SUBJECT deve usar mailto: ou uma URL HTTPS",
   );
 
-  const forbiddenClientKeys = [
-    "VITE_SUPABASE_SECRET_KEY",
-    "VITE_SUPABASE_SERVICE_ROLE_KEY",
-    "VITE_VAPID_PRIVATE_KEY",
-    "VITE_CRON_SECRET",
-    "VITE_PUSH_ADMIN_SECRET",
-    "VITE_REDEMET_API_KEY",
-    "VITE_GEMINI_API_KEY",
-  ];
-  const exposed = forbiddenClientKeys.filter((key) => hasKey(values, key));
-  addCheck(
-    "Segredos fora do bundle cliente",
-    exposed.length === 0,
-    exposed.length === 0 ? "nenhum segredo server-only usa prefixo VITE_" : `declarações inseguras: ${exposed.join(", ")}`,
-  );
+  validateForbiddenClientKeys(values, hasKey);
 }
 
 function validateProduction(values) {
@@ -148,9 +172,12 @@ function validateProduction(values) {
     `VITE_SITE_URL deve ser exatamente ${CANONICAL_SITE_URL}`,
   );
 
+  const externalMode =
+    value("SUPABASE_MODE") === "external" &&
+    value("VITE_SUPABASE_MODE") === "external";
   addCheck(
     "Supabase externo habilitado",
-    value("SUPABASE_MODE") === "external" && value("VITE_SUPABASE_MODE") === "external",
+    externalMode,
     "SUPABASE_MODE e VITE_SUPABASE_MODE devem ser external",
   );
 
@@ -164,23 +191,33 @@ function validateProduction(values) {
 
   const publicKey = value("VITE_SUPABASE_PUBLISHABLE_KEY");
   const serverPublicKey = value("SUPABASE_PUBLISHABLE_KEY");
+  const publishableKeysMatch = Boolean(
+    publicKey &&
+      serverPublicKey &&
+      publicKey === serverPublicKey &&
+      !looksLikePlaceholder(publicKey),
+  );
   addCheck(
     "Publishable key do Supabase",
-    Boolean(publicKey && serverPublicKey && publicKey === serverPublicKey && !looksLikePlaceholder(publicKey)),
+    publishableKeysMatch,
     "as publishable keys pública e server-side devem existir e ser idênticas",
   );
 
-  const adminKey = value("SUPABASE_SECRET_KEY") ?? value("SUPABASE_SERVICE_ROLE_KEY");
+  const adminKey =
+    value("SUPABASE_SECRET_KEY") ?? value("SUPABASE_SERVICE_ROLE_KEY");
+  const adminKeyIsValid = Boolean(
+    adminKey && !looksLikePlaceholder(adminKey) && adminKey !== publicKey,
+  );
   addCheck(
     "Chave administrativa do Supabase",
-    Boolean(adminKey && !looksLikePlaceholder(adminKey) && adminKey !== publicKey),
+    adminKeyIsValid,
     "uma chave administrativa server-only válida deve estar configurada",
   );
 
   const cronSecret = value("CRON_SECRET");
   const pushAdminSecret = value("PUSH_ADMIN_SECRET");
-  const secretsAreStrong = [cronSecret, pushAdminSecret].every(
-    (secret) => Boolean(secret && secret.length >= 32 && !looksLikePlaceholder(secret)),
+  const secretsAreStrong = [cronSecret, pushAdminSecret].every((secret) =>
+    Boolean(secret && secret.length >= 32 && !looksLikePlaceholder(secret)),
   );
   addCheck(
     "Segredos operacionais",
@@ -190,9 +227,12 @@ function validateProduction(values) {
 
   const vapidPublic = value("VAPID_PUBLIC_KEY");
   const vapidPrivate = value("VAPID_PRIVATE_KEY");
+  const vapidPairIsValid =
+    decodedBase64UrlLength(vapidPublic) === 65 &&
+    decodedBase64UrlLength(vapidPrivate) === 32;
   addCheck(
     "Par VAPID",
-    decodedBase64UrlLength(vapidPublic) === 65 && decodedBase64UrlLength(vapidPrivate) === 32,
+    vapidPairIsValid,
     "a chave pública deve decodificar para 65 bytes e a privada para 32 bytes",
   );
 
@@ -202,33 +242,30 @@ function validateProduction(values) {
     "VAPID_SUBJECT deve usar mailto: ou uma URL HTTPS",
   );
 
+  const redemetIsConfigured = Boolean(
+    value("REDEMET_API_KEY") && isHttpsUrl(value("REDEMET_API_BASE_URL")),
+  );
   addCheck(
     "REDEMET",
-    Boolean(value("REDEMET_API_KEY") && isHttpsUrl(value("REDEMET_API_BASE_URL"))),
+    redemetIsConfigured,
     "a chave deve existir e a URL base deve usar HTTPS",
   );
 
-  const geminiEnabled = value("GEMINI_WEATHER_ENABLED")?.toLowerCase() === "true";
+  const geminiEnabled =
+    value("GEMINI_WEATHER_ENABLED")?.toLowerCase() === "true";
+  const geminiKey = value("GEMINI_API_KEY");
+  const geminiIsConfigured =
+    !geminiEnabled || Boolean(geminiKey && !looksLikePlaceholder(geminiKey));
   addCheck(
     "Gemini opcional",
-    !geminiEnabled || Boolean(value("GEMINI_API_KEY") && !looksLikePlaceholder(value("GEMINI_API_KEY"))),
-    geminiEnabled ? "GEMINI_API_KEY é obrigatória quando o recurso está habilitado" : "síntese Gemini desabilitada ou não exigida",
+    geminiIsConfigured,
+    geminiEnabled
+      ? "GEMINI_API_KEY é obrigatória quando o recurso está habilitado"
+      : "síntese Gemini desabilitada ou não exigida",
   );
 
-  const forbiddenClientKeys = [
-    "VITE_SUPABASE_SECRET_KEY",
-    "VITE_SUPABASE_SERVICE_ROLE_KEY",
-    "VITE_VAPID_PRIVATE_KEY",
-    "VITE_CRON_SECRET",
-    "VITE_PUSH_ADMIN_SECRET",
-    "VITE_REDEMET_API_KEY",
-    "VITE_GEMINI_API_KEY",
-  ];
-  const exposed = forbiddenClientKeys.filter((key) => value(key));
-  addCheck(
-    "Ausência de segredos VITE_",
-    exposed.length === 0,
-    exposed.length === 0 ? "nenhum segredo server-only está exposto ao cliente" : `variáveis inseguras configuradas: ${exposed.join(", ")}`,
+  validateForbiddenClientKeys(values, (environment, key) =>
+    Boolean(normalize(environment[key])),
   );
 }
 
@@ -249,9 +286,13 @@ const report = {
   failed: checks.filter((check) => check.status === "failed").length,
   checks,
 };
-await writeFile(path.join(outputDirectory, "report.json"), `${JSON.stringify(report, null, 2)}\n`);
+const reportPath = path.join(outputDirectory, "report.json");
+const reportContent = `${JSON.stringify(report, null, 2)}\n`;
+await writeFile(reportPath, reportContent);
 
-console.log(`\nResultado: ${report.passed} aprovados; ${report.failed} reprovados.`);
-console.log(`Relatório sanitizado: ${path.join(outputDirectory, "report.json")}`);
+console.log(
+  `\nResultado: ${report.passed} aprovados; ${report.failed} reprovados.`,
+);
+console.log(`Relatório sanitizado: ${reportPath}`);
 
 if (report.failed > 0) process.exitCode = 1;
