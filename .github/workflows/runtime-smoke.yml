@@ -21,9 +21,12 @@ jobs:
   smoke:
     name: Validar publicação, REDEMET e hidrologia
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Consultar aplicação publicada
         env:
           BASE_URL: https://mobitempopelotas.lovable.app
@@ -178,3 +181,17 @@ jobs:
             `Runtime validado em ${baseUrl}: REDEMET ${available.length}/3; Guaíba e 5 estações regionais renderizados.`,
           );
           NODE
+
+      - name: Executar baseline completa pré-cutover
+        env:
+          BASE_URL: https://tempopelotas.com.br
+        run: node scripts/cutover-smoke.mjs
+
+      - name: Publicar relatório da baseline
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cutover-baseline-${{ github.run_number }}
+          path: artifacts/cutover-smoke
+          if-no-files-found: error
+          retention-days: 30
