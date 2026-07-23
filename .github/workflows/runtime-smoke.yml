@@ -21,7 +21,7 @@ jobs:
   smoke:
     name: Validar publicação, REDEMET e hidrologia
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     steps:
       - name: Consultar aplicação publicada
@@ -32,7 +32,7 @@ jobs:
           const baseUrl = process.env.BASE_URL.replace(/\/$/, "");
           const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-          async function request(path, attempts = 18) {
+          async function request(path, attempts = 24) {
             let lastError;
 
             for (let attempt = 1; attempt <= attempts; attempt += 1) {
@@ -40,7 +40,7 @@ jobs:
                 const response = await fetch(`${baseUrl}${path}`, {
                   headers: {
                     Accept: path.startsWith("/api/") ? "application/json" : "text/html",
-                    "User-Agent": "TempoPelotas-Runtime-Smoke/2.0",
+                    "User-Agent": "TempoPelotas-Runtime-Smoke/3.0",
                   },
                   signal: AbortSignal.timeout(20_000),
                 });
@@ -131,7 +131,7 @@ jobs:
           if (imageLayer) {
             const imageUrl = new URL(imageLayer.frames.at(-1).imageUrl, baseUrl);
             const imageResponse = await fetch(imageUrl, {
-              headers: { "User-Agent": "TempoPelotas-Runtime-Smoke/2.0" },
+              headers: { "User-Agent": "TempoPelotas-Runtime-Smoke/3.0" },
               signal: AbortSignal.timeout(25_000),
             });
             const contentType = imageResponse.headers.get("content-type") || "";
@@ -145,11 +145,33 @@ jobs:
             console.log(`proxy de imagem: HTTP ${imageResponse.status} ${contentType}`);
           }
 
-          const homeResponse = await request("/");
-          const homeHtml = await homeResponse.text();
-          assertContains(homeHtml, "Do Guaíba à Lagoa dos Patos", "Homepage");
-          assertContains(homeHtml, "Rede da Lagoa dos Patos", "Homepage");
-          assertContains(homeHtml, "Nível do Guaíba", "Homepage");
+          let homeHtml = "";
+          for (let attempt = 1; attempt <= 24; attempt += 1) {
+            const homeResponse = await request("/", 1);
+            homeHtml = await homeResponse.text();
+            if (homeHtml.includes("site-shell--home-editorial")) break;
+            console.log(`Aguardando publicação da homepage literal (${attempt}/24).`);
+            if (attempt < 24) await wait(10_000);
+          }
+
+          const productionMarkers = [
+            "site-shell--home-editorial",
+            "weather-hero",
+            "home-section-navigation",
+            "home-story--forecast",
+            "home-story--map",
+            "home-story--observation",
+            "home-story--water",
+            "site-footer",
+            "Veja como o tempo deve mudar ao longo do dia",
+            "Do Guaíba à Lagoa dos Patos",
+            "Rede da Lagoa dos Patos",
+            "Nível do Guaíba",
+            "Informação local para acompanhar o dia",
+          ];
+          for (const marker of productionMarkers) {
+            assertContains(homeHtml, marker, "Homepage literal da produção");
+          }
           assertNoSensitiveMarkers(homeHtml, "Homepage");
 
           const hydrologyResponse = await request("/situacao-hidrologica-pelotas");
@@ -175,6 +197,6 @@ jobs:
           }
 
           console.log(
-            `Runtime validado em ${baseUrl}: REDEMET ${available.length}/3; Guaíba e 5 estações regionais renderizados.`,
+            `Homepage literal e runtime validados em ${baseUrl}: REDEMET ${available.length}/3; Guaíba e 5 estações regionais renderizados.`,
           );
           NODE
