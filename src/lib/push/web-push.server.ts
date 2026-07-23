@@ -11,7 +11,7 @@ import { isAllowedPushEndpoint } from "./push-http.server";
 import {
   deletePushSubscription,
   getPushStorageStatus,
-  listPushSubscriptions,
+  iteratePushSubscriptionPages,
 } from "./push-storage.server";
 import type { PushDeliveryResult, PushPayload, StoredPushSubscription } from "./push.types";
 
@@ -25,6 +25,10 @@ export type PushConfigurationStatus = {
   enabled: boolean;
   publicKey: string | null;
   missing: string[];
+};
+
+export type PushBroadcastOptions = {
+  beforeBatch?: (context: { processed: number; batchSize: number }) => Promise<void>;
 };
 
 type VapidConfiguration = {
@@ -279,54 +283,65 @@ function deliveryStatusCode(error: unknown) {
   return Number.isFinite(value) ? value : null;
 }
 
-export async function broadcastPushNotification(payload: PushPayload): Promise<PushDeliveryResult> {
+export async function broadcastPushNotification(
+  payload: PushPayload,
+  options: PushBroadcastOptions = {},
+): Promise<PushDeliveryResult> {
   const status = getPushConfigurationStatus();
   if (!status.enabled) {
     throw new Error(`Notificações web push não configuradas: ${status.missing.join(", ")}`);
   }
 
   const vapid = getActiveVapidConfig();
-  const subscriptions = await listPushSubscriptions(payload.topic);
   const body = notificationBody(payload);
   const result: PushDeliveryResult = {
-    total: subscriptions.length,
+    total: 0,
     sent: 0,
     failed: 0,
     removed: 0,
   };
+  let processed = 0;
 
-  for (let index = 0; index < subscriptions.length; index += DELIVERY_BATCH_SIZE) {
-    const batch = subscriptions.slice(index, index + DELIVERY_BATCH_SIZE);
-    await Promise.all(
-      batch.map(async (subscription) => {
-        try {
-          await sendNotification(subscription, payload, body, vapid);
-          result.sent += 1;
-        } catch (error) {
-          const statusCode = deliveryStatusCode(error);
-          if (statusCode === 404 || statusCode === 410) {
-            try {
-              await deletePushSubscription(subscription.endpoint);
-              result.removed += 1;
-            } catch (cleanupError) {
-              result.failed += 1;
-              console.error("[push] Endpoint expirado, mas a inscrição não foi removida", {
-                statusCode,
-                message:
-                  cleanupError instanceof Error ? cleanupError.message : String(cleanupError),
-              });
+  for await (const subscriptions of iteratePushSubscriptionPages(payload.topic)) {
+    result.total += subscriptions.length;
+
+    for (let index = 0; index < subscriptions.length; index += DELIVERY_BATCH_SIZE) {
+      const batch = subscriptions.slice(index, index + DELIVERY_BATCH_SIZE);
+      await options.beforeBatch?.({ processed, batchSize: batch.length });
+
+      await Promise.all(
+        batch.map(async (subscription) => {
+          try {
+            await sendNotification(subscription, payload, body, vapid);
+            result.sent += 1;
+          } catch (error) {
+            const statusCode = deliveryStatusCode(error);
+            if (statusCode === 404 || statusCode === 410) {
+              try {
+                await deletePushSubscription(subscription.endpoint);
+                result.removed += 1;
+              } catch (cleanupError) {
+                result.failed += 1;
+                console.error("[push] Endpoint expirado, mas a inscrição não foi removida", {
+                  statusCode,
+                  message:
+                    cleanupError instanceof Error ? cleanupError.message : String(cleanupError),
+                });
+              }
+              return;
             }
-            return;
-          }
 
-          result.failed += 1;
-          console.error("[push] Falha ao entregar notificação", {
-            statusCode,
-            message: error instanceof Error ? error.message : String(error),
-          });
-        }
-      }),
-    );
+            result.failed += 1;
+            console.error("[push] Falha ao entregar notificação", {
+              statusCode,
+              message: error instanceof Error ? error.message : String(error),
+            });
+          }
+        }),
+      );
+
+      processed += batch.length;
+    }
   }
 
   return result;
