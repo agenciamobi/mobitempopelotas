@@ -1,28 +1,29 @@
-# Capturas e verificações estruturais reproduzíveis para a decisão final de cutover.
-name: Auditoria visual de paridade
+# Capturas e verificações estruturais da homepage copiada da produção Vercel.
+name: Auditoria visual do transplante literal
 
 on:
   workflow_dispatch:
   push:
     branches:
-      - agent/visual-parity-audit
+      - agent/visual-exact-production
     paths:
-      - scripts/visual-parity-audit.mjs
+      - scripts/visual-exact-production-audit.mjs
       - .github/workflows/visual-parity.yml
   pull_request:
     branches:
       - main
     paths:
-      - src/components/**
-      - src/styles.css
-      - scripts/visual-parity-audit.mjs
+      - src/production/**
+      - src/routes/index.tsx
+      - src/components/layout/SiteLayout.tsx
+      - scripts/visual-exact-production-audit.mjs
       - .github/workflows/visual-parity.yml
 
 permissions:
   contents: read
 
 concurrency:
-  group: visual-parity-${{ github.ref }}
+  group: visual-exact-production-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -47,15 +48,15 @@ jobs:
 
       - name: Capturar e validar viewports
         env:
-          PRODUCTION_URL: https://tempopelotas.com.br
+          PRODUCTION_URL: https://www.tempopelotas.com.br
           LOVABLE_URL: https://mobitempopelotas.lovable.app
-        run: node scripts/visual-parity-audit.mjs
+        run: node scripts/visual-exact-production-audit.mjs
 
       - name: Publicar relatório e capturas
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: visual-parity-${{ github.run_number }}
-          path: artifacts/visual-parity
+          name: visual-exact-production-${{ github.run_number }}
+          path: artifacts/visual-exact-production
           if-no-files-found: error
           retention-days: 14
