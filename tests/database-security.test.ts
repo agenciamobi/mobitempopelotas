@@ -56,7 +56,8 @@ function assertNoClientGrantOnServerOnlyTables(sql: string) {
     /grant\s+[^;]+?\s+on\s+(?:table\s+)?public\.([a-z0-9_]+)\s+to\s+([^;]+);/g;
 
   for (const match of sql.matchAll(grantPattern)) {
-    const [, table, roles] = match;
+    const table = match[1] ?? "";
+    const roles = match[2] ?? "";
     if (!serverOnlyTables.includes(table as (typeof serverOnlyTables)[number])) continue;
 
     assert.doesNotMatch(
@@ -74,7 +75,10 @@ test("descobre e examina todas as migrations SQL versionadas", async () => {
   assert.ok(migrations.size >= 7, "O inventário de migrations ficou incompleto.");
   assertNoAnonymousPolicy(allSql);
   assertNoClientGrantOnServerOnlyTables(allSql);
-  assert.doesNotMatch(allSql, /alter\s+table\s+public\.[a-z0-9_]+\s+disable\s+row\s+level\s+security/);
+  assert.doesNotMatch(
+    allSql,
+    /alter\s+table\s+public\.[a-z0-9_]+\s+disable\s+row\s+level\s+security/,
+  );
   assert.doesNotMatch(allSql, /grant\s+execute\s+on\s+function\s+[^;]+\s+to\s+anon\b/);
 });
 
