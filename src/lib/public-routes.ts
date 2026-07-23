@@ -12,6 +12,7 @@ export const PUBLIC_ROUTES: PublicRouteEntry[] = [
   { path: "/chuva-em-pelotas", changeFrequency: "hourly", priority: 0.8 },
   { path: "/vento-em-pelotas", changeFrequency: "hourly", priority: 0.8 },
   { path: "/alertas", changeFrequency: "hourly", priority: 0.9 },
+  { path: "/radar-e-satelite-pelotas", changeFrequency: "hourly", priority: 0.8 },
   { path: "/situacao-hidrologica-pelotas", changeFrequency: "hourly", priority: 0.8 },
   { path: "/nivel-da-lagoa-dos-patos-laranjal", changeFrequency: "hourly", priority: 0.8 },
   { path: "/estacao-embrapa-pelotas", changeFrequency: "hourly", priority: 0.7 },
