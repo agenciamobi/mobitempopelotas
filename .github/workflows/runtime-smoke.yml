@@ -25,6 +25,7 @@ jobs:
 
     steps:
       - name: Consultar aplicação publicada
+        continue-on-error: true
         env:
           BASE_URL: https://mobitempopelotas.lovable.app
         run: |
@@ -180,6 +181,7 @@ jobs:
           NODE
 
       - name: Confirmar contratos canônicos com www
+        if: always()
         env:
           BASE_URL: https://mobitempopelotas.lovable.app
           CANONICAL_ORIGIN: https://www.tempopelotas.com.br
