@@ -3,14 +3,8 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const ROOT_ROUTE_PATH = new URL("../src/routes/__root.tsx", import.meta.url);
-const PRODUCTION_CSS_PATH = new URL(
-  "../src/production/production-styles.css",
-  import.meta.url,
-);
-const PRODUCTION_MANIFEST_PATH = new URL(
-  "../src/production/production-styles.ts",
-  import.meta.url,
-);
+const PRODUCTION_CSS_PATH = new URL("../src/production/production-styles.css", import.meta.url);
+const PRODUCTION_MANIFEST_PATH = new URL("../src/production/production-styles.ts", import.meta.url);
 
 function extractStyleImports(content: string, pattern: RegExp) {
   return [...content.matchAll(pattern)].map((match) => match[1]);
@@ -19,10 +13,7 @@ function extractStyleImports(content: string, pattern: RegExp) {
 test("carrega as folhas estruturais no head global antes da hidratação", async () => {
   const rootRoute = await readFile(ROOT_ROUTE_PATH, "utf8");
 
-  assert.match(
-    rootRoute,
-    /import mapLibreCss from "maplibre-gl\/dist\/maplibre-gl\.css\?url";/,
-  );
+  assert.match(rootRoute, /import mapLibreCss from "maplibre-gl\/dist\/maplibre-gl\.css\?url";/);
   assert.match(
     rootRoute,
     /import productionCss from "@\/production\/production-styles\.css\?url";/,
@@ -46,13 +37,10 @@ test("mantém a entrada CSS global idêntica ao manifesto de produção", async 
     readFile(PRODUCTION_MANIFEST_PATH, "utf8"),
   ]);
 
-  const cssImports = extractStyleImports(
-    productionCss,
-    /@import "\.\/styles\/([^\"]+\.css)";/g,
-  );
+  const cssImports = extractStyleImports(productionCss, /@import "\.\/styles\/([^"+]+\.css)";/g);
   const manifestImports = extractStyleImports(
     productionManifest,
-    /import "\.\/styles\/([^\"]+\.css)";/g,
+    /import "\.\/styles\/([^"+]+\.css)";/g,
   );
 
   assert.ok(cssImports.length >= 100, "a pilha editorial completa deve permanecer declarada");
