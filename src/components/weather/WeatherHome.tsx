@@ -2,12 +2,14 @@ import { Link } from "@tanstack/react-router";
 import { AlertTriangle, ShieldAlert } from "lucide-react";
 
 import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
+import type { RedemetOverview } from "@/lib/redemet/redemet.types";
 import type { WeatherSourceKey } from "@/lib/weather/aggregated-weather.types";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 
 import { HomeForecastStory } from "./HomeForecastStory";
 import { HomeLocalMonitoring } from "./HomeLocalMonitoring";
 import { HomeOperationalNavigation } from "./HomeOperationalNavigation";
+import { HomeRegionalObservation } from "./HomeRegionalObservation";
 import { WeatherEditorialHero } from "./WeatherEditorialHero";
 import "./WeatherHome.css";
 
@@ -38,9 +40,11 @@ function formatFetchedAt(value: string) {
 export function WeatherHome({
   data,
   laranjal,
+  redemet,
 }: {
   data: WeatherIntelligenceData;
   laranjal: LaranjalLevelData;
+  redemet: RedemetOverview;
 }) {
   const weather = data.weather;
 
@@ -119,6 +123,7 @@ export function WeatherHome({
       ) : null}
 
       <HomeForecastStory data={data} />
+      <HomeRegionalObservation data={redemet} />
       <HomeLocalMonitoring observation={weather.observation} laranjal={laranjal} />
 
       {weather.officialForecast.length > 0 ? (
@@ -153,8 +158,8 @@ export function WeatherHome({
 
       <p className="weather-source-note">
         Dados consolidados por MOBI Tempo Pelotas a partir de Embrapa Clima Temperado, INMET,
-        CPPMet/UFPel e {weather.quality.forecastProvider ?? "modelo meteorológico"}. Consulta
-        realizada em {formatFetchedAt(weather.source.fetchedAt)}.
+        CPPMet/UFPel, REDEMET/DECEA e {weather.quality.forecastProvider ?? "modelo meteorológico"}.
+        Consulta realizada em {formatFetchedAt(weather.source.fetchedAt)}.
         {degradedSources.length > 0
           ? ` Fontes com restrição: ${degradedSources.map((source) => sourceLabels[source]).join(", ")}.`
           : " Todas as fontes prioritárias responderam dentro dos critérios operacionais."}
