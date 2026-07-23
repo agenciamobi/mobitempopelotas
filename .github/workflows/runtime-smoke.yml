@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - agent/redemet-home-methodology-runtime
+      - agent/hydrology-runtime-smoke
   pull_request:
     branches:
       - main
@@ -18,9 +19,9 @@ concurrency:
 
 jobs:
   smoke:
-    name: Validar publicação e REDEMET
+    name: Validar publicação, REDEMET e hidrologia
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
 
     steps:
       - name: Consultar aplicação publicada
@@ -31,7 +32,7 @@ jobs:
           const baseUrl = process.env.BASE_URL.replace(/\/$/, "");
           const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-          async function request(path, attempts = 12) {
+          async function request(path, attempts = 18) {
             let lastError;
 
             for (let attempt = 1; attempt <= attempts; attempt += 1) {
@@ -39,7 +40,7 @@ jobs:
                 const response = await fetch(`${baseUrl}${path}`, {
                   headers: {
                     Accept: path.startsWith("/api/") ? "application/json" : "text/html",
-                    "User-Agent": "TempoPelotas-Runtime-Smoke/1.0",
+                    "User-Agent": "TempoPelotas-Runtime-Smoke/2.0",
                   },
                   signal: AbortSignal.timeout(20_000),
                 });
@@ -59,11 +60,32 @@ jobs:
             throw lastError;
           }
 
-          const pageResponse = await request("/radar-e-satelite-pelotas");
-          const pageHtml = await pageResponse.text();
-          if (!pageHtml.includes("Radar, satélite e trovoadas")) {
-            throw new Error("A página REDEMET publicada não contém o conteúdo esperado.");
+          function assertContains(html, expected, context) {
+            if (!html.includes(expected)) {
+              throw new Error(`${context}: conteúdo esperado ausente: ${expected}`);
+            }
           }
+
+          function assertNoSensitiveMarkers(html, context) {
+            const forbidden = [
+              "REDEMET_API_KEY",
+              "GOOGLE_OAUTH_CLIENT_SECRET",
+              "GEMINI_API_KEY",
+              "LOVABLE_API_KEY",
+              "process.env.",
+            ];
+
+            for (const marker of forbidden) {
+              if (html.includes(marker)) {
+                throw new Error(`${context}: marcador sensível exposto: ${marker}`);
+              }
+            }
+          }
+
+          const radarPageResponse = await request("/radar-e-satelite-pelotas");
+          const radarPageHtml = await radarPageResponse.text();
+          assertContains(radarPageHtml, "Radar, satélite e trovoadas", "Página REDEMET");
+          assertNoSensitiveMarkers(radarPageHtml, "Página REDEMET");
 
           const endpoints = [
             ["radar", "/api/redemet/radar?frames=2"],
@@ -74,7 +96,9 @@ jobs:
           const results = {};
           for (const [name, path] of endpoints) {
             const response = await request(path);
-            const payload = await response.json();
+            const raw = await response.text();
+            assertNoSensitiveMarkers(raw, `Endpoint ${name}`);
+            const payload = JSON.parse(raw);
 
             if (payload.provider !== "REDEMET / DECEA") {
               throw new Error(`${name}: contrato de provedor inesperado.`);
@@ -107,7 +131,7 @@ jobs:
           if (imageLayer) {
             const imageUrl = new URL(imageLayer.frames.at(-1).imageUrl, baseUrl);
             const imageResponse = await fetch(imageUrl, {
-              headers: { "User-Agent": "TempoPelotas-Runtime-Smoke/1.0" },
+              headers: { "User-Agent": "TempoPelotas-Runtime-Smoke/2.0" },
               signal: AbortSignal.timeout(25_000),
             });
             const contentType = imageResponse.headers.get("content-type") || "";
@@ -121,5 +145,36 @@ jobs:
             console.log(`proxy de imagem: HTTP ${imageResponse.status} ${contentType}`);
           }
 
-          console.log(`Runtime validado em ${baseUrl}. Produtos disponíveis: ${available.length}/3.`);
+          const homeResponse = await request("/");
+          const homeHtml = await homeResponse.text();
+          assertContains(homeHtml, "Do Guaíba à Lagoa dos Patos", "Homepage");
+          assertContains(homeHtml, "Rede da Lagoa dos Patos", "Homepage");
+          assertContains(homeHtml, "Nível do Guaíba", "Homepage");
+          assertNoSensitiveMarkers(homeHtml, "Homepage");
+
+          const hydrologyResponse = await request("/situacao-hidrologica-pelotas");
+          const hydrologyHtml = await hydrologyResponse.text();
+          assertContains(hydrologyHtml, "Do Guaíba à Lagoa dos Patos", "Página hidrológica");
+          assertContains(hydrologyHtml, "Nível do Guaíba", "Página hidrológica");
+
+          const stations = [
+            "FURG CCMAR",
+            "São Lourenço do Sul",
+            "Arambaré",
+            "São José do Norte",
+            "Itapuã",
+          ];
+          for (const station of stations) {
+            assertContains(hydrologyHtml, station, "Rede da Lagoa dos Patos");
+          }
+          assertNoSensitiveMarkers(hydrologyHtml, "Página hidrológica");
+
+          const stateMarkers = ["Atualizado", "Leitura atrasada", "Indisponível"];
+          if (!stateMarkers.some((marker) => hydrologyHtml.includes(marker))) {
+            throw new Error("Página hidrológica não apresentou um estado operacional reconhecível.");
+          }
+
+          console.log(
+            `Runtime validado em ${baseUrl}: REDEMET ${available.length}/3; Guaíba e 5 estações regionais renderizados.`,
+          );
           NODE
