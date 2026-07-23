@@ -23,69 +23,65 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Capturar e analisar HTML
+      - name: Capturar HTML
         env:
           BASE_URL: https://mobitempopelotas.lovable.app
         run: |
           mkdir -p artifacts/exact-production-live
-          node <<'NODE'
-          const { writeFile } = require("node:fs/promises");
-          const baseUrl = process.env.BASE_URL.replace(/\/$/, "");
-          const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
-          const markers = [
-            "site-shell--home-editorial",
-            "weather-hero",
-            "home-section-navigation",
-            "home-story--forecast",
-            "home-story--map",
-            "home-story--observation",
-            "home-story--water",
-            "site-footer",
-            "Veja como o tempo deve mudar ao longo do dia",
-            "Do Guaíba à Lagoa dos Patos",
-            "Rede da Lagoa dos Patos",
-            "Nível do Guaíba",
-            "Informação local para acompanhar o dia",
-          ];
+          printf '{}\n' > artifacts/exact-production-live/summary.json
+          curl \
+            --fail \
+            --location \
+            --retry 24 \
+            --retry-all-errors \
+            --retry-delay 10 \
+            --connect-timeout 20 \
+            --max-time 300 \
+            --user-agent 'TempoPelotas-Exact-Port-Debug/2.0' \
+            --output artifacts/exact-production-live/home.html \
+            "$BASE_URL/"
 
-          let response;
-          let html = "";
-          for (let attempt = 1; attempt <= 24; attempt += 1) {
-            response = await fetch(`${baseUrl}/`, {
-              headers: {
-                Accept: "text/html",
-                "User-Agent": "TempoPelotas-Exact-Port-Debug/1.0",
-              },
-              signal: AbortSignal.timeout(25_000),
-            });
-            html = await response.text();
-            if (response.ok && html.includes("site-shell--home-editorial")) break;
-            console.log(`Tentativa ${attempt}/24: HTTP ${response.status}; shell literal ainda ausente.`);
-            if (attempt < 24) await wait(10_000);
+      - name: Analisar estrutura publicada
+        run: |
+          python <<'PY'
+          import json
+          import re
+          from datetime import datetime, timezone
+          from pathlib import Path
+
+          html_path = Path("artifacts/exact-production-live/home.html")
+          summary_path = Path("artifacts/exact-production-live/summary.json")
+          html = html_path.read_text(errors="replace") if html_path.exists() else ""
+          markers = [
+              "site-shell--home-editorial",
+              "weather-hero",
+              "home-section-navigation",
+              "home-story--forecast",
+              "home-story--map",
+              "home-story--observation",
+              "home-story--water",
+              "site-footer",
+              "Veja como o tempo deve mudar ao longo do dia",
+              "Do Guaíba à Lagoa dos Patos",
+              "Rede da Lagoa dos Patos",
+              "Nível do Guaíba",
+              "Informação local para acompanhar o dia",
+          ]
+          results = {marker: marker in html for marker in markers}
+          missing = [marker for marker, present in results.items() if not present]
+          title_match = re.search(r"<title>([^<]*)</title>", html, re.I)
+          summary = {
+              "capturedAt": datetime.now(timezone.utc).isoformat(),
+              "htmlLength": len(html),
+              "title": title_match.group(1) if title_match else None,
+              "results": results,
+              "missing": missing,
           }
-
-          const results = Object.fromEntries(markers.map((marker) => [marker, html.includes(marker)]));
-          const missing = markers.filter((marker) => !results[marker]);
-          const summary = {
-            capturedAt: new Date().toISOString(),
-            baseUrl,
-            status: response?.status ?? null,
-            htmlLength: html.length,
-            title: html.match(/<title>([^<]*)<\/title>/i)?.[1] ?? null,
-            results,
-            missing,
-          };
-
-          await writeFile("artifacts/exact-production-live/home.html", html);
-          await writeFile(
-            "artifacts/exact-production-live/summary.json",
-            `${JSON.stringify(summary, null, 2)}\n`,
-          );
-
-          console.log(JSON.stringify(summary, null, 2));
-          if (!response?.ok) throw new Error(`Homepage respondeu HTTP ${response?.status ?? "desconhecido"}.`);
-          if (missing.length > 0) throw new Error(`Marcadores ausentes: ${missing.join(" | ")}`);
-          NODE
+          summary_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n")
+          print(json.dumps(summary, ensure_ascii=False, indent=2))
+          if missing:
+              raise SystemExit("Marcadores ausentes: " + " | ".join(missing))
+          PY
 
       - name: Publicar captura
         if: always()
