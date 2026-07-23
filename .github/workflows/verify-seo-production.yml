@@ -1,0 +1,93 @@
+name: Verificar SEO em produção
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.head_ref == 'agent/verify-seo-production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+
+    steps:
+      - name: Aguardar publicação
+        run: sleep 20
+
+      - name: Baixar home publicada
+        run: |
+          set -euo pipefail
+          for attempt in {1..8}; do
+            if curl --fail --location --silent --show-error --max-time 60 \
+              --dump-header /tmp/home.headers \
+              https://mobitempopelotas.lovable.app/ > /tmp/home.html; then
+              break
+            fi
+            if [ "$attempt" -eq 8 ]; then exit 1; fi
+            sleep 15
+          done
+          test -s /tmp/home.html
+
+      - name: Validar metadados da home
+        run: |
+          set -euo pipefail
+          grep -q 'rel="canonical"' /tmp/home.html
+          grep -q 'href="https://mobitempopelotas.lovable.app/"' /tmp/home.html
+          grep -q 'property="og:url" content="https://mobitempopelotas.lovable.app/"' /tmp/home.html
+          grep -q 'application/ld+json' /tmp/home.html
+          grep -q '"@type":"WebSite"' /tmp/home.html
+
+      - name: Validar sitemap publicado
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error --max-time 60 \
+            --dump-header /tmp/sitemap.headers \
+            https://mobitempopelotas.lovable.app/sitemap.xml > /tmp/sitemap.xml
+          grep -qi '^content-type: application/xml' /tmp/sitemap.headers
+          grep -q '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' /tmp/sitemap.xml
+          test "$(grep -c '<url>' /tmp/sitemap.xml)" -eq 12
+          grep -q '<loc>https://mobitempopelotas.lovable.app/</loc>' /tmp/sitemap.xml
+          grep -q '<loc>https://mobitempopelotas.lovable.app/metodologia</loc>' /tmp/sitemap.xml
+          grep -q '<loc>https://mobitempopelotas.lovable.app/cameras-ao-vivo-pelotas</loc>' /tmp/sitemap.xml
+
+      - name: Validar robots publicado
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error --max-time 60 \
+            --dump-header /tmp/robots.headers \
+            https://mobitempopelotas.lovable.app/robots.txt > /tmp/robots.txt
+          grep -qi '^content-type: text/plain' /tmp/robots.headers
+          grep -q '^User-agent: \*$' /tmp/robots.txt
+          grep -q '^Allow: /$' /tmp/robots.txt
+          grep -q '^Disallow: /api/$' /tmp/robots.txt
+          grep -q '^Sitemap: https://mobitempopelotas.lovable.app/sitemap.xml$' /tmp/robots.txt
+
+      - name: Gerar relatório
+        if: always()
+        run: |
+          {
+            echo "## SEO em produção"
+            echo
+            echo "- Home: $(wc -c < /tmp/home.html 2>/dev/null || echo 0) bytes"
+            echo "- Sitemap: $(grep -c '<url>' /tmp/sitemap.xml 2>/dev/null || echo 0) URLs"
+            echo "- Robots: $(wc -l < /tmp/robots.txt 2>/dev/null || echo 0) linhas"
+          } | tee /tmp/seo-production-report.md
+
+      - name: Publicar relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-production-report
+          path: |
+            /tmp/seo-production-report.md
+            /tmp/home.headers
+            /tmp/sitemap.headers
+            /tmp/sitemap.xml
+            /tmp/robots.headers
+            /tmp/robots.txt
+          if-no-files-found: warn
+          retention-days: 3
