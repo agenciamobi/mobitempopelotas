@@ -32,10 +32,11 @@ A arquitetura nativa do novo projeto deve ser preservada. Arquivos de configura�
 4. Executar `npm run build`, `npm run typecheck` e `npm run lint` antes de integrar cada etapa. O build deve ocorrer primeiro para gerar a árvore de rotas do TanStack Router.
 5. Manter dados meteorológicos normalizados e desacoplados dos componentes visuais.
 6. Manter segredos exclusivamente no servidor.
-7. Não expor `SUPABASE_SERVICE_ROLE_KEY`, segredos de cron ou chaves privadas no bundle do navegador.
+7. Não expor `SUPABASE_SECRET_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, segredos de cron ou chaves privadas no bundle do navegador.
 8. Preservar SEO, acessibilidade, semântica HTML, PWA e desempenho durante a migração.
 9. Não criar um segundo banco no Lovable Cloud.
-10. Aplicar migrations somente no Supabase externo oficial após revisão.
+10. Aplicar migrations somente no Supabase externo oficial após revisão e conferência do histórico existente.
+11. Textos públicos devem ser compreensíveis para visitantes leigos e distinguir previsão, observação, tendência e alerta oficial.
 
 ## Estrutura pretendida
 
@@ -73,10 +74,13 @@ _legacy/
 
 - [x] Definir variáveis públicas e modo controlado em `.env.example`
 - [x] Criar configuração e adaptador mock sem acesso de rede
-- [ ] Instalar o SDK e criar clientes reais separados para browser e servidor
-- [ ] Copiar e revisar migrations existentes
-- [ ] Validar RLS e permissões
-- [ ] Definir estratégia de Edge Functions para tarefas incompatíveis com o runtime do deploy
+- [x] Instalar `@supabase/supabase-js` e `@supabase/ssr` com versões fixadas
+- [x] Criar clientes reais separados para navegador, servidor público e operações administrativas server-only
+- [x] Versionar migrations de perfis e preferências com RLS
+- [ ] Conferir o histórico de migrations do projeto Supabase oficial antes de aplicar qualquer SQL
+- [ ] Validar policies RLS com usuários autenticados e anônimos
+- [ ] Gerar novamente `database.types.ts` a partir do projeto oficial após a aplicação das migrations
+- [ ] Definir Edge Functions para cron, snapshots e web push
 
 ### 3. Layout e identidade
 
@@ -87,6 +91,7 @@ _legacy/
 - [x] Implementar navegação acessível
 - [x] Integrar o layout global ao `__root.tsx`
 - [x] Integrar estados de erro e página 404 ao layout
+- [x] Consolidar tema editorial moderno e navegação orientada ao visitante leigo
 
 ### 4. Camada meteorológica
 
@@ -95,9 +100,10 @@ _legacy/
 - [x] Separar contratos compartilhados, helper server-only e server function
 - [x] Implementar timeout, cache, validação e fallback explícito
 - [x] Impedir que dados demonstrativos sejam identificados como observações reais
-- [ ] Portar observação local da Embrapa com validação de atualidade
-- [ ] Portar alertas oficiais do INMET
-- [ ] Mapear e revisar as fontes hidrológicas
+- [x] Portar observação local da Embrapa com validação de atualidade
+- [x] Portar alertas oficiais do INMET
+- [x] Portar CPPMet/UFPel e resumo meteorológico com fallback determinístico
+- [x] Portar fontes hidrológicas prioritárias, regras semânticas e estados de atraso
 
 ### 5. Home
 
@@ -106,31 +112,29 @@ _legacy/
 - [x] Exibir previsão horária
 - [x] Exibir previsão para sete dias
 - [x] Exibir chuva e vento
-- [ ] Alertas e destaques locais
-- [ ] Links para histórico, mapa, câmeras e nível da Lagoa
-- [ ] Dados estruturados e metadados específicos
+- [x] Integrar alertas, banners preventivos e destaques locais
+- [x] Integrar atalhos para histórico, mapas, câmeras e níveis das águas
+- [x] Manter navegação útil durante indisponibilidade completa das fontes
+- [x] Integrar dados estruturados e metadados editoriais
 
 ### 6. Páginas internas e SEO
 
-- [x] Criar rotas estáticas para os destinos atuais do Header e Footer
-- [x] Adicionar metadados básicos por rota
-- [ ] Histórico meteorológico funcional
-- [ ] Radar e mapas
-- [ ] Alertas funcionais
-- [ ] Câmeras ao vivo
-- [ ] Nível da Lagoa dos Patos
-- [ ] Conteúdo institucional e metodologia
-- [ ] Sitemap
-- [ ] Robots
-- [ ] Canonicals
-- [ ] Open Graph completo
-- [ ] Schema.org
+- [x] Criar rotas públicas para tempo, clima, águas, mapas, câmeras e transparência
+- [x] Adicionar metadados próprios por rota
+- [ ] Persistir histórico meteorológico real no Supabase externo
+- [x] Integrar radar, satélite, trovoadas e mapa regional com contingência explícita
+- [x] Integrar avisos meteorológicos funcionais
+- [x] Integrar câmeras ao vivo e contingências do YouTube
+- [x] Integrar nível da Lagoa dos Patos e situação hidrológica regional
+- [x] Publicar conteúdo institucional e metodologia
+- [x] Publicar sitemap, robots, canonicals e Open Graph
+- [x] Publicar Schema.org global, feed JSON e endpoint público de dados
 
 ### 7. PWA, cron e notificações
 
-- [ ] Manifest
-- [ ] Service worker
-- [ ] Estratégia de atualização e cache
+- [x] Manifesto instalável com atalhos editoriais
+- [x] Service worker com fallback offline seguro
+- [x] Estratégia controlada de atualização e cache de ativos
 - [ ] Captura diária de snapshots
 - [ ] Autenticação e idempotência dos crons
 - [ ] Inscrições push
@@ -138,38 +142,37 @@ _legacy/
 
 ### 8. Qualidade e deploy
 
-- [ ] Typecheck sem erros
-- [ ] Lint sem erros
-- [ ] Build de produção sem erros
-- [ ] Testes das principais rotas
-- [ ] Verificação mobile-first
-- [ ] Auditoria de acessibilidade
-- [ ] Auditoria de Core Web Vitals
-- [ ] Configuração das variáveis no ambiente de deploy
+- [x] Typecheck sem erros no CI
+- [x] Lint sem erros no CI
+- [x] Build de produção sem erros no CI
+- [x] Auditoria visual automatizada em desktop e mobile
+- [ ] Testes unitários dos parsers, normalizadores, RLS e rotas críticas
+- [ ] Auditoria completa de acessibilidade WCAG 2.2 AA
+- [ ] Auditoria de Core Web Vitals em produção
+- [ ] Configuração das variáveis no ambiente definitivo
 - [ ] Validação do Supabase externo em produção
 - [ ] Remoção do `_legacy/` após conclusão e conferência final
 
 ## Snapshot atual do legado
 
 - Repositório origem: `agenciamobi/tempopelotas` @ `main`
-- Commit sincronizado: `05cd2d268ad25c070718ecc170bd30e8ad181341`
-- Data UTC: `2026-07-22T00:11:00Z`
+- Commit sincronizado no diretório `_legacy/`: `05cd2d268ad25c070718ecc170bd30e8ad181341`
+- Data UTC do snapshot: `2026-07-22T00:11:00Z`
 - Método: `git clone --depth 1` + `rsync` sanitizado
 - Arquivos em `_legacy/`: `249`
 - Detalhes e exclusões: ver `_legacy/SOURCE_SNAPSHOT.md`
 
+As entregas posteriores ao snapshot são comparadas diretamente com o repositório de origem antes de cada lote. A presença de um arquivo em `_legacy/` nunca deve ser considerada implementação concluída.
+
 ## Matriz de migração
 
-O inventário completo (status por domínio, origem → destino, dependências,
-incompatibilidades Next → TanStack, risco, critério de aceite e lote
-recomendado) vive em [`MIGRATION_MATRIX.md`](./MIGRATION_MATRIX.md). Este
-documento passa a registrar apenas o roteiro de alto nível; o detalhamento
-operacional fica na matriz.
+O inventário completo (status por domínio, origem → destino, dependências, incompatibilidades Next → TanStack, risco, critério de aceite e lote recomendado) vive em [`MIGRATION_MATRIX.md`](./MIGRATION_MATRIX.md).
 
 ## Próxima fatia
 
-Com base na matriz, o próximo lote é a **camada meteorológica completa**
-(Lote 2): portar Embrapa (com validação de atualidade), alertas oficiais do
-INMET e o painel CPPMet/UFPel, consolidando contratos normalizados em
-`src/lib/weather/` e alimentando Home, "Hoje" e "7 dias" a partir dos mesmos
-tipos.
+O próximo bloco é o **Lote 6 — histórico climático e snapshots**:
+
+1. revisar e versionar as tabelas de snapshots meteorológicos do projeto de origem;
+2. validar retenção, timezone `America/Sao_Paulo`, índices e acesso exclusivamente server-side para escrita;
+3. substituir o estado vazio de `/historico-climatico-pelotas` por séries reais, períodos compreensíveis e explicações editoriais para o visitante;
+4. somente depois ativar autenticação Google, área de conta e preferências pessoais sobre a base SSR já preparada.
