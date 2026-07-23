@@ -62,7 +62,9 @@ async function staleWhileRevalidate(request, event) {
   const cached = await cache.match(request);
   const networkPromise = fetch(request)
     .then(async (response) => {
-      if (response.ok) await cache.put(request, response.clone());
+      if (response.ok) {
+        await cache.put(request, response.clone()).catch(() => undefined);
+      }
       return response;
     })
     .catch(() => null);
