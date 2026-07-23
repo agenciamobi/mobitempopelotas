@@ -39,18 +39,26 @@ jobs:
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
 
-      - name: Executar transplante literal
+      - name: Materializar script de transplante
         run: |
           python <<'PY'
           from pathlib import Path
-          import textwrap
 
           workflow = Path('.github/workflows/exact-production-port.yml').read_text()
-          marker_start = "          python <<'PY'\n"
-          marker_end = "\n          PY\n\n      - name: Instalar MapLibre"
-          embedded = workflow.split(marker_start, 1)[1].split(marker_end, 1)[0]
-          exec(compile(textwrap.dedent(embedded), 'exact-production-port', 'exec'))
+          section = workflow.split('- name: Copiar componentes e estilos da produção', 1)[1]
+          start = section.index("          from pathlib import Path\n")
+          end = section.index("\n          PY\n", start)
+          embedded = section[start:end]
+          script = "\n".join(
+              line[10:] if line.startswith("          ") else line
+              for line in embedded.splitlines()
+          )
+          Path('/tmp/exact-production-port.py').write_text(script + "\n")
+          print(f'Script materializado com {len(script.splitlines())} linhas.')
           PY
+
+      - name: Executar transplante literal
+        run: python /tmp/exact-production-port.py
 
       - name: Instalar MapLibre usado pela produção
         run: npm install maplibre-gl@5.24.0 --save --no-audit --no-fund
