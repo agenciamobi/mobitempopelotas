@@ -18,12 +18,18 @@ export const PUSH_RESPONSE_HEADERS = {
 } as const;
 
 export type LimitedJsonResult =
-  { ok: true; value: unknown } | { ok: false; status: 400 | 413 | 415; error: string };
+  | { ok: true; value: unknown }
+  | { ok: false; status: 400 | 413 | 415; error: string };
 
-export function pushJsonResponse(body: unknown, status = 200) {
+export function pushJsonResponse(body: unknown, status = 200, additionalHeaders?: HeadersInit) {
+  const headers = new Headers(PUSH_RESPONSE_HEADERS);
+  if (additionalHeaders) {
+    new Headers(additionalHeaders).forEach((value, key) => headers.append(key, value));
+  }
+
   return new Response(JSON.stringify(body), {
     status,
-    headers: PUSH_RESPONSE_HEADERS,
+    headers,
   });
 }
 
