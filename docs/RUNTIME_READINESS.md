@@ -38,10 +38,10 @@ O comando exige:
 - publishable keys pública e server-side idênticas;
 - chave administrativa do Supabase exclusiva do servidor;
 - `CRON_SECRET` e `PUSH_ADMIN_SECRET` distintos, não triviais e com pelo menos 32 caracteres;
-- par VAPID em base64url com comprimentos criptográficos esperados;
+- par VAPID P-256 correspondente, com chave pública não comprimida;
 - `VAPID_SUBJECT` em `mailto:` ou HTTPS;
 - chave da REDEMET e base HTTPS;
-- `GEMINI_API_KEY` quando `GEMINI_WEATHER_ENABLED=true`;
+- `GEMINI_API_KEY` quando `GEMINI_WEATHER_ENABLED` usa `true`, `1` ou `on`;
 - ausência de secrets indevidamente configurados com prefixo `VITE_`;
 - `VITE_SITE_URL=https://www.tempopelotas.com.br`.
 
