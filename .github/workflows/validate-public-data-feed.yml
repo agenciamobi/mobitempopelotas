@@ -1,0 +1,139 @@
+name: Validar dados públicos e feed
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    if: github.head_ref == 'agent/public-data-feed' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout da branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/public-data-feed
+          fetch-depth: 0
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Atualizar matriz de migração
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("MIGRATION_MATRIX.md")
+          text = path.read_text(encoding="utf-8")
+          old = "| 45 | `pelotas.json`, feed e transparência | Não migrado | `/pelotas.json`, `/feed`, metodologia | rotas públicas Nitro | contratos agregados | Definir cache, content-type e versão do schema | Médio | JSON estável, feed válido e documentação das fontes | 9 |"
+          new = "| 45 | `pelotas.json`, feed e transparência | Migrado | `/pelotas.json`, `/feed`, metodologia | `src/routes/pelotas[.]json.ts`, `src/routes/feed.ts`, `src/lib/public-portal.server.ts` | contratos meteorológico e hidrológico atuais | Schema 2.0, JSON Feed 1.1, CORS e cache explícitos | Baixo | JSON estável, feed válido e documentação das fontes | 9 |"
+          if text.count(old) != 1:
+              raise SystemExit("Linha 45 da matriz não encontrada de forma única")
+          path.write_text(text.replace(old, new), encoding="utf-8")
+          PY
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Formatar arquivos
+        run: |
+          npx prettier --write \
+            src/lib/public-portal.server.ts \
+            src/routes/feed.ts \
+            src/routes/__root.tsx
+          for file in "src/routes/pelotas[.]json.ts"; do
+            npx prettier --stdin-filepath "$file" < "$file" > "$file.formatted"
+            mv "$file.formatted" "$file"
+          done
+
+      - name: Validar build
+        run: npm run build
+
+      - name: Validar tipos
+        run: npm run typecheck
+
+      - name: Validar lint
+        run: npm run lint
+
+      - name: Iniciar runtime SSR
+        run: |
+          npm run dev -- --host 127.0.0.1 --port 3000 > /tmp/tempo-pelotas-public-data.log 2>&1 &
+          echo $! > /tmp/tempo-pelotas-public-data.pid
+
+      - name: Aguardar runtime
+        run: |
+          for attempt in {1..60}; do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/ > /tmp/home.html; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/tempo-pelotas-public-data.log
+          exit 1
+
+      - name: Validar descoberta do feed
+        run: |
+          grep -q 'rel="alternate"' /tmp/home.html
+          grep -q 'type="application/feed+json"' /tmp/home.html
+          grep -q 'href="https://mobitempopelotas.lovable.app/feed"' /tmp/home.html
+
+      - name: Validar pelotas.json
+        run: |
+          curl --fail --silent --show-error --max-time 60 \
+            --dump-header /tmp/pelotas.headers \
+            http://127.0.0.1:3000/pelotas.json > /tmp/pelotas.json
+          grep -qi '^content-type: application/json' /tmp/pelotas.headers
+          grep -qi '^access-control-allow-origin: \*$' /tmp/pelotas.headers
+          jq -e '
+            .schema_version == "2.0" and
+            .location.city == "Pelotas" and
+            .location.timezone == "America/Sao_Paulo" and
+            (.weather | has("current")) and
+            (.weather | has("daily")) and
+            (.weather | has("quality")) and
+            (.weather.observed.embrapa | has("error") | not) and
+            (.hydrology.local_level.laranjal | has("error") | not) and
+            .links.feed == "https://mobitempopelotas.lovable.app/feed" and
+            .links.public_data == "https://mobitempopelotas.lovable.app/pelotas.json"
+          ' /tmp/pelotas.json >/dev/null
+
+      - name: Validar JSON Feed
+        run: |
+          curl --fail --silent --show-error --max-time 60 \
+            --dump-header /tmp/feed.headers \
+            http://127.0.0.1:3000/feed > /tmp/feed.json
+          grep -qi '^content-type: application/feed+json' /tmp/feed.headers
+          grep -qi '^access-control-allow-origin: \*$' /tmp/feed.headers
+          jq -e '
+            .version == "https://jsonfeed.org/version/1.1" and
+            .title == "Tempo Pelotas" and
+            .feed_url == "https://mobitempopelotas.lovable.app/feed" and
+            (.items | length) == 5 and
+            ([.items[].id] | unique | length) == 5 and
+            ([.items[] | has("content_text")] | all)
+          ' /tmp/feed.json >/dev/null
+
+      - name: Publicar formatação e route tree
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add MIGRATION_MATRIX.md src
+          git commit -m "feat: publica dados estruturados e feed JSON"
+          git push origin HEAD:agent/public-data-feed
+
+      - name: Exibir diagnóstico
+        if: failure()
+        run: |
+          cat /tmp/tempo-pelotas-public-data.log 2>/dev/null || true
+          cat /tmp/pelotas.headers 2>/dev/null || true
+          cat /tmp/pelotas.json 2>/dev/null || true
+          cat /tmp/feed.headers 2>/dev/null || true
+          cat /tmp/feed.json 2>/dev/null || true
