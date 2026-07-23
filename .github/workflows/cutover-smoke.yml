@@ -1,4 +1,4 @@
-# Validação manual e auditável do domínio público antes e depois do cutover.
+# Rodada de baseline pré-cutover contra a produção Vercel ainda ativa.
 name: Smoke test de cutover
 
 on:
