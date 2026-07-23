@@ -1,0 +1,67 @@
+{
+  "id": "/",
+  "name": "TEMPO Pelotas",
+  "short_name": "Tempo Pelotas",
+  "description": "Previsão do tempo, avisos e situação das águas para ajudar a comunidade de Pelotas a se preparar.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#eaf0f3",
+  "theme_color": "#071e2f",
+  "lang": "pt-BR",
+  "orientation": "portrait-primary",
+  "categories": ["weather", "utilities", "local", "news"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/brand/tempo-pelotas-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/tempo-pelotas-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Tempo agora",
+      "short_name": "Agora",
+      "description": "Abrir as condições atuais de Pelotas.",
+      "url": "/"
+    },
+    {
+      "name": "Previsão de 7 dias",
+      "short_name": "7 dias",
+      "description": "Consultar máximas, mínimas e tendência semanal.",
+      "url": "/previsao-7-dias-pelotas"
+    },
+    {
+      "name": "Situação das águas",
+      "short_name": "Águas",
+      "description": "Acompanhar a Lagoa dos Patos, o Guaíba e os pontos monitorados da região.",
+      "url": "/situacao-hidrologica-pelotas"
+    },
+    {
+      "name": "Nível da Lagoa dos Patos",
+      "short_name": "Lagoa",
+      "description": "Abrir a leitura disponível para o Laranjal.",
+      "url": "/nivel-da-lagoa-dos-patos-laranjal"
+    },
+    {
+      "name": "Câmeras ao vivo",
+      "short_name": "Câmeras",
+      "description": "Observar céu, visibilidade e condições locais.",
+      "url": "/cameras-ao-vivo-pelotas"
+    },
+    {
+      "name": "Avisos meteorológicos",
+      "short_name": "Avisos",
+      "description": "Consultar condições que merecem atenção em Pelotas.",
+      "url": "/alertas"
+    }
+  ]
+}

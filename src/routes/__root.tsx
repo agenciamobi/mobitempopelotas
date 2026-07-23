@@ -10,6 +10,7 @@ import {
 import { useEffect, type ReactNode } from "react";
 
 import { SiteLayout } from "@/components/layout/SiteLayout";
+import { PwaManager } from "@/components/pwa/PwaManager";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 import {
   SITE_DESCRIPTION,
@@ -77,6 +78,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: SITE_TITLE },
       { name: "description", content: SITE_DESCRIPTION },
+      { name: "application-name", content: SITE_NAME },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
       { property: "og:title", content: SITE_TITLE },
       { property: "og:description", content: SITE_DESCRIPTION },
       { property: "og:type", content: "website" },
@@ -91,7 +96,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "icon", href: "/favicon.ico" },
+      { rel: "icon", href: "/brand/tempo-pelotas-icon.svg", type: "image/svg+xml" },
+      { rel: "apple-touch-icon", href: "/brand/tempo-pelotas-icon.svg" },
       {
         rel: "alternate",
         type: "application/feed+json",
@@ -134,6 +142,7 @@ function RootComponent() {
       <SiteLayout>
         <Outlet />
       </SiteLayout>
+      <PwaManager />
     </QueryClientProvider>
   );
 }
