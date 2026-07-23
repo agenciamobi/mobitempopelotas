@@ -41,7 +41,7 @@ summary:focus-visible,
     scroll-margin-top: 4.75rem;
   }
 
-  .editorial-footer-shell {
+  .site-shell .editorial-footer-shell {
     padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
   }
 }

@@ -61,13 +61,13 @@ function markdownReport(results) {
     `- Publicação Lovable: ${lovableUrl}`,
     `- Executada em: ${new Date().toISOString()}`,
     "",
-    "| Ambiente | Viewport | Overflow horizontal | Exploração | Skip link | Rodapé protegido |",
-    "|---|---:|---:|---:|---:|---:|",
+    "| Ambiente | Viewport | Overflow horizontal | Exploração | Skip link | Rodapé claro | Rodapé protegido |",
+    "|---|---:|---:|---:|---:|---:|---:|",
   ];
 
   for (const result of results) {
     lines.push(
-      `| ${result.target} | ${result.viewport.width}×${result.viewport.height} | ${result.audit.horizontalOverflow}px | ${result.audit.hasExplore ? "sim" : "não"} | ${result.audit.skipLinkVisible ? "sim" : "não"} | ${result.audit.footerProtected === null ? "n/a" : result.audit.footerProtected ? "sim" : "não"} |`,
+      `| ${result.target} | ${result.viewport.width}×${result.viewport.height} | ${result.audit.horizontalOverflow}px | ${result.audit.hasExplore ? "sim" : "não"} | ${result.audit.skipLinkVisible ? "sim" : "não"} | ${result.audit.footerLight === null ? "n/a" : result.audit.footerLight ? "sim" : "não"} | ${result.audit.footerProtected === null ? "n/a" : result.audit.footerProtected ? "sim" : "não"} |`,
     );
   }
 
@@ -93,10 +93,13 @@ async function auditPage(page, target, viewport) {
       const skipRect = skipLink?.getBoundingClientRect() ?? null;
       const mobileNavigation = document.querySelector(".production-mobile-navigation");
       const footer = document.querySelector(".editorial-footer-shell");
+      const footerPanel = document.querySelector(".editorial-footer");
       const mobileNavigationStyle = mobileNavigation
         ? window.getComputedStyle(mobileNavigation)
         : null;
       const footerStyle = footer ? window.getComputedStyle(footer) : null;
+      const footerPanelStyle = footerPanel ? window.getComputedStyle(footerPanel) : null;
+      const footerBackground = footerPanelStyle?.backgroundColor ?? null;
       const navigationRect = mobileNavigation?.getBoundingClientRect() ?? null;
       const navigationVisible = Boolean(
         mobileNavigationStyle &&
@@ -116,6 +119,8 @@ async function auditPage(page, target, viewport) {
         exploreHeading:
           document.querySelector("#home-explore-portal-title")?.textContent?.trim() ?? null,
         hasFooter: Boolean(footer),
+        footerBackground,
+        footerLight: strictLayout ? footerBackground === "rgb(248, 250, 248)" : null,
         skipLinkFocused: active === skipLink,
         skipLinkVisible: Boolean(
           skipRect &&
@@ -145,6 +150,9 @@ async function auditPage(page, target, viewport) {
   }
   if (target.strictLayout && !audit.hasFooter) {
     failures.push("rodapé editorial ausente");
+  }
+  if (target.strictLayout && audit.footerLight !== true) {
+    failures.push(`rodapé publicado não está claro: ${audit.footerBackground ?? "cor ausente"}`);
   }
   if (target.strictLayout && (!audit.skipLinkFocused || !audit.skipLinkVisible)) {
     failures.push("skip link não recebeu foco visível");
@@ -212,7 +220,7 @@ const failures = results.flatMap((result) =>
 
 for (const result of results) {
   console.log(
-    `${result.target} ${result.viewport.width}×${result.viewport.height}: overflow=${result.audit.horizontalOverflow}px explore=${result.audit.hasExplore} skip=${result.audit.skipLinkVisible} footerProtected=${result.audit.footerProtected}`,
+    `${result.target} ${result.viewport.width}×${result.viewport.height}: overflow=${result.audit.horizontalOverflow}px explore=${result.audit.hasExplore} skip=${result.audit.skipLinkVisible} footerLight=${result.audit.footerLight} footerProtected=${result.audit.footerProtected}`,
   );
 }
 
