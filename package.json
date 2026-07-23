@@ -9,7 +9,7 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "test": "node --test tests/**/*.test.ts",
-    "test:contracts": "node --test tests/water-level-state.test.ts tests/push-http.test.ts tests/database-security.test.ts",
+    "test:contracts": "node --test tests/water-level-state.test.ts tests/push-http.test.ts tests/database-security.test.ts tests/runtime-readiness.test.ts",
     "test:routes": "node --test tests/public-routes.test.ts",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
