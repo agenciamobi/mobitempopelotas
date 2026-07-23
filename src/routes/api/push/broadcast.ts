@@ -21,7 +21,7 @@ const payloadSchema = z.object({
     .max(32)
     .optional(),
   urgency: z.enum(["very-low", "low", "normal", "high"]).default("normal"),
-  topic: z.enum(PUSH_TOPICS).optional(),
+  topic: z.enum(PUSH_TOPICS),
 });
 
 async function broadcast(request: Request) {
@@ -48,7 +48,10 @@ async function broadcast(request: Request) {
   const parsed = payloadSchema.safeParse(body.value);
   if (!parsed.success) {
     return pushJsonResponse(
-      { success: false, error: "Informe título, mensagem e parâmetros válidos." },
+      {
+        success: false,
+        error: "Informe título, mensagem, categoria de consentimento e parâmetros válidos.",
+      },
       400,
     );
   }
