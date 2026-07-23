@@ -25,7 +25,7 @@ Inventário comparativo entre:
 | Câmeras | 0% | YouTube e contingências ainda não migrados |
 | Supabase, histórico e autenticação | 5% | Somente adaptador mock e configuração pública |
 | PWA, push e cron | 0% | Requer adaptação de runtime |
-| SEO técnico | 15% | Metadados básicos presentes; endpoints e dados estruturados ausentes |
+| SEO técnico | 60% | Canonicals, Open Graph, Twitter Cards, sitemap, robots e WebSite JSON-LD implementados |
 | Qualidade, observabilidade e LGPD | 5% | Build e typecheck funcionam; testes e governança pendentes |
 
 **Percentual global aproximado de paridade funcional: 10% a 15%.**
@@ -82,11 +82,11 @@ Inventário comparativo entre:
 | 37 | Cron | Não migrado | `/api/cron/push-daily`, `/api/cron/weather-snapshot` | rotas públicas assinadas ou Edge Functions | `CRON_SECRET`, `PUSH_ADMIN_SECRET` | Substituir Vercel Cron por scheduler compatível | Alto | Assinatura, idempotência, logs e execução observável | 8 |
 | 38 | Web push | Não migrado | `web-push-service.ts`, subscription store, APIs | Supabase Edge Function ou runtime Node compatível | VAPID public/private, subject | `web-push` pode ser incompatível com runtime; evitar service role no navegador | Crítico | Subscribe/unsubscribe, envio real, expiração e limpeza de inscrições | 8 |
 | 39 | PWA e offline | Não migrado | `manifest.ts`, `public/sw.js`, `pwa-manager.tsx`, `/offline` | manifest estático/dinâmico, SW Vite e rota | VAPID opcional | Reescrever integração Next; definir atualização segura do SW | Alto | Instalável, offline controlado, atualização sem cache quebrado | 8 |
-| 40 | Sitemap | Não migrado | `_legacy/app/sitemap.ts` | `src/routes/sitemap[.]xml.ts` ou server route equivalente | lista canônica de rotas | Gerar XML com headers e datas confiáveis | Médio | Todas as URLs públicas canônicas, sem rotas privadas ou duplicadas | 9 |
-| 41 | Robots | Não migrado | `_legacy/app/robots.ts` | `src/routes/robots[.]txt.ts` | URL de produção | Gerar texto no runtime ou arquivo público | Baixo | Sitemap referenciado e regras corretas por ambiente | 9 |
-| 42 | Canonicals | Parcial | metadata das páginas Next | `head()` das rotas TanStack | `SITE_URL` | Centralizar URL absoluta e evitar canonicals de preview | Médio | Toda rota indexável possui canonical único de produção | 9 |
-| 43 | Open Graph e Twitter Cards | Parcial | metadata e assets do legado | `head()` + assets em `public/` | URL pública e imagem social | Adaptar metadata por rota | Médio | Título, descrição, imagem, dimensões e URL corretos | 9 |
-| 44 | Schema.org | Não migrado | JSON-LD espalhado no legado | helpers e scripts por rota | dados meteorológicos e organização | Validar tipos WebSite, Organization, BreadcrumbList e Dataset/Weather quando aplicável | Médio | JSON-LD válido sem alegações indevidas ou dados inventados | 9 |
+| 40 | Sitemap | Migrado | `_legacy/app/sitemap.ts` | `src/routes/sitemap[.]xml.ts`, `src/lib/public-routes.ts` | `VITE_SITE_URL` | Server route TanStack com XML e cache explícitos | Baixo | Todas as URLs públicas canônicas, sem rotas privadas ou duplicadas | 9 |
+| 41 | Robots | Migrado | `_legacy/app/robots.ts` | `src/routes/robots[.]txt.ts` | `VITE_SITE_URL` | Server route TanStack com content-type e cache explícitos | Baixo | Sitemap referenciado e regras corretas por ambiente | 9 |
+| 42 | Canonicals | Migrado | metadata das páginas Next | `src/lib/site-config.ts`, `src/lib/page-meta.ts`, `head()` das rotas | `VITE_SITE_URL` | URL absoluta centralizada com fallback de produção | Baixo | Toda rota indexável possui canonical único de produção | 9 |
+| 43 | Open Graph e Twitter Cards | Migrado | metadata e assets do legado | `src/lib/page-meta.ts`, `src/routes/__root.tsx` | URL pública e imagem social | Metadados por rota com URL canônica e imagem compartilhada | Baixo | Título, descrição, imagem e URL corretos | 9 |
+| 44 | Schema.org | Parcial | JSON-LD espalhado no legado | `src/lib/site-config.ts`, `src/routes/__root.tsx` | dados meteorológicos e organização | WebSite global implementado; BreadcrumbList e datasets permanecem pendentes | Médio | JSON-LD válido sem alegações indevidas ou dados inventados | 9 |
 | 45 | `pelotas.json`, feed e transparência | Não migrado | `/pelotas.json`, `/feed`, metodologia | rotas públicas Nitro | contratos agregados | Definir cache, content-type e versão do schema | Médio | JSON estável, feed válido e documentação das fontes | 9 |
 | 46 | PageSpeed API | Revisar | variável disponível, sem consumo funcional | Ferramenta administrativa futura | `GOOGLE_PAGESPEED_API_KEY` | Não incluir na experiência pública sem caso de uso | Baixo | Remover chave desnecessária ou criar diagnóstico restrito | 10 |
 | 47 | Acessibilidade | Revisar | skip link, ARIA e semântica em componentes legados | todos os componentes migrados | Nenhuma | Preservar foco, teclado, contraste e informação além da cor | Alto | WCAG 2.2 AA nos fluxos principais e testes de teclado | Contínuo |

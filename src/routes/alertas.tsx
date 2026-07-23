@@ -9,6 +9,7 @@ export const Route = createFileRoute("/alertas")({
     createPageHead(
       "Alertas meteorológicos em Pelotas",
       "Avisos meteorológicos oficiais do INMET para Pelotas e região, organizados por severidade e período.",
+      "/alertas",
     ),
   loader: () => getWeatherIntelligence(),
   staleTime: 5 * 60 * 1_000,

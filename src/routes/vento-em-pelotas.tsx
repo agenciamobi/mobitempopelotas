@@ -9,6 +9,7 @@ export const Route = createFileRoute("/vento-em-pelotas")({
     createPageHead(
       "Vento em Pelotas",
       "Velocidade, direção e rajadas de vento previstas para Pelotas nas próximas horas e nos próximos sete dias.",
+      "/vento-em-pelotas",
     ),
   loader: () => getWeatherIntelligence(),
   staleTime: 5 * 60 * 1_000,

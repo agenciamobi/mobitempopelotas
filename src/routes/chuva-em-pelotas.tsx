@@ -9,6 +9,7 @@ export const Route = createFileRoute("/chuva-em-pelotas")({
     createPageHead(
       "Chuva em Pelotas",
       "Previsão de chuva por hora, probabilidade e volume acumulado previsto para Pelotas nos próximos sete dias.",
+      "/chuva-em-pelotas",
     ),
   loader: () => getWeatherIntelligence(),
   staleTime: 5 * 60 * 1_000,

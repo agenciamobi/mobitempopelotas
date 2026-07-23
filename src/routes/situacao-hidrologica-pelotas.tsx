@@ -10,6 +10,7 @@ export const Route = createFileRoute("/situacao-hidrologica-pelotas")({
     createPageHead(
       "Situação das águas em Pelotas",
       "Leitura da Estação Laranjal, evolução recente da Lagoa dos Patos e contexto meteorológico e regional para Pelotas.",
+      "/situacao-hidrologica-pelotas",
     ),
   loader: async () => {
     const [weather, level] = await Promise.all([getWeatherIntelligence(), getLaranjalLevelData()]);

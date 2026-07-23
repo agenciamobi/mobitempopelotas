@@ -9,6 +9,7 @@ export const Route = createFileRoute("/historico-climatico-pelotas")({
     createPageHead(
       "Como foi o tempo nos últimos 30 dias em Pelotas",
       "Compare temperaturas máximas e mínimas, chuva e rajadas dos últimos 30 dias completos em Pelotas, com fonte e metodologia explícitas.",
+      "/historico-climatico-pelotas",
     ),
   loader: () => getPelotasWeatherHistory(),
   staleTime: 6 * 60 * 60 * 1_000,

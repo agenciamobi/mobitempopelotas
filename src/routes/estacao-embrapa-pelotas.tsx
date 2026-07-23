@@ -9,6 +9,7 @@ export const Route = createFileRoute("/estacao-embrapa-pelotas")({
     createPageHead(
       "Estação meteorológica da Embrapa em Pelotas",
       "Temperatura, umidade, pressão, vento, extremos e chuva acumulada consultados na Estação da Embrapa Clima Temperado em Pelotas.",
+      "/estacao-embrapa-pelotas",
     ),
   loader: () => getWeatherIntelligence(),
   staleTime: 60 * 1_000,

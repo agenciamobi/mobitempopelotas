@@ -10,6 +10,7 @@ export const Route = createFileRoute("/cameras-ao-vivo-pelotas")({
     createPageHead(
       "Câmeras do Laranjal e pontos de observação em Pelotas",
       "Acompanhe a câmera da Praia do Laranjal, transmissões públicas recentes e pontos previstos de observação visual em Pelotas.",
+      "/cameras-ao-vivo-pelotas",
     ),
   loader: async () => {
     const [cameraData, weather] = await Promise.all([
