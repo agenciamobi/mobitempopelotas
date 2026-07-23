@@ -112,7 +112,8 @@ function alertFingerprint(alerts: InmetAlert[]) {
 
 function sortPelotasAlertsBySeverity(alerts: InmetAlert[]) {
   return [...alerts].sort((left, right) => {
-    const severityDifference = ALERT_SEVERITY_RANK[right.severity] - ALERT_SEVERITY_RANK[left.severity];
+    const severityDifference =
+      ALERT_SEVERITY_RANK[right.severity] - ALERT_SEVERITY_RANK[left.severity];
     if (severityDifference !== 0) return severityDifference;
 
     const rightSentAt = right.sentAt ? Date.parse(right.sentAt) : 0;
