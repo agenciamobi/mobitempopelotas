@@ -1,0 +1,387 @@
+.home-local-monitoring {
+  display: grid;
+  gap: 1.25rem;
+  padding: clamp(1.4rem, 4vw, 2.35rem);
+  border: 1px solid rgba(255, 255, 255, 0.86);
+  border-radius: 1.75rem;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(83, 200, 218, 0.16), transparent 24rem),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(239, 246, 245, 0.94));
+  box-shadow: var(--portal-shadow);
+}
+
+.home-local-monitoring-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.72fr);
+  align-items: end;
+  gap: 2rem;
+  padding-bottom: 1.35rem;
+  border-bottom: 1px solid var(--portal-line);
+}
+
+.home-local-monitoring-heading > div > span,
+.home-monitoring-panel-copy > span {
+  color: var(--portal-sky-deep);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.home-local-monitoring-heading h2 {
+  max-width: 760px;
+  margin: 0.55rem 0 0;
+  font-size: clamp(1.85rem, 4vw, 3.35rem);
+  letter-spacing: -0.055em;
+  line-height: 1.02;
+}
+
+.home-local-monitoring-heading > p,
+.home-monitoring-panel-copy p,
+.home-monitoring-unavailable p {
+  color: var(--portal-ink-soft);
+  line-height: 1.65;
+}
+
+.home-local-monitoring-heading > p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.home-local-monitoring-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 1rem;
+}
+
+.home-observation-panel,
+.home-water-panel {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 1.15rem;
+  padding: clamp(1.2rem, 3vw, 1.75rem);
+  border: 1px solid var(--portal-line);
+  border-radius: 1.35rem;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.home-water-panel {
+  background:
+    radial-gradient(circle at 92% 5%, rgba(83, 200, 218, 0.2), transparent 15rem),
+    rgba(255, 255, 255, 0.88);
+}
+
+.home-monitoring-panel-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.home-monitoring-panel-topline > div {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  color: var(--portal-ink);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.home-monitoring-panel-topline svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  color: var(--portal-sky-deep);
+}
+
+.home-monitoring-panel-topline small {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  color: var(--portal-ink-soft);
+  font-size: 0.69rem;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.home-monitoring-panel-topline small i {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #55a778;
+  box-shadow: 0 0 0 4px rgba(85, 167, 120, 0.12);
+}
+
+.home-monitoring-panel-topline small.is-partial i,
+.home-monitoring-panel-topline small.is-stale i {
+  background: #d5972f;
+  box-shadow: 0 0 0 4px rgba(213, 151, 47, 0.12);
+}
+
+.home-monitoring-panel-topline small.is-unavailable i {
+  background: #9a6c6c;
+  box-shadow: 0 0 0 4px rgba(154, 108, 108, 0.12);
+}
+
+.home-monitoring-panel-copy h3 {
+  max-width: 520px;
+  margin: 0.45rem 0 0;
+  font-size: clamp(1.4rem, 3vw, 2.15rem);
+  letter-spacing: -0.045em;
+  line-height: 1.05;
+}
+
+.home-monitoring-panel-copy p {
+  max-width: 58ch;
+  margin: 0.75rem 0 0;
+  font-size: 0.86rem;
+}
+
+.home-observation-reading,
+.home-water-reading {
+  display: flex;
+  min-height: 150px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid rgba(83, 200, 218, 0.2);
+  border-radius: 1.1rem;
+  background:
+    linear-gradient(135deg, rgba(216, 243, 247, 0.76), rgba(255, 255, 255, 0.88));
+}
+
+.home-water-reading {
+  background:
+    linear-gradient(135deg, rgba(219, 244, 247, 0.9), rgba(255, 255, 255, 0.92));
+}
+
+.home-observation-reading > div,
+.home-water-reading > div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.home-observation-reading small,
+.home-water-reading small {
+  color: var(--portal-ink-soft);
+  font-size: 0.72rem;
+}
+
+.home-observation-reading strong,
+.home-water-reading strong {
+  font-size: clamp(3.4rem, 7vw, 5.2rem);
+  letter-spacing: -0.085em;
+  line-height: 0.92;
+}
+
+.home-observation-reading span,
+.home-water-reading span {
+  color: var(--portal-ink-soft);
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.home-observation-reading > svg,
+.home-water-reading > svg {
+  width: clamp(48px, 7vw, 74px);
+  height: clamp(48px, 7vw, 74px);
+  color: var(--portal-sky-deep);
+  stroke-width: 1.3;
+}
+
+.home-observation-metrics,
+.home-water-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin: 0;
+}
+
+.home-observation-metrics > div,
+.home-water-metrics > div {
+  display: grid;
+  min-width: 0;
+  gap: 0.25rem;
+  padding: 0.85rem 0.9rem;
+  border: 1px solid var(--portal-line);
+  border-radius: 0.9rem;
+  background: rgba(244, 247, 245, 0.82);
+}
+
+.home-observation-metrics dt,
+.home-water-metrics dt {
+  color: var(--portal-ink-soft);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.home-observation-metrics dd,
+.home-water-metrics dd {
+  min-width: 0;
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 850;
+  overflow-wrap: anywhere;
+}
+
+.home-water-metrics > div:last-child dd {
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.home-water-trend {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--portal-line);
+  border-radius: 999px;
+  background: rgba(244, 247, 245, 0.88);
+  color: var(--portal-ink-soft);
+  font-size: 0.75rem;
+  font-weight: 760;
+}
+
+.home-water-trend svg {
+  width: 16px;
+  height: 16px;
+}
+
+.home-water-trend.is-rising {
+  border-color: rgba(213, 151, 47, 0.25);
+  color: #946715;
+}
+
+.home-water-trend.is-falling {
+  border-color: rgba(23, 152, 177, 0.25);
+  color: #0c7b90;
+}
+
+.home-monitoring-unavailable {
+  display: grid;
+  gap: 0.4rem;
+  min-height: 168px;
+  align-content: center;
+  padding: 1.25rem;
+  border: 1px dashed rgba(7, 30, 47, 0.18);
+  border-radius: 1rem;
+  background: rgba(244, 247, 245, 0.7);
+}
+
+.home-monitoring-unavailable strong {
+  font-size: 1rem;
+}
+
+.home-monitoring-unavailable p {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.home-monitoring-panel-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 0.2rem;
+}
+
+.home-monitoring-panel-footer a,
+.home-local-monitoring-actions > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.home-monitoring-panel-footer a:first-child,
+.home-local-monitoring-actions > a {
+  color: var(--portal-sky-deep);
+}
+
+.home-monitoring-panel-footer a:last-child {
+  color: var(--portal-ink-soft);
+}
+
+.home-monitoring-panel-footer svg,
+.home-local-monitoring-actions svg {
+  width: 15px;
+  height: 15px;
+}
+
+.home-monitoring-panel-footer a:hover,
+.home-monitoring-panel-footer a:focus-visible,
+.home-local-monitoring-actions > a:hover,
+.home-local-monitoring-actions > a:focus-visible {
+  color: var(--portal-ink);
+  outline: none;
+}
+
+.home-local-monitoring-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.15rem;
+}
+
+.home-local-monitoring-actions > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--portal-ink-soft);
+  font-size: 0.72rem;
+}
+
+@media (max-width: 900px) {
+  .home-local-monitoring-heading,
+  .home-local-monitoring-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-local-monitoring-heading {
+    align-items: start;
+    gap: 0.85rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .home-local-monitoring {
+    padding: 1rem;
+    border-radius: 1.25rem;
+  }
+
+  .home-observation-panel,
+  .home-water-panel {
+    padding: 1rem;
+    border-radius: 1rem;
+  }
+
+  .home-monitoring-panel-topline {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .home-observation-reading,
+  .home-water-reading {
+    min-height: 132px;
+  }
+
+  .home-observation-metrics,
+  .home-water-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .home-monitoring-panel-footer,
+  .home-local-monitoring-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

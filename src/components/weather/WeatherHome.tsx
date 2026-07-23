@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { AlertTriangle, ShieldAlert } from "lucide-react";
 
+import type { LaranjalLevelData } from "@/lib/hydrology/laranjal.types";
 import type { WeatherSourceKey } from "@/lib/weather/aggregated-weather.types";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 
 import { HomeForecastStory } from "./HomeForecastStory";
+import { HomeLocalMonitoring } from "./HomeLocalMonitoring";
 import { HomeOperationalNavigation } from "./HomeOperationalNavigation";
 import { WeatherEditorialHero } from "./WeatherEditorialHero";
 import "./WeatherHome.css";
@@ -33,7 +35,13 @@ function formatFetchedAt(value: string) {
   return formatDateTime(value) ?? "horário não informado";
 }
 
-export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
+export function WeatherHome({
+  data,
+  laranjal,
+}: {
+  data: WeatherIntelligenceData;
+  laranjal: LaranjalLevelData;
+}) {
   const weather = data.weather;
 
   if (
@@ -111,6 +119,7 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
       ) : null}
 
       <HomeForecastStory data={data} />
+      <HomeLocalMonitoring observation={weather.observation} laranjal={laranjal} />
 
       {weather.officialForecast.length > 0 ? (
         <section
