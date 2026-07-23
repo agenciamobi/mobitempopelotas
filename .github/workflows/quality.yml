@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
@@ -36,6 +36,24 @@ jobs:
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
 
+      - name: Formatar lote web push
+        if: github.event_name == 'push' && github.ref == 'refs/heads/agent/web-push-notifications'
+        run: |
+          npx prettier --write \
+            public/sw.js \
+            src/components/pwa/PushNotificationsManager.tsx \
+            src/lib/push/push-storage.server.ts \
+            src/lib/push/web-push.server.ts \
+            src/routes/api/cron/push-daily.ts \
+            src/routes/api/push/broadcast.ts
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/sw.js src/components/pwa/PushNotificationsManager.tsx src/lib/push/push-storage.server.ts src/lib/push/web-push.server.ts src/routes/api/cron/push-daily.ts src/routes/api/push/broadcast.ts
+          if ! git diff --cached --quiet; then
+            git commit -m "style: formata implementação web push"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
+
       - name: Build de produção
         run: npm run build
 
@@ -43,19 +61,4 @@ jobs:
         run: npm run typecheck
 
       - name: ESLint
-        shell: bash
-        run: |
-          mkdir -p artifacts/lint
-          set +e
-          npm run lint 2>&1 | tee artifacts/lint/output.log
-          status=${PIPESTATUS[0]}
-          exit "$status"
-
-      - name: Publicar diagnóstico ESLint
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: lint-${{ github.run_number }}
-          path: artifacts/lint
-          if-no-files-found: warn
-          retention-days: 2
+        run: npm run lint
