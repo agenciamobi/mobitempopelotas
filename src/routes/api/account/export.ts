@@ -44,16 +44,16 @@ function jsonHeaders(base = new Headers()) {
 
 async function loadConsentHistory(admin: AccountAdminClient, userId: string) {
   const records: ConsentExportRow[] = [];
-  let offset = 0;
+  let idCursor = 0;
 
   while (true) {
-    const { data, error, count } = await admin
+    const { data, error } = await admin
       .from("account_consent_events")
-      .select("id,channel,granted,source,policy_version,created_at", { count: "exact" })
+      .select("id,channel,granted,source,policy_version,created_at")
       .eq("user_id", userId)
-      .order("created_at", { ascending: true })
+      .gt("id", idCursor)
       .order("id", { ascending: true })
-      .range(offset, offset + EXPORT_PAGE_SIZE - 1)
+      .limit(EXPORT_PAGE_SIZE)
       .abortSignal(timeoutSignal());
 
     if (error) {
@@ -61,6 +61,8 @@ async function loadConsentHistory(admin: AccountAdminClient, userId: string) {
     }
 
     const page = data ?? [];
+    if (page.length === 0) return records;
+
     for (const record of page) {
       records.push({
         channel: record.channel,
@@ -71,34 +73,43 @@ async function loadConsentHistory(admin: AccountAdminClient, userId: string) {
       });
     }
 
-    offset += page.length;
-    if (page.length === 0 || (typeof count === "number" && offset >= count)) return records;
+    const nextCursor = page.at(-1)?.id;
+    if (typeof nextCursor !== "number" || nextCursor <= idCursor) {
+      throw new Error("A paginação do histórico de consentimentos não avançou.");
+    }
+    idCursor = nextCursor;
   }
 }
 
 async function loadNotificationDevices(admin: AccountAdminClient, userId: string) {
   const records: NotificationDeviceExportRow[] = [];
-  let offset = 0;
+  let endpointCursor: string | null = null;
 
   while (true) {
-    const { data, error, count } = await admin
+    let query = admin
       .from("web_push_subscriptions")
-      .select("endpoint,user_agent,topics,created_at,updated_at,last_seen_at", { count: "exact" })
+      .select("endpoint,user_agent,topics,created_at,updated_at,last_seen_at")
       .eq("user_id", userId)
-      .order("created_at", { ascending: true })
       .order("endpoint", { ascending: true })
-      .range(offset, offset + EXPORT_PAGE_SIZE - 1)
-      .abortSignal(timeoutSignal());
+      .limit(EXPORT_PAGE_SIZE);
 
+    if (endpointCursor) query = query.gt("endpoint", endpointCursor);
+
+    const { data, error } = await query.abortSignal(timeoutSignal());
     if (error) {
       throw new Error(`Falha ao consultar aparelhos de notificação: ${error.message}`);
     }
 
     const page = data ?? [];
-    records.push(...page);
-    offset += page.length;
+    if (page.length === 0) return records;
 
-    if (page.length === 0 || (typeof count === "number" && offset >= count)) return records;
+    records.push(...page);
+
+    const nextCursor = page.at(-1)?.endpoint;
+    if (!nextCursor || nextCursor === endpointCursor) {
+      throw new Error("A paginação dos aparelhos de notificação não avançou.");
+    }
+    endpointCursor = nextCursor;
   }
 }
 
