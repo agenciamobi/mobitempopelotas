@@ -11,7 +11,7 @@ import {
   Wind,
 } from "lucide-react";
 
-import type { LaranjalLevelData } from "@/lib/hydrology/laranjal.types";
+import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
 import type { EmbrapaObservation } from "@/lib/weather/official-sources.types";
 
 import "./HomeLocalMonitoring.css";

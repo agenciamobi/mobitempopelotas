@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { AlertTriangle, ShieldAlert } from "lucide-react";
 
-import type { LaranjalLevelData } from "@/lib/hydrology/laranjal.types";
+import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
 import type { WeatherSourceKey } from "@/lib/weather/aggregated-weather.types";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 
