@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-const rawBaseUrl = process.env.BASE_URL ?? process.argv[2] ?? "https://tempopelotas.com.br";
+const rawBaseUrl = process.env.BASE_URL ?? process.argv[2] ?? "https://www.tempopelotas.com.br";
 const parsedBaseUrl = new URL(rawBaseUrl);
 const baseUrl = `${parsedBaseUrl.protocol}//${parsedBaseUrl.host}`;
 const outputDirectory = path.resolve("artifacts/cutover-smoke");

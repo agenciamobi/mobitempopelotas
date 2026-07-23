@@ -7,7 +7,7 @@ on:
       base_url:
         description: URL pública que deve ser validada
         required: true
-        default: https://tempopelotas.com.br
+        default: https://www.tempopelotas.com.br
         type: string
   push:
     branches:
@@ -54,7 +54,7 @@ jobs:
 
       - name: Executar smoke test
         env:
-          BASE_URL: ${{ inputs.base_url || 'https://tempopelotas.com.br' }}
+          BASE_URL: ${{ inputs.base_url || 'https://www.tempopelotas.com.br' }}
         run: node scripts/cutover-smoke.mjs
 
       - name: Publicar relatório
