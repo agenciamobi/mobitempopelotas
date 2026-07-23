@@ -35,10 +35,7 @@ try {
 
     const context = await browser.newContext({ viewport, reducedMotion: "reduce" });
     const page = await context.newPage();
-    const screenshot = path.join(
-      outputDirectory,
-      `${result.route}-${result.viewport}-falha.png`,
-    );
+    const screenshot = path.join(outputDirectory, `${result.route}-${result.viewport}-falha.png`);
 
     try {
       await page.goto(new URL(result.path, baseUrl).toString(), {
