@@ -223,7 +223,9 @@ export function TomorrowForecastPage({ data }: { data: WeatherIntelligenceData }
         <article>
           <Wind aria-hidden="true" />
           <span>Rajada mais forte</span>
-          <strong>{tomorrow.windGust === null ? "Não informada" : `${tomorrow.windGust} km/h`}</strong>
+          <strong>
+            {tomorrow.windGust === null ? "Não informada" : `${tomorrow.windGust} km/h`}
+          </strong>
           <small>Maior rajada publicada pela fonte</small>
         </article>
         <article>
@@ -301,7 +303,7 @@ export function TomorrowForecastPage({ data }: { data: WeatherIntelligenceData }
       </div>
 
       <p className="tomorrow-source-note">
-        Previsão consolidada em {formatFetchedAt(weather.source.fetchedAt)}. Fonte principal: {" "}
+        Previsão consolidada em {formatFetchedAt(weather.source.fetchedAt)}. Fonte principal:{" "}
         {weather.quality.forecastProvider ?? "modelo meteorológico disponível"}, enriquecida com
         fontes oficiais e regionais quando disponíveis.
       </p>
