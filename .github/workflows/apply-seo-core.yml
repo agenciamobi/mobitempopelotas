@@ -33,13 +33,33 @@ jobs:
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
 
-      - name: Formatar arquivos TypeScript
+      - name: Formatar configuração SEO
+        run: npx prettier --write src/lib/site-config.ts src/lib/public-routes.ts src/lib/page-meta.ts
+
+      - name: Formatar root e home
+        run: npx prettier --write src/routes/__root.tsx src/routes/index.tsx
+
+      - name: Formatar rotas meteorológicas
         run: |
           npx prettier --write \
-            src/lib/site-config.ts \
-            src/lib/public-routes.ts \
-            src/lib/page-meta.ts \
-            src/routes
+            src/routes/alertas.tsx \
+            src/routes/vento-em-pelotas.tsx \
+            src/routes/chuva-em-pelotas.tsx \
+            src/routes/tempo-hoje-pelotas.tsx \
+            src/routes/previsao-7-dias-pelotas.tsx
+
+      - name: Formatar rotas especiais
+        run: |
+          npx prettier --write \
+            src/routes/metodologia.tsx \
+            src/routes/cameras-ao-vivo-pelotas.tsx \
+            src/routes/estacao-embrapa-pelotas.tsx \
+            src/routes/historico-climatico-pelotas.tsx \
+            src/routes/situacao-hidrologica-pelotas.tsx \
+            src/routes/nivel-da-lagoa-dos-patos-laranjal.tsx
+
+      - name: Formatar endpoints SEO
+        run: find src/routes -maxdepth 1 -type f \( -name 'sitemap*xml.ts' -o -name 'robots*txt.ts' \) -print0 | xargs -0 npx prettier --write
 
       - name: Validar build
         run: npm run build
