@@ -34,7 +34,11 @@ async function exportAccountData(request: Request) {
 
     const admin = createSupabaseAdminClient();
     const [profileResult, preferencesResult, consentResult, pushResult] = await Promise.all([
-      admin.from("profiles").select("email,display_name,avatar_url,created_at,updated_at").eq("id", account.user.id).maybeSingle(),
+      admin
+        .from("profiles")
+        .select("email,display_name,avatar_url,created_at,updated_at")
+        .eq("id", account.user.id)
+        .maybeSingle(),
       admin
         .from("user_preferences")
         .select("weather_alerts,water_alerts,daily_summary,community_updates,created_at,updated_at")
@@ -92,10 +96,7 @@ async function exportAccountData(request: Request) {
     };
 
     const date = exportedAt.toISOString().slice(0, 10);
-    headers.set(
-      "Content-Disposition",
-      `attachment; filename="tempo-pelotas-dados-${date}.json"`,
-    );
+    headers.set("Content-Disposition", `attachment; filename="tempo-pelotas-dados-${date}.json"`);
 
     return new Response(`${JSON.stringify(document, null, 2)}\n`, { status: 200, headers });
   } catch (error) {

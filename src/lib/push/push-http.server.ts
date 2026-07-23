@@ -18,8 +18,7 @@ export const PUSH_RESPONSE_HEADERS = {
 } as const;
 
 export type LimitedJsonResult =
-  | { ok: true; value: unknown }
-  | { ok: false; status: 400 | 413 | 415; error: string };
+  { ok: true; value: unknown } | { ok: false; status: 400 | 413 | 415; error: string };
 
 export function pushJsonResponse(body: unknown, status = 200, additionalHeaders?: HeadersInit) {
   const headers = new Headers(PUSH_RESPONSE_HEADERS);
