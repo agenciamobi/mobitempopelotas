@@ -18,11 +18,13 @@ Uma notificação nunca deve transformar uma previsão, tendência ou regra inte
 - inscrição e remoção pelo navegador;
 - seleção entre tempo, águas e novidades do portal;
 - armazenamento server-only no Supabase;
+- leitura paginada de todas as inscrições do tópico, sem limite global silencioso;
 - limpeza automática de endpoints expirados após respostas 404 ou 410;
 - disparo administrativo protegido por segredo próprio;
 - resumo diário protegido por `CRON_SECRET`;
-- reserva atômica de cada envio diário para impedir duplicidade concorrente;
+- reserva atômica e lease renovada entre lotes para impedir duplicidade concorrente;
 - abertura somente de caminhos internos do portal;
+- limite real de 16 KiB durante a leitura dos corpos JSON, inclusive em transferência chunked;
 - service worker com recebimento e clique em notificação;
 - mensagens públicas em linguagem compreensível para visitantes leigos.
 
@@ -48,7 +50,8 @@ A chave VAPID pública é entregue ao navegador pelo endpoint `/api/push/config`
 A migration `20260723113000_create_web_push_subscriptions.sql` cria:
 
 - `web_push_subscriptions`: endpoint, chaves públicas da inscrição, assuntos escolhidos e timestamps;
-- `web_push_dispatches`: impressão digital dos envios automáticos e contadores de entrega.
+- `web_push_dispatches`: impressão digital, estado, token e vigência operacional da lease, conclusão e contadores de entrega;
+- `claim_web_push_dispatch`: reserva atômica que permite recuperar somente leases interrompidas e vencidas.
 
 As duas tabelas têm RLS habilitada. `anon` e `authenticated` não recebem privilégios diretos. A leitura e a gravação ocorrem somente pelo cliente administrativo server-side.
 
@@ -69,7 +72,7 @@ POST /api/push/subscription
 Content-Type: application/json
 ```
 
-O corpo contém a inscrição gerada pelo `PushManager` e os assuntos escolhidos. A rota exige mesma origem, valida tamanhos e aceita somente endpoints HTTPS.
+O corpo contém a inscrição gerada pelo `PushManager` e os assuntos escolhidos. A rota exige mesma origem, aceita somente endpoints HTTPS autorizados e interrompe a leitura quando o corpo real ultrapassa 16 KiB.
 
 ### Remoção por aparelho
 
@@ -101,7 +104,7 @@ Exemplo:
 }
 ```
 
-Título e mensagem são limitados. A URL deve ser um caminho interno.
+Título e mensagem são limitados. A URL deve ser um caminho interno. O broadcast percorre as inscrições por páginas estáveis ordenadas pelo endpoint e entrega em lotes menores, evitando excluir assinantes antigos quando o volume ultrapassar 10 mil registros.
 
 ### Resumo diário
 
@@ -110,9 +113,12 @@ GET /api/cron/push-daily
 Authorization: Bearer $CRON_SECRET
 ```
 
-A rotina consulta previsão agregada, avisos oficiais do INMET e nível observado no Laranjal. Quando há aviso oficial ativo, a notificação leva o visitante para `/alertas`; caso contrário, apresenta um resumo da previsão.
+A rotina consulta a previsão agregada e os avisos oficiais do INMET aplicáveis especificamente a Pelotas.
 
-O fingerprint `resumo-diario-AAAA-MM-DD` é reservado por inserção única antes do envio. Duas execuções simultâneas não disparam duas notificações.
+- quando existe aviso local ativo, o payload usa somente evento, severidade, vigência e orientação do próprio INMET, priorizando o aviso de maior gravidade e levando o visitante para `/alertas`;
+- sem aviso local, a mensagem é identificada como previsão meteorológica e não mistura observações hidrológicas ou conteúdo preventivo sob a identidade de um alerta oficial.
+
+O resumo comum usa o fingerprint `resumo-diario-AAAA-MM-DD`. Avisos locais usam um fingerprint próprio com a data e os IDs oficiais aplicáveis. Antes de cada lote de entrega, o servidor renova e verifica a lease; se outra execução assumir uma reserva vencida, a execução anterior interrompe os próximos lotes.
 
 ## Scheduler recomendado
 
@@ -133,14 +139,14 @@ O scheduler deve:
 - o banco recebe apenas os dados técnicos necessários para entrega;
 - não há acesso público às inscrições;
 - o visitante pode desativar os avisos no portal ou nas configurações do navegador;
-- endpoints inválidos são removidos automaticamente;
+- endpoints inválidos são removidos automaticamente apenas quando a exclusão no banco é confirmada;
 - os avisos não dependem de login.
 
 Antes da produção, documentar retenção e executar limpeza periódica de inscrições sem atividade por período definido pela política do portal.
 
 ## Validação do lote
 
-O lote deve permanecer em rascunho até que dependências, build, TypeScript, ESLint, auditoria visual e revisão automatizada estejam verdes no mesmo head.
+O lote deve permanecer aberto até que dependências, build, TypeScript, ESLint, auditoria visual e revisão automatizada estejam verdes no mesmo head.
 
 ## Checklist de produção
 
@@ -150,7 +156,9 @@ O lote deve permanecer em rascunho até que dependências, build, TypeScript, ES
 4. configurar `CRON_SECRET` e `PUSH_ADMIN_SECRET` distintos;
 5. testar ativação, alteração de assuntos e remoção em Chrome/Android;
 6. testar o fluxo instalado no Safari/iOS compatível;
-7. testar respostas 404/410 e limpeza do endpoint;
+7. testar respostas 404/410 e confirmar que falha de limpeza não incrementa `removed`;
 8. validar que URLs externas são recusadas;
-9. validar que uma previsão comum não é descrita como alerta oficial;
-10. configurar scheduler, logs e plano de rollback.
+9. validar que previsão, observação e aviso oficial permanecem editorialmente separados;
+10. simular mais de 10 mil inscrições e confirmar paginação completa;
+11. simular uma execução longa e confirmar renovação e perda segura da lease;
+12. configurar scheduler, logs e plano de rollback.
