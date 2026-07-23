@@ -1,10 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { fetchLaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
-import {
-  hasBearerSecret,
-  pushJsonResponse,
-} from "@/lib/push/push-http.server";
+import { hasBearerSecret, pushJsonResponse } from "@/lib/push/push-http.server";
 import {
   claimPushDispatch,
   recordPushDispatch,
@@ -94,6 +91,7 @@ async function sendDailySummary(request: Request) {
   const date = localDateKey();
   const fingerprint = `resumo-diario-${date}`;
   let claimed = false;
+  let deliveryCompleted = false;
 
   try {
     const [weather, laranjal] = await Promise.all([
@@ -108,14 +106,11 @@ async function sendDailySummary(request: Request) {
     const summary = buildWeatherSummary(weather, laranjal);
 
     if (!summary && activeAlerts.length === 0) {
-      return pushJsonResponse(
-        {
-          success: true,
-          skipped: true,
-          reason: "no-usable-data",
-        },
-        200,
-      );
+      return pushJsonResponse({
+        success: true,
+        skipped: true,
+        reason: "no-usable-data",
+      });
     }
 
     claimed = await claimPushDispatch(fingerprint, title);
@@ -124,9 +119,11 @@ async function sendDailySummary(request: Request) {
     }
 
     const alertContext =
-      activeAlerts.length > 0
-        ? `Há ${activeAlerts.length} aviso${activeAlerts.length === 1 ? "" : "s"} oficial${activeAlerts.length === 1 ? "" : "is"} ativo${activeAlerts.length === 1 ? "" : "s"}. `
-        : "";
+      activeAlerts.length === 1
+        ? "Há 1 aviso oficial ativo. "
+        : activeAlerts.length > 1
+          ? `Há ${activeAlerts.length} avisos oficiais ativos. `
+          : "";
     const result = await broadcastPushNotification({
       title,
       body: `${alertContext}${summary ?? "Consulte os detalhes no portal."}`.slice(0, 240),
@@ -137,17 +134,29 @@ async function sendDailySummary(request: Request) {
       renotify: activeAlerts.length > 0,
       topic: "weather",
     });
+    deliveryCompleted = true;
 
-    await recordPushDispatch(fingerprint, title, result);
+    let dispatchRecorded = true;
+    try {
+      await recordPushDispatch(fingerprint, title, result);
+    } catch (error) {
+      dispatchRecorded = false;
+      console.error("[push/cron] Entrega concluída, mas métricas não foram atualizadas", {
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
 
     return pushJsonResponse({
       success: true,
       date,
       officialAlerts: activeAlerts.length,
+      dispatchRecorded,
       ...result,
     });
   } catch (error) {
-    if (claimed) await releasePushDispatch(fingerprint).catch(() => undefined);
+    if (claimed && !deliveryCompleted) {
+      await releasePushDispatch(fingerprint).catch(() => undefined);
+    }
     console.error("[push/cron] Falha no resumo diário", {
       message: error instanceof Error ? error.message : String(error),
     });
