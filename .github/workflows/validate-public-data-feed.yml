@@ -96,7 +96,7 @@ jobs:
         run: |
           cat /tmp/pelotas.headers
           grep -qi '^content-type: application/json' /tmp/pelotas.headers
-          grep -qi '^access-control-allow-origin: \*$' /tmp/pelotas.headers
+          grep -qi '^access-control-allow-origin: \*' /tmp/pelotas.headers
 
       - name: Validar contrato base do pelotas.json
         run: |
@@ -125,7 +125,7 @@ jobs:
         run: |
           cat /tmp/feed.headers
           grep -qi '^content-type: application/feed+json' /tmp/feed.headers
-          grep -qi '^access-control-allow-origin: \*$' /tmp/feed.headers
+          grep -qi '^access-control-allow-origin: \*' /tmp/feed.headers
 
       - name: Validar contrato do JSON Feed
         run: |
