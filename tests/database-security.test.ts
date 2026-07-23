@@ -58,8 +58,7 @@ function statements(sql: string) {
 function hasExpectedAccountGuard(statement: string, ownerColumn: string) {
   const compact = statement
     .replace(/\s+/g, "")
-    .replace(/\(selectauth\.uid\(\)\)/g, "auth.uid()")
-    .replace(/[()]/g, "");
+    .replace(/\(selectauth\.uid\(\)\)/g, "auth.uid()");
 
   return (
     compact.includes(`auth.uid()=${ownerColumn}`) ||
