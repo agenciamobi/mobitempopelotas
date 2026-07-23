@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
@@ -19,16 +19,13 @@ concurrency:
 
 jobs:
   validate:
-    name: Diagnosticar CSS emitido
-    if: ${{ !contains(github.event.head_commit.message, '[css-build-diagnostic]') }}
+    name: Build, typecheck e lint
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: agent/diagnose-production-css-build
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
@@ -42,100 +39,8 @@ jobs:
       - name: Build de produção
         run: npm run build
 
-      - name: Gerar relatório da cascata
-        run: |
-          python <<'PY'
-          from pathlib import Path
-          import json
-          import re
-
-          root = Path('.')
-          output_dirs = [path for path in [root / '.output', root / 'dist', root / 'build'] if path.exists()]
-          built_css = []
-          for directory in output_dirs:
-              built_css.extend(sorted(directory.rglob('*.css')))
-
-          source_css = sorted((root / 'src' / 'production' / 'styles').glob('*.css'))
-          selectors = [
-              '.mobile-tab-bar',
-              '.mobile-tab-bar a',
-              '.mobile-tab-icon svg',
-              '.weather-hero',
-              '.site-header',
-              '.home-story--forecast',
-              '.home-map-story',
-              '.editorial-footer',
-          ]
-
-          def context(text, needle, radius=500):
-              positions = [match.start() for match in re.finditer(re.escape(needle), text)]
-              chunks = []
-              for pos in positions[:12]:
-                  start = max(0, pos - radius)
-                  end = min(len(text), pos + len(needle) + radius)
-                  chunks.append(text[start:end])
-              return chunks
-
-          report = {
-              'output_directories': [str(path) for path in output_dirs],
-              'source_css_count': len(source_css),
-              'built_css': [],
-              'selectors': {},
-          }
-
-          combined = ''
-          for path in built_css:
-              text = path.read_text(errors='replace')
-              combined += f'\n/* FILE: {path} */\n{text}\n'
-              report['built_css'].append({
-                  'path': str(path),
-                  'bytes': path.stat().st_size,
-                  'mobile_tab_bar': text.count('.mobile-tab-bar'),
-                  'weather_hero': text.count('.weather-hero'),
-              })
-
-          for selector in selectors:
-              source_hits = []
-              for path in source_css:
-                  text = path.read_text(errors='replace')
-                  count = text.count(selector)
-                  if count:
-                      source_hits.append({'path': str(path), 'count': count})
-              report['selectors'][selector] = {
-                  'source_hits': source_hits,
-                  'built_count': combined.count(selector),
-                  'built_contexts': context(combined, selector),
-              }
-
-          diagnostics = root / 'diagnostics'
-          diagnostics.mkdir(exist_ok=True)
-          (diagnostics / 'production-css-build.json').write_text(
-              json.dumps(report, ensure_ascii=False, indent=2) + '\n'
-          )
-          (diagnostics / 'production-built-css.css').write_text(combined)
-
-          print(json.dumps({
-              'source_css_count': len(source_css),
-              'built_css_count': len(built_css),
-              'built_css_bytes': sum(item['bytes'] for item in report['built_css']),
-              'selector_counts': {
-                  key: value['built_count'] for key, value in report['selectors'].items()
-              },
-          }, ensure_ascii=False, indent=2))
-          PY
-
       - name: TypeScript
         run: npm run typecheck
 
       - name: ESLint
         run: npm run lint
-
-      - name: Publicar diagnóstico
-        run: |
-          git fetch origin main --depth=1
-          git show origin/main:.github/workflows/quality.yml > .github/workflows/quality.yml
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/workflows/quality.yml diagnostics
-          git commit -m "[css-build-diagnostic] registra CSS emitido pelo build"
-          git push origin HEAD:agent/diagnose-production-css-build
