@@ -52,7 +52,7 @@ jobs:
             jq -e '.items[] | select(.id | endswith("/tempo-hoje-pelotas")) | has("date_modified") | not' "$file" >/dev/null
             jq -e '.items[] | select(.id | endswith("/estacao-embrapa-pelotas")) | has("date_modified") | not' "$file" >/dev/null
             jq -e '.items[] | select(.id | endswith("/metodologia")) | has("date_modified") | not' "$file" >/dev/null
-            jq -e '[.items[] | select(has("date_modified")) | .date_modified | fromdateiso8601] | all' "$file" >/dev/null
+            jq -e '[.items[] | select(has("date_modified")) | .date_modified | test("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$")] | all' "$file" >/dev/null
           done
 
       - name: Diagnóstico
