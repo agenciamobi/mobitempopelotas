@@ -9,7 +9,10 @@ import type { WeatherAiSummaries } from "@/production/lib/weather-ai-summary";
 import type { WeatherData } from "@/production/lib/weather-data";
 
 function firstFinite(...values: Array<number | null | undefined>) {
-  return values.find((value): value is number => typeof value === "number" && Number.isFinite(value)) ?? null;
+  return (
+    values.find((value): value is number => typeof value === "number" && Number.isFinite(value)) ??
+    null
+  );
 }
 
 function formatUpdatedAt(value: string | null | undefined) {
@@ -37,7 +40,8 @@ export function toProductionWeatherData(data: AggregatedWeatherData): WeatherDat
   const pressure = firstFinite(current?.pressure, observation.pressure) ?? 0;
   const windSpeed = firstFinite(current?.windSpeed, observation.windSpeed) ?? 0;
   const windGust = firstFinite(current?.windGust, current?.windSpeed, observation.windSpeed) ?? 0;
-  const observedAt = current?.observedAt ?? data.observation.source.observationTime ?? data.source.fetchedAt;
+  const observedAt =
+    current?.observedAt ?? data.observation.source.observationTime ?? data.source.fetchedAt;
 
   return {
     current: {

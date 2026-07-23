@@ -266,8 +266,7 @@ export function WeatherHero({
     .filter((reason): reason is string => Boolean(reason))
     .slice(0, 2);
   const currentSourceMeta = getCurrentSourceMeta(current);
-  const visibilityValue =
-    current.visibility >= 0 ? `${current.visibility} km` : "Indisponível";
+  const visibilityValue = current.visibility >= 0 ? `${current.visibility} km` : "Indisponível";
 
   return (
     <section
