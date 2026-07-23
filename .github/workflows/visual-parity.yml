@@ -1,4 +1,4 @@
-# Capturas estruturais reproduzíveis para a decisão de cutover.
+# Capturas e verificações estruturais reproduzíveis para a decisão de cutover.
 name: Auditoria visual de paridade
 
 on:
