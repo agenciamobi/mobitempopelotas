@@ -1,0 +1,112 @@
+name: Verificar dados públicos em produção
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.head_ref == 'agent/verify-public-data-production'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Aguardar publicação
+        run: sleep 25
+
+      - name: Baixar home publicada
+        run: |
+          set -euo pipefail
+          for attempt in {1..8}; do
+            if curl --fail --location --silent --show-error --max-time 60 \
+              https://mobitempopelotas.lovable.app/ > /tmp/home.html; then
+              break
+            fi
+            if [ "$attempt" -eq 8 ]; then exit 1; fi
+            sleep 15
+          done
+          test -s /tmp/home.html
+
+      - name: Validar descoberta do feed
+        run: |
+          set -euo pipefail
+          grep -q 'rel="alternate"' /tmp/home.html
+          grep -q 'type="application/feed+json"' /tmp/home.html
+          grep -q 'href="https://mobitempopelotas.lovable.app/feed"' /tmp/home.html
+
+      - name: Baixar pelotas.json publicado
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error --max-time 90 \
+            --dump-header /tmp/pelotas.headers \
+            https://mobitempopelotas.lovable.app/pelotas.json > /tmp/pelotas.json
+          test -s /tmp/pelotas.json
+          jq -e . /tmp/pelotas.json >/dev/null
+
+      - name: Validar pelotas.json publicado
+        run: |
+          set -euo pipefail
+          tr -d '\r' < /tmp/pelotas.headers > /tmp/pelotas.headers.normalized
+          grep -qi '^content-type: application/json' /tmp/pelotas.headers.normalized
+          grep -qi '^access-control-allow-origin: \*$' /tmp/pelotas.headers.normalized
+          jq -e '.schema_version == "2.0"' /tmp/pelotas.json >/dev/null
+          jq -e '.location.city == "Pelotas" and .location.state == "RS"' /tmp/pelotas.json >/dev/null
+          jq -e '.weather | has("current") and has("daily") and has("quality") and has("sources")' /tmp/pelotas.json >/dev/null
+          jq -e '.weather.observed.embrapa | has("error") | not' /tmp/pelotas.json >/dev/null
+          jq -e '.hydrology.local_level.laranjal | has("error") | not' /tmp/pelotas.json >/dev/null
+          jq -e '.links.feed == "https://mobitempopelotas.lovable.app/feed"' /tmp/pelotas.json >/dev/null
+          jq -e '.links.public_data == "https://mobitempopelotas.lovable.app/pelotas.json"' /tmp/pelotas.json >/dev/null
+
+      - name: Baixar feed publicado
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error --max-time 90 \
+            --dump-header /tmp/feed.headers \
+            https://mobitempopelotas.lovable.app/feed > /tmp/feed.json
+          test -s /tmp/feed.json
+          jq -e . /tmp/feed.json >/dev/null
+
+      - name: Validar JSON Feed publicado
+        run: |
+          set -euo pipefail
+          tr -d '\r' < /tmp/feed.headers > /tmp/feed.headers.normalized
+          grep -qi '^content-type: application/feed+json' /tmp/feed.headers.normalized
+          grep -qi '^access-control-allow-origin: \*$' /tmp/feed.headers.normalized
+          jq -e '.version == "https://jsonfeed.org/version/1.1"' /tmp/feed.json >/dev/null
+          jq -e '.title == "Tempo Pelotas" and .feed_url == "https://mobitempopelotas.lovable.app/feed"' /tmp/feed.json >/dev/null
+          jq -e '(.items | length) == 5 and ([.items[].id] | unique | length) == 5' /tmp/feed.json >/dev/null
+          jq -e '.items[] | select(.id | endswith("/tempo-hoje-pelotas")) | has("date_modified") | not' /tmp/feed.json >/dev/null
+          jq -e '.items[] | select(.id | endswith("/estacao-embrapa-pelotas")) | has("date_modified") | not' /tmp/feed.json >/dev/null
+          jq -e '.items[] | select(.id | endswith("/metodologia")) | has("date_modified") | not' /tmp/feed.json >/dev/null
+          jq -e '[.items[] | select(has("date_modified")) | .date_modified | test("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$")] | all' /tmp/feed.json >/dev/null
+
+      - name: Gerar relatório
+        if: always()
+        run: |
+          {
+            echo "## Dados públicos em produção"
+            echo
+            echo "- Home: $(wc -c < /tmp/home.html 2>/dev/null || echo 0) bytes"
+            echo "- pelotas.json: $(wc -c < /tmp/pelotas.json 2>/dev/null || echo 0) bytes"
+            echo "- Schema: $(jq -r '.schema_version // "ausente"' /tmp/pelotas.json 2>/dev/null || echo ausente)"
+            echo "- Status meteorológico: $(jq -r '.status // "ausente"' /tmp/pelotas.json 2>/dev/null || echo ausente)"
+            echo "- Itens do feed: $(jq '.items | length' /tmp/feed.json 2>/dev/null || echo 0)"
+          } | tee /tmp/public-data-production-report.md
+
+      - name: Publicar relatório
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-data-production-report
+          path: |
+            /tmp/public-data-production-report.md
+            /tmp/pelotas.headers.normalized
+            /tmp/pelotas.json
+            /tmp/feed.headers.normalized
+            /tmp/feed.json
+          if-no-files-found: warn
+          retention-days: 3
