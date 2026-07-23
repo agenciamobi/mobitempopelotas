@@ -1,0 +1,477 @@
+/*
+ * Refinamento das páginas meteorológicas de consulta direta.
+ * Contextualiza o hero, remove repetições e prioriza leitura vertical no mobile.
+ */
+
+/* Destaques contextuais do hero ------------------------------------------- */
+.site-shell--topic .topic-hero-status--forecast::before {
+  background: linear-gradient(90deg, #5e2ced, #18bdcd, #f27035);
+}
+
+.site-shell--topic .topic-hero-status--rain::before {
+  background: linear-gradient(90deg, #1685a1, #18bdcd, #5e2ced);
+}
+
+.site-shell--topic .topic-hero-status--wind::before {
+  background: linear-gradient(90deg, #18bdcd, #3b9d89, #f27035);
+}
+
+.site-shell--topic .topic-hero-status--forecast strong,
+.site-shell--topic .topic-hero-status--rain strong,
+.site-shell--topic .topic-hero-status--wind strong {
+  max-width: 100%;
+  font-size: clamp(3.2rem, 5.4vw, 5.6rem);
+  line-height: 0.88;
+  letter-spacing: -0.075em;
+  overflow-wrap: anywhere;
+}
+
+.site-shell--topic .topic-hero-status--forecast strong {
+  font-size: clamp(4.2rem, 7vw, 6.8rem);
+}
+
+/* Tempo hoje -------------------------------------------------------------- */
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-observation-band {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(260px, 0.48fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 58px);
+  margin-top: clamp(46px, 5vw, 74px);
+  padding: clamp(30px, 4vw, 50px) 0;
+  border-top: 1px solid var(--topic-editorial-line);
+  border-bottom: 1px solid var(--topic-editorial-line);
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-observation-icon {
+  display: grid;
+  place-items: center;
+  width: clamp(82px, 8vw, 112px);
+  height: clamp(82px, 8vw, 112px);
+  border-radius: 28px;
+  background: color-mix(in srgb, var(--topic-accent) 10%, white);
+  color: var(--topic-accent);
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-observation-icon svg {
+  width: 72%;
+  height: 72%;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-observation-copy h2 {
+  max-width: 620px;
+  margin: 9px 0 0;
+  color: #071e2f;
+  font-size: clamp(2rem, 3.8vw, 3.75rem);
+  font-weight: 900;
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-observation-copy p {
+  max-width: 620px;
+  margin: 14px 0 0;
+  color: var(--topic-editorial-muted);
+  line-height: 1.65;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-temperature-range {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--topic-editorial-line);
+  border-bottom: 1px solid var(--topic-editorial-line);
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-temperature-range > div {
+  display: grid;
+  gap: 12px;
+  min-height: 118px;
+  align-content: center;
+  padding: 20px clamp(18px, 2.2vw, 30px);
+  border-right: 1px solid var(--topic-editorial-line);
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-temperature-range > div:last-child {
+  border-right: 0;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-temperature-range dt {
+  color: var(--topic-accent);
+  font-size: 0.66rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-temperature-range dd {
+  margin: 0;
+  color: #071e2f;
+  font-size: clamp(2rem, 3.2vw, 3.2rem);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.065em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Chuva ------------------------------------------------------------------- */
+.site-shell--topic[data-topic="chuva-em-pelotas"] .rain-progress {
+  position: relative;
+  outline: none;
+}
+
+.site-shell--topic[data-topic="chuva-em-pelotas"] .rain-progress:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--topic-accent) 30%, transparent);
+  outline-offset: 4px;
+}
+
+/* Vento ------------------------------------------------------------------- */
+.site-shell--topic[data-topic="vento-em-pelotas"] .wind-context-band {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: clamp(24px, 4vw, 54px);
+  margin-top: clamp(46px, 5vw, 74px);
+  padding: clamp(30px, 4vw, 50px) 0;
+  border: 0;
+  border-top: 1px solid var(--topic-editorial-line);
+  border-bottom: 1px solid var(--topic-editorial-line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.site-shell--topic[data-topic="vento-em-pelotas"] .wind-context-band .wind-hero-icon {
+  width: clamp(82px, 8vw, 112px);
+  height: clamp(82px, 8vw, 112px);
+  border-radius: 28px;
+}
+
+.site-shell--topic[data-topic="vento-em-pelotas"] .wind-context-band h2 {
+  max-width: 620px;
+  font-size: clamp(2.2rem, 4vw, 4.2rem);
+}
+
+.site-shell--topic[data-topic="vento-em-pelotas"] .wind-context-band p {
+  max-width: 720px;
+  line-height: 1.68;
+}
+
+.site-shell--topic[data-topic="vento-em-pelotas"] .wind-direction {
+  width: 126px;
+  height: 126px;
+  border-color: color-mix(in srgb, var(--topic-accent) 24%, var(--topic-editorial-line));
+  background: color-mix(in srgb, var(--topic-accent) 7%, white);
+}
+
+.site-shell--topic[data-topic="vento-em-pelotas"] .wind-direction strong {
+  color: #071e2f;
+  font-size: 1.15rem;
+}
+
+.site-shell--topic[data-topic="vento-em-pelotas"] .wind-direction i {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  transform-origin: 50% 50%;
+  color: var(--topic-accent);
+  font-size: 1.7rem;
+  line-height: 1;
+  transition: transform 240ms ease;
+}
+
+/* Desktop e tablet: listas meteorológicas com melhor ritmo ---------------- */
+.site-shell--topic .week-forecast-grid article,
+.site-shell--topic .wind-hourly-grid article {
+  min-width: 0;
+}
+
+.site-shell--topic .data-table--responsive .data-table-row > span[data-label]::before,
+.site-shell--topic .topic-hourly-table article > span[data-label]::before {
+  display: none;
+  content: attr(data-label);
+}
+
+@media (max-width: 900px) {
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-observation-band {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-temperature-range {
+    grid-column: 1 / -1;
+  }
+
+  .site-shell--topic[data-topic="vento-em-pelotas"] .wind-context-band {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .site-shell--topic[data-topic="vento-em-pelotas"] .wind-direction {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-shell--topic .topic-hero-status--forecast strong,
+  .site-shell--topic .topic-hero-status--rain strong,
+  .site-shell--topic .topic-hero-status--wind strong {
+    font-size: clamp(3.25rem, 15vw, 5rem);
+  }
+
+  /* Resumo de hoje */
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-observation-band {
+    grid-template-columns: 74px minmax(0, 1fr);
+    gap: 20px 16px;
+    margin-top: 38px;
+    padding: 28px 2px;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-observation-icon {
+    width: 74px;
+    height: 74px;
+    border-radius: 22px;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-observation-copy h2 {
+    font-size: clamp(1.85rem, 9vw, 2.8rem);
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-observation-copy p {
+    font-size: 0.82rem;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-temperature-range {
+    grid-column: 1 / -1;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .today-temperature-range > div {
+    min-height: 96px;
+    padding: 17px 12px;
+  }
+
+  /* Hora por hora sem rolagem horizontal */
+  .site-shell--topic .topic-hourly-table {
+    overflow: visible;
+  }
+
+  .site-shell--topic .topic-hourly-table article,
+  .site-shell--topic .topic-hourly-table article.is-current {
+    grid-template-columns: 58px 44px repeat(2, minmax(0, 1fr));
+    gap: 13px 10px;
+    min-width: 0;
+    min-height: 0;
+    padding: 17px 2px;
+  }
+
+  .site-shell--topic .topic-hourly-table article > strong {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+  }
+
+  .site-shell--topic .topic-hourly-table article > svg {
+    grid-column: 2;
+    grid-row: 1;
+    width: 38px;
+    height: 38px;
+  }
+
+  .site-shell--topic .topic-hourly-table article > span:nth-of-type(1) {
+    grid-column: 3 / 5;
+    grid-row: 1;
+    justify-self: end;
+    align-self: center;
+    color: #071e2f;
+    font-size: 1rem;
+    font-weight: 820;
+  }
+
+  .site-shell--topic .topic-hourly-table article > span:nth-of-type(2) {
+    grid-column: 1 / 3;
+    grid-row: 2;
+  }
+
+  .site-shell--topic .topic-hourly-table article > span:nth-of-type(3) {
+    grid-column: 3 / 5;
+    grid-row: 2;
+  }
+
+  .site-shell--topic .topic-hourly-table article > span[data-label] {
+    display: grid;
+    gap: 4px;
+    color: var(--topic-editorial-muted);
+    font-size: 0.72rem;
+  }
+
+  .site-shell--topic .topic-hourly-table article > span[data-label]::before {
+    display: block;
+    color: var(--topic-accent);
+    font-size: 0.57rem;
+    font-weight: 850;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .site-shell--topic .topic-hourly-table article.is-current > span[data-label]::before {
+    color: color-mix(in srgb, var(--topic-accent) 72%, #071e2f);
+  }
+
+  /* Tabelas semanais viram blocos verticais legíveis */
+  .site-shell--topic .data-table--responsive {
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .site-shell--topic .data-table--responsive .data-table-head {
+    display: none;
+  }
+
+  .site-shell--topic .data-table--responsive .data-table-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    border-top: 1px solid var(--topic-editorial-line);
+  }
+
+  .site-shell--topic .data-table--responsive .data-table-row:last-child {
+    border-bottom: 1px solid var(--topic-editorial-line);
+  }
+
+  .site-shell--topic .data-table--responsive .data-table-row > span {
+    display: grid;
+    min-width: 0;
+    min-height: 78px;
+    align-content: center;
+    gap: 6px;
+    padding: 14px 12px;
+    border-right: 1px solid var(--topic-editorial-line);
+  }
+
+  .site-shell--topic .data-table--responsive .data-table-row > span:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .site-shell--topic .data-table--responsive .data-table-row > span:first-child {
+    grid-column: 1 / -1;
+    min-height: 68px;
+    padding-right: 0;
+    padding-left: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--topic-editorial-line);
+  }
+
+  .site-shell--topic .data-table--responsive .data-table-row > span:nth-child(2) {
+    padding-left: 0;
+  }
+
+  .site-shell--topic .data-table--responsive .data-table-row > span:last-child {
+    padding-right: 0;
+  }
+
+  .site-shell--topic .data-table--responsive .data-table-row > span[data-label]::before {
+    display: block;
+    color: var(--topic-accent);
+    font-size: 0.57rem;
+    font-weight: 850;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .site-shell--topic .data-table--responsive .data-table-row > span:first-child strong {
+    font-size: 0.92rem;
+  }
+
+  /* Cartões diários e horários deixam de depender de carrossel */
+  .site-shell--topic .week-forecast-grid,
+  .site-shell--topic .wind-hourly-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    overflow: visible;
+    border: 0;
+  }
+
+  .site-shell--topic .week-forecast-grid article,
+  .site-shell--topic .week-forecast-grid article:last-child,
+  .site-shell--topic .wind-hourly-grid article,
+  .site-shell--topic .wind-hourly-grid article:last-child {
+    min-width: 0;
+    padding: 17px;
+    border: 1px solid var(--topic-editorial-line);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.78);
+  }
+
+  .site-shell--topic .week-forecast-grid article.is-today,
+  .site-shell--topic .wind-hourly-grid article.is-current {
+    border-color: #071e2f;
+    background: #071e2f;
+    color: white;
+  }
+
+  /* Direção do vento */
+  .site-shell--topic[data-topic="vento-em-pelotas"] .wind-context-band {
+    grid-template-columns: 74px minmax(0, 1fr);
+    gap: 20px 16px;
+    margin-top: 38px;
+    padding: 28px 2px;
+  }
+
+  .site-shell--topic[data-topic="vento-em-pelotas"] .wind-context-band .wind-hero-icon {
+    width: 74px;
+    height: 74px;
+    border-radius: 22px;
+  }
+
+  .site-shell--topic[data-topic="vento-em-pelotas"] .wind-context-band h2 {
+    font-size: clamp(1.85rem, 9vw, 2.8rem);
+  }
+
+  .site-shell--topic[data-topic="vento-em-pelotas"] .wind-context-band p {
+    font-size: 0.82rem;
+  }
+
+  .site-shell--topic[data-topic="vento-em-pelotas"] .wind-direction {
+    grid-column: 1 / -1;
+    width: 112px;
+    height: 112px;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 520px) {
+  .site-shell--topic .week-forecast-grid,
+  .site-shell--topic .wind-hourly-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .site-shell--topic .week-forecast-grid article,
+  .site-shell--topic .wind-hourly-grid article {
+    padding: 18px;
+  }
+
+  .site-shell--topic .data-table--responsive .data-table-row {
+    grid-template-columns: 1fr;
+  }
+
+  .site-shell--topic .data-table--responsive .data-table-row > span,
+  .site-shell--topic .data-table--responsive .data-table-row > span:nth-child(2),
+  .site-shell--topic .data-table--responsive .data-table-row > span:last-child {
+    min-height: 64px;
+    padding: 13px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--topic-editorial-line);
+  }
+
+  .site-shell--topic .data-table--responsive .data-table-row > span:last-child {
+    border-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell--topic[data-topic="vento-em-pelotas"] .wind-direction i {
+    transition: none;
+  }
+}

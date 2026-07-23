@@ -1,0 +1,722 @@
+.embrapa-observation-home {
+  margin-top: 24px;
+  padding: clamp(22px, 4vw, 42px);
+  border: 1px solid rgba(7, 30, 47, 0.08);
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(242, 112, 53, 0.14), transparent 24rem),
+    radial-gradient(circle at 0% 100%, rgba(24, 189, 205, 0.12), transparent 22rem),
+    rgba(255, 255, 255, 0.92);
+  box-shadow: 0 24px 65px rgba(7, 30, 47, 0.08);
+}
+
+.embrapa-observation-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 26px;
+  align-items: end;
+}
+
+.embrapa-stage-label {
+  display: block;
+  width: fit-content;
+  margin-bottom: 12px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(242, 112, 53, 0.11);
+  color: #a84c23;
+  font-size: 0.66rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.embrapa-observation-intro h2 {
+  max-width: 850px;
+  margin: 8px 0 12px;
+  font-size: clamp(2rem, 4.5vw, 4rem);
+  line-height: 0.96;
+  letter-spacing: -0.07em;
+}
+
+.embrapa-observation-intro p {
+  max-width: 780px;
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.7;
+}
+
+.embrapa-observation-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.embrapa-primary-action,
+.embrapa-secondary-action {
+  display: inline-flex;
+  min-height: 45px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 11px 15px;
+  border-radius: 15px;
+  font-size: 0.78rem;
+  font-weight: 820;
+  white-space: nowrap;
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.embrapa-primary-action {
+  background: var(--ink);
+  color: white;
+  box-shadow: 0 12px 28px rgba(7, 30, 47, 0.16);
+}
+
+.embrapa-secondary-action {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--ink);
+}
+
+.embrapa-primary-action:hover,
+.embrapa-primary-action:focus-visible,
+.embrapa-secondary-action:hover,
+.embrapa-secondary-action:focus-visible {
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.embrapa-primary-action:focus-visible,
+.embrapa-secondary-action:focus-visible {
+  box-shadow: 0 0 0 3px rgba(24, 189, 205, 0.24);
+}
+
+.embrapa-observation-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.75fr) minmax(260px, 0.65fr);
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.embrapa-current-card,
+.embrapa-observation-metrics article,
+.embrapa-station-context,
+.embrapa-unavailable-card,
+.embrapa-page-current,
+.embrapa-accumulated-grid article,
+.embrapa-extremes-grid article,
+.embrapa-page-unavailable {
+  border: 1px solid rgba(7, 30, 47, 0.09);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 15px 38px rgba(7, 30, 47, 0.055);
+}
+
+.embrapa-current-card {
+  display: flex;
+  min-height: 365px;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(22px, 3vw, 32px);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 90% 15%, rgba(242, 112, 53, 0.15), transparent 15rem),
+    linear-gradient(150deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 245, 0.9));
+}
+
+.embrapa-current-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.embrapa-current-topline > small {
+  color: var(--ink-soft);
+  font-size: 0.68rem;
+}
+
+.embrapa-live-status {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  color: #176e4d;
+  font-size: 0.65rem;
+  font-weight: 850;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.embrapa-live-status i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2bb078;
+  box-shadow: 0 0 0 5px rgba(43, 176, 120, 0.12);
+}
+
+.embrapa-temperature-reading {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  margin: 28px 0;
+}
+
+.embrapa-temperature-reading > span {
+  font-size: clamp(4.6rem, 10vw, 7.6rem);
+  font-weight: 930;
+  line-height: 0.78;
+  letter-spacing: -0.1em;
+}
+
+.embrapa-temperature-reading > div {
+  display: grid;
+  gap: 5px;
+  padding-bottom: 5px;
+}
+
+.embrapa-temperature-reading strong {
+  font-size: 1.05rem;
+  letter-spacing: -0.03em;
+}
+
+.embrapa-temperature-reading small {
+  color: var(--ink-soft);
+}
+
+.embrapa-primary-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.embrapa-primary-metrics > div {
+  min-width: 0;
+  padding: 14px;
+  border-radius: 17px;
+  background: rgba(7, 30, 47, 0.045);
+}
+
+.embrapa-primary-metrics span,
+.embrapa-primary-metrics small {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 0.66rem;
+}
+
+.embrapa-primary-metrics span {
+  margin-bottom: 4px;
+  font-weight: 760;
+}
+
+.embrapa-primary-metrics strong {
+  display: block;
+  overflow: hidden;
+  font-size: 0.88rem;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.embrapa-primary-metrics small {
+  margin-top: 2px;
+}
+
+.embrapa-observation-metrics {
+  display: grid;
+  gap: 10px;
+}
+
+.embrapa-observation-metrics article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 13px;
+  min-height: 82px;
+  padding: 14px;
+  border-radius: 20px;
+}
+
+.embrapa-metric-icon {
+  display: grid;
+  width: 43px;
+  height: 43px;
+  place-items: center;
+  border-radius: 14px;
+  background: var(--surface-soft);
+  color: #b34d22;
+}
+
+.embrapa-metric-icon svg {
+  width: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.embrapa-observation-metrics article > div {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.embrapa-observation-metrics small,
+.embrapa-observation-metrics span {
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.embrapa-observation-metrics small {
+  font-weight: 780;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.embrapa-observation-metrics strong {
+  overflow: hidden;
+  font-size: 1rem;
+  font-weight: 880;
+  letter-spacing: -0.035em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.embrapa-station-context {
+  display: flex;
+  min-height: 365px;
+  flex-direction: column;
+  padding: 24px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(24, 189, 205, 0.12), transparent 14rem),
+    var(--surface-soft);
+}
+
+.embrapa-station-context h3 {
+  margin: 9px 0 10px;
+  font-size: 1.4rem;
+  line-height: 1.04;
+  letter-spacing: -0.05em;
+}
+
+.embrapa-station-context > p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.62;
+}
+
+.embrapa-station-context dl {
+  display: grid;
+  gap: 0;
+  margin: 18px 0;
+}
+
+.embrapa-station-context dl div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(7, 30, 47, 0.08);
+}
+
+.embrapa-station-context dt {
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+}
+
+.embrapa-station-context dd {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 820;
+}
+
+.embrapa-source-note {
+  margin-top: auto !important;
+  padding-top: 14px;
+  border-top: 1px solid rgba(7, 30, 47, 0.08);
+  font-size: 0.68rem !important;
+}
+
+.embrapa-unavailable-card,
+.embrapa-page-unavailable {
+  margin-top: 24px;
+  padding: 28px;
+  border-radius: 24px;
+}
+
+.embrapa-unavailable-card strong,
+.embrapa-page-unavailable h2 {
+  display: block;
+  margin: 0 0 7px;
+}
+
+.embrapa-unavailable-card p,
+.embrapa-page-unavailable p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.embrapa-unavailable-card a,
+.embrapa-page-unavailable a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  font-size: 0.78rem;
+  font-weight: 820;
+}
+
+.embrapa-page-current {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.7fr) minmax(0, 1.3fr);
+  gap: 18px;
+  padding: clamp(22px, 4vw, 38px);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(242, 112, 53, 0.14), transparent 20rem),
+    rgba(255, 255, 255, 0.92);
+}
+
+.embrapa-page-reading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.embrapa-page-reading h2 {
+  margin: 10px 0 8px;
+  font-size: clamp(4.5rem, 10vw, 7.5rem);
+  line-height: 0.8;
+  letter-spacing: -0.1em;
+}
+
+.embrapa-page-reading p {
+  max-width: 430px;
+  margin: 8px 0 14px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.embrapa-page-reading > small {
+  color: var(--ink-soft);
+  font-size: 0.7rem;
+}
+
+.embrapa-page-current-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.embrapa-page-current-grid article,
+.embrapa-accumulated-grid article {
+  display: flex;
+  min-height: 145px;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 20px;
+  border-radius: 22px;
+  background: var(--surface-soft);
+}
+
+.embrapa-page-current-grid span,
+.embrapa-page-current-grid small,
+.embrapa-accumulated-grid span {
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+}
+
+.embrapa-page-current-grid span,
+.embrapa-accumulated-grid span {
+  margin-bottom: auto;
+  font-weight: 770;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.embrapa-page-current-grid strong,
+.embrapa-accumulated-grid strong {
+  margin-top: 20px;
+  font-size: clamp(1.25rem, 3vw, 2.1rem);
+  font-weight: 900;
+  letter-spacing: -0.055em;
+}
+
+.embrapa-page-current-grid small {
+  margin-top: 4px;
+}
+
+.embrapa-accumulated-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.embrapa-accumulated-grid article {
+  min-height: 165px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(24, 189, 205, 0.13), transparent 12rem),
+    rgba(255, 255, 255, 0.9);
+}
+
+.embrapa-accumulated-grid--agro article {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(94, 44, 237, 0.1), transparent 12rem),
+    rgba(255, 255, 255, 0.9);
+}
+
+.embrapa-extremes-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.embrapa-extremes-grid article {
+  padding: 20px;
+  border-radius: 22px;
+}
+
+.embrapa-extremes-grid article > span {
+  display: block;
+  min-height: 38px;
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  font-weight: 790;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.embrapa-extremes-grid article > div {
+  display: grid;
+  gap: 2px;
+  padding: 13px 0;
+  border-top: 1px solid rgba(7, 30, 47, 0.08);
+}
+
+.embrapa-extremes-grid small,
+.embrapa-extremes-grid em {
+  color: var(--ink-soft);
+  font-size: 0.68rem;
+  font-style: normal;
+}
+
+.embrapa-extremes-grid strong {
+  font-size: 1.05rem;
+  font-weight: 880;
+  letter-spacing: -0.035em;
+}
+
+@media (max-width: 1180px) {
+  .embrapa-observation-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(270px, 0.72fr);
+  }
+
+  .embrapa-station-context {
+    grid-column: 1 / -1;
+    min-height: 0;
+  }
+
+  .embrapa-station-context dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .embrapa-station-context dl div {
+    display: grid;
+    justify-content: stretch;
+  }
+
+  .embrapa-source-note {
+    margin-top: 0 !important;
+  }
+
+  .embrapa-extremes-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .embrapa-observation-home {
+    margin-top: 18px;
+  }
+
+  .embrapa-observation-intro {
+    grid-template-columns: 1fr;
+  }
+
+  .embrapa-observation-actions {
+    justify-content: flex-start;
+  }
+
+  .embrapa-observation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .embrapa-current-card,
+  .embrapa-station-context {
+    min-height: 0;
+  }
+
+  .embrapa-observation-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .embrapa-station-context {
+    grid-column: auto;
+  }
+
+  .embrapa-page-current {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .embrapa-observation-home {
+    margin-inline: -2px;
+    padding: 20px 14px 14px;
+    border-radius: 28px;
+  }
+
+  .embrapa-observation-intro h2 {
+    font-size: 2.15rem;
+  }
+
+  .embrapa-observation-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .embrapa-primary-action,
+  .embrapa-secondary-action {
+    width: 100%;
+  }
+
+  .embrapa-current-card {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .embrapa-current-topline {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .embrapa-temperature-reading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .embrapa-temperature-reading > span {
+    font-size: 5.8rem;
+  }
+
+  .embrapa-primary-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .embrapa-observation-metrics {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+  }
+
+  .embrapa-observation-metrics::-webkit-scrollbar {
+    display: none;
+  }
+
+  .embrapa-observation-metrics article {
+    min-width: min(78vw, 285px);
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  .embrapa-station-context {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .embrapa-station-context dl {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .embrapa-page-current {
+    padding: 20px;
+    border-radius: 26px;
+  }
+
+  .embrapa-page-reading h2 {
+    font-size: 5rem;
+  }
+
+  .embrapa-page-current-grid,
+  .embrapa-accumulated-grid {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+  }
+
+  .embrapa-page-current-grid::-webkit-scrollbar,
+  .embrapa-accumulated-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .embrapa-page-current-grid article,
+  .embrapa-accumulated-grid article {
+    min-width: min(72vw, 260px);
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  .embrapa-extremes-grid {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+  }
+
+  .embrapa-extremes-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .embrapa-extremes-grid article {
+    min-width: min(76vw, 275px);
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+}
+
+@media (max-width: 420px) {
+  .embrapa-temperature-reading > span,
+  .embrapa-page-reading h2 {
+    font-size: 4.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .embrapa-primary-action,
+  .embrapa-secondary-action {
+    transition: none;
+  }
+}

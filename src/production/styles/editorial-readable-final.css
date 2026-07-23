@@ -1,0 +1,94 @@
+/* Complemento final da escala de leitura editorial. */
+
+.site-shell--home-editorial .home-water-story__footer p {
+  font-size: 0.74rem;
+}
+
+.site-shell--home-editorial .home-inmet-alerts__copy > span {
+  font-size: 0.65rem;
+}
+
+.site-shell--home-editorial .home-inmet-alerts h2 {
+  font-size: clamp(1.08rem, 1.55vw, 1.34rem);
+}
+
+.site-shell--home-editorial .home-inmet-alerts p {
+  font-size: 0.76rem;
+}
+
+.site-shell--home-editorial .home-inmet-alerts > a {
+  min-height: 45px;
+  font-size: 0.78rem;
+}
+
+.inmet-alerts-heading p {
+  font-size: 0.98rem;
+}
+
+.inmet-source-status {
+  font-size: 0.68rem;
+}
+
+.inmet-alerts-counts span {
+  font-size: 0.64rem;
+}
+
+.inmet-alert-group > header p {
+  font-size: 0.8rem;
+}
+
+.inmet-alert-severity,
+.inmet-alert-relevance,
+.inmet-alert-event {
+  font-size: 0.65rem;
+}
+
+.inmet-alert-card h3 {
+  font-size: clamp(1.16rem, 1.85vw, 1.48rem);
+}
+
+.inmet-alert-card__heading p {
+  font-size: 0.76rem;
+}
+
+.inmet-alert-area,
+.inmet-alert-description {
+  font-size: 0.87rem;
+}
+
+.inmet-alert-card summary {
+  font-size: 0.78rem;
+}
+
+.inmet-alert-card details p {
+  font-size: 0.84rem;
+}
+
+.inmet-alert-card > a,
+.inmet-alerts-empty > a,
+.inmet-alerts-footer > a {
+  font-size: 0.79rem;
+}
+
+.inmet-alerts-footer p {
+  font-size: 0.74rem;
+}
+
+.inmet-alerts-empty p {
+  font-size: 0.86rem;
+}
+
+@media (max-width: 620px) {
+  .site-shell--home-editorial .home-inmet-alerts h2 {
+    font-size: 1.05rem;
+  }
+
+  .site-shell--home-editorial .home-inmet-alerts p {
+    font-size: 0.72rem;
+  }
+
+  .inmet-alert-severity,
+  .inmet-alert-relevance {
+    font-size: 0.59rem;
+  }
+}

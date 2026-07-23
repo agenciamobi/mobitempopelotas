@@ -1,0 +1,383 @@
+/* Homepage v17 — refinamento da seção de observação da Embrapa. */
+
+.site-shell--home-editorial .home-observation-story {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
+  gap: clamp(48px, 6vw, 96px);
+  align-items: center;
+  margin: clamp(72px, 8vw, 116px) 0;
+  padding: clamp(48px, 5.4vw, 76px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(94, 44, 237, 0.3), transparent 24rem),
+    radial-gradient(circle at 10% 105%, rgba(24, 189, 205, 0.19), transparent 26rem),
+    linear-gradient(132deg, #061928 0%, #082b3e 54%, #0a4052 100%);
+  box-shadow: 0 34px 90px rgba(3, 18, 29, 0.2);
+}
+
+.site-shell--home-editorial .home-observation-story::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 68px 68px;
+  mask-image: linear-gradient(110deg, rgba(0, 0, 0, 0.7), transparent 72%);
+  content: "";
+  pointer-events: none;
+}
+
+.site-shell--home-editorial .home-observation-story::after {
+  position: absolute;
+  top: -150px;
+  right: -110px;
+  z-index: -1;
+  width: 360px;
+  height: 360px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 48px rgba(255, 255, 255, 0.018),
+    0 0 0 96px rgba(255, 255, 255, 0.012);
+  content: "";
+  pointer-events: none;
+}
+
+.site-shell--home-editorial .home-observation-story__intro {
+  position: relative;
+  z-index: 1;
+  max-width: 470px;
+}
+
+.site-shell--home-editorial .home-observation-story h2 {
+  max-width: 520px;
+  font-size: clamp(3rem, 4.65vw, 5.15rem);
+  line-height: 0.94;
+  letter-spacing: -0.07em;
+}
+
+.site-shell--home-editorial .home-observation-story__intro > p {
+  max-width: 455px;
+  margin-top: 24px;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: clamp(1.02rem, 1.13vw, 1.16rem);
+  line-height: 1.72;
+}
+
+.site-shell--home-editorial .home-observation-story__intro > a {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  gap: 18px;
+  margin-top: 28px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 820;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease;
+}
+
+.site-shell--home-editorial .home-observation-story__intro > a span {
+  font-size: 1rem;
+}
+
+.site-shell--home-editorial .home-observation-story__reading {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(200px, 0.7fr) minmax(0, 1.3fr);
+  gap: 0;
+  align-items: stretch;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.065);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 24px 60px rgba(0, 0, 0, 0.14);
+  backdrop-filter: blur(18px) saturate(120%);
+}
+
+.site-shell--home-editorial .home-observation-temperature {
+  display: grid;
+  min-height: 286px;
+  align-content: center;
+  gap: 12px;
+  padding: 28px 34px 28px 18px;
+  border-right: 1px solid rgba(255, 255, 255, 0.13);
+}
+
+.site-shell--home-editorial .home-observation-temperature small {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 32px;
+  align-items: center;
+  gap: 9px;
+  max-width: 250px;
+  padding: 7px 11px;
+  border: 1px solid rgba(24, 189, 205, 0.22);
+  border-radius: 999px;
+  background: rgba(24, 189, 205, 0.09);
+  color: #8ee8ef;
+  font-size: 0.72rem;
+  font-weight: 790;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-transform: none;
+}
+
+.site-shell--home-editorial .home-observation-temperature small::before {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #35d6e3;
+  box-shadow: 0 0 0 5px rgba(53, 214, 227, 0.11);
+  content: "";
+}
+
+.site-shell--home-editorial .home-observation-temperature strong {
+  margin-top: 8px;
+  color: #fff;
+  font-size: clamp(5.5rem, 7.6vw, 8.25rem);
+  font-weight: 760;
+  font-variant-numeric: tabular-nums;
+  line-height: 0.82;
+  letter-spacing: -0.095em;
+}
+
+.site-shell--home-editorial .home-observation-temperature span {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: stretch;
+  min-width: 0;
+  margin: 0;
+  padding-left: 20px;
+  border: 0;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dl > div {
+  display: grid;
+  min-width: 0;
+  min-height: 134px;
+  align-content: center;
+  gap: 10px;
+  padding: 20px 22px;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.site-shell--home-editorial .home-observation-story__reading dl > div:nth-child(2n) {
+  border-right: 0;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dl > div:nth-last-child(-n + 2) {
+  border-bottom: 0;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dt {
+  max-width: 170px;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.76rem;
+  font-weight: 720;
+  letter-spacing: 0;
+  line-height: 1.4;
+  text-transform: none;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dd {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.3rem, 1.72vw, 1.68rem);
+  font-weight: 840;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+}
+
+.site-shell--home-editorial .home-observation-story__unavailable {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 250px;
+  align-content: center;
+  gap: 12px;
+  padding: clamp(28px, 4vw, 52px);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.site-shell--home-editorial .home-observation-story__unavailable strong {
+  max-width: 470px;
+  color: #fff;
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+.site-shell--home-editorial .home-observation-story__unavailable span {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.96rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .site-shell--home-editorial .home-observation-story__intro > a:hover {
+    border-color: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.12);
+    transform: translateY(-1px);
+  }
+}
+
+@media (max-width: 1120px) {
+  .site-shell--home-editorial .home-observation-story {
+    grid-template-columns: minmax(250px, 0.62fr) minmax(0, 1.38fr);
+    gap: 40px;
+    padding-inline: 42px;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading {
+    grid-template-columns: minmax(180px, 0.62fr) minmax(0, 1.38fr);
+  }
+
+  .site-shell--home-editorial .home-observation-temperature {
+    padding-right: 24px;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading dl {
+    padding-left: 14px;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading dl > div {
+    min-height: 122px;
+    padding-inline: 16px;
+  }
+}
+
+@media (max-width: 920px) {
+  .site-shell--home-editorial .home-observation-story {
+    grid-template-columns: 1fr;
+    gap: 38px;
+    padding: 44px;
+  }
+
+  .site-shell--home-editorial .home-observation-story__intro {
+    max-width: 690px;
+  }
+
+  .site-shell--home-editorial .home-observation-story__intro > p {
+    max-width: 620px;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading {
+    grid-template-columns: minmax(210px, 0.66fr) minmax(0, 1.34fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .site-shell--home-editorial .home-observation-story {
+    gap: 32px;
+    padding: 32px;
+    border-radius: 26px;
+  }
+
+  .site-shell--home-editorial .home-observation-story h2 {
+    font-size: clamp(2.75rem, 10.5vw, 4rem);
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading {
+    grid-template-columns: 1fr;
+    padding: 14px;
+    border-radius: 22px;
+  }
+
+  .site-shell--home-editorial .home-observation-temperature {
+    min-height: 0;
+    padding: 24px 18px 30px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+  }
+
+  .site-shell--home-editorial .home-observation-temperature strong {
+    font-size: clamp(5.2rem, 21vw, 7.2rem);
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading dl {
+    padding: 12px 0 0;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading dl > div {
+    min-height: 108px;
+    padding: 17px 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-shell--home-editorial .home-observation-story {
+    margin-block: 64px;
+    padding: 24px 18px;
+    border-radius: 22px;
+  }
+
+  .site-shell--home-editorial .home-observation-story h2 {
+    font-size: clamp(2.5rem, 12vw, 3.35rem);
+  }
+
+  .site-shell--home-editorial .home-observation-story__intro > p {
+    margin-top: 20px;
+    font-size: 0.98rem;
+  }
+
+  .site-shell--home-editorial .home-observation-story__intro > a {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading {
+    padding: 10px;
+  }
+
+  .site-shell--home-editorial .home-observation-temperature {
+    padding-inline: 12px;
+  }
+
+  .site-shell--home-editorial .home-observation-temperature small {
+    max-width: 100%;
+    font-size: 0.68rem;
+  }
+
+  .site-shell--home-editorial .home-observation-temperature strong {
+    font-size: clamp(4.75rem, 24vw, 6rem);
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading dl > div {
+    min-height: 100px;
+    padding-inline: 12px;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading dt {
+    font-size: 0.7rem;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading dd {
+    font-size: 1.22rem;
+  }
+}

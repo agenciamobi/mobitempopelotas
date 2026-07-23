@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
@@ -19,16 +19,13 @@ concurrency:
 
 jobs:
   validate:
-    name: Portar CSS integral e validar
-    if: ${{ !contains(github.event.head_commit.message, '[exact-production-css-stack]') }}
+    name: Build, typecheck e lint
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: agent/exact-production-css-stack
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
@@ -39,65 +36,6 @@ jobs:
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
 
-      - name: Copiar pilha CSS da produção na ordem original
-        run: |
-          python <<'PY'
-          from pathlib import Path
-          import re
-          import shutil
-
-          root = Path('.')
-          legacy_app = root / '_legacy' / 'app'
-          layout = (legacy_app / 'layout.tsx').read_text()
-          css_names = re.findall(r'import "\./([^"\n]+\.css)";', layout)
-
-          if not css_names:
-              raise SystemExit('Nenhum CSS encontrado no layout legado.')
-
-          styles_dir = root / 'src' / 'production' / 'styles'
-          if styles_dir.exists():
-              shutil.rmtree(styles_dir)
-          styles_dir.mkdir(parents=True)
-
-          imports = []
-          for name in css_names:
-              source = legacy_app / name
-              if not source.exists():
-                  raise SystemExit(f'Arquivo CSS ausente em _legacy/app: {name}')
-
-              content = source.read_text()
-              if name == 'globals.css':
-                  content = re.sub(r'^@import\s+["\']tailwindcss["\'];\s*', '', content, count=1)
-
-              target = styles_dir / name
-              target.write_text(content)
-              imports.append(f'import "./styles/{name}";')
-
-          entry = root / 'src' / 'production' / 'production-styles.ts'
-          entry.write_text(
-              '// Ordem idêntica ao app/layout.tsx da produção Vercel.\n'
-              + '\n'.join(imports)
-              + '\n'
-          )
-
-          home_path = root / 'src' / 'production' / 'ProductionHome.tsx'
-          home = home_path.read_text()
-          home = home.replace('import "./production.css";', 'import "./production-styles";')
-          if 'import "./production-styles";' not in home:
-              raise SystemExit('Import da pilha de estilos não foi aplicado em ProductionHome.tsx.')
-          home_path.write_text(home)
-
-          old_css = root / 'src' / 'production' / 'production.css'
-          if old_css.exists():
-              old_css.unlink()
-
-          print(f'Copiados {len(css_names)} arquivos CSS na ordem da produção.')
-          print('\n'.join(css_names))
-          PY
-
-      - name: Formatar arquivos gerados
-        run: npx prettier --write src/production/ProductionHome.tsx src/production/production-styles.ts
-
       - name: Build de produção
         run: npm run build
 
@@ -106,13 +44,3 @@ jobs:
 
       - name: ESLint
         run: npm run lint
-
-      - name: Publicar pilha CSS validada
-        run: |
-          git fetch origin main --depth=1
-          git show origin/main:.github/workflows/quality.yml > .github/workflows/quality.yml
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "[exact-production-css-stack] porta pilha CSS integral da produção"
-          git push origin HEAD:agent/exact-production-css-stack

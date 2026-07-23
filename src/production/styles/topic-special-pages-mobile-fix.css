@@ -1,0 +1,22 @@
+/* Consolida o comportamento mobile das páginas especiais após as camadas legadas. */
+@media (max-width: 820px) {
+  .site-shell--topic[data-topic="situacao-hidrologica-pelotas"] .hydrology-page-index-links {
+    display: grid;
+    grid-template-columns: 1fr;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+    scroll-snap-type: none;
+  }
+
+  .site-shell--topic[data-topic="situacao-hidrologica-pelotas"] .hydrology-page-index-links a {
+    min-width: 0;
+    scroll-snap-align: unset;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-shell--topic[data-topic="situacao-hidrologica-pelotas"] .hydrology-page-index-links {
+    display: grid;
+  }
+}

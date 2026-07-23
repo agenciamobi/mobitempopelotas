@@ -1,0 +1,195 @@
+.weather-hero {
+  --hero-accent: #ffc94b;
+  --hero-accent-rgb: 255, 201, 75;
+  --hero-highlight: #a5e8ef;
+  --hero-metric: #9de5ef;
+  --hero-status: #71e5a4;
+  --hero-status-ring: rgba(113, 229, 164, 0.13);
+}
+
+.weather-hero--normal .weather-hero-photo {
+  background-image: image-set(
+    url("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Amanhecer_na_Praia_do_Laranjal.jpg/1920px-Amanhecer_na_Praia_do_Laranjal.jpg") 1x,
+    url("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Amanhecer_na_Praia_do_Laranjal.jpg/2560px-Amanhecer_na_Praia_do_Laranjal.jpg") 2x
+  );
+  background-position: center 55%;
+}
+
+.weather-hero--attention {
+  --hero-accent: #ffad42;
+  --hero-accent-rgb: 255, 173, 66;
+  --hero-highlight: #ffd39a;
+  --hero-metric: #ffc56f;
+  --hero-status: #ffad42;
+  --hero-status-ring: rgba(255, 173, 66, 0.17);
+}
+
+.weather-hero--attention .weather-hero-photo {
+  background-image: image-set(
+    url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Sunset_over_Calm_Lake.jpg?width=1920") 1x,
+    url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Sunset_over_Calm_Lake.jpg?width=2560") 2x
+  );
+  background-position: center 46%;
+}
+
+.weather-hero--attention .weather-hero-overlay {
+  background:
+    linear-gradient(90deg, rgba(24, 20, 20, 0.97) 0%, rgba(40, 29, 22, 0.93) 35%, rgba(78, 49, 24, 0.69) 66%, rgba(42, 27, 20, 0.48) 100%),
+    linear-gradient(180deg, rgba(16, 13, 13, 0.13), rgba(26, 17, 15, 0.84));
+}
+
+.weather-hero--attention .weather-hero-orbit--one {
+  background: linear-gradient(100deg, rgba(255, 173, 66, 0.08), rgba(255, 173, 66, 0.32));
+}
+
+.weather-hero--attention .weather-hero-orbit--two {
+  border-color: rgba(255, 197, 111, 0.2);
+  background: rgba(132, 67, 22, 0.2);
+}
+
+.weather-hero--attention .weather-hero-now {
+  background:
+    linear-gradient(150deg, rgba(40, 27, 22, 0.78), rgba(92, 52, 24, 0.43)),
+    rgba(27, 18, 15, 0.28);
+}
+
+.weather-hero--warning {
+  --hero-accent: #ff725e;
+  --hero-accent-rgb: 255, 114, 94;
+  --hero-highlight: #ffb5aa;
+  --hero-metric: #ff9c8d;
+  --hero-status: #ff725e;
+  --hero-status-ring: rgba(255, 114, 94, 0.18);
+}
+
+.weather-hero--warning .weather-hero-photo {
+  background-image: image-set(
+    url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Heavy_Rain.jpg?width=1920") 1x,
+    url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Heavy_Rain.jpg?width=2560") 2x
+  );
+  background-position: center 52%;
+}
+
+.weather-hero--warning .weather-hero-overlay {
+  background:
+    linear-gradient(90deg, rgba(37, 8, 13, 0.98) 0%, rgba(58, 13, 17, 0.93) 35%, rgba(102, 29, 22, 0.7) 66%, rgba(48, 16, 18, 0.52) 100%),
+    linear-gradient(180deg, rgba(24, 5, 9, 0.16), rgba(35, 7, 11, 0.87));
+}
+
+.weather-hero--warning .weather-hero-orbit--one {
+  background: linear-gradient(100deg, rgba(255, 114, 94, 0.08), rgba(255, 114, 94, 0.34));
+}
+
+.weather-hero--warning .weather-hero-orbit--two {
+  border-color: rgba(255, 181, 170, 0.2);
+  background: rgba(132, 25, 29, 0.23);
+}
+
+.weather-hero--warning .weather-hero-now {
+  background:
+    linear-gradient(150deg, rgba(48, 10, 16, 0.79), rgba(105, 28, 23, 0.44)),
+    rgba(31, 7, 11, 0.3);
+}
+
+.weather-hero .weather-hero-kicker {
+  color: var(--hero-accent);
+}
+
+.weather-hero h1 span {
+  color: var(--hero-highlight);
+}
+
+.weather-hero .weather-hero-primary {
+  background: var(--hero-accent);
+  box-shadow: 0 14px 30px rgba(var(--hero-accent-rgb), 0.18);
+}
+
+.weather-hero .weather-hero-primary:hover,
+.weather-hero .weather-hero-primary:focus-visible {
+  box-shadow: 0 18px 38px rgba(var(--hero-accent-rgb), 0.25);
+}
+
+.weather-hero .weather-hero-status i,
+.weather-hero .weather-hero-status--attention i,
+.weather-hero .weather-hero-status--warning i {
+  background: var(--hero-status);
+  box-shadow: 0 0 0 5px var(--hero-status-ring);
+}
+
+.weather-hero .weather-hero-metric > svg {
+  color: var(--hero-metric);
+}
+
+.weather-hero-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.weather-hero-reasons span {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 8px 12px 8px 29px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.075);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.69rem;
+  font-weight: 720;
+  line-height: 1.35;
+  backdrop-filter: blur(10px);
+}
+
+.weather-hero-reasons span::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--hero-accent);
+  box-shadow: 0 0 0 4px rgba(var(--hero-accent-rgb), 0.12);
+}
+
+.weather-hero--attention .weather-hero-description,
+.weather-hero--warning .weather-hero-description {
+  max-width: 650px;
+  color: rgba(255, 255, 255, 0.83);
+}
+
+@media (max-width: 900px) {
+  .weather-hero--attention .weather-hero-photo {
+    background-position: 57% center;
+  }
+
+  .weather-hero--warning .weather-hero-photo {
+    background-position: 54% center;
+  }
+
+  .weather-hero--attention .weather-hero-overlay {
+    background:
+      linear-gradient(180deg, rgba(30, 22, 19, 0.84) 0%, rgba(42, 27, 20, 0.95) 48%, rgba(26, 16, 14, 0.99) 100%),
+      linear-gradient(90deg, rgba(34, 23, 18, 0.52), rgba(34, 23, 18, 0.2));
+  }
+
+  .weather-hero--warning .weather-hero-overlay {
+    background:
+      linear-gradient(180deg, rgba(44, 9, 14, 0.86) 0%, rgba(55, 12, 16, 0.96) 48%, rgba(35, 7, 11, 0.99) 100%),
+      linear-gradient(90deg, rgba(45, 10, 14, 0.55), rgba(45, 10, 14, 0.22));
+  }
+
+  .weather-hero-reasons {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7px;
+    margin-top: 17px;
+  }
+
+  .weather-hero-reasons span {
+    width: 100%;
+    border-radius: 15px;
+  }
+}

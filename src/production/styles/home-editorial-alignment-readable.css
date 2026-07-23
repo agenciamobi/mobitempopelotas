@@ -1,0 +1,306 @@
+/*
+ * Régua editorial e escala de leitura da homepage.
+ * A coluna esquerda do hero acompanha a posição inicial do logotipo.
+ */
+
+.site-shell--home-editorial {
+  --editorial-rail: max(17px, calc((100% - 1540px) / 2 + 17px));
+}
+
+/* Header, conteúdo do hero e indicador inferior usam a mesma régua. */
+.site-shell--home-editorial .weather-hero-content {
+  padding-left: 17px;
+}
+
+.site-shell--home-editorial .weather-hero-copy {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.site-shell--home-editorial .weather-hero-scroll {
+  left: var(--editorial-rail);
+}
+
+/* Header e primeira dobra: textos auxiliares mais legíveis. */
+.site-shell--home-editorial .site-header--hero .main-nav a {
+  font-size: 0.82rem;
+}
+
+.site-shell--home-editorial .site-header--hero .header-action {
+  font-size: 0.86rem;
+}
+
+.site-shell--home-editorial .weather-hero-status {
+  font-size: 0.74rem;
+}
+
+.site-shell--home-editorial .weather-hero-kicker {
+  font-size: 0.76rem;
+}
+
+.site-shell--home-editorial .weather-hero-description {
+  max-width: 590px;
+  font-size: clamp(1.02rem, 1.12vw, 1.14rem);
+  line-height: 1.68;
+}
+
+.site-shell--home-editorial .weather-hero-reasons span {
+  padding: 9px 12px;
+  font-size: 0.72rem;
+}
+
+.site-shell--home-editorial .weather-hero-primary,
+.site-shell--home-editorial .weather-hero-secondary {
+  font-size: 0.87rem;
+}
+
+.site-shell--home-editorial .weather-hero-scroll {
+  font-size: 0.69rem;
+  font-weight: 760;
+}
+
+.site-shell--home-editorial .weather-hero-now-heading > div > span {
+  font-size: 0.92rem;
+}
+
+.site-shell--home-editorial .weather-hero-now-heading small {
+  font-size: 0.65rem;
+}
+
+.site-shell--home-editorial .weather-hero-live {
+  font-size: 0.61rem !important;
+}
+
+.site-shell--home-editorial .weather-hero-temperature span {
+  font-size: 0.92rem;
+}
+
+.site-shell--home-editorial .weather-hero-temperature small {
+  font-size: 0.67rem;
+}
+
+.site-shell--home-editorial .weather-hero-metric span {
+  font-size: 0.61rem;
+}
+
+.site-shell--home-editorial .weather-hero-metric strong {
+  font-size: 0.84rem;
+}
+
+/* Conteúdo editorial: descrições e dados deixam de parecer notas de rodapé. */
+.site-shell--home-editorial .eyebrow {
+  font-size: 0.78rem;
+}
+
+.site-shell--home-editorial .home-story-heading > p,
+.site-shell--home-editorial .home-map-story__copy > p,
+.site-shell--home-editorial .home-observation-story__intro > p {
+  font-size: clamp(1.02rem, 1.16vw, 1.15rem);
+  line-height: 1.72;
+}
+
+.site-shell--home-editorial .home-today-facts > div {
+  gap: 9px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.site-shell--home-editorial .home-today-facts dt {
+  font-size: 0.68rem;
+}
+
+.site-shell--home-editorial .home-today-facts dd {
+  font-size: clamp(1.22rem, 1.65vw, 1.58rem);
+}
+
+.site-shell--home-editorial .home-advisory-strip {
+  padding-top: 19px;
+  padding-bottom: 19px;
+}
+
+.site-shell--home-editorial .home-advisory-strip small {
+  font-size: 0.66rem;
+}
+
+.site-shell--home-editorial .home-advisory-strip strong {
+  font-size: 1.02rem;
+}
+
+.site-shell--home-editorial .home-advisory-strip p {
+  font-size: 0.82rem;
+}
+
+.site-shell--home-editorial .home-advisory-strip > a,
+.site-shell--home-editorial .home-inline-links a,
+.site-shell--home-editorial .home-observation-story__intro > a,
+.site-shell--home-editorial .home-water-focus > a,
+.site-shell--home-editorial .home-water-story__footer > a {
+  font-size: 0.79rem;
+}
+
+.site-shell--home-editorial .home-hourly-story article {
+  min-height: 174px;
+  gap: 10px;
+}
+
+.site-shell--home-editorial .home-hourly-story article > span {
+  font-size: 0.72rem;
+}
+
+.site-shell--home-editorial .home-hourly-story article svg {
+  width: 42px;
+  height: 42px;
+}
+
+.site-shell--home-editorial .home-hourly-story article strong {
+  font-size: 1.58rem;
+}
+
+.site-shell--home-editorial .home-hourly-story article small {
+  font-size: 0.68rem;
+}
+
+.site-shell--home-editorial .home-next-days__heading > strong,
+.site-shell--home-editorial .home-water-table__heading strong {
+  font-size: clamp(1.34rem, 1.9vw, 1.78rem);
+}
+
+.site-shell--home-editorial .home-next-days__list article {
+  min-height: 72px;
+}
+
+.site-shell--home-editorial .home-next-days__list article > div strong {
+  font-size: 0.9rem;
+}
+
+.site-shell--home-editorial .home-next-days__list article > div span,
+.site-shell--home-editorial .home-next-days__list article > span {
+  font-size: 0.72rem;
+}
+
+.site-shell--home-editorial .home-next-days__list article > b {
+  font-size: 1.02rem;
+}
+
+.site-shell--home-editorial .home-next-days__list article > b small {
+  font-size: 0.78rem;
+}
+
+.site-shell--home-editorial .home-observation-temperature small {
+  font-size: 0.68rem;
+}
+
+.site-shell--home-editorial .home-observation-temperature span,
+.site-shell--home-editorial .home-observation-story__unavailable span {
+  font-size: 0.84rem;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dt {
+  font-size: 0.63rem;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dd {
+  font-size: clamp(1.08rem, 1.45vw, 1.38rem);
+}
+
+.site-shell--home-editorial .home-water-focus__topline span {
+  font-size: 0.94rem;
+}
+
+.site-shell--home-editorial .home-water-focus__topline small,
+.site-shell--home-editorial .home-water-focus__topline > b {
+  font-size: 0.62rem;
+}
+
+.site-shell--home-editorial .home-water-trend {
+  font-size: 0.82rem;
+}
+
+.site-shell--home-editorial .home-water-focus dt {
+  font-size: 0.57rem;
+}
+
+.site-shell--home-editorial .home-water-focus dd {
+  font-size: 0.76rem;
+}
+
+.site-shell--home-editorial .home-water-table__heading > small {
+  font-size: 0.68rem;
+}
+
+.site-shell--home-editorial .home-water-table__rows article > div strong,
+.site-shell--home-editorial .home-water-context > div strong {
+  font-size: 0.87rem;
+}
+
+.site-shell--home-editorial .home-water-table__rows article > div span,
+.site-shell--home-editorial .home-water-context > div span {
+  font-size: 0.64rem;
+}
+
+.site-shell--home-editorial .home-water-table__rows article > b,
+.site-shell--home-editorial .home-water-context > b {
+  font-size: 0.92rem;
+}
+
+.site-shell--home-editorial .home-water-table__rows article > span,
+.site-shell--home-editorial .home-water-context > span {
+  font-size: 0.68rem;
+}
+
+.site-shell--home-editorial .home-water-table__rows article > small,
+.site-shell--home-editorial .home-water-context > small,
+.site-shell--home-editorial .home-water-story__footer p {
+  font-size: 0.62rem;
+}
+
+.site-shell--home-editorial .home-explore-groups h3 {
+  font-size: 0.68rem;
+}
+
+.site-shell--home-editorial .home-explore-groups a {
+  min-height: 60px;
+  font-size: 0.88rem;
+}
+
+@media (max-width: 1180px) {
+  .site-shell--home-editorial {
+    --editorial-rail: 17px;
+  }
+
+  .site-shell--home-editorial .weather-hero-content {
+    padding-left: 17px;
+  }
+}
+
+@media (max-width: 900px) {
+  .site-shell--home-editorial {
+    --editorial-rail: 22px;
+  }
+
+  .site-shell--home-editorial .weather-hero-content {
+    padding-left: 22px;
+  }
+}
+
+@media (max-width: 620px) {
+  .site-shell--home-editorial {
+    --editorial-rail: 16px;
+  }
+
+  .site-shell--home-editorial .weather-hero-content {
+    padding-left: 16px;
+  }
+
+  .site-shell--home-editorial .home-today-facts dt {
+    font-size: 0.64rem;
+  }
+
+  .site-shell--home-editorial .home-today-facts dd {
+    font-size: 1.18rem;
+  }
+
+  .site-shell--home-editorial .home-hourly-story article {
+    min-height: 162px;
+  }
+}

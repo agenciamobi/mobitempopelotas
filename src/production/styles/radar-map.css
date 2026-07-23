@@ -1,0 +1,336 @@
+.map-layer-switcher {
+  position: absolute;
+  z-index: 5;
+  top: 112px;
+  left: 24px;
+  display: inline-flex;
+  gap: 4px;
+  padding: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 10px 30px rgba(7, 30, 47, 0.13);
+  backdrop-filter: blur(16px);
+}
+
+.map-layer-switcher button {
+  min-height: 37px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 800;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.map-layer-switcher button:hover:not(:disabled),
+.map-layer-switcher button:focus-visible:not(:disabled) {
+  background: var(--surface-soft);
+  color: var(--ink);
+  outline: none;
+}
+
+.map-layer-switcher button:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.map-layer-switcher button.is-active {
+  background: var(--ink);
+  color: white;
+  box-shadow: 0 7px 18px rgba(7, 30, 47, 0.18);
+}
+
+.map-layer-switcher button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.map-radar-unavailable {
+  position: absolute;
+  z-index: 5;
+  top: 164px;
+  left: 24px;
+  display: grid;
+  max-width: 245px;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid rgba(239, 143, 71, 0.23);
+  border-radius: 14px;
+  background: rgba(255, 250, 245, 0.9);
+  box-shadow: 0 9px 24px rgba(7, 30, 47, 0.1);
+  backdrop-filter: blur(14px);
+}
+
+.map-radar-unavailable strong {
+  color: #9a4c16;
+  font-size: 0.68rem;
+  font-weight: 850;
+}
+
+.map-radar-unavailable span {
+  color: var(--ink-soft);
+  font-size: 0.61rem;
+  line-height: 1.45;
+}
+
+.map-canvas--satellite .regional-map-marker,
+.map-canvas--radar .regional-map-marker {
+  border-color: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 12px 32px rgba(2, 12, 20, 0.32);
+}
+
+.map-canvas--satellite .map-panel-heading,
+.map-canvas--radar .map-panel-heading {
+  color: white;
+}
+
+.radar-player {
+  position: absolute;
+  z-index: 6;
+  right: 18px;
+  bottom: 18px;
+  left: 18px;
+  display: grid;
+  gap: 8px;
+  padding: 13px 14px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 20px;
+  background: rgba(5, 20, 31, 0.88);
+  box-shadow: 0 18px 45px rgba(2, 12, 20, 0.32);
+  color: white;
+  backdrop-filter: blur(18px);
+}
+
+.radar-player-topline {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(108px, 0.45fr);
+  align-items: center;
+  gap: 11px;
+}
+
+.radar-play-button {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 13px;
+  background: var(--sky);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.radar-play-button:hover,
+.radar-play-button:focus-visible {
+  background: white;
+  outline: none;
+}
+
+.radar-play-button svg {
+  width: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.radar-frame-status {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.radar-frame-status span {
+  color: var(--sky);
+  font-size: 0.59rem;
+  font-weight: 850;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.radar-frame-status strong {
+  font-size: 1.05rem;
+  letter-spacing: -0.035em;
+}
+
+.radar-opacity-control {
+  display: grid;
+  grid-template-columns: auto minmax(62px, 1fr);
+  align-items: center;
+  gap: 8px;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 0.6rem;
+  font-weight: 750;
+}
+
+.radar-opacity-control input,
+.radar-timeline {
+  accent-color: var(--sky);
+  cursor: pointer;
+}
+
+.radar-opacity-control input {
+  width: 100%;
+}
+
+.radar-timeline {
+  width: 100%;
+  margin: 0;
+}
+
+.radar-time-range,
+.radar-intensity-legend {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 9px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.56rem;
+  font-weight: 720;
+}
+
+.radar-time-range span:nth-child(2) {
+  justify-self: center;
+  color: white;
+  font-weight: 820;
+}
+
+.radar-intensity-legend i {
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    #78b7ff 0%,
+    #35c4d0 19%,
+    #63d476 38%,
+    #f4dc58 58%,
+    #ff9a42 76%,
+    #ef476f 91%,
+    #9c4dcc 100%
+  );
+}
+
+.radar-provider-note {
+  color: rgba(255, 255, 255, 0.52);
+  font-size: 0.54rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.map-canvas--radar .maplibregl-ctrl-bottom-right {
+  bottom: 176px;
+}
+
+.map-canvas--satellite .maplibregl-ctrl-attrib,
+.map-canvas--radar .maplibregl-ctrl-attrib {
+  background: rgba(5, 20, 31, 0.72);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.map-canvas--satellite .maplibregl-ctrl-attrib a,
+.map-canvas--radar .maplibregl-ctrl-attrib a {
+  color: white;
+}
+
+@media (max-width: 900px) {
+  .map-layer-switcher {
+    top: 100px;
+    left: 16px;
+  }
+
+  .map-radar-unavailable {
+    top: 152px;
+    left: 16px;
+  }
+
+  .radar-player {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    border-radius: 18px;
+  }
+
+  .map-canvas--radar .maplibregl-ctrl-bottom-right {
+    bottom: 180px;
+  }
+}
+
+@media (max-width: 640px) {
+  .map-layer-switcher {
+    top: 92px;
+    left: 12px;
+    max-width: calc(100% - 72px);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .map-layer-switcher::-webkit-scrollbar {
+    display: none;
+  }
+
+  .map-layer-switcher button {
+    flex: 0 0 auto;
+    min-height: 39px;
+    padding-inline: 11px;
+  }
+
+  .map-radar-unavailable {
+    top: 143px;
+    left: 12px;
+    max-width: min(235px, calc(100% - 24px));
+  }
+
+  .radar-player {
+    gap: 7px;
+    padding: 11px 12px 10px;
+  }
+
+  .radar-player-topline {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .radar-opacity-control {
+    grid-column: 1 / -1;
+    grid-template-columns: auto 1fr;
+  }
+
+  .radar-provider-note {
+    display: none;
+  }
+
+  .map-canvas--radar .maplibregl-ctrl-bottom-right {
+    bottom: 188px;
+  }
+}
+
+@media (max-width: 420px) {
+  .map-layer-switcher {
+    right: 12px;
+    max-width: none;
+  }
+
+  .map-layer-switcher button {
+    flex: 1;
+    padding-inline: 8px;
+  }
+
+  .radar-time-range,
+  .radar-intensity-legend {
+    font-size: 0.52rem;
+  }
+
+  .radar-frame-status strong {
+    font-size: 0.94rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-layer-switcher button,
+  .radar-play-button {
+    transition: none;
+  }
+}

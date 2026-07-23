@@ -1,0 +1,81 @@
+/* Avisos oficiais do INMET. Cores de risco preservam a semântica oficial. */
+.inmet-alerts-section{display:grid;gap:30px;margin-top:22px;padding:clamp(26px,4vw,48px);border:1px solid rgba(7,30,47,.1);border-radius:28px;background:#fff;box-shadow:0 22px 60px rgba(7,30,47,.08)}
+.inmet-alerts-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;padding-bottom:24px;border-bottom:1px solid rgba(7,30,47,.1)}
+.inmet-alerts-heading>div:first-child{display:grid;gap:9px;max-width:830px}
+.inmet-alerts-heading h2{margin:0;color:#071e2f;font-size:clamp(1.8rem,3.4vw,3.4rem);line-height:.98;letter-spacing:-.055em}
+.inmet-alerts-heading p{max-width:760px;margin:3px 0 0;color:#5d727d;font-size:.88rem;line-height:1.65}
+.inmet-source-status{flex:0 0 auto;padding:8px 11px;border:1px solid rgba(24,189,205,.2);border-radius:999px;background:rgba(24,189,205,.08);color:#087f91;font-size:.6rem;font-weight:820;letter-spacing:.06em;text-transform:uppercase}
+.inmet-alerts-counts{display:grid;grid-template-columns:repeat(3,minmax(76px,1fr));min-width:286px;border-top:1px solid rgba(7,30,47,.1);border-bottom:1px solid rgba(7,30,47,.1)}
+.inmet-alerts-counts>div{display:grid;gap:4px;padding:13px 15px;border-right:1px solid rgba(7,30,47,.1);text-align:center}
+.inmet-alerts-counts>div:last-child{border-right:0}
+.inmet-alerts-counts strong{color:#071e2f;font-size:1.55rem;line-height:1}
+.inmet-alerts-counts span{color:#60747d;font-size:.56rem;font-weight:760;text-transform:uppercase}
+.inmet-alert-groups{display:grid;gap:34px}
+.inmet-alert-group{display:grid;gap:14px}
+.inmet-alert-group>header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding-bottom:13px;border-bottom:1px solid rgba(7,30,47,.1)}
+.inmet-alert-group>header>div{display:grid;gap:4px}
+.inmet-alert-group>header h3{margin:0;color:#071e2f;font-size:clamp(1.15rem,2vw,1.65rem);letter-spacing:-.035em}
+.inmet-alert-group>header p{margin:0;color:#647985;font-size:.7rem;line-height:1.55}
+.inmet-alert-group>header>span{display:grid;width:32px;height:32px;place-items:center;border-radius:10px;background:rgba(94,44,237,.08);color:#5e2ced;font-size:.75rem;font-weight:850}
+.inmet-alert-list{display:grid;gap:12px}
+.inmet-alert-card{--risk:#18bdcd;position:relative;display:grid;gap:14px;padding:21px 22px 21px 26px;border:1px solid rgba(7,30,47,.09);border-radius:18px;background:#fbfcfc;overflow:hidden}
+.inmet-alert-card::before{position:absolute;inset:0 auto 0 0;width:5px;background:var(--risk);content:""}
+.inmet-alert-card.severity-potential{--risk:#e2b800;background:#fffdf4}
+.inmet-alert-card.severity-danger{--risk:#ef7d2f;background:#fff9f4}
+.inmet-alert-card.severity-great-danger{--risk:#d93636;background:#fff7f7}
+.inmet-alert-card__topline{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:9px}
+.inmet-alert-severity,.inmet-alert-relevance,.inmet-alert-event{display:inline-flex;width:fit-content;align-items:center;border-radius:999px;font-size:.57rem;font-weight:830;letter-spacing:.045em;text-transform:uppercase}
+.inmet-alert-severity{padding:6px 9px;background:color-mix(in srgb,var(--risk) 12%,white);color:color-mix(in srgb,var(--risk) 78%,#071e2f)}
+.inmet-alert-relevance{padding:6px 9px;border:1px solid rgba(94,44,237,.15);background:rgba(94,44,237,.06);color:#5e2ced}
+.relevance-pelotas .inmet-alert-relevance{border-color:rgba(24,189,205,.22);background:rgba(24,189,205,.09);color:#087f91}
+.inmet-alert-card__heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.inmet-alert-card__heading>div{display:grid;gap:6px}
+.inmet-alert-card h3{margin:0;color:#071e2f;font-size:clamp(1.05rem,1.7vw,1.35rem);line-height:1.16;letter-spacing:-.03em}
+.inmet-alert-card__heading p{margin:0;color:#647985;font-size:.66rem}
+.inmet-alert-event{flex:0 0 auto;padding:7px 9px;background:rgba(7,30,47,.055);color:#385466}
+.inmet-alert-area,.inmet-alert-description{margin:0;color:#526b77;font-size:.76rem;line-height:1.65}
+.inmet-alert-area strong{color:#071e2f}
+.inmet-alert-description{max-width:940px}
+.inmet-alert-card details{padding-top:3px;border-top:1px solid rgba(7,30,47,.08)}
+.inmet-alert-card summary{width:fit-content;padding-top:10px;color:#5e2ced;font-size:.68rem;font-weight:800;cursor:pointer}
+.inmet-alert-card details p{margin:10px 0 0;color:#526b77;font-size:.74rem;line-height:1.65}
+.inmet-alert-card>a,.inmet-alerts-empty>a,.inmet-alerts-footer>a{display:inline-flex;width:fit-content;align-items:center;gap:7px;color:#071e2f;font-size:.69rem;font-weight:840;text-decoration:underline;text-decoration-color:rgba(24,189,205,.5);text-underline-offset:5px}
+.inmet-alerts-footer{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-top:18px;border-top:1px solid rgba(7,30,47,.1)}
+.inmet-alerts-footer p{margin:0;color:#647985;font-size:.65rem;line-height:1.55}
+.inmet-alerts-empty{display:grid;gap:9px;padding:24px;border-radius:18px;background:rgba(24,189,205,.065)}
+.inmet-alerts-empty strong{color:#071e2f;font-size:1rem}
+.inmet-alerts-empty p{margin:0;color:#5d727d;font-size:.76rem;line-height:1.6}
+.inmet-alerts-section.is-unavailable .inmet-alerts-empty{background:rgba(94,44,237,.055)}
+.inmet-alerts-section.is-unavailable .inmet-source-status{border-color:rgba(94,44,237,.16);background:rgba(94,44,237,.07);color:#5e2ced}
+
+.home-inmet-alerts{--risk:#18bdcd;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:center;margin:30px 0 0;padding:17px 20px;border:1px solid color-mix(in srgb,var(--risk) 23%,rgba(7,30,47,.08));border-radius:18px;background:color-mix(in srgb,var(--risk) 6%,white)}
+.home-inmet-alerts.severity-potential{--risk:#d6ae00}
+.home-inmet-alerts.severity-danger{--risk:#ef7d2f}
+.home-inmet-alerts.severity-great-danger{--risk:#d93636}
+.home-inmet-alerts__mark{display:grid;width:38px;height:38px;place-items:center;border-radius:12px;background:var(--risk);color:#fff;font-size:1rem;font-weight:900;box-shadow:0 9px 20px color-mix(in srgb,var(--risk) 22%,transparent)}
+.home-inmet-alerts__copy{display:grid;gap:3px;min-width:0}
+.home-inmet-alerts__copy>span{color:color-mix(in srgb,var(--risk) 82%,#071e2f);font-size:.56rem;font-weight:850;letter-spacing:.075em;text-transform:uppercase}
+.home-inmet-alerts h2{margin:0;color:#071e2f;font-size:clamp(.95rem,1.4vw,1.2rem);letter-spacing:-.025em}
+.home-inmet-alerts p{margin:0;color:#60747d;font-size:.66rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-inmet-alerts>a{display:inline-flex;align-items:center;gap:10px;min-height:42px;padding:0 15px;border-radius:12px;background:#071e2f;color:#fff;font-size:.68rem;font-weight:830;white-space:nowrap}
+
+@media(max-width:820px){
+.inmet-alerts-heading{display:grid;align-items:start}
+.inmet-alerts-counts{width:100%;min-width:0}
+.inmet-alert-card__heading{display:grid}
+.inmet-alert-event{order:-1}
+.inmet-alerts-footer{display:grid}
+.home-inmet-alerts{grid-template-columns:auto minmax(0,1fr)}
+.home-inmet-alerts>a{grid-column:1/-1;width:100%;justify-content:center}
+}
+@media(max-width:560px){
+.inmet-alerts-section{gap:24px;margin-top:14px;padding:20px 16px;border-radius:21px}
+.inmet-alerts-heading h2{font-size:2rem}
+.inmet-alerts-counts>div{padding:11px 7px}
+.inmet-alert-card{padding:18px 16px 18px 20px;border-radius:16px}
+.inmet-alert-card__topline{align-items:flex-start}
+.inmet-alert-severity,.inmet-alert-relevance{font-size:.51rem}
+.home-inmet-alerts{margin-top:18px;padding:15px;border-radius:15px}
+.home-inmet-alerts__mark{width:34px;height:34px}
+.home-inmet-alerts p{white-space:normal}
+}

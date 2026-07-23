@@ -1,0 +1,192 @@
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+img,
+picture,
+video,
+canvas,
+iframe {
+  max-width: 100%;
+}
+
+.site-shell,
+.dashboard-layout,
+.weather-content,
+.topic-page,
+.topic-hero,
+.topic-section,
+.related-weather,
+.home-weather-navigation,
+.hydrology-home,
+.hydrology-home-intro,
+.hydrology-home-grid,
+.hydrology-context-column,
+.hydrology-monitor-grid,
+.lagoon-dashboard-layout,
+.lagoon-dashboard-main,
+.lagoon-dashboard-aside,
+.laranjal-monitor,
+.guaiba-level-card,
+.home-lagoon-card,
+.site-footer {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.dashboard-layout > *,
+.weather-content > *,
+.topic-page > *,
+.topic-section > *,
+.section-heading > *,
+.hydrology-home-intro > *,
+.hydrology-home-grid > *,
+.hydrology-context-column > *,
+.hydrology-monitor-grid > *,
+.lagoon-dashboard-layout > *,
+.lagoon-dashboard-aside > *,
+.guaiba-level-card-header > *,
+.guaiba-level-reading > *,
+.guaiba-summary-grid > *,
+.guaiba-source-links > * {
+  min-width: 0;
+}
+
+.guaiba-level-card p,
+.guaiba-level-card a,
+.topic-section p,
+.topic-section a,
+.hydrology-home p,
+.hydrology-home a,
+.site-footer p,
+.site-footer a {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+  .site-shell {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .site-header,
+  .mobile-tab-bar {
+    right: 0;
+    left: 0;
+    width: auto;
+    max-width: 100vw;
+  }
+
+  .dashboard-layout,
+  .topic-page,
+  .home-weather-navigation,
+  .hydrology-home,
+  .site-footer {
+    width: auto;
+    max-width: calc(100% - var(--mobile-gutter) - var(--mobile-gutter));
+  }
+
+  .current-weather,
+  .hourly-section,
+  .weekly-section,
+  .map-panel,
+  .alert-card,
+  .topic-hero,
+  .topic-section,
+  .related-weather,
+  .topic-current-card,
+  .wind-hero,
+  .advisory-panel,
+  .home-lagoon-card,
+  .guaiba-level-card,
+  .laranjal-monitor,
+  .lagoon-dashboard-layout {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .hourly-list,
+  .week-forecast-grid,
+  .related-weather-grid,
+  .hydrology-flow,
+  .lagoon-dashboard-aside {
+    width: 100%;
+    max-width: 100%;
+    overscroll-behavior-x: contain;
+  }
+
+  .hydrology-flow {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
+  .maplibregl-map,
+  .maplibregl-canvas-container,
+  .maplibregl-canvas,
+  .map-canvas {
+    max-width: 100%;
+  }
+
+  .guaiba-chart-range,
+  .guaiba-chart-labels {
+    min-width: 0;
+  }
+
+  .guaiba-chart-range strong {
+    min-width: 0;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+
+  .hydrology-home-actions,
+  .guaiba-source-links,
+  .laranjal-weather-grid,
+  .hydrology-driver-grid,
+  .methodology-rules-grid,
+  .hydrology-stations-grid,
+  .hydrology-page-flow {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .pwa-dialog-backdrop,
+  .pwa-dialog {
+    max-width: 100vw;
+  }
+}
+
+@media (max-width: 420px) {
+  .topic-hero,
+  .topic-section,
+  .related-weather {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  .guaiba-level-card,
+  .laranjal-level-card {
+    max-width: 100%;
+  }
+}
+
+@media (display-mode: fullscreen) {
+  html,
+  body,
+  .site-shell {
+    min-height: 100dvh;
+  }
+}
+
+@media (display-mode: fullscreen) and (max-width: 900px) {
+  .mobile-tab-bar {
+    position: fixed;
+    bottom: 0;
+  }
+
+  .pwa-launcher {
+    bottom: calc(82px + env(safe-area-inset-bottom));
+  }
+}

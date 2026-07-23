@@ -1,0 +1,108 @@
+/* Ordena o resumo de amanhã antes dos links finais da seção. */
+.site-shell--home-editorial .home-next-days__heading {
+  order: 1;
+}
+
+.site-shell--home-editorial .home-next-days__list {
+  order: 2;
+}
+
+.site-shell--home-editorial .home-next-days__tomorrow-summary {
+  order: 3;
+}
+
+.site-shell--home-editorial .home-next-days > .home-inline-links {
+  order: 4;
+}
+
+/* Mantém a profundidade do card escuro junto da faixa semântica. */
+.site-shell--home-editorial .home-water-focus {
+  box-shadow:
+    inset 4px 0 0 var(--home-water-state-accent),
+    0 28px 72px rgba(3, 18, 29, 0.16) !important;
+}
+
+/*
+ * Reduz a altura da primeira dobra e melhora a leitura do título editorial.
+ * Esta camada é importada por último para consolidar a escala após os estilos
+ * históricos do hero.
+ */
+.site-shell--home-editorial .weather-hero h1 {
+  font-size: clamp(3.9rem, 5vw, 4.6rem);
+  line-height: 0.94;
+}
+
+@media (max-width: 1240px) {
+  .site-shell--home-editorial .weather-hero h1 {
+    font-size: clamp(3.45rem, 5.1vw, 4.15rem);
+  }
+}
+
+@media (max-width: 900px) {
+  .site-shell--home-editorial .weather-hero h1 {
+    font-size: clamp(3rem, 8vw, 3.7rem);
+  }
+}
+
+@media (max-width: 620px) {
+  .site-shell--home-editorial .weather-hero h1 {
+    font-size: clamp(2.45rem, 10.5vw, 3rem);
+    line-height: 0.96;
+  }
+}
+
+/*
+ * Corrige a composição do resumo de amanhã.
+ * A grade histórica de duas colunas fazia o novo card cair na coluna estreita
+ * da esquerda e mantinha os links na coluna direita. Os !important abaixo são
+ * intencionais: esta é a camada final de compatibilidade contra estilos legados.
+ */
+.site-shell--home-editorial .home-next-days {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-auto-flow: row !important;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+}
+
+.site-shell--home-editorial .home-next-days > .home-next-days__heading,
+.site-shell--home-editorial .home-next-days > .home-next-days__list,
+.site-shell--home-editorial .home-next-days > .home-next-days__tomorrow-summary,
+.site-shell--home-editorial .home-next-days > .home-inline-links {
+  grid-column: 1 / -1 !important;
+  justify-self: stretch !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+}
+
+.site-shell--home-editorial .home-next-days__tomorrow-summary {
+  box-sizing: border-box;
+  display: grid !important;
+  grid-template-columns: minmax(170px, 0.24fr) minmax(0, 1fr) !important;
+  align-items: start;
+  justify-self: stretch;
+  overflow: hidden;
+}
+
+.site-shell--home-editorial .home-next-days__tomorrow-summary > div,
+.site-shell--home-editorial .home-next-days__tomorrow-summary > section {
+  width: 100%;
+  min-width: 0;
+}
+
+.site-shell--home-editorial .home-next-days__tomorrow-summary h3,
+.site-shell--home-editorial .home-next-days__tomorrow-summary p {
+  max-width: none;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: none;
+}
+
+@media (max-width: 760px) {
+  .site-shell--home-editorial .home-next-days__tomorrow-summary {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
