@@ -183,6 +183,7 @@ jobs:
           NODE
 
       - name: Executar baseline completa pré-cutover
+        if: always()
         env:
           BASE_URL: https://tempopelotas.com.br
         run: node scripts/cutover-smoke.mjs
