@@ -36,6 +36,9 @@ jobs:
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
 
+      - name: Validar template de ambiente
+        run: npm run runtime:check:example
+
       - name: Contratos rápidos
         run: npm run test:contracts
 
