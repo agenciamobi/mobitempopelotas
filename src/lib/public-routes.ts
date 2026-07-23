@@ -19,4 +19,5 @@ export const PUBLIC_ROUTES: PublicRouteEntry[] = [
   { path: "/historico-climatico-pelotas", changeFrequency: "daily", priority: 0.7 },
   { path: "/cameras-ao-vivo-pelotas", changeFrequency: "hourly", priority: 0.7 },
   { path: "/metodologia", changeFrequency: "monthly", priority: 0.6 },
+  { path: "/privacidade-e-dados", changeFrequency: "monthly", priority: 0.5 },
 ];

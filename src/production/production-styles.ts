@@ -91,6 +91,8 @@ import "./styles/home-operational-bridge-v21-fix.css";
 import "./styles/weather-ai-summary.css";
 import "./styles/integrations-v22.css";
 import "./styles/account-v24.css";
+import "./styles/account-lgpd-v26.css";
+import "./styles/privacy-data-v26.css";
 import "./styles/footer-editorial-v23.css";
 import "./styles/footer-production-cleanup.css";
 import "./styles/water-level-semantic-colors.css";

@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 
@@ -16,14 +17,27 @@ const accountFooterSource = {
   forecastUrl: "/metodologia",
 } satisfies WeatherData["source"];
 
+const DELETE_CONFIRMATION = "EXCLUIR MINHA CONTA";
+
 type AuthenticatedAccount = Extract<AccountSnapshot, { status: "authenticated" }>;
 type Feedback = { tone: "success" | "error"; text: string } | null;
+
+async function unsubscribeCurrentBrowserPush() {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+
+  const registration = await navigator.serviceWorker.getRegistration();
+  const subscription = await registration?.pushManager.getSubscription();
+  if (subscription) await subscription.unsubscribe();
+}
 
 export function AccountPage({ snapshot }: { snapshot: AuthenticatedAccount }) {
   const savePreferences = useServerFn(saveAccountPreferences);
   const [displayName, setDisplayName] = useState(snapshot.identity.displayName);
   const [preferences, setPreferences] = useState(snapshot.preferences);
   const [pending, setPending] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteFeedback, setDeleteFeedback] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Feedback>(
     snapshot.storageReady
       ? null
@@ -72,6 +86,49 @@ export function AccountPage({ snapshot }: { snapshot: AuthenticatedAccount }) {
       });
     } finally {
       setPending(false);
+    }
+  }
+
+  async function handleDeleteAccount(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setDeleteFeedback(null);
+
+    if (deleteConfirmation !== DELETE_CONFIRMATION) {
+      setDeleteFeedback(`Digite exatamente ${DELETE_CONFIRMATION} para confirmar.`);
+      return;
+    }
+
+    setDeleting(true);
+
+    try {
+      const response = await fetch("/api/account/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirmation: deleteConfirmation }),
+      });
+      const result = (await response.json()) as { success?: boolean; error?: string };
+
+      if (response.status === 401) {
+        window.location.assign("/entrar?next=/minha-conta");
+        return;
+      }
+
+      if (!response.ok || !result.success) {
+        setDeleteFeedback(result.error ?? "Não foi possível excluir a conta agora.");
+        return;
+      }
+
+      try {
+        await unsubscribeCurrentBrowserPush();
+      } catch (error) {
+        console.error("A conta foi excluída, mas o navegador não removeu a inscrição push:", error);
+      }
+
+      window.location.assign("/");
+    } catch {
+      setDeleteFeedback("Não foi possível excluir a conta agora.");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -160,7 +217,7 @@ export function AccountPage({ snapshot }: { snapshot: AuthenticatedAccount }) {
                   <h2 id="preferences-title">Preferências de comunicação</h2>
                 </div>
                 <p>
-                  Estas escolhas preparam sua conta para alertas futuros. Nenhuma comunicação é
+                  Cada alteração é registrada com data e versão da política. Nenhuma comunicação é
                   ativada fora das opções marcadas.
                 </p>
               </div>
@@ -214,13 +271,20 @@ export function AccountPage({ snapshot }: { snapshot: AuthenticatedAccount }) {
 
           <aside className="account-sidebar" aria-label="Privacidade e sessão">
             <section>
-              <span className="eyebrow">Privacidade</span>
-              <h2>Uso restrito ao funcionamento da conta</h2>
+              <span className="eyebrow">Seus dados</span>
+              <h2>Consulte ou leve uma cópia</h2>
               <p>
-                O login utiliza identificação básica fornecida pelo Google. Perfil e preferências
-                são protegidos no Supabase por políticas que permitem acesso apenas ao próprio
-                usuário autenticado.
+                A exportação reúne perfil, preferências, histórico de consentimentos e aparelhos de
+                notificação vinculados à conta.
               </p>
+              <div className="account-data-actions">
+                <a className="account-data-button" href="/api/account/export" download>
+                  Baixar meus dados
+                </a>
+                <Link className="account-data-link" to="/privacidade-e-dados">
+                  Ver política de privacidade
+                </Link>
+              </div>
             </section>
 
             <section>
@@ -233,6 +297,39 @@ export function AccountPage({ snapshot }: { snapshot: AuthenticatedAccount }) {
               <form action="/auth/signout" method="post">
                 <button type="submit" className="account-signout-button">
                   Sair da conta
+                </button>
+              </form>
+            </section>
+
+            <section className="account-danger-zone">
+              <span className="eyebrow">Exclusão definitiva</span>
+              <h2>Remover conta e preferências</h2>
+              <p id="delete-account-help">
+                Esta ação remove perfil, preferências, consentimentos e inscrições push vinculadas.
+                Os conteúdos públicos do portal continuam acessíveis sem conta.
+              </p>
+              <form onSubmit={handleDeleteAccount}>
+                <label className="account-delete-confirmation">
+                  <span>Digite {DELETE_CONFIRMATION}</span>
+                  <input
+                    type="text"
+                    value={deleteConfirmation}
+                    onChange={(event) => setDeleteConfirmation(event.target.value)}
+                    autoComplete="off"
+                    aria-describedby="delete-account-help"
+                  />
+                </label>
+                {deleteFeedback ? (
+                  <p className="account-delete-feedback" role="alert">
+                    {deleteFeedback}
+                  </p>
+                ) : null}
+                <button
+                  type="submit"
+                  className="account-delete-button"
+                  disabled={deleting || deleteConfirmation !== DELETE_CONFIRMATION}
+                >
+                  {deleting ? "Excluindo…" : "Excluir minha conta"}
                 </button>
               </form>
             </section>

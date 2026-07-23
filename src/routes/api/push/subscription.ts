@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
+import { getVerifiedRequestUser } from "@/lib/auth/request-user.server";
 import {
   isAllowedPushEndpoint,
   isSameOriginRequest,
@@ -49,6 +50,24 @@ function validateBrowserRequest(request: Request) {
   return null;
 }
 
+async function optionalAccountContext(request: Request): Promise<{
+  userId: string | null | undefined;
+  responseHeaders: Headers;
+}> {
+  try {
+    const account = await getVerifiedRequestUser(request);
+    return {
+      userId: account.configured ? (account.user?.id ?? null) : undefined,
+      responseHeaders: account.responseHeaders,
+    };
+  } catch (error) {
+    console.warn("[push/subscription] Não foi possível verificar a conta opcional", {
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return { userId: undefined, responseHeaders: new Headers() };
+  }
+}
+
 async function subscribe(request: Request) {
   const requestError = validateBrowserRequest(request);
   if (requestError) return requestError;
@@ -74,6 +93,8 @@ async function subscribe(request: Request) {
     return pushJsonResponse({ success: false, error: "Inscrição inválida." }, 400);
   }
 
+  const account = await optionalAccountContext(request);
+
   try {
     await savePushSubscription(
       {
@@ -84,9 +105,10 @@ async function subscribe(request: Request) {
       },
       request.headers.get("user-agent"),
       parsed.data.topics,
+      account.userId,
     );
 
-    return pushJsonResponse({ success: true });
+    return pushJsonResponse({ success: true }, 200, account.responseHeaders);
   } catch (error) {
     console.error("[push/subscription] Falha ao salvar inscrição", {
       message: error instanceof Error ? error.message : String(error),
@@ -94,6 +116,7 @@ async function subscribe(request: Request) {
     return pushJsonResponse(
       { success: false, error: "Não foi possível ativar os avisos neste aparelho." },
       500,
+      account.responseHeaders,
     );
   }
 }

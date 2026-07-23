@@ -20,10 +20,34 @@ export const PUSH_RESPONSE_HEADERS = {
 export type LimitedJsonResult =
   { ok: true; value: unknown } | { ok: false; status: 400 | 413 | 415; error: string };
 
-export function pushJsonResponse(body: unknown, status = 200) {
+type HeadersWithSetCookie = Headers & {
+  getSetCookie?: () => string[];
+};
+
+function appendResponseHeaders(target: Headers, source: HeadersInit) {
+  const sourceHeaders = source instanceof Headers ? source : new Headers(source);
+  const setCookies = (sourceHeaders as HeadersWithSetCookie).getSetCookie?.() ?? [];
+
+  sourceHeaders.forEach((value, key) => {
+    if (key.toLowerCase() !== "set-cookie") target.append(key, value);
+  });
+
+  if (setCookies.length > 0) {
+    for (const cookie of setCookies) target.append("Set-Cookie", cookie);
+    return;
+  }
+
+  const fallbackSetCookie = sourceHeaders.get("set-cookie");
+  if (fallbackSetCookie) target.append("Set-Cookie", fallbackSetCookie);
+}
+
+export function pushJsonResponse(body: unknown, status = 200, additionalHeaders?: HeadersInit) {
+  const headers = new Headers(PUSH_RESPONSE_HEADERS);
+  if (additionalHeaders) appendResponseHeaders(headers, additionalHeaders);
+
   return new Response(JSON.stringify(body), {
     status,
-    headers: PUSH_RESPONSE_HEADERS,
+    headers,
   });
 }
 

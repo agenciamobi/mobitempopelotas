@@ -4,7 +4,7 @@ import {
   createSupabaseAdminClient,
   getSupabaseServerConfig,
 } from "@/lib/supabase/server-client.server";
-import type { WebPushSubscription } from "@/lib/supabase/database.types";
+import type { UserPreferences, WebPushSubscription } from "@/lib/supabase/database.types";
 
 import {
   PUSH_TOPICS,
@@ -15,12 +15,21 @@ import {
 
 const QUERY_TIMEOUT_MS = 3_500;
 const PUSH_SUBSCRIPTION_PAGE_SIZE = 500;
+const PREFERENCE_QUERY_BATCH_SIZE = 100;
 const CLAIM_LEASE_SECONDS = 15 * 60;
 
 export type PushStorageStatus = {
   configured: boolean;
   missing: Array<"SUPABASE_URL" | "SUPABASE_SECRET_KEY">;
 };
+
+export type PushConsentPreference =
+  "weather_alerts" | "water_alerts" | "daily_summary" | "community_updates";
+
+type PushPreferenceSnapshot = Pick<
+  UserPreferences,
+  "user_id" | "weather_alerts" | "water_alerts" | "daily_summary" | "community_updates"
+>;
 
 function timeoutSignal() {
   return AbortSignal.timeout(QUERY_TIMEOUT_MS);
@@ -47,6 +56,24 @@ function rowToSubscription(row: WebPushSubscription): StoredPushSubscription {
   };
 }
 
+function isConsentGranted(
+  preference: PushPreferenceSnapshot | undefined,
+  consentPreference: PushConsentPreference,
+) {
+  if (!preference) return false;
+
+  switch (consentPreference) {
+    case "weather_alerts":
+      return preference.weather_alerts;
+    case "water_alerts":
+      return preference.water_alerts;
+    case "daily_summary":
+      return preference.daily_summary;
+    case "community_updates":
+      return preference.community_updates;
+  }
+}
+
 export function getPushStorageStatus(): PushStorageStatus {
   const config = getSupabaseServerConfig();
   const missing: PushStorageStatus["missing"] = [];
@@ -69,13 +96,39 @@ function requirePushStorage() {
   return createSupabaseAdminClient();
 }
 
+async function loadPushPreferences(
+  client: ReturnType<typeof requirePushStorage>,
+  userIds: string[],
+) {
+  const preferences = new Map<string, PushPreferenceSnapshot>();
+
+  for (let index = 0; index < userIds.length; index += PREFERENCE_QUERY_BATCH_SIZE) {
+    const batch = userIds.slice(index, index + PREFERENCE_QUERY_BATCH_SIZE);
+    const { data, error } = await client
+      .from("user_preferences")
+      .select("user_id,weather_alerts,water_alerts,daily_summary,community_updates")
+      .in("user_id", batch)
+      .abortSignal(timeoutSignal());
+
+    if (error) throw new Error(`Falha ao consultar preferências de comunicação: ${error.message}`);
+
+    for (const preference of data ?? []) {
+      preferences.set(preference.user_id, preference);
+    }
+  }
+
+  return preferences;
+}
+
 export async function savePushSubscription(
   subscription: StoredPushSubscription,
   userAgent: string | null,
   topics: readonly PushTopic[],
+  userId?: string | null,
 ) {
   const client = requirePushStorage();
   const now = new Date().toISOString();
+  const accountFields = userId === undefined ? {} : { user_id: userId };
   const { error } = await client
     .from("web_push_subscriptions")
     .upsert(
@@ -85,6 +138,7 @@ export async function savePushSubscription(
         p256dh: subscription.keys.p256dh,
         auth: subscription.keys.auth,
         user_agent: userAgent?.slice(0, 500) ?? null,
+        ...accountFields,
         topics: normalizeTopics(topics),
         updated_at: now,
         last_seen_at: now,
@@ -109,6 +163,7 @@ export async function deletePushSubscription(endpoint: string) {
 
 export async function* iteratePushSubscriptionPages(
   topic?: PushTopic,
+  consentPreference?: PushConsentPreference,
 ): AsyncGenerator<StoredPushSubscription[]> {
   const client = requirePushStorage();
   let endpointCursor: string | null = null;
@@ -117,7 +172,7 @@ export async function* iteratePushSubscriptionPages(
     let query = client
       .from("web_push_subscriptions")
       .select(
-        "endpoint,expiration_time,p256dh,auth,user_agent,topics,created_at,updated_at,last_seen_at",
+        "endpoint,expiration_time,p256dh,auth,user_agent,user_id,topics,created_at,updated_at,last_seen_at",
       )
       .order("endpoint", { ascending: true })
       .limit(PUSH_SUBSCRIPTION_PAGE_SIZE);
@@ -128,13 +183,25 @@ export async function* iteratePushSubscriptionPages(
     const { data, error } = await query.abortSignal(timeoutSignal());
     if (error) throw new Error(`Falha ao consultar inscrições web push: ${error.message}`);
 
-    const page = (data ?? []).map(rowToSubscription);
-    if (page.length === 0) return;
+    const rows = data ?? [];
+    if (rows.length === 0) return;
 
-    yield page;
-    endpointCursor = page.at(-1)?.endpoint ?? null;
+    let eligibleRows = rows;
+    if (consentPreference) {
+      const userIds = Array.from(
+        new Set(rows.flatMap((row) => (row.user_id ? [row.user_id] : []))),
+      );
+      const preferences = await loadPushPreferences(client, userIds);
+      eligibleRows = rows.filter(
+        (row) => !row.user_id || isConsentGranted(preferences.get(row.user_id), consentPreference),
+      );
+    }
 
-    if (!endpointCursor || page.length < PUSH_SUBSCRIPTION_PAGE_SIZE) return;
+    const page = eligibleRows.map(rowToSubscription);
+    if (page.length > 0) yield page;
+
+    endpointCursor = rows.at(-1)?.endpoint ?? null;
+    if (!endpointCursor || rows.length < PUSH_SUBSCRIPTION_PAGE_SIZE) return;
   }
 }
 
