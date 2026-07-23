@@ -77,6 +77,7 @@ jobs:
 
       - name: Publicar transplante validado
         run: |
+          git fetch origin main --depth=1
           git show origin/main:.github/workflows/quality.yml > .github/workflows/quality.yml
           rm -f .github/workflows/exact-production-port.yml PORT_EXACT_PRODUCTION.md
           git config user.name "github-actions[bot]"
