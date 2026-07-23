@@ -1,5 +1,6 @@
 "use client";
 
+import { AuthAccountAction } from "@/components/auth/AuthAccountAction";
 import Link from "@/production/compat/NextLink";
 import { usePathname } from "@/production/compat/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -413,6 +414,8 @@ export function SiteHeader({ advisoryLevel = "normal", variant = "default" }: Si
         </nav>
 
         <div className="site-header-actions">
+          <AuthAccountAction />
+
           <Link
             className={`header-utility-link${camerasActive ? " is-active" : ""}`}
             href="/cameras-ao-vivo-pelotas"
