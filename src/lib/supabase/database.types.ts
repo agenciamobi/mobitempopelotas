@@ -63,6 +63,69 @@ export type Database = {
         };
         Relationships: [];
       };
+      web_push_dispatches: {
+        Row: {
+          failed_count: number;
+          fingerprint: string;
+          removed_count: number;
+          sent_at: string;
+          sent_count: number;
+          title: string;
+        };
+        Insert: {
+          failed_count?: number;
+          fingerprint: string;
+          removed_count?: number;
+          sent_at?: string;
+          sent_count?: number;
+          title: string;
+        };
+        Update: {
+          failed_count?: number;
+          fingerprint?: string;
+          removed_count?: number;
+          sent_at?: string;
+          sent_count?: number;
+          title?: string;
+        };
+        Relationships: [];
+      };
+      web_push_subscriptions: {
+        Row: {
+          auth: string;
+          created_at: string;
+          endpoint: string;
+          expiration_time: number | null;
+          last_seen_at: string;
+          p256dh: string;
+          topics: string[];
+          updated_at: string;
+          user_agent: string | null;
+        };
+        Insert: {
+          auth: string;
+          created_at?: string;
+          endpoint: string;
+          expiration_time?: number | null;
+          last_seen_at?: string;
+          p256dh: string;
+          topics?: string[];
+          updated_at?: string;
+          user_agent?: string | null;
+        };
+        Update: {
+          auth?: string;
+          created_at?: string;
+          endpoint?: string;
+          expiration_time?: number | null;
+          last_seen_at?: string;
+          p256dh?: string;
+          topics?: string[];
+          updated_at?: string;
+          user_agent?: string | null;
+        };
+        Relationships: [];
+      };
       weather_daily_snapshots: {
         Row: {
           city: string;
@@ -137,4 +200,6 @@ export type Database = {
 
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type UserPreferences = Database["public"]["Tables"]["user_preferences"]["Row"];
+export type WebPushDispatch = Database["public"]["Tables"]["web_push_dispatches"]["Row"];
+export type WebPushSubscription = Database["public"]["Tables"]["web_push_subscriptions"]["Row"];
 export type WeatherDailySnapshot = Database["public"]["Tables"]["weather_daily_snapshots"]["Row"];
