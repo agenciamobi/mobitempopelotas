@@ -101,8 +101,12 @@ function PrivacyDataPage() {
               <li>ao excluir a conta, esses registros são removidos em cascata;</li>
               <li>inscrições push vinculadas à conta também são removidas com a exclusão;</li>
               <li>
-                inscrições anônimas permanecem no aparelho até desativação ou até o provedor indicar
-                expiração;
+                inscrições push anônimas ficam registradas no servidor com endpoint, chaves de
+                entrega, tópicos escolhidos e identificação técnica do navegador;
+              </li>
+              <li>
+                esse registro anônimo não possui prazo fixo: ele é removido quando o visitante
+                desativa os avisos com sucesso ou quando o provedor informa que a inscrição expirou;
               </li>
               <li>métricas agregadas de disparo não guardam identificação do visitante.</li>
             </ul>
