@@ -24,18 +24,11 @@ export type PushStorageStatus = {
 };
 
 export type PushConsentPreference =
-  | "weather_alerts"
-  | "water_alerts"
-  | "daily_summary"
-  | "community_updates";
+  "weather_alerts" | "water_alerts" | "daily_summary" | "community_updates";
 
 type PushPreferenceSnapshot = Pick<
   UserPreferences,
-  | "user_id"
-  | "weather_alerts"
-  | "water_alerts"
-  | "daily_summary"
-  | "community_updates"
+  "user_id" | "weather_alerts" | "water_alerts" | "daily_summary" | "community_updates"
 >;
 
 function timeoutSignal() {
@@ -200,8 +193,7 @@ export async function* iteratePushSubscriptionPages(
       );
       const preferences = await loadPushPreferences(client, userIds);
       eligibleRows = rows.filter(
-        (row) =>
-          !row.user_id || isConsentGranted(preferences.get(row.user_id), consentPreference),
+        (row) => !row.user_id || isConsentGranted(preferences.get(row.user_id), consentPreference),
       );
     }
 
