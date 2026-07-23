@@ -36,6 +36,18 @@ jobs:
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
 
+      - name: Gerar diagnóstico de formatação
+        run: npx prettier --write scripts/accessibility-failure-screenshots.mjs .github/workflows/visual-parity.yml
+
+      - name: Publicar diagnóstico de formatação
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-prettier
+          path: |
+            scripts/accessibility-failure-screenshots.mjs
+            .github/workflows/visual-parity.yml
+          retention-days: 1
+
       - name: Contratos rápidos
         run: npm run test:contracts
 
