@@ -12,6 +12,7 @@ import {
   deletePushSubscription,
   getPushStorageStatus,
   iteratePushSubscriptionPages,
+  type PushConsentPreference,
 } from "./push-storage.server";
 import type { PushDeliveryResult, PushPayload, StoredPushSubscription } from "./push.types";
 
@@ -34,6 +35,7 @@ export type PushBroadcastProgress = {
 };
 
 export type PushBroadcastOptions = {
+  consentPreference?: PushConsentPreference;
   beforeBatch?: (context: { processed: number; batchSize: number }) => Promise<void>;
   afterBatch?: (progress: PushBroadcastProgress) => void | Promise<void>;
 };
@@ -140,6 +142,19 @@ function notificationBody(payload: PushPayload) {
     requireInteraction: payload.requireInteraction ?? false,
     renotify: payload.renotify ?? false,
   });
+}
+
+function defaultConsentPreference(topic: PushPayload["topic"]): PushConsentPreference | undefined {
+  switch (topic) {
+    case "weather":
+      return "weather_alerts";
+    case "water":
+      return "water_alerts";
+    case "community":
+      return "community_updates";
+    default:
+      return undefined;
+  }
 }
 
 function hkdfExtract(salt: Buffer, inputKeyMaterial: Buffer) {
@@ -307,9 +322,13 @@ export async function broadcastPushNotification(
     failed: 0,
     removed: 0,
   };
+  const consentPreference = options.consentPreference ?? defaultConsentPreference(payload.topic);
   let processed = 0;
 
-  for await (const subscriptions of iteratePushSubscriptionPages(payload.topic)) {
+  for await (const subscriptions of iteratePushSubscriptionPages(
+    payload.topic,
+    consentPreference,
+  )) {
     for (let index = 0; index < subscriptions.length; index += DELIVERY_BATCH_SIZE) {
       const batch = subscriptions.slice(index, index + DELIVERY_BATCH_SIZE);
       await options.beforeBatch?.({ processed, batchSize: batch.length });
