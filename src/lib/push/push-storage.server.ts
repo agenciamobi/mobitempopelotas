@@ -1,7 +1,12 @@
 import { createSupabaseAdminClient, getSupabaseServerConfig } from "@/lib/supabase/server-client.server";
 import type { WebPushSubscription } from "@/lib/supabase/database.types";
 
-import { PUSH_TOPICS, type PushDeliveryResult, type PushTopic, type StoredPushSubscription } from "./push.types";
+import {
+  PUSH_TOPICS,
+  type PushDeliveryResult,
+  type PushTopic,
+  type StoredPushSubscription,
+} from "./push.types";
 
 const QUERY_TIMEOUT_MS = 3_500;
 const MAX_SUBSCRIPTIONS = 10_000;
@@ -100,7 +105,9 @@ export async function listPushSubscriptions(topic?: PushTopic): Promise<StoredPu
   const client = requirePushStorage();
   let query = client
     .from("web_push_subscriptions")
-    .select("endpoint,expiration_time,p256dh,auth,user_agent,topics,created_at,updated_at,last_seen_at")
+    .select(
+      "endpoint,expiration_time,p256dh,auth,user_agent,topics,created_at,updated_at,last_seen_at",
+    )
     .order("updated_at", { ascending: false })
     .limit(MAX_SUBSCRIPTIONS);
 
@@ -125,6 +132,36 @@ export async function hasPushDispatch(fingerprint: string) {
   return Boolean(data);
 }
 
+export async function claimPushDispatch(fingerprint: string, title: string) {
+  const client = requirePushStorage();
+  const { error } = await client
+    .from("web_push_dispatches")
+    .insert({
+      fingerprint,
+      title,
+      sent_count: 0,
+      failed_count: 0,
+      removed_count: 0,
+      sent_at: new Date().toISOString(),
+    })
+    .abortSignal(timeoutSignal());
+
+  if (error?.code === "23505") return false;
+  if (error) throw new Error(`Falha ao reservar envio web push: ${error.message}`);
+  return true;
+}
+
+export async function releasePushDispatch(fingerprint: string) {
+  const client = requirePushStorage();
+  const { error } = await client
+    .from("web_push_dispatches")
+    .delete()
+    .eq("fingerprint", fingerprint)
+    .abortSignal(timeoutSignal());
+
+  if (error) throw new Error(`Falha ao liberar envio web push: ${error.message}`);
+}
+
 export async function recordPushDispatch(
   fingerprint: string,
   title: string,
@@ -133,17 +170,14 @@ export async function recordPushDispatch(
   const client = requirePushStorage();
   const { error } = await client
     .from("web_push_dispatches")
-    .upsert(
-      {
-        fingerprint,
-        title,
-        sent_count: result.sent,
-        failed_count: result.failed,
-        removed_count: result.removed,
-        sent_at: new Date().toISOString(),
-      },
-      { onConflict: "fingerprint" },
-    )
+    .update({
+      title,
+      sent_count: result.sent,
+      failed_count: result.failed,
+      removed_count: result.removed,
+      sent_at: new Date().toISOString(),
+    })
+    .eq("fingerprint", fingerprint)
     .abortSignal(timeoutSignal());
 
   if (error) throw new Error(`Falha ao registrar envio web push: ${error.message}`);
