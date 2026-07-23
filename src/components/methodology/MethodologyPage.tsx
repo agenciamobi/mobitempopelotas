@@ -268,8 +268,8 @@ export function MethodologyPage({ weather, level, redemet }: MethodologyPageProp
           <h1>De onde vêm os dados do Tempo Pelotas</h1>
           <p className="methodology-lead">
             O portal combina medições locais, alertas oficiais, observação regional e modelos de
-            previsão. Esta página mostra a função de cada fonte, como os dados são verificados e quais
-            limites precisam ser considerados antes de tomar decisões.
+            previsão. Esta página mostra a função de cada fonte, como os dados são verificados e
+            quais limites precisam ser considerados antes de tomar decisões.
           </p>
         </div>
 
@@ -369,8 +369,8 @@ export function MethodologyPage({ weather, level, redemet }: MethodologyPageProp
             <FileCheck2 aria-hidden="true" />
             <h3>Normalização</h3>
             <p>
-              Datas, unidades e campos são convertidos para um contrato comum sem preencher o que não
-              existe.
+              Datas, unidades e campos são convertidos para um contrato comum sem preencher o que
+              não existe.
             </p>
           </li>
           <li>
@@ -451,8 +451,8 @@ export function MethodologyPage({ weather, level, redemet }: MethodologyPageProp
             <Sparkles aria-hidden="true" />
             <h3>Interpretação</h3>
             <p>
-              É o texto que organiza os dados para leitura rápida. A síntese não substitui os números,
-              os avisos oficiais nem a avaliação de profissionais responsáveis.
+              É o texto que organiza os dados para leitura rápida. A síntese não substitui os
+              números, os avisos oficiais nem a avaliação de profissionais responsáveis.
             </p>
           </article>
         </div>
@@ -467,8 +467,8 @@ export function MethodologyPage({ weather, level, redemet }: MethodologyPageProp
           </h2>
           <p>
             O Tempo Pelotas não determina evacuações, não garante que uma rua irá alagar e não
-            consegue assegurar disponibilidade contínua de sistemas externos. Em risco iminente, siga
-            a Defesa Civil, o INMET, órgãos municipais e demais autoridades responsáveis.
+            consegue assegurar disponibilidade contínua de sistemas externos. Em risco iminente,
+            siga a Defesa Civil, o INMET, órgãos municipais e demais autoridades responsáveis.
           </p>
         </div>
       </section>
