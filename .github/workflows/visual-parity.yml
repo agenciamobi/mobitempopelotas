@@ -11,6 +11,7 @@ on:
       - public/**
       - scripts/visual-parity-audit.mjs
       - scripts/auth-visual-smoke.mjs
+      - scripts/accessibility-editorial-smoke.mjs
       - vite.config.ts
       - tsconfig*.json
       - eslint.config.js
@@ -44,9 +45,11 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      - name: Validar build, tipos e lint
+      - name: Validar build, testes, tipos e lint
         run: |
+          npm run test:contracts
           npm run build
+          ROUTE_TREE_REQUIRED=1 npm run test:routes
           npm run typecheck
           npm run lint
 
@@ -100,6 +103,11 @@ jobs:
         env:
           CANDIDATE_URL: http://127.0.0.1:4173
         run: node scripts/auth-visual-smoke.mjs
+
+      - name: Auditar acessibilidade editorial
+        env:
+          CANDIDATE_URL: http://127.0.0.1:4173
+        run: node scripts/accessibility-editorial-smoke.mjs
 
       - name: Exibir log da aplicação em caso de falha
         if: failure()
