@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   validate:
-    name: Build, typecheck e lint
+    name: Build, testes, typecheck e lint
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -38,6 +38,9 @@ jobs:
 
       - name: Build de produção
         run: npm run build
+
+      - name: Testes de contratos
+        run: npm test
 
       - name: TypeScript
         run: npm run typecheck
