@@ -1,3 +1,4 @@
+# Sincroniza o host canônico já utilizado pela produção Vercel.
 name: Preservar canonical www
 
 on:
