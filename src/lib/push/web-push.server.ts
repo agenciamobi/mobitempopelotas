@@ -323,6 +323,9 @@ export async function broadcastPushNotification(
     removed: 0,
   };
   const consentPreference = options.consentPreference ?? defaultConsentPreference(payload.topic);
+  if (!consentPreference) {
+    throw new Error("Toda notificação precisa de uma categoria de consentimento.");
+  }
   let processed = 0;
 
   for await (const subscriptions of iteratePushSubscriptionPages(
