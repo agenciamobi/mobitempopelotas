@@ -150,7 +150,9 @@ self.addEventListener("notificationclick", (event) => {
         if (client.url === destination.href && "focus" in client) return client.focus();
       }
 
-      const sameOriginClient = clients.find((client) => client.url.startsWith(self.location.origin));
+      const sameOriginClient = clients.find((client) =>
+        client.url.startsWith(self.location.origin),
+      );
       if (sameOriginClient && "navigate" in sameOriginClient) {
         await sameOriginClient.navigate(destination.href);
         return sameOriginClient.focus();

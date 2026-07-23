@@ -13,11 +13,7 @@ import {
   getPushStorageStatus,
   listPushSubscriptions,
 } from "./push-storage.server";
-import type {
-  PushDeliveryResult,
-  PushPayload,
-  StoredPushSubscription,
-} from "./push.types";
+import type { PushDeliveryResult, PushPayload, StoredPushSubscription } from "./push.types";
 
 const DELIVERY_BATCH_SIZE = 50;
 const DELIVERY_TIMEOUT_MS = 12_000;
@@ -187,11 +183,7 @@ function createEncryptionMaterial(subscription: StoredPushSubscription, payload:
     Buffer.from("Content-Encoding: aes128gcm\0", "utf8"),
     16,
   );
-  const nonce = hkdfExpand(
-    pseudoRandomKey,
-    Buffer.from("Content-Encoding: nonce\0", "utf8"),
-    12,
-  );
+  const nonce = hkdfExpand(pseudoRandomKey, Buffer.from("Content-Encoding: nonce\0", "utf8"), 12);
   const plaintext = Buffer.concat([Buffer.from(payload, "utf8"), Buffer.from([2])]);
   const cipher = createCipheriv("aes-128-gcm", contentEncryptionKey, nonce);
   const ciphertext = Buffer.concat([cipher.update(plaintext), cipher.final(), cipher.getAuthTag()]);
@@ -274,7 +266,10 @@ async function sendNotification(
   });
 
   if (!response.ok) {
-    throw pushDeliveryError(`Serviço push respondeu com status ${response.status}`, response.status);
+    throw pushDeliveryError(
+      `Serviço push respondeu com status ${response.status}`,
+      response.status,
+    );
   }
 }
 
@@ -284,9 +279,7 @@ function deliveryStatusCode(error: unknown) {
   return Number.isFinite(value) ? value : null;
 }
 
-export async function broadcastPushNotification(
-  payload: PushPayload,
-): Promise<PushDeliveryResult> {
+export async function broadcastPushNotification(payload: PushPayload): Promise<PushDeliveryResult> {
   const status = getPushConfigurationStatus();
   if (!status.enabled) {
     throw new Error(`Notificações web push não configuradas: ${status.missing.join(", ")}`);

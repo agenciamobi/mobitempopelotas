@@ -53,9 +53,7 @@ function readStoredTopics(): PushTopic[] {
     if (!Array.isArray(parsed)) return [...DEFAULT_TOPICS];
 
     const allowed = new Set<PushTopic>(TOPIC_OPTIONS.map((option) => option.value));
-    const topics = parsed.filter((topic): topic is PushTopic =>
-      allowed.has(topic as PushTopic),
-    );
+    const topics = parsed.filter((topic): topic is PushTopic => allowed.has(topic as PushTopic));
     return topics.length > 0 ? Array.from(new Set(topics)) : [...DEFAULT_TOPICS];
   } catch {
     return [...DEFAULT_TOPICS];
@@ -377,8 +375,8 @@ export function PushNotificationsManager() {
 
             {permission === "denied" ? (
               <p className="push-permission-note">
-                As notificações estão bloqueadas no navegador. Abra as configurações deste site
-                para liberar a permissão.
+                As notificações estão bloqueadas no navegador. Abra as configurações deste site para
+                liberar a permissão.
               </p>
             ) : null}
 

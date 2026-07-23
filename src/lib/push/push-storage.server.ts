@@ -1,4 +1,7 @@
-import { createSupabaseAdminClient, getSupabaseServerConfig } from "@/lib/supabase/server-client.server";
+import {
+  createSupabaseAdminClient,
+  getSupabaseServerConfig,
+} from "@/lib/supabase/server-client.server";
 import type { WebPushSubscription } from "@/lib/supabase/database.types";
 
 import {

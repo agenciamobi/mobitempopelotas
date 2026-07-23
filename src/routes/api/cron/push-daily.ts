@@ -100,9 +100,7 @@ async function sendDailySummary(request: Request) {
     ]);
     const activeAlerts = weather.weather.alerts.filter((alert) => alert.period === "active");
     const title =
-      activeAlerts.length > 0
-        ? "INMET: aviso oficial para Pelotas"
-        : "Previsão de hoje em Pelotas";
+      activeAlerts.length > 0 ? "INMET: aviso oficial para Pelotas" : "Previsão de hoje em Pelotas";
     const summary = buildWeatherSummary(weather, laranjal);
 
     if (!summary && activeAlerts.length === 0) {

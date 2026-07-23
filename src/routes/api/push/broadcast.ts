@@ -1,11 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
-import {
-  hasBearerSecret,
-  pushJsonResponse,
-  safeInternalPath,
-} from "@/lib/push/push-http.server";
+import { hasBearerSecret, pushJsonResponse, safeInternalPath } from "@/lib/push/push-http.server";
 import { PUSH_TOPICS } from "@/lib/push/push.types";
 import { broadcastPushNotification } from "@/lib/push/web-push.server";
 
