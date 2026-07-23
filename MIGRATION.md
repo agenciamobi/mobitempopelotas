@@ -80,7 +80,7 @@ _legacy/
 - [ ] Conferir o histórico de migrations do projeto Supabase oficial antes de aplicar qualquer SQL
 - [ ] Validar policies RLS com usuários autenticados e anônimos
 - [ ] Gerar novamente `database.types.ts` a partir do projeto oficial após a aplicação das migrations
-- [ ] Definir Edge Functions para cron, snapshots e web push
+- [ ] Definir o runtime definitivo para cron, snapshots e web push
 
 ### 3. Layout e identidade
 
@@ -121,7 +121,7 @@ _legacy/
 
 - [x] Criar rotas públicas para tempo, clima, águas, mapas, câmeras e transparência
 - [x] Adicionar metadados próprios por rota
-- [ ] Persistir histórico meteorológico real no Supabase externo
+- [x] Persistir histórico meteorológico real no Supabase externo
 - [x] Integrar radar, satélite, trovoadas e mapa regional com contingência explícita
 - [x] Integrar avisos meteorológicos funcionais
 - [x] Integrar câmeras ao vivo e contingências do YouTube
@@ -135,8 +135,9 @@ _legacy/
 - [x] Manifesto instalável com atalhos editoriais
 - [x] Service worker com fallback offline seguro
 - [x] Estratégia controlada de atualização e cache de ativos
-- [ ] Captura diária de snapshots
-- [ ] Autenticação e idempotência dos crons
+- [x] Captura diária de snapshots
+- [x] Autenticação e idempotência dos crons
+- [ ] Configurar o scheduler no ambiente definitivo
 - [ ] Inscrições push
 - [ ] Envio push em runtime compatível
 
@@ -170,9 +171,10 @@ O inventário completo (status por domínio, origem → destino, dependências, 
 
 ## Próxima fatia
 
-O próximo bloco é o **Lote 6 — histórico climático e snapshots**:
+O próximo bloco é o **Lote 7 — autenticação, conta e LGPD**:
 
-1. revisar e versionar as tabelas de snapshots meteorológicos do projeto de origem;
-2. validar retenção, timezone `America/Sao_Paulo`, índices e acesso exclusivamente server-side para escrita;
-3. substituir o estado vazio de `/historico-climatico-pelotas` por séries reais, períodos compreensíveis e explicações editoriais para o visitante;
-4. somente depois ativar autenticação Google, área de conta e preferências pessoais sobre a base SSR já preparada.
+1. adaptar login Google e callback PKCE para TanStack Start/Nitro com sessão SSR;
+2. implementar entrada, saída, área de conta e proteção de rotas sem expor dados pessoais no navegador;
+3. conectar preferências meteorológicas à tabela já versionada, com RLS e textos claros para o visitante;
+4. implementar os fluxos de consulta, atualização e exclusão de dados previstos pela LGPD;
+5. somente depois concluir inscrições web push, envio, scheduler e observabilidade operacional.
