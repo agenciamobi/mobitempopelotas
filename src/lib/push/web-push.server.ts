@@ -7,6 +7,7 @@ import {
   sign,
 } from "node:crypto";
 
+import { isAllowedPushEndpoint } from "./push-http.server";
 import {
   deletePushSubscription,
   getPushStorageStatus,
@@ -241,12 +242,22 @@ function normalizedTopic(value: string) {
   return value.replace(/[^A-Za-z0-9_-]/g, "-").slice(0, 32) || "tempo-pelotas";
 }
 
+function pushDeliveryError(message: string, statusCode: number) {
+  const error = new Error(message) as Error & { statusCode?: number };
+  error.statusCode = statusCode;
+  return error;
+}
+
 async function sendNotification(
   subscription: StoredPushSubscription,
   payload: PushPayload,
   body: string,
   vapid: ActiveVapidConfiguration,
 ) {
+  if (!isAllowedPushEndpoint(subscription.endpoint)) {
+    throw pushDeliveryError("Destino de web push não permitido.", 410);
+  }
+
   const encryptedBody = createEncryptionMaterial(subscription, body);
   const response = await fetch(subscription.endpoint, {
     method: "POST",
@@ -263,11 +274,7 @@ async function sendNotification(
   });
 
   if (!response.ok) {
-    const error = new Error(`Serviço push respondeu com status ${response.status}`) as Error & {
-      statusCode?: number;
-    };
-    error.statusCode = response.status;
-    throw error;
+    throw pushDeliveryError(`Serviço push respondeu com status ${response.status}`, response.status);
   }
 }
 
