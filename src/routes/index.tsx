@@ -4,6 +4,7 @@ import { WeatherHome } from "@/components/weather/WeatherHome";
 import "@/components/weather/WeatherHomeIntegrated.css";
 import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
 import { createPageHead } from "@/lib/page-meta";
+import { getRedemetOverview } from "@/lib/redemet/redemet.functions";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 export const Route = createFileRoute("/")({
@@ -14,18 +15,19 @@ export const Route = createFileRoute("/")({
       "/",
     ),
   loader: async () => {
-    const [weather, laranjal] = await Promise.all([
+    const [weather, laranjal, redemet] = await Promise.all([
       getWeatherIntelligence(),
       getLaranjalLevelData(),
+      getRedemetOverview(),
     ]);
 
-    return { weather, laranjal };
+    return { weather, laranjal, redemet };
   },
   staleTime: 60 * 1_000,
   component: HomePage,
 });
 
 function HomePage() {
-  const { weather, laranjal } = Route.useLoaderData();
-  return <WeatherHome data={weather} laranjal={laranjal} />;
+  const { weather, laranjal, redemet } = Route.useLoaderData();
+  return <WeatherHome data={weather} laranjal={laranjal} redemet={redemet} />;
 }
