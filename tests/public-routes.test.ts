@@ -23,15 +23,31 @@ test("mantém caminhos públicos únicos e absolutos", () => {
   assert.equal(new Set(paths).size, paths.length);
   for (const path of paths) {
     assert.ok(path.startsWith("/"), `${path} deve começar com /`);
-    assert.equal(path.includes("?"), false, `${path} não deve conter query string`);
-    assert.equal(path.includes("#"), false, `${path} não deve conter fragmento`);
-    if (path !== "/") assert.equal(path.endsWith("/"), false, `${path} não deve terminar com /`);
+    assert.equal(
+      path.includes("?"),
+      false,
+      `${path} não deve conter query string`,
+    );
+    assert.equal(
+      path.includes("#"),
+      false,
+      `${path} não deve conter fragmento`,
+    );
+    if (path !== "/")
+      assert.equal(
+        path.endsWith("/"),
+        false,
+        `${path} não deve terminar com /`,
+      );
   }
 });
 
 test("mantém prioridades de sitemap dentro do intervalo válido", () => {
   for (const route of PUBLIC_ROUTES) {
-    assert.ok(route.priority >= 0 && route.priority <= 1, `${route.path} tem prioridade inválida`);
+    assert.ok(
+      route.priority >= 0 && route.priority <= 1,
+      `${route.path} tem prioridade inválida`,
+    );
   }
 });
 
@@ -56,6 +72,10 @@ test("mantém atualização frequente nas páginas operacionais", () => {
   ];
 
   for (const path of hourlyRoutes) {
-    assert.equal(routeMap.get(path)?.changeFrequency, "hourly", `${path} deve ser horária`);
+    assert.equal(
+      routeMap.get(path)?.changeFrequency,
+      "hourly",
+      `${path} deve ser horária`,
+    );
   }
 });
