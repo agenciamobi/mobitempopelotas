@@ -37,10 +37,10 @@ test("mantém a entrada CSS global idêntica ao manifesto de produção", async 
     readFile(PRODUCTION_MANIFEST_PATH, "utf8"),
   ]);
 
-  const cssImports = extractStyleImports(productionCss, /@import "\.\/styles\/([^"+]+\.css)";/g);
+  const cssImports = extractStyleImports(productionCss, /@import "\.\/styles\/([^"]+\.css)";/g);
   const manifestImports = extractStyleImports(
     productionManifest,
-    /import "\.\/styles\/([^"+]+\.css)";/g,
+    /import "\.\/styles\/([^"]+\.css)";/g,
   );
 
   assert.ok(cssImports.length >= 100, "a pilha editorial completa deve permanecer declarada");
