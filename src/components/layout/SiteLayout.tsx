@@ -9,6 +9,8 @@ type SiteLayoutProps = {
   children: ReactNode;
 };
 
+const standaloneRoutes = new Set(["/", "/entrar", "/minha-conta", "/privacidade-e-dados"]);
+
 function pageAnnouncement() {
   const title = document.title.split("|")[0]?.trim();
   return title ? `Página carregada: ${title}` : "Página carregada";
@@ -27,14 +29,15 @@ export function SiteLayout({ children }: SiteLayoutProps) {
     }
 
     const frame = window.requestAnimationFrame(() => {
-      mainRef.current?.focus({ preventScroll: true });
+      const routeMain = mainRef.current ?? document.getElementById("conteudo-principal");
+      routeMain?.focus({ preventScroll: true });
       setAnnouncement(pageAnnouncement());
     });
 
     return () => window.cancelAnimationFrame(frame);
   }, [pathname]);
 
-  if (pathname === "/") {
+  if (standaloneRoutes.has(pathname)) {
     return (
       <>
         <div className="visually-hidden" aria-live="polite" aria-atomic="true">
