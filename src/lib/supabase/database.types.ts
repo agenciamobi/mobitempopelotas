@@ -65,27 +65,39 @@ export type Database = {
       };
       web_push_dispatches: {
         Row: {
+          claimed_at: string;
+          completed_at: string | null;
           failed_count: number;
           fingerprint: string;
+          lease_token: string;
           removed_count: number;
           sent_at: string;
           sent_count: number;
+          status: string;
           title: string;
         };
         Insert: {
+          claimed_at?: string;
+          completed_at?: string | null;
           failed_count?: number;
           fingerprint: string;
+          lease_token: string;
           removed_count?: number;
           sent_at?: string;
           sent_count?: number;
+          status?: string;
           title: string;
         };
         Update: {
+          claimed_at?: string;
+          completed_at?: string | null;
           failed_count?: number;
           fingerprint?: string;
+          lease_token?: string;
           removed_count?: number;
           sent_at?: string;
           sent_count?: number;
+          status?: string;
           title?: string;
         };
         Relationships: [];
@@ -180,6 +192,15 @@ export type Database = {
     };
     Views: { [_ in never]: never };
     Functions: {
+      claim_web_push_dispatch: {
+        Args: {
+          p_fingerprint: string;
+          p_lease_token: string;
+          p_stale_after_seconds?: number;
+          p_title: string;
+        };
+        Returns: boolean;
+      };
       update_account_preferences: {
         Args: {
           p_avatar_url: string | null;
