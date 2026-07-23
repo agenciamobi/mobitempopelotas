@@ -7,7 +7,7 @@ import {
   sign,
 } from "node:crypto";
 
-import { isAllowedPushEndpoint } from "./push-http.server";
+import { fetchAllowedPushEndpoint, isAllowedPushEndpoint } from "./push-http.server";
 import {
   deletePushSubscription,
   getPushStorageStatus,
@@ -126,7 +126,9 @@ export function getPushConfigurationStatus(): PushConfigurationStatus {
   if (!vapid.publicKey) missing.push("VAPID_PUBLIC_KEY");
   if (!vapid.privateKey) missing.push("VAPID_PRIVATE_KEY");
   if (!validateVapidSubject(vapid.subject)) missing.push("VAPID_SUBJECT");
-  if (!validateVapidKeys(vapid.publicKey, vapid.privateKey)) missing.push("VAPID_KEY_PAIR");
+  if (!validateVapidKeys(vapid.publicKey, vapid.privateKey)) {
+    missing.push("VAPID_KEY_PAIR");
+  }
   missing.push(...storage.missing);
 
   return {
@@ -283,7 +285,7 @@ async function sendNotification(
   }
 
   const encryptedBody = createEncryptionMaterial(subscription, body);
-  const response = await fetch(subscription.endpoint, {
+  const response = await fetchAllowedPushEndpoint(subscription.endpoint, {
     method: "POST",
     headers: {
       Authorization: createVapidAuthorization(subscription.endpoint, vapid),
@@ -306,7 +308,9 @@ async function sendNotification(
 }
 
 function deliveryStatusCode(error: unknown) {
-  if (!error || typeof error !== "object" || !("statusCode" in error)) return null;
+  if (!error || typeof error !== "object" || !("statusCode" in error)) {
+    return null;
+  }
   const value = Number((error as { statusCode?: unknown }).statusCode);
   return Number.isFinite(value) ? value : null;
 }

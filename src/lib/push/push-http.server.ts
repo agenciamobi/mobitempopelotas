@@ -24,6 +24,8 @@ type HeadersWithSetCookie = Headers & {
   getSetCookie?: () => string[];
 };
 
+type PushFetch = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+
 function appendResponseHeaders(target: Headers, source: HeadersInit) {
   const sourceHeaders = source instanceof Headers ? source : new Headers(source);
   const setCookies = (sourceHeaders as HeadersWithSetCookie).getSetCookie?.() ?? [];
@@ -65,17 +67,29 @@ export function isSameOriginRequest(request: Request) {
 export async function readLimitedJson(request: Request): Promise<LimitedJsonResult> {
   const contentType = request.headers.get("content-type")?.toLowerCase() ?? "";
   if (!contentType.startsWith("application/json")) {
-    return { ok: false, status: 415, error: "O corpo deve ser enviado como JSON." };
+    return {
+      ok: false,
+      status: 415,
+      error: "O corpo deve ser enviado como JSON.",
+    };
   }
 
   const contentLength = request.headers.get("content-length");
   if (contentLength !== null) {
     const declaredBytes = Number(contentLength);
     if (!Number.isFinite(declaredBytes) || declaredBytes < 0) {
-      return { ok: false, status: 400, error: "O tamanho declarado do corpo é inválido." };
+      return {
+        ok: false,
+        status: 400,
+        error: "O tamanho declarado do corpo é inválido.",
+      };
     }
     if (declaredBytes > MAX_PUSH_JSON_BYTES) {
-      return { ok: false, status: 413, error: "O corpo JSON excede o limite permitido." };
+      return {
+        ok: false,
+        status: 413,
+        error: "O corpo JSON excede o limite permitido.",
+      };
     }
   }
 
@@ -94,7 +108,11 @@ export async function readLimitedJson(request: Request): Promise<LimitedJsonResu
       totalBytes += value.byteLength;
       if (totalBytes > MAX_PUSH_JSON_BYTES) {
         await reader.cancel("Corpo JSON acima do limite.").catch(() => undefined);
-        return { ok: false, status: 413, error: "O corpo JSON excede o limite permitido." };
+        return {
+          ok: false,
+          status: 413,
+          error: "O corpo JSON excede o limite permitido.",
+        };
       }
 
       chunks.push(value);
@@ -131,6 +149,27 @@ export function isAllowedPushEndpoint(value: string) {
   } catch {
     return false;
   }
+}
+
+export async function fetchAllowedPushEndpoint(
+  endpoint: string,
+  init: RequestInit,
+  fetcher: PushFetch = fetch,
+) {
+  if (!isAllowedPushEndpoint(endpoint)) {
+    throw new Error("Destino de web push não permitido.");
+  }
+
+  const response = await fetcher(endpoint, {
+    ...init,
+    redirect: "error",
+  });
+
+  if (response.redirected) {
+    throw new Error("O provedor web push tentou redirecionar a entrega.");
+  }
+
+  return response;
 }
 
 export function hasBearerSecret(request: Request, secret: string | undefined) {
