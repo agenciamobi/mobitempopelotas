@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - agent/redemet-home-methodology-runtime
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
