@@ -266,6 +266,8 @@ export function WeatherHero({
     .filter((reason): reason is string => Boolean(reason))
     .slice(0, 2);
   const currentSourceMeta = getCurrentSourceMeta(current);
+  const visibilityValue =
+    current.visibility >= 0 ? `${current.visibility} km` : "Indisponível";
 
   return (
     <section
@@ -362,7 +364,7 @@ export function WeatherHero({
             <HeroMetric icon="humidity" label="Umidade" value={`${current.humidity}%`} />
             <HeroMetric icon="wind" label="Vento" value={`${current.windSpeed} km/h`} />
             <HeroMetric icon="gust" label="Rajada" value={`${current.windGust} km/h`} />
-            <HeroMetric icon="visibility" label="Visibilidade" value={`${current.visibility} km`} />
+            <HeroMetric icon="visibility" label="Visibilidade" value={visibilityValue} />
           </div>
         </div>
       </div>
