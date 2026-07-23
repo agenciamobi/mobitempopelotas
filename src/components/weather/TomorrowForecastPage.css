@@ -1,0 +1,486 @@
+.tomorrow-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  min-width: 0;
+  padding-bottom: 3rem;
+}
+
+.tomorrow-header {
+  display: grid;
+  padding: clamp(2.25rem, 5vw, 4.75rem);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 2rem;
+  border: 1px solid rgba(7, 30, 47, 0.07);
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(24, 189, 205, 0.17), transparent 24rem),
+    radial-gradient(circle at 90% 105%, rgba(94, 44, 237, 0.12), transparent 25rem),
+    linear-gradient(145deg, #ffffff, #f7fbff 55%, #f8f7ff);
+  box-shadow: 0 22px 65px rgba(7, 30, 47, 0.08);
+}
+
+.tomorrow-header > div:first-child {
+  max-width: 860px;
+}
+
+.tomorrow-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 2rem;
+  color: #526c78;
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
+.tomorrow-back-link svg,
+.tomorrow-related-links svg,
+.tomorrow-alert a svg {
+  width: 17px;
+  height: 17px;
+}
+
+.tomorrow-kicker {
+  margin: 0 0 0.7rem;
+  color: #087c8a;
+  font-size: 0.69rem;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.tomorrow-header h1 {
+  max-width: 920px;
+  margin: 0;
+  color: var(--portal-ink);
+  font-size: clamp(2.7rem, 5vw, 5.15rem);
+  font-weight: 760;
+  line-height: 0.94;
+  letter-spacing: -0.07em;
+  text-wrap: balance;
+}
+
+.tomorrow-header p:not(.tomorrow-kicker) {
+  max-width: 760px;
+  margin: 1.4rem 0 0;
+  color: #5b7480;
+  font-size: clamp(0.98rem, 1.2vw, 1.12rem);
+  line-height: 1.7;
+}
+
+.tomorrow-quality {
+  display: grid;
+  min-width: 205px;
+  gap: 0.55rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(7, 30, 47, 0.07);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.76);
+  color: #6d8590;
+  font-size: 0.67rem;
+  box-shadow: 0 14px 34px rgba(7, 30, 47, 0.06);
+  backdrop-filter: blur(15px);
+}
+
+.tomorrow-quality strong {
+  color: #087c8a;
+  font-size: 0.75rem;
+}
+
+.tomorrow-hero {
+  display: grid;
+  min-height: 310px;
+  padding: clamp(1.75rem, 4vw, 3rem);
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 1rem;
+  border-radius: 28px;
+  background: #08263a;
+  color: white;
+  box-shadow: 0 24px 65px rgba(7, 30, 47, 0.17);
+}
+
+.tomorrow-condition,
+.tomorrow-temperature-range {
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 22px;
+}
+
+.tomorrow-condition {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.2rem, 3vw, 2.2rem);
+  padding: clamp(1.5rem, 3vw, 2.4rem);
+  background:
+    radial-gradient(circle at 85% 0%, rgba(24, 189, 205, 0.2), transparent 18rem),
+    rgba(255, 255, 255, 0.04);
+}
+
+.tomorrow-condition .tomorrow-kicker {
+  color: #7de7f2;
+}
+
+.tomorrow-condition h2 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.8rem);
+  line-height: 1;
+  letter-spacing: -0.055em;
+}
+
+.tomorrow-condition > div > span {
+  display: block;
+  margin-top: 0.7rem;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.82rem;
+}
+
+.tomorrow-icon {
+  display: grid;
+  width: 126px;
+  height: 126px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.09);
+  color: #7de7f2;
+}
+
+.tomorrow-temperature-range {
+  display: grid;
+  padding: clamp(1.5rem, 3vw, 2.4rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(155deg, rgba(94, 44, 237, 0.27), rgba(231, 11, 133, 0.12));
+}
+
+.tomorrow-temperature-range div {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.tomorrow-temperature-range dt {
+  color: #a8eef5;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tomorrow-temperature-range dd {
+  margin: 0;
+  font-size: clamp(3rem, 5vw, 5.3rem);
+  font-weight: 740;
+  line-height: 0.9;
+  letter-spacing: -0.09em;
+}
+
+.tomorrow-alert {
+  display: grid;
+  padding: 1rem 1.15rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.85rem;
+  border: 1px solid rgba(242, 112, 53, 0.2);
+  border-radius: 18px;
+  background: #fff8f4;
+  color: #923d1c;
+}
+
+.tomorrow-alert > svg {
+  width: 22px;
+  height: 22px;
+}
+
+.tomorrow-alert > div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.tomorrow-alert strong {
+  font-size: 0.83rem;
+}
+
+.tomorrow-alert span {
+  color: #a95937;
+  font-size: 0.72rem;
+}
+
+.tomorrow-alert a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 780;
+}
+
+.tomorrow-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.tomorrow-metrics article {
+  display: grid;
+  min-height: 158px;
+  align-content: start;
+  gap: 0.45rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(7, 30, 47, 0.07);
+  border-radius: 19px;
+  background: white;
+  box-shadow: 0 12px 30px rgba(7, 30, 47, 0.045);
+}
+
+.tomorrow-metrics svg {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 0.45rem;
+  color: #168fa3;
+}
+
+.tomorrow-metrics span,
+.tomorrow-metrics small {
+  color: #78909b;
+  font-size: 0.68rem;
+}
+
+.tomorrow-metrics strong {
+  color: var(--portal-ink);
+  font-size: clamp(1.3rem, 2vw, 2rem);
+  letter-spacing: -0.04em;
+}
+
+.tomorrow-section {
+  padding: clamp(1.5rem, 3.5vw, 2.5rem);
+  border: 1px solid rgba(7, 30, 47, 0.07);
+  border-radius: 24px;
+  background: white;
+  box-shadow: 0 15px 42px rgba(7, 30, 47, 0.05);
+}
+
+.tomorrow-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.tomorrow-section-heading h2 {
+  margin: 0;
+  color: var(--portal-ink);
+  font-size: clamp(1.65rem, 3vw, 2.75rem);
+  letter-spacing: -0.045em;
+}
+
+.tomorrow-section-heading > a {
+  color: #5e2ced;
+  font-size: 0.74rem;
+  font-weight: 780;
+}
+
+.tomorrow-guidance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.tomorrow-guidance-grid article {
+  min-height: 155px;
+  padding: 1.3rem;
+  border: 1px solid rgba(24, 189, 205, 0.14);
+  border-radius: 18px;
+  background: #f7fcfd;
+}
+
+.tomorrow-guidance-grid strong {
+  color: var(--portal-ink);
+  font-size: 0.86rem;
+}
+
+.tomorrow-guidance-grid p {
+  margin: 0.75rem 0 0;
+  color: #5c7480;
+  font-size: 0.76rem;
+  line-height: 1.6;
+}
+
+.tomorrow-faq-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.tomorrow-faq-list details {
+  border: 1px solid rgba(7, 30, 47, 0.07);
+  border-radius: 16px;
+  background: #fafcfd;
+}
+
+.tomorrow-faq-list summary {
+  padding: 1rem 1.15rem;
+  color: var(--portal-ink);
+  font-size: 0.82rem;
+  font-weight: 770;
+  cursor: pointer;
+}
+
+.tomorrow-faq-list p {
+  margin: 0;
+  padding: 0 1.15rem 1.1rem;
+  color: #5c7480;
+  font-size: 0.76rem;
+  line-height: 1.6;
+}
+
+.tomorrow-related-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.tomorrow-related-links a {
+  display: flex;
+  min-height: 76px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid rgba(7, 30, 47, 0.07);
+  border-radius: 17px;
+  background: white;
+  color: #315362;
+  font-size: 0.79rem;
+  font-weight: 780;
+}
+
+.tomorrow-related-links svg {
+  color: #5e2ced;
+}
+
+.tomorrow-source-note {
+  margin: 0.25rem 0 0;
+  color: #7a909a;
+  font-size: 0.67rem;
+  line-height: 1.55;
+}
+
+.tomorrow-unavailable {
+  max-width: 780px;
+  padding: clamp(2.2rem, 6vw, 5rem);
+  border: 1px solid rgba(7, 30, 47, 0.07);
+  border-radius: 28px;
+  background: white;
+  box-shadow: 0 22px 65px rgba(7, 30, 47, 0.08);
+}
+
+.tomorrow-unavailable h1 {
+  margin: 0;
+  font-size: clamp(2.8rem, 5vw, 4.8rem);
+  letter-spacing: -0.065em;
+}
+
+.tomorrow-unavailable p:not(.tomorrow-kicker) {
+  max-width: 580px;
+  color: #5c7480;
+  line-height: 1.65;
+}
+
+.tomorrow-unavailable a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  color: #5e2ced;
+  font-weight: 780;
+}
+
+@media (max-width: 980px) {
+  .tomorrow-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .tomorrow-header,
+  .tomorrow-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .tomorrow-quality {
+    min-width: 0;
+    grid-template-columns: repeat(3, auto);
+    justify-content: start;
+  }
+
+  .tomorrow-guidance-grid,
+  .tomorrow-related-links {
+    grid-template-columns: 1fr;
+  }
+
+  .tomorrow-alert {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .tomorrow-alert a {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 520px) {
+  .tomorrow-header,
+  .tomorrow-section {
+    padding: 1.35rem;
+    border-radius: 21px;
+  }
+
+  .tomorrow-header h1 {
+    font-size: clamp(2.45rem, 12vw, 3.7rem);
+  }
+
+  .tomorrow-quality {
+    grid-template-columns: 1fr;
+  }
+
+  .tomorrow-hero {
+    padding: 0.75rem;
+    border-radius: 22px;
+  }
+
+  .tomorrow-condition {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 1.2rem;
+    border-radius: 18px;
+  }
+
+  .tomorrow-icon {
+    width: 82px;
+    height: 82px;
+    border-radius: 22px;
+  }
+
+  .tomorrow-temperature-range {
+    padding: 1.2rem;
+    border-radius: 18px;
+  }
+
+  .tomorrow-temperature-range dd {
+    font-size: 3.4rem;
+  }
+
+  .tomorrow-metrics {
+    grid-template-columns: 1fr;
+    gap: 0.55rem;
+  }
+
+  .tomorrow-metrics article {
+    min-height: 132px;
+  }
+
+  .tomorrow-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
