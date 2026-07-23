@@ -1,36 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import {
-  AlertTriangle,
-  Cloud,
-  CloudLightning,
-  CloudMoon,
-  CloudRain,
-  CloudSun,
-  Moon,
-  ShieldAlert,
-  Sun,
-  Wind,
-  type LucideIcon,
-} from "lucide-react";
+import { AlertTriangle, ShieldAlert } from "lucide-react";
 
 import type { WeatherSourceKey } from "@/lib/weather/aggregated-weather.types";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
-import type { WeatherIconName } from "@/lib/weather/types";
 
+import { HomeForecastStory } from "./HomeForecastStory";
 import { HomeOperationalNavigation } from "./HomeOperationalNavigation";
 import { WeatherEditorialHero } from "./WeatherEditorialHero";
 import "./WeatherHome.css";
-
-const iconMap: Record<WeatherIconName, LucideIcon> = {
-  sun: Sun,
-  moon: Moon,
-  "partly-cloudy": CloudSun,
-  "partly-cloudy-night": CloudMoon,
-  cloud: Cloud,
-  rain: CloudRain,
-  storm: CloudLightning,
-  wind: Wind,
-};
 
 const sourceLabels: Record<WeatherSourceKey, string> = {
   embrapa: "Embrapa Clima Temperado",
@@ -38,11 +15,6 @@ const sourceLabels: Record<WeatherSourceKey, string> = {
   cppmet: "CPPMet / UFPel",
   "open-meteo": "Modelo meteorológico",
 };
-
-function WeatherIcon({ name, size = 28 }: { name: WeatherIconName | null; size?: number }) {
-  const Icon = name ? iconMap[name] : Cloud;
-  return <Icon aria-hidden="true" size={size} strokeWidth={1.8} />;
-}
 
 function formatDateTime(value: string | null) {
   if (!value) return null;
@@ -92,44 +64,6 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
       <WeatherEditorialHero data={data} />
       <HomeOperationalNavigation data={data} />
 
-      <section className="weather-section weather-brief" aria-labelledby="weather-brief-title">
-        <div className="weather-section-heading">
-          <div>
-            <p className="weather-kicker">Síntese meteorológica</p>
-            <h2 id="weather-brief-title">{data.brief.headline}</h2>
-          </div>
-          <span className="weather-brief-origin">Atualizada automaticamente</span>
-        </div>
-
-        <p className="weather-brief-summary">{data.brief.summary}</p>
-
-        {data.brief.highlights.length > 0 || data.brief.cautions.length > 0 ? (
-          <div className="weather-brief-grid">
-            {data.brief.highlights.length > 0 ? (
-              <div>
-                <strong>Destaques</strong>
-                <ul>
-                  {data.brief.highlights.map((highlight) => (
-                    <li key={highlight}>{highlight}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-
-            {data.brief.cautions.length > 0 ? (
-              <div className="weather-brief-cautions">
-                <strong>Pontos de atenção</strong>
-                <ul>
-                  {data.brief.cautions.map((caution) => (
-                    <li key={caution}>{caution}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-      </section>
-
       {relevantAlerts.length > 0 ? (
         <section className="weather-section weather-alerts" aria-labelledby="weather-alerts-title">
           <div className="weather-section-heading">
@@ -176,32 +110,7 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
         </section>
       ) : null}
 
-      {weather.hourly.length > 0 ? (
-        <section id="previsao-hoje" className="weather-section" aria-labelledby="hourly-title">
-          <div className="weather-section-heading">
-            <div>
-              <p className="weather-kicker">Próximas horas</p>
-              <h2 id="hourly-title">Evolução do tempo</h2>
-            </div>
-            <Link to="/tempo-hoje-pelotas">Ver previsão de hoje</Link>
-          </div>
-
-          <div className="hourly-forecast">
-            {weather.hourly.map((hour) => (
-              <article key={hour.time}>
-                <span>{hour.time}</span>
-                <WeatherIcon name={hour.icon} />
-                <strong>{hour.temperature}°</strong>
-                <small>
-                  {hour.precipitationProbability === null
-                    ? "Probabilidade não informada"
-                    : `${hour.precipitationProbability}% de chuva`}
-                </small>
-              </article>
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <HomeForecastStory data={data} />
 
       {weather.officialForecast.length > 0 ? (
         <section
@@ -227,44 +136,6 @@ export function WeatherHome({ data }: { data: WeatherIntelligenceData }) {
                   </span>
                 </div>
                 <p>{day.summary || day.text}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      {weather.daily.length > 0 ? (
-        <section id="tendencia" className="weather-section" aria-labelledby="daily-title">
-          <div className="weather-section-heading">
-            <div>
-              <p className="weather-kicker">Previsão estendida</p>
-              <h2 id="daily-title">Próximos 7 dias</h2>
-            </div>
-            <Link to="/previsao-7-dias-pelotas">Ver detalhes</Link>
-          </div>
-
-          <div className="daily-forecast">
-            {weather.daily.map((day) => (
-              <article key={`${day.weekday}-${day.date}`}>
-                <div>
-                  <strong>{day.weekday}</strong>
-                  <span>{day.date}</span>
-                </div>
-                <WeatherIcon name={day.icon} />
-                <span>
-                  {day.rainChance === null
-                    ? "Chuva: probabilidade não informada"
-                    : `${day.rainChance}% chuva`}
-                </span>
-                <span>{day.precipitationMm} mm</span>
-                <span>
-                  {day.windGust === null
-                    ? "Rajadas não informadas"
-                    : `Rajadas ${day.windGust} km/h`}
-                </span>
-                <strong>
-                  {day.min}° / {day.max}°
-                </strong>
               </article>
             ))}
           </div>
