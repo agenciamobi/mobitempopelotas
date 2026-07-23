@@ -11,6 +11,15 @@ type NavigatorWithStandalone = Navigator & {
   standalone?: boolean;
 };
 
+const FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+].join(",");
+
 function InstallIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -34,6 +43,12 @@ function isStandaloneMode() {
     window.matchMedia("(display-mode: standalone)").matches ||
     window.matchMedia("(display-mode: fullscreen)").matches ||
     Boolean((navigator as NavigatorWithStandalone).standalone)
+  );
+}
+
+function focusableElements(container: HTMLElement) {
+  return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+    (element) => !element.hasAttribute("hidden") && element.getAttribute("aria-hidden") !== "true",
   );
 }
 
@@ -130,16 +145,43 @@ export function PwaManager() {
     if (!isOpen) return;
 
     const previousElement = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      event.preventDefault();
-      setIsOpen(false);
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setIsOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab" || !dialogRef.current) return;
+
+      const elements = focusableElements(dialogRef.current);
+      if (elements.length === 0) {
+        event.preventDefault();
+        dialogRef.current.focus();
+        return;
+      }
+
+      const first = elements[0];
+      const last = elements.at(-1) ?? first;
+      const active = document.activeElement;
+
+      if (event.shiftKey && (active === first || active === dialogRef.current)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     window.requestAnimationFrame(() => dialogRef.current?.focus());
 
     return () => {
+      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
       window.requestAnimationFrame(() => (previousElement ?? launcherRef.current)?.focus());
     };
@@ -152,7 +194,7 @@ export function PwaManager() {
       setMessage(
         isIos
           ? "No iPhone ou iPad, toque em Compartilhar e depois em Adicionar à Tela de Início."
-          : "Abra o menu do navegador e escolha Instalar aplicativo ou Adicionar à tela inicial.",
+          : "Este navegador não oferece instalação direta do aplicativo.",
       );
       return;
     }
@@ -181,9 +223,11 @@ export function PwaManager() {
     waitingWorker.postMessage({ type: "SKIP_WAITING" });
   }
 
-  if (!isReady || (isInstalled && !waitingWorker)) return null;
-
   const hasUpdate = Boolean(waitingWorker);
+  const canInstall = Boolean(installPrompt) || isIos;
+
+  if (!isReady || (isInstalled && !hasUpdate) || (!hasUpdate && !canInstall)) return null;
+
   const launcherLabel = hasUpdate ? "Atualizar portal" : "Instalar app";
 
   return (
@@ -207,6 +251,7 @@ export function PwaManager() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="pwa-dialog-title"
+            aria-describedby="pwa-dialog-description"
             tabIndex={-1}
             onMouseDown={(event) => event.stopPropagation()}
           >
@@ -223,7 +268,7 @@ export function PwaManager() {
             <h2 id="pwa-dialog-title">
               {hasUpdate ? "Há uma nova versão disponível" : "Tenha o portal na tela inicial"}
             </h2>
-            <p className="pwa-dialog-intro">
+            <p className="pwa-dialog-intro" id="pwa-dialog-description">
               {hasUpdate
                 ? "Atualize para receber as correções mais recentes do portal. A página será recarregada automaticamente."
                 : "Instale o Tempo Pelotas para abrir o portal com mais rapidez e ter uma página de orientação disponível mesmo sem conexão."}
@@ -244,7 +289,11 @@ export function PwaManager() {
               </button>
             </div>
 
-            {message ? <p className="pwa-feedback" role="status">{message}</p> : null}
+            {message ? (
+              <p className="pwa-feedback" role="status">
+                {message}
+              </p>
+            ) : null}
 
             <small className="pwa-disclaimer">
               A página offline serve apenas como orientação. Previsão, alertas e níveis das águas
