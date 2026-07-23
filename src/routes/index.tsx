@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { WeatherHome } from "@/components/weather/WeatherHome";
 import "@/components/weather/WeatherHomeIntegrated.css";
-import { getLaranjalLevel } from "@/lib/hydrology/laranjal.functions";
+import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
 import { createPageHead } from "@/lib/page-meta";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
@@ -14,11 +14,14 @@ export const Route = createFileRoute("/")({
       "/",
     ),
   loader: async () => {
-    const [weather, laranjal] = await Promise.all([getWeatherIntelligence(), getLaranjalLevel()]);
+    const [weather, laranjal] = await Promise.all([
+      getWeatherIntelligence(),
+      getLaranjalLevelData(),
+    ]);
 
     return { weather, laranjal };
   },
-  staleTime: 30 * 1_000,
+  staleTime: 60 * 1_000,
   component: HomePage,
 });
 
