@@ -22,6 +22,14 @@ const DELETE_CONFIRMATION = "EXCLUIR MINHA CONTA";
 type AuthenticatedAccount = Extract<AccountSnapshot, { status: "authenticated" }>;
 type Feedback = { tone: "success" | "error"; text: string } | null;
 
+async function unsubscribeCurrentBrowserPush() {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+
+  const registration = await navigator.serviceWorker.getRegistration();
+  const subscription = await registration?.pushManager.getSubscription();
+  if (subscription) await subscription.unsubscribe();
+}
+
 export function AccountPage({ snapshot }: { snapshot: AuthenticatedAccount }) {
   const savePreferences = useServerFn(saveAccountPreferences);
   const [displayName, setDisplayName] = useState(snapshot.identity.displayName);
@@ -108,6 +116,12 @@ export function AccountPage({ snapshot }: { snapshot: AuthenticatedAccount }) {
       if (!response.ok || !result.success) {
         setDeleteFeedback(result.error ?? "Não foi possível excluir a conta agora.");
         return;
+      }
+
+      try {
+        await unsubscribeCurrentBrowserPush();
+      } catch (error) {
+        console.error("A conta foi excluída, mas o navegador não removeu a inscrição push:", error);
       }
 
       window.location.assign("/");
