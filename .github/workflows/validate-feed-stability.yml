@@ -1,0 +1,64 @@
+name: Validar estabilidade do feed
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    if: github.head_ref == 'agent/public-data-feed'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar e compilar
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+
+      - name: Iniciar runtime SSR
+        run: npm run dev -- --host 127.0.0.1 --port 3000 > /tmp/feed-stability.log 2>&1 &
+
+      - name: Aguardar runtime
+        run: |
+          for attempt in {1..60}; do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/feed > /tmp/feed-1.json; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/feed-stability.log
+          exit 1
+
+      - name: Comparar duas consultas
+        run: |
+          sleep 3
+          curl --fail --silent --show-error http://127.0.0.1:3000/feed > /tmp/feed-2.json
+          jq -e '.version == "https://jsonfeed.org/version/1.1" and (.items | length) == 5' /tmp/feed-1.json >/dev/null
+          jq -e '.version == "https://jsonfeed.org/version/1.1" and (.items | length) == 5' /tmp/feed-2.json >/dev/null
+          jq '[.items[] | {id, date_modified}]' /tmp/feed-1.json > /tmp/dates-1.json
+          jq '[.items[] | {id, date_modified}]' /tmp/feed-2.json > /tmp/dates-2.json
+          diff -u /tmp/dates-1.json /tmp/dates-2.json
+          jq -e '.items[] | select(.id | endswith("/tempo-hoje-pelotas")) | has("date_modified") | not' /tmp/feed-1.json >/dev/null
+          jq -e '.items[] | select(.id | endswith("/estacao-embrapa-pelotas")) | has("date_modified") | not' /tmp/feed-1.json >/dev/null
+          jq -e '.items[] | select(.id | endswith("/metodologia")) | has("date_modified") | not' /tmp/feed-1.json >/dev/null
+
+      - name: Diagnóstico
+        if: always()
+        run: |
+          cat /tmp/dates-1.json 2>/dev/null || true
+          cat /tmp/dates-2.json 2>/dev/null || true
+          cat /tmp/feed-stability.log 2>/dev/null || true
