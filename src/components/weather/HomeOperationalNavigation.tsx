@@ -13,13 +13,10 @@ const shortcuts = [
   { label: "Metodologia", description: "Fontes", to: "/metodologia" },
 ] as const;
 
-export function HomeOperationalNavigation({
-  data,
-}: {
-  data: WeatherIntelligenceData;
-}) {
+export function HomeOperationalNavigation({ data }: { data: WeatherIntelligenceData }) {
   const activeAlerts = data.weather.alerts.filter((alert) => alert.period === "active");
-  const relevantAlert = activeAlerts.find((alert) => alert.relevance === "pelotas") ?? activeAlerts[0];
+  const relevantAlert =
+    activeAlerts.find((alert) => alert.relevance === "pelotas") ?? activeAlerts[0];
   const hasAlert = Boolean(relevantAlert);
 
   return (
