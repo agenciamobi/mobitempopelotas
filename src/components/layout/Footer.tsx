@@ -6,6 +6,7 @@ const footerGroups = [
     links: [
       { label: "Tempo agora", to: "/" },
       { label: "Previsão para hoje", to: "/tempo-hoje-pelotas" },
+      { label: "Previsão para amanhã", to: "/tempo-amanha-pelotas" },
       { label: "Próximos 7 dias", to: "/previsao-7-dias-pelotas" },
       { label: "Chuva em Pelotas", to: "/chuva-em-pelotas" },
       { label: "Vento em Pelotas", to: "/vento-em-pelotas" },
