@@ -1,7 +1,9 @@
+import { createECDH } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const CANONICAL_SITE_URL = "https://www.tempopelotas.com.br";
+const GEMINI_ENABLED_VALUES = new Set(["true", "1", "on"]);
 const PLACEHOLDER_PATTERN =
   /(change[-_ ]?me|placeholder|example|your[-_ ]|todo|replace[-_ ]?me)/i;
 const REQUIRED_TEMPLATE_KEYS = [
@@ -93,13 +95,35 @@ function isValidVapidSubject(value) {
   return isHttpsUrl(value);
 }
 
-function decodedBase64UrlLength(value) {
+function decodeBase64Url(value) {
   if (!value || !/^[A-Za-z0-9_-]+$/.test(value)) return null;
 
   try {
-    return Buffer.from(value, "base64url").length;
+    return Buffer.from(value, "base64url");
   } catch {
     return null;
+  }
+}
+
+function validateVapidKeyPair(publicKey, privateKey) {
+  const publicBytes = decodeBase64Url(publicKey);
+  const privateBytes = decodeBase64Url(privateKey);
+
+  if (
+    publicBytes?.length !== 65 ||
+    publicBytes[0] !== 4 ||
+    privateBytes?.length !== 32
+  ) {
+    return false;
+  }
+
+  try {
+    const keyAgreement = createECDH("prime256v1");
+    keyAgreement.setPrivateKey(privateBytes);
+    const derivedPublicKey = keyAgreement.getPublicKey(undefined, "uncompressed");
+    return derivedPublicKey.equals(publicBytes);
+  } catch {
+    return false;
   }
 }
 
@@ -227,13 +251,10 @@ function validateProduction(values) {
 
   const vapidPublic = value("VAPID_PUBLIC_KEY");
   const vapidPrivate = value("VAPID_PRIVATE_KEY");
-  const vapidPairIsValid =
-    decodedBase64UrlLength(vapidPublic) === 65 &&
-    decodedBase64UrlLength(vapidPrivate) === 32;
   addCheck(
     "Par VAPID",
-    vapidPairIsValid,
-    "a chave pública deve decodificar para 65 bytes e a privada para 32 bytes",
+    validateVapidKeyPair(vapidPublic, vapidPrivate),
+    "as chaves devem formar o mesmo par P-256 e usar ponto público não comprimido",
   );
 
   addCheck(
@@ -251,8 +272,8 @@ function validateProduction(values) {
     "a chave deve existir e a URL base deve usar HTTPS",
   );
 
-  const geminiEnabled =
-    value("GEMINI_WEATHER_ENABLED")?.toLowerCase() === "true";
+  const geminiFlag = value("GEMINI_WEATHER_ENABLED")?.toLowerCase() ?? "";
+  const geminiEnabled = GEMINI_ENABLED_VALUES.has(geminiFlag);
   const geminiKey = value("GEMINI_API_KEY");
   const geminiIsConfigured =
     !geminiEnabled || Boolean(geminiKey && !looksLikePlaceholder(geminiKey));
