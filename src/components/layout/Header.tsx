@@ -3,6 +3,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 const primaryNavigation = [
   { label: "Agora", to: "/" },
   { label: "Hoje", to: "/tempo-hoje-pelotas" },
+  { label: "Amanhã", to: "/tempo-amanha-pelotas" },
   { label: "7 dias", to: "/previsao-7-dias-pelotas" },
   { label: "Chuva", to: "/chuva-em-pelotas" },
   { label: "Águas", to: "/situacao-hidrologica-pelotas" },
