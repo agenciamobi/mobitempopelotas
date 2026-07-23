@@ -1,0 +1,99 @@
+name: Verificar rotas finais em produção
+
+on:
+  push:
+    branches:
+      - agent/verify-tomorrow-production
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-final-routes-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Tempo amanhã, redirect e sitemap
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE_URL: https://mobitempopelotas.lovable.app
+
+    steps:
+      - name: Aguardar publicação da main
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for attempt in $(seq 1 20); do
+            status=$(curl --silent --show-error --output tomorrow.html --write-out '%{http_code}' \
+              --max-time 25 \
+              --header 'Cache-Control: no-cache' \
+              "$BASE_URL/tempo-amanha-pelotas?validation=${GITHUB_RUN_ID}")
+
+            if [ "$status" = "200" ] \
+              && grep -q '/tempo-amanha-pelotas' tomorrow.html \
+              && grep -Eq 'Tempo amanhã em Pelotas|Previsão do tempo para amanhã em Pelotas|A previsão de amanhã está em atualização' tomorrow.html; then
+              echo "A nova página já está publicada."
+              exit 0
+            fi
+
+            echo "Tentativa $attempt/20: deploy ainda não refletido (HTTP $status)."
+            sleep 15
+          done
+
+          echo "A versão publicada não recebeu a nova página dentro da janela de validação."
+          exit 1
+
+      - name: Validar página de amanhã
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=$(curl --silent --show-error --output tomorrow.html --write-out '%{http_code}' \
+            --max-time 25 \
+            --header 'Cache-Control: no-cache' \
+            "$BASE_URL/tempo-amanha-pelotas?validation=${GITHUB_RUN_ID}")
+
+          test "$status" = "200"
+          grep -q '/tempo-amanha-pelotas' tomorrow.html
+          grep -Eq 'Tempo amanhã em Pelotas|Previsão do tempo para amanhã em Pelotas|A previsão de amanhã está em atualização' tomorrow.html
+
+      - name: Validar redirect legado
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --silent --show-error \
+            --max-time 25 \
+            --header 'Cache-Control: no-cache' \
+            --dump-header redirect.headers \
+            --output /dev/null \
+            "$BASE_URL/clima-em-pelotas?validation=${GITHUB_RUN_ID}"
+
+          status=$(awk 'NR == 1 { print $2 }' redirect.headers)
+          location=$(awk 'BEGIN { IGNORECASE=1 } /^location:/ { sub(/^[^:]*:[[:space:]]*/, ""); sub(/\r$/, ""); print; exit }' redirect.headers)
+
+          test "$status" = "301"
+          case "$location" in
+            */historico-climatico-pelotas*) ;;
+            *) echo "Location inesperado: $location"; exit 1 ;;
+          esac
+
+      - name: Validar sitemap
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=$(curl --silent --show-error --output sitemap.xml --write-out '%{http_code}' \
+            --max-time 25 \
+            --header 'Cache-Control: no-cache' \
+            "$BASE_URL/sitemap.xml?validation=${GITHUB_RUN_ID}")
+
+          test "$status" = "200"
+          grep -q '/tempo-amanha-pelotas' sitemap.xml
+          count=$(grep -o '<url>' sitemap.xml | wc -l | tr -d ' ')
+          test "$count" = "13"
+          echo "Sitemap validado com $count URLs públicas."
