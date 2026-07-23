@@ -1,6 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { AlertTriangle, ShieldAlert } from "lucide-react";
 
+import { RegionalWaterNetwork } from "@/components/hydrology/RegionalWaterNetwork";
+import type { GuaibaObservationData } from "@/lib/hydrology/guaiba.server";
+import type { LagoonMonitoringNetworkData } from "@/lib/hydrology/lagoon-network.server";
 import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
 import type { RedemetOverview } from "@/lib/redemet/redemet.types";
 import type { WeatherSourceKey } from "@/lib/weather/aggregated-weather.types";
@@ -41,10 +44,14 @@ export function WeatherHome({
   data,
   laranjal,
   redemet,
+  guaiba,
+  lagoon,
 }: {
   data: WeatherIntelligenceData;
   laranjal: LaranjalLevelData;
   redemet: RedemetOverview;
+  guaiba: GuaibaObservationData;
+  lagoon: LagoonMonitoringNetworkData;
 }) {
   const weather = data.weather;
 
@@ -125,6 +132,7 @@ export function WeatherHome({
       <HomeForecastStory data={data} />
       <HomeRegionalObservation data={redemet} />
       <HomeLocalMonitoring observation={weather.observation} laranjal={laranjal} />
+      <RegionalWaterNetwork guaiba={guaiba} lagoon={lagoon} />
 
       {weather.officialForecast.length > 0 ? (
         <section
@@ -158,11 +166,12 @@ export function WeatherHome({
 
       <p className="weather-source-note">
         Dados consolidados por MOBI Tempo Pelotas a partir de Embrapa Clima Temperado, INMET,
-        CPPMet/UFPel, REDEMET/DECEA e {weather.quality.forecastProvider ?? "modelo meteorológico"}.
-        Consulta realizada em {formatFetchedAt(weather.source.fetchedAt)}.
+        CPPMet/UFPel, REDEMET/DECEA, LabHidroSens/UFPel, Nível Guaíba, FURG & Portos RS e{" "}
+        {weather.quality.forecastProvider ?? "modelo meteorológico"}. Consulta realizada em{" "}
+        {formatFetchedAt(weather.source.fetchedAt)}.
         {degradedSources.length > 0
           ? ` Fontes com restrição: ${degradedSources.map((source) => sourceLabels[source]).join(", ")}.`
-          : " Todas as fontes prioritárias responderam dentro dos critérios operacionais."}
+          : " Todas as fontes meteorológicas prioritárias responderam dentro dos critérios operacionais."}
       </p>
     </div>
   );

@@ -20,9 +20,12 @@ import {
   Wind,
 } from "lucide-react";
 
+import type { GuaibaObservationData } from "@/lib/hydrology/guaiba.server";
+import type { LagoonMonitoringNetworkData } from "@/lib/hydrology/lagoon-network.server";
 import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 
+import { RegionalWaterNetwork } from "./RegionalWaterNetwork";
 import "./HydrologyPages.css";
 
 const officialSources = [
@@ -395,9 +398,13 @@ function OfficialSources() {
 export function HydrologyOverviewPage({
   weather,
   level,
+  guaiba,
+  lagoon,
 }: {
   weather: WeatherIntelligenceData;
   level: LaranjalLevelData;
+  guaiba: GuaibaObservationData;
+  lagoon: LagoonMonitoringNetworkData;
 }) {
   return (
     <div className="hydrology-page">
@@ -423,6 +430,7 @@ export function HydrologyOverviewPage({
       </header>
 
       <LevelReading level={level} />
+      <RegionalWaterNetwork guaiba={guaiba} lagoon={lagoon} variant="full" />
       <WeatherWaterContext weather={weather} />
 
       <section className="hydrology-flow" aria-labelledby="hydrology-flow-title">

@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { WeatherHome } from "@/components/weather/WeatherHome";
 import "@/components/weather/WeatherHomeIntegrated.css";
+import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
+import { getLagoonMonitoringNetwork } from "@/lib/hydrology/lagoon-network.functions";
 import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
 import { createPageHead } from "@/lib/page-meta";
 import { getRedemetOverview } from "@/lib/redemet/redemet.functions";
@@ -15,19 +17,29 @@ export const Route = createFileRoute("/")({
       "/",
     ),
   loader: async () => {
-    const [weather, laranjal, redemet] = await Promise.all([
+    const [weather, laranjal, redemet, guaiba, lagoon] = await Promise.all([
       getWeatherIntelligence(),
       getLaranjalLevelData(),
       getRedemetOverview(),
+      getGuaibaObservation(),
+      getLagoonMonitoringNetwork(),
     ]);
 
-    return { weather, laranjal, redemet };
+    return { weather, laranjal, redemet, guaiba, lagoon };
   },
   staleTime: 60 * 1_000,
   component: HomePage,
 });
 
 function HomePage() {
-  const { weather, laranjal, redemet } = Route.useLoaderData();
-  return <WeatherHome data={weather} laranjal={laranjal} redemet={redemet} />;
+  const { weather, laranjal, redemet, guaiba, lagoon } = Route.useLoaderData();
+  return (
+    <WeatherHome
+      data={weather}
+      laranjal={laranjal}
+      redemet={redemet}
+      guaiba={guaiba}
+      lagoon={lagoon}
+    />
+  );
 }
