@@ -28,6 +28,7 @@ const footerGroups = [
     title: "Dados locais",
     links: [
       { label: "Estação Embrapa", to: "/estacao-embrapa-pelotas" },
+      { label: "Radar e satélite", to: "/radar-e-satelite-pelotas" },
       { label: "Histórico climático", to: "/historico-climatico-pelotas" },
       { label: "Metodologia e fontes", to: "/metodologia" },
     ],
@@ -112,7 +113,10 @@ export function Footer() {
         >
           <div className="editorial-footer-sources">
             <span>Fontes meteorológicas e locais</span>
-            <p>Embrapa Clima Temperado · INMET · CPPMet/UFPel · Open-Meteo · LabHidroSens/UFPel</p>
+            <p>
+              Embrapa Clima Temperado · INMET · CPPMet/UFPel · Open-Meteo · REDEMET/DECEA ·
+              LabHidroSens/UFPel
+            </p>
           </div>
 
           <div className="editorial-footer-guidance">

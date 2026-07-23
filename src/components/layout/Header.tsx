@@ -73,6 +73,7 @@ const megaMenus = [
       "/estacao-embrapa-pelotas",
       "/historico-climatico-pelotas",
       "/cameras-ao-vivo-pelotas",
+      "/radar-e-satelite-pelotas",
       "/metodologia",
     ],
     featured: {
@@ -83,12 +84,17 @@ const megaMenus = [
     },
     sections: [
       {
-        title: "Medições locais",
+        title: "Medições e imagens",
         links: [
           {
             label: "Estação Embrapa",
             to: "/estacao-embrapa-pelotas",
             description: "Dados observados na estação de Pelotas.",
+          },
+          {
+            label: "Radar e satélite",
+            to: "/radar-e-satelite-pelotas",
+            description: "Produtos regionais da REDEMET e trovoadas detectadas.",
           },
           {
             label: "Câmeras ao vivo",
