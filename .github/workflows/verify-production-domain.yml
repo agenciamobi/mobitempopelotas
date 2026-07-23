@@ -1,0 +1,111 @@
+name: Verificar domínio canônico publicado
+
+on:
+  push:
+    branches:
+      - agent/verify-production-domain
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-production-domain-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Canonical, sitemap, robots e feeds
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE_URL: https://mobitempopelotas.lovable.app
+      CANONICAL_URL: https://tempopelotas.com.br
+
+    steps:
+      - name: Aguardar publicação do domínio canônico
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for attempt in $(seq 1 20); do
+            status=$(curl --silent --show-error --output home.html --write-out '%{http_code}' \
+              --max-time 25 \
+              --header 'Cache-Control: no-cache' \
+              "$BASE_URL/?validation=${GITHUB_RUN_ID}")
+
+            if [ "$status" = "200" ] \
+              && grep -q '<link rel="canonical" href="https://tempopelotas.com.br/"' home.html \
+              && grep -q '<meta property="og:url" content="https://tempopelotas.com.br/"' home.html; then
+              echo "Canonical definitivo já está publicado."
+              exit 0
+            fi
+
+            echo "Tentativa $attempt/20: versão canônica ainda não refletida (HTTP $status)."
+            sleep 15
+          done
+
+          echo "A publicação não refletiu o domínio canônico dentro da janela de validação."
+          exit 1
+
+      - name: Validar metadata da home
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --silent --show-error \
+            --max-time 25 \
+            --header 'Cache-Control: no-cache' \
+            "$BASE_URL/?validation=${GITHUB_RUN_ID}" > home.html
+
+          grep -q '<link rel="canonical" href="https://tempopelotas.com.br/"' home.html
+          grep -q '<meta property="og:url" content="https://tempopelotas.com.br/"' home.html
+          grep -q '"url":"https://tempopelotas.com.br"' home.html
+
+      - name: Validar sitemap
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --silent --show-error \
+            --max-time 25 \
+            --header 'Cache-Control: no-cache' \
+            "$BASE_URL/sitemap.xml?validation=${GITHUB_RUN_ID}" > sitemap.xml
+
+          grep -q '<loc>https://tempopelotas.com.br/</loc>' sitemap.xml
+          grep -q 'https://tempopelotas.com.br/tempo-amanha-pelotas' sitemap.xml
+          ! grep -q 'lovable.app' sitemap.xml
+          count=$(grep -o '<url>' sitemap.xml | wc -l | tr -d ' ')
+          test "$count" = "13"
+          echo "Sitemap canônico validado com $count URLs."
+
+      - name: Validar robots
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --silent --show-error \
+            --max-time 25 \
+            --header 'Cache-Control: no-cache' \
+            "$BASE_URL/robots.txt?validation=${GITHUB_RUN_ID}" > robots.txt
+
+          grep -q 'Sitemap: https://tempopelotas.com.br/sitemap.xml' robots.txt
+          ! grep -q 'lovable.app' robots.txt
+
+      - name: Validar dados públicos
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --silent --show-error \
+            --max-time 25 \
+            --header 'Cache-Control: no-cache' \
+            "$BASE_URL/pelotas.json?validation=${GITHUB_RUN_ID}" > pelotas.json
+          curl --silent --show-error \
+            --max-time 25 \
+            --header 'Cache-Control: no-cache' \
+            "$BASE_URL/feed?validation=${GITHUB_RUN_ID}" > feed.json
+
+          grep -q 'https://tempopelotas.com.br' pelotas.json
+          grep -q 'https://tempopelotas.com.br' feed.json
+          ! grep -q 'mobitempopelotas.lovable.app' pelotas.json
+          ! grep -q 'mobitempopelotas.lovable.app' feed.json
