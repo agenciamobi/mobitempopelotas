@@ -22,12 +22,11 @@
 
 .site-shell--home-editorial .weather-hero-icon--condition small {
   color: #657d88;
-  font-size: 0.54rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  line-height: 1.15;
+  font-size: 0.62rem;
+  font-weight: 760;
+  letter-spacing: 0;
+  line-height: 1.25;
   text-align: center;
-  text-transform: uppercase;
 }
 
 .site-shell--home-editorial .weather-hero--condition-sun {
