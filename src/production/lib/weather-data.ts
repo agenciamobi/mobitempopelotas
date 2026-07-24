@@ -1,5 +1,12 @@
 export type WeatherIconName =
-  "sun" | "moon" | "partly-cloudy" | "partly-cloudy-night" | "cloud" | "rain" | "storm" | "wind";
+  | "sun"
+  | "moon"
+  | "partly-cloudy"
+  | "partly-cloudy-night"
+  | "cloud"
+  | "rain"
+  | "storm"
+  | "wind";
 
 export type HourlyForecast = {
   time: string;

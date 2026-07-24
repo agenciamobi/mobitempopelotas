@@ -24,7 +24,10 @@ export type PushStorageStatus = {
 };
 
 export type PushConsentPreference =
-  "weather_alerts" | "water_alerts" | "daily_summary" | "community_updates";
+  | "weather_alerts"
+  | "water_alerts"
+  | "daily_summary"
+  | "community_updates";
 
 type PushPreferenceSnapshot = Pick<
   UserPreferences,
