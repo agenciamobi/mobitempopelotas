@@ -210,7 +210,7 @@ export function Header() {
             <Link className="production-brand" to="/" aria-label="Tempo Pelotas — página inicial">
               <img
                 className="production-brand-logo"
-                src="/brand/tempo-pelotas-header"
+                src="/brand/tempo-pelotas-purple.svg"
                 alt=""
                 width={10694}
                 height={1552}

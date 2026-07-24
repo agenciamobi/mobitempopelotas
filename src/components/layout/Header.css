@@ -37,7 +37,7 @@
 
 .production-brand-logo {
   display: block;
-  width: clamp(132px, 12vw, 166px);
+  width: clamp(176px, 14vw, 206px);
   height: auto;
 }
 

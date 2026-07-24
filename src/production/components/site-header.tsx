@@ -322,7 +322,7 @@ export function SiteHeader({ advisoryLevel = "normal", variant = "default" }: Si
           <Link className="brand" href="/" aria-label="TEMPO Pelotas — página inicial">
             <img
               className="brand-logo"
-              src="/brand/tempo-pelotas-header"
+              src="/brand/tempo-pelotas-purple.svg"
               alt=""
               width={10694}
               height={1552}
