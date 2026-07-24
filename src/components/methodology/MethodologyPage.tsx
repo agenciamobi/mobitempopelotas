@@ -150,8 +150,9 @@ function createSourceCards(
   redemet: RedemetOverview,
 ) {
   const sourceHealth = weather.weather.sources;
-  const forecastProvider = weather.weather.quality.forecastProvider ?? "Open-Meteo / MET Norway";
-  const usesMetNorway = forecastProvider.toLocaleLowerCase("pt-BR").includes("norway");
+  const usesMetNorway = weather.weather.quality.forecastSource === "met-norway";
+  const forecastProvider =
+    weather.weather.quality.forecastProvider ?? (usesMetNorway ? "MET Norway" : "Open-Meteo");
 
   const cards: SourceCard[] = [
     {
