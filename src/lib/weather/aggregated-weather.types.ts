@@ -10,7 +10,6 @@ export type { ForecastSourceKey };
 
 export type WeatherSourceKey = "embrapa" | "inmet" | "cppmet" | ForecastSourceKey;
 
-
 export type AggregatedWeatherStatus = "live" | "degraded" | "unavailable";
 export type WeatherConfidence = "high" | "medium" | "low";
 export type WeatherSourceHealthStatus = OfficialSourceStatus | "stale";

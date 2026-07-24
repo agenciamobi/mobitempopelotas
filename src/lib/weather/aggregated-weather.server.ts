@@ -1,12 +1,7 @@
 import { fetchOfficialWeatherSources } from "./official-sources.server";
 import type { EmbrapaObservation } from "./official-sources.types";
 import { fetchPelotasWeather, type WeatherBaselineData } from "./weather-baseline.server";
-import type {
-  CurrentWeather,
-  DailyForecast,
-  ForecastSourceKey,
-  WeatherHomeData,
-} from "./types";
+import type { CurrentWeather, DailyForecast, ForecastSourceKey, WeatherHomeData } from "./types";
 import type {
   AggregatedCurrentField,
   AggregatedCurrentProvenance,
@@ -50,7 +45,6 @@ const FORECAST_PROVIDER_LABELS: Record<ForecastSourceKey, string> = {
   "open-meteo": "Open-Meteo",
   "met-norway": "MET Norway",
 };
-
 
 function clockToMinutes(value: string | null) {
   if (!value) return null;
@@ -353,7 +347,6 @@ function compareDailyForecasts(
   return discrepancies;
 }
 
-
 function calculateQualityScore(options: {
   baseline: WeatherHomeData;
   embrapaUsable: boolean;
@@ -497,7 +490,6 @@ function buildMessage(
   return null;
 }
 
-
 export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeatherData> {
   const [baseline, official] = await Promise.all([
     fetchPelotasWeather(),
@@ -568,9 +560,7 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
         : "degraded";
 
   const normalizedCurrentSource: "embrapa" | ForecastSourceKey | null =
-    currentSource === "embrapa" ||
-    currentSource === "open-meteo" ||
-    currentSource === "met-norway"
+    currentSource === "embrapa" || currentSource === "open-meteo" || currentSource === "met-norway"
       ? currentSource
       : null;
   const forecastProvider =
