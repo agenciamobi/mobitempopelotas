@@ -1,4 +1,4 @@
-import { CANONICAL_SITE_URL } from "./site-config";
+import { CANONICAL_SITE_URL } from "./site-config.ts";
 
 const CANONICAL_HOSTNAME = new URL(CANONICAL_SITE_URL).hostname;
 const LEGACY_HOSTNAME = ["mobitempopelotas", "lovable", "app"].join(".");
