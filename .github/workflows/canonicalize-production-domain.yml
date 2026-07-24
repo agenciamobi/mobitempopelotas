@@ -72,22 +72,6 @@ jobs:
           path.write_text(before + replacement + after, encoding="utf-8")
           PY
 
-      - name: Instalar dependências
-        run: npm ci
-
-      - name: Formatar arquivos alterados
-        continue-on-error: true
-        run: |
-          npx prettier --write \
-            src/lib/site-config.ts \
-            src/lib/canonical-host.ts \
-            src/lib/sitemap.ts \
-            src/server.ts \
-            src/components/cameras/CameraPage.tsx \
-            'src/routes/sitemap[.]xml.ts' \
-            tests/seo-domain.test.ts \
-            package.json
-
       - name: Validar ausência de domínios obsoletos
         run: |
           if git grep -n 'lovable\.app'; then
