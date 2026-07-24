@@ -117,10 +117,13 @@ function createCurrentFromObservation(observation: EmbrapaObservation): Aggregat
   };
 }
 
-function baselineProvenance(current: CurrentWeather | null): AggregatedCurrentProvenance {
+function baselineProvenance(
+  current: CurrentWeather | null,
+  key: ForecastSourceKey,
+): AggregatedCurrentProvenance {
   if (!current) return {};
   return Object.fromEntries(
-    CURRENT_FIELDS.map((field) => [field, "open-meteo"]),
+    CURRENT_FIELDS.map((field) => [field, key]),
   ) as AggregatedCurrentProvenance;
 }
 
