@@ -199,8 +199,10 @@ function createSourceCards(
       description: usesMetNorway
         ? "Contingência global usada quando o provedor principal não responde, preservando como ausentes os campos que o modelo não publica."
         : "Condições modeladas, previsão horária e previsão diária usadas como base global para temperatura, chuva e vento.",
-      status: sourceHealth["open-meteo"].status,
-      fetchedAt: sourceHealth["open-meteo"].fetchedAt,
+      status: usesMetNorway ? sourceHealth["met-norway"].status : sourceHealth["open-meteo"].status,
+      fetchedAt: usesMetNorway
+        ? sourceHealth["met-norway"].fetchedAt
+        : sourceHealth["open-meteo"].fetchedAt,
       url: usesMetNorway
         ? "https://api.met.no/weatherapi/locationforecast/2.0/documentation"
         : "https://open-meteo.com/",
