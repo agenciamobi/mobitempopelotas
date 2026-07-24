@@ -313,6 +313,7 @@ function normalizeWeather(response: OpenMeteoResponse): WeatherHomeData {
       name: "Open-Meteo",
       url: OPEN_METEO_URL,
       kind: "forecast",
+      key: "open-meteo",
       fetchedAt: new Date().toISOString(),
       isFallback: false,
     },
