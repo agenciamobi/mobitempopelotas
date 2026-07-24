@@ -4,7 +4,9 @@ import test from "node:test";
 import {
   needsOpenMeteoRecovery,
   recoverWeatherDataFromOpenMeteo,
+  recoverWeatherIntelligenceFromOpenMeteo,
 } from "../src/production/lib/open-meteo-browser-recovery.ts";
+import type { WeatherIntelligenceData } from "../src/lib/weather/weather-intelligence.types.ts";
 import { fallbackWeatherData } from "../src/production/lib/weather-data.ts";
 
 const hours = Array.from({ length: 8 }, (_, index) => `2026-07-24T${String(17 + index).padStart(2, "0")}:00`);
@@ -62,4 +64,88 @@ test("recupera previsão completa no navegador sem substituir a observação atu
 
 test("rejeita resposta parcial sem apagar o fallback auditável", () => {
   assert.equal(recoverWeatherDataFromOpenMeteo(fallbackWeatherData, { hourly: {} }), null);
+});
+
+test("propaga a recuperação para o agregado e corrige sua rastreabilidade", () => {
+  const baseline = {
+    weather: {
+      status: "degraded",
+      current: {
+        city: "Pelotas",
+        state: "RS",
+        temperature: 16,
+        feelsLike: 16,
+        condition: null,
+        humidity: 90,
+        pressure: 1019,
+        windSpeed: 5,
+        windGust: null,
+        windDirection: "L",
+        visibilityKm: null,
+        sunrise: null,
+        sunset: null,
+        observedAt: "18:00",
+        icon: null,
+      },
+      currentProvenance: { temperature: "embrapa" },
+      hourly: [],
+      daily: [],
+      observation: {},
+      alerts: [],
+      officialForecast: [],
+      sources: {
+        "open-meteo": {
+          source: "open-meteo",
+          status: "unavailable",
+          role: "forecast",
+          fetchedAt: "2026-07-24T21:00:00.000Z",
+          usable: false,
+          reason: "timeout",
+        },
+      },
+      quality: {
+        score: 70,
+        confidence: "medium",
+        currentSource: "embrapa",
+        forecastSource: "met-norway",
+        forecastProvider: "MET Norway",
+        degradedSources: ["open-meteo"],
+        observationAgeMinutes: 5,
+        discrepancies: [],
+        notes: ["MET Norway usado como contingência do Open-Meteo."],
+      },
+      source: {
+        name: "MOBI Tempo Pelotas",
+        kind: "aggregated",
+        fetchedAt: "2026-07-24T21:00:00.000Z",
+      },
+      message: "Dados disponíveis em modo degradado.",
+    },
+    brief: {
+      headline: "Dados degradados",
+      summary: "Previsão em contingência.",
+      highlights: [],
+      cautions: ["Fontes com restrição ou indisponibilidade: Open-Meteo."],
+    },
+    intelligence: {
+      origin: "deterministic",
+      geminiStatus: "disabled",
+      model: null,
+      generatedAt: "2026-07-24T21:00:00.000Z",
+      error: null,
+    },
+  } as unknown as WeatherIntelligenceData;
+
+  const recovered = recoverWeatherIntelligenceFromOpenMeteo(baseline, payload());
+
+  assert.ok(recovered);
+  assert.equal(recovered.weather.status, "live");
+  assert.equal(recovered.weather.quality.forecastSource, "open-meteo");
+  assert.equal(recovered.weather.quality.forecastProvider, "Open-Meteo");
+  assert.deepEqual(recovered.weather.quality.degradedSources, []);
+  assert.equal(recovered.weather.sources["open-meteo"].usable, true);
+  assert.equal(recovered.weather.hourly[0]?.precipitationProbability, 20);
+  assert.equal(recovered.weather.daily[0]?.windGust, 35);
+  assert.equal(recovered.weather.message, null);
+  assert.match(recovered.brief.summary, /Embrapa registra 16 °C/);
 });
