@@ -80,6 +80,16 @@ function htmlToText(html: string) {
     .trim();
 }
 
+function decodeResponseHtml(response: Response, bytes: ArrayBuffer) {
+  const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
+  const charset = contentType.match(/charset\s*=\s*["']?([^;"'\s]+)/)?.[1] ?? "utf-8";
+  const encoding = /^(?:iso-8859-1|latin-?1|windows-1252)$/.test(charset)
+    ? "windows-1252"
+    : "utf-8";
+
+  return new TextDecoder(encoding).decode(bytes);
+}
+
 function parseNumber(value: string | undefined) {
   if (!value) return null;
   const parsed = Number(value.replace(",", "."));
@@ -199,15 +209,20 @@ export function parseEmbrapaObservationHtml(
 export async function fetchEmbrapaObservation(): Promise<EmbrapaObservation> {
   try {
     const response = await fetch(SOURCE_URL, {
+      cache: "no-store",
       headers: {
         Accept: "text/html,application/xhtml+xml",
+        "Cache-Control": "no-cache",
         "User-Agent": "TEMPO-Pelotas/2.0 (+https://tempopelotas.com.br)",
       },
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
 
     if (!response.ok) throw new Error(`Embrapa respondeu com HTTP ${response.status}.`);
-    return parseEmbrapaObservationHtml(await response.text());
+
+    const fetchedAt = new Date().toISOString();
+    const html = decodeResponseHtml(response, await response.arrayBuffer());
+    return parseEmbrapaObservationHtml(html, fetchedAt);
   } catch (error) {
     return unavailable(
       error instanceof Error ? error.message : "Falha desconhecida ao consultar a Embrapa.",
