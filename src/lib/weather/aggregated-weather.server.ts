@@ -385,8 +385,22 @@ function confidenceFromScore(score: number): WeatherConfidence {
   return "low";
 }
 
+function createProviderHealth(
+  provider: WeatherHomeData,
+  key: ForecastSourceKey,
+): WeatherSourceHealth {
+  return {
+    source: key,
+    status: provider.status,
+    role: "forecast",
+    fetchedAt: provider.source.fetchedAt,
+    usable: provider.status === "live" && provider.daily.length > 0,
+    reason: provider.message,
+  };
+}
+
 function createSources(
-  baseline: WeatherHomeData,
+  baseline: WeatherBaselineData,
   observation: EmbrapaObservation,
   official: Awaited<ReturnType<typeof fetchOfficialWeatherSources>>,
   observationAgeMinutes: number | null,
@@ -398,14 +412,8 @@ function createSources(
     observationAgeMinutes > OBSERVATION_MAX_AGE_MINUTES;
 
   return {
-    "open-meteo": {
-      source: "open-meteo",
-      status: baseline.status,
-      role: "forecast",
-      fetchedAt: baseline.source.fetchedAt,
-      usable: baseline.status === "live" && baseline.daily.length > 0,
-      reason: baseline.message,
-    },
+    "open-meteo": createProviderHealth(baseline.providers["open-meteo"], "open-meteo"),
+    "met-norway": createProviderHealth(baseline.providers["met-norway"], "met-norway"),
     embrapa: {
       source: "embrapa",
       status: embrapaIsStale ? "stale" : observation.status,
@@ -436,8 +444,10 @@ function createSources(
 }
 
 function buildNotes(options: {
-  currentSource: "embrapa" | "open-meteo" | null;
+  currentSource: "embrapa" | ForecastSourceKey | null;
   forecastProvider: string;
+  selectedForecastKey: ForecastSourceKey;
+  usingContingency: boolean;
   sources: Record<WeatherSourceKey, WeatherSourceHealth>;
   discrepancies: WeatherDiscrepancy[];
 }) {
@@ -445,8 +455,21 @@ function buildNotes(options: {
 
   if (options.currentSource === "embrapa") {
     notes.push("Condições atuais priorizam a medição local da Embrapa.");
-  } else if (options.currentSource === "open-meteo") {
+  } else if (options.currentSource) {
     notes.push(`Condições atuais usam ${options.forecastProvider}.`);
+  }
+  if (options.usingContingency) {
+    notes.push(
+      "Open-Meteo não respondeu; a previsão foi assumida pela contingência do MET Norway.",
+    );
+  } else {
+    const contingencyKey: ForecastSourceKey =
+      options.selectedForecastKey === "open-meteo" ? "met-norway" : "open-meteo";
+    if (!options.sources[contingencyKey].usable) {
+      notes.push(
+        "Contingência do MET Norway indisponível no momento; Open-Meteo segue como fonte ativa.",
+      );
+    }
   }
   if (options.sources.embrapa.status === "stale") {
     notes.push("A leitura da Embrapa foi preservada como contexto, mas não substituiu o modelo.");
@@ -473,6 +496,7 @@ function buildMessage(
   }
   return null;
 }
+
 
 export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeatherData> {
   const [baseline, official] = await Promise.all([
