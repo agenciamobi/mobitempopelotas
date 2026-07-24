@@ -217,11 +217,6 @@ export function Header() {
                 draggable={false}
               />
             </Link>
-            <span className="production-brand-divider" aria-hidden="true" />
-            <span className="production-brand-context">
-              <strong>Pelotas, RS</strong>
-              <small>Tempo e águas</small>
-            </span>
           </div>
 
           <nav className="mega-navigation" aria-label="Navegação principal">

@@ -329,11 +329,6 @@ export function SiteHeader({ advisoryLevel = "normal", variant = "default" }: Si
               draggable={false}
             />
           </Link>
-          <span className="site-header-brand-divider" aria-hidden="true" />
-          <span className="site-header-context">
-            <strong>Pelotas, RS</strong>
-            <small>Tempo e águas</small>
-          </span>
         </div>
 
         <nav className="main-nav main-nav--mega" aria-label="Navegação principal">
