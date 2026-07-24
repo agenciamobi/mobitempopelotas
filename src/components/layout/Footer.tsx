@@ -1,7 +1,10 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
+import type { WeatherData } from "@/production/lib/weather-data";
+
 import "./Footer.css";
+import { getFooterLead } from "./footer-content";
 
 const footerGroups = [
   {
@@ -38,7 +41,11 @@ const footerGroups = [
 const mobiUrl =
   "https://agenciamobi.com.br/?utm_source=tempopelotas&utm_medium=footer&utm_campaign=portal_tempo_pelotas";
 
-export function Footer() {
+export function Footer({ source }: { source?: WeatherData["source"] }) {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const lead = getFooterLead(pathname);
+  const sourceStatus = source?.isFallback ? "Operação em contingência" : "Fontes identificadas";
+
   return (
     <footer className="editorial-footer-shell">
       <div className="editorial-footer">
@@ -62,20 +69,20 @@ export function Footer() {
                 draggable={false}
               />
             </Link>
-            <span className="editorial-footer-eyebrow">Tempo e águas de Pelotas</span>
-            <h2 id="editorial-footer-title">Informação local para acompanhar o dia.</h2>
-            <p>
-              Previsão, medições, avisos oficiais e situação das águas reunidos em um portal
-              independente desenvolvido em Pelotas.
-            </p>
+            <span className="editorial-footer-eyebrow">{lead.eyebrow}</span>
+            <h2 id="editorial-footer-title">{lead.title}</h2>
+            <p>{lead.description}</p>
           </div>
 
           <div className="editorial-footer-lead-aside">
-            <div className="editorial-footer-status" aria-label="Portal em operação">
+            <div
+              className={`editorial-footer-status${source?.isFallback ? " is-fallback" : ""}`}
+              aria-label="Estado das fontes do portal"
+            >
               <span aria-hidden="true" />
               <div>
-                <small>Operação do portal</small>
-                <strong>Fontes identificadas por seção</strong>
+                <small>Estado dos dados</small>
+                <strong>{sourceStatus}</strong>
               </div>
             </div>
 
