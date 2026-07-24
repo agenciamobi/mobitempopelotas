@@ -78,9 +78,17 @@ const advisoryCopy = {
   },
 } as const;
 
-type RainLevel = "none" | "low" | "moderate" | "high" | "very-high";
+type RainLevel = "unknown" | "none" | "low" | "moderate" | "high" | "very-high";
 
-function rainReading(value: number) {
+function rainReading(value: number | null) {
+  if (value === null) {
+    return {
+      chance: null,
+      level: "unknown" as RainLevel,
+      label: "Probabilidade não informada",
+    };
+  }
+
   const chance = Math.max(0, Math.min(100, Math.round(value)));
 
   if (chance === 0)
@@ -180,22 +188,27 @@ export function HomeEditorialDashboard({
   const today = weather.daily[0];
   const hourly = weather.hourly.slice(0, 7);
   const nextDays = weather.daily.slice(1, 5);
-  const peakHour = hourly.reduce<(typeof hourly)[number] | null>(
-    (highest, hour) => (!highest || hour.precipitation > highest.precipitation ? hour : highest),
+  const hoursWithRainChance = hourly.filter((hour) => hour.precipitation !== null);
+  const peakHour = hoursWithRainChance.reduce<(typeof hourly)[number] | null>(
+    (highest, hour) =>
+      !highest || (hour.precipitation ?? -1) > (highest.precipitation ?? -1) ? hour : highest,
     null,
   );
-  const strongestHourlyGust = hourly.reduce(
-    (highest, hour) => Math.max(highest, hour.windGust),
-    weather.current.windGust,
-  );
-  const rainiestDayChance = nextDays.reduce((highest, day) => Math.max(highest, day.rainChance), 0);
+  const hourlyGusts = hourly
+    .map((hour) => hour.windGust)
+    .filter((value): value is number => value !== null);
+  const strongestHourlyGust = hourlyGusts.length > 0 ? Math.max(...hourlyGusts) : null;
+  const dayRainChances = nextDays
+    .map((day) => day.rainChance)
+    .filter((value): value is number => value !== null);
+  const rainiestDayChance = dayRainChances.length > 0 ? Math.max(...dayRainChances) : null;
   const forecastWindow =
     hourly.length > 1
       ? `${hourly[0].time} até ${hourly[hourly.length - 1].time}`
       : (hourly[0]?.time ?? "Horários indisponíveis");
   const laranjalTrend = trendLabel(laranjal.trendCmPerHour);
   const guaibaTrend = trendLabel(guaiba.trendCmPerHour);
-  const observationAvailable = observation.status !== "unavailable";
+  const observationAvailable = weather.current.available;
 
   return (
     <>
@@ -212,19 +225,23 @@ export function HomeEditorialDashboard({
           <dl className="home-today-facts" aria-label="Resumo do tempo de hoje">
             <div>
               <dt>Temperatura máxima</dt>
-              <dd>{today?.max ?? weather.current.temperature}°</dd>
+              <dd>{today ? `${today.max}°` : "—"}</dd>
             </div>
             <div>
               <dt>Temperatura mínima</dt>
-              <dd>{today?.min ?? weather.current.temperature}°</dd>
+              <dd>{today ? `${today.min}°` : "—"}</dd>
             </div>
             <div>
               <dt>Chance de chuva</dt>
-              <dd>{today?.rainChance ?? 0}%</dd>
+              <dd>
+                {today?.rainChance === null || !today ? "Não informada" : `${today.rainChance}%`}
+              </dd>
             </div>
             <div>
               <dt>Vento mais forte</dt>
-              <dd>{today?.windGust ?? weather.current.windGust} km/h</dd>
+              <dd>
+                {today?.windGust === null || !today ? "Não informada" : `${today.windGust} km/h`}
+              </dd>
             </div>
           </dl>
         </header>
@@ -245,14 +262,20 @@ export function HomeEditorialDashboard({
             <strong>{hourly.length} horários</strong>
             <span>{forecastWindow}</span>
           </div>
-          <div className={`rain-${rainReading(peakHour?.precipitation ?? 0).level}`}>
+          <div className={`rain-${rainReading(peakHour?.precipitation ?? null).level}`}>
             <small>Maior chance de chuva</small>
-            <strong>{peakHour?.precipitation ?? 0}%</strong>
+            <strong>
+              {peakHour?.precipitation === null || !peakHour
+                ? "Não informada"
+                : `${peakHour.precipitation}%`}
+            </strong>
             <span>{peakHour ? `por volta de ${peakHour.time}` : "sem horário disponível"}</span>
           </div>
           <div>
             <small>Rajada mais forte</small>
-            <strong>{strongestHourlyGust} km/h</strong>
+            <strong>
+              {strongestHourlyGust === null ? "Não informada" : `${strongestHourlyGust} km/h`}
+            </strong>
             <span>nas próximas horas</span>
           </div>
         </div>
@@ -260,12 +283,8 @@ export function HomeEditorialDashboard({
         <div className="home-hourly-story" aria-label="Tempo nas próximas horas">
           {hourly.map((hour, index) => {
             const rain = rainReading(hour.precipitation);
-            const isPeak = peakHour === hour && rain.chance > 0;
-            const className = [
-              `rain-${rain.level}`,
-              index === 0 ? "is-current" : "",
-              isPeak ? "is-rain-peak" : "",
-            ]
+            const isPeak = peakHour === hour && rain.chance !== null && rain.chance > 0;
+            const className = [`rain-${rain.level}`, isPeak ? "is-rain-peak" : ""]
               .filter(Boolean)
               .join(" ");
 
@@ -273,11 +292,11 @@ export function HomeEditorialDashboard({
               <article
                 className={className}
                 key={`${hour.time}-${index}`}
-                aria-label={`${hour.time}: ${hour.temperature} graus, ${rain.chance}% de chance de chuva e rajadas de até ${hour.windGust} quilômetros por hora`}
+                aria-label={`${hour.time}: ${hour.temperature} graus, ${rain.chance === null ? "probabilidade de chuva não informada" : `${rain.chance}% de chance de chuva`} e ${hour.windGust === null ? "rajada não informada" : `rajadas de até ${hour.windGust} quilômetros por hora`}`}
               >
                 <div className="home-hourly-story__topline">
                   <span>{hour.time}</span>
-                  {index === 0 ? <b>Agora</b> : isPeak ? <b>Maior chance</b> : null}
+                  {isPeak ? <b>Maior chance</b> : null}
                 </div>
                 <div className="home-hourly-story__weather">
                   <WeatherIcon name={hour.icon} title={`Tempo às ${hour.time}`} />
@@ -286,14 +305,18 @@ export function HomeEditorialDashboard({
                 <div className="home-hourly-story__rain">
                   <div>
                     <span>Chuva</span>
-                    <strong>{rain.chance}%</strong>
+                    <strong>{rain.chance === null ? "—" : `${rain.chance}%`}</strong>
                   </div>
                   <span className="home-hourly-story__bar" aria-hidden="true">
-                    <i style={{ width: `${rain.chance}%` }} />
+                    <i style={{ width: `${rain.chance ?? 0}%` }} />
                   </span>
                   <small>{rain.label}</small>
                 </div>
-                <span className="home-hourly-story__wind">Rajada de até {hour.windGust} km/h</span>
+                <span className="home-hourly-story__wind">
+                  {hour.windGust === null
+                    ? "Rajada não informada"
+                    : `Rajada de até ${hour.windGust} km/h`}
+                </span>
               </article>
             );
           })}
@@ -307,7 +330,11 @@ export function HomeEditorialDashboard({
           <div className="home-next-days__list">
             {nextDays.map((day) => {
               const rain = rainReading(day.rainChance);
-              const isRainiest = day.rainChance === rainiestDayChance && rain.chance >= 20;
+              const isRainiest =
+                rainiestDayChance !== null &&
+                day.rainChance === rainiestDayChance &&
+                rain.chance !== null &&
+                rain.chance >= 20;
 
               return (
                 <article
@@ -332,7 +359,7 @@ export function HomeEditorialDashboard({
                       <strong>{rain.chance}%</strong>
                     </div>
                     <i aria-hidden="true">
-                      <b style={{ width: `${rain.chance}%` }} />
+                      <b style={{ width: `${rain.chance ?? 0}%` }} />
                     </i>
                     <small>
                       {day.precipitation > 0
@@ -385,10 +412,10 @@ export function HomeEditorialDashboard({
       >
         <div className="home-observation-story__intro">
           <span className="eyebrow">Medições da Embrapa em Pelotas</span>
-          <h2 id="home-observation-story-title">Condições registradas agora</h2>
+          <h2 id="home-observation-story-title">Medição local mais recente</h2>
           <p>
-            A previsão indica o que pode acontecer. A estação da Embrapa mostra as condições medidas
-            neste momento.
+            A previsão indica o que pode acontecer. A estação da Embrapa fornece a observação local
+            quando existe uma leitura recente e verificável.
           </p>
           <Link href="/estacao-embrapa-pelotas">
             Ver dados completos da estação <span aria-hidden="true">→</span>
@@ -399,17 +426,29 @@ export function HomeEditorialDashboard({
           <div className="home-observation-story__reading">
             <div className="home-observation-temperature">
               <small>{observationStatusLabel(observation)}</small>
-              <strong>{formatNumber(observation.current.temperature)}°</strong>
-              <span>Sensação de {formatNumber(observation.current.feelsLike)} °C</span>
+              <strong>{formatNumber(weather.current.temperature)}°</strong>
+              <span>
+                {weather.current.feelsLike === null
+                  ? "Sensação não informada"
+                  : `Sensação de ${formatNumber(weather.current.feelsLike)} °C`}
+              </span>
             </div>
             <dl>
               <div>
                 <dt>Umidade</dt>
-                <dd>{formatNumber(observation.current.humidity, 0)}%</dd>
+                <dd>
+                  {weather.current.humidity === null
+                    ? "Não informada"
+                    : `${formatNumber(weather.current.humidity, 0)}%`}
+                </dd>
               </div>
               <div>
                 <dt>Vento agora</dt>
-                <dd>{formatNumber(observation.current.windSpeed)} km/h</dd>
+                <dd>
+                  {weather.current.windSpeed === null
+                    ? "Não informado"
+                    : `${formatNumber(weather.current.windSpeed)} km/h`}
+                </dd>
               </div>
               <div>
                 <dt>Chuva registrada hoje</dt>
