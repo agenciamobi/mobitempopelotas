@@ -54,7 +54,10 @@ test("o sitemap contém somente URLs canônicas e todas as rotas públicas", () 
 });
 
 test("nenhum arquivo rastreado publica domínios obsoletos", () => {
-  const trackedFiles = execFileSync("git", ["ls-files", "-z"]).toString("utf8").split("\0").filter(Boolean);
+  const trackedFiles = execFileSync("git", ["ls-files", "-z"])
+    .toString("utf8")
+    .split("\0")
+    .filter(Boolean);
   const offenders: string[] = [];
 
   for (const file of trackedFiles) {
