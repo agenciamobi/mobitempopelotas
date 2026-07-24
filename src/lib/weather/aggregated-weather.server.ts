@@ -398,10 +398,11 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     forecastProvider,
   } = deriveTraceability({ baseline, sources, confidence, hasWeatherData });
 
-  const normalizedCurrentSource: "embrapa" | ForecastSourceKey | null =
-    currentSource === "embrapa" || currentSource === "open-meteo" || currentSource === "met-norway"
-      ? currentSource
-      : null;
+  // Fonte do "agora" é EXCLUSIVAMENTE Embrapa. Sem observação válida → null.
+  const normalizedCurrentSource: "embrapa" | ForecastSourceKey | null = embrapaUsable
+    ? "embrapa"
+    : null;
+
 
   return {
     status,
