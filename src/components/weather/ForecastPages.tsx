@@ -23,6 +23,7 @@ import {
 
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import type { WeatherIconName } from "@/lib/weather/types";
+import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-browser-recovery";
 
 import "./ForecastPages.css";
 
@@ -126,7 +127,8 @@ function ForecastPageHeader({
 }
 
 export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
-  const weather = data.weather;
+  const recoveredData = useOpenMeteoIntelligenceRecovery(data);
+  const weather = recoveredData.weather;
   const current = weather.current;
   const today = weather.daily[0];
   const activeAlerts = weather.alerts.filter((alert) => alert.period === "active");
@@ -145,8 +147,8 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
       <ForecastPageHeader
         kicker="Previsão de hoje"
         title={title}
-        description={data.brief.summary}
-        data={data}
+        description={recoveredData.brief.summary}
+        data={recoveredData}
       />
 
       <section className="forecast-today-hero" aria-labelledby="today-summary-title">
@@ -295,9 +297,9 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
         <div className="forecast-guidance-grid">
           <article>
             <strong>Destaques</strong>
-            {data.brief.highlights.length > 0 ? (
+            {recoveredData.brief.highlights.length > 0 ? (
               <ul>
-                {data.brief.highlights.map((highlight) => (
+                {recoveredData.brief.highlights.map((highlight) => (
                   <li key={highlight}>{highlight}</li>
                 ))}
               </ul>
@@ -307,9 +309,9 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
           </article>
           <article className="forecast-guidance-caution">
             <strong>Pontos de atenção</strong>
-            {data.brief.cautions.length > 0 ? (
+            {recoveredData.brief.cautions.length > 0 ? (
               <ul>
-                {data.brief.cautions.map((caution) => (
+                {recoveredData.brief.cautions.map((caution) => (
                   <li key={caution}>{caution}</li>
                 ))}
               </ul>
@@ -329,7 +331,8 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
 }
 
 export function SevenDayForecastPage({ data }: { data: WeatherIntelligenceData }) {
-  const weather = data.weather;
+  const recoveredData = useOpenMeteoIntelligenceRecovery(data);
+  const weather = recoveredData.weather;
 
   if (weather.daily.length === 0) return <ForecastUnavailable />;
 
@@ -356,7 +359,7 @@ export function SevenDayForecastPage({ data }: { data: WeatherIntelligenceData }
         kicker="Previsão estendida"
         title="Previsão do tempo para os próximos 7 dias em Pelotas"
         description={`A semana varia entre ${minimum}° e ${maximum}°. Compare temperaturas, chuva e rajadas para planejar os próximos dias.`}
-        data={data}
+        data={recoveredData}
       />
 
       <section className="forecast-week-summary" aria-label="Resumo dos próximos sete dias">
