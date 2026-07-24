@@ -1,0 +1,169 @@
+name: Aplicar logotipos oficiais
+
+on:
+  push:
+    branches:
+      - agent/apply-official-logo
+
+permissions:
+  contents: write
+
+jobs:
+  apply-logo:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Gravar ativos oficiais e atualizar componentes
+        run: |
+          mkdir -p public/brand
+
+          cat <<'B64' | base64 --decode | gzip --decompress > public/brand/tempo-pelotas-primary.svg
+H4sIANTOYmoC/+1cS5bdOHLdCk/WpD3gE/EH+pRq4BV44A3ITyll2imlTjI7VUcjL8I78FK8E6/EgXsDAaa6y+52lY9rwEFnQXwkCATic+NGsH/cXz4u14f7L+vTnx5u397cvtx+fnz//mb5cP/w8P21/fnp8V9u14f7z7fXd1/e3jw9/unz68v//Hj/+fvrn+6fb58e7uU/b2/8zfJy+7TfP8pd7uLkX/e3X//+8ee3N9uyLW7LLS4uJbnt508Pf9y/vLvK+7883e63Ty+3uPh5f3tz9/z85Y9v3nz9+vXyNVwenz6+8du2vZGt3Pz04/P988PtT/94++nL4/IPtw+Pz+/25T//9d/w3v/498flev/u8+OPb3jbjx+X56d3n/cPj0+f3t5g+PDu+fYPq0vOXfyyhuDSJf/dzXd3fnr3/HT/8x9crpeaF6ydw7XGWmtY1lRSca0/+OXd893yXp5JWwxLiL5d0nW7uIAHLz7Jfy9bkj/9ysWlvf/pQ+/iMsby3Iu7hOav/SF5eO0PeU6w2l15l7H3+txqc+a71V1qyy/pEn3kHMn3OSLeVPsUofYpasQcW55zRD8nSS1fV11+vy9hIbwL69g5FdaRbRxKfZAba1xlBQEzyV7wgOdEpXJLvJlbwlyJWxrDkF9WlcRYBxfgE5eJtdTd3h+7NHTKGO+y7LZ+o4a/vfn8+Pl2qOrbmx/SB//+duru1/v3z3dvby6b+/LzzZvzLH/fZ/mDq//0/vraecn5frt9euyH9+bj32DFbQv+l6y4XPrZB3fJL9ulFX8XuqS7HvhKPYCQqQcqbyjCgn0sOpRtiBpsMb5SA2gBRQYloBZQe7KfJ5j93Yr39jlylTWI33yli9HWkOLrNQRbQutPB1XEGG0FZZ2L5ALqXECKYwHiG3N8rUKcI/K+FffNkw/z5GXza5Hjizz65O3oS13mTTvebavhlOmOL/7rdvs/SdwfRJ4PMvcHkdcpchHzb+A9Th06dej/wGt5/0teK/lL7RpXLrELLcVKoTkIDf7eu75COFrfYt97hdPF5sOm4zsJPvna/T+k5jKkhrP1egJ4FvvdCgSJrbv44OX4/OIvUX70IpLV9wDSJ2uQY8UsG4IPPL0bwcPUAvEwOh3LYjI0tm9j0S1s0G7ZArezjy246pcxll9fVAq4hvCJk8bLPXcMrasmlcBRD3h5q1e90aIjpahr9nkGT5Ujg+cmMS/KDvJDj5tDHJiMQIGhHttHpMxcDaOmvi9w/9li9UYbc4134Tihj97hPbWLWgwdb/7Le3bNjnnD2VXMVdpBK9pBAo4xvz8GETjMB6vd8GTAGzCLnOw6ZnGHcfj1rvRU7FOxf8+K/Zv69yhn/Jf9exYB0AwSzECg/QFT54mp6wxGrq3Q0C6qHAxfRx3eeZkmXR00RU5zKwHnGGScIb3cDaKFsDg1iFZl2GLAQXQI7W9XKNeSOfByMFGvbcGu+jKGoTiaX2ur3qiKAG2RtKv/mizLcaotUaKzu4iEurYUBN4qCYhkFyIBhwzJdfPqc6SuM5vDUIK5LwpeClVkaqVHRhUjJpWYPuSXmVHVri5UlhqhLFTf2O+JWbMUqi/9kLexHMG3T17+kQUPFBG2rFpMrwuAcKTQFZS+Qwy9czsW3+fWfXTs6HDQoazD2+SI44Y2VmomXulq1+SI67Ln/usY3/WZGhxWoMPhJjb1ohhLtua7AeN9G43AZduw/f31Pv1U5lOZf2/K/Jv68RTaL/jx4pkZihyxtNKg6BLnnChKl1RqHV6IrKGu/dC2rhR58wjfvmsO4pTcuPBQOO4TZE4m1wWNLOO6h2RawDSVk9mPcdO32mQOlpH89y/pQR/LWQ/zQFNt2fbWdUzgEMJtldzPqluzTdmPtjU+9O1TFnPHPBuBX4gzLmfoDn5uETgidq1J0PuCWXOjCRiuaFExxhX5J3FJhkPYAHcaTEdu6PMlGGfUqRadj94pY6kct6jIo1/P3jBlQ6YZWoUfwK+cpb8jw8LlTcvhrd2qNGPNIOy6ds1V730e+BAc29gk3SJRlw3l5b/eV58Keyrs/4fC/i/9cbjEwqiw6HB1MeW6rDmm7ZUzzsWXS158CxJ41yx/tiJOu8t4laTvUpaQ5GDrUoKEW9HFfKkSdX2STbRFsgQJmGvHMBIEiyCalJaaJNY0eXNLYgLOX4pMLE83mUsmlEjYCHPkbT6WVe7IkpvUcmmbQAh5bktLBvDIRe73S5U55JceXNPixQhlRzFJYMxLFMgjT8kcW3BLqZKalL4NJ2mkrjwR8MjCJdvJXfFD38221TXUHo7x2yLG3V9Vethci5M3SiTvATMuNVyqWE5JIoI19F3KfHJNwJcuo/+UIBUnshRlSqusXUyp9bgu/5EXiZanKNmfgD0n4E3wX6iyK5FgCnv/KUqEFoEKXlvljYIMV99xoei8TLmJP4ld+dbU5+rYqd8nIuyLEYCxejHeAijkukDkFIBq/HG8yz/kRSI+wRKyoH6AIm2RteCAhy642A8+ylnIb/UiJyjyrpJjJnmTgBIRnA/tzxXUnOrrC68qo7K+752tutpfBBYi7OAILDgstcZLErGLePMrTXYOHgN/r+sw641AqoAdqQGeB8QtvACwNhxexN0RNGaJdAh5+pIAp1Vg1XLeZA/gPBKhG+gKgkhQpiBzo0GxTE9DqmDr/1iNSHaG/bYAQhUgH9A2koEAMPUVzgQojq6NBSwcLPleONBGj0uel1ewuNIdtat+V9q6ZN2wXAV5QV4mY48Z+wVjkIAYEzxdgTQphkTyGpNXwGiKiktBgGQNq4Hj6TJF5a6vS/0zxhn8EETuEIc011HyCbGRx6TuEqdKsmUMQyAtQkALIqo2Rpke+yBWrjQzHUiHVbOMCHnLlTFLyrMoWTcdX8f0OJW4IgUCf0LsTRqH/zjg+C0y5yBhU3hskCHrjpGyxdPM7iLVFhJCnFhGOrMF1UGTFzkuBCtXr7rAZVA1FGkfQM5cW6OYVyt0VFNolg48l+qi3QJuyvt+ltwBC8EJSphwfMhWKlLM1IcZobNAEM31JzdE+o1FCNzOLZLzEq+Icw44oYptdvWkdRXX0VYtBfdUmz8WqDDUJWOce00D6VVFUJfF9HyyLoPro5ESWSSHJMrHQaiRQ6N46xgKAlyqZsHwsRu1Bgq4W6oOjQyF4BB4wg/1DYYudMvIWumkfLmuOrsuBIt1WqHmqbC8BMPBWUAPKjLHAGPL3E1XeLo0HH2D8xC17+BQWT9WmOF9POXGGVtPXdMspGUYMLnYlvMgdpMygTPnZW2orUM9g7hgbGjsivQvi/tUttAdEfgMFp7IvIY2qmoB6hXxqlR4BzyduencyB2PbF4Pl2YSVC+p9Mzf52tig6GQb03gRSteSmzHtFs27NW+XeHZVFvY1oBZ6dYb+VVvmpk03YfzcH0NMVPxcFIIPlD2PBoBBiviUZwEwu0/a4wBOeJZ7+uzBVotJMT6ZDY2X+uejb44G6UetznuIXIzHdiwqswsomYoAUt7MNRc7WQay7fklsls013gRhh9BGfv2yzBxo12BjNLpgdbZJxzNC/4gmRROjaG3QBsXxhXBJ14Fn5x/hCLuohAlC+wDU79EJsTJoWaVKCAzJyjRaPJy6a2eF2VT6FU7PwFYXZXv2vNdrj9Teyjj5VQMnolwN+WQwBnbbcZye9pt8rXs/nE6KBOZVXTPC0YO7WogR8AU+mYjKfnODFcaA0HSlnIKe5g95dxZ/KqvcoiDWPVopBfRjSS8Z3mchfPOJ42DXILwqMWMVDvgG4wu8IGopWItNGnRMuEWAthzQmYxvtZsIApvPLM0VyzN88sqx2emXEl0KUuY0ks40/LoPPH9tQTwncQt9GOsv0mB3V9/RIKzU0jk/HO64MnHZdVXKPuxWjtLHwzMXT4kedC957rdKRuQgKqEjscVKsOqIQ1ONKOdaoSvTZVPrR1VPPLQCfW0tRbJMxkK0NjpzKjJ5QtHUk5AEeQuNXVvy2WHEJJsRphCt5Cif+rIkkg0iIKXAd+5K6c9ih4Lff5XK0Pg84441URxpYtF+/O92oMaSxT1+gkWsJ6WZ7ki2g5DTGj4Bhg7kAnXAxhQIBWF7pq8EWSkfR4AEeRcQ+xNsw1wSMkYOd5Q1LABVxblBXpyqVl3FDoEOCDDZKMaAs18jQ25iaL9cvBFoKG6EN/CPmPq8mhsvxAtZs9NmI1+2BgCH60SphgNXE6qzJLxIRVTv3NBD4H+jofhlG9GQ2JmYDZNsqeMCnP+jCzBp7C3DLB8WLmQwQmquSHy1tVfor5ymEvcToqlw030qeC0fdZiw4DnxTapFPYAnWE28iB92QCqp0JHX5g9RmIDVYaZxbA8Ez7UOem6QaB+XdQq1qbJJqDevDZlL7zPG9gI67C1wkVuYMcySEAr1TzR8VPtIV9KdpKcaKtEP87tHVw5JqnHUK/X8LIpeg9a4IHItoHjiImLsO4A/xMwo6Yrkoc6qkHwws0pdGciiEtHGAjZnHMwFgvQdLLLD5Ua3N1LZr1BE0E6kw98zxfKg/3lY7ZomedSWwhzvBN9d5Xk4o71GMAHuCt9Ee6dnq4bd6uuaX64UbUAphGJ5Waboe+n90Z+IEFMzY8pKkEuIVKwDQ7bLP2yOuMfkBx9COMF6puoY4OMhkekn4FHfS91bpMgqJnkgzL0PQweugGukUs9366MFwQp3cdybYuS+nWuTnGBhIntJaBu5AnW07O3uKR9I5ukaGmk0bi1jjdbrqrwYiR9hBIklVy+RbtyYhxAiulOrJdIULiLXx+EiOQ1BDyPpxBz521FOuUmYIeMwi1A98cmGWA1YqMK+DWGX4zsACroadsGCsrISnMbDdXRn1I5NQDnQXMIfkDU2b+pCurU/+tsMM3QluSIGw+UVxC+iwQ8TT6zNmdQzI/WytNaMPUsIFi3TzDHoOVcjUaZW+wynkWz5l6eHMMJOMj91qZsOUpAyZ7ecrAs8EzZLJDmRshbVjUvPZ1BM5SlRfq9e40gRQr2r6RiZkpI9P/QJODhBMLQBtBG61iMAAAH6sGdrKMsahiQfIbF0l0yPAdyYgmXSRTvjxYRYk+15kNiREFy4yijZ3aX7RFRrh4VjgwrNoZm5cxfa6j9tSBYbWx+s3IVoJUrSAkIX5fB4NLeIV8K6XZkJ+qpjDryFk3poXEFEi4YpytugXJ2gY0wdo9DdZPAgjMlQ/zK4NEh4Ln6yHaKQiNZjWRWoJzETlSfSgAaxBL8EuRvW8UeLVjjKUab1K8etrr0GDLHUmgKIymjBpd3KSS0efFNZOpoArEQOMHqeGys8MMCJsuaSsbrjPFgU1VOmJ0OMAZcR9qQVQBnydjgyydbGydt5Cl6Oneb33uDpoJ/eSw9L+mx+7bJ5cutZZuhaVRBMwRYSVIGnFKAVElgVR0jPV5KlSgG0JYSoSZUCEmlqA8CinXNCnPOLM834xzpFsVL7wPxl/D5jbHXQut00az0QctQHYvOMEWM3myNdUiGhEhpUQ8w7Hb/GgrHTjENeaSR9fgxxWlL5rFjXUk95xPf9ePfDR5z9OxeLptOqEwmfMMKQMAOidntLoqvxdMUq72JRAdXczGl6bq19E0GpPGDkOHxAsTvwZtvvemngnZDINACLO5kr5Tv9khxTBbN1O1bknntHPyVac/VZK2EBUZ7oO09XTODLTjIjNxXMz0I9CYZDOU2ivs6Ory2JRWCJLW3L2RMmEj+cgiUSXIXS3ax0MfUNuqegUxBpjdAD+Utzv6OEJFrVioq4o2loMgvdiMkJJr1RJOGX/7BHgQOui6zk5my0xZ4anzo5CBdY6loesM6NHIdOJSGpnfDr48zqIgNxQO1BmP1VuSioCgMdmxI0zLTYaMiPUIPZWAbpOAVTRdOtCNdHDYGB24FlKIr6mOUDsMk0dFI8EHONAH0BUHBPVCHoWW6qe1EdoyTdBPM5i867dommBiW6ayfkgCrveQQdCdloO6MjZBM4j06JJGShmN8tBa5AhwZNZEJb59qr1kzozCfNSrHnafrVgg79sHn+q9+SjNtrRelO0jGlrq6Fcmr08Fjsev9oLXutms7G4K6IwjYnpU+CkhDiTDLxHnNdJkeJa2FIHIeV1p9+Rt45yHjltTSAIk5iBG1ubvvinaLU4fmuYHp6RJjHkueijW6KArvD2ShiG/nGdykw6EH+t17J5MWgSvLFug3TEvoVevryQnGX2M+WUNcTt+fuS9eQl+kqCdjNUQajjSR0atyFR3jCMskRsDvlVTcadtpXcYEy1UhQvTgOlpBBvts4eW9Iqnf4nXaeaMRHAixkSKjr0oL65NsSPabHUmbbHLjXBBMwmdUAJWb7iIvQVL9MdYAAvKk71XFxQsR1yHiSHEaNBv+8x92EwK4ZX5mUCe3xIQ59FNhZkKpXaABdx6NU6RcD+5fQR8VRAUX4xvohfq87tBGWO6qv4OdZicr6OY3iCb3kfWX4iu3e7vZWxHq2Jh+jdrGnk6YwooV8vdlKCbbt9cvpKD24EdHP7bKBvtJyCMj/lQp/WDIQx1BhGEGL2blGCth0/nSCAhOmy8bkEjuathlEEHUG3mRzmecYWFTpfNSLMWSzB9m58StpBH/wpv6WkEinVXK/7EUW/WRF7bJVgGjdY/ELSV4Ni+rKk3ZsTkKOcgDFSrCbA1jui8jGCv7Y4arZDoIVgNr8bsuRp6JC2n2KexLw6IQ0sQkbnuqrEk0nqJ7pJBfoe8OWq5rnLXyZt2auDSpgJ2Tx98I+NWztadk6rlzJPKzfRHjGFxsLdu5IAepRBqLc2XpDGTMa+piSYuw4NxAQy97KUI5EyxfRQS1CJn909TsgIGt43c0KlakvPMUM5GUidbth1hfcRnfadOFdKj+ZQncVVCAc8vdEZOScOA+lZRyNdL1SDca2KoQ5DDH9SFtL1qGfbvexEpaX9OoqdzffJtfKqPtjW2WrE6xD53W3OBJhc01eodxKvZpBBIHJbXvBJJVe6bTaesZXlySdFSlE5QT0Y4a3rq6JkkoeuA+FDJ4rlh25My0zinRfE8vkMTge2DnuvBanw0MXK1Q9kyW6ViIzFejdfbfvFz7O/a7UYPc27f9TCf3XFnd9zZHXd2x53dcWd33Nkdd3bHnd1xZ3fc2R13dsed3XFnd9zZHXd2x53dcWd33Nkdd3bHnd1xZ3fc2R13dsed3XFnd9zZHXd2x53dcWd33Nkdd3bHnd1xZ3fc2R13dsed3XFnd9zvuDvuhw8fPoz/Qzn8b3/5+NN/AY2LLL8BbAAA
+B64
+
+          cat <<'B64' | base64 --decode | gzip --decompress > public/brand/tempo-pelotas-purple.svg
+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
+B64
+
+          cp public/brand/tempo-pelotas-primary.svg public/brand/tempo-pelotas-header.svg
+
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace_once(path: str, old: str, new: str) -> None:
+              file = Path(path)
+              content = file.read_text()
+              if old not in content:
+                  raise SystemExit(f"Bloco esperado não encontrado em {path}")
+              file.write_text(content.replace(old, new, 1))
+
+          replace_once(
+              "src/components/layout/Header.tsx",
+              '''              <span className="production-brand-wordmark">
+                <strong>TEMPO</strong>
+                <em>Pelotas</em>
+              </span>''',
+              '''              <img
+                className="production-brand-logo"
+                src="/brand/tempo-pelotas-header"
+                alt=""
+                width={10694}
+                height={1552}
+                draggable={false}
+              />''',
+          )
+
+          header_css = Path("src/components/layout/Header.css")
+          content = header_css.read_text()
+          pattern = re.compile(
+              r'''\.production-brand-wordmark \{.*?\}\n\n\.production-brand-wordmark strong \{.*?\}\n\n\.production-brand-wordmark em \{.*?\}''',
+              re.S,
+          )
+          replacement = '''.production-brand-logo {
+            display: block;
+            width: clamp(132px, 12vw, 166px);
+            height: auto;
+          }'''
+          content, count = pattern.subn(replacement, content, count=1)
+          if count != 1:
+              raise SystemExit("Estilos antigos da marca do header não encontrados")
+          header_css.write_text(content)
+
+          replace_once(
+              "src/components/layout/Footer.tsx",
+              '''              <strong>TEMPO</strong>
+              <em>Pelotas</em>''',
+              '''              <img
+                className="editorial-footer-brand-logo"
+                src="/brand/tempo-pelotas-header"
+                alt=""
+                width={10694}
+                height={1552}
+                loading="lazy"
+                draggable={false}
+              />''',
+          )
+
+          footer_css = Path("src/components/layout/Footer.css")
+          content = footer_css.read_text()
+          pattern = re.compile(
+              r'''\.editorial-footer-brand \{.*?\}\n\n\.editorial-footer-brand strong \{.*?\}\n\n\.editorial-footer-brand em \{.*?\}''',
+              re.S,
+          )
+          replacement = '''.editorial-footer-brand {
+            display: inline-flex;
+            width: fit-content;
+            max-width: 100%;
+            align-items: center;
+            border-radius: 10px;
+            color: var(--footer-ink);
+          }
+
+          .editorial-footer-brand-logo {
+            display: block;
+            width: clamp(210px, 24vw, 330px);
+            max-width: 100%;
+            height: auto;
+          }'''
+          content, count = pattern.subn(replacement, content, count=1)
+          if count != 1:
+              raise SystemExit("Estilos antigos da marca do footer não encontrados")
+          footer_css.write_text(content)
+
+          replace_once(
+              "src/production/components/site-header.tsx",
+              '''              width={11349}
+              height={1552}''',
+              '''              width={10694}
+              height={1552}''',
+          )
+
+          replace_once(
+              "src/production/components/site-footer.tsx",
+              '''                width={900}
+                height={180}''',
+              '''                width={10694}
+                height={1552}''',
+          )
+
+          Path("public/brand/README.md").write_text('''# Identidade Tempo Pelotas
+
+- `tempo-pelotas-primary.svg`: assinatura principal em ciano.
+- `tempo-pelotas-purple.svg`: variação institucional em roxo.
+- `tempo-pelotas-header.svg`: alias compatível da versão principal usado pelo portal.
+
+As três versões preservam desenho vetorial e fundo transparente. A assinatura ciano é a aplicação padrão nos cabeçalhos e rodapés.
+''')
+          PY
+
+          npx prettier --write \
+            src/components/layout/Header.tsx \
+            src/components/layout/Header.css \
+            src/components/layout/Footer.tsx \
+            src/components/layout/Footer.css \
+            src/production/components/site-header.tsx \
+            src/production/components/site-footer.tsx \
+            public/brand/README.md
+
+      - name: Commitar aplicação da marca
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/brand src/components/layout src/production/components/site-header.tsx src/production/components/site-footer.tsx
+          git commit -m "brand: aplica logotipos oficiais do Tempo Pelotas"
+          git push origin HEAD:agent/apply-official-logo
