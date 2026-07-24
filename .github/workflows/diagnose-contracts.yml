@@ -1,0 +1,46 @@
+name: Diagnóstico temporário dos contratos
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    if: github.head_ref == 'agent/canonical-domain-seo' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/canonical-domain-seo
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Capturar contratos
+        run: |
+          set +e
+          npm run test:contracts > /tmp/contracts.log 2>&1
+          status=$?
+          set -e
+          {
+            echo "exit=$status"
+            tail -n 160 /tmp/contracts.log
+          } > contract-diagnostics.txt
+
+      - name: Salvar diagnóstico
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add contract-diagnostics.txt
+          git commit -m "chore: registra diagnóstico temporário dos contratos"
+          git push origin HEAD:agent/canonical-domain-seo
