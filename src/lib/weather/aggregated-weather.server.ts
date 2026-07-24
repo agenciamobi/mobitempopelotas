@@ -1,7 +1,7 @@
 import { fetchOfficialWeatherSources } from "./official-sources.server";
 import type { EmbrapaObservation } from "./official-sources.types";
-import { fetchPelotasWeather } from "./weather-baseline.server";
-import type { CurrentWeather, DailyForecast, WeatherHomeData } from "./types";
+import { fetchPelotasWeather, type WeatherBaselineData } from "./weather-baseline.server";
+import type { CurrentWeather, DailyForecast, ForecastSourceKey, WeatherHomeData } from "./types";
 import type {
   AggregatedCurrentField,
   AggregatedCurrentProvenance,
@@ -37,7 +37,13 @@ const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
   embrapa: "Embrapa",
   inmet: "INMET",
   cppmet: "CPPMet",
-  "open-meteo": "Modelo meteorológico",
+  "open-meteo": "Open-Meteo",
+  "met-norway": "MET Norway",
+};
+
+const FORECAST_PROVIDER_LABELS: Record<ForecastSourceKey, string> = {
+  "open-meteo": "Open-Meteo",
+  "met-norway": "MET Norway",
 };
 
 function clockToMinutes(value: string | null) {
@@ -105,10 +111,13 @@ function createCurrentFromObservation(observation: EmbrapaObservation): Aggregat
   };
 }
 
-function baselineProvenance(current: CurrentWeather | null): AggregatedCurrentProvenance {
+function baselineProvenance(
+  current: CurrentWeather | null,
+  key: ForecastSourceKey,
+): AggregatedCurrentProvenance {
   if (!current) return {};
   return Object.fromEntries(
-    CURRENT_FIELDS.map((field) => [field, "open-meteo"]),
+    CURRENT_FIELDS.map((field) => [field, key]),
   ) as AggregatedCurrentProvenance;
 }
 
@@ -191,6 +200,7 @@ function compareCurrentSources(
   baseline: CurrentWeather | null,
   observation: EmbrapaObservation,
   usable: boolean,
+  referenceKey: ForecastSourceKey,
 ) {
   const discrepancies: WeatherDiscrepancy[] = [];
   if (!baseline || !usable) return discrepancies;
@@ -198,7 +208,7 @@ function compareCurrentSources(
   addDiscrepancy(discrepancies, {
     scope: "current",
     field: "temperature",
-    referenceSource: "open-meteo",
+    referenceSource: referenceKey,
     comparisonSource: "embrapa",
     referenceValue: baseline.temperature,
     comparisonValue: observation.current.temperature,
@@ -209,7 +219,7 @@ function compareCurrentSources(
   addDiscrepancy(discrepancies, {
     scope: "current",
     field: "feelsLike",
-    referenceSource: "open-meteo",
+    referenceSource: referenceKey,
     comparisonSource: "embrapa",
     referenceValue: baseline.feelsLike,
     comparisonValue: observation.current.feelsLike,
@@ -220,7 +230,7 @@ function compareCurrentSources(
   addDiscrepancy(discrepancies, {
     scope: "current",
     field: "humidity",
-    referenceSource: "open-meteo",
+    referenceSource: referenceKey,
     comparisonSource: "embrapa",
     referenceValue: baseline.humidity,
     comparisonValue: observation.current.humidity,
@@ -231,7 +241,7 @@ function compareCurrentSources(
   addDiscrepancy(discrepancies, {
     scope: "current",
     field: "pressure",
-    referenceSource: "open-meteo",
+    referenceSource: referenceKey,
     comparisonSource: "embrapa",
     referenceValue: baseline.pressure,
     comparisonValue: observation.current.pressure,
@@ -242,7 +252,8 @@ function compareCurrentSources(
   addDiscrepancy(discrepancies, {
     scope: "current",
     field: "windSpeed",
-    referenceSource: "open-meteo",
+    referenceSource: referenceKey,
+
     comparisonSource: "embrapa",
     referenceValue: baseline.windSpeed,
     comparisonValue: observation.current.windSpeed,
@@ -298,6 +309,7 @@ function dailyWeekdayKey(day: DailyForecast) {
 function compareDailyForecasts(
   daily: DailyForecast[],
   officialForecast: AggregatedWeatherData["officialForecast"],
+  referenceKey: ForecastSourceKey,
 ) {
   const discrepancies: WeatherDiscrepancy[] = [];
   const dailyByWeekday = new Map(daily.map((day) => [dailyWeekdayKey(day), day]));
@@ -309,7 +321,7 @@ function compareDailyForecasts(
     addDiscrepancy(discrepancies, {
       scope: "daily",
       field: "minimum",
-      referenceSource: "open-meteo",
+      referenceSource: referenceKey,
       comparisonSource: "cppmet",
       referenceValue: baselineDay.min,
       comparisonValue: officialDay.minimum,
@@ -321,7 +333,7 @@ function compareDailyForecasts(
     addDiscrepancy(discrepancies, {
       scope: "daily",
       field: "maximum",
-      referenceSource: "open-meteo",
+      referenceSource: referenceKey,
       comparisonSource: "cppmet",
       referenceValue: baselineDay.max,
       comparisonValue: officialDay.maximum,
@@ -366,8 +378,22 @@ function confidenceFromScore(score: number): WeatherConfidence {
   return "low";
 }
 
+function createProviderHealth(
+  provider: WeatherHomeData,
+  key: ForecastSourceKey,
+): WeatherSourceHealth {
+  return {
+    source: key,
+    status: provider.status,
+    role: "forecast",
+    fetchedAt: provider.source.fetchedAt,
+    usable: provider.status === "live" && provider.daily.length > 0,
+    reason: provider.message,
+  };
+}
+
 function createSources(
-  baseline: WeatherHomeData,
+  baseline: WeatherBaselineData,
   observation: EmbrapaObservation,
   official: Awaited<ReturnType<typeof fetchOfficialWeatherSources>>,
   observationAgeMinutes: number | null,
@@ -379,14 +405,8 @@ function createSources(
     observationAgeMinutes > OBSERVATION_MAX_AGE_MINUTES;
 
   return {
-    "open-meteo": {
-      source: "open-meteo",
-      status: baseline.status,
-      role: "forecast",
-      fetchedAt: baseline.source.fetchedAt,
-      usable: baseline.status === "live" && baseline.daily.length > 0,
-      reason: baseline.message,
-    },
+    "open-meteo": createProviderHealth(baseline.providers["open-meteo"], "open-meteo"),
+    "met-norway": createProviderHealth(baseline.providers["met-norway"], "met-norway"),
     embrapa: {
       source: "embrapa",
       status: embrapaIsStale ? "stale" : observation.status,
@@ -417,8 +437,10 @@ function createSources(
 }
 
 function buildNotes(options: {
-  currentSource: "embrapa" | "open-meteo" | null;
+  currentSource: "embrapa" | ForecastSourceKey | null;
   forecastProvider: string;
+  selectedForecastKey: ForecastSourceKey;
+  usingContingency: boolean;
   sources: Record<WeatherSourceKey, WeatherSourceHealth>;
   discrepancies: WeatherDiscrepancy[];
 }) {
@@ -426,8 +448,21 @@ function buildNotes(options: {
 
   if (options.currentSource === "embrapa") {
     notes.push("Condições atuais priorizam a medição local da Embrapa.");
-  } else if (options.currentSource === "open-meteo") {
+  } else if (options.currentSource) {
     notes.push(`Condições atuais usam ${options.forecastProvider}.`);
+  }
+  if (options.usingContingency) {
+    notes.push(
+      "Open-Meteo não respondeu; a previsão foi assumida pela contingência do MET Norway.",
+    );
+  } else {
+    const contingencyKey: ForecastSourceKey =
+      options.selectedForecastKey === "open-meteo" ? "met-norway" : "open-meteo";
+    if (!options.sources[contingencyKey].usable) {
+      notes.push(
+        "Contingência do MET Norway indisponível no momento; Open-Meteo segue como fonte ativa.",
+      );
+    }
   }
   if (options.sources.embrapa.status === "stale") {
     notes.push("A leitura da Embrapa foi preservada como contexto, mas não substituiu o modelo.");
@@ -461,6 +496,9 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     fetchOfficialWeatherSources(),
   ]);
 
+  const selectedForecastKey: ForecastSourceKey = baseline.source.key;
+  const usingContingency = selectedForecastKey === "met-norway";
+
   const observation = official.embrapa;
   const observationAgeMinutes = getObservationAgeMinutes(observation);
   const embrapaUsable = canUseEmbrapaObservation(observation, observationAgeMinutes);
@@ -469,7 +507,7 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     : embrapaUsable
       ? createCurrentFromObservation(observation)
       : null;
-  const currentProvenance = baselineProvenance(baseline.current);
+  const currentProvenance = baselineProvenance(baseline.current, selectedForecastKey);
 
   if (current && embrapaUsable) {
     applyEmbrapaObservation(current, currentProvenance, observation);
@@ -486,8 +524,8 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
   });
 
   const discrepancies = [
-    ...compareCurrentSources(baseline.current, observation, embrapaUsable),
-    ...compareDailyForecasts(baseline.daily, official.cppmet.items),
+    ...compareCurrentSources(baseline.current, observation, embrapaUsable, selectedForecastKey),
+    ...compareDailyForecasts(baseline.daily, official.cppmet.items, selectedForecastKey),
   ];
   const sources = createSources(
     baseline,
@@ -496,9 +534,13 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     observationAgeMinutes,
     embrapaUsable,
   );
-  const degradedSources = (Object.keys(sources) as WeatherSourceKey[]).filter(
-    (source) => sources[source].status !== "live" || !sources[source].usable,
-  );
+
+  const contingencyKey: ForecastSourceKey =
+    selectedForecastKey === "open-meteo" ? "met-norway" : "open-meteo";
+  const degradedSources = (Object.keys(sources) as WeatherSourceKey[]).filter((source) => {
+    if (source === contingencyKey) return false;
+    return sources[source].status !== "live" || !sources[source].usable;
+  });
   const score = calculateQualityScore({
     baseline,
     embrapaUsable,
@@ -511,9 +553,20 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
   const hasWeatherData = current !== null || hourly.length > 0 || baseline.daily.length > 0;
   const status: AggregatedWeatherData["status"] = !hasWeatherData
     ? "unavailable"
-    : degradedSources.length === 0 && confidence === "high"
-      ? "live"
-      : "degraded";
+    : usingContingency
+      ? "degraded"
+      : degradedSources.length === 0 && confidence === "high"
+        ? "live"
+        : "degraded";
+
+  const normalizedCurrentSource: "embrapa" | ForecastSourceKey | null =
+    currentSource === "embrapa" || currentSource === "open-meteo" || currentSource === "met-norway"
+      ? currentSource
+      : null;
+  const forecastProvider =
+    baseline.status === "live"
+      ? (baseline.source.name ?? FORECAST_PROVIDER_LABELS[selectedForecastKey])
+      : null;
 
   return {
     status,
@@ -528,17 +581,17 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     quality: {
       score,
       confidence,
-      currentSource:
-        currentSource === "embrapa" || currentSource === "open-meteo" ? currentSource : null,
-      forecastSource: baseline.daily.length > 0 ? "open-meteo" : null,
-      forecastProvider: baseline.status === "live" ? baseline.source.name : null,
+      currentSource: normalizedCurrentSource,
+      forecastSource: baseline.daily.length > 0 ? selectedForecastKey : null,
+      forecastProvider,
       degradedSources,
       observationAgeMinutes,
       discrepancies,
       notes: buildNotes({
-        currentSource:
-          currentSource === "embrapa" || currentSource === "open-meteo" ? currentSource : null,
-        forecastProvider: baseline.source.name,
+        currentSource: normalizedCurrentSource,
+        forecastProvider: forecastProvider ?? FORECAST_PROVIDER_LABELS[selectedForecastKey],
+        selectedForecastKey,
+        usingContingency,
         sources,
         discrepancies,
       }),

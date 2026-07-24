@@ -21,7 +21,8 @@ const sourceLabels: Record<WeatherSourceKey, string> = {
   embrapa: "Embrapa Clima Temperado",
   inmet: "INMET",
   cppmet: "CPPMet / UFPel",
-  "open-meteo": "Modelo meteorológico",
+  "open-meteo": "Open-Meteo",
+  "met-norway": "MET Norway",
 };
 
 function formatDateTime(value: string | null) {
