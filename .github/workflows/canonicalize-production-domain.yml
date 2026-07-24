@@ -72,13 +72,16 @@ jobs:
           path.write_text(before + replacement + after, encoding="utf-8")
           PY
 
-      - name: Validar ausência de domínios obsoletos
+      - name: Restaurar workflows para atualização separada
+        run: git checkout -- .github/workflows
+
+      - name: Validar ausência de domínios obsoletos fora dos workflows
         run: |
-          if git grep -n 'lovable\.app'; then
+          if git grep -n 'lovable\.app' -- ':!.github/workflows/**'; then
             echo 'Foi encontrada referência ao domínio de plataforma.' >&2
             exit 1
           fi
-          if git grep -n 'www\.tempopelotas\.com\.br'; then
+          if git grep -n 'www\.tempopelotas\.com\.br' -- ':!.github/workflows/**'; then
             echo 'Foi encontrada referência à variante www.' >&2
             exit 1
           fi
