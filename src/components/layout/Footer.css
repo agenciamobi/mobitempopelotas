@@ -134,6 +134,11 @@
   box-shadow: 0 0 0 6px rgba(35, 135, 91, 0.1);
 }
 
+.editorial-footer-status.is-fallback > span {
+  background: #c56a25;
+  box-shadow: 0 0 0 6px rgba(197, 106, 37, 0.11);
+}
+
 .editorial-footer-status div {
   display: grid;
   gap: 4px;
