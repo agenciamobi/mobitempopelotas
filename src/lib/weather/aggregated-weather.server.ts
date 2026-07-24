@@ -38,106 +38,16 @@ function clockToMinutes(value: string | null) {
   const match = value.match(/^(\d{1,2}):(\d{2})$/);
   if (!match) return null;
 
-  const hours = Number(match[1]);
-  const minutes = Number(match[2]);
-  if (hours > 23 || minutes > 59) return null;
-  return hours * 60 + minutes;
+function clockToMinutes(_value: string | null) {
+  // legado: substituído por getObservationAgeMinutes exportado de current-observation.ts
+  return null;
+}
+void clockToMinutes;
+void formatFetchedClock;
+function formatFetchedClock(_value: string) {
+  return null;
 }
 
-function formatFetchedClock(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-
-  return new Intl.DateTimeFormat("pt-BR", {
-    timeZone: TIMEZONE,
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  }).format(date);
-}
-
-function getObservationAgeMinutes(observation: EmbrapaObservation) {
-  const observedMinutes = clockToMinutes(observation.source.observationTime);
-  const fetchedMinutes = clockToMinutes(formatFetchedClock(observation.source.fetchedAt));
-  if (observedMinutes === null || fetchedMinutes === null) return null;
-
-  let age = fetchedMinutes - observedMinutes;
-  if (age < -5) age += 24 * 60;
-  return Math.max(0, age);
-}
-
-function canUseEmbrapaObservation(observation: EmbrapaObservation, ageMinutes: number | null) {
-  if (observation.status === "unavailable" || observation.current.temperature === null) {
-    return false;
-  }
-  if (ageMinutes === null) return observation.status === "live";
-  return ageMinutes <= OBSERVATION_MAX_AGE_MINUTES;
-}
-
-function createCurrentFromBaseline(current: CurrentWeather): AggregatedCurrentWeather {
-  return { ...current };
-}
-
-function createCurrentFromObservation(observation: EmbrapaObservation): AggregatedCurrentWeather {
-  return {
-    city: "Pelotas",
-    state: "RS",
-    temperature: observation.current.temperature,
-    feelsLike: observation.current.feelsLike,
-    condition: null,
-    humidity: observation.current.humidity,
-    pressure: observation.current.pressure,
-    windSpeed: observation.current.windSpeed,
-    windGust: null,
-    windDirection: observation.current.windDirection,
-    visibilityKm: null,
-    sunrise: observation.current.sunrise,
-    sunset: observation.current.sunset,
-    observedAt: observation.source.observationTime,
-    icon: null,
-  };
-}
-
-function applyEmbrapaObservation(
-  current: AggregatedCurrentWeather,
-  provenance: AggregatedCurrentProvenance,
-  observation: EmbrapaObservation,
-) {
-  const applyNumber = (
-    field: Extract<
-      AggregatedCurrentField,
-      "temperature" | "feelsLike" | "humidity" | "pressure" | "windSpeed"
-    >,
-    value: number | null,
-  ) => {
-    if (value === null) return;
-    current[field] = Math.round(value);
-    provenance[field] = "embrapa";
-  };
-
-  applyNumber("temperature", observation.current.temperature);
-  applyNumber("feelsLike", observation.current.feelsLike);
-  applyNumber("humidity", observation.current.humidity);
-  applyNumber("pressure", observation.current.pressure);
-  applyNumber("windSpeed", observation.current.windSpeed);
-
-  if (observation.current.windDirection) {
-    current.windDirection = observation.current.windDirection;
-    provenance.windDirection = "embrapa";
-  }
-  if (observation.current.sunrise) {
-    current.sunrise = observation.current.sunrise;
-    provenance.sunrise = "embrapa";
-  }
-  if (observation.current.sunset) {
-    current.sunset = observation.current.sunset;
-    provenance.sunset = "embrapa";
-  }
-  if (observation.source.observationTime) {
-    current.observedAt = observation.source.observationTime;
-    provenance.observedAt = "embrapa";
-  }
-}
 
 function addDiscrepancy(
   discrepancies: WeatherDiscrepancy[],
