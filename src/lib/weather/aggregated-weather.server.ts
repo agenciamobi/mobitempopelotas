@@ -3,9 +3,7 @@ import type { EmbrapaObservation } from "./official-sources.types";
 import { fetchPelotasWeather, type WeatherBaselineData } from "./weather-baseline.server";
 import type { CurrentWeather, DailyForecast, ForecastSourceKey, WeatherHomeData } from "./types";
 import type {
-  AggregatedCurrentField,
   AggregatedCurrentProvenance,
-  AggregatedCurrentWeather,
   AggregatedWeatherData,
   WeatherConfidence,
   WeatherDiscrepancy,
@@ -14,15 +12,17 @@ import type {
   WeatherSourceKey,
 } from "./aggregated-weather.types";
 import {
-  CURRENT_FIELDS,
   FORECAST_PROVIDER_LABELS,
-  baselineProvenance,
   createProviderHealth,
   deriveTraceability,
 } from "./weather-traceability";
+import {
+  OBSERVATION_MAX_AGE_MINUTES,
+  deriveEmbrapaCurrent,
+  getObservationAgeMinutes,
+} from "./current-observation";
 
 const TIMEZONE = "America/Sao_Paulo";
-const OBSERVATION_MAX_AGE_MINUTES = 30;
 
 const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
   embrapa: "Embrapa",
@@ -31,112 +31,6 @@ const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
   "open-meteo": "Open-Meteo",
   "met-norway": "MET Norway",
 };
-
-function clockToMinutes(value: string | null) {
-  if (!value) return null;
-  const match = value.match(/^(\d{1,2}):(\d{2})$/);
-  if (!match) return null;
-
-  const hours = Number(match[1]);
-  const minutes = Number(match[2]);
-  if (hours > 23 || minutes > 59) return null;
-  return hours * 60 + minutes;
-}
-
-function formatFetchedClock(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-
-  return new Intl.DateTimeFormat("pt-BR", {
-    timeZone: TIMEZONE,
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  }).format(date);
-}
-
-function getObservationAgeMinutes(observation: EmbrapaObservation) {
-  const observedMinutes = clockToMinutes(observation.source.observationTime);
-  const fetchedMinutes = clockToMinutes(formatFetchedClock(observation.source.fetchedAt));
-  if (observedMinutes === null || fetchedMinutes === null) return null;
-
-  let age = fetchedMinutes - observedMinutes;
-  if (age < -5) age += 24 * 60;
-  return Math.max(0, age);
-}
-
-function canUseEmbrapaObservation(observation: EmbrapaObservation, ageMinutes: number | null) {
-  if (observation.status === "unavailable" || observation.current.temperature === null) {
-    return false;
-  }
-  if (ageMinutes === null) return observation.status === "live";
-  return ageMinutes <= OBSERVATION_MAX_AGE_MINUTES;
-}
-
-function createCurrentFromBaseline(current: CurrentWeather): AggregatedCurrentWeather {
-  return { ...current };
-}
-
-function createCurrentFromObservation(observation: EmbrapaObservation): AggregatedCurrentWeather {
-  return {
-    city: "Pelotas",
-    state: "RS",
-    temperature: observation.current.temperature,
-    feelsLike: observation.current.feelsLike,
-    condition: null,
-    humidity: observation.current.humidity,
-    pressure: observation.current.pressure,
-    windSpeed: observation.current.windSpeed,
-    windGust: null,
-    windDirection: observation.current.windDirection,
-    visibilityKm: null,
-    sunrise: observation.current.sunrise,
-    sunset: observation.current.sunset,
-    observedAt: observation.source.observationTime,
-    icon: null,
-  };
-}
-
-function applyEmbrapaObservation(
-  current: AggregatedCurrentWeather,
-  provenance: AggregatedCurrentProvenance,
-  observation: EmbrapaObservation,
-) {
-  const applyNumber = (
-    field: Extract<
-      AggregatedCurrentField,
-      "temperature" | "feelsLike" | "humidity" | "pressure" | "windSpeed"
-    >,
-    value: number | null,
-  ) => {
-    if (value === null) return;
-    current[field] = Math.round(value);
-    provenance[field] = "embrapa";
-  };
-
-  applyNumber("temperature", observation.current.temperature);
-  applyNumber("feelsLike", observation.current.feelsLike);
-  applyNumber("humidity", observation.current.humidity);
-  applyNumber("pressure", observation.current.pressure);
-  applyNumber("windSpeed", observation.current.windSpeed);
-
-  if (observation.current.windDirection) {
-    current.windDirection = observation.current.windDirection;
-    provenance.windDirection = "embrapa";
-  }
-  if (observation.current.sunrise) {
-    current.sunrise = observation.current.sunrise;
-    provenance.sunrise = "embrapa";
-  }
-  if (observation.current.sunset) {
-    current.sunset = observation.current.sunset;
-    provenance.sunset = "embrapa";
-  }
-  if (observation.source.observationTime) {
-    current.observedAt = observation.source.observationTime;
-    provenance.observedAt = "embrapa";
-  }
-}
 
 function addDiscrepancy(
   discrepancies: WeatherDiscrepancy[],
@@ -409,9 +303,11 @@ function buildNotes(options: {
   const notes: string[] = [];
 
   if (options.currentSource === "embrapa") {
-    notes.push("Condições atuais priorizam a medição local da Embrapa.");
-  } else if (options.currentSource) {
-    notes.push(`Condições atuais usam ${options.forecastProvider}.`);
+    notes.push("Condições atuais medidas exclusivamente pela estação Embrapa Clima Temperado.");
+  } else {
+    notes.push(
+      "Sem leitura recente da Embrapa: condições atuais indisponíveis. A previsão segue disponível de forma independente.",
+    );
   }
   if (options.usingContingency) {
     notes.push(
@@ -427,8 +323,11 @@ function buildNotes(options: {
     }
   }
   if (options.sources.embrapa.status === "stale") {
-    notes.push("A leitura da Embrapa foi preservada como contexto, mas não substituiu o modelo.");
+    notes.push(
+      "Última leitura da Embrapa está desatualizada; nenhum valor de modelo foi apresentado como observação.",
+    );
   }
+
   if (options.discrepancies.length > 0) {
     notes.push("Foram detectadas diferenças relevantes entre as fontes disponíveis.");
   }
@@ -460,27 +359,14 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
 
   const observation = official.embrapa;
   const observationAgeMinutes = getObservationAgeMinutes(observation);
-  const embrapaUsable = canUseEmbrapaObservation(observation, observationAgeMinutes);
-  const current = baseline.current
-    ? createCurrentFromBaseline(baseline.current)
-    : embrapaUsable
-      ? createCurrentFromObservation(observation)
-      : null;
-  const currentProvenance = baselineProvenance(baseline.current, baseline.source.key);
+  const {
+    usable: embrapaUsable,
+    current,
+    provenance: currentProvenance,
+  } = deriveEmbrapaCurrent(observation, observationAgeMinutes);
 
-  if (current && embrapaUsable) {
-    applyEmbrapaObservation(current, currentProvenance, observation);
-  }
-
-  const currentSource = currentProvenance.temperature ?? null;
-  const hourly = baseline.hourly.map((item, index) => {
-    if (index !== 0 || currentSource !== "embrapa" || !current) return item;
-    return {
-      ...item,
-      temperature: current.temperature ?? item.temperature,
-      windSpeed: current.windSpeed ?? item.windSpeed,
-    };
-  });
+  // Observação e previsão são séries distintas — não sobrescrever hourly[0].
+  const hourly = baseline.hourly;
 
   const discrepancies = [
     ...compareCurrentSources(baseline.current, observation, embrapaUsable, baseline.source.key),
@@ -514,10 +400,10 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     forecastProvider,
   } = deriveTraceability({ baseline, sources, confidence, hasWeatherData });
 
-  const normalizedCurrentSource: "embrapa" | ForecastSourceKey | null =
-    currentSource === "embrapa" || currentSource === "open-meteo" || currentSource === "met-norway"
-      ? currentSource
-      : null;
+  // Fonte do "agora" é EXCLUSIVAMENTE Embrapa. Sem observação válida → null.
+  const normalizedCurrentSource: "embrapa" | ForecastSourceKey | null = embrapaUsable
+    ? "embrapa"
+    : null;
 
   return {
     status,
