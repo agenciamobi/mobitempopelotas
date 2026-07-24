@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
+import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-browser-recovery";
 
 import "./RainWindPages.css";
 
@@ -92,7 +93,8 @@ function EmptyConditionPage({ label }: { label: string }) {
 }
 
 export function RainPage({ data }: { data: WeatherIntelligenceData }) {
-  const weather = data.weather;
+  const recoveredData = useOpenMeteoIntelligenceRecovery(data);
+  const weather = recoveredData.weather;
   const today = weather.daily[0];
 
   if (!today && weather.hourly.length === 0)
@@ -124,7 +126,7 @@ export function RainPage({ data }: { data: WeatherIntelligenceData }) {
         kicker="Chuva em Pelotas"
         title="Quando e quanto pode chover em Pelotas"
         description="Probabilidade por hora, volume previsto e tendência para os próximos sete dias, com alertas oficiais quando disponíveis."
-        data={data}
+        data={recoveredData}
       />
 
       <section
@@ -273,7 +275,8 @@ export function RainPage({ data }: { data: WeatherIntelligenceData }) {
 }
 
 export function WindPage({ data }: { data: WeatherIntelligenceData }) {
-  const weather = data.weather;
+  const recoveredData = useOpenMeteoIntelligenceRecovery(data);
+  const weather = recoveredData.weather;
   const current = weather.current;
 
   if (!current && weather.hourly.length === 0 && weather.daily.length === 0) {
@@ -314,7 +317,7 @@ export function WindPage({ data }: { data: WeatherIntelligenceData }) {
         kicker="Vento em Pelotas"
         title="Velocidade, direção e rajadas previstas"
         description="Consulte a medição local quando disponível e compare com o vento e as rajadas previstos para as próximas horas."
-        data={data}
+        data={recoveredData}
       />
 
       <section
