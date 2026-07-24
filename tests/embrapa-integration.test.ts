@@ -22,10 +22,15 @@ const EMBRAPA_HTML = `
   <label>Temperatura máxima</label><label>18.9&nbsp;°C - 12:41</label>
   <label>Umidade relativa mínima</label><label>82&nbsp;% - 13:16</label>
   <label>Umidade relativa máxima</label><label>97&nbsp;% - 6:49</label>
+  <label>Ponto de orvalho mínimo</label><label>7.8&nbsp;°C - 4:50</label>
+  <label>Ponto de orvalho máximo</label><label>16.7&nbsp;°C - 12:39</label>
   <label>Velocidade do vento máxima</label><label>25.7&nbsp;km/hr - 14:26</label>
   <label>Chuva diária</label><label>0.2&nbsp;mm</label>
   <label>Chuva mensal</label><label>134.8&nbsp;mm</label>
   <label>Chuva anual</label><label>613.6&nbsp;mm</label>
+  <label>Evapotranspiração diária</label><label>1.27&nbsp;mm</label>
+  <label>Evapotranspiração mensal</label><label>33.02&nbsp;mm</label>
+  <label>Evapotranspiração anual</label><label>570.74&nbsp;mm</label>
 </body>
 </html>
 `;
@@ -47,9 +52,14 @@ test("parser reconhece o HTML real do Current_Monitor da Embrapa", () => {
   assert.equal(result.current.sunset, "17:49");
   assert.deepEqual(result.extremes.temperatureMin, { value: 8.6, time: "4:50" });
   assert.deepEqual(result.extremes.temperatureMax, { value: 18.9, time: "12:41" });
+  assert.deepEqual(result.extremes.dewPointMin, { value: 7.8, time: "4:50" });
+  assert.deepEqual(result.extremes.dewPointMax, { value: 16.7, time: "12:39" });
   assert.equal(result.accumulated.rainDaily, 0.2);
   assert.equal(result.accumulated.rainMonthly, 134.8);
   assert.equal(result.accumulated.rainAnnual, 613.6);
+  assert.equal(result.accumulated.evapotranspirationDaily, 1.27);
+  assert.equal(result.accumulated.evapotranspirationMonthly, 33.02);
+  assert.equal(result.accumulated.evapotranspirationAnnual, 570.74);
   assert.equal(result.source.observationTime, null);
   assert.equal(getObservationAgeMinutes(result), 0);
 });
