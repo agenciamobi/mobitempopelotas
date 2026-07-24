@@ -323,12 +323,12 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
               aria-current={alertsActive ? "page" : undefined}
             >
               <span className="production-alert-icon" aria-hidden="true">
-                !
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 3 3.6 19h16.8L12 3Z" />
+                  <path d="M12 9v4.5M12 17h.01" />
+                </svg>
               </span>
-              <span>
-                <small>Avisos oficiais</small>
-                <strong>Consultar</strong>
-              </span>
+              <strong>Consultar</strong>
               <i aria-hidden="true">→</i>
             </Link>
           </div>

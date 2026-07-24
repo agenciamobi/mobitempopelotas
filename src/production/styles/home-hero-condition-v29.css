@@ -1,0 +1,89 @@
+/*
+ * Hero v29 — a medição permanece atribuída à Embrapa e a representação
+ * visual responde à condição prevista para o período.
+ */
+
+.site-shell--home-editorial .weather-hero-icon--condition {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 7px;
+  min-width: 0;
+  color: #087c8a;
+}
+
+.site-shell--home-editorial .weather-hero-icon--condition svg {
+  width: 82px;
+  height: 82px;
+  overflow: visible;
+  color: currentColor;
+  filter: drop-shadow(0 12px 22px rgba(7, 30, 47, 0.12));
+}
+
+.site-shell--home-editorial .weather-hero-icon--condition small {
+  color: #657d88;
+  font-size: 0.54rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  line-height: 1.15;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.site-shell--home-editorial .weather-hero--condition-sun {
+  --stripe-hero-a: rgba(242, 112, 53, 0.2);
+  --stripe-hero-b: rgba(255, 201, 75, 0.17);
+}
+
+.site-shell--home-editorial .weather-hero--condition-sun .weather-hero-icon--condition {
+  color: #e7652f;
+}
+
+.site-shell--home-editorial .weather-hero--condition-moon,
+.site-shell--home-editorial .weather-hero--condition-partly-cloudy-night {
+  --stripe-hero-a: rgba(24, 189, 205, 0.16);
+  --stripe-hero-b: rgba(94, 44, 237, 0.28);
+}
+
+.site-shell--home-editorial .weather-hero--condition-moon .weather-hero-photo,
+.site-shell--home-editorial .weather-hero--condition-partly-cloudy-night .weather-hero-photo {
+  filter: saturate(0.72) brightness(0.72) contrast(1.08);
+}
+
+.site-shell--home-editorial .weather-hero--condition-cloud .weather-hero-photo,
+.site-shell--home-editorial .weather-hero--condition-partly-cloudy .weather-hero-photo {
+  filter: saturate(0.72) contrast(0.94);
+}
+
+.site-shell--home-editorial .weather-hero--condition-rain,
+.site-shell--home-editorial .weather-hero--condition-storm {
+  --stripe-hero-a: rgba(24, 189, 205, 0.22);
+  --stripe-hero-b: rgba(43, 66, 106, 0.28);
+  --stripe-hero-c: rgba(94, 44, 237, 0.13);
+}
+
+.site-shell--home-editorial .weather-hero--condition-rain .weather-hero-photo,
+.site-shell--home-editorial .weather-hero--condition-storm .weather-hero-photo {
+  filter: saturate(0.62) brightness(0.76) contrast(1.08);
+}
+
+.site-shell--home-editorial .weather-hero--condition-storm .weather-hero-overlay {
+  background:
+    linear-gradient(180deg, rgba(7, 30, 47, 0.08), rgba(7, 30, 47, 0.34)),
+    linear-gradient(130deg, rgba(24, 189, 205, 0.08), rgba(94, 44, 237, 0.25));
+}
+
+.site-shell--home-editorial .weather-hero--condition-wind .weather-hero-icon--condition {
+  color: #5e2ced;
+}
+
+@media (max-width: 620px) {
+  .site-shell--home-editorial .weather-hero-icon--condition svg {
+    width: 62px;
+    height: 62px;
+  }
+
+  .site-shell--home-editorial .weather-hero-icon--condition small {
+    font-size: 0.48rem;
+  }
+}

@@ -1,6 +1,11 @@
 import Link from "@/production/compat/NextLink";
 import type { ReactNode } from "react";
 import type { CppmetForecastItem } from "@/production/lib/cppmet-forecast";
+import { WeatherIcon } from "@/production/components/weather-icon";
+import {
+  resolveHeroWeatherIcon,
+  weatherConditionLabels,
+} from "@/production/lib/hero-weather-presentation";
 import type { WeatherData } from "@/production/lib/weather-data";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/production/lib/weather-insights";
 
@@ -227,18 +232,6 @@ function HeroMetricIcon({ name }: { name: HeroMetricIconName }) {
   );
 }
 
-function StationObservationIcon() {
-  return (
-    <svg viewBox="0 0 96 96" aria-hidden="true">
-      <g fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round">
-        <path d="M48 18v43" />
-        <circle cx="48" cy="68" r="13" />
-        <path d="M48 25h11M48 38h8M48 51h11" />
-      </g>
-    </svg>
-  );
-}
-
 function HeroMetric({
   icon,
   label,
@@ -289,10 +282,13 @@ export function WeatherHero({
     .slice(0, 2);
   const currentSourceMeta = getCurrentSourceMeta(current);
   const nextHourForecast = !current.available ? (weather.hourly[0] ?? null) : null;
+  const heroIcon = resolveHeroWeatherIcon(weather, cppmetForecast?.item.summary);
+  const heroCondition = weatherConditionLabels[heroIcon];
 
   return (
     <section
-      className={`weather-hero weather-hero--${resolvedLevel}`}
+      className={`weather-hero weather-hero--${resolvedLevel} weather-hero--condition-${heroIcon}`}
+      data-condition={heroIcon}
       data-official-alerts={officialAlertCount > 0 ? "true" : "false"}
       aria-labelledby="weather-hero-title"
     >
@@ -383,8 +379,12 @@ export function WeatherHero({
           {current.available ? (
             <>
               <div className="weather-hero-visual">
-                <div className="weather-hero-icon weather-hero-icon--station">
-                  <StationObservationIcon />
+                <div className="weather-hero-icon weather-hero-icon--condition">
+                  <WeatherIcon
+                    name={heroIcon}
+                    title={`Condição prevista para este período: ${heroCondition}`}
+                  />
+                  <small>Condição prevista</small>
                 </div>
 
                 <div className="weather-hero-temperature">
@@ -394,7 +394,7 @@ export function WeatherHero({
                     <small>
                       {current.feelsLike === null
                         ? "Sensação não informada"
-                        : `Sensação de ${current.feelsLike}°`}
+                        : `Sensação de ${current.feelsLike}° · ${heroCondition}`}
                     </small>
                   </div>
                 </div>
@@ -426,8 +426,12 @@ export function WeatherHero({
           ) : nextHourForecast ? (
             <>
               <div className="weather-hero-visual">
-                <div className="weather-hero-icon weather-hero-icon--station">
-                  <StationObservationIcon />
+                <div className="weather-hero-icon weather-hero-icon--condition">
+                  <WeatherIcon
+                    name={nextHourForecast.icon}
+                    title={`Condição prevista para a próxima hora: ${weatherConditionLabels[nextHourForecast.icon]}`}
+                  />
+                  <small>Próxima hora</small>
                 </div>
 
                 <div className="weather-hero-temperature">
@@ -467,9 +471,6 @@ export function WeatherHero({
             </>
           ) : (
             <div className="weather-hero-current-unavailable">
-              <div className="weather-hero-icon weather-hero-icon--station">
-                <StationObservationIcon />
-              </div>
               <strong>Medição atual indisponível</strong>
               <p>
                 A Embrapa não forneceu uma leitura recente e verificável. Nenhum valor de previsão
