@@ -4,6 +4,7 @@ import type {
   InmetAlertSeverity,
   InmetAlerts,
 } from "./official-sources.types";
+import { WEATHER_SOURCE_REQUEST_TIMEOUT_MS } from "./source-policy.ts";
 
 const FEED_URLS = [
   "https://apiprevmet3.inmet.gov.br/avisos/rss",
@@ -11,7 +12,6 @@ const FEED_URLS = [
 ] as const;
 const PORTAL_URL = "https://avisos.inmet.gov.br/";
 const PELOTAS_IBGE_CODE = "4314407";
-const REQUEST_TIMEOUT_MS = 12_000;
 const MAX_DETAIL_REQUESTS = 40;
 
 function decodeXml(value: string) {
@@ -85,7 +85,7 @@ async function fetchText(url: string) {
       Accept: "application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.1",
       "User-Agent": "TEMPO-Pelotas/2.0 (+https://tempopelotas.com.br)",
     },
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    signal: AbortSignal.timeout(WEATHER_SOURCE_REQUEST_TIMEOUT_MS.inmet),
   });
   if (!response.ok) throw new Error(`INMET respondeu com HTTP ${response.status}.`);
   const text = await response.text();
@@ -207,9 +207,8 @@ function unavailable(error: string, feedUrl = FEED_URLS[0]): InmetAlerts {
 }
 
 export async function fetchInmetAlerts(): Promise<InmetAlerts> {
-  let lastError = "Os avisos do INMET não puderam ser consultados.";
-  for (const feedUrl of FEED_URLS) {
-    try {
+  const attempts = await Promise.allSettled(
+    FEED_URLS.map(async (feedUrl) => {
       const feedXml = await fetchText(feedUrl);
       const urls = detailUrls(feedXml, feedUrl);
       const settled = await Promise.allSettled(
@@ -238,11 +237,22 @@ export async function fetchInmetAlerts(): Promise<InmetAlerts> {
           fetchedAt: new Date().toISOString(),
         },
         error: null,
-      };
-    } catch (error) {
-      lastError =
-        error instanceof Error ? error.message : "Falha desconhecida ao consultar o INMET.";
-    }
+      } satisfies InmetAlerts;
+    }),
+  );
+
+  for (const attempt of attempts) {
+    if (attempt.status === "fulfilled") return attempt.value;
   }
-  return unavailable(lastError);
+
+  const errors = attempts.flatMap((attempt) =>
+    attempt.status === "rejected"
+      ? [
+          attempt.reason instanceof Error
+            ? attempt.reason.message
+            : "Falha desconhecida ao consultar o INMET.",
+        ]
+      : [],
+  );
+  return unavailable(unique(errors).join(" ") || "Os avisos do INMET não puderam ser consultados.");
 }
