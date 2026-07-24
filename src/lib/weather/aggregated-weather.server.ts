@@ -33,20 +33,6 @@ const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
   "met-norway": "MET Norway",
 };
 
-function clockToMinutes(value: string | null) {
-  if (!value) return null;
-  const match = value.match(/^(\d{1,2}):(\d{2})$/);
-  if (!match) return null;
-
-function clockToMinutes(_value: string | null) {
-  // legado: substituído por getObservationAgeMinutes exportado de current-observation.ts
-  return null;
-}
-void clockToMinutes;
-void formatFetchedClock;
-function formatFetchedClock(_value: string) {
-  return null;
-}
 
 
 function addDiscrepancy(
