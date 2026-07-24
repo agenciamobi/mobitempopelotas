@@ -384,17 +384,16 @@ export function WeatherHero({
                     name={heroIcon}
                     title={`Condição prevista para este período: ${heroCondition}`}
                   />
-                  <small>Condição prevista</small>
+                  <small>{heroCondition}</small>
                 </div>
 
                 <div className="weather-hero-temperature">
                   <strong>{metricValue(current.temperature, "°")}</strong>
                   <div>
-                    <span>Medição da estação</span>
                     <small>
                       {current.feelsLike === null
                         ? "Sensação não informada"
-                        : `Sensação de ${current.feelsLike}° · ${heroCondition}`}
+                        : `Sensação de ${current.feelsLike}°`}
                     </small>
                   </div>
                 </div>
@@ -431,7 +430,7 @@ export function WeatherHero({
                     name={nextHourForecast.icon}
                     title={`Condição prevista para a próxima hora: ${weatherConditionLabels[nextHourForecast.icon]}`}
                   />
-                  <small>Próxima hora</small>
+                  <small>{weatherConditionLabels[nextHourForecast.icon]}</small>
                 </div>
 
                 <div className="weather-hero-temperature">
