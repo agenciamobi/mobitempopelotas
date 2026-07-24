@@ -10,7 +10,6 @@ import {
   CloudRain,
   CloudSun,
   Droplets,
-  Eye,
   Gauge,
   Info,
   Moon,
