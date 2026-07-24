@@ -504,6 +504,9 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     fetchOfficialWeatherSources(),
   ]);
 
+  const selectedForecastKey: ForecastSourceKey = baseline.source.key;
+  const usingContingency = selectedForecastKey === "met-norway";
+
   const observation = official.embrapa;
   const observationAgeMinutes = getObservationAgeMinutes(observation);
   const embrapaUsable = canUseEmbrapaObservation(observation, observationAgeMinutes);
@@ -512,7 +515,7 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     : embrapaUsable
       ? createCurrentFromObservation(observation)
       : null;
-  const currentProvenance = baselineProvenance(baseline.current);
+  const currentProvenance = baselineProvenance(baseline.current, selectedForecastKey);
 
   if (current && embrapaUsable) {
     applyEmbrapaObservation(current, currentProvenance, observation);
@@ -529,8 +532,8 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
   });
 
   const discrepancies = [
-    ...compareCurrentSources(baseline.current, observation, embrapaUsable),
-    ...compareDailyForecasts(baseline.daily, official.cppmet.items),
+    ...compareCurrentSources(baseline.current, observation, embrapaUsable, selectedForecastKey),
+    ...compareDailyForecasts(baseline.daily, official.cppmet.items, selectedForecastKey),
   ];
   const sources = createSources(
     baseline,
@@ -539,9 +542,13 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     observationAgeMinutes,
     embrapaUsable,
   );
-  const degradedSources = (Object.keys(sources) as WeatherSourceKey[]).filter(
-    (source) => sources[source].status !== "live" || !sources[source].usable,
-  );
+
+  const contingencyKey: ForecastSourceKey =
+    selectedForecastKey === "open-meteo" ? "met-norway" : "open-meteo";
+  const degradedSources = (Object.keys(sources) as WeatherSourceKey[]).filter((source) => {
+    if (source === contingencyKey) return false;
+    return sources[source].status !== "live" || !sources[source].usable;
+  });
   const score = calculateQualityScore({
     baseline,
     embrapaUsable,
@@ -554,9 +561,22 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
   const hasWeatherData = current !== null || hourly.length > 0 || baseline.daily.length > 0;
   const status: AggregatedWeatherData["status"] = !hasWeatherData
     ? "unavailable"
-    : degradedSources.length === 0 && confidence === "high"
-      ? "live"
-      : "degraded";
+    : usingContingency
+      ? "degraded"
+      : degradedSources.length === 0 && confidence === "high"
+        ? "live"
+        : "degraded";
+
+  const normalizedCurrentSource: "embrapa" | ForecastSourceKey | null =
+    currentSource === "embrapa" ||
+    currentSource === "open-meteo" ||
+    currentSource === "met-norway"
+      ? currentSource
+      : null;
+  const forecastProvider =
+    baseline.status === "live"
+      ? (baseline.source.name ?? FORECAST_PROVIDER_LABELS[selectedForecastKey])
+      : null;
 
   return {
     status,
@@ -571,17 +591,17 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     quality: {
       score,
       confidence,
-      currentSource:
-        currentSource === "embrapa" || currentSource === "open-meteo" ? currentSource : null,
-      forecastSource: baseline.daily.length > 0 ? "open-meteo" : null,
-      forecastProvider: baseline.status === "live" ? baseline.source.name : null,
+      currentSource: normalizedCurrentSource,
+      forecastSource: baseline.daily.length > 0 ? selectedForecastKey : null,
+      forecastProvider,
       degradedSources,
       observationAgeMinutes,
       discrepancies,
       notes: buildNotes({
-        currentSource:
-          currentSource === "embrapa" || currentSource === "open-meteo" ? currentSource : null,
-        forecastProvider: baseline.source.name,
+        currentSource: normalizedCurrentSource,
+        forecastProvider: forecastProvider ?? FORECAST_PROVIDER_LABELS[selectedForecastKey],
+        selectedForecastKey,
+        usingContingency,
         sources,
         discrepancies,
       }),
@@ -593,4 +613,6 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     },
     message: buildMessage(status, degradedSources),
   };
+}
+
 }
