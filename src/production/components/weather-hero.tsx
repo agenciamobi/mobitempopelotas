@@ -288,6 +288,7 @@ export function WeatherHero({
     .filter((reason): reason is string => Boolean(reason))
     .slice(0, 2);
   const currentSourceMeta = getCurrentSourceMeta(current);
+  const nextHourForecast = !current.available ? (weather.hourly[0] ?? null) : null;
 
   return (
     <section
@@ -420,6 +421,48 @@ export function WeatherHero({
                   label="Direção"
                   value={current.windDirection ?? "Não informada"}
                 />
+              </div>
+            </>
+          ) : nextHourForecast ? (
+            <>
+              <div className="weather-hero-visual">
+                <div className="weather-hero-icon weather-hero-icon--station">
+                  <StationObservationIcon />
+                </div>
+
+                <div className="weather-hero-temperature">
+                  <strong>{metricValue(nextHourForecast.temperature, "°")}</strong>
+                  <div>
+                    <span>Previsão da próxima hora</span>
+                    <small>Medição recente da Embrapa indisponível</small>
+                  </div>
+                </div>
+              </div>
+
+              <div className="weather-hero-metrics">
+                <HeroMetric
+                  icon="humidity"
+                  label="Chance de chuva"
+                  value={metricValue(nextHourForecast.precipitation, "%")}
+                />
+                <HeroMetric
+                  icon="wind"
+                  label="Vento previsto"
+                  value={metricValue(nextHourForecast.windSpeed, " km/h")}
+                />
+                <HeroMetric
+                  icon="direction"
+                  label="Rajada prevista"
+                  value={metricValue(nextHourForecast.windGust, " km/h")}
+                />
+              </div>
+
+              <div className="weather-hero-current-unavailable">
+                <p>
+                  Valores acima são de previsão meteorológica e não representam uma medição da
+                  estação.
+                </p>
+                <Link href="/estacao-embrapa-pelotas">Consultar a estação Embrapa</Link>
               </div>
             </>
           ) : (
