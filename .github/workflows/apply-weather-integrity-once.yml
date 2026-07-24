@@ -1,4 +1,4 @@
-name: Formatar integridade meteorológica
+name: Validar integridade meteorológica
 
 on:
   pull_request:
@@ -9,9 +9,9 @@ permissions:
   contents: write
 
 jobs:
-  format:
+  validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,32 +21,27 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - name: Formatar conjunto final
-        run: >-
-          npx prettier --write
-          src/production/lib/weather-data.ts
-          src/production/adapters/home.ts
-          src/production/ProductionHome.tsx
-          src/production/lib/weather-insights.ts
-          src/production/components/weather-hero.tsx
-          src/production/components/home-editorial-dashboard.tsx
-          src/production/components/home-editorial-dashboard-semantic.tsx
-          src/components/weather/WeatherEditorialHero.tsx
-          src/components/weather/ForecastPages.tsx
-          src/components/weather/RainWindPages.tsx
-          src/lib/public-portal.server.ts
-          src/production/production-styles.ts
-          src/production/production-styles.css
-          src/production/styles/weather-data-integrity-v28.css
-          tests/production-weather-integrity.test.ts
-          package.json
-      - name: Commitar formatação
+      - name: Remover importação sem uso
+        run: sed -i '/^  Eye,$/d' src/components/weather/ForecastPages.tsx
+      - name: Formatar arquivo
+        run: npx prettier --write src/components/weather/ForecastPages.tsx
+      - name: Validar contratos
+        run: npm run test:contracts
+      - name: Validar build
+        run: npm run build
+      - name: Validar rotas
+        run: npm run test:routes
+      - name: Validar TypeScript
+        run: npm run typecheck
+      - name: Validar ESLint
+        run: npm run lint
+      - name: Commitar correção final
         run: |
           if git diff --quiet; then
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/production/lib/weather-data.ts src/production/adapters/home.ts src/production/ProductionHome.tsx src/production/lib/weather-insights.ts src/production/components/weather-hero.tsx src/production/components/home-editorial-dashboard.tsx src/production/components/home-editorial-dashboard-semantic.tsx src/components/weather/WeatherEditorialHero.tsx src/components/weather/ForecastPages.tsx src/components/weather/RainWindPages.tsx src/lib/public-portal.server.ts src/production/production-styles.ts src/production/production-styles.css src/production/styles/weather-data-integrity-v28.css tests/production-weather-integrity.test.ts package.json
-          git commit -m "style: format weather integrity changes"
+          git add src/components/weather/ForecastPages.tsx
+          git commit -m "fix: remove unused weather icon import"
           git push origin HEAD:agent/weather-data-integrity
