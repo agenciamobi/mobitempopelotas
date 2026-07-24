@@ -75,7 +75,10 @@ export async function fetchPublicPortalSnapshot() {
       alerts: weather.alerts,
       official_forecast: weather.officialForecast,
       observed: {
-        embrapa: publicEmbrapaObservation(weather.observation),
+        embrapa: {
+          ...publicEmbrapaObservation(weather.observation),
+          usable_as_current: weather.quality.currentSource === "embrapa",
+        },
       },
       quality: weather.quality,
       sources: weather.sources,
@@ -133,9 +136,9 @@ export function createPublicJsonFeed(snapshot: PublicPortalSnapshot) {
     ? ` Hoje, mínima de ${today.min} °C, máxima de ${today.max} °C e ${today.rainChance === null ? `${today.precipitationMm} mm de precipitação previstos` : `${today.rainChance}% de chance de chuva`}.`
     : "";
   const embrapaText =
-    embrapa.status === "unavailable"
-      ? "A observação da Embrapa está temporariamente indisponível para consulta pelo portal."
-      : `A estação da Embrapa informou ${formatMetric(embrapa.current.temperature, " °C")}, umidade de ${formatMetric(embrapa.current.humidity, "%")}, vento de ${formatMetric(embrapa.current.windSpeed, " km/h")} e ${formatMetric(embrapa.accumulated.rainDaily, " mm")} de chuva no dia.`;
+    !embrapa.usable_as_current || !current
+      ? "A Embrapa não forneceu uma leitura recente e verificável para uso como condição atual."
+      : `A estação da Embrapa informou ${formatMetric(current.temperature, " °C")}, umidade de ${formatMetric(current.humidity, "%")} e vento de ${formatMetric(current.windSpeed, " km/h")}.`;
   const alertText =
     activeAlerts.length === 0
       ? "Nenhum alerta oficial ativo para Pelotas ou contexto regional foi identificado na consulta atual."

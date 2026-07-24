@@ -1,37 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import {
-  AlertTriangle,
   ArrowRight,
   CheckCircle2,
-  Cloud,
-  CloudLightning,
-  CloudMoon,
-  CloudRain,
-  CloudSun,
   Droplets,
-  Eye,
+  Gauge,
   Info,
-  Moon,
-  Sun,
   Wind,
   type LucideIcon,
 } from "lucide-react";
 
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
-import type { WeatherIconName } from "@/lib/weather/types";
-
 import "./WeatherEditorialHero.css";
-
-const iconMap: Record<WeatherIconName, LucideIcon> = {
-  sun: Sun,
-  moon: Moon,
-  "partly-cloudy": CloudSun,
-  "partly-cloudy-night": CloudMoon,
-  cloud: Cloud,
-  rain: CloudRain,
-  storm: CloudLightning,
-  wind: Wind,
-};
 
 const confidenceLabels = {
   high: "Alta confiança",
@@ -46,11 +25,6 @@ type HeroMetricProps = {
   label: string;
   value: string;
 };
-
-function WeatherIcon({ name, size = 64 }: { name: WeatherIconName | null; size?: number }) {
-  const Icon = name ? iconMap[name] : Cloud;
-  return <Icon aria-hidden="true" size={size} strokeWidth={1.55} />;
-}
 
 function HeroMetric({ icon: Icon, label, value }: HeroMetricProps) {
   return (
@@ -151,10 +125,7 @@ export function WeatherEditorialHero({ data }: { data: WeatherIntelligenceData }
   const title = resolveHeroTitle(data, level);
   const activeAlertCount = weather.alerts.filter((alert) => alert.period === "active").length;
   const description = cppmetToday?.summary || data.brief.summary;
-  const currentSource =
-    weather.quality.currentSource === "embrapa"
-      ? "Embrapa"
-      : (weather.quality.forecastProvider ?? "Modelo meteorológico");
+  const currentSource = "Embrapa Clima Temperado";
 
   return (
     <section
@@ -222,17 +193,23 @@ export function WeatherEditorialHero({ data }: { data: WeatherIntelligenceData }
           </div>
         </div>
 
-        <aside className="weather-editorial-now" aria-label="Tempo agora em Pelotas">
+        <aside
+          className={`weather-editorial-now${current ? "" : " is-unavailable"}`}
+          aria-label={
+            current ? "Medição atual da Embrapa em Pelotas" : "Medição atual indisponível"
+          }
+        >
           <div className="weather-editorial-now-heading">
             <div>
               <strong>Pelotas, RS</strong>
               <small>
-                {current?.observedAt ? `Atualizado às ${current.observedAt}` : "Dados atualizados"}
-                {current ? ` · ${currentSource}` : ""}
+                {current?.observedAt
+                  ? `Leitura das ${current.observedAt} · ${currentSource}`
+                  : `Medição recente indisponível · ${currentSource}`}
               </small>
             </div>
             <span className="weather-editorial-live">
-              <i aria-hidden="true" /> Agora
+              <i aria-hidden="true" /> {current ? "Medição" : "Indisponível"}
             </span>
           </div>
 
@@ -240,15 +217,15 @@ export function WeatherEditorialHero({ data }: { data: WeatherIntelligenceData }
             <>
               <div className="weather-editorial-visual">
                 <div className="weather-editorial-icon">
-                  <WeatherIcon name={current.icon} />
+                  <Gauge aria-hidden="true" size={64} strokeWidth={1.55} />
                 </div>
                 <div className="weather-editorial-temperature">
                   <strong>{current.temperature === null ? "—" : `${current.temperature}°`}</strong>
                   <div>
-                    <span>{current.condition ?? "Condição em atualização"}</span>
+                    <span>Medição da estação</span>
                     <small>
                       {current.feelsLike === null
-                        ? "Sensação em atualização"
+                        ? "Sensação não informada"
                         : `Sensação de ${current.feelsLike}°`}
                     </small>
                   </div>
@@ -263,34 +240,24 @@ export function WeatherEditorialHero({ data }: { data: WeatherIntelligenceData }
                 />
                 <HeroMetric
                   icon={Wind}
-                  label="Vento"
+                  label="Vento medido"
                   value={displayNumber(current.windSpeed, " km/h")}
                 />
                 <HeroMetric
-                  icon={AlertTriangle}
-                  label="Rajada"
-                  value={displayNumber(current.windGust, " km/h")}
+                  icon={Gauge}
+                  label="Pressão"
+                  value={displayNumber(current.pressure, " hPa")}
                 />
-                <HeroMetric
-                  icon={Eye}
-                  label="Visibilidade"
-                  value={displayNumber(current.visibilityKm, " km")}
-                />
+                <HeroMetric icon={Wind} label="Direção" value={current.windDirection ?? "—"} />
               </div>
             </>
-          ) : today ? (
+          ) : (
             <div className="weather-editorial-forecast-only">
-              <WeatherIcon name={today.icon} />
-              <strong>
-                {today.min}° / {today.max}°
-              </strong>
-              <span>
-                {today.rainChance === null
-                  ? `${today.precipitationMm} mm previstos`
-                  : `${today.rainChance}% de chance de chuva`}
-              </span>
+              <Gauge aria-hidden="true" size={54} strokeWidth={1.55} />
+              <strong>Medição atual indisponível</strong>
+              <span>A previsão permanece disponível abaixo, separada da observação local.</span>
             </div>
-          ) : null}
+          )}
 
           <div className="weather-editorial-quality">
             <span

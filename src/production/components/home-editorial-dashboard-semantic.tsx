@@ -71,27 +71,34 @@ function buildTomorrowFallback(weather: WeatherData): ForecastNarrative | null {
   const tomorrow = weather.daily[1];
   if (!tomorrow) return null;
 
+  const hasStrongWind = (tomorrow.windGust ?? -1) >= 50;
   const headline =
-    tomorrow.icon === "storm" || tomorrow.windGust >= 50
+    tomorrow.icon === "storm" || hasStrongWind
       ? "Amanhã exige atenção ao tempo"
-      : tomorrow.rainChance >= 70
+      : tomorrow.rainChance !== null && tomorrow.rainChance >= 70
         ? "Chuva deve marcar o dia de amanhã"
-        : tomorrow.rainChance >= 35
+        : tomorrow.rainChance !== null && tomorrow.rainChance >= 35
           ? "Amanhã pode ter períodos de chuva"
           : tomorrow.icon === "sun"
             ? "Amanhã terá períodos de sol"
             : "Amanhã terá variação de nuvens";
 
   const rainDescription =
-    tomorrow.rainChance >= 70
-      ? `A chance de chuva é alta, com ${formatNumber(tomorrow.precipitation)} mm previstos.`
-      : tomorrow.rainChance >= 35
-        ? `Há possibilidade de chuva, com ${formatNumber(tomorrow.precipitation)} mm previstos.`
-        : "A chance de chuva é baixa e não há volume relevante indicado.";
+    tomorrow.rainChance === null
+      ? `A fonte não informou a probabilidade de chuva; o volume previsto é de ${formatNumber(tomorrow.precipitation)} mm.`
+      : tomorrow.rainChance >= 70
+        ? `A chance de chuva é alta, com ${formatNumber(tomorrow.precipitation)} mm previstos.`
+        : tomorrow.rainChance >= 35
+          ? `Há possibilidade de chuva, com ${formatNumber(tomorrow.precipitation)} mm previstos.`
+          : "A chance de chuva é baixa e não há volume relevante indicado.";
+  const gustDescription =
+    tomorrow.windGust === null
+      ? "A fonte não informou rajada máxima."
+      : `As rajadas podem chegar a ${tomorrow.windGust} km/h.`;
 
   return {
     headline,
-    summary: `${rainDescription} A temperatura deve variar entre ${tomorrow.min}° e ${tomorrow.max}°, com rajadas de até ${tomorrow.windGust} km/h.`,
+    summary: `${rainDescription} A temperatura deve variar entre ${tomorrow.min}° e ${tomorrow.max}°. ${gustDescription}`,
   };
 }
 

@@ -6,17 +6,10 @@ import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence
 import type { EmbrapaObservationData } from "@/production/lib/embrapa-observation";
 import type { InmetAlertsData } from "@/production/lib/inmet-alerts";
 import type { WeatherAiSummaries } from "@/production/lib/weather-ai-summary";
-import type { WeatherData } from "@/production/lib/weather-data";
-
-function firstFinite(...values: Array<number | null | undefined>) {
-  return (
-    values.find((value): value is number => typeof value === "number" && Number.isFinite(value)) ??
-    null
-  );
-}
+import type { CurrentWeather, WeatherData } from "@/production/lib/weather-data";
 
 function formatUpdatedAt(value: string | null | undefined) {
-  if (!value) return "Horário não informado";
+  if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return new Intl.DateTimeFormat("pt-BR", {
@@ -28,55 +21,76 @@ function formatUpdatedAt(value: string | null | undefined) {
   }).format(date);
 }
 
-export function toProductionWeatherData(data: AggregatedWeatherData): WeatherData {
+function forecastTimeLabel(value: string) {
+  return value.trim().toLocaleLowerCase("pt-BR") === "agora" ? "Próxima hora" : value;
+}
+
+function unavailableCurrent(data: AggregatedWeatherData): CurrentWeather {
+  return {
+    available: false,
+    city: "Pelotas",
+    state: "RS",
+    temperature: null,
+    feelsLike: null,
+    condition: null,
+    humidity: null,
+    pressure: null,
+    windSpeed: null,
+    windGust: null,
+    windDirection: null,
+    visibility: null,
+    sunrise: null,
+    sunset: null,
+    updatedAt: null,
+    icon: null,
+    source: {
+      name: "Embrapa Clima Temperado",
+      url: data.observation.source.url,
+      kind: "unavailable",
+      observedAt: null,
+    },
+  };
+}
+
+function observedCurrent(data: AggregatedWeatherData): CurrentWeather {
   const current = data.current;
-  const observation = data.observation.current;
-  const today = data.daily[0];
-  const temperature =
-    firstFinite(current?.temperature, observation.temperature, today?.max, today?.min) ?? 0;
-  const feelsLike =
-    firstFinite(current?.feelsLike, observation.feelsLike, temperature) ?? temperature;
-  const humidity = firstFinite(current?.humidity, observation.humidity) ?? 0;
-  const pressure = firstFinite(current?.pressure, observation.pressure) ?? 0;
-  const windSpeed = firstFinite(current?.windSpeed, observation.windSpeed) ?? 0;
-  const windGust = firstFinite(current?.windGust, current?.windSpeed, observation.windSpeed) ?? 0;
-  const observedAt =
-    current?.observedAt ?? data.observation.source.observationTime ?? data.source.fetchedAt;
+  if (!current || data.quality.currentSource !== "embrapa") return unavailableCurrent(data);
 
   return {
-    current: {
-      city: current?.city ?? "Pelotas",
-      state: current?.state ?? "RS",
-      temperature,
-      feelsLike,
-      condition: current?.condition ?? data.message ?? "Condições em atualização",
-      humidity,
-      pressure,
-      windSpeed,
-      windGust,
-      windDirection: current?.windDirection ?? observation.windDirection ?? "Indisponível",
-      visibility: firstFinite(current?.visibilityKm) ?? -1,
-      sunrise: current?.sunrise ?? observation.sunrise ?? "—",
-      sunset: current?.sunset ?? observation.sunset ?? "—",
-      updatedAt: formatUpdatedAt(observedAt),
-      icon: current?.icon ?? today?.icon ?? "cloud",
-      source: {
-        name:
-          data.quality.currentSource === "embrapa"
-            ? "Embrapa Clima Temperado"
-            : (data.quality.forecastProvider ?? "MOBI Tempo Pelotas"),
-        url:
-          data.quality.currentSource === "embrapa" ? data.observation.source.url : "/metodologia",
-        kind: data.quality.currentSource === "embrapa" ? "observation" : "forecast",
-        observedAt: data.observation.source.observationTime ?? observedAt,
-      },
+    available: true,
+    city: current.city,
+    state: current.state,
+    temperature: current.temperature,
+    feelsLike: current.feelsLike,
+    condition: null,
+    humidity: current.humidity,
+    pressure: current.pressure,
+    windSpeed: current.windSpeed,
+    windGust: null,
+    windDirection: current.windDirection,
+    visibility: null,
+    sunrise: current.sunrise,
+    sunset: current.sunset,
+    updatedAt: formatUpdatedAt(current.observedAt),
+    icon: null,
+    source: {
+      name: "Embrapa Clima Temperado",
+      url: data.observation.source.url,
+      kind: "observation",
+      observedAt: current.observedAt,
     },
+  };
+}
+
+export function toProductionWeatherData(data: AggregatedWeatherData): WeatherData {
+  return {
+    current: observedCurrent(data),
     hourly: data.hourly.map((hour) => ({
-      time: hour.time,
+      time: forecastTimeLabel(hour.time),
       temperature: hour.temperature,
-      precipitation: hour.precipitationProbability ?? 0,
+      precipitation: hour.precipitationProbability,
       windSpeed: hour.windSpeed,
-      windGust: hour.windGust ?? hour.windSpeed,
+      windGust: hour.windGust,
       icon: hour.icon,
     })),
     daily: data.daily.map((day) => ({
@@ -84,29 +98,20 @@ export function toProductionWeatherData(data: AggregatedWeatherData): WeatherDat
       date: day.date,
       min: day.min,
       max: day.max,
-      rainChance: day.rainChance ?? 0,
+      rainChance: day.rainChance,
       precipitation: day.precipitationMm,
-      windGust: day.windGust ?? 0,
+      windGust: day.windGust,
       icon: day.icon,
     })),
-    regional: current
-      ? [
-          {
-            city: "Pelotas",
-            temperature,
-            condition: current.icon ?? "cloud",
-            latitude: -31.7654,
-            longitude: -52.3376,
-          },
-        ]
-      : [],
+    // O mapa operacional usa REDEMET. Não criamos marcadores de condição atual a partir de modelos.
+    regional: [],
     source: {
       name: "MOBI Tempo Pelotas",
       url: "/metodologia",
       isFallback: data.status !== "live",
       observationName: data.observation.source.name,
       observationUrl: data.observation.source.url,
-      forecastName: data.quality.forecastProvider ?? "Modelo meteorológico",
+      forecastName: data.quality.forecastProvider ?? "Previsão meteorológica indisponível",
       forecastUrl: "/metodologia",
     },
   };

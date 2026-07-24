@@ -1,6 +1,5 @@
 import Link from "@/production/compat/NextLink";
 import type { ReactNode } from "react";
-import { WeatherIcon } from "@/production/components/weather-icon";
 import type { CppmetForecastItem } from "@/production/lib/cppmet-forecast";
 import type { WeatherData } from "@/production/lib/weather-data";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/production/lib/weather-insights";
@@ -15,7 +14,7 @@ type WeatherHeroProps = {
   } | null;
 };
 
-type HeroMetricIconName = "humidity" | "wind" | "gust" | "visibility";
+type HeroMetricIconName = "humidity" | "wind" | "pressure" | "direction";
 
 type HeroPresentation = {
   title: string;
@@ -37,8 +36,7 @@ const heroPresentationByLevel = {
   normal: {
     title: "Veja as condições para hoje.",
     highlightedTitle: "Planeje o restante do dia.",
-    description:
-      "Consulte a temperatura, a chuva e o vento agora e veja a previsão para as próximas horas.",
+    description: "Consulte a medição local disponível e veja a previsão para as próximas horas.",
     primaryAction: {
       href: "/tempo-hoje-pelotas",
       label: "Ver previsão de hoje",
@@ -108,7 +106,7 @@ function getDynamicTitle(weather: WeatherData, level: AdvisoryLevel, cppmetSumma
   }
 
   if (level === "attention") {
-    if ((today?.windGust ?? weather.current.windGust) >= 50 || has(/vento|rajada/)) {
+    if ((today?.windGust ?? 0) >= 50 || has(/vento|rajada/)) {
       return {
         title: "O vento pode ganhar força.",
         highlightedTitle: "Veja os horários com rajadas mais intensas.",
@@ -156,14 +154,14 @@ function getDynamicTitle(weather: WeatherData, level: AdvisoryLevel, cppmetSumma
     };
   }
 
-  if ((today?.max ?? weather.current.temperature) <= 15) {
+  if (today && today.max <= 15) {
     return {
       title: "O frio permanece em Pelotas.",
-      highlightedTitle: "Confira mínima, máxima e sensação.",
+      highlightedTitle: "Confira mínima e máxima previstas.",
     };
   }
 
-  if ((today?.max ?? weather.current.temperature) >= 30) {
+  if (today && today.max >= 30) {
     return {
       title: "O calor ganha destaque.",
       highlightedTitle: "Planeje os horários do dia.",
@@ -177,15 +175,15 @@ function getDynamicTitle(weather: WeatherData, level: AdvisoryLevel, cppmetSumma
 }
 
 function getCurrentSourceMeta(current: WeatherData["current"]) {
-  if (current.source.kind === "observation") {
-    const updateTime = current.source.observedAt
-      ? `Atualizado às ${current.source.observedAt}`
-      : "Dados atualizados";
+  if (!current.available) return "Medição recente indisponível · Embrapa Clima Temperado";
 
-    return `${updateTime} · ${current.source.name}`;
-  }
+  const updateTime = current.source.observedAt
+    ? `Leitura das ${current.source.observedAt}`
+    : current.updatedAt
+      ? `Atualizada em ${current.updatedAt}`
+      : "Leitura recente";
 
-  return `${current.updatedAt} · ${current.source.name}`;
+  return `${updateTime} · ${current.source.name}`;
 }
 
 function getOfficialAlertReason(count: number) {
@@ -200,9 +198,17 @@ function HeroMetricIcon({ name }: { name: HeroMetricIconName }) {
     wind: (
       <path d="M3 8h10.5c3.8 0 3.8-5.5.2-5.5-1.9 0-2.9 1-2.9 2.8M3 13h15.5c3.8 0 3.8 6.5.2 6.5-1.9 0-2.9-1-2.9-2.8M3 18h7.5" />
     ),
-    gust: <path d="M4 7.5h10.8M4 12h16M4 16.5h12.5M17.5 5.2l2.5 2.3-2.5 2.3" />,
-    visibility: (
-      <path d="M2.5 12s3.4-5.5 9.5-5.5 9.5 5.5 9.5 5.5-3.4 5.5-9.5 5.5S2.5 12 2.5 12Zm9.5-2.8a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6Z" />
+    pressure: (
+      <>
+        <circle cx="12" cy="12" r="8" />
+        <path d="m12 12 3.2-3.2M8 16h8" />
+      </>
+    ),
+    direction: (
+      <>
+        <path d="m12 3 5 13-5-2-5 2 5-13Z" />
+        <path d="M12 14v7" />
+      </>
     ),
   } satisfies Record<HeroMetricIconName, ReactNode>;
 
@@ -216,6 +222,18 @@ function HeroMetricIcon({ name }: { name: HeroMetricIconName }) {
         strokeLinejoin="round"
       >
         {paths[name]}
+      </g>
+    </svg>
+  );
+}
+
+function StationObservationIcon() {
+  return (
+    <svg viewBox="0 0 96 96" aria-hidden="true">
+      <g fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round">
+        <path d="M48 18v43" />
+        <circle cx="48" cy="68" r="13" />
+        <path d="M48 25h11M48 38h8M48 51h11" />
       </g>
     </svg>
   );
@@ -239,6 +257,10 @@ function HeroMetric({
       </div>
     </div>
   );
+}
+
+function metricValue(value: number | null, unit: string) {
+  return value === null ? "Não informado" : `${value}${unit}`;
 }
 
 export function WeatherHero({
@@ -266,7 +288,6 @@ export function WeatherHero({
     .filter((reason): reason is string => Boolean(reason))
     .slice(0, 2);
   const currentSourceMeta = getCurrentSourceMeta(current);
-  const visibilityValue = current.visibility >= 0 ? `${current.visibility} km` : "Indisponível";
 
   return (
     <section
@@ -304,12 +325,18 @@ export function WeatherHero({
               </div>
               <div>
                 <dt>Chance máxima de chuva</dt>
-                <dd>{today.rainChance}%</dd>
+                <dd>{today.rainChance === null ? "Não informada" : `${today.rainChance}%`}</dd>
               </div>
               <div>
                 <dt>Rajada máxima prevista</dt>
                 <dd>
-                  {today.windGust} <small>km/h</small>
+                  {today.windGust === null ? (
+                    "Não informada"
+                  ) : (
+                    <>
+                      {today.windGust} <small>km/h</small>
+                    </>
+                  )}
                 </dd>
               </div>
             </dl>
@@ -334,37 +361,80 @@ export function WeatherHero({
           </div>
         </div>
 
-        <div className="weather-hero-now" aria-label="Tempo agora em Pelotas">
+        <div
+          className={`weather-hero-now${current.available ? "" : " is-unavailable"}`}
+          aria-label={
+            current.available
+              ? "Medição atual da Embrapa em Pelotas"
+              : "Medição atual da Embrapa indisponível"
+          }
+        >
           <div className="weather-hero-now-heading">
             <div>
               <span>Pelotas, RS</span>
               <small>{currentSourceMeta}</small>
             </div>
             <span className="weather-hero-live">
-              <i aria-hidden="true" /> Agora
+              <i aria-hidden="true" /> {current.available ? "Medição" : "Indisponível"}
             </span>
           </div>
 
-          <div className="weather-hero-visual">
-            <div className="weather-hero-icon">
-              <WeatherIcon name={current.icon} title={current.condition} />
-            </div>
+          {current.available ? (
+            <>
+              <div className="weather-hero-visual">
+                <div className="weather-hero-icon weather-hero-icon--station">
+                  <StationObservationIcon />
+                </div>
 
-            <div className="weather-hero-temperature">
-              <strong>{current.temperature}°</strong>
-              <div>
-                <span>{current.condition}</span>
-                <small>Sensação de {current.feelsLike}°</small>
+                <div className="weather-hero-temperature">
+                  <strong>{metricValue(current.temperature, "°")}</strong>
+                  <div>
+                    <span>Medição da estação</span>
+                    <small>
+                      {current.feelsLike === null
+                        ? "Sensação não informada"
+                        : `Sensação de ${current.feelsLike}°`}
+                    </small>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          <div className="weather-hero-metrics">
-            <HeroMetric icon="humidity" label="Umidade" value={`${current.humidity}%`} />
-            <HeroMetric icon="wind" label="Vento" value={`${current.windSpeed} km/h`} />
-            <HeroMetric icon="gust" label="Rajada" value={`${current.windGust} km/h`} />
-            <HeroMetric icon="visibility" label="Visibilidade" value={visibilityValue} />
-          </div>
+              <div className="weather-hero-metrics">
+                <HeroMetric
+                  icon="humidity"
+                  label="Umidade"
+                  value={metricValue(current.humidity, "%")}
+                />
+                <HeroMetric
+                  icon="wind"
+                  label="Vento medido"
+                  value={metricValue(current.windSpeed, " km/h")}
+                />
+                <HeroMetric
+                  icon="pressure"
+                  label="Pressão"
+                  value={metricValue(current.pressure, " hPa")}
+                />
+                <HeroMetric
+                  icon="direction"
+                  label="Direção"
+                  value={current.windDirection ?? "Não informada"}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="weather-hero-current-unavailable">
+              <div className="weather-hero-icon weather-hero-icon--station">
+                <StationObservationIcon />
+              </div>
+              <strong>Medição atual indisponível</strong>
+              <p>
+                A Embrapa não forneceu uma leitura recente e verificável. Nenhum valor de previsão
+                foi usado como condição atual.
+              </p>
+              <Link href="/estacao-embrapa-pelotas">Consultar a estação</Link>
+            </div>
+          )}
         </div>
       </div>
 

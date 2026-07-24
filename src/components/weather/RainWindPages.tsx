@@ -67,7 +67,7 @@ function PageHeader({
     <header className="condition-page-header">
       <div>
         <Link className="condition-back-link" to="/">
-          <ArrowLeft aria-hidden="true" /> Tempo agora
+          <ArrowLeft aria-hidden="true" /> Visão geral
         </Link>
         <p className="condition-kicker">{kicker}</p>
         <h1>{title}</h1>
@@ -85,7 +85,7 @@ function EmptyConditionPage({ label }: { label: string }) {
       <h1>{label} temporariamente indisponível</h1>
       <p>As fontes consultadas não forneceram dados suficientes para esta análise.</p>
       <Link to="/">
-        <ArrowLeft aria-hidden="true" /> Voltar ao tempo agora
+        <ArrowLeft aria-hidden="true" /> Voltar à visão geral
       </Link>
     </section>
   );
@@ -294,16 +294,17 @@ export function WindPage({ data }: { data: WeatherIntelligenceData }) {
           (day.windGust ?? -1) > (selected.windGust ?? -1) ? day : selected,
         )
       : null;
-  const gustValues = [current?.windGust, windiestHour?.windGust, windiestDay?.windGust].filter(
+  const forecastGustValues = [windiestHour?.windGust, windiestDay?.windGust].filter(
     (value): value is number => value !== null && value !== undefined,
   );
-  const maximumGust = gustValues.length > 0 ? Math.max(...gustValues) : null;
+  const maximumForecastGust =
+    forecastGustValues.length > 0 ? Math.max(...forecastGustValues) : null;
   const windLevel =
-    maximumGust === null
+    maximumForecastGust === null
       ? "normal"
-      : maximumGust >= 70
+      : maximumForecastGust >= 70
         ? "warning"
-        : maximumGust >= 50
+        : maximumForecastGust >= 50
           ? "attention"
           : "normal";
 
@@ -312,7 +313,7 @@ export function WindPage({ data }: { data: WeatherIntelligenceData }) {
       <PageHeader
         kicker="Vento em Pelotas"
         title="Velocidade, direção e rajadas previstas"
-        description="Acompanhe o vento agora, a evolução das próximas horas e os períodos com rajadas mais fortes em Pelotas."
+        description="Consulte a medição local quando disponível e compare com o vento e as rajadas previstos para as próximas horas."
         data={data}
       />
 
@@ -321,9 +322,9 @@ export function WindPage({ data }: { data: WeatherIntelligenceData }) {
         aria-labelledby="wind-highlight-title"
       >
         <div>
-          <p className="condition-kicker">Condição atual</p>
+          <p className="condition-kicker">Previsão de vento</p>
           <h2 id="wind-highlight-title">
-            {maximumGust === null
+            {maximumForecastGust === null
               ? "A fonte informa vento, mas não estima rajadas"
               : windLevel === "warning"
                 ? "Rajadas fortes aparecem na previsão"
@@ -333,8 +334,8 @@ export function WindPage({ data }: { data: WeatherIntelligenceData }) {
           </h2>
           <p>
             {current
-              ? `Agora, o vento está em ${current.windSpeed ?? "—"} km/h, com direção ${current.windDirection ?? "não informada"}${current.windGust === null ? "; a fonte não informa rajadas" : ` e rajadas de ${current.windGust} km/h`}.`
-              : "A leitura atual está em atualização; consulte as projeções horárias abaixo."}
+              ? `A Embrapa mediu vento de ${current.windSpeed ?? "—"} km/h, com direção ${current.windDirection ?? "não informada"}. As rajadas abaixo são previsões do modelo.`
+              : "A medição atual da Embrapa está indisponível. Os valores abaixo são exclusivamente previstos."}
           </p>
         </div>
 
@@ -345,7 +346,7 @@ export function WindPage({ data }: { data: WeatherIntelligenceData }) {
               ? "—"
               : current.windSpeed}
           </strong>
-          <span>km/h agora</span>
+          <span>{current ? "km/h medidos" : "medição indisponível"}</span>
         </div>
       </section>
 

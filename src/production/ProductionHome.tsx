@@ -44,8 +44,7 @@ export function ProductionHome({
   lagoon: LagoonMonitoringNetworkData;
 }) {
   const hasUsableWeather = Boolean(
-    data.weather.current?.temperature != null ||
-    data.weather.observation.current.temperature != null ||
+    data.weather.current !== null ||
     data.weather.hourly.length > 0 ||
     data.weather.daily.length > 0,
   );
