@@ -7,7 +7,7 @@ import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.funct
 
 const PAGE_TITLE = "Estação meteorológica da Embrapa em Pelotas";
 const PAGE_DESCRIPTION =
-  "Temperatura, umidade, pressão, vento, extremos e chuva acumulada consultados na Estação da Embrapa Clima Temperado em Pelotas.";
+  "Temperatura, umidade, pressão, vento, extremos, chuva e evapotranspiração da Estação Embrapa Clima Temperado em Pelotas.";
 const PAGE_PATH = "/estacao-embrapa-pelotas";
 
 export const Route = createFileRoute("/estacao-embrapa-pelotas")({
