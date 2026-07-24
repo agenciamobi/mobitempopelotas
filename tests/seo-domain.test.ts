@@ -10,6 +10,7 @@ const legacyHost = ["mobitempopelotas", "lovable", "app"].join(".");
 const wwwHost = ["www", "tempopelotas", "com", "br"].join(".");
 const wwwHost = ["www", "tempopelotas", "com", "br"].join(".");
 const wwwHost = ["www", "tempopelotas", "com", "br"].join(".");
+const wwwHost = ["www", "tempopelotas", "com", "br"].join(".");
 
 test("o domínio canônico é único e não depende de ambiente", () => {
   assert.equal(CANONICAL_SITE_URL, "https://tempopelotas.com.br");
