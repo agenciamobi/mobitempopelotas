@@ -210,18 +210,13 @@ export function Header() {
             <Link className="production-brand" to="/" aria-label="Tempo Pelotas — página inicial">
               <img
                 className="production-brand-logo"
-                src="/brand/tempo-pelotas-header"
+                src="/brand/tempo-pelotas-purple.svg"
                 alt=""
                 width={10694}
                 height={1552}
                 draggable={false}
               />
             </Link>
-            <span className="production-brand-divider" aria-hidden="true" />
-            <span className="production-brand-context">
-              <strong>Pelotas, RS</strong>
-              <small>Tempo e águas</small>
-            </span>
           </div>
 
           <nav className="mega-navigation" aria-label="Navegação principal">

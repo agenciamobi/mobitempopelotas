@@ -85,8 +85,8 @@
 
   .site-shell .site-header .brand-logo,
   .site-shell--home-editorial .site-header--hero .brand-logo {
-    width: clamp(172px, 11vw, 194px);
-    max-height: 28px;
+    width: clamp(190px, 13vw, 218px);
+    max-height: 34px;
   }
 
   .site-header-brand-divider {
@@ -390,7 +390,7 @@
 
   .site-shell .site-header .brand-logo,
   .site-shell--home-editorial .site-header--hero .brand-logo {
-    width: 160px;
+    width: 184px;
   }
 
   .site-shell .site-header .main-nav a,
@@ -425,7 +425,7 @@
 
   .site-shell .site-header .brand-logo,
   .site-shell--home-editorial .site-header--hero .brand-logo {
-    width: 146px;
+    width: 168px;
   }
 
   .site-shell .site-header .main-nav a,
@@ -489,8 +489,8 @@
 
   .site-shell .site-header .brand-logo,
   .site-shell--home-editorial .site-header--hero .brand-logo {
-    width: clamp(142px, 38vw, 160px);
-    max-height: 24px;
+    width: clamp(154px, 42vw, 176px);
+    max-height: 27px;
   }
 
   .site-header-context,
