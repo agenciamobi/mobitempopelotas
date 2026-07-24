@@ -32,7 +32,6 @@ const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
   "met-norway": "MET Norway",
 };
 
-
 function clockToMinutes(value: string | null) {
   if (!value) return null;
   const match = value.match(/^(\d{1,2}):(\d{2})$/);
@@ -97,7 +96,6 @@ function createCurrentFromObservation(observation: EmbrapaObservation): Aggregat
     icon: null,
   };
 }
-
 
 function applyEmbrapaObservation(
   current: AggregatedCurrentWeather,
@@ -356,7 +354,6 @@ function confidenceFromScore(score: number): WeatherConfidence {
   return "low";
 }
 
-
 function createSources(
   baseline: WeatherBaselineData,
   observation: EmbrapaObservation,
@@ -558,4 +555,3 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     message: buildMessage(status, degradedSources),
   };
 }
-

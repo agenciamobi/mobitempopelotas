@@ -108,20 +108,29 @@ function makeSources(
 // ---- selectBaseline (rastreabilidade da seleção) --------------------------
 
 test("Open-Meteo saudável é selecionado com a chave correta", () => {
-  const baseline = selectBaseline(makeProvider("open-meteo", true), makeProvider("met-norway", true));
+  const baseline = selectBaseline(
+    makeProvider("open-meteo", true),
+    makeProvider("met-norway", true),
+  );
   assert.equal(baseline.source.key, "open-meteo");
   assert.equal(baseline.providers["open-meteo"].status, "live");
   assert.equal(baseline.providers["met-norway"].status, "live");
 });
 
 test("Open-Meteo indisponível: MET Norway assume como contingência", () => {
-  const baseline = selectBaseline(makeProvider("open-meteo", false), makeProvider("met-norway", true));
+  const baseline = selectBaseline(
+    makeProvider("open-meteo", false),
+    makeProvider("met-norway", true),
+  );
   assert.equal(baseline.source.key, "met-norway");
   assert.equal(baseline.providers["open-meteo"].status, "unavailable");
 });
 
 test("Baseline preserva providers para auditoria mesmo em falha total", () => {
-  const baseline = selectBaseline(makeProvider("open-meteo", false), makeProvider("met-norway", false));
+  const baseline = selectBaseline(
+    makeProvider("open-meteo", false),
+    makeProvider("met-norway", false),
+  );
   assert.equal(baseline.source.key, "open-meteo");
   assert.ok(baseline.providers["open-meteo"]);
   assert.ok(baseline.providers["met-norway"]);
@@ -129,7 +138,10 @@ test("Baseline preserva providers para auditoria mesmo em falha total", () => {
 });
 
 test("Falha isolada do MET Norway não altera a seleção do Open-Meteo", () => {
-  const baseline = selectBaseline(makeProvider("open-meteo", true), makeProvider("met-norway", false));
+  const baseline = selectBaseline(
+    makeProvider("open-meteo", true),
+    makeProvider("met-norway", false),
+  );
   assert.equal(baseline.source.key, "open-meteo");
   assert.equal(baseline.providers["met-norway"].status, "unavailable");
 });
@@ -137,7 +149,10 @@ test("Falha isolada do MET Norway não altera a seleção do Open-Meteo", () => 
 // ---- deriveTraceability (camada agregada) --------------------------------
 
 test("Agregação com Open-Meteo saudável: forecastSource=open-meteo, provider Open-Meteo, status live", () => {
-  const baseline = selectBaseline(makeProvider("open-meteo", true), makeProvider("met-norway", true));
+  const baseline = selectBaseline(
+    makeProvider("open-meteo", true),
+    makeProvider("met-norway", true),
+  );
   const sources = makeSources(baseline);
   const trace = deriveTraceability({
     baseline,
@@ -154,7 +169,10 @@ test("Agregação com Open-Meteo saudável: forecastSource=open-meteo, provider 
 });
 
 test("Agregação: falha apenas do MET Norway não entra em degradedSources nem degrada status", () => {
-  const baseline = selectBaseline(makeProvider("open-meteo", true), makeProvider("met-norway", false));
+  const baseline = selectBaseline(
+    makeProvider("open-meteo", true),
+    makeProvider("met-norway", false),
+  );
   const sources = makeSources(baseline);
   const trace = deriveTraceability({
     baseline,
@@ -170,7 +188,10 @@ test("Agregação: falha apenas do MET Norway não entra em degradedSources nem 
 });
 
 test("Agregação com contingência MET Norway: forecastSource=met-norway, provider MET Norway, status degraded", () => {
-  const baseline = selectBaseline(makeProvider("open-meteo", false), makeProvider("met-norway", true));
+  const baseline = selectBaseline(
+    makeProvider("open-meteo", false),
+    makeProvider("met-norway", true),
+  );
   const sources = makeSources(baseline);
   const trace = deriveTraceability({
     baseline,
@@ -188,7 +209,10 @@ test("Agregação com contingência MET Norway: forecastSource=met-norway, provi
 });
 
 test("Procedência da baseline MET Norway contém met-norway e nunca open-meteo", () => {
-  const baseline = selectBaseline(makeProvider("open-meteo", false), makeProvider("met-norway", true));
+  const baseline = selectBaseline(
+    makeProvider("open-meteo", false),
+    makeProvider("met-norway", true),
+  );
   const provenance = baselineProvenance(baseline.current, baseline.source.key);
   const values = Object.values(provenance);
   assert.ok(values.length > 0);
@@ -197,7 +221,10 @@ test("Procedência da baseline MET Norway contém met-norway e nunca open-meteo"
 });
 
 test("Procedência da baseline Open-Meteo contém open-meteo e nunca met-norway", () => {
-  const baseline = selectBaseline(makeProvider("open-meteo", true), makeProvider("met-norway", true));
+  const baseline = selectBaseline(
+    makeProvider("open-meteo", true),
+    makeProvider("met-norway", true),
+  );
   const provenance = baselineProvenance(baseline.current, baseline.source.key);
   const values = Object.values(provenance);
   assert.ok(values.every((v) => v === "open-meteo"));
