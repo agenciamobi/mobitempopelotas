@@ -1,4 +1,4 @@
-name: Runtime Lovable
+name: Runtime de produção
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: runtime-lovable-production
+  group: runtime-production
   cancel-in-progress: true
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
     steps:
       - name: Consultar aplicação publicada
         env:
-          BASE_URL: https://mobitempopelotas.lovable.app
+          BASE_URL: https://tempopelotas.com.br
         run: |
           node <<'NODE'
           const baseUrl = process.env.BASE_URL.replace(/\/$/, "");
