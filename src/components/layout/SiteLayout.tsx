@@ -17,11 +17,17 @@ function pageAnnouncement() {
   return title ? `Página carregada: ${title}` : "Página carregada";
 }
 
+function topicKeyFromPath(pathname: string) {
+  return pathname.split("/").filter(Boolean)[0] ?? "geral";
+}
+
 export function SiteLayout({ children, forceShell = false }: SiteLayoutProps) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const mainRef = useRef<HTMLElement>(null);
   const firstRender = useRef(true);
   const [announcement, setAnnouncement] = useState("");
+  const isTopicRoute = !forceShell && !standaloneRoutes.has(pathname);
+  const topicKey = isTopicRoute ? topicKeyFromPath(pathname) : undefined;
 
   useEffect(() => {
     if (firstRender.current) {
@@ -55,13 +61,23 @@ export function SiteLayout({ children, forceShell = false }: SiteLayoutProps) {
   }
 
   return (
-    <div className="site-shell">
+    <div
+      className={isTopicRoute ? "site-shell site-shell--topic" : "site-shell"}
+      data-topic={topicKey}
+    >
       <div className="visually-hidden" aria-live="polite" aria-atomic="true">
         {announcement}
       </div>
       <Header />
-      <main ref={mainRef} id="conteudo-principal" className="site-main" tabIndex={-1}>
-        <div className="site-container">{children}</div>
+      <main
+        ref={mainRef}
+        id="conteudo-principal"
+        className={isTopicRoute ? "site-main site-main--topic" : "site-main"}
+        tabIndex={-1}
+      >
+        <div className={isTopicRoute ? "site-container site-container--topic" : "site-container"}>
+          {children}
+        </div>
       </main>
       <Footer />
     </div>
