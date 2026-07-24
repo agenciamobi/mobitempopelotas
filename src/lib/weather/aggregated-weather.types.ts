@@ -4,9 +4,12 @@ import type {
   InmetAlert,
   OfficialSourceStatus,
 } from "./official-sources.types";
-import type { DailyForecast, HourlyForecast, WeatherIconName } from "./types";
+import type { DailyForecast, ForecastSourceKey, HourlyForecast, WeatherIconName } from "./types";
 
-export type WeatherSourceKey = "embrapa" | "inmet" | "cppmet" | "open-meteo";
+export type { ForecastSourceKey };
+
+export type WeatherSourceKey = "embrapa" | "inmet" | "cppmet" | ForecastSourceKey;
+
 
 export type AggregatedWeatherStatus = "live" | "degraded" | "unavailable";
 export type WeatherConfidence = "high" | "medium" | "low";
@@ -68,8 +71,8 @@ export type WeatherSourceHealth = {
 export type AggregatedWeatherQuality = {
   score: number;
   confidence: WeatherConfidence;
-  currentSource: "embrapa" | "open-meteo" | null;
-  forecastSource: "open-meteo" | null;
+  currentSource: "embrapa" | ForecastSourceKey | null;
+  forecastSource: ForecastSourceKey | null;
   forecastProvider: string | null;
   degradedSources: WeatherSourceKey[];
   observationAgeMinutes: number | null;
