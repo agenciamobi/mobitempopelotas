@@ -24,12 +24,17 @@ export type EmbrapaObservation = {
     temperatureMax: TimedObservation;
     humidityMin: TimedObservation;
     humidityMax: TimedObservation;
+    dewPointMin?: TimedObservation;
+    dewPointMax?: TimedObservation;
     windSpeedMax: TimedObservation;
   };
   accumulated: {
     rainDaily: number | null;
     rainMonthly: number | null;
     rainAnnual: number | null;
+    evapotranspirationDaily?: number | null;
+    evapotranspirationMonthly?: number | null;
+    evapotranspirationAnnual?: number | null;
   };
   source: {
     name: "Embrapa Clima Temperado";
