@@ -54,15 +54,24 @@ jobs:
           echo "status=$((python_status + prettier_status))" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Commitar resultado ou diagnóstico
+      - name: Publicar diagnóstico
+        uses: actions/upload-artifact@v4
+        with:
+          name: apply-official-logo-${{ github.run_id }}
+          path: .github/logo-assets/apply-logo.log
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Commitar resultado
+        if: steps.apply.outputs.status == '0'
         run: |
           if [ -z "$(git status --porcelain)" ]; then
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "brand: aplica identidade ou registra diagnóstico"
+          git add public/brand src/components/layout src/production/components/site-header.tsx src/production/components/site-footer.tsx
+          git commit -m "brand: aplica logotipos oficiais do Tempo Pelotas"
           git push origin HEAD:agent/apply-official-logo
 
       - name: Falhar quando a aplicação não concluir
