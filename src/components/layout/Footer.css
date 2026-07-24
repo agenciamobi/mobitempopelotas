@@ -62,24 +62,16 @@
   display: inline-flex;
   width: fit-content;
   max-width: 100%;
-  align-items: baseline;
-  gap: 0.42rem;
+  align-items: center;
   border-radius: 10px;
   color: var(--footer-ink);
 }
 
-.editorial-footer-brand strong {
-  color: #5e2ced;
-  font-size: clamp(1.35rem, 3vw, 2rem);
-  font-weight: 950;
-  letter-spacing: -0.06em;
-}
-
-.editorial-footer-brand em {
-  color: #16869a;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(1.1rem, 2.5vw, 1.55rem);
-  font-style: italic;
+.editorial-footer-brand-logo {
+  display: block;
+  width: clamp(210px, 24vw, 330px);
+  max-width: 100%;
+  height: auto;
 }
 
 .editorial-footer-eyebrow {

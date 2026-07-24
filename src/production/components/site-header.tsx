@@ -324,7 +324,7 @@ export function SiteHeader({ advisoryLevel = "normal", variant = "default" }: Si
               className="brand-logo"
               src="/brand/tempo-pelotas-header"
               alt=""
-              width={11349}
+              width={10694}
               height={1552}
               draggable={false}
             />
