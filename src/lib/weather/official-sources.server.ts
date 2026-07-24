@@ -8,8 +8,8 @@ import type {
   OfficialWeatherSources,
   TimedObservation,
 } from "./official-sources.types";
+import { OFFICIAL_SOURCE_DEADLINE_MS } from "./source-policy.ts";
 
-const OFFICIAL_SOURCE_DEADLINE_MS = 3_500;
 const EMBRAPA_URL = "https://agromet.cpact.embrapa.br/online/Current_Monitor.htm";
 const INMET_FEED_URL = "https://apiprevmet3.inmet.gov.br/avisos/rss";
 const INMET_PORTAL_URL = "https://avisos.inmet.gov.br/";
@@ -89,6 +89,7 @@ function unavailableCppmet(error: string): CppmetForecast {
 async function settleWithin<T>(
   promise: Promise<T>,
   sourceName: string,
+  deadlineMs: number,
   fallback: (error: string) => T,
 ): Promise<T> {
   let timeout: ReturnType<typeof setTimeout> | undefined;
@@ -98,12 +99,8 @@ async function settleWithin<T>(
       promise,
       new Promise<T>((resolve) => {
         timeout = setTimeout(() => {
-          resolve(
-            fallback(
-              `${sourceName} excedeu o limite de ${OFFICIAL_SOURCE_DEADLINE_MS / 1_000} segundos.`,
-            ),
-          );
-        }, OFFICIAL_SOURCE_DEADLINE_MS);
+          resolve(fallback(`${sourceName} excedeu o limite de ${deadlineMs / 1_000} segundos.`));
+        }, deadlineMs);
       }),
     ]);
   } catch (error) {
@@ -117,9 +114,19 @@ async function settleWithin<T>(
 
 export async function fetchOfficialWeatherSources(): Promise<OfficialWeatherSources> {
   const [embrapa, inmet, cppmet] = await Promise.all([
-    settleWithin(fetchEmbrapaObservation(), "Embrapa", unavailableEmbrapa),
-    settleWithin(fetchInmetAlerts(), "INMET", unavailableInmet),
-    settleWithin(fetchCppmetForecast(), "CPPMet", unavailableCppmet),
+    settleWithin(
+      fetchEmbrapaObservation(),
+      "Embrapa",
+      OFFICIAL_SOURCE_DEADLINE_MS.embrapa,
+      unavailableEmbrapa,
+    ),
+    settleWithin(fetchInmetAlerts(), "INMET", OFFICIAL_SOURCE_DEADLINE_MS.inmet, unavailableInmet),
+    settleWithin(
+      fetchCppmetForecast(),
+      "CPPMet",
+      OFFICIAL_SOURCE_DEADLINE_MS.cppmet,
+      unavailableCppmet,
+    ),
   ]);
 
   const degradedSources: OfficialWeatherSources["degradedSources"] = [];
