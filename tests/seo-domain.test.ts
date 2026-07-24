@@ -1,3 +1,5 @@
+import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import test from "node:test";
 
@@ -49,4 +51,20 @@ test("o sitemap contém somente URLs canônicas e todas as rotas públicas", () 
   for (const route of PUBLIC_ROUTES) {
     assert.equal(sitemap.includes(`<loc>${absoluteUrl(route.path)}</loc>`), true);
   }
+});
+
+test("nenhum arquivo rastreado publica domínios obsoletos", () => {
+  const trackedFiles = execFileSync("git", ["ls-files", "-z"]).toString("utf8").split("\0").filter(Boolean);
+  const offenders: string[] = [];
+
+  for (const file of trackedFiles) {
+    try {
+      const content = readFileSync(file, "utf8");
+      if (content.includes(legacyHost) || content.includes(wwwHost)) offenders.push(file);
+    } catch {
+      // Arquivos binários não participam da verificação textual.
+    }
+  }
+
+  assert.deepEqual(offenders, []);
 });
