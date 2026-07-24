@@ -83,6 +83,7 @@ function createUnavailableWeather(message: string): WeatherHomeData {
       name: "MET Norway",
       url: SOURCE_URL,
       kind: "forecast",
+      key: "met-norway",
       fetchedAt: new Date().toISOString(),
       isFallback: true,
     },
