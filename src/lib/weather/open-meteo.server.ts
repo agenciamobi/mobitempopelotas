@@ -5,7 +5,7 @@ import type { DailyForecast, HourlyForecast, WeatherHomeData, WeatherIconName } 
 const FORECAST_ENDPOINT = "https://api.open-meteo.com/v1/forecast";
 const OPEN_METEO_URL = "https://open-meteo.com/";
 const TIMEZONE = "America/Sao_Paulo";
-const REQUEST_TIMEOUT_MS = 8_000;
+const REQUEST_TIMEOUT_MS = 15_000;
 
 const PELOTAS = {
   city: "Pelotas",
@@ -201,17 +201,25 @@ function normalizeHourly(response: OpenMeteoResponse): HourlyForecast[] {
     const temperature = response.hourly.temperature_2m[index];
     if (!time || temperature === null || temperature === undefined) continue;
 
+    const windSpeed = response.hourly.wind_speed_10m[index];
+    if (windSpeed === null || windSpeed === undefined) continue;
+
     const presentation = weatherCodeToPresentation(
       response.hourly.weather_code[index],
       response.hourly.is_day[index] !== 0,
     );
+    const precipitationProbability = response.hourly.precipitation_probability[index];
+    const windGust = response.hourly.wind_gusts_10m[index];
 
     items.push({
       time: offset === 0 ? "Agora" : `${formatClock(time)?.slice(0, 2) ?? "--"}h`,
       temperature: Math.round(temperature),
-      precipitationProbability: Math.round(response.hourly.precipitation_probability[index] ?? 0),
-      windSpeed: Math.round(response.hourly.wind_speed_10m[index] ?? 0),
-      windGust: Math.round(response.hourly.wind_gusts_10m[index] ?? 0),
+      precipitationProbability:
+        precipitationProbability === null || precipitationProbability === undefined
+          ? null
+          : Math.round(precipitationProbability),
+      windSpeed: Math.round(windSpeed),
+      windGust: windGust === null || windGust === undefined ? null : Math.round(windGust),
       icon: presentation.icon,
     });
   }
@@ -229,14 +237,20 @@ function normalizeDaily(response: OpenMeteoResponse): DailyForecast[] {
       return;
     }
 
+    const precipitation = response.daily.precipitation_sum[index];
+    if (precipitation === null || precipitation === undefined) return;
+
+    const rainChance = response.daily.precipitation_probability_max[index];
+    const windGust = response.daily.wind_gusts_10m_max[index];
+
     items.push({
       weekday: formatDay(date, index),
       date: formatDate(date),
       min: Math.round(minimum),
       max: Math.round(maximum),
-      rainChance: Math.round(response.daily.precipitation_probability_max[index] ?? 0),
-      precipitationMm: Number((response.daily.precipitation_sum[index] ?? 0).toFixed(1)),
-      windGust: Math.round(response.daily.wind_gusts_10m_max[index] ?? 0),
+      rainChance: rainChance === null || rainChance === undefined ? null : Math.round(rainChance),
+      precipitationMm: Number(precipitation.toFixed(1)),
+      windGust: windGust === null || windGust === undefined ? null : Math.round(windGust),
       icon: weatherCodeToPresentation(response.daily.weather_code[index], true).icon,
     });
   });
@@ -262,7 +276,7 @@ function createUnavailableWeather(message: string): WeatherHomeData {
   };
 }
 
-function normalizeWeather(response: OpenMeteoResponse): WeatherHomeData {
+export function normalizeOpenMeteoWeather(response: OpenMeteoResponse): WeatherHomeData {
   const currentPresentation = weatherCodeToPresentation(
     response.current.weather_code,
     response.current.is_day !== 0,
@@ -321,12 +335,17 @@ function normalizeWeather(response: OpenMeteoResponse): WeatherHomeData {
   };
 }
 
-function createForecastUrl() {
+export function createOpenMeteoForecastUrl() {
   const params = new URLSearchParams({
     latitude: String(PELOTAS.latitude),
     longitude: String(PELOTAS.longitude),
     timezone: TIMEZONE,
     forecast_days: "7",
+    temperature_unit: "celsius",
+    wind_speed_unit: "kmh",
+    precipitation_unit: "mm",
+    timeformat: "iso8601",
+    cell_selection: "land",
     current: [
       "temperature_2m",
       "relative_humidity_2m",
@@ -381,8 +400,12 @@ export async function fetchPelotasWeather(): Promise<WeatherHomeData> {
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const response = await fetch(createForecastUrl(), {
-      headers: { Accept: "application/json" },
+    const response = await fetch(createOpenMeteoForecastUrl(), {
+      cache: "no-store",
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "MOBI-Tempo-Pelotas/2.0 (+https://tempopelotas.com.br)",
+      },
       signal: controller.signal,
     });
 
@@ -404,7 +427,7 @@ export async function fetchPelotasWeather(): Promise<WeatherHomeData> {
       );
     }
 
-    return normalizeWeather(parsed.data);
+    return normalizeOpenMeteoWeather(parsed.data);
   } catch (error) {
     logOpenMeteoError(error);
     return createUnavailableWeather(
