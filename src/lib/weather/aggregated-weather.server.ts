@@ -13,25 +13,16 @@ import type {
   WeatherSourceHealth,
   WeatherSourceKey,
 } from "./aggregated-weather.types";
+import {
+  CURRENT_FIELDS,
+  FORECAST_PROVIDER_LABELS,
+  baselineProvenance,
+  createProviderHealth,
+  deriveTraceability,
+} from "./weather-traceability";
 
 const TIMEZONE = "America/Sao_Paulo";
 const OBSERVATION_MAX_AGE_MINUTES = 30;
-
-const CURRENT_FIELDS: AggregatedCurrentField[] = [
-  "temperature",
-  "feelsLike",
-  "condition",
-  "humidity",
-  "pressure",
-  "windSpeed",
-  "windGust",
-  "windDirection",
-  "visibilityKm",
-  "sunrise",
-  "sunset",
-  "observedAt",
-  "icon",
-];
 
 const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
   embrapa: "Embrapa",
@@ -41,10 +32,6 @@ const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
   "met-norway": "MET Norway",
 };
 
-const FORECAST_PROVIDER_LABELS: Record<ForecastSourceKey, string> = {
-  "open-meteo": "Open-Meteo",
-  "met-norway": "MET Norway",
-};
 
 function clockToMinutes(value: string | null) {
   if (!value) return null;
