@@ -93,7 +93,7 @@ jobs:
 
       - name: Capturar e validar viewports
         env:
-          PRODUCTION_URL: https://www.tempopelotas.com.br
+          PRODUCTION_URL: https://tempopelotas.com.br
           CANDIDATE_URL: http://127.0.0.1:4173
           CANDIDATE_NAME: revisao-${{ github.event.pull_request.number || 'manual' }}
           WAIT_FOR_CANDIDATE_DEPLOYMENT: "false"
