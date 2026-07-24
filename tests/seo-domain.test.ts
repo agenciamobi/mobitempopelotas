@@ -1,5 +1,5 @@
-import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import path from "node:path";
 import assert from "node:assert/strict";
 import test from "node:test";
 
@@ -10,6 +10,28 @@ import { createSitemapXml } from "../src/lib/sitemap.ts";
 
 const legacyHost = ["mobitempopelotas", "lovable", "app"].join(".");
 const wwwHost = ["www", "tempopelotas", "com", "br"].join(".");
+const ignoredDirectories = new Set([
+  ".git",
+  ".output",
+  ".vinxi",
+  "artifacts",
+  "dist",
+  "node_modules",
+]);
+
+function listProjectFiles(directory = "."): string[] {
+  const files: string[] = [];
+
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    if (entry.isDirectory() && ignoredDirectories.has(entry.name)) continue;
+
+    const target = path.join(directory, entry.name);
+    if (entry.isDirectory()) files.push(...listProjectFiles(target));
+    if (entry.isFile()) files.push(target);
+  }
+
+  return files;
+}
 
 test("o domínio canônico é único e não depende de ambiente", () => {
   assert.equal(CANONICAL_SITE_URL, "https://tempopelotas.com.br");
@@ -53,14 +75,10 @@ test("o sitemap contém somente URLs canônicas e todas as rotas públicas", () 
   }
 });
 
-test("nenhum arquivo rastreado publica domínios obsoletos", () => {
-  const trackedFiles = execFileSync("git", ["ls-files", "-z"])
-    .toString("utf8")
-    .split("\0")
-    .filter(Boolean);
+test("nenhum arquivo do projeto publica domínios obsoletos", () => {
   const offenders: string[] = [];
 
-  for (const file of trackedFiles) {
+  for (const file of listProjectFiles()) {
     try {
       const content = readFileSync(file, "utf8");
       if (content.includes(legacyHost) || content.includes(wwwHost)) offenders.push(file);
