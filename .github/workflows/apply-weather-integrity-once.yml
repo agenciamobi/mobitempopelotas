@@ -21,20 +21,14 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - name: Corrigir integridade meteorológica
-        run: |
-          python scripts/apply-weather-integrity-once.py
-          python scripts/apply-weather-integrity-stage2.py
-          python scripts/apply-weather-integrity-stage3.py
+      - name: Limpar apresentação de campos opcionais
+        run: python scripts/apply-weather-integrity-stage3.py
       - name: Formatar arquivos alterados
         run: >-
           npx prettier --write
-          src/production/components/home-editorial-dashboard.tsx
           src/production/components/home-editorial-dashboard-semantic.tsx
           src/components/weather/WeatherEditorialHero.tsx
           src/components/weather/ForecastPages.tsx
-          src/components/weather/RainWindPages.tsx
-          src/lib/public-portal.server.ts
       - name: Commitar correções
         run: |
           if git diff --quiet; then
@@ -42,6 +36,6 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/production/components/home-editorial-dashboard.tsx src/production/components/home-editorial-dashboard-semantic.tsx src/components/weather/WeatherEditorialHero.tsx src/components/weather/ForecastPages.tsx src/components/weather/RainWindPages.tsx src/lib/public-portal.server.ts
+          git add src/production/components/home-editorial-dashboard-semantic.tsx src/components/weather/WeatherEditorialHero.tsx src/components/weather/ForecastPages.tsx
           git commit -m "fix: clean nullable weather presentation"
           git push origin HEAD:agent/weather-data-integrity
