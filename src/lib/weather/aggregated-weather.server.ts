@@ -3,9 +3,7 @@ import type { EmbrapaObservation } from "./official-sources.types";
 import { fetchPelotasWeather, type WeatherBaselineData } from "./weather-baseline.server";
 import type { CurrentWeather, DailyForecast, ForecastSourceKey, WeatherHomeData } from "./types";
 import type {
-  AggregatedCurrentField,
   AggregatedCurrentProvenance,
-  AggregatedCurrentWeather,
   AggregatedWeatherData,
   WeatherConfidence,
   WeatherDiscrepancy,
@@ -14,15 +12,18 @@ import type {
   WeatherSourceKey,
 } from "./aggregated-weather.types";
 import {
-  CURRENT_FIELDS,
   FORECAST_PROVIDER_LABELS,
-  baselineProvenance,
   createProviderHealth,
   deriveTraceability,
 } from "./weather-traceability";
+import {
+  OBSERVATION_MAX_AGE_MINUTES,
+  deriveEmbrapaCurrent,
+  getObservationAgeMinutes,
+} from "./current-observation";
 
 const TIMEZONE = "America/Sao_Paulo";
-const OBSERVATION_MAX_AGE_MINUTES = 30;
+
 
 const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
   embrapa: "Embrapa",
