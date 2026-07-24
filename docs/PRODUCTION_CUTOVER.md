@@ -1,8 +1,8 @@
 # Runbook de cutover para o Lovable
 
-Este documento controla a migração de `www.tempopelotas.com.br` da produção Vercel para a publicação Lovable.
+Este documento controla a migração de `tempopelotas.com.br` da produção Vercel para a publicação Lovable.
 
-A produção atual já utiliza `www.tempopelotas.com.br` nos canonicals e redireciona o domínio raiz `tempopelotas.com.br` para `www`. Essa estratégia deve ser preservada para não combinar a troca de infraestrutura com uma migração de host.
+A produção atual já utiliza `tempopelotas.com.br` nos canonicals e redireciona o domínio raiz `tempopelotas.com.br` para `www`. Essa estratégia deve ser preservada para não combinar a troca de infraestrutura com uma migração de host.
 
 A existência deste runbook **não autoriza a troca de DNS**. O cutover só deve ocorrer em uma janela definida, com um executor responsável, uma segunda pessoa acompanhando a validação e possibilidade imediata de rollback.
 
@@ -10,7 +10,7 @@ A existência deste runbook **não autoriza a troca de DNS**. O cutover só deve
 
 Baseline aprovada em 23/07/2026:
 
-- publicação Lovable: `https://mobitempopelotas.lovable.app`;
+- publicação Lovable: `https://tempopelotas.com.br`;
 - commit funcional publicado: `98d865a90ffb862bdc30a5baea403adc35751689`;
 - auditoria visual final: workflow run `29983757973`;
 - artefato: `visual-parity-19`;
@@ -24,16 +24,16 @@ A baseline Vercel confirmou diferenças esperadas entre o legado e o novo portal
 
 ## Estratégia de domínio
 
-- Host principal e canônico: `https://www.tempopelotas.com.br`.
+- Host principal e canônico: `https://tempopelotas.com.br`.
 - Domínio raiz: `https://tempopelotas.com.br`.
 - Comportamento obrigatório do domínio raiz: redirect permanente 301 ou 308 para o mesmo caminho em `www`.
-- Publicação técnica de contingência: `https://mobitempopelotas.lovable.app`.
-- `VITE_SITE_URL` de produção: `https://www.tempopelotas.com.br`.
+- Publicação técnica de contingência: `https://tempopelotas.com.br`.
+- `VITE_SITE_URL` de produção: `https://tempopelotas.com.br`.
 
 Exemplos:
 
-- `https://tempopelotas.com.br/` → `https://www.tempopelotas.com.br/`;
-- `https://tempopelotas.com.br/alertas` → `https://www.tempopelotas.com.br/alertas`;
+- `https://tempopelotas.com.br/` → `https://tempopelotas.com.br/`;
+- `https://tempopelotas.com.br/alertas` → `https://tempopelotas.com.br/alertas`;
 - canonicals, sitemap, feed e JSON devem sempre usar `www`.
 
 ## Princípios obrigatórios
@@ -75,18 +75,18 @@ Executar preferencialmente 24 horas antes.
 
 ### Lovable
 
-- [ ] Adicionar `www.tempopelotas.com.br` no painel de domínio personalizado.
-- [ ] Definir `www.tempopelotas.com.br` como domínio principal.
+- [ ] Adicionar `tempopelotas.com.br` no painel de domínio personalizado.
+- [ ] Definir `tempopelotas.com.br` como domínio principal.
 - [ ] Adicionar `tempopelotas.com.br` como alias.
-- [ ] Configurar o domínio raiz para redirecionar permanentemente a `https://www.tempopelotas.com.br`, preservando caminho e query string.
+- [ ] Configurar o domínio raiz para redirecionar permanentemente a `https://tempopelotas.com.br`, preservando caminho e query string.
 - [ ] Copiar do painel Lovable os registros exatos solicitados para validação e tráfego.
-- [ ] Confirmar que os domínios aparecem como aguardando DNS, sem remover a publicação `lovable.app`.
+- [ ] Confirmar que os domínios aparecem como aguardando DNS, sem remover a publicação `tempopelotas.com.br`.
 - [ ] Confirmar que todas as secrets atuais continuam reconhecidas pelo runtime.
-- [ ] Definir `VITE_SITE_URL=https://www.tempopelotas.com.br` no ambiente de produção quando o painel permitir.
+- [ ] Definir `VITE_SITE_URL=https://tempopelotas.com.br` no ambiente de produção quando o painel permitir.
 
 ### Aplicação e SEO
 
-- [ ] Confirmar que `src/lib/site-config.ts` usa `https://www.tempopelotas.com.br` como fallback público.
+- [ ] Confirmar que `src/lib/site-config.ts` usa `https://tempopelotas.com.br` como fallback público.
 - [ ] Confirmar que `/clima-em-pelotas` mantém redirect 301 para `/historico-climatico-pelotas`.
 - [ ] Confirmar que `/tempo-amanha-pelotas` responde diretamente, sem redirect.
 - [ ] Confirmar que `robots.txt`, `sitemap.xml`, `/feed` e `/pelotas.json` usam URLs com `www`.
@@ -99,7 +99,7 @@ No computador de operação, atualizar o repositório e executar:
 
 ```powershell
 npm ci
-$env:BASE_URL = "https://www.tempopelotas.com.br"
+$env:BASE_URL = "https://tempopelotas.com.br"
 npm run cutover:smoke
 ```
 
@@ -108,18 +108,18 @@ Antes do cutover, diferenças do legado já registradas podem permanecer. O obje
 Confirmar manualmente:
 
 ```powershell
-Resolve-DnsName www.tempopelotas.com.br -Type CNAME -ErrorAction SilentlyContinue
+Resolve-DnsName tempopelotas.com.br -Type CNAME -ErrorAction SilentlyContinue
 Resolve-DnsName tempopelotas.com.br -Type A -ErrorAction SilentlyContinue
-curl.exe -I https://www.tempopelotas.com.br/
 curl.exe -I https://tempopelotas.com.br/
-curl.exe -I https://www.tempopelotas.com.br/sitemap.xml
+curl.exe -I https://tempopelotas.com.br/
+curl.exe -I https://tempopelotas.com.br/sitemap.xml
 ```
 
 - [ ] O domínio raiz redireciona atualmente para `www`.
 - [ ] Homepage atual abre em janela anônima.
 - [ ] Captura do DNS anterior armazenada.
 - [ ] Vercel continua saudável.
-- [ ] Lovable continua saudável em `mobitempopelotas.lovable.app`.
+- [ ] Lovable continua saudável em `tempopelotas.com.br`.
 - [ ] Nenhuma implantação ou alteração de código em andamento.
 
 ## Fase 3 — Alteração de DNS
@@ -157,9 +157,9 @@ Checklist:
 Durante os primeiros 15 minutos:
 
 ```powershell
-Resolve-DnsName www.tempopelotas.com.br
 Resolve-DnsName tempopelotas.com.br
-curl.exe -I https://www.tempopelotas.com.br/
+Resolve-DnsName tempopelotas.com.br
+curl.exe -I https://tempopelotas.com.br/
 curl.exe -I https://tempopelotas.com.br/
 ```
 
@@ -169,7 +169,7 @@ Verificar no Lovable:
 - [ ] certificados TLS emitidos e ativos;
 - [ ] `www` definido como domínio principal;
 - [ ] domínio raiz redirecionando permanentemente para `www`;
-- [ ] URL `lovable.app` disponível para diagnóstico.
+- [ ] URL `tempopelotas.com.br` disponível para diagnóstico.
 
 Não considerar a operação concluída apenas porque o DNS resolveu. Certificados, redirect e testes funcionais precisam estar aprovados.
 
@@ -178,7 +178,7 @@ Não considerar a operação concluída apenas porque o DNS resolveu. Certificad
 Quando `www` já responder pelo Lovable:
 
 ```powershell
-$env:BASE_URL = "https://www.tempopelotas.com.br"
+$env:BASE_URL = "https://tempopelotas.com.br"
 npm run cutover:smoke
 ```
 
@@ -194,7 +194,7 @@ O teste cobre:
 
 Checklist manual complementar:
 
-- [ ] `https://tempopelotas.com.br/` redireciona permanentemente para `https://www.tempopelotas.com.br/`.
+- [ ] `https://tempopelotas.com.br/` redireciona permanentemente para `https://tempopelotas.com.br/`.
 - [ ] O redirect do domínio raiz preserva caminhos e query strings.
 - [ ] Homepage desktop.
 - [ ] Homepage mobile em aproximadamente 390 px.
@@ -208,9 +208,9 @@ Checklist manual complementar:
 - [ ] `/nivel-da-lagoa-dos-patos-laranjal`.
 - [ ] `/cameras-ao-vivo-pelotas`, sem classificar replay como transmissão ao vivo.
 - [ ] Estação Laranjal não apresenta leitura atrasada como atual.
-- [ ] `https://www.tempopelotas.com.br/robots.txt` aponta para o sitemap com `www`.
-- [ ] `https://www.tempopelotas.com.br/sitemap.xml` contém as rotas públicas com `www`.
-- [ ] Código-fonte da homepage contém canonical `https://www.tempopelotas.com.br/`.
+- [ ] `https://tempopelotas.com.br/robots.txt` aponta para o sitemap com `www`.
+- [ ] `https://tempopelotas.com.br/sitemap.xml` contém as rotas públicas com `www`.
+- [ ] Código-fonte da homepage contém canonical `https://tempopelotas.com.br/`.
 - [ ] Search Console consegue acessar o sitemap.
 - [ ] Analytics recebe uma visita de teste, quando aplicável.
 
@@ -240,11 +240,11 @@ Falha isolada de uma fonte externa, tratada corretamente como `stale`, `partial`
 5. Aguardar o TTL e confirmar novamente:
 
 ```powershell
-Resolve-DnsName www.tempopelotas.com.br
 Resolve-DnsName tempopelotas.com.br
-curl.exe -I https://www.tempopelotas.com.br/
+Resolve-DnsName tempopelotas.com.br
 curl.exe -I https://tempopelotas.com.br/
-$env:BASE_URL = "https://www.tempopelotas.com.br"
+curl.exe -I https://tempopelotas.com.br/
+$env:BASE_URL = "https://tempopelotas.com.br"
 npm run cutover:smoke
 ```
 

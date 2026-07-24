@@ -25,6 +25,7 @@ def tracked_files() -> list[Path]:
 def replace_domain_references() -> None:
     replacements = (
         (LEGACY_PROJECT_HOST, CANONICAL_HOST),
+        (PLATFORM_DOMAIN, CANONICAL_HOST),
         (WWW_HOST, CANONICAL_HOST),
     )
 
@@ -229,6 +230,7 @@ import { CANONICAL_SITE_URL, SITE_URL, absoluteUrl } from "../src/lib/site-confi
 import { createSitemapXml } from "../src/lib/sitemap";
 
 const legacyHost = ["mobitempopelotas", "lovable", "app"].join(".");
+const wwwHost = ["www", "tempopelotas", "com", "br"].join(".");
 
 test("o domínio canônico é único e não depende de ambiente", () => {
   assert.equal(CANONICAL_SITE_URL, "https://tempopelotas.com.br");
@@ -245,7 +247,7 @@ test("o endereço anterior redireciona permanentemente preservando caminho e con
 
 test("www e http convergem para o domínio oficial em HTTPS", () => {
   assert.equal(
-    getCanonicalRedirectUrl("https://www.tempopelotas.com.br/alertas"),
+    getCanonicalRedirectUrl(`https://${wwwHost}/alertas`),
     "https://tempopelotas.com.br/alertas",
   );
   assert.equal(
@@ -265,7 +267,7 @@ test("o sitemap contém somente URLs canônicas e todas as rotas públicas", () 
   assert.match(sitemap, /^<\?xml version="1\.0" encoding="UTF-8"\?>/);
   assert.equal((sitemap.match(/<url>/g) ?? []).length, PUBLIC_ROUTES.length);
   assert.equal(sitemap.includes(legacyHost), false);
-  assert.equal(sitemap.includes("www.tempopelotas.com.br"), false);
+  assert.equal(sitemap.includes(wwwHost), false);
 
   for (const route of PUBLIC_ROUTES) {
     assert.match(sitemap, new RegExp(`<loc>${absoluteUrl(route.path).replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}</loc>`));

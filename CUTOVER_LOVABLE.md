@@ -5,9 +5,9 @@ Este documento controla a substituição do ambiente de produção atual pelo pr
 ## Origens envolvidas
 
 - Domínio canônico definitivo: `https://tempopelotas.com.br`.
-- Alias a preservar ou redirecionar: `https://www.tempopelotas.com.br`.
+- Alias a preservar ou redirecionar: `https://tempopelotas.com.br`.
 - Produção atual para rollback: projeto `tempopelotas` na Vercel.
-- Nova hospedagem validada: `https://mobitempopelotas.lovable.app`.
+- Nova hospedagem validada: `https://tempopelotas.com.br`.
 
 ## Condições obrigatórias antes do DNS
 
@@ -53,7 +53,7 @@ Este documento controla a substituição do ambiente de produção atual pelo pr
 
 ## Procedimento de DNS
 
-1. Adicionar `tempopelotas.com.br` e `www.tempopelotas.com.br` como domínios personalizados no projeto `mobitempopelotas` do Lovable.
+1. Adicionar `tempopelotas.com.br` e `tempopelotas.com.br` como domínios personalizados no projeto `mobitempopelotas` do Lovable.
 2. Copiar exatamente os registros DNS solicitados pelo Lovable antes de remover qualquer associação da Vercel.
 3. Reduzir o TTL dos registros atuais, quando o provedor permitir.
 4. Manter o projeto Vercel e seus deployments disponíveis durante a janela de rollback.

@@ -237,7 +237,7 @@ const getCachedPublicLiveStream = unstable_cache(
           Accept: "text/html,application/xhtml+xml",
           "Accept-Language": "pt-BR,pt;q=0.9,en;q=0.7",
           "User-Agent":
-            "Mozilla/5.0 (compatible; TempoPelotas/1.0; +https://www.tempopelotas.com.br)",
+            "Mozilla/5.0 (compatible; TempoPelotas/1.0; +https://tempopelotas.com.br)",
         },
         next: { revalidate: 180 },
         signal: AbortSignal.timeout(8_000),

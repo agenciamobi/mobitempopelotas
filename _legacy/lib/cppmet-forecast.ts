@@ -217,7 +217,7 @@ export async function getCppmetForecast(): Promise<CppmetForecastData> {
           Accept: "text/html,application/xhtml+xml",
           "Accept-Language": "pt-BR,pt;q=0.9",
           "User-Agent":
-            "TEMPO-Pelotas/1.0 (+https://www.tempopelotas.com.br; contato@agenciamobi.com.br)",
+            "TEMPO-Pelotas/1.0 (+https://tempopelotas.com.br; contato@agenciamobi.com.br)",
         },
         next: {
           revalidate: 600,
