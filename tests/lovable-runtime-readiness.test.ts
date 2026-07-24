@@ -69,7 +69,10 @@ test("preflight do Lovable usa .env.production e MOBI_SUPABASE_SECRET_KEY", () =
 
     assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
     assert.equal(report.failed, 0);
-    assert.equal(report.checks.every((check) => check.status === "passed"), true);
+    assert.equal(
+      report.checks.every((check) => check.status === "passed"),
+      true,
+    );
     assert.equal(`${result.stdout}\n${result.stderr}`.includes(adminKey), false);
   } finally {
     rmSync(workspace, { recursive: true, force: true });
