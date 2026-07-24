@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
@@ -36,6 +36,35 @@ jobs:
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
 
+      - name: Formatar arquivos diagnosticados
+        if: github.event_name == 'push' && github.ref == 'refs/heads/agent/internal-editorial-shell'
+        run: |
+          npx prettier --write \
+            src/lib/push/push-http.server.ts \
+            src/lib/push/push-storage.server.ts \
+            src/lib/weather/aggregated-weather.types.ts \
+            src/lib/weather/types.ts \
+            src/lib/weather/weather-intelligence.types.ts \
+            src/production/components/weather-map.tsx \
+            src/production/lib/weather-data.ts \
+            src/components/layout/SiteLayout.tsx
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/lib/push/push-http.server.ts \
+            src/lib/push/push-storage.server.ts \
+            src/lib/weather/aggregated-weather.types.ts \
+            src/lib/weather/types.ts \
+            src/lib/weather/weather-intelligence.types.ts \
+            src/production/components/weather-map.tsx \
+            src/production/lib/weather-data.ts \
+            src/components/layout/SiteLayout.tsx
+          git commit -m "style: aplica formatação validada pelo Prettier"
+          git push origin HEAD:agent/internal-editorial-shell
+
       - name: Validar template de ambiente
         run: npm run runtime:check:example
 
@@ -52,18 +81,6 @@ jobs:
 
       - name: TypeScript
         run: npm run typecheck
-
-      - name: Gerar diagnóstico do ESLint
-        run: npx eslint . --format json --output-file eslint-report.json || true
-
-      - name: Publicar diagnóstico do ESLint
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: eslint-report-${{ github.run_id }}
-          path: eslint-report.json
-          if-no-files-found: error
-          retention-days: 1
 
       - name: ESLint
         run: npm run lint
