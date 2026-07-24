@@ -13,35 +13,21 @@ import type {
   WeatherSourceHealth,
   WeatherSourceKey,
 } from "./aggregated-weather.types";
+import {
+  CURRENT_FIELDS,
+  FORECAST_PROVIDER_LABELS,
+  baselineProvenance,
+  createProviderHealth,
+  deriveTraceability,
+} from "./weather-traceability";
 
 const TIMEZONE = "America/Sao_Paulo";
 const OBSERVATION_MAX_AGE_MINUTES = 30;
-
-const CURRENT_FIELDS: AggregatedCurrentField[] = [
-  "temperature",
-  "feelsLike",
-  "condition",
-  "humidity",
-  "pressure",
-  "windSpeed",
-  "windGust",
-  "windDirection",
-  "visibilityKm",
-  "sunrise",
-  "sunset",
-  "observedAt",
-  "icon",
-];
 
 const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
   embrapa: "Embrapa",
   inmet: "INMET",
   cppmet: "CPPMet",
-  "open-meteo": "Open-Meteo",
-  "met-norway": "MET Norway",
-};
-
-const FORECAST_PROVIDER_LABELS: Record<ForecastSourceKey, string> = {
   "open-meteo": "Open-Meteo",
   "met-norway": "MET Norway",
 };
@@ -109,16 +95,6 @@ function createCurrentFromObservation(observation: EmbrapaObservation): Aggregat
     observedAt: observation.source.observationTime,
     icon: null,
   };
-}
-
-function baselineProvenance(
-  current: CurrentWeather | null,
-  key: ForecastSourceKey,
-): AggregatedCurrentProvenance {
-  if (!current) return {};
-  return Object.fromEntries(
-    CURRENT_FIELDS.map((field) => [field, key]),
-  ) as AggregatedCurrentProvenance;
 }
 
 function applyEmbrapaObservation(
@@ -378,20 +354,6 @@ function confidenceFromScore(score: number): WeatherConfidence {
   return "low";
 }
 
-function createProviderHealth(
-  provider: WeatherHomeData,
-  key: ForecastSourceKey,
-): WeatherSourceHealth {
-  return {
-    source: key,
-    status: provider.status,
-    role: "forecast",
-    fetchedAt: provider.source.fetchedAt,
-    usable: provider.status === "live" && provider.daily.length > 0,
-    reason: provider.message,
-  };
-}
-
 function createSources(
   baseline: WeatherBaselineData,
   observation: EmbrapaObservation,
@@ -496,9 +458,6 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     fetchOfficialWeatherSources(),
   ]);
 
-  const selectedForecastKey: ForecastSourceKey = baseline.source.key;
-  const usingContingency = selectedForecastKey === "met-norway";
-
   const observation = official.embrapa;
   const observationAgeMinutes = getObservationAgeMinutes(observation);
   const embrapaUsable = canUseEmbrapaObservation(observation, observationAgeMinutes);
@@ -507,7 +466,7 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     : embrapaUsable
       ? createCurrentFromObservation(observation)
       : null;
-  const currentProvenance = baselineProvenance(baseline.current, selectedForecastKey);
+  const currentProvenance = baselineProvenance(baseline.current, baseline.source.key);
 
   if (current && embrapaUsable) {
     applyEmbrapaObservation(current, currentProvenance, observation);
@@ -524,8 +483,8 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
   });
 
   const discrepancies = [
-    ...compareCurrentSources(baseline.current, observation, embrapaUsable, selectedForecastKey),
-    ...compareDailyForecasts(baseline.daily, official.cppmet.items, selectedForecastKey),
+    ...compareCurrentSources(baseline.current, observation, embrapaUsable, baseline.source.key),
+    ...compareDailyForecasts(baseline.daily, official.cppmet.items, baseline.source.key),
   ];
   const sources = createSources(
     baseline,
@@ -535,12 +494,6 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     embrapaUsable,
   );
 
-  const contingencyKey: ForecastSourceKey =
-    selectedForecastKey === "open-meteo" ? "met-norway" : "open-meteo";
-  const degradedSources = (Object.keys(sources) as WeatherSourceKey[]).filter((source) => {
-    if (source === contingencyKey) return false;
-    return sources[source].status !== "live" || !sources[source].usable;
-  });
   const score = calculateQualityScore({
     baseline,
     embrapaUsable,
@@ -551,21 +504,19 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
   });
   const confidence = confidenceFromScore(score);
   const hasWeatherData = current !== null || hourly.length > 0 || baseline.daily.length > 0;
-  const status: AggregatedWeatherData["status"] = !hasWeatherData
-    ? "unavailable"
-    : usingContingency
-      ? "degraded"
-      : degradedSources.length === 0 && confidence === "high"
-        ? "live"
-        : "degraded";
+
+  const {
+    selectedForecastKey,
+    usingContingency,
+    degradedSources,
+    status,
+    forecastSource,
+    forecastProvider,
+  } = deriveTraceability({ baseline, sources, confidence, hasWeatherData });
 
   const normalizedCurrentSource: "embrapa" | ForecastSourceKey | null =
     currentSource === "embrapa" || currentSource === "open-meteo" || currentSource === "met-norway"
       ? currentSource
-      : null;
-  const forecastProvider =
-    baseline.status === "live"
-      ? (baseline.source.name ?? FORECAST_PROVIDER_LABELS[selectedForecastKey])
       : null;
 
   return {
@@ -582,7 +533,7 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
       score,
       confidence,
       currentSource: normalizedCurrentSource,
-      forecastSource: baseline.daily.length > 0 ? selectedForecastKey : null,
+      forecastSource,
       forecastProvider,
       degradedSources,
       observationAgeMinutes,
