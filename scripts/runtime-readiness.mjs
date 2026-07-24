@@ -2,7 +2,7 @@ import { createECDH } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-const CANONICAL_SITE_URL = "https://www.tempopelotas.com.br";
+const CANONICAL_SITE_URL = "https://tempopelotas.com.br";
 const GEMINI_ENABLED_VALUES = new Set(["true", "1", "on"]);
 const PLACEHOLDER_PATTERN = /(change[-_ ]?me|placeholder|example|your[-_ ]|todo|replace[-_ ]?me)/i;
 const REQUIRED_TEMPLATE_KEYS = [

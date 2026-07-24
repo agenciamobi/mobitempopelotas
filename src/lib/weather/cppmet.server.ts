@@ -153,7 +153,7 @@ export async function fetchCppmetForecast(): Promise<CppmetForecast> {
         headers: {
           Accept: "text/html,application/xhtml+xml",
           "Accept-Language": "pt-BR,pt;q=0.9",
-          "User-Agent": "TEMPO-Pelotas/2.0 (+https://www.tempopelotas.com.br)",
+          "User-Agent": "TEMPO-Pelotas/2.0 (+https://tempopelotas.com.br)",
         },
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       });

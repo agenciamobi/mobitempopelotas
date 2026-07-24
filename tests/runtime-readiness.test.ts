@@ -8,7 +8,7 @@ import test from "node:test";
 
 const SCRIPT_PATH = path.resolve("scripts/runtime-readiness.mjs");
 const REPORT_PATH = path.join("artifacts", "runtime-readiness", "report.json");
-const CANONICAL_SITE_URL = "https://www.tempopelotas.com.br";
+const CANONICAL_SITE_URL = "https://tempopelotas.com.br";
 const MANAGED_ENVIRONMENT_KEYS = [
   "VITE_SITE_URL",
   "VITE_SUPABASE_MODE",

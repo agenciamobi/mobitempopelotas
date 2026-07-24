@@ -14,6 +14,7 @@ import {
   Wind,
 } from "lucide-react";
 
+import { absoluteUrl } from "@/lib/site-config";
 import type { WeatherCameraData } from "@/lib/cameras/cameras.types";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 
@@ -58,7 +59,7 @@ export function CameraPage({ cameraData, weather }: CameraPageProps) {
       position: index + 1,
       name: camera.name,
       description: camera.description,
-      url: `https://mobitempopelotas.lovable.app/cameras-ao-vivo-pelotas#${camera.id}`,
+      url: absoluteUrl(`/cameras-ao-vivo-pelotas#${camera.id}`),
     })),
   };
 

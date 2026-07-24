@@ -16,7 +16,7 @@ Essa validação lê apenas `.env.example` e confirma:
 
 - presença das declarações operacionais obrigatórias;
 - modo `mock` como padrão seguro do repositório;
-- `https://www.tempopelotas.com.br` como host canônico;
+- `https://tempopelotas.com.br` como host canônico;
 - URL base HTTPS da REDEMET;
 - formato aceito para `VAPID_SUBJECT`;
 - ausência de declarações client-side para secrets server-only.
@@ -43,7 +43,7 @@ O comando exige:
 - chave da REDEMET e base HTTPS;
 - `GEMINI_API_KEY` quando `GEMINI_WEATHER_ENABLED` usa `true`, `1` ou `on`;
 - ausência de secrets indevidamente configurados com prefixo `VITE_`;
-- `VITE_SITE_URL=https://www.tempopelotas.com.br`.
+- `VITE_SITE_URL=https://tempopelotas.com.br`.
 
 O resultado sanitizado é salvo em:
 

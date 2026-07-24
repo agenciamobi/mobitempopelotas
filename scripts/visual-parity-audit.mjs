@@ -6,9 +6,9 @@ import path from "node:path";
 import { chromium } from "playwright";
 
 const outputDirectory = path.resolve("artifacts/visual-parity");
-const productionUrl = process.env.PRODUCTION_URL ?? "https://www.tempopelotas.com.br";
+const productionUrl = process.env.PRODUCTION_URL ?? "https://tempopelotas.com.br";
 const candidateUrl =
-  process.env.CANDIDATE_URL ?? process.env.LOVABLE_URL ?? "https://mobitempopelotas.lovable.app";
+  process.env.CANDIDATE_URL ?? process.env.LOVABLE_URL ?? "https://tempopelotas.com.br";
 const candidateName = process.env.CANDIDATE_NAME ?? "revisao";
 const expectedCandidateMarker =
   process.env.EXPECTED_CANDIDATE_MARKER ?? "Encontre o que precisa acompanhar";

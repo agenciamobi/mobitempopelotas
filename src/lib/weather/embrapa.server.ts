@@ -201,7 +201,7 @@ export async function fetchEmbrapaObservation(): Promise<EmbrapaObservation> {
     const response = await fetch(SOURCE_URL, {
       headers: {
         Accept: "text/html,application/xhtml+xml",
-        "User-Agent": "TEMPO-Pelotas/2.0 (+https://www.tempopelotas.com.br)",
+        "User-Agent": "TEMPO-Pelotas/2.0 (+https://tempopelotas.com.br)",
       },
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });

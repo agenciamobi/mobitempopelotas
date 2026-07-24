@@ -83,7 +83,7 @@ async function fetchText(url: string) {
   const response = await fetch(url, {
     headers: {
       Accept: "application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.1",
-      "User-Agent": "TEMPO-Pelotas/2.0 (+https://www.tempopelotas.com.br)",
+      "User-Agent": "TEMPO-Pelotas/2.0 (+https://tempopelotas.com.br)",
     },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
