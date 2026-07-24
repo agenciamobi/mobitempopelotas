@@ -124,14 +124,14 @@ export function toProductionObservation(data: AggregatedWeatherData): EmbrapaObs
     ...observation,
     extremes: {
       ...observation.extremes,
-      dewPointMin: empty,
-      dewPointMax: empty,
+      dewPointMin: observation.extremes.dewPointMin ?? empty,
+      dewPointMax: observation.extremes.dewPointMax ?? empty,
     },
     accumulated: {
       ...observation.accumulated,
-      evapotranspirationDaily: null,
-      evapotranspirationMonthly: null,
-      evapotranspirationAnnual: null,
+      evapotranspirationDaily: observation.accumulated.evapotranspirationDaily ?? null,
+      evapotranspirationMonthly: observation.accumulated.evapotranspirationMonthly ?? null,
+      evapotranspirationAnnual: observation.accumulated.evapotranspirationAnnual ?? null,
     },
   };
 }
