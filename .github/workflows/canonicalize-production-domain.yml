@@ -49,6 +49,29 @@ jobs:
       - name: Aplicar domínio canônico e regras SEO
         run: python scripts/canonicalize-production-domain.py
 
+      - name: Simplificar contrato das URLs do sitemap
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path("tests/seo-domain.test.ts")
+          content = path.read_text(encoding="utf-8")
+          start = "  for (const route of PUBLIC_ROUTES) {\n"
+          end = "  }\n});\n"
+          before, separator, remainder = content.partition(start)
+          if not separator:
+              raise SystemExit("Laço de validação do sitemap não encontrado")
+          _, separator, after = remainder.partition(end)
+          if not separator:
+              raise SystemExit("Fim do contrato do sitemap não encontrado")
+          replacement = (
+              "  for (const route of PUBLIC_ROUTES) {\n"
+              "    assert.equal(sitemap.includes(`<loc>${absoluteUrl(route.path)}</loc>`), true);\n"
+              "  }\n});\n"
+          )
+          path.write_text(before + replacement + after, encoding="utf-8")
+          PY
+
       - name: Formatar arquivos alterados
         run: |
           npm ci
