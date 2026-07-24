@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import type { GuaibaObservationData } from "@/lib/hydrology/guaiba.server";
 import type { LagoonMonitoringNetworkData } from "@/lib/hydrology/lagoon-network.server";
 import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
@@ -17,6 +19,7 @@ import { SiteFooter } from "@/production/components/site-footer";
 import { SiteHeader } from "@/production/components/site-header";
 import { WeatherHero } from "@/production/components/weather-hero";
 import { getFeaturedSafetyBanner } from "@/production/lib/safety-banners";
+import { useOpenMeteoForecastRecovery } from "@/production/lib/open-meteo-browser-recovery";
 import type { WeatherData } from "@/production/lib/weather-data";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/production/lib/weather-insights";
 
@@ -43,10 +46,10 @@ export function ProductionHome({
   guaiba: GuaibaObservationData;
   lagoon: LagoonMonitoringNetworkData;
 }) {
+  const serverWeather = useMemo(() => toProductionWeatherData(data.weather), [data.weather]);
+  const weather = useOpenMeteoForecastRecovery(serverWeather);
   const hasUsableWeather = Boolean(
-    data.weather.current !== null ||
-    data.weather.hourly.length > 0 ||
-    data.weather.daily.length > 0,
+    weather.current.available || weather.hourly.length > 0 || weather.daily.length > 0,
   );
 
   if (!hasUsableWeather) {
@@ -74,7 +77,6 @@ export function ProductionHome({
     );
   }
 
-  const weather = toProductionWeatherData(data.weather);
   const summaries = toProductionSummaries(data);
   const observation = toProductionObservation(data.weather);
   const inmetAlerts = toProductionAlerts(data.weather);
