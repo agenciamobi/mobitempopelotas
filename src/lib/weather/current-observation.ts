@@ -30,9 +30,16 @@ function formatFetchedClock(value: string) {
 }
 
 export function getObservationAgeMinutes(observation: EmbrapaObservation) {
-  const observedMinutes = clockToMinutes(observation.source.observationTime);
   const fetchedMinutes = clockToMinutes(formatFetchedClock(observation.source.fetchedAt));
-  if (observedMinutes === null || fetchedMinutes === null) return null;
+  if (fetchedMinutes === null) return null;
+
+  const observedMinutes = clockToMinutes(observation.source.observationTime);
+  // A página Current_Monitor é gerada em tempo real, mas não publica o horário
+  // da amostra. Nesse caso, a idade verificável começa na consulta HTTP sem cache.
+  if (observedMinutes === null) {
+    return observation.status === "unavailable" ? null : 0;
+  }
+
   let age = fetchedMinutes - observedMinutes;
   if (age < -5) age += 24 * 60;
   return Math.max(0, age);
