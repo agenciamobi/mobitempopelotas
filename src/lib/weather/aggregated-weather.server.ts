@@ -306,9 +306,11 @@ function buildNotes(options: {
   const notes: string[] = [];
 
   if (options.currentSource === "embrapa") {
-    notes.push("Condições atuais priorizam a medição local da Embrapa.");
-  } else if (options.currentSource) {
-    notes.push(`Condições atuais usam ${options.forecastProvider}.`);
+    notes.push("Condições atuais medidas exclusivamente pela estação Embrapa Clima Temperado.");
+  } else {
+    notes.push(
+      "Sem leitura recente da Embrapa: condições atuais indisponíveis. A previsão segue disponível de forma independente.",
+    );
   }
   if (options.usingContingency) {
     notes.push(
@@ -324,8 +326,11 @@ function buildNotes(options: {
     }
   }
   if (options.sources.embrapa.status === "stale") {
-    notes.push("A leitura da Embrapa foi preservada como contexto, mas não substituiu o modelo.");
+    notes.push(
+      "Última leitura da Embrapa está desatualizada; nenhum valor de modelo foi apresentado como observação.",
+    );
   }
+
   if (options.discrepancies.length > 0) {
     notes.push("Foram detectadas diferenças relevantes entre as fontes disponíveis.");
   }
