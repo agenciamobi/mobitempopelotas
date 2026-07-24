@@ -356,19 +356,6 @@ function confidenceFromScore(score: number): WeatherConfidence {
   return "low";
 }
 
-function createProviderHealth(
-  provider: WeatherHomeData,
-  key: ForecastSourceKey,
-): WeatherSourceHealth {
-  return {
-    source: key,
-    status: provider.status,
-    role: "forecast",
-    fetchedAt: provider.source.fetchedAt,
-    usable: provider.status === "live" && provider.daily.length > 0,
-    reason: provider.message,
-  };
-}
 
 function createSources(
   baseline: WeatherBaselineData,
