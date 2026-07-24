@@ -19,7 +19,7 @@ import { SiteFooter } from "@/production/components/site-footer";
 import { SiteHeader } from "@/production/components/site-header";
 import { WeatherHero } from "@/production/components/weather-hero";
 import { getFeaturedSafetyBanner } from "@/production/lib/safety-banners";
-import { useOpenMeteoForecastRecovery } from "@/production/lib/open-meteo-browser-recovery";
+import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-browser-recovery";
 import type { WeatherData } from "@/production/lib/weather-data";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/production/lib/weather-insights";
 
@@ -46,8 +46,11 @@ export function ProductionHome({
   guaiba: GuaibaObservationData;
   lagoon: LagoonMonitoringNetworkData;
 }) {
-  const serverWeather = useMemo(() => toProductionWeatherData(data.weather), [data.weather]);
-  const weather = useOpenMeteoForecastRecovery(serverWeather);
+  const recoveredData = useOpenMeteoIntelligenceRecovery(data);
+  const weather = useMemo(
+    () => toProductionWeatherData(recoveredData.weather),
+    [recoveredData.weather],
+  );
   const hasUsableWeather = Boolean(
     weather.current.available || weather.hourly.length > 0 || weather.daily.length > 0,
   );
@@ -63,7 +66,7 @@ export function ProductionHome({
           >
             <p className="status-kicker">Tempo em Pelotas</p>
             <h1 id="weather-unavailable-title">Dados temporariamente indisponíveis</h1>
-            <p>{data.weather.message ?? data.brief.summary}</p>
+            <p>{recoveredData.weather.message ?? recoveredData.brief.summary}</p>
             <p>O portal continuará consultando automaticamente as fontes meteorológicas.</p>
             <p>
               Enquanto a previsão não atualiza, use os atalhos abaixo para consultar águas, câmeras,
@@ -77,9 +80,9 @@ export function ProductionHome({
     );
   }
 
-  const summaries = toProductionSummaries(data);
-  const observation = toProductionObservation(data.weather);
-  const inmetAlerts = toProductionAlerts(data.weather);
+  const summaries = toProductionSummaries(recoveredData);
+  const observation = toProductionObservation(recoveredData.weather);
+  const inmetAlerts = toProductionAlerts(recoveredData.weather);
   const advisory = getWeatherAdvisory(weather);
   const pelotasOfficialAlerts = inmetAlerts.alerts.filter((alert) => alert.relevance === "pelotas");
   const officialLevel: AdvisoryLevel = pelotasOfficialAlerts.some(
@@ -92,7 +95,7 @@ export function ProductionHome({
   const headerLevel =
     advisoryRank[officialLevel] > advisoryRank[advisory.level] ? officialLevel : advisory.level;
   const featuredSafetyBanner = getFeaturedSafetyBanner(pelotasOfficialAlerts.length > 0);
-  const cppmetToday = data.weather.officialForecast[0] ?? null;
+  const cppmetToday = recoveredData.weather.officialForecast[0] ?? null;
   const mainClassName =
     pelotasOfficialAlerts.length > 0
       ? "home-editorial-main has-official-alerts"
