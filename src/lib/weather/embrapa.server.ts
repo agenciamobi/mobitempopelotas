@@ -1,7 +1,7 @@
 import type { EmbrapaObservation, TimedObservation } from "./official-sources.types";
+import { WEATHER_SOURCE_REQUEST_TIMEOUT_MS } from "./source-policy.ts";
 
 const SOURCE_URL = "https://agromet.cpact.embrapa.br/online/Current_Monitor.htm";
-const REQUEST_TIMEOUT_MS = 8_000;
 
 function emptyTimedObservation(): TimedObservation {
   return { value: null, time: null };
@@ -235,7 +235,7 @@ export async function fetchEmbrapaObservation(): Promise<EmbrapaObservation> {
         "Cache-Control": "no-cache",
         "User-Agent": "TEMPO-Pelotas/2.0 (+https://tempopelotas.com.br)",
       },
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      signal: AbortSignal.timeout(WEATHER_SOURCE_REQUEST_TIMEOUT_MS.embrapa),
     });
 
     if (!response.ok) throw new Error(`Embrapa respondeu com HTTP ${response.status}.`);
