@@ -1,11 +1,9 @@
 name: Aplicar integridade meteorológica
 
 on:
-  push:
+  pull_request:
     branches:
-      - agent/weather-data-integrity
-    paths:
-      - .github/workflows/apply-weather-integrity-once.yml
+      - main
 
 permissions:
   contents: write
@@ -30,6 +28,9 @@ jobs:
 
           path = Path('src/production/components/home-editorial-dashboard.tsx')
           text = path.read_text()
+
+          if 'type RainLevel = "unknown"' in text:
+              raise SystemExit(0)
 
           def replace_once(old, new):
               global text
