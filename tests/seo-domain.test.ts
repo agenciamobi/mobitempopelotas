@@ -3,10 +3,10 @@ import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { getCanonicalRedirectUrl } from "../src/lib/canonical-host";
-import { PUBLIC_ROUTES } from "../src/lib/public-routes";
-import { CANONICAL_SITE_URL, SITE_URL, absoluteUrl } from "../src/lib/site-config";
-import { createSitemapXml } from "../src/lib/sitemap";
+import { getCanonicalRedirectUrl } from "../src/lib/canonical-host.ts";
+import { PUBLIC_ROUTES } from "../src/lib/public-routes.ts";
+import { CANONICAL_SITE_URL, SITE_URL, absoluteUrl } from "../src/lib/site-config.ts";
+import { createSitemapXml } from "../src/lib/sitemap.ts";
 
 const legacyHost = ["mobitempopelotas", "lovable", "app"].join(".");
 const wwwHost = ["www", "tempopelotas", "com", "br"].join(".");
