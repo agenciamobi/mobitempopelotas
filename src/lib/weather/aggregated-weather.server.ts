@@ -206,6 +206,7 @@ function compareCurrentSources(
   baseline: CurrentWeather | null,
   observation: EmbrapaObservation,
   usable: boolean,
+  referenceKey: ForecastSourceKey,
 ) {
   const discrepancies: WeatherDiscrepancy[] = [];
   if (!baseline || !usable) return discrepancies;
@@ -213,7 +214,7 @@ function compareCurrentSources(
   addDiscrepancy(discrepancies, {
     scope: "current",
     field: "temperature",
-    referenceSource: "open-meteo",
+    referenceSource: referenceKey,
     comparisonSource: "embrapa",
     referenceValue: baseline.temperature,
     comparisonValue: observation.current.temperature,
@@ -224,7 +225,7 @@ function compareCurrentSources(
   addDiscrepancy(discrepancies, {
     scope: "current",
     field: "feelsLike",
-    referenceSource: "open-meteo",
+    referenceSource: referenceKey,
     comparisonSource: "embrapa",
     referenceValue: baseline.feelsLike,
     comparisonValue: observation.current.feelsLike,
@@ -235,7 +236,7 @@ function compareCurrentSources(
   addDiscrepancy(discrepancies, {
     scope: "current",
     field: "humidity",
-    referenceSource: "open-meteo",
+    referenceSource: referenceKey,
     comparisonSource: "embrapa",
     referenceValue: baseline.humidity,
     comparisonValue: observation.current.humidity,
@@ -246,7 +247,7 @@ function compareCurrentSources(
   addDiscrepancy(discrepancies, {
     scope: "current",
     field: "pressure",
-    referenceSource: "open-meteo",
+    referenceSource: referenceKey,
     comparisonSource: "embrapa",
     referenceValue: baseline.pressure,
     comparisonValue: observation.current.pressure,
@@ -257,7 +258,8 @@ function compareCurrentSources(
   addDiscrepancy(discrepancies, {
     scope: "current",
     field: "windSpeed",
-    referenceSource: "open-meteo",
+    referenceSource: referenceKey,
+
     comparisonSource: "embrapa",
     referenceValue: baseline.windSpeed,
     comparisonValue: observation.current.windSpeed,
