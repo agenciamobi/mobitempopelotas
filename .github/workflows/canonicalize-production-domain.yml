@@ -1,0 +1,59 @@
+name: Canonicalizar domínio oficial
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  canonicalize-domain:
+    if: github.head_ref == 'agent/canonical-domain-seo' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout da branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/canonical-domain-seo
+
+      - name: Aplicar domínio canônico e regras SEO
+        run: python scripts/canonicalize-production-domain.py
+
+      - name: Formatar arquivos alterados
+        run: |
+          npm ci
+          npx prettier --write \
+            src/lib/site-config.ts \
+            src/lib/canonical-host.ts \
+            src/lib/sitemap.ts \
+            src/server.ts \
+            src/components/cameras/CameraPage.tsx \
+            'src/routes/sitemap[.]xml.ts' \
+            tests/seo-domain.test.ts \
+            package.json
+
+      - name: Validar ausência de domínios obsoletos
+        run: |
+          if git grep -n 'lovable\.app'; then
+            echo 'Foi encontrada referência ao domínio de plataforma.' >&2
+            exit 1
+          fi
+          if git grep -n 'www\.tempopelotas\.com\.br'; then
+            echo 'Foi encontrada referência à variante www.' >&2
+            exit 1
+          fi
+
+      - name: Commitar resultado
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "seo: consolida domínio oficial e sitemap"
+          git push origin HEAD:agent/canonical-domain-seo
