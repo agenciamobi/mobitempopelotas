@@ -1,0 +1,78 @@
+exit=1
+
+> test:contracts
+> node --test tests/water-level-state.test.ts tests/push-http.test.ts tests/database-security.test.ts tests/runtime-readiness.test.ts tests/production-css-entry.test.ts tests/weather-traceability.test.ts tests/seo-domain.test.ts
+
+✔ descobre e examina todas as migrations SQL versionadas (13.303971ms)
+✔ perfis e preferências isolam cada conta com RLS e auth.uid (0.380248ms)
+✔ snapshots e web push permanecem exclusivos do servidor (0.532164ms)
+✔ a definição efetiva da RPC de conta exige sessão e search_path seguro (0.7795ms)
+✔ carrega as folhas estruturais no head global antes da hidratação (10.091268ms)
+✔ mantém a entrada CSS global idêntica ao manifesto de produção (5.582391ms)
+✔ componentes e rotas não carregam novamente a pilha editorial (5.429614ms)
+✔ aceita somente endpoints HTTPS de provedores push conhecidos (1.356576ms)
+✔ a entrega real exige destino permitido e bloqueia redirects (35.95178ms)
+✔ mantém apenas caminhos internos seguros (0.260635ms)
+✔ exige origem exata em operações do navegador (2.044661ms)
+✔ compara o bearer administrativo sem aceitar segredo vazio (1.630683ms)
+✔ recusa corpo sem JSON, inválido ou acima do limite declarado (10.855008ms)
+✔ produz respostas privadas, não indexáveis e sem sniffing (2.309457ms)
+✔ aprova ambiente coerente sem expor credenciais no relatório ou console (122.40647ms)
+✔ reprova chaves VAPID válidas que não pertencem ao mesmo par (49.266526ms)
+▶ exige chave Gemini para todos os valores de ativação aceitos pelo runtime
+  ✔ true (41.20184ms)
+  ✔ 1 (36.989402ms)
+  ✔ on (39.497346ms)
+  ✔ on com chave configurada (42.377187ms)
+✔ exige chave Gemini para todos os valores de ativação aceitos pelo runtime (161.007178ms)
+✔ reprova segredo server-only configurado com prefixo VITE_ (39.511405ms)
+node:internal/modules/esm/resolve:271
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/home/runner/work/mobitempopelotas/mobitempopelotas/src/lib/canonical-host' imported from /home/runner/work/mobitempopelotas/mobitempopelotas/tests/seo-domain.test.ts
+    at finalizeResolution (node:internal/modules/esm/resolve:271:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:759:56)
+    at #resolve (node:internal/modules/esm/loader:683:17)
+    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:603:35)
+    at ModuleJob.syncLink (node:internal/modules/esm/module_job:163:33)
+    at ModuleJob.link (node:internal/modules/esm/module_job:253:17) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///home/runner/work/mobitempopelotas/mobitempopelotas/src/lib/canonical-host'
+}
+
+Node.js v24.18.0
+✖ tests/seo-domain.test.ts (109.27528ms)
+✔ classifica tendência de nível com faixa estável (1.38882ms)
+✔ respeita limiar estável configurável (0.18978ms)
+✔ cota de cheia tem prioridade sobre disponibilidade e tendência (0.181279ms)
+✔ não marca cheia sem valores numéricos válidos (0.241711ms)
+✔ indisponibilidade prevalece quando não há cota de cheia (0.164078ms)
+✔ gera classe visual previsível para o tema editorial (0.133396ms)
+✔ Open-Meteo saudável é selecionado com a chave correta (1.976864ms)
+✔ Open-Meteo indisponível: MET Norway assume como contingência (0.226507ms)
+✔ Baseline preserva providers para auditoria mesmo em falha total (0.44838ms)
+✔ Falha isolada do MET Norway não altera a seleção do Open-Meteo (0.204345ms)
+✔ Agregação com Open-Meteo saudável: forecastSource=open-meteo, provider Open-Meteo, status live (0.416729ms)
+✔ Agregação: falha apenas do MET Norway não entra em degradedSources nem degrada status (0.870155ms)
+✔ Agregação com contingência MET Norway: forecastSource=met-norway, provider MET Norway, status degraded (0.245442ms)
+✔ Procedência da baseline MET Norway contém met-norway e nunca open-meteo (0.22638ms)
+✔ Procedência da baseline Open-Meteo contém open-meteo e nunca met-norway (1.216728ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 37
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 662.913553
+
+✖ failing tests:
+
+test at tests/seo-domain.test.ts:1:1
+✖ tests/seo-domain.test.ts (109.27528ms)
+  'test failed'
