@@ -91,6 +91,14 @@ test("Embrapa stale (idade > limite) => current fica null", () => {
   assert.equal(current, null);
 });
 
+test("Embrapa sem idade verificável não é apresentada como agora", () => {
+  const observation = makeObservation();
+  const { usable, current, provenance } = deriveEmbrapaCurrent(observation, null);
+  assert.equal(usable, false);
+  assert.equal(current, null);
+  assert.deepEqual(provenance, {});
+});
+
 test("Embrapa sem temperatura => not usable", () => {
   const observation = makeObservation({}, { temperature: null });
   assert.equal(canUseEmbrapaObservation(observation, 5), false);
