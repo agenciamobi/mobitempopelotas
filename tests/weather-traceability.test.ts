@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { selectBaseline } from "../src/lib/weather/weather-baseline.server.ts";
+import { selectBaseline } from "../src/lib/weather/weather-baseline-select.ts";
 import type { ForecastSourceKey, WeatherHomeData } from "../src/lib/weather/types.ts";
 
 function makeProvider(key: ForecastSourceKey, live: boolean): WeatherHomeData {
