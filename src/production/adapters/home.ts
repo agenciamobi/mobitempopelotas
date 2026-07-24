@@ -77,7 +77,7 @@ function observedCurrent(data: AggregatedWeatherData): CurrentWeather {
       name: "Embrapa Clima Temperado",
       url: data.observation.source.url,
       kind: "observation",
-      observedAt: current.observedAt,
+      observedAt: data.observation.source.observationTime,
     },
   };
 }
