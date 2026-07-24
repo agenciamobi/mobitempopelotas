@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
@@ -35,62 +35,6 @@ jobs:
 
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
-
-      - name: Restringir espaçamento aos capítulos editoriais
-        if: github.event_name == 'push' && github.ref == 'refs/heads/agent/internal-editorial-shell'
-        run: |
-          python - <<'PY'
-          from pathlib import Path
-
-          path = Path("src/production/styles/internal-editorial-v27.css")
-          content = path.read_text()
-          old = '''.site-shell--topic .site-container--topic > [class*="-page"] > section {
-            scroll-margin-top: 96px;
-            margin-top: 0;
-            padding-block: clamp(64px, 7vw, 108px);
-          }
-
-          .site-shell--topic .site-container--topic > [class*="-page"] > section + section {
-            border-top: 1px solid var(--internal-line);
-          }'''
-          new = '''.site-shell--topic .site-container--topic > [class*="-page"] > section {
-            scroll-margin-top: 96px;
-          }
-
-          .site-shell--topic
-            .site-container--topic
-            > [class*="-page"]
-            > section[class*="-section"] {
-            margin-top: 0;
-            padding-block: clamp(64px, 7vw, 108px);
-          }
-
-          .site-shell--topic
-            .site-container--topic
-            > [class*="-page"]
-            > section[class*="-section"]
-            + section[class*="-section"] {
-            border-top: 1px solid var(--internal-line);
-          }'''
-          if old not in content:
-              raise SystemExit("Bloco editorial esperado não encontrado")
-          content = content.replace(old, new, 1)
-          content = content.replace(
-              '.site-shell--topic .site-container--topic > [class*="-page"] > section {\n    padding-block: 58px;\n  }',
-              '.site-shell--topic\n    .site-container--topic\n    > [class*="-page"]\n    > section[class*="-section"] {\n    padding-block: 58px;\n  }',
-              1,
-          )
-          path.write_text(content)
-          PY
-          npx prettier --write src/production/styles/internal-editorial-v27.css
-          if git diff --quiet; then
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/production/styles/internal-editorial-v27.css
-          git commit -m "fix: preserva altura dos blocos editoriais compactos"
-          git push origin HEAD:agent/internal-editorial-shell
 
       - name: Validar template de ambiente
         run: npm run runtime:check:example
