@@ -16,11 +16,13 @@ function makeObservation(
     status: "live",
     current: {
       temperature: 21.4,
-      feelsLike: 20.9,
       humidity: 78,
+      feelsLike: 20.9,
+      dewPoint: 17.5,
       pressure: 1013.5,
-      windSpeed: 12.3,
+      pressureTrend: "estável",
       windDirection: "SE",
+      windSpeed: 12.3,
       sunrise: "05:52",
       sunset: "18:12",
     },
@@ -29,22 +31,27 @@ function makeObservation(
       temperatureMax: { value: null, time: null },
       humidityMin: { value: null, time: null },
       humidityMax: { value: null, time: null },
-      windGustMax: { value: null, time: null },
+      windSpeedMax: { value: null, time: null },
     },
     accumulated: {
-      precipitationDaily: null,
-      precipitationMonthly: null,
-      precipitationAnnual: null,
+      rainDaily: null,
+      rainMonthly: null,
+      rainAnnual: null,
     },
     source: {
       name: "Embrapa Clima Temperado",
+      station: "Pelotas",
       url: "https://example.com/embrapa",
+      latitude: -31.77,
+      longitude: -52.36,
+      altitude: 60,
       observationTime: "12:00",
-      fetchedAt: "2026-07-24T15:10:00.000Z", // 12:10 America/Sao_Paulo → 10 min de idade
+      fetchedAt: "2026-07-24T15:10:00.000Z",
     },
     error: null,
     ...overrides,
   };
+
   base.current = { ...base.current, ...currentOverrides };
   return base;
 }
