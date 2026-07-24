@@ -1,0 +1,53 @@
+name: Aplicar logotipos oficiais no PR
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  apply-logo:
+    if: github.head_ref == 'agent/apply-official-logo' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout da branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/apply-official-logo
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Aplicar ativos e componentes
+        run: |
+          python scripts/apply-official-logo.py
+          npx prettier --write \
+            src/components/layout/Header.tsx \
+            src/components/layout/Header.css \
+            src/components/layout/Footer.tsx \
+            src/components/layout/Footer.css \
+            src/production/components/site-header.tsx \
+            src/production/components/site-footer.tsx \
+            public/brand/README.md
+
+      - name: Commitar resultado
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/brand src/components/layout src/production/components/site-header.tsx src/production/components/site-footer.tsx
+          git commit -m "brand: aplica logotipos oficiais do Tempo Pelotas"
+          git push origin HEAD:agent/apply-official-logo
