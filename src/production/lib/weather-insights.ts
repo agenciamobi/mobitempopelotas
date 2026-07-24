@@ -40,10 +40,7 @@ export function formatMillimeters(value: number) {
 
 export function getWeatherAdvisory(weather: WeatherData): WeatherAdvisory {
   const today = weather.daily[0];
-  const maxHourlyGust = maximum([
-    today?.windGust,
-    ...weather.hourly.map((hour) => hour.windGust),
-  ]);
+  const maxHourlyGust = maximum([today?.windGust, ...weather.hourly.map((hour) => hour.windGust)]);
   const maxHourlyRainChance = maximum([
     today?.rainChance,
     ...weather.hourly.map((hour) => hour.precipitation),
@@ -66,11 +63,7 @@ export function getWeatherAdvisory(weather: WeatherData): WeatherAdvisory {
     );
   }
 
-  if (
-    hasStormSignal ||
-    (maxHourlyGust !== null && maxHourlyGust >= 75) ||
-    precipitation >= 50
-  ) {
+  if (hasStormSignal || (maxHourlyGust !== null && maxHourlyGust >= 75) || precipitation >= 50) {
     return {
       level: "warning",
       eyebrow: "Atenção redobrada",

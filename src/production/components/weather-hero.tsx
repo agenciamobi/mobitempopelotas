@@ -36,8 +36,7 @@ const heroPresentationByLevel = {
   normal: {
     title: "Veja as condições para hoje.",
     highlightedTitle: "Planeje o restante do dia.",
-    description:
-      "Consulte a medição local disponível e veja a previsão para as próximas horas.",
+    description: "Consulte a medição local disponível e veja a previsão para as próximas horas.",
     primaryAction: {
       href: "/tempo-hoje-pelotas",
       label: "Ver previsão de hoje",
@@ -430,8 +429,8 @@ export function WeatherHero({
               </div>
               <strong>Medição atual indisponível</strong>
               <p>
-                A Embrapa não forneceu uma leitura recente e verificável. Nenhum valor de previsão foi
-                usado como condição atual.
+                A Embrapa não forneceu uma leitura recente e verificável. Nenhum valor de previsão
+                foi usado como condição atual.
               </p>
               <Link href="/estacao-embrapa-pelotas">Consultar a estação</Link>
             </div>

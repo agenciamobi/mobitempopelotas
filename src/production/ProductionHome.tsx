@@ -45,8 +45,8 @@ export function ProductionHome({
 }) {
   const hasUsableWeather = Boolean(
     data.weather.current !== null ||
-      data.weather.hourly.length > 0 ||
-      data.weather.daily.length > 0,
+    data.weather.hourly.length > 0 ||
+    data.weather.daily.length > 0,
   );
 
   if (!hasUsableWeather) {
