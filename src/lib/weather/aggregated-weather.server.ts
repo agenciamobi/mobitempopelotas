@@ -1,7 +1,12 @@
 import { fetchOfficialWeatherSources } from "./official-sources.server";
 import type { EmbrapaObservation } from "./official-sources.types";
-import { fetchPelotasWeather } from "./weather-baseline.server";
-import type { CurrentWeather, DailyForecast, WeatherHomeData } from "./types";
+import { fetchPelotasWeather, type WeatherBaselineData } from "./weather-baseline.server";
+import type {
+  CurrentWeather,
+  DailyForecast,
+  ForecastSourceKey,
+  WeatherHomeData,
+} from "./types";
 import type {
   AggregatedCurrentField,
   AggregatedCurrentProvenance,
@@ -37,8 +42,15 @@ const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
   embrapa: "Embrapa",
   inmet: "INMET",
   cppmet: "CPPMet",
-  "open-meteo": "Modelo meteorológico",
+  "open-meteo": "Open-Meteo",
+  "met-norway": "MET Norway",
 };
+
+const FORECAST_PROVIDER_LABELS: Record<ForecastSourceKey, string> = {
+  "open-meteo": "Open-Meteo",
+  "met-norway": "MET Norway",
+};
+
 
 function clockToMinutes(value: string | null) {
   if (!value) return null;
