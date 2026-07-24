@@ -357,27 +357,14 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
 
   const observation = official.embrapa;
   const observationAgeMinutes = getObservationAgeMinutes(observation);
-  const embrapaUsable = canUseEmbrapaObservation(observation, observationAgeMinutes);
-  const current = baseline.current
-    ? createCurrentFromBaseline(baseline.current)
-    : embrapaUsable
-      ? createCurrentFromObservation(observation)
-      : null;
-  const currentProvenance = baselineProvenance(baseline.current, baseline.source.key);
+  const {
+    usable: embrapaUsable,
+    current,
+    provenance: currentProvenance,
+  } = deriveEmbrapaCurrent(observation, observationAgeMinutes);
 
-  if (current && embrapaUsable) {
-    applyEmbrapaObservation(current, currentProvenance, observation);
-  }
-
-  const currentSource = currentProvenance.temperature ?? null;
-  const hourly = baseline.hourly.map((item, index) => {
-    if (index !== 0 || currentSource !== "embrapa" || !current) return item;
-    return {
-      ...item,
-      temperature: current.temperature ?? item.temperature,
-      windSpeed: current.windSpeed ?? item.windSpeed,
-    };
-  });
+  // Observação e previsão são séries distintas — não sobrescrever hourly[0].
+  const hourly = baseline.hourly;
 
   const discrepancies = [
     ...compareCurrentSources(baseline.current, observation, embrapaUsable, baseline.source.key),
