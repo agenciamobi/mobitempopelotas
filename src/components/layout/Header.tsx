@@ -208,10 +208,14 @@ export function Header() {
         <div className="production-header-inner">
           <div className="production-branding">
             <Link className="production-brand" to="/" aria-label="Tempo Pelotas — página inicial">
-              <span className="production-brand-wordmark">
-                <strong>TEMPO</strong>
-                <em>Pelotas</em>
-              </span>
+              <img
+                className="production-brand-logo"
+                src="/brand/tempo-pelotas-header"
+                alt=""
+                width={10694}
+                height={1552}
+                draggable={false}
+              />
             </Link>
             <span className="production-brand-divider" aria-hidden="true" />
             <span className="production-brand-context">

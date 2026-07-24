@@ -83,8 +83,8 @@ export function SiteFooter({ source }: SiteFooterProps) {
               <img
                 src="/brand/tempo-pelotas-header"
                 alt="TEMPO Pelotas"
-                width={900}
-                height={180}
+                width={10694}
+                height={1552}
                 loading="lazy"
                 draggable={false}
               />

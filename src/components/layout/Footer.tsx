@@ -52,8 +52,15 @@ export function Footer() {
         <section className="editorial-footer-lead" aria-labelledby="editorial-footer-title">
           <div className="editorial-footer-lead-copy">
             <Link className="editorial-footer-brand" to="/" aria-label="Tempo Pelotas — início">
-              <strong>TEMPO</strong>
-              <em>Pelotas</em>
+              <img
+                className="editorial-footer-brand-logo"
+                src="/brand/tempo-pelotas-header"
+                alt=""
+                width={10694}
+                height={1552}
+                loading="lazy"
+                draggable={false}
+              />
             </Link>
             <span className="editorial-footer-eyebrow">Tempo e águas de Pelotas</span>
             <h2 id="editorial-footer-title">Informação local para acompanhar o dia.</h2>
