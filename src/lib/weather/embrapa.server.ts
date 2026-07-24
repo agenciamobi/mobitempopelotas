@@ -80,7 +80,7 @@ function htmlToText(html: string) {
     .trim();
 }
 
-function decodeResponseHtml(response: Response, bytes: ArrayBuffer) {
+export function decodeResponseHtml(response: Response, bytes: ArrayBuffer) {
   const contentType = response.headers.get("content-type")?.toLowerCase() ?? "";
   const charset = contentType.match(/charset\s*=\s*["']?([^;"'\s]+)/)?.[1] ?? "utf-8";
   const encoding = /^(?:iso-8859-1|latin-?1|windows-1252)$/.test(charset)
