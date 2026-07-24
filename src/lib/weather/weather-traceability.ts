@@ -54,8 +54,9 @@ export function createProviderHealth(
   };
 }
 
-export function contingencyKeyFor(selected: ForecastSourceKey): ForecastSourceKey {
-  return selected === "open-meteo" ? "met-norway" : "open-meteo";
+export function contingencyKeyFor(_selected: ForecastSourceKey): ForecastSourceKey {
+  // MET Norway é sempre a contingência semântica; nunca a fonte principal.
+  return "met-norway";
 }
 
 export type TraceabilityInput = {
