@@ -41,17 +41,30 @@ function firstEnvironmentValue(...values: Array<string | undefined>) {
 }
 
 export function getSupabaseServerConfig(): SupabaseServerConfig {
-  const mode =
-    process.env.SUPABASE_MODE === "external" || process.env.VITE_SUPABASE_MODE === "external"
-      ? "external"
-      : "mock";
-  const url = firstEnvironmentValue(process.env.SUPABASE_URL, process.env.VITE_SUPABASE_URL);
+  const publicMode = normalizeEnvironmentValue(import.meta.env.VITE_SUPABASE_MODE);
+  const requestedMode = firstEnvironmentValue(
+    process.env.MOBI_SUPABASE_MODE,
+    process.env.SUPABASE_MODE,
+    process.env.VITE_SUPABASE_MODE,
+    publicMode ?? undefined,
+  );
+  const mode = requestedMode === "external" ? "external" : "mock";
+  const url = firstEnvironmentValue(
+    process.env.MOBI_SUPABASE_URL,
+    process.env.SUPABASE_URL,
+    process.env.VITE_SUPABASE_URL,
+    import.meta.env.VITE_SUPABASE_URL,
+  );
   const publishableKey = firstEnvironmentValue(
+    process.env.MOBI_SUPABASE_PUBLISHABLE_KEY,
     process.env.SUPABASE_PUBLISHABLE_KEY,
     process.env.VITE_SUPABASE_PUBLISHABLE_KEY,
     process.env.VITE_SUPABASE_ANON_KEY,
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    import.meta.env.VITE_SUPABASE_ANON_KEY,
   );
   const secretKey = firstEnvironmentValue(
+    process.env.MOBI_SUPABASE_SECRET_KEY,
     process.env.SUPABASE_SECRET_KEY,
     process.env.SUPABASE_SERVICE_ROLE_KEY,
   );
@@ -70,7 +83,7 @@ function requirePublicServerConfig() {
   const config = getSupabaseServerConfig();
   if (!config.isPublicConfigured || !config.url || !config.publishableKey) {
     throw new Error(
-      "Supabase externo não configurado no servidor. Defina SUPABASE_URL e SUPABASE_PUBLISHABLE_KEY.",
+      "Supabase externo não configurado no servidor. Defina a configuração pública VITE_SUPABASE_* no build ou MOBI_SUPABASE_URL e MOBI_SUPABASE_PUBLISHABLE_KEY no runtime.",
     );
   }
 
@@ -110,7 +123,7 @@ export function createSupabaseAdminClient(): SupabaseClient<Database> {
   const config = getSupabaseServerConfig();
   if (!config.isAdminConfigured || !config.url || !config.secretKey) {
     throw new Error(
-      "Cliente administrativo do Supabase não configurado. Defina SUPABASE_URL e SUPABASE_SECRET_KEY somente no servidor.",
+      "Cliente administrativo do Supabase não configurado. Defina MOBI_SUPABASE_SECRET_KEY somente no runtime do servidor.",
     );
   }
 
