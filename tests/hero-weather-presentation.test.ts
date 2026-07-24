@@ -54,4 +54,5 @@ test("o hero usa a narrativa oficial quando não há grade de previsão", () => 
 
 test("o hero nunca inventa céu aberto quando a condição é desconhecida", () => {
   assert.equal(resolveHeroWeatherIcon(weatherWith({}), null), "cloud");
+  assert.equal(weatherConditionLabels.moon, "Céu aberto à noite");
 });
