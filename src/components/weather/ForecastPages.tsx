@@ -73,7 +73,7 @@ function ForecastUnavailable() {
         As fontes meteorológicas não forneceram dados suficientes para montar esta página agora.
       </p>
       <Link to="/">
-        <ArrowLeft aria-hidden="true" /> Voltar ao tempo agora
+        <ArrowLeft aria-hidden="true" /> Voltar à visão geral
       </Link>
     </section>
   );
@@ -115,7 +115,7 @@ function ForecastPageHeader({
     <header className="forecast-page-header">
       <div>
         <Link className="forecast-back-link" to="/">
-          <ArrowLeft aria-hidden="true" /> Tempo agora
+          <ArrowLeft aria-hidden="true" /> Visão geral
         </Link>
         <p className="forecast-kicker">{kicker}</p>
         <h1>{title}</h1>
@@ -152,30 +152,41 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
 
       <section className="forecast-today-hero" aria-labelledby="today-summary-title">
         <div className="forecast-today-main">
-          <p className="forecast-kicker">Condições atuais</p>
-          <h2 id="today-summary-title">Como está o tempo agora</h2>
-          <div className="forecast-now-reading">
-            <span className="forecast-now-icon">
-              <WeatherIcon name={current?.icon ?? today?.icon ?? null} size={62} />
-            </span>
-            <div>
-              <strong>
-                {current?.temperature === null || current?.temperature === undefined
-                  ? "—"
-                  : `${current.temperature}°`}
-              </strong>
-              <span>{current?.condition ?? "Condição em atualização"}</span>
-              <small>
-                {current?.feelsLike === null || current?.feelsLike === undefined
-                  ? "Sensação térmica em atualização"
-                  : `Sensação de ${current.feelsLike}°`}
-              </small>
+          <p className="forecast-kicker">Observação local</p>
+          <h2 id="today-summary-title">
+            {current ? "Medição atual da Embrapa" : "Medição atual indisponível"}
+          </h2>
+          {current ? (
+            <div className="forecast-now-reading">
+              <span className="forecast-now-icon">
+                <Gauge aria-hidden="true" size={62} strokeWidth={1.55} />
+              </span>
+              <div>
+                <strong>{current.temperature === null ? "—" : `${current.temperature}°`}</strong>
+                <span>Embrapa Clima Temperado</span>
+                <small>
+                  {current.feelsLike === null
+                    ? "Sensação térmica não informada"
+                    : `Sensação de ${current.feelsLike}°`}
+                </small>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="forecast-now-reading is-unavailable">
+              <span className="forecast-now-icon">
+                <Gauge aria-hidden="true" size={62} strokeWidth={1.55} />
+              </span>
+              <div>
+                <strong>—</strong>
+                <span>Nenhuma leitura recente e verificável</span>
+                <small>Os números previstos não são usados como condição atual.</small>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="forecast-today-range">
-          <span>Hoje</span>
+          <span>Previsão para hoje</span>
           <strong>
             {today ? `${today.min}° / ${today.max}°` : "Faixa térmica em atualização"}
           </strong>

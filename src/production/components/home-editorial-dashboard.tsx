@@ -340,7 +340,7 @@ export function HomeEditorialDashboard({
                 <article
                   className={`rain-${rain.level}${isRainiest ? " is-rainiest" : ""}`}
                   key={`${day.weekday}-${day.date}`}
-                  aria-label={`${day.weekday}, ${day.date}: máxima de ${day.max} graus, mínima de ${day.min} graus e ${rain.chance}% de chance de chuva`}
+                  aria-label={`${day.weekday}, ${day.date}: máxima de ${day.max} graus, mínima de ${day.min} graus e ${rain.chance === null ? "probabilidade de chuva não informada" : `${rain.chance}% de chance de chuva`}`}
                 >
                   <div className="home-next-days__topline">
                     <div>
@@ -356,7 +356,7 @@ export function HomeEditorialDashboard({
                   <div className="home-next-days__rain-meter">
                     <div>
                       <span>Chance de chuva</span>
-                      <strong>{rain.chance}%</strong>
+                      <strong>{rain.chance === null ? "—" : `${rain.chance}%`}</strong>
                     </div>
                     <i aria-hidden="true">
                       <b style={{ width: `${rain.chance ?? 0}%` }} />
