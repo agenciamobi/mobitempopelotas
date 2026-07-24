@@ -1,14 +1,23 @@
 import { useEffect, useState } from "react";
 
+import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import type {
   DailyForecast,
   HourlyForecast,
   WeatherData,
   WeatherIconName,
-} from "@/production/lib/weather-data";
+} from "./weather-data.ts";
+import { fallbackWeatherData } from "./weather-data.ts";
 
 const OPEN_METEO_URL = "https://open-meteo.com/";
 const REQUEST_TIMEOUT_MS = 12_000;
+const sourceLabels = {
+  embrapa: "Embrapa",
+  inmet: "INMET",
+  cppmet: "CPPMet",
+  "open-meteo": "Open-Meteo",
+  "met-norway": "MET Norway",
+} as const;
 
 type OpenMeteoPayload = {
   current?: { time?: unknown };
@@ -210,6 +219,189 @@ function createForecastUrl() {
   return `https://api.open-meteo.com/v1/forecast?${params.toString()}`;
 }
 
+function fetchForecastPayload(signal: AbortSignal) {
+  return fetch(createForecastUrl(), {
+    headers: { Accept: "application/json" },
+    signal,
+  }).then((response) => {
+    if (!response.ok) throw new Error(`Open-Meteo respondeu com status ${response.status}`);
+    return response.json() as Promise<unknown>;
+  });
+}
+
+export function needsOpenMeteoIntelligenceRecovery(data: WeatherIntelligenceData) {
+  return (
+    data.weather.quality.forecastSource !== "open-meteo" ||
+    data.weather.hourly.length < 7 ||
+    data.weather.daily.length === 0 ||
+    data.weather.hourly.some(
+      (hour) => hour.precipitationProbability === null || hour.windGust === null,
+    ) ||
+    data.weather.daily.some((day) => day.rainChance === null || day.windGust === null)
+  );
+}
+
+function recoveredBrief(
+  data: WeatherIntelligenceData,
+  hourly: HourlyForecast[],
+  daily: DailyForecast[],
+) {
+  const current = data.weather.current;
+  const today = daily[0];
+  const currentText =
+    current?.temperature === null || current?.temperature === undefined
+      ? null
+      : `Agora, a Embrapa registra ${Math.round(current.temperature)} °C em Pelotas`;
+  const todayText = today
+    ? `Hoje, a previsão indica mínima de ${today.min} °C, máxima de ${today.max} °C e ${today.rainChance === null ? `${today.precipitation} mm de precipitação` : `${today.rainChance}% de chance de chuva`}`
+    : null;
+  const strongestGust = hourly.reduce<number | null>(
+    (maximum, hour) =>
+      hour.windGust === null ? maximum : Math.max(maximum ?? hour.windGust, hour.windGust),
+    null,
+  );
+
+  return {
+    headline:
+      current?.temperature === null || current?.temperature === undefined
+        ? today
+          ? `Previsão entre ${today.min} °C e ${today.max} °C em Pelotas`
+          : data.brief.headline
+        : `${Math.round(current.temperature)} °C em Pelotas`,
+    summary: [currentText, todayText].filter(Boolean).join(". ") + ".",
+    highlights: [
+      today
+        ? `Hoje: ${today.min} °C a ${today.max} °C, com ${today.rainChance === null ? `${today.precipitation} mm previstos` : `${today.rainChance}% de chance de chuva`}.`
+        : null,
+      strongestGust === null ? null : `Rajadas previstas de até ${strongestGust} km/h.`,
+    ].filter((item): item is string => item !== null),
+    cautions: data.brief.cautions.filter(
+      (caution) => !/Open-Meteo|fontes? com restrição ou indisponibilidade/i.test(caution),
+    ),
+  };
+}
+
+export function recoverWeatherIntelligenceFromOpenMeteo(
+  data: WeatherIntelligenceData,
+  payload: unknown,
+): WeatherIntelligenceData | null {
+  const production = recoverWeatherDataFromOpenMeteo(
+    {
+      ...fallbackWeatherData,
+      current: {
+        ...fallbackWeatherData.current,
+        available: data.weather.current !== null,
+      },
+    },
+    payload,
+  );
+  if (!production) return null;
+
+  const hourly = production.hourly.map((hour) => ({
+    time: hour.time === "Próxima hora" ? "Agora" : hour.time,
+    temperature: hour.temperature,
+    precipitationProbability: hour.precipitation,
+    windSpeed: hour.windSpeed,
+    windGust: hour.windGust,
+    icon: hour.icon,
+  }));
+  const daily = production.daily.map((day) => ({
+    weekday: day.weekday,
+    date: day.date,
+    min: day.min,
+    max: day.max,
+    rainChance: day.rainChance,
+    precipitationMm: day.precipitation,
+    windGust: day.windGust,
+    icon: day.icon,
+  }));
+  const degradedSources = data.weather.quality.degradedSources.filter(
+    (source) => source !== "open-meteo",
+  );
+  const status = degradedSources.length > 0 ? "degraded" : "live";
+  const now = new Date().toISOString();
+  const message =
+    degradedSources.length === 0
+      ? null
+      : `Dados disponíveis em modo degradado. Fontes com restrição: ${degradedSources.map((source) => sourceLabels[source]).join(", ")}.`;
+
+  return {
+    ...data,
+    weather: {
+      ...data.weather,
+      status,
+      hourly,
+      daily,
+      sources: {
+        ...data.weather.sources,
+        "open-meteo": {
+          source: "open-meteo",
+          status: "live",
+          role: "forecast",
+          fetchedAt: now,
+          usable: true,
+          reason: null,
+        },
+      },
+      quality: {
+        ...data.weather.quality,
+        forecastSource: "open-meteo",
+        forecastProvider: "Open-Meteo",
+        degradedSources,
+        notes: [
+          ...data.weather.quality.notes.filter(
+            (note) => !/Open-Meteo|MET Norway|contingência/i.test(note),
+          ),
+          "Previsão recuperada diretamente do Open-Meteo no navegador.",
+        ],
+      },
+      source: {
+        ...data.weather.source,
+        fetchedAt: now,
+      },
+      message,
+    },
+    brief: recoveredBrief(data, production.hourly, production.daily),
+    intelligence: {
+      ...data.intelligence,
+      origin: "deterministic",
+      model: null,
+      generatedAt: now,
+    },
+  };
+}
+
+export function useOpenMeteoIntelligenceRecovery(baseline: WeatherIntelligenceData) {
+  const [data, setData] = useState(baseline);
+
+  useEffect(() => {
+    setData(baseline);
+    if (!needsOpenMeteoIntelligenceRecovery(baseline)) return;
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    let active = true;
+
+    void fetchForecastPayload(controller.signal)
+      .then((payload) => {
+        const recovered = recoverWeatherIntelligenceFromOpenMeteo(baseline, payload);
+        if (active && recovered) setData(recovered);
+      })
+      .catch(() => {
+        // O SSR já entregou o fallback auditável; uma falha no reforço do navegador é silenciosa.
+      })
+      .finally(() => window.clearTimeout(timeout));
+
+    return () => {
+      active = false;
+      controller.abort();
+      window.clearTimeout(timeout);
+    };
+  }, [baseline]);
+
+  return data;
+}
+
 export function useOpenMeteoForecastRecovery(baseline: WeatherData) {
   const [weather, setWeather] = useState(baseline);
 
@@ -221,14 +413,7 @@ export function useOpenMeteoForecastRecovery(baseline: WeatherData) {
     const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     let active = true;
 
-    void fetch(createForecastUrl(), {
-      headers: { Accept: "application/json" },
-      signal: controller.signal,
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error(`Open-Meteo respondeu com status ${response.status}`);
-        return response.json() as Promise<unknown>;
-      })
+    void fetchForecastPayload(controller.signal)
       .then((payload) => {
         const recovered = recoverWeatherDataFromOpenMeteo(baseline, payload);
         if (active && recovered) setWeather(recovered);
