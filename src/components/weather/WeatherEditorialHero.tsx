@@ -1,38 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import {
-  AlertTriangle,
   ArrowRight,
   CheckCircle2,
-  Cloud,
-  CloudLightning,
-  CloudMoon,
-  CloudRain,
-  CloudSun,
   Droplets,
-  Eye,
   Gauge,
   Info,
-  Moon,
-  Sun,
   Wind,
   type LucideIcon,
 } from "lucide-react";
 
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
-import type { WeatherIconName } from "@/lib/weather/types";
-
 import "./WeatherEditorialHero.css";
-
-const iconMap: Record<WeatherIconName, LucideIcon> = {
-  sun: Sun,
-  moon: Moon,
-  "partly-cloudy": CloudSun,
-  "partly-cloudy-night": CloudMoon,
-  cloud: Cloud,
-  rain: CloudRain,
-  storm: CloudLightning,
-  wind: Wind,
-};
 
 const confidenceLabels = {
   high: "Alta confiança",
@@ -47,11 +25,6 @@ type HeroMetricProps = {
   label: string;
   value: string;
 };
-
-function WeatherIcon({ name, size = 64 }: { name: WeatherIconName | null; size?: number }) {
-  const Icon = name ? iconMap[name] : Cloud;
-  return <Icon aria-hidden="true" size={size} strokeWidth={1.55} />;
-}
 
 function HeroMetric({ icon: Icon, label, value }: HeroMetricProps) {
   return (

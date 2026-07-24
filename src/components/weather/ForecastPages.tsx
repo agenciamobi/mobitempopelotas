@@ -216,7 +216,10 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
       ) : null}
 
       {current ? (
-        <section className="forecast-current-metrics" aria-label="Detalhes do tempo agora">
+        <section
+          className="forecast-current-metrics"
+          aria-label="Detalhes da medição atual da Embrapa"
+        >
           <article>
             <Droplets aria-hidden="true" />
             <span>Umidade</span>
@@ -226,7 +229,7 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
             <Wind aria-hidden="true" />
             <span>Vento</span>
             <strong>{displayNumber(current.windSpeed, " km/h")}</strong>
-            <small>{displayNumber(current.windGust, " km/h de rajada")}</small>
+            <small>Rajada instantânea não publicada</small>
           </article>
           <article>
             <Navigation aria-hidden="true" />
@@ -237,11 +240,6 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
             <Gauge aria-hidden="true" />
             <span>Pressão</span>
             <strong>{displayNumber(current.pressure, " hPa")}</strong>
-          </article>
-          <article>
-            <Eye aria-hidden="true" />
-            <span>Visibilidade</span>
-            <strong>{displayNumber(current.visibilityKm, " km")}</strong>
           </article>
           <article>
             <Sunrise aria-hidden="true" />
