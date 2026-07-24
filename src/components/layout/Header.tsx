@@ -1,6 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 
+import { AuthAccountAction } from "@/components/auth/AuthAccountAction";
+import type { AdvisoryLevel } from "@/production/lib/weather-insights";
+
 import "./Header.css";
 
 type MenuId = "forecast" | "monitoring" | "water";
@@ -178,7 +181,7 @@ function isActivePath(pathname: string, to: string) {
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 
-export function Header() {
+export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryLevel }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const headerRef = useRef<HTMLElement>(null);
   const [openMenu, setOpenMenu] = useState<MenuId | null>(null);
@@ -204,7 +207,11 @@ export function Header() {
         Pular para o conteúdo principal
       </a>
 
-      <header ref={headerRef} className="site-header production-header">
+      <header
+        ref={headerRef}
+        className="site-header production-header"
+        data-advisory-level={advisoryLevel}
+      >
         <div className="production-header-inner">
           <div className="production-branding">
             <Link className="production-brand" to="/" aria-label="Tempo Pelotas — página inicial">
@@ -300,6 +307,8 @@ export function Header() {
           </nav>
 
           <div className="production-header-actions">
+            <AuthAccountAction />
+
             <Link
               className={`production-camera-link${camerasActive ? " is-active" : ""}`}
               to="/cameras-ao-vivo-pelotas"
@@ -308,7 +317,7 @@ export function Header() {
               Câmeras ao vivo
             </Link>
             <Link
-              className={`production-alert-link${alertsActive ? " is-active" : ""}`}
+              className={`production-alert-link is-${advisoryLevel}${alertsActive ? " is-active" : ""}`}
               to="/alertas"
               aria-label="Consultar avisos oficiais"
               aria-current={alertsActive ? "page" : undefined}
@@ -326,7 +335,11 @@ export function Header() {
         </div>
       </header>
 
-      <nav className="production-mobile-navigation" aria-label="Navegação principal no celular">
+      <nav
+        className="production-mobile-navigation"
+        data-advisory-level={advisoryLevel}
+        aria-label="Navegação principal no celular"
+      >
         {mobileNavigation.map((item) => {
           const active = isActivePath(pathname, item.to);
           return (
