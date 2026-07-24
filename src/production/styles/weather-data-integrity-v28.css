@@ -1,0 +1,88 @@
+/*
+ * Integridade de dados meteorológicos.
+ * Estados sem observação real não recebem números, ícones de condição ou aparência de transmissão ao vivo.
+ */
+
+.site-shell--home-editorial .weather-hero-now.is-unavailable {
+  border-color: rgba(93, 108, 119, 0.2);
+  background: rgba(255, 255, 255, 0.97);
+}
+
+.site-shell--home-editorial .weather-hero-now.is-unavailable .weather-hero-live {
+  border-color: rgba(93, 108, 119, 0.22);
+  background: rgba(93, 108, 119, 0.08);
+  color: #4c5e6b;
+}
+
+.site-shell--home-editorial .weather-hero-now.is-unavailable .weather-hero-live i {
+  background: #71838f;
+  box-shadow: 0 0 0 4px rgba(113, 131, 143, 0.12);
+}
+
+.site-shell--home-editorial .weather-hero-icon--station {
+  color: var(--fold-cyan-deep);
+}
+
+.site-shell--home-editorial .weather-hero-icon--station svg {
+  width: 88px;
+  height: 88px;
+}
+
+.site-shell--home-editorial .weather-hero-current-unavailable {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  min-height: 245px;
+  padding: 28px 20px 24px;
+  text-align: center;
+}
+
+.site-shell--home-editorial .weather-hero-current-unavailable strong {
+  color: var(--fold-ink);
+  font-size: clamp(1.25rem, 2vw, 1.6rem);
+  line-height: 1.1;
+}
+
+.site-shell--home-editorial .weather-hero-current-unavailable p {
+  max-width: 320px;
+  margin: 0;
+  color: var(--fold-muted);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.site-shell--home-editorial .weather-hero-current-unavailable a {
+  color: var(--fold-cyan-deep);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.site-shell--home-editorial .rain-unknown .home-hourly-story__bar i,
+.site-shell--home-editorial .rain-unknown .home-next-days__rain-meter i b {
+  width: 0 !important;
+}
+
+.site-shell--home-editorial .rain-unknown .home-hourly-story__bar,
+.site-shell--home-editorial .rain-unknown .home-next-days__rain-meter i {
+  background: rgba(93, 108, 119, 0.11);
+}
+
+.weather-editorial-now.is-unavailable,
+.forecast-now-reading.is-unavailable {
+  border-color: rgba(93, 108, 119, 0.2);
+  background: rgba(247, 249, 250, 0.96);
+}
+
+@media (max-width: 620px) {
+  .site-shell--home-editorial .weather-hero-current-unavailable {
+    min-height: 210px;
+    padding: 22px 14px 18px;
+  }
+
+  .site-shell--home-editorial .weather-hero-icon--station svg {
+    width: 66px;
+    height: 66px;
+  }
+}
