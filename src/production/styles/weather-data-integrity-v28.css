@@ -75,6 +75,37 @@
   background: rgba(247, 249, 250, 0.96);
 }
 
+/*
+ * O resumo ocupa metade do cabeçalho editorial. Em quatro colunas, estados
+ * auditáveis como "Não informada" colidiam entre si em telas largas.
+ */
+@media (min-width: 621px) {
+  .site-shell--home-editorial .home-today-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-shell--home-editorial .home-today-facts > div {
+    min-height: 92px;
+    border-bottom: 1px solid rgba(7, 30, 47, 0.085);
+  }
+
+  .site-shell--home-editorial .home-today-facts > div:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .site-shell--home-editorial .home-today-facts > div:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .site-shell--home-editorial .home-today-facts dd {
+    min-width: 0;
+    font-size: clamp(1.2rem, 1.65vw, 1.55rem);
+    line-height: 1.08;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+
 @media (max-width: 620px) {
   .site-shell--home-editorial .weather-hero-current-unavailable {
     min-height: 210px;
