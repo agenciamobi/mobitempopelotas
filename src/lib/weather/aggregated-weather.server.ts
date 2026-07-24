@@ -614,5 +614,3 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     message: buildMessage(status, degradedSources),
   };
 }
-
-}
