@@ -45,7 +45,7 @@ export function canUseEmbrapaObservation(
   if (observation.status === "unavailable" || observation.current.temperature === null) {
     return false;
   }
-  if (ageMinutes === null) return observation.status === "live";
+  if (ageMinutes === null) return false;
   return ageMinutes <= OBSERVATION_MAX_AGE_MINUTES;
 }
 
