@@ -1,0 +1,35 @@
+name: Remover contexto textual do header
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  remove-header-context:
+    if: github.head_ref == 'agent/header-purple-logo-clean' && github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout da branch
+        uses: actions/checkout@v4
+        with:
+          ref: agent/header-purple-logo-clean
+
+      - name: Remover textos laterais
+        run: python scripts/remove-header-context.py
+
+      - name: Commitar resultado
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/production/components/site-header.tsx src/components/layout/Header.tsx
+          git commit -m "brand: remove textos laterais do logotipo"
+          git push origin HEAD:agent/header-purple-logo-clean
