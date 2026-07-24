@@ -24,6 +24,13 @@ function minBy<T>(items: T[], selector: (item: T) => number) {
   }, undefined);
 }
 
+function maximum(values: Array<number | null | undefined>) {
+  const available = values.filter(
+    (value): value is number => typeof value === "number" && Number.isFinite(value),
+  );
+  return available.length > 0 ? Math.max(...available) : null;
+}
+
 export function formatMillimeters(value: number) {
   return new Intl.NumberFormat("pt-BR", {
     minimumFractionDigits: value % 1 === 0 ? 0 : 1,
@@ -33,30 +40,37 @@ export function formatMillimeters(value: number) {
 
 export function getWeatherAdvisory(weather: WeatherData): WeatherAdvisory {
   const today = weather.daily[0];
-  const maxHourlyGust = Math.max(
-    weather.current.windGust,
+  const maxHourlyGust = maximum([
+    today?.windGust,
     ...weather.hourly.map((hour) => hour.windGust),
-  );
-  const maxHourlyRainChance = Math.max(
-    today?.rainChance ?? 0,
+  ]);
+  const maxHourlyRainChance = maximum([
+    today?.rainChance,
     ...weather.hourly.map((hour) => hour.precipitation),
-  );
+  ]);
   const hasStormSignal =
-    weather.current.icon === "storm" ||
-    weather.hourly.some((hour) => hour.icon === "storm") ||
-    today?.icon === "storm";
+    weather.hourly.some((hour) => hour.icon === "storm") || today?.icon === "storm";
   const precipitation = today?.precipitation ?? 0;
   const reasons: string[] = [];
 
   if (hasStormSignal) reasons.push("a previsão mostra possibilidade de temporal");
-  if (maxHourlyGust >= 50) reasons.push(`as rajadas podem chegar a ${maxHourlyGust} km/h`);
-  if (maxHourlyRainChance >= 70) reasons.push(`a chance de chuva chega a ${maxHourlyRainChance}%`);
-  if (precipitation >= 25)
+  if (maxHourlyGust !== null && maxHourlyGust >= 50) {
+    reasons.push(`as rajadas podem chegar a ${maxHourlyGust} km/h`);
+  }
+  if (maxHourlyRainChance !== null && maxHourlyRainChance >= 70) {
+    reasons.push(`a chance de chuva chega a ${maxHourlyRainChance}%`);
+  }
+  if (precipitation >= 25) {
     reasons.push(
       `o volume de chuva previsto para hoje é de ${formatMillimeters(precipitation)} mm`,
     );
+  }
 
-  if (hasStormSignal || maxHourlyGust >= 75 || precipitation >= 50) {
+  if (
+    hasStormSignal ||
+    (maxHourlyGust !== null && maxHourlyGust >= 75) ||
+    precipitation >= 50
+  ) {
     return {
       level: "warning",
       eyebrow: "Atenção redobrada",
@@ -67,7 +81,11 @@ export function getWeatherAdvisory(weather: WeatherData): WeatherAdvisory {
     };
   }
 
-  if (maxHourlyGust >= 50 || maxHourlyRainChance >= 70 || precipitation >= 25) {
+  if (
+    (maxHourlyGust !== null && maxHourlyGust >= 50) ||
+    (maxHourlyRainChance !== null && maxHourlyRainChance >= 70) ||
+    precipitation >= 25
+  ) {
     return {
       level: "attention",
       eyebrow: "Atenção nas próximas horas",
@@ -80,7 +98,7 @@ export function getWeatherAdvisory(weather: WeatherData): WeatherAdvisory {
 
   return {
     level: "normal",
-    eyebrow: "Sem sinal importante no momento",
+    eyebrow: "Sem sinal importante na previsão",
     title: "A previsão não mostra chuva ou vento fortes",
     description:
       "As condições podem mudar. Continue acompanhando e consulte os canais oficiais quando o tempo estiver instável.",
@@ -92,7 +110,8 @@ export function getWeekHighlights(days: DailyForecast[]) {
   const hottest = maxBy(days, (day) => day.max);
   const coldest = minBy(days, (day) => day.min);
   const wettest = maxBy(days, (day) => day.precipitation);
-  const windiest = maxBy(days, (day) => day.windGust);
+  const daysWithGust = days.filter((day) => day.windGust !== null);
+  const windiest = maxBy(daysWithGust, (day) => day.windGust ?? Number.NEGATIVE_INFINITY);
 
   return { hottest, coldest, wettest, windiest };
 }
