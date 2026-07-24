@@ -141,7 +141,7 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
     "@type": "Dataset",
     name: "Observações meteorológicas da Embrapa Clima Temperado em Pelotas",
     description:
-      "Temperatura, umidade, pressão, vento, extremos e chuva acumulada consultados no Posto Meteorológico da Sede da Embrapa Clima Temperado.",
+      "Temperatura, umidade, pressão, vento, extremos, chuva acumulada e evapotranspiração consultados no Posto Meteorológico da Sede da Embrapa Clima Temperado.",
     spatialCoverage: "Pelotas, Rio Grande do Sul, Brasil",
     temporalCoverage: "Condição atual informada pela fonte e acumulados do dia, mês e ano",
     isAccessibleForFree: true,
@@ -297,6 +297,52 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
             </div>
           </section>
 
+          <section className="embrapa-section" aria-labelledby="embrapa-et-title">
+            <div className="embrapa-section-heading">
+              <div>
+                <p className="embrapa-kicker">Demanda atmosférica</p>
+                <h2 id="embrapa-et-title">Evapotranspiração acumulada</h2>
+              </div>
+              <p>
+                A evapotranspiração combina a perda de água do solo e da vegetação para a
+                atmosfera. É uma referência útil para agricultura, irrigação e balanço hídrico.
+              </p>
+            </div>
+
+            <div className="embrapa-metric-grid">
+              <MetricCard
+                icon={Sun}
+                label="Hoje"
+                value={displayValue(
+                  observation.accumulated.evapotranspirationDaily ?? null,
+                  " mm",
+                  2,
+                )}
+                detail="Evapotranspiração acumulada no dia"
+              />
+              <MetricCard
+                icon={Activity}
+                label="No mês"
+                value={displayValue(
+                  observation.accumulated.evapotranspirationMonthly ?? null,
+                  " mm",
+                  2,
+                )}
+                detail="Evapotranspiração acumulada no mês"
+              />
+              <MetricCard
+                icon={Waves}
+                label="No ano"
+                value={displayValue(
+                  observation.accumulated.evapotranspirationAnnual ?? null,
+                  " mm",
+                  2,
+                )}
+                detail="Evapotranspiração acumulada no ano"
+              />
+            </div>
+          </section>
+
           <section className="embrapa-section" aria-labelledby="embrapa-extremes-title">
             <div className="embrapa-section-heading">
               <div>
@@ -340,6 +386,26 @@ export function EmbrapaStationPage({ data }: EmbrapaStationPageProps) {
                   label="Máxima"
                   observation={observation.extremes.humidityMax}
                   unit="%"
+                />
+              </article>
+              <article>
+                <div className="embrapa-extreme-heading">
+                  <Droplets aria-hidden="true" />
+                  <h3>Ponto de orvalho</h3>
+                </div>
+                <ExtremeValue
+                  label="Mínimo"
+                  observation={
+                    observation.extremes.dewPointMin ?? { value: null, time: null }
+                  }
+                  unit=" °C"
+                />
+                <ExtremeValue
+                  label="Máximo"
+                  observation={
+                    observation.extremes.dewPointMax ?? { value: null, time: null }
+                  }
+                  unit=" °C"
                 />
               </article>
               <article>
