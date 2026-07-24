@@ -24,7 +24,6 @@ import {
 
 const TIMEZONE = "America/Sao_Paulo";
 
-
 const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
   embrapa: "Embrapa",
   inmet: "INMET",
@@ -32,8 +31,6 @@ const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
   "open-meteo": "Open-Meteo",
   "met-norway": "MET Norway",
 };
-
-
 
 function addDiscrepancy(
   discrepancies: WeatherDiscrepancy[],
@@ -407,7 +404,6 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
   const normalizedCurrentSource: "embrapa" | ForecastSourceKey | null = embrapaUsable
     ? "embrapa"
     : null;
-
 
   return {
     status,
