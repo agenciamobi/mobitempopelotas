@@ -167,6 +167,14 @@ export function parseEmbrapaObservationHtml(
         text,
         /Umidade relativa maxima\s*(\d+(?:[.,]\d+)?)\s*%\s*-\s*(\d{1,2}:\d{2})/i,
       ),
+      dewPointMin: extractTimed(
+        text,
+        /Ponto de orvalho minimo\s*(-?\d+(?:[.,]\d+)?)\s*°?\s*C\s*-\s*(\d{1,2}:\d{2})/i,
+      ),
+      dewPointMax: extractTimed(
+        text,
+        /Ponto de orvalho maximo\s*(-?\d+(?:[.,]\d+)?)\s*°?\s*C\s*-\s*(\d{1,2}:\d{2})/i,
+      ),
       windSpeedMax: extractTimed(
         text,
         /Velocidade do vento maxima\s*(\d+(?:[.,]\d+)?)\s*km\/?h(?:r)?\s*-\s*(\d{1,2}:\d{2})/i,
@@ -176,6 +184,18 @@ export function parseEmbrapaObservationHtml(
       rainDaily: extractNumber(text, /Chuva diaria\s*(\d+(?:[.,]\d+)?)\s*mm/i),
       rainMonthly: extractNumber(text, /Chuva mensal\s*(\d+(?:[.,]\d+)?)\s*mm/i),
       rainAnnual: extractNumber(text, /Chuva anual\s*(\d+(?:[.,]\d+)?)\s*mm/i),
+      evapotranspirationDaily: extractNumber(
+        text,
+        /Evapotranspiracao diaria\s*(\d+(?:[.,]\d+)?)\s*mm/i,
+      ),
+      evapotranspirationMonthly: extractNumber(
+        text,
+        /Evapotranspiracao mensal\s*(\d+(?:[.,]\d+)?)\s*mm/i,
+      ),
+      evapotranspirationAnnual: extractNumber(
+        text,
+        /Evapotranspiracao anual\s*(\d+(?:[.,]\d+)?)\s*mm/i,
+      ),
     },
     source: {
       name: "Embrapa Clima Temperado",
