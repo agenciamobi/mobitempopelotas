@@ -8,10 +8,13 @@ export type WeatherIconName =
   | "storm"
   | "wind";
 
+export type ForecastSourceKey = "open-meteo" | "met-norway";
+
 export type WeatherSource = {
   name: string;
   url: string;
   kind: "forecast";
+  key: ForecastSourceKey;
   fetchedAt: string;
   isFallback: boolean;
 };
