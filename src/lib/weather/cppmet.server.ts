@@ -1,4 +1,5 @@
 import type { CppmetForecast, CppmetForecastItem } from "./official-sources.types";
+import { WEATHER_SOURCE_REQUEST_TIMEOUT_MS } from "./source-policy.ts";
 
 const SOURCE_URL = "https://wp.ufpel.edu.br/cppmet/";
 const FALLBACK_URLS = [
@@ -6,7 +7,6 @@ const FALLBACK_URLS = [
   "https://wp.ufpel.edu.br/cppmet/estacoes-do-inmet/",
   "https://wp.ufpel.edu.br/cppmet/estacoes-do-ano/",
 ] as const;
-const REQUEST_TIMEOUT_MS = 8_000;
 const WEEKDAY_PATTERN =
   /^(segunda(?:-feira)?|terça(?:-feira)?|terca(?:-feira)?|quarta(?:-feira)?|quinta(?:-feira)?|sexta(?:-feira)?|sábado|sabado|domingo)\s*:\s*/i;
 
@@ -146,25 +146,22 @@ function unavailable(error: string): CppmetForecast {
 }
 
 export async function fetchCppmetForecast(): Promise<CppmetForecast> {
-  let lastError = "A previsão textual do CPPMet não pôde ser localizada.";
-  for (const url of FALLBACK_URLS) {
-    try {
+  const attempts = await Promise.allSettled(
+    FALLBACK_URLS.map(async (url) => {
       const response = await fetch(url, {
         headers: {
           Accept: "text/html,application/xhtml+xml",
           "Accept-Language": "pt-BR,pt;q=0.9",
           "User-Agent": "TEMPO-Pelotas/2.0 (+https://tempopelotas.com.br)",
         },
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        signal: AbortSignal.timeout(WEATHER_SOURCE_REQUEST_TIMEOUT_MS.cppmet),
       });
       if (!response.ok) {
-        lastError = `CPPMet respondeu com HTTP ${response.status}.`;
-        continue;
+        throw new Error(`CPPMet respondeu com HTTP ${response.status}.`);
       }
       const items = parseCppmetForecastHtml(await response.text());
       if (items.length < 2) {
-        lastError = "A estrutura da previsão do CPPMet não foi reconhecida.";
-        continue;
+        throw new Error("A estrutura da previsão do CPPMet não foi reconhecida.");
       }
       return {
         status: "live",
@@ -172,16 +169,30 @@ export async function fetchCppmetForecast(): Promise<CppmetForecast> {
         fingerprint: await sha256(items.map((item) => item.text).join("\n")),
         source: {
           name: "CPPMet / UFPel",
-          url: SOURCE_URL,
+          url,
           fetchedAt: new Date().toISOString(),
           lastModified: response.headers.get("last-modified"),
         },
         error: null,
-      };
-    } catch (error) {
-      lastError =
-        error instanceof Error ? error.message : "Falha desconhecida ao consultar o CPPMet.";
-    }
+      } satisfies CppmetForecast;
+    }),
+  );
+
+  for (const attempt of attempts) {
+    if (attempt.status === "fulfilled") return attempt.value;
   }
-  return unavailable(lastError);
+
+  const errors = attempts.flatMap((attempt) =>
+    attempt.status === "rejected"
+      ? [
+          attempt.reason instanceof Error
+            ? attempt.reason.message
+            : "Falha desconhecida ao consultar o CPPMet.",
+        ]
+      : [],
+  );
+  return unavailable(
+    Array.from(new Set(errors)).join(" ") ||
+      "A previsão textual do CPPMet não pôde ser localizada.",
+  );
 }
