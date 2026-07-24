@@ -1,5 +1,5 @@
-import { PUBLIC_ROUTES } from "./public-routes";
-import { absoluteUrl } from "./site-config";
+import { PUBLIC_ROUTES } from "./public-routes.ts";
+import { absoluteUrl } from "./site-config.ts";
 
 function escapeXml(value: string) {
   return value
