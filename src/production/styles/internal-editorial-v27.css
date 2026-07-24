@@ -133,7 +133,12 @@
   text-wrap: balance;
 }
 
-.site-shell--topic .site-container--topic > [class*="-page"] > header > :first-child > p:last-child {
+.site-shell--topic
+  .site-container--topic
+  > [class*="-page"]
+  > header
+  > :first-child
+  > p:last-child {
   max-width: 650px;
   margin: 22px 0 0;
   color: var(--internal-muted);
@@ -168,7 +173,11 @@
 
 /* O segundo bloco do hero mantém os estados específicos, mas passa a atuar
    como a ficha editorial da primeira dobra. */
-.site-shell--topic .site-container--topic > [class*="-page"] > header > :last-child:not(:first-child) {
+.site-shell--topic
+  .site-container--topic
+  > [class*="-page"]
+  > header
+  > :last-child:not(:first-child) {
   position: relative;
   z-index: 1;
   justify-self: end;
@@ -183,7 +192,11 @@
   backdrop-filter: blur(15px) saturate(120%);
 }
 
-.site-shell--topic .site-container--topic > [class*="-page"] > header > :last-child:not(:first-child)::before {
+.site-shell--topic
+  .site-container--topic
+  > [class*="-page"]
+  > header
+  > :last-child:not(:first-child)::before {
   display: block;
   width: 100%;
   height: 2px;
@@ -196,11 +209,18 @@
 /* Capítulos e hierarquia --------------------------------------------------- */
 .site-shell--topic .site-container--topic > [class*="-page"] > section {
   scroll-margin-top: 96px;
+}
+
+.site-shell--topic .site-container--topic > [class*="-page"] > section[class*="-section"] {
   margin-top: 0;
   padding-block: clamp(64px, 7vw, 108px);
 }
 
-.site-shell--topic .site-container--topic > [class*="-page"] > section + section {
+.site-shell--topic
+  .site-container--topic
+  > [class*="-page"]
+  > section[class*="-section"]
+  + section[class*="-section"] {
   border-top: 1px solid var(--internal-line);
 }
 
@@ -231,7 +251,8 @@
   line-height: 1.75;
 }
 
-.site-shell--topic :is(
+.site-shell--topic
+  :is(
     .forecast-current-metrics,
     .forecast-week-summary,
     .condition-summary-grid,
@@ -248,14 +269,16 @@
   box-shadow: none;
 }
 
-.site-shell--topic :is(
+.site-shell--topic
+  :is(
     .forecast-current-metrics,
     .forecast-week-summary,
     .condition-summary-grid,
     .alerts-overview,
     .history-summary,
     .camera-overview
-  ) > article {
+  )
+  > article {
   min-width: 0;
   min-height: 145px;
   padding: 25px clamp(18px, 2vw, 30px);
@@ -266,40 +289,42 @@
   box-shadow: none;
 }
 
-.site-shell--topic :is(
+.site-shell--topic
+  :is(
     .forecast-current-metrics,
     .forecast-week-summary,
     .condition-summary-grid,
     .alerts-overview,
     .history-summary,
     .camera-overview
-  ) > article:last-child {
+  )
+  > article:last-child {
   border-right: 0;
 }
 
-.site-shell--topic :is(
+.site-shell--topic
+  :is(
     .forecast-current-metrics,
     .forecast-week-summary,
     .condition-summary-grid,
     .alerts-overview,
     .history-summary,
     .camera-overview
-  ) > article > span {
+  )
+  > article
+  > span {
   color: var(--internal-accent);
 }
 
-.site-shell--topic :is(
-    .forecast-content-section,
-    .condition-section,
-    .alerts-section,
-    .methodology-section
-  ) {
+.site-shell--topic
+  :is(.forecast-content-section, .condition-section, .alerts-section, .methodology-section) {
   border-radius: 0;
   background: transparent;
   box-shadow: none;
 }
 
-.site-shell--topic :is(
+.site-shell--topic
+  :is(
     .forecast-today-hero,
     .condition-highlight,
     .alerts-clear-state,
@@ -380,13 +405,17 @@
     letter-spacing: -0.061em;
   }
 
-  .site-shell--topic .site-container--topic > [class*="-page"] > header > :last-child:not(:first-child) {
+  .site-shell--topic
+    .site-container--topic
+    > [class*="-page"]
+    > header
+    > :last-child:not(:first-child) {
     justify-self: stretch;
     width: 100%;
     padding: 20px;
   }
 
-  .site-shell--topic .site-container--topic > [class*="-page"] > section {
+  .site-shell--topic .site-container--topic > [class*="-page"] > section[class*="-section"] {
     padding-block: 58px;
   }
 
@@ -395,7 +424,8 @@
     font-size: clamp(2.15rem, 10.5vw, 3.35rem);
   }
 
-  .site-shell--topic :is(
+  .site-shell--topic
+    :is(
       .forecast-current-metrics,
       .forecast-week-summary,
       .condition-summary-grid,
@@ -406,27 +436,31 @@
     grid-template-columns: 1fr 1fr;
   }
 
-  .site-shell--topic :is(
+  .site-shell--topic
+    :is(
       .forecast-current-metrics,
       .forecast-week-summary,
       .condition-summary-grid,
       .alerts-overview,
       .history-summary,
       .camera-overview
-    ) > article {
+    )
+    > article {
     min-height: 126px;
     padding: 20px 16px;
     border-bottom: 1px solid var(--internal-line);
   }
 
-  .site-shell--topic :is(
+  .site-shell--topic
+    :is(
       .forecast-current-metrics,
       .forecast-week-summary,
       .condition-summary-grid,
       .alerts-overview,
       .history-summary,
       .camera-overview
-    ) > article:nth-child(2n) {
+    )
+    > article:nth-child(2n) {
     border-right: 0;
   }
 }
@@ -444,7 +478,8 @@
     font-size: clamp(2.35rem, 12.7vw, 3.35rem);
   }
 
-  .site-shell--topic :is(
+  .site-shell--topic
+    :is(
       .forecast-current-metrics,
       .forecast-week-summary,
       .condition-summary-grid,
@@ -455,14 +490,16 @@
     grid-template-columns: 1fr;
   }
 
-  .site-shell--topic :is(
+  .site-shell--topic
+    :is(
       .forecast-current-metrics,
       .forecast-week-summary,
       .condition-summary-grid,
       .alerts-overview,
       .history-summary,
       .camera-overview
-    ) > article {
+    )
+    > article {
     border-right: 0;
   }
 }
