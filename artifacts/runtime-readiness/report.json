@@ -1,0 +1,64 @@
+{
+  "generatedAt": "2026-07-24T04:12:53.609Z",
+  "mode": "production",
+  "canonicalSiteUrl": "https://tempopelotas.com.br",
+  "passed": 3,
+  "failed": 8,
+  "checks": [
+    {
+      "name": "Host canônico de produção",
+      "status": "failed",
+      "details": "VITE_SITE_URL deve ser exatamente https://tempopelotas.com.br"
+    },
+    {
+      "name": "Supabase externo habilitado",
+      "status": "failed",
+      "details": "SUPABASE_MODE e VITE_SUPABASE_MODE devem ser external"
+    },
+    {
+      "name": "URLs do Supabase",
+      "status": "failed",
+      "details": "as URLs pública e server-side devem existir, usar HTTPS e ser idênticas"
+    },
+    {
+      "name": "Publishable key do Supabase",
+      "status": "failed",
+      "details": "as publishable keys pública e server-side devem existir e ser idênticas"
+    },
+    {
+      "name": "Chave administrativa do Supabase",
+      "status": "failed",
+      "details": "uma chave administrativa server-only válida deve estar configurada"
+    },
+    {
+      "name": "Segredos operacionais",
+      "status": "failed",
+      "details": "CRON_SECRET e PUSH_ADMIN_SECRET devem ter ao menos 32 caracteres e ser distintos"
+    },
+    {
+      "name": "Par VAPID",
+      "status": "failed",
+      "details": "as chaves devem formar o mesmo par P-256 e usar ponto público não comprimido"
+    },
+    {
+      "name": "Assunto VAPID",
+      "status": "failed",
+      "details": "VAPID_SUBJECT deve usar mailto: ou uma URL HTTPS"
+    },
+    {
+      "name": "REDEMET",
+      "status": "passed",
+      "details": "a chave deve existir e a URL base deve usar HTTPS"
+    },
+    {
+      "name": "Gemini opcional",
+      "status": "passed",
+      "details": "síntese Gemini desabilitada ou não exigida"
+    },
+    {
+      "name": "Segredos fora do bundle cliente",
+      "status": "passed",
+      "details": "nenhum segredo server-only usa prefixo VITE_"
+    }
+  ]
+}
