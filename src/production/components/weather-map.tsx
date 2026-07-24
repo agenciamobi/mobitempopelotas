@@ -240,7 +240,8 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
         }
 
         const payload = (await response.json()) as
-          RedemetImageLayerResponse | RedemetStormLayerResponse;
+          | RedemetImageLayerResponse
+          | RedemetStormLayerResponse;
 
         if (cancelled) return;
 
