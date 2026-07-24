@@ -21,6 +21,10 @@ function formatUpdatedAt(value: string | null | undefined) {
   }).format(date);
 }
 
+function forecastTimeLabel(value: string) {
+  return value.trim().toLocaleLowerCase("pt-BR") === "agora" ? "Próxima hora" : value;
+}
+
 function unavailableCurrent(data: AggregatedWeatherData): CurrentWeather {
   return {
     available: false,
@@ -82,7 +86,7 @@ export function toProductionWeatherData(data: AggregatedWeatherData): WeatherDat
   return {
     current: observedCurrent(data),
     hourly: data.hourly.map((hour) => ({
-      time: hour.time,
+      time: forecastTimeLabel(hour.time),
       temperature: hour.temperature,
       precipitation: hour.precipitationProbability,
       windSpeed: hour.windSpeed,
