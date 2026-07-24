@@ -315,6 +315,7 @@ function dailyWeekdayKey(day: DailyForecast) {
 function compareDailyForecasts(
   daily: DailyForecast[],
   officialForecast: AggregatedWeatherData["officialForecast"],
+  referenceKey: ForecastSourceKey,
 ) {
   const discrepancies: WeatherDiscrepancy[] = [];
   const dailyByWeekday = new Map(daily.map((day) => [dailyWeekdayKey(day), day]));
@@ -326,7 +327,7 @@ function compareDailyForecasts(
     addDiscrepancy(discrepancies, {
       scope: "daily",
       field: "minimum",
-      referenceSource: "open-meteo",
+      referenceSource: referenceKey,
       comparisonSource: "cppmet",
       referenceValue: baselineDay.min,
       comparisonValue: officialDay.minimum,
@@ -338,7 +339,7 @@ function compareDailyForecasts(
     addDiscrepancy(discrepancies, {
       scope: "daily",
       field: "maximum",
-      referenceSource: "open-meteo",
+      referenceSource: referenceKey,
       comparisonSource: "cppmet",
       referenceValue: baselineDay.max,
       comparisonValue: officialDay.maximum,
@@ -351,6 +352,7 @@ function compareDailyForecasts(
 
   return discrepancies;
 }
+
 
 function calculateQualityScore(options: {
   baseline: WeatherHomeData;
