@@ -41,27 +41,26 @@ function firstEnvironmentValue(...values: Array<string | undefined>) {
 }
 
 export function getSupabaseServerConfig(): SupabaseServerConfig {
-  const publicMode = normalizeEnvironmentValue(import.meta.env.VITE_SUPABASE_MODE);
   const requestedMode = firstEnvironmentValue(
     process.env.MOBI_SUPABASE_MODE,
+    import.meta.env.VITE_SUPABASE_MODE,
     process.env.SUPABASE_MODE,
     process.env.VITE_SUPABASE_MODE,
-    publicMode ?? undefined,
   );
   const mode = requestedMode === "external" ? "external" : "mock";
   const url = firstEnvironmentValue(
     process.env.MOBI_SUPABASE_URL,
+    import.meta.env.VITE_SUPABASE_URL,
     process.env.SUPABASE_URL,
     process.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_URL,
   );
   const publishableKey = firstEnvironmentValue(
     process.env.MOBI_SUPABASE_PUBLISHABLE_KEY,
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+    import.meta.env.VITE_SUPABASE_ANON_KEY,
     process.env.SUPABASE_PUBLISHABLE_KEY,
     process.env.VITE_SUPABASE_PUBLISHABLE_KEY,
     process.env.VITE_SUPABASE_ANON_KEY,
-    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    import.meta.env.VITE_SUPABASE_ANON_KEY,
   );
   const secretKey = firstEnvironmentValue(
     process.env.MOBI_SUPABASE_SECRET_KEY,
