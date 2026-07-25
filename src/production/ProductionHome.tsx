@@ -11,6 +11,7 @@ import {
   toProductionSummaries,
   toProductionWeatherData,
 } from "@/production/adapters/home";
+import { HeroAstronomyPortal } from "@/production/components/hero-astronomy-portal";
 import { HomeEditorialDashboard } from "@/production/components/home-editorial-dashboard-semantic";
 import { HomeSectionNavigation } from "@/production/components/home-section-navigation";
 import { InmetAlertsPanel } from "@/production/components/inmet-alerts-panel";
@@ -113,6 +114,7 @@ export function ProductionHome({
           cppmetToday ? { item: cppmetToday, sourceUrl: "https://wp.ufpel.edu.br/cppmet/" } : null
         }
       />
+      <HeroAstronomyPortal astronomy={weather.astronomy} />
 
       <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
         <InmetAlertsPanel data={inmetAlerts} variant="home" />
