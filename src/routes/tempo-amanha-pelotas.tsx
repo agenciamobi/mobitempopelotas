@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { TomorrowForecastPage } from "@/components/weather/TomorrowForecastPage";
+import { TomorrowForecastPageV2 } from "@/components/weather/DailyForecastPagesV2";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
@@ -21,7 +21,13 @@ export const Route = createFileRoute("/tempo-amanha-pelotas")({
           { name: "Início", path: "/" },
           { name: "Previsão para amanhã em Pelotas", path: PAGE_PATH },
         ],
-        about: ["Previsão do tempo", "Tempo amanhã em Pelotas"],
+        about: [
+          "Previsão do tempo",
+          "Tempo amanhã em Pelotas",
+          "Chuva amanhã em Pelotas",
+          "Temperatura amanhã em Pelotas",
+          "Vento amanhã em Pelotas",
+        ],
       }),
     ]),
   loader: () => getWeatherIntelligence(),
@@ -31,5 +37,5 @@ export const Route = createFileRoute("/tempo-amanha-pelotas")({
 
 function TempoAmanhaPage() {
   const weather = Route.useLoaderData();
-  return <TomorrowForecastPage data={weather} />;
+  return <TomorrowForecastPageV2 data={weather} />;
 }
