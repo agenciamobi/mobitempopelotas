@@ -25,7 +25,7 @@ import productionCss from "@/production/production-styles.css?url";
 import appCss from "../styles.css?url";
 
 const ONESIGNAL_SDK_URL = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
-const ONESIGNAL_INIT_SCRIPT = `
+const ONESIGNAL_BOOTSTRAP_SCRIPT = `
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 window.OneSignalDeferred.push(async function(OneSignal) {
   await OneSignal.init({
@@ -43,6 +43,33 @@ window.OneSignalDeferred.push(async function(OneSignal) {
     },
   });
 });
+
+(function loadOneSignalOutsideCriticalRendering() {
+  var loaded = false;
+
+  function loadSdk() {
+    if (loaded || document.querySelector('script[data-tempo-pelotas-onesignal]')) return;
+    loaded = true;
+
+    var script = document.createElement("script");
+    script.src = ${JSON.stringify(ONESIGNAL_SDK_URL)};
+    script.async = true;
+    script.dataset.tempoPelotasOnesignal = "true";
+    document.head.appendChild(script);
+  }
+
+  function scheduleLoad() {
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(loadSdk, { timeout: 3500 });
+      return;
+    }
+
+    window.setTimeout(loadSdk, 1200);
+  }
+
+  if (document.readyState === "complete") scheduleLoad();
+  else window.addEventListener("load", scheduleLoad, { once: true });
+})();
 `;
 
 function NotFoundComponent() {
@@ -105,6 +132,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "color-scheme", content: "light" },
       { property: "og:title", content: SITE_TITLE },
       { property: "og:description", content: SITE_DESCRIPTION },
       { property: "og:type", content: "website" },
@@ -150,8 +178,7 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="pt-BR">
       <head>
         <HeadContent />
-        <script src={ONESIGNAL_SDK_URL} defer />
-        <script dangerouslySetInnerHTML={{ __html: ONESIGNAL_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: ONESIGNAL_BOOTSTRAP_SCRIPT }} />
       </head>
       <body>
         {children}
