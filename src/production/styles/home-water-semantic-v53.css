@@ -1,0 +1,186 @@
+/* Home v53 — tendência das águas determina a cor, inclusive no Guaíba e no estado estável. */
+:root {
+  --water-level-stable: #b7bec2;
+  --water-level-stable-ink: #61717a;
+}
+
+.site-shell--home-editorial .home-water-context {
+  border-color: rgba(183, 190, 194, 0.5) !important;
+  background: linear-gradient(90deg, rgba(183, 190, 194, 0.08), rgba(255, 255, 255, 0.9)) !important;
+  box-shadow: inset 4px 0 0 var(--water-level-stable) !important;
+}
+
+.site-shell--home-editorial .home-water-context > div span {
+  color: var(--water-level-stable-ink) !important;
+}
+
+.site-shell--home-editorial .home-water-context.level-state--falling {
+  border-color: rgba(24, 189, 205, 0.24) !important;
+  background: linear-gradient(90deg, rgba(24, 189, 205, 0.075), rgba(255, 255, 255, 0.92)) !important;
+  box-shadow: inset 4px 0 0 var(--water-level-falling) !important;
+}
+
+.site-shell--home-editorial .home-water-context.level-state--falling > div span,
+.site-shell--home-editorial .home-water-context.level-state--falling > b,
+.site-shell--home-editorial .home-water-context.level-state--falling > span {
+  color: var(--water-level-falling-ink) !important;
+}
+
+.site-shell--home-editorial .home-water-context.level-state--rising {
+  border-color: rgba(242, 112, 53, 0.26) !important;
+  background: linear-gradient(90deg, rgba(242, 112, 53, 0.08), rgba(255, 255, 255, 0.92)) !important;
+  box-shadow: inset 4px 0 0 var(--water-level-rising) !important;
+}
+
+.site-shell--home-editorial .home-water-context.level-state--rising > div span,
+.site-shell--home-editorial .home-water-context.level-state--rising > b,
+.site-shell--home-editorial .home-water-context.level-state--rising > span {
+  color: var(--water-level-rising-ink) !important;
+}
+
+.site-shell--home-editorial .home-water-context.level-state--stable {
+  border-color: rgba(183, 190, 194, 0.56) !important;
+  background: linear-gradient(90deg, rgba(183, 190, 194, 0.1), rgba(255, 255, 255, 0.92)) !important;
+  box-shadow: inset 4px 0 0 var(--water-level-stable) !important;
+}
+
+.site-shell--home-editorial .home-water-context.level-state--stable > div span,
+.site-shell--home-editorial .home-water-context.level-state--stable > b,
+.site-shell--home-editorial .home-water-context.level-state--stable > span {
+  color: var(--water-level-stable-ink) !important;
+}
+
+.site-shell--home-editorial .home-water-context.level-state--unavailable {
+  border-color: rgba(135, 151, 160, 0.36) !important;
+  background: linear-gradient(90deg, rgba(135, 151, 160, 0.08), rgba(255, 255, 255, 0.9)) !important;
+  box-shadow: inset 4px 0 0 var(--water-level-unavailable) !important;
+}
+
+.site-shell--home-editorial .home-water-context.level-state--flood {
+  border-color: rgba(217, 45, 32, 0.3) !important;
+  background: linear-gradient(90deg, rgba(217, 45, 32, 0.08), rgba(255, 255, 255, 0.92)) !important;
+  box-shadow: inset 4px 0 0 var(--water-level-flood) !important;
+}
+
+.site-shell--home-editorial .home-water-context.level-state--flood > div span,
+.site-shell--home-editorial .home-water-context.level-state--flood > b,
+.site-shell--home-editorial .home-water-context.level-state--flood > span {
+  color: var(--water-level-flood-ink) !important;
+}
+
+/* Estabilidade passa a usar a mesma referência cinza em todos os pontos da seção. */
+.site-shell--home-editorial .home-water-focus.level-state--stable::before,
+.site-shell--home-editorial .home-water-table__rows article.level-state--stable::before {
+  background: var(--water-level-stable) !important;
+}
+
+.site-shell--home-editorial .home-water-trend.is-stable {
+  border-color: rgba(183, 190, 194, 0.58) !important;
+  background: rgba(183, 190, 194, 0.12) !important;
+  color: var(--water-level-stable-ink) !important;
+}
+
+.site-shell--home-editorial .home-water-trend.is-stable > b {
+  background: rgba(183, 190, 194, 0.2) !important;
+  color: var(--water-level-stable-ink) !important;
+}
+
+.site-shell--home-editorial .home-water-table__rows article > span.is-stable,
+.site-shell--home-editorial .home-water-context > span.is-stable {
+  color: var(--water-level-stable-ink) !important;
+}
+
+.site-shell--home-editorial .home-water-table__rows article.level-state--stable > small {
+  border-color: rgba(183, 190, 194, 0.42) !important;
+  background: rgba(183, 190, 194, 0.12) !important;
+  color: var(--water-level-stable-ink) !important;
+}
+
+/* Legenda visual explícita. */
+.site-shell--home-editorial .home-water-trend-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 22px;
+  min-width: 0;
+}
+
+.site-shell--home-editorial .home-water-trend-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #526f7a;
+  font-size: 0.79rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.site-shell--home-editorial .home-water-trend-legend > span > i {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--water-level-stable);
+  box-shadow: 0 0 0 4px rgba(183, 190, 194, 0.14);
+}
+
+.site-shell--home-editorial .home-water-trend-legend > span.is-falling > i {
+  background: var(--water-level-falling);
+  box-shadow: 0 0 0 4px rgba(24, 189, 205, 0.12);
+}
+
+.site-shell--home-editorial .home-water-trend-legend > span.is-rising > i {
+  background: var(--water-level-rising);
+  box-shadow: 0 0 0 4px rgba(242, 112, 53, 0.12);
+}
+
+.site-shell--home-editorial .home-water-trend-legend > span.is-stable > i {
+  background: var(--water-level-stable);
+  box-shadow: 0 0 0 4px rgba(183, 190, 194, 0.16);
+}
+
+.site-shell--home-editorial .home-water-trend-legend > small {
+  flex: 1 1 300px;
+  color: #657c87;
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+
+/* A mesma cor de estabilidade é refletida nos componentes hidrológicos compartilhados. */
+.guaiba-level-card.level-state--stable::before,
+.guaiba-city-links > a.level-state--stable::before {
+  background: var(--water-level-stable) !important;
+  opacity: 1;
+}
+
+.guaiba-level-card.level-state--stable .guaiba-level-value,
+.guaiba-level-card.level-state--stable .guaiba-mini-chart,
+.guaiba-city-links > a.level-state--stable .guaiba-city-level,
+.guaiba-city-links > a.level-state--stable .guaiba-city-meta,
+.regional-water-trend.is-stable {
+  color: var(--water-level-stable-ink) !important;
+}
+
+.guaiba-trend--stable,
+.regional-water-trend.is-stable {
+  background: rgba(183, 190, 194, 0.14) !important;
+}
+
+.lagoon-monitoring-card.level-state--stable {
+  box-shadow: inset 0 3px 0 var(--water-level-stable) !important;
+}
+
+.lagoon-monitoring-card.level-state--stable .lagoon-monitoring-trend {
+  background: rgba(183, 190, 194, 0.15) !important;
+  color: #d5dadd !important;
+}
+
+@media (max-width: 720px) {
+  .site-shell--home-editorial .home-water-trend-legend {
+    gap: 12px 18px;
+  }
+
+  .site-shell--home-editorial .home-water-trend-legend > small {
+    flex-basis: 100%;
+  }
+}
