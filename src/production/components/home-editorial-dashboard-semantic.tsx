@@ -1,11 +1,11 @@
 import { Children, cloneElement, isValidElement, type ReactElement, type ReactNode } from "react";
+
 import { HomeEditorialDashboard as HomeEditorialDashboardBase } from "@/production/components/home-editorial-dashboard";
 import { WeatherIcon } from "@/production/components/weather-icon";
 import type { EmbrapaObservationData } from "@/production/lib/embrapa-observation";
 import type { GuaibaObservationData } from "@/production/lib/guaiba-monitor";
 import type { LagoonMonitoringNetworkData } from "@/production/lib/lagoon-monitoring-network";
 import type { LaranjalLevelData } from "@/production/lib/laranjal-level";
-import type { ForecastNarrative, WeatherAiSummaries } from "@/production/lib/weather-ai-summary";
 import type { WeatherData } from "@/production/lib/weather-data";
 import type { AdvisoryLevel } from "@/production/lib/weather-insights";
 import {
@@ -16,7 +16,6 @@ import {
 
 type HomeEditorialDashboardProps = {
   weather: WeatherData;
-  summaries: WeatherAiSummaries;
   advisoryLevel?: AdvisoryLevel;
   observation: EmbrapaObservationData;
   laranjal: LaranjalLevelData;
@@ -56,95 +55,13 @@ const stationStateLabels: Record<string, string> = {
 
 const editorialCopyReplacements: Record<string, string> = {
   "Próximos dias": "Tendência do tempo",
-  "Previsão para os próximos dias": "Como o tempo deve evoluir",
-  "Resumo para amanhã": "Destaque da previsão",
+  "Previsão para os próximos dias": "Como o tempo deve evoluir na semana",
 };
 
-function formatNumber(value: number, maximumFractionDigits = 1) {
-  return new Intl.NumberFormat("pt-BR", {
-    maximumFractionDigits,
-    minimumFractionDigits: value % 1 === 0 ? 0 : 1,
-  }).format(value);
-}
-
-function buildTomorrowFallback(weather: WeatherData): ForecastNarrative | null {
-  const tomorrow = weather.daily[1];
-  if (!tomorrow) return null;
-
-  const hasStrongWind = (tomorrow.windGust ?? -1) >= 50;
-  const headline =
-    tomorrow.icon === "storm" || hasStrongWind
-      ? "Amanhã exige atenção ao tempo"
-      : tomorrow.rainChance !== null && tomorrow.rainChance >= 70
-        ? "Chuva deve marcar o dia de amanhã"
-        : tomorrow.rainChance !== null && tomorrow.rainChance >= 35
-          ? "Amanhã pode ter períodos de chuva"
-          : tomorrow.icon === "sun"
-            ? "Amanhã terá períodos de sol"
-            : "Amanhã terá variação de nuvens";
-
-  const rainDescription =
-    tomorrow.rainChance === null
-      ? `A fonte não informou a probabilidade de chuva; o volume previsto é de ${formatNumber(tomorrow.precipitation)} mm.`
-      : tomorrow.rainChance >= 70
-        ? `A chance de chuva é alta, com ${formatNumber(tomorrow.precipitation)} mm previstos.`
-        : tomorrow.rainChance >= 35
-          ? `Há possibilidade de chuva, com ${formatNumber(tomorrow.precipitation)} mm previstos.`
-          : "A chance de chuva é baixa e não há volume relevante indicado.";
-  const gustDescription =
-    tomorrow.windGust === null
-      ? "A fonte não informou rajada máxima."
-      : `As rajadas podem chegar a ${tomorrow.windGust} km/h.`;
-
-  return {
-    headline,
-    summary: `${rainDescription} A temperatura deve variar entre ${tomorrow.min}° e ${tomorrow.max}°. ${gustDescription}`,
-  };
-}
-
-function TomorrowForecastSummary({
-  weather,
-  narrative,
-}: {
-  weather: WeatherData;
-  narrative: ForecastNarrative | null;
-}) {
-  const tomorrow = weather.daily[1];
-  const resolvedNarrative = narrative ?? buildTomorrowFallback(weather);
-  if (!tomorrow || !resolvedNarrative) return null;
-
-  return (
-    <article
-      className="home-next-days__tomorrow-summary"
-      aria-labelledby="home-tomorrow-summary-title"
-    >
-      <div>
-        <span>Destaque da previsão</span>
-        <small>
-          {tomorrow.weekday} · {tomorrow.date}
-        </small>
-      </div>
-      <section>
-        <h3 id="home-tomorrow-summary-title">{resolvedNarrative.headline}</h3>
-        <p>{resolvedNarrative.summary}</p>
-      </section>
-    </article>
-  );
-}
-
 function getTextContent(node: ReactNode): string {
-  if (typeof node === "string" || typeof node === "number") {
-    return String(node);
-  }
-
-  if (Array.isArray(node)) {
-    return node.map(getTextContent).join("");
-  }
-
-  if (isValidElement<ElementProps>(node)) {
-    return getTextContent(node.props.children);
-  }
-
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map(getTextContent).join("");
+  if (isValidElement<ElementProps>(node)) return getTextContent(node.props.children);
   return "";
 }
 
@@ -174,13 +91,9 @@ function transformDashboardNode(
   context: SemanticContext,
   waterStates: WaterVisualStates,
   stationStates: StationVisualState[],
-  tomorrowSummary: ReactNode,
 ): ReactNode {
   if (typeof node === "string") return normalizeTextNode(node);
-
-  if (!isValidElement<ElementProps>(node)) {
-    return node;
-  }
+  if (!isValidElement<ElementProps>(node)) return node;
 
   const props = node.props;
   const className = typeof props.className === "string" ? props.className : "";
@@ -200,9 +113,7 @@ function transformDashboardNode(
   };
 
   if (node.type === WeatherIcon && nextContext.currentHour) {
-    return cloneElement(node as ReactElement<ElementProps>, {
-      title: "Tempo agora",
-    });
+    return cloneElement(node as ReactElement<ElementProps>, { title: "Tempo agora" });
   }
 
   if (
@@ -215,7 +126,7 @@ function transformDashboardNode(
     return cloneElement(
       node as ReactElement<ElementProps>,
       undefined,
-      transformDashboardNode(timeLabel, nextContext, waterStates, stationStates, tomorrowSummary),
+      transformDashboardNode(timeLabel, nextContext, waterStates, stationStates),
     );
   }
 
@@ -225,11 +136,7 @@ function transformDashboardNode(
     hasClass(className, "home-water-focus__reading") &&
     nextContext.laranjalUnavailable
   ) {
-    return cloneElement(
-      node as ReactElement<ElementProps>,
-      undefined,
-      <strong>Sem leitura</strong>,
-    );
+    return cloneElement(node as ReactElement<ElementProps>, undefined, <strong>Sem leitura</strong>);
   }
 
   if (
@@ -279,7 +186,7 @@ function transformDashboardNode(
   }
 
   const transformedChildren = Children.map(props.children, (child) =>
-    transformDashboardNode(child, nextContext, waterStates, stationStates, tomorrowSummary),
+    transformDashboardNode(child, nextContext, waterStates, stationStates),
   );
 
   let normalizedClassName = className;
@@ -314,27 +221,10 @@ function transformDashboardNode(
   const nextProps =
     normalizedClassName !== className ? { className: normalizedClassName || undefined } : undefined;
 
-  if (
-    isDomElement &&
-    node.type === "div" &&
-    hasClass(className, "home-next-days") &&
-    tomorrowSummary
-  ) {
-    return cloneElement(
-      node as ReactElement<ElementProps>,
-      nextProps,
-      transformedChildren,
-      tomorrowSummary,
-    );
-  }
-
   return cloneElement(node as ReactElement<ElementProps>, nextProps, transformedChildren);
 }
 
-export function HomeEditorialDashboard({
-  summaries,
-  ...dashboardProps
-}: HomeEditorialDashboardProps) {
+export function HomeEditorialDashboard(dashboardProps: HomeEditorialDashboardProps) {
   const dashboard = HomeEditorialDashboardBase(dashboardProps);
   const waterStates: WaterVisualStates = {
     laranjal: getWaterLevelVisualState({
@@ -362,9 +252,6 @@ export function HomeEditorialDashboard({
       threshold: station.floodLevelCm,
     }),
   }));
-  const tomorrowSummary = (
-    <TomorrowForecastSummary weather={dashboardProps.weather} narrative={summaries.tomorrow} />
-  );
 
   return transformDashboardNode(
     dashboard,
@@ -376,6 +263,5 @@ export function HomeEditorialDashboard({
     },
     waterStates,
     stationStates,
-    tomorrowSummary,
   );
 }
