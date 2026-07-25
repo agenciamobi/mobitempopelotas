@@ -139,6 +139,7 @@ export function ProductionHome({
         />
         <HomeHourlyConditionPortal hours={weather.hourly} />
         <HomeTrendEditorialPortal weather={weather} narrative={summaries.tomorrow} />
+        <HomeExplorePortal />
         <EditorialContentSection id="como-interpretar-o-tempo" content={HOME_EDITORIAL_CONTENT} />
       </main>
 
