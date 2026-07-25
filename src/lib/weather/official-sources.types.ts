@@ -90,6 +90,51 @@ export type InmetAlerts = {
   error: string | null;
 };
 
+export type InmetForecastPeriod = {
+  id: string;
+  date: string | null;
+  period: string;
+  summary: string;
+  minimum: number | null;
+  maximum: number | null;
+  humidityMinimum: number | null;
+  humidityMaximum: number | null;
+  windDirection: string | null;
+  windIntensity: string | null;
+  icon: string | null;
+};
+
+export type InmetForecast = {
+  status: "live" | "unavailable";
+  periods: InmetForecastPeriod[];
+  source: {
+    name: "INMET";
+    url: string;
+    fetchedAt: string;
+  };
+  error: string | null;
+};
+
+export type InmetStationReference = {
+  status: "live" | "unavailable";
+  station: {
+    code: string | null;
+    name: string;
+    municipality: string | null;
+    state: string | null;
+    latitude: number | null;
+    longitude: number | null;
+    altitude: number | null;
+    distanceKm: number | null;
+  } | null;
+  source: {
+    name: "INMET";
+    url: string;
+    fetchedAt: string;
+  };
+  error: string | null;
+};
+
 export type CppmetForecastItem = {
   day: string;
   summary: string;
@@ -114,7 +159,9 @@ export type CppmetForecast = {
 export type OfficialWeatherSources = {
   embrapa: EmbrapaObservation;
   inmet: InmetAlerts;
+  inmetForecast: InmetForecast;
+  inmetStation: InmetStationReference;
   cppmet: CppmetForecast;
   fetchedAt: string;
-  degradedSources: Array<"embrapa" | "inmet" | "cppmet">;
+  degradedSources: Array<"embrapa" | "inmet" | "inmet-forecast" | "inmet-station" | "cppmet">;
 };
