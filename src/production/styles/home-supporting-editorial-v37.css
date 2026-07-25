@@ -1,0 +1,353 @@
+/*
+ * Home editorial v37 — continuidade após hero e previsão do INMET.
+ *
+ * Unifica a régua das seções auxiliares, arredonda o bloco institucional do
+ * INMET e transforma aviso preventivo e sumário da página em faixas editoriais.
+ */
+
+.site-shell--home-editorial .inmet-official-panel {
+  border-radius: clamp(20px, 1.7vw, 28px);
+}
+
+.site-shell--home-editorial .safety-alert-banner,
+.site-shell--home-editorial .home-section-navigation {
+  width: min(calc(100vw - var(--portal-frame-gap)), var(--portal-frame-max));
+  max-width: var(--portal-frame-max);
+  margin-right: 0;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  box-sizing: border-box;
+}
+
+/* Aviso preventivo — faixa de serviço público. */
+.site-shell--home-editorial .safety-alert-banner {
+  position: relative;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  gap: clamp(18px, 2vw, 30px);
+  align-items: center;
+  margin-top: clamp(22px, 3vw, 38px);
+  padding: clamp(20px, 2.2vw, 30px) var(--portal-content-gutter);
+  overflow: hidden;
+  border: 1px solid rgba(7, 30, 47, 0.11);
+  border-left: 0;
+  border-radius: clamp(16px, 1.35vw, 22px);
+  background:
+    radial-gradient(circle at 92% 20%, color-mix(in srgb, var(--safety-accent) 8%, transparent), transparent 22rem),
+    #fff;
+  box-shadow: 0 16px 44px rgba(7, 30, 47, 0.065);
+}
+
+.site-shell--home-editorial .safety-alert-banner::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  background: var(--safety-accent);
+  content: "";
+}
+
+.site-shell--home-editorial .safety-alert-banner__icon {
+  width: 64px;
+  height: 64px;
+  border: 0;
+  border-right: 1px solid rgba(7, 30, 47, 0.1);
+  border-radius: 0;
+  background: transparent;
+  color: var(--safety-accent);
+}
+
+.site-shell--home-editorial .safety-alert-banner__icon svg {
+  width: 29px;
+  height: 29px;
+  stroke-width: 1.65;
+}
+
+.site-shell--home-editorial .safety-alert-banner__content {
+  display: grid;
+  gap: 0.22rem;
+}
+
+.site-shell--home-editorial .safety-alert-banner__content > span {
+  margin: 0;
+  color: var(--safety-accent);
+  font-size: 0.62rem;
+  font-weight: 880;
+  letter-spacing: 0.115em;
+}
+
+.site-shell--home-editorial .safety-alert-banner__content strong {
+  color: #071e2f;
+  font-size: clamp(1rem, 1.25vw, 1.2rem);
+  font-weight: 840;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+}
+
+.site-shell--home-editorial .safety-alert-banner__content p {
+  max-width: 900px;
+  margin: 0.12rem 0 0;
+  color: #5d747f;
+  font-size: clamp(0.78rem, 0.9vw, 0.88rem);
+  line-height: 1.55;
+}
+
+.site-shell--home-editorial .safety-alert-banner__actions {
+  gap: 0.7rem;
+}
+
+.site-shell--home-editorial .safety-alert-banner__actions a {
+  min-height: 44px;
+  padding: 0 9px 0 17px;
+  border-radius: 10px;
+  background: #071e2f;
+  box-shadow: 0 9px 22px rgba(7, 30, 47, 0.14);
+  font-size: 0.72rem;
+  font-weight: 840;
+}
+
+.site-shell--home-editorial .safety-alert-banner__actions a > span {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.site-shell--home-editorial .safety-alert-banner__actions button {
+  width: 42px;
+  height: 42px;
+  border-color: rgba(7, 30, 47, 0.12);
+  border-radius: 10px;
+  background: transparent;
+  color: #6b808a;
+  font-size: 1.08rem;
+}
+
+/* Sumário editorial da home. */
+.site-shell--home-editorial .home-section-navigation {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(150px, 0.18fr) minmax(0, 1fr);
+  gap: 0;
+  align-items: stretch;
+  margin-top: 14px;
+  padding: 0 var(--portal-content-gutter);
+  overflow: hidden;
+  border: 1px solid rgba(7, 30, 47, 0.1);
+  border-radius: clamp(16px, 1.35vw, 22px);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 14px 38px rgba(7, 30, 47, 0.055);
+}
+
+.site-shell--home-editorial .home-section-navigation::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #18bdcd, #5e2ced 58%, #e70b85);
+  content: "";
+}
+
+.site-shell--home-editorial .home-section-navigation__label {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  padding: 22px clamp(20px, 2.2vw, 32px) 22px 0;
+  border-right: 1px solid rgba(7, 30, 47, 0.1);
+  color: #087c8a;
+  font-size: 0.62rem;
+  font-weight: 880;
+  letter-spacing: 0.115em;
+}
+
+.site-shell--home-editorial .home-section-navigation__label::after {
+  position: absolute;
+  right: clamp(20px, 2.2vw, 32px);
+  bottom: 18px;
+  left: 0;
+  height: 1px;
+  background: rgba(24, 189, 205, 0.32);
+  content: "";
+}
+
+.site-shell--home-editorial .home-section-navigation__links {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  min-width: 0;
+}
+
+.site-shell--home-editorial .home-section-navigation__links > a,
+.site-shell--home-editorial .home-section-navigation__links > a:first-child {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  min-height: 82px;
+  padding: 15px clamp(13px, 1.55vw, 24px);
+  border: 0;
+  border-left: 1px solid rgba(7, 30, 47, 0.09);
+  border-radius: 0;
+  background: transparent;
+  color: #071e2f;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.site-shell--home-editorial .home-section-navigation__links > a:first-child {
+  border-left: 0;
+}
+
+.site-shell--home-editorial .home-section-navigation__links > a::after {
+  position: absolute;
+  right: 18px;
+  bottom: 0;
+  left: 18px;
+  height: 2px;
+  background: transparent;
+  content: "";
+  transition: background-color 160ms ease;
+}
+
+.site-shell--home-editorial .home-section-navigation__links > a:hover,
+.site-shell--home-editorial .home-section-navigation__links > a:focus-visible {
+  background: rgba(24, 189, 205, 0.045);
+  color: #5e2ced;
+}
+
+.site-shell--home-editorial .home-section-navigation__links > a:hover::after,
+.site-shell--home-editorial .home-section-navigation__links > a:focus-visible::after {
+  background: linear-gradient(90deg, #18bdcd, #5e2ced);
+}
+
+.site-shell--home-editorial .home-section-navigation__links > a > span:first-child {
+  color: #8ca0a9;
+  font-size: 0.58rem;
+  font-weight: 860;
+  letter-spacing: 0.07em;
+}
+
+.site-shell--home-editorial .home-section-navigation__links strong {
+  font-size: clamp(0.76rem, 0.9vw, 0.86rem);
+  font-weight: 830;
+  letter-spacing: -0.02em;
+}
+
+.site-shell--home-editorial .home-section-navigation__links small {
+  margin-top: 2px;
+  color: #6b808a;
+  font-size: 0.6rem;
+  line-height: 1.35;
+}
+
+@media (max-width: 1180px) {
+  .site-shell--home-editorial .home-section-navigation {
+    grid-template-columns: 1fr;
+  }
+
+  .site-shell--home-editorial .home-section-navigation__label {
+    padding: 18px 0 12px;
+    border-right: 0;
+    border-bottom: 1px solid rgba(7, 30, 47, 0.09);
+  }
+
+  .site-shell--home-editorial .home-section-navigation__label::after {
+    display: none;
+  }
+
+  .site-shell--home-editorial .home-section-navigation__links > a,
+  .site-shell--home-editorial .home-section-navigation__links > a:first-child {
+    min-height: 72px;
+  }
+}
+
+@media (max-width: 900px) {
+  .site-shell--home-editorial .safety-alert-banner {
+    grid-template-columns: 54px minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .site-shell--home-editorial .safety-alert-banner__icon {
+    width: 54px;
+    height: 54px;
+  }
+
+  .site-shell--home-editorial .safety-alert-banner__actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+    padding-top: 4px;
+  }
+
+  .site-shell--home-editorial .home-section-navigation__links {
+    display: flex;
+    gap: 0;
+    margin: 0 calc(var(--portal-content-gutter) * -1);
+    padding: 0 var(--portal-content-gutter);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+
+  .site-shell--home-editorial .home-section-navigation__links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .site-shell--home-editorial .home-section-navigation__links > a,
+  .site-shell--home-editorial .home-section-navigation__links > a:first-child {
+    flex: 0 0 min(72vw, 270px);
+    border-left: 1px solid rgba(7, 30, 47, 0.09);
+    scroll-snap-align: start;
+  }
+}
+
+@media (max-width: 620px) {
+  .site-shell--home-editorial .inmet-official-panel {
+    border-radius: 16px;
+  }
+
+  .site-shell--home-editorial .safety-alert-banner,
+  .site-shell--home-editorial .home-section-navigation {
+    border-radius: 14px;
+  }
+
+  .site-shell--home-editorial .safety-alert-banner {
+    grid-template-columns: 46px minmax(0, 1fr);
+    gap: 14px;
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  .site-shell--home-editorial .safety-alert-banner__icon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .site-shell--home-editorial .safety-alert-banner__icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .site-shell--home-editorial .safety-alert-banner__actions {
+    justify-content: stretch;
+  }
+
+  .site-shell--home-editorial .safety-alert-banner__actions a {
+    flex: 1;
+    justify-content: space-between;
+  }
+
+  .site-shell--home-editorial .home-section-navigation {
+    padding-right: var(--portal-content-gutter);
+    padding-left: var(--portal-content-gutter);
+  }
+
+  .site-shell--home-editorial .home-section-navigation__links > a,
+  .site-shell--home-editorial .home-section-navigation__links > a:first-child {
+    flex-basis: min(80vw, 255px);
+    min-height: 68px;
+  }
+}
