@@ -102,9 +102,9 @@ export type InmetForecastPeriod = {
   windDirection: string | null;
   windIntensity: string | null;
   icon: string | null;
-  sunrise: string | null;
-  sunset: string | null;
-  season: string | null;
+  sunrise?: string | null;
+  sunset?: string | null;
+  season?: string | null;
 };
 
 export type InmetForecast = {
