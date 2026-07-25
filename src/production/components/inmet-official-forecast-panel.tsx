@@ -6,8 +6,7 @@ import type {
 } from "@/lib/weather/official-sources.types";
 
 import "./inmet-official-forecast-panel.css";
-
-const INMET_PORTAL_URL = "https://portal.inmet.gov.br/";
+import "./inmet-official-forecast-panel-refinement.css";
 
 type ForecastIconName = "sun" | "cloud" | "rain" | "storm" | "fog" | "wind";
 
@@ -150,25 +149,12 @@ export function InmetOfficialForecastPanel({
     <section className="inmet-official-panel" aria-labelledby="inmet-official-title">
       <header className="inmet-official-header">
         <div className="inmet-official-heading">
-          <div className="inmet-official-institution">
-            <strong>INMET</strong>
-            <span>Previsão municipal oficial</span>
-          </div>
           <h2 id="inmet-official-title">Previsão oficial para Pelotas</h2>
           <p>
             Leitura institucional por períodos, apresentada separadamente da previsão horária por
             modelos e das medições observadas em estação.
           </p>
         </div>
-
-        <aside className="inmet-official-reference" aria-label="Referência da previsão oficial">
-          <span>Município monitorado</span>
-          <strong>Pelotas, RS</strong>
-          <small>Código IBGE 4314407</small>
-          <a href={INMET_PORTAL_URL} target="_blank" rel="noreferrer">
-            Abrir portal do INMET <span aria-hidden="true">↗</span>
-          </a>
-        </aside>
       </header>
 
       {featuredPeriod ? (
