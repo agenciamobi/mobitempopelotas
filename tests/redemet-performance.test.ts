@@ -18,13 +18,12 @@ const radarUsabilityCss = readFileSync(
   "src/production/styles/home-weekly-radar-usability-v47.css",
   "utf8",
 );
-
 const weeklyPortal = readFileSync(
   "src/production/components/home-trend-editorial-portal.tsx",
   "utf8",
 );
 
- test("REDEMET limits animation payloads", () => {
+test("REDEMET limits animation payloads", () => {
   assert.match(radarRoute, /const MAX_FRAMES = 8;/);
   assert.match(satelliteRoute, /const MAX_FRAMES = 8;/);
   assert.match(stormsRoute, /const MAX_FRAMES = 12;/);
