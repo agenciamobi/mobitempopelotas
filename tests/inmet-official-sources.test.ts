@@ -15,6 +15,9 @@ test("previsão municipal do INMET reconhece períodos aninhados e preserva valo
         umidade_max: "95%",
         dir_vento: "SE",
         int_vento: "Fracos",
+        nascer: "07h24",
+        ocaso: "17h49",
+        estacao: "Inverno",
       },
       noite: {
         descricao: "Céu encoberto.",
@@ -40,6 +43,9 @@ test("previsão municipal do INMET reconhece períodos aninhados e preserva valo
   assert.equal(periods[0]?.humidityMinimum, 70);
   assert.equal(periods[0]?.humidityMaximum, 95);
   assert.equal(periods[0]?.windDirection, "SE");
+  assert.equal(periods[0]?.sunrise, "07h24");
+  assert.equal(periods[0]?.sunset, "17h49");
+  assert.equal(periods[0]?.season, "Inverno");
 });
 
 test("previsão do INMET elimina períodos duplicados", () => {
