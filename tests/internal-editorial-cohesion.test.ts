@@ -28,6 +28,10 @@ const footerFixCss = readFileSync(
   "src/production/styles/footer-editorial-v51-fix.css",
   "utf8",
 );
+const headerMegaCss = readFileSync(
+  "src/production/styles/header-megamenu-editorial-v52.css",
+  "utf8",
+);
 const productionHome = readFileSync("src/production/ProductionHome.tsx", "utf8");
 const semanticDashboard = readFileSync(
   "src/production/components/home-editorial-dashboard-semantic.tsx",
@@ -42,6 +46,7 @@ test("final editorial layers preserve their cascade order", () => {
     "home-closing-editorial-v50.css",
     "footer-editorial-v51.css",
     "footer-editorial-v51-fix.css",
+    "header-megamenu-editorial-v52.css",
   ];
 
   for (const layer of finalLayers) {
@@ -140,6 +145,18 @@ test("developer credit stays centered and the PWA launcher does not cover it", (
   assert.match(footerFixCss, /transform:translateX\(-50%\)!important/);
 });
 
+test("desktop megamenu is opaque, compact and visibly interactive", () => {
+  assert.match(headerMegaCss, /@media \(min-width: 901px\)/);
+  assert.match(headerMegaCss, /\.mega-navigation-surface\s*\{[\s\S]*background:\s*#fff !important/);
+  assert.match(headerMegaCss, /backdrop-filter:\s*none !important/);
+  assert.match(headerMegaCss, /min-height:\s*210px !important/);
+  assert.match(headerMegaCss, /\.mega-navigation-feature b i/);
+  assert.match(headerMegaCss, /\.mega-navigation-columns section \+ section/);
+  assert.match(headerMegaCss, /\.mega-navigation-columns a::after/);
+  assert.match(headerMegaCss, /content:\s*"→"/);
+  assert.match(headerMegaCss, /a\[aria-current="page"\]/);
+});
+
 test("homepage final visual layers remain usable on tablet and mobile", () => {
   assert.match(homeWaterCss, /@media \(max-width: 980px\)/);
   assert.match(homeWaterCss, /@media \(max-width: 720px\)/);
@@ -151,4 +168,6 @@ test("homepage final visual layers remain usable on tablet and mobile", () => {
   assert.match(footerCss, /@media\(max-width:880px\)/);
   assert.match(footerCss, /@media\(max-width:620px\)/);
   assert.match(footerCss, /@media\(prefers-reduced-motion:reduce\)/);
+  assert.match(headerMegaCss, /@media \(min-width: 901px\) and \(max-width: 1080px\)/);
+  assert.match(headerMegaCss, /@media \(prefers-reduced-motion: reduce\)/);
 });
