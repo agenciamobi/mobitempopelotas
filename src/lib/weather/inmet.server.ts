@@ -15,6 +15,80 @@ const FEED_URLS = [
 const PORTAL_URL = "https://avisos.inmet.gov.br/";
 const MAX_DETAIL_REQUESTS = 40;
 
+const START_DATE_ALIASES = [
+  "inicio",
+  "onset",
+  "effective",
+  "data_inicio",
+  "dataInicial",
+  "dataInicio",
+  "dt_inicio",
+  "dtInicio",
+  "data_hora_inicio",
+  "dataHoraInicio",
+  "inicio_vigencia",
+  "inicioVigencia",
+  "inicio_aviso",
+  "inicioAviso",
+  "valid_from",
+  "validFrom",
+] as const;
+
+const END_DATE_ALIASES = [
+  "fim",
+  "expires",
+  "data_fim",
+  "dataFinal",
+  "dataFim",
+  "dt_fim",
+  "dtFim",
+  "data_hora_fim",
+  "dataHoraFim",
+  "fim_vigencia",
+  "fimVigencia",
+  "fim_aviso",
+  "fimAviso",
+  "validade",
+  "valid_until",
+  "validUntil",
+] as const;
+
+const SENT_DATE_ALIASES = [
+  "enviado",
+  "sent",
+  "data_envio",
+  "dataEnvio",
+  "dt_envio",
+  "dtEnvio",
+  "publicado",
+  "publicadoEm",
+  "created_at",
+  "createdAt",
+] as const;
+
+const SEVERITY_ALIASES = [
+  "severidade",
+  "severity",
+  "grau",
+  "nivel",
+  "nivel_severidade",
+  "nivelSeveridade",
+  "nivel_aviso",
+  "nivelAviso",
+  "aviso_nivel",
+  "avisoNivel",
+  "cor",
+  "color",
+  "cor_aviso",
+  "corAviso",
+  "aviso_cor",
+  "avisoCor",
+  "cor_hexa",
+  "corHexa",
+  "cor_hexadecimal",
+  "corHexadecimal",
+] as const;
+
 type JsonRecord = Record<string, unknown>;
 
 function decodeXml(value: string) {
@@ -73,6 +147,39 @@ function findValue(record: JsonRecord, aliases: readonly string[]) {
   return null;
 }
 
+function nestedText(value: unknown): string | null {
+  const direct = asText(value);
+  if (direct) return direct;
+
+  if (Array.isArray(value)) {
+    const values = value.map(nestedText).filter((item): item is string => Boolean(item));
+    return values.length > 0 ? values.join(" ") : null;
+  }
+
+  const record = asRecord(value);
+  if (!record) return null;
+
+  const nested = findValue(record, [
+    "value",
+    "valor",
+    "label",
+    "nome",
+    "descricao",
+    "date",
+    "data",
+    "datetime",
+    "dataHora",
+    "timestamp",
+    "code",
+    "codigo",
+    "hex",
+    "cor",
+    "color",
+  ]);
+
+  return nested === value ? null : nestedText(nested);
+}
+
 function collectRecords(value: unknown): JsonRecord[] {
   if (Array.isArray(value)) return value.flatMap(collectRecords);
   const record = asRecord(value);
@@ -99,13 +206,37 @@ function unique(values: string[]) {
 
 function safeDate(value: string | null | undefined) {
   if (!value) return null;
-  const normalized = value.trim();
-  const brazilian = normalized.match(/^(\d{2})\/(\d{2})\/(20\d{2})(?:\s+(\d{2}):(\d{2}))?/);
-  const date = brazilian
-    ? new Date(
-        `${brazilian[3]}-${brazilian[2]}-${brazilian[1]}T${brazilian[4] ?? "00"}:${brazilian[5] ?? "00"}:00-03:00`,
-      )
-    : new Date(normalized);
+
+  const normalized = value.trim().replace(/\s+(?:às|as)\s+/i, " ");
+  if (!normalized) return null;
+
+  if (/^\d{10}$/.test(normalized) || /^\d{13}$/.test(normalized)) {
+    const numeric = Number(normalized);
+    const date = new Date(normalized.length === 10 ? numeric * 1_000 : numeric);
+    return Number.isNaN(date.getTime()) ? null : date.toISOString();
+  }
+
+  const brazilian = normalized.match(
+    /^(\d{2})[\/-](\d{2})[\/-](20\d{2})(?:[ T]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/,
+  );
+  if (brazilian) {
+    const date = new Date(
+      `${brazilian[3]}-${brazilian[2]}-${brazilian[1]}T${(brazilian[4] ?? "00").padStart(2, "0")}:${brazilian[5] ?? "00"}:${brazilian[6] ?? "00"}-03:00`,
+    );
+    return Number.isNaN(date.getTime()) ? null : date.toISOString();
+  }
+
+  const localIso = normalized.match(
+    /^(20\d{2})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?$/,
+  );
+  if (localIso) {
+    const date = new Date(
+      `${localIso[1]}-${localIso[2]}-${localIso[3]}T${localIso[4]}:${localIso[5]}:${localIso[6] ?? "00"}-03:00`,
+    );
+    return Number.isNaN(date.getTime()) ? null : date.toISOString();
+  }
+
+  const date = new Date(normalized);
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
@@ -151,13 +282,28 @@ async function fetchJson(url: string) {
 
 function severityFromText(value: string): { severity: InmetAlertSeverity; label: string } {
   const normalized = normalizeText(value);
-  if (/grande perigo|extreme|extremo|vermelh|ff0000/.test(normalized)) {
+  const compact = normalized.replace(/\s+/g, "");
+
+  if (
+    compact === "3" ||
+    /grande perigo|extreme|extremo|vermelh|ff0000|dc2626|rgb\(?255,?0,?0/.test(normalized)
+  ) {
     return { severity: "great-danger", label: "Grande perigo" };
   }
-  if (/perigo|severe|severo|laranja|ff9900|ffa500/.test(normalized)) {
+  if (
+    compact === "2" ||
+    /(?:^|\b)perigo(?:\b|$)|severe|severo|laranja|ff9900|ffa500|ff8c00|rgb\(?255,?(?:140|153|165),?0/.test(
+      normalized,
+    )
+  ) {
     return { severity: "danger", label: "Perigo" };
   }
-  if (/potencial|moderate|moderado|amarel|ffff00/.test(normalized)) {
+  if (
+    compact === "1" ||
+    /potencial|moderate|moderado|amarel|ffff00|ffcc00|facc15|rgb\(?255,?(?:204|255),?0/.test(
+      normalized,
+    )
+  ) {
     return { severity: "potential", label: "Perigo potencial" };
   }
   return { severity: "unknown", label: "Aviso meteorológico" };
@@ -240,24 +386,22 @@ function parseCapAlert(xml: string, fallbackUrl: string): InmetAlert | null {
 
 function toTextArray(value: unknown) {
   if (Array.isArray(value)) return unique(value.flatMap((item) => toTextArray(item)));
-  const text = asText(value);
+  const text = nestedText(value);
   return text ? unique(text.split(/[,;|\n]+/)) : [];
 }
 
 function parseJsonAlert(record: JsonRecord, index: number): InmetAlert | null {
-  const event = asText(findValue(record, ["evento", "event", "tipo", "aviso", "titulo", "headline"]));
-  const headline = asText(findValue(record, ["headline", "titulo", "aviso", "evento", "event"])) ?? event;
+  const event = nestedText(findValue(record, ["evento", "event", "tipo", "aviso", "titulo", "headline"]));
+  const headline =
+    nestedText(findValue(record, ["headline", "titulo", "aviso", "evento", "event"])) ?? event;
   if (!event && !headline) return null;
 
-  const description = asText(findValue(record, ["descricao", "description", "riscos", "risco", "detalhes"])) ?? "";
+  const description =
+    nestedText(findValue(record, ["descricao", "description", "riscos", "risco", "detalhes"])) ?? "";
   const instruction =
-    asText(findValue(record, ["instrucoes", "instruction", "recomendacoes", "orientacoes"])) ?? "";
-  const startsAt = safeDate(
-    asText(findValue(record, ["inicio", "onset", "effective", "data_inicio", "dataInicial"])),
-  );
-  const expiresAt = safeDate(
-    asText(findValue(record, ["fim", "expires", "data_fim", "dataFinal", "validade"])),
-  );
+    nestedText(findValue(record, ["instrucoes", "instruction", "recomendacoes", "orientacoes"])) ?? "";
+  const startsAt = safeDate(nestedText(findValue(record, START_DATE_ALIASES)));
+  const expiresAt = safeDate(nestedText(findValue(record, END_DATE_ALIASES)));
   if (expiresAt && new Date(expiresAt).getTime() < Date.now()) return null;
 
   const municipalities = toTextArray(
@@ -268,15 +412,13 @@ function parseJsonAlert(record: JsonRecord, index: number): InmetAlert | null {
     PELOTAS_IBGE_CODE,
     ...(searchable.match(/\b\d{7}\b/g) ?? []),
   ]);
-  const severity = severityFromText(
-    asText(findValue(record, ["severidade", "severity", "grau", "nivel", "cor", "color"])) ?? "",
-  );
+  const severity = severityFromText(nestedText(findValue(record, SEVERITY_ALIASES)) ?? "");
   const identifier =
-    asText(findValue(record, ["id", "identifier", "codigo", "codigo_aviso"])) ??
+    nestedText(findValue(record, ["id", "identifier", "codigo", "codigo_aviso", "codigoAviso"])) ??
     `inmet-pelotas-${startsAt ?? index}`;
   const officialUrl =
     safeOfficialUrl(
-      asText(findValue(record, ["url", "link", "web", "link_aviso"])) ?? "",
+      nestedText(findValue(record, ["url", "link", "web", "link_aviso", "linkAviso"])) ?? "",
       PORTAL_URL,
     ) ?? PORTAL_URL;
 
@@ -292,7 +434,7 @@ function parseJsonAlert(record: JsonRecord, index: number): InmetAlert | null {
     period: startsAt && new Date(startsAt).getTime() > Date.now() ? "upcoming" : "active",
     startsAt,
     expiresAt,
-    sentAt: safeDate(asText(findValue(record, ["enviado", "sent", "data_envio", "publicado"]))),
+    sentAt: safeDate(nestedText(findValue(record, SENT_DATE_ALIASES))),
     areas: municipalities,
     municipalities: municipalities.length ? municipalities : ["Pelotas"],
     municipalityCodes,
@@ -313,11 +455,30 @@ function detailUrls(feedXml: string, feedUrl: string) {
 }
 
 function response(alerts: InmetAlert[], feedUrl: string): InmetAlerts {
+  const relevanceRank = { pelotas: 0, regional: 1, state: 2 } as const;
+  const periodRank = { active: 0, upcoming: 1 } as const;
+  const severityRank: Record<InmetAlertSeverity, number> = {
+    unknown: 0,
+    potential: 1,
+    danger: 2,
+    "great-danger": 3,
+  };
+
   const normalized = alerts
     .filter((alert, index, all) => all.findIndex((item) => item.id === alert.id) === index)
     .sort((first, second) => {
-      const relevanceRank = { pelotas: 0, regional: 1, state: 2 } as const;
-      return relevanceRank[first.relevance] - relevanceRank[second.relevance];
+      const relevanceDifference = relevanceRank[first.relevance] - relevanceRank[second.relevance];
+      if (relevanceDifference !== 0) return relevanceDifference;
+
+      const periodDifference = periodRank[first.period] - periodRank[second.period];
+      if (periodDifference !== 0) return periodDifference;
+
+      const severityDifference = severityRank[second.severity] - severityRank[first.severity];
+      if (severityDifference !== 0) return severityDifference;
+
+      const firstExpiry = first.expiresAt ? new Date(first.expiresAt).getTime() : Number.MAX_SAFE_INTEGER;
+      const secondExpiry = second.expiresAt ? new Date(second.expiresAt).getTime() : Number.MAX_SAFE_INTEGER;
+      return firstExpiry - secondExpiry;
     });
 
   return {
