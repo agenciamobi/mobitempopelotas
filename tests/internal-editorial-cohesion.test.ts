@@ -16,12 +16,22 @@ const homeWaterCss = readFileSync(
   "src/production/styles/home-water-editorial-v49.css",
   "utf8",
 );
+const homeClosingCss = readFileSync(
+  "src/production/styles/home-closing-editorial-v50.css",
+  "utf8",
+);
+const productionHome = readFileSync("src/production/ProductionHome.tsx", "utf8");
+const semanticDashboard = readFileSync(
+  "src/production/components/home-editorial-dashboard-semantic.tsx",
+  "utf8",
+);
 
 test("final editorial layers preserve their cascade order", () => {
   const finalLayers = [
     "internal-home-cohesion-v48.css",
     "internal-home-cohesion-v48-fix.css",
     "home-water-editorial-v49.css",
+    "home-closing-editorial-v50.css",
   ];
 
   for (const layer of finalLayers) {
@@ -29,10 +39,10 @@ test("final editorial layers preserve their cascade order", () => {
     assert.match(tsEntry, new RegExp(layer.replace(".", "\\.")));
   }
 
-  assert.ok(cssEntry.indexOf(finalLayers[0]) < cssEntry.indexOf(finalLayers[1]));
-  assert.ok(cssEntry.indexOf(finalLayers[1]) < cssEntry.indexOf(finalLayers[2]));
-  assert.ok(tsEntry.indexOf(finalLayers[0]) < tsEntry.indexOf(finalLayers[1]));
-  assert.ok(tsEntry.indexOf(finalLayers[1]) < tsEntry.indexOf(finalLayers[2]));
+  for (let index = 1; index < finalLayers.length; index += 1) {
+    assert.ok(cssEntry.indexOf(finalLayers[index - 1]) < cssEntry.indexOf(finalLayers[index]));
+    assert.ok(tsEntry.indexOf(finalLayers[index - 1]) < tsEntry.indexOf(finalLayers[index]));
+  }
 });
 
 test("internal pages share the homepage frame and fullwidth hero", () => {
@@ -62,10 +72,36 @@ test("Lagoa homepage section uses the current light editorial composition", () =
   assert.match(homeWaterCss, /level-state--flood::before/);
 });
 
-test("Lagoa visual remains usable on tablet and mobile", () => {
+test("homepage replaces the embedded legacy directory with the complete portal directory", () => {
+  const explorePortalUsages = [...productionHome.matchAll(/<HomeExplorePortal\s*\/>/g)];
+
+  assert.ok(explorePortalUsages.length >= 2, "normal and unavailable states must expose navigation");
+  assert.match(semanticDashboard, /hasClass\(className, "home-explore-story"\)/);
+  assert.match(semanticDashboard, /home-explore-story"\)\)\s*\{\s*return null;/);
+});
+
+test("homepage closing directory uses the framed editorial composition", () => {
+  assert.match(homeClosingCss, /\.home-explore-portal\s*\{[\s\S]*content-visibility:\s*auto/);
+  assert.match(homeClosingCss, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+  assert.match(homeClosingCss, /\.home-explore-portal-group::before/);
+  assert.match(homeClosingCss, /\.home-explore-portal-group\.is-weather::before/);
+  assert.match(homeClosingCss, /\.home-explore-portal-group\.is-monitoring::before/);
+  assert.match(homeClosingCss, /\.home-explore-portal-group\.is-water::before/);
+});
+
+test("homepage answer section closes with an accessible institutional surface", () => {
+  assert.match(homeClosingCss, /#como-interpretar-o-tempo\.editorial-answer-section/);
+  assert.match(homeClosingCss, /linear-gradient\(142deg, #061a2a/);
+  assert.match(homeClosingCss, /counter-reset:\s*home-editorial-fact/);
+  assert.match(homeClosingCss, /details\[open\][\s\S]*summary::after/);
+  assert.match(homeClosingCss, /outline:\s*3px solid rgba\(120, 230, 238, 0\.45\)/);
+});
+
+test("homepage final visual layers remain usable on tablet and mobile", () => {
   assert.match(homeWaterCss, /@media \(max-width: 980px\)/);
   assert.match(homeWaterCss, /@media \(max-width: 720px\)/);
-  assert.match(homeWaterCss, /grid-template-columns:\s*minmax\(0, 1fr\) auto/);
-  assert.match(homeWaterCss, /\.home-water-table__columns\s*\{[\s\S]*display:\s*none !important/);
-  assert.match(homeWaterCss, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(homeClosingCss, /@media \(max-width: 1080px\)/);
+  assert.match(homeClosingCss, /@media \(max-width: 820px\)/);
+  assert.match(homeClosingCss, /@media \(max-width: 520px\)/);
+  assert.match(homeClosingCss, /@media \(prefers-reduced-motion: reduce\)/);
 });
