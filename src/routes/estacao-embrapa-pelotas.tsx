@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { EmbrapaStationPage } from "@/components/embrapa/EmbrapaStationPage";
+import { EMBRAPA_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
-import { createEditorialPageJsonLd } from "@/lib/structured-data";
+import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 const PAGE_TITLE = "Estação meteorológica da Embrapa em Pelotas";
@@ -25,8 +27,11 @@ export const Route = createFileRoute("/estacao-embrapa-pelotas")({
           "Observação meteorológica em Pelotas",
           "Embrapa Clima Temperado",
           "Medições meteorológicas locais",
+          "Temperatura e umidade observadas",
+          "Chuva e vento medidos em Pelotas",
         ],
       }),
+      createFaqPageJsonLd(PAGE_PATH, EMBRAPA_EDITORIAL_CONTENT.faqs),
     ]),
   loader: () => getWeatherIntelligence(),
   staleTime: 60 * 1_000,
@@ -35,5 +40,11 @@ export const Route = createFileRoute("/estacao-embrapa-pelotas")({
 
 function EstacaoEmbrapaPage() {
   const data = Route.useLoaderData();
-  return <EmbrapaStationPage data={data} />;
+
+  return (
+    <>
+      <EmbrapaStationPage data={data} />
+      <EditorialContentSection id="como-interpretar-estacao-embrapa" content={EMBRAPA_EDITORIAL_CONTENT} />
+    </>
+  );
 }
