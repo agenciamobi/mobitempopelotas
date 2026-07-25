@@ -2,6 +2,8 @@ import type {
   CppmetForecastItem,
   EmbrapaObservation,
   InmetAlert,
+  InmetForecastPeriod,
+  InmetStationReference,
   OfficialSourceStatus,
 } from "./official-sources.types";
 import type { DailyForecast, ForecastSourceKey, HourlyForecast, WeatherIconName } from "./types";
@@ -37,7 +39,13 @@ export type AggregatedCurrentField = Exclude<keyof AggregatedCurrentWeather, "ci
 export type AggregatedCurrentProvenance = Partial<Record<AggregatedCurrentField, WeatherSourceKey>>;
 
 export type WeatherDiscrepancyField =
-  "temperature" | "feelsLike" | "humidity" | "pressure" | "windSpeed" | "minimum" | "maximum";
+  | "temperature"
+  | "feelsLike"
+  | "humidity"
+  | "pressure"
+  | "windSpeed"
+  | "minimum"
+  | "maximum";
 
 export type WeatherDiscrepancy = {
   scope: "current" | "daily";
@@ -55,7 +63,7 @@ export type WeatherDiscrepancy = {
 export type WeatherSourceHealth = {
   source: WeatherSourceKey;
   status: WeatherSourceHealthStatus;
-  role: "observation" | "forecast" | "alerts" | "forecast-context";
+  role: "observation" | "forecast" | "alerts" | "forecast-context" | "official";
   fetchedAt: string;
   usable: boolean;
   reason: string | null;
@@ -81,6 +89,8 @@ export type AggregatedWeatherData = {
   daily: DailyForecast[];
   observation: EmbrapaObservation;
   alerts: InmetAlert[];
+  inmetForecast: InmetForecastPeriod[];
+  inmetStation: InmetStationReference["station"];
   officialForecast: CppmetForecastItem[];
   sources: Record<WeatherSourceKey, WeatherSourceHealth>;
   quality: AggregatedWeatherQuality;
