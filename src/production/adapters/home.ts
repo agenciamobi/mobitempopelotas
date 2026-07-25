@@ -2,6 +2,7 @@ import type { GuaibaObservationData } from "@/lib/hydrology/guaiba.server";
 import type { LagoonMonitoringNetworkData } from "@/lib/hydrology/lagoon-network.server";
 import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
 import type { AggregatedWeatherData } from "@/lib/weather/aggregated-weather.types";
+import { reconcileDailyTemperatures } from "@/lib/weather/daily-temperature-reconciliation";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import type { EmbrapaObservationData } from "@/production/lib/embrapa-observation";
 import type { InmetAlertsData } from "@/production/lib/inmet-alerts";
@@ -118,6 +119,8 @@ function observedCurrent(data: AggregatedWeatherData): CurrentWeather {
 }
 
 export function toProductionWeatherData(data: AggregatedWeatherData): WeatherData {
+  const daily = reconcileDailyTemperatures(data.daily, data.inmetForecast);
+
   return {
     current: observedCurrent(data),
     hourly: data.hourly.map((hour) => ({
@@ -128,7 +131,7 @@ export function toProductionWeatherData(data: AggregatedWeatherData): WeatherDat
       windGust: hour.windGust,
       icon: hour.icon,
     })),
-    daily: data.daily.map((day) => ({
+    daily: daily.map((day) => ({
       weekday: day.weekday,
       date: day.date,
       min: day.min,
