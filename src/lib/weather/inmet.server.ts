@@ -6,13 +6,16 @@ import type {
 } from "./official-sources.types";
 import { WEATHER_SOURCE_REQUEST_TIMEOUT_MS } from "./source-policy.ts";
 
+const PELOTAS_IBGE_CODE = "4314407";
+const MUNICIPAL_ALERTS_URL = `https://apiprevmet3.inmet.gov.br/avisos/getByGeocode/${PELOTAS_IBGE_CODE}`;
 const FEED_URLS = [
   "https://apiprevmet3.inmet.gov.br/avisos/rss",
   "https://avisos.inmet.gov.br/cap_12/rss/alert-as.rss",
 ] as const;
 const PORTAL_URL = "https://avisos.inmet.gov.br/";
-const PELOTAS_IBGE_CODE = "4314407";
 const MAX_DETAIL_REQUESTS = 40;
+
+type JsonRecord = Record<string, unknown>;
 
 function decodeXml(value: string) {
   return value
@@ -45,6 +48,38 @@ function normalizeText(value: string) {
     .toLowerCase();
 }
 
+function normalizeKey(value: string) {
+  return normalizeText(value).replace(/[^a-z0-9]/g, "");
+}
+
+function asRecord(value: unknown): JsonRecord | null {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as JsonRecord)
+    : null;
+}
+
+function asText(value: unknown) {
+  if (typeof value !== "string" && typeof value !== "number") return null;
+  const text = cleanText(String(value));
+  return text || null;
+}
+
+function findValue(record: JsonRecord, aliases: readonly string[]) {
+  const normalized = new Map(Object.entries(record).map(([key, value]) => [normalizeKey(key), value]));
+  for (const alias of aliases) {
+    const value = normalized.get(normalizeKey(alias));
+    if (value !== undefined && value !== null) return value;
+  }
+  return null;
+}
+
+function collectRecords(value: unknown): JsonRecord[] {
+  if (Array.isArray(value)) return value.flatMap(collectRecords);
+  const record = asRecord(value);
+  if (!record) return [];
+  return [record, ...Object.values(record).flatMap(collectRecords)];
+}
+
 function tagBlocks(xml: string, tag: string) {
   const pattern = new RegExp(
     `<(?:[\\w-]+:)?${tag}\\b[^>]*>([\\s\\S]*?)<\\/(?:[\\w-]+:)?${tag}>`,
@@ -64,7 +99,13 @@ function unique(values: string[]) {
 
 function safeDate(value: string | null | undefined) {
   if (!value) return null;
-  const date = new Date(value);
+  const normalized = value.trim();
+  const brazilian = normalized.match(/^(\d{2})\/(\d{2})\/(20\d{2})(?:\s+(\d{2}):(\d{2}))?/);
+  const date = brazilian
+    ? new Date(
+        `${brazilian[3]}-${brazilian[2]}-${brazilian[1]}T${brazilian[4] ?? "00"}:${brazilian[5] ?? "00"}:00-03:00`,
+      )
+    : new Date(normalized);
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
@@ -95,25 +136,28 @@ async function fetchText(url: string) {
   return text;
 }
 
-function parameterValues(infoXml: string, includes: string) {
-  return tagBlocks(infoXml, "parameter").flatMap((block) => {
-    const name = normalizeText(tagText(block, "valueName"));
-    return name.includes(includes) ? [tagText(block, "value")] : [];
+async function fetchJson(url: string) {
+  const response = await fetch(url, {
+    headers: {
+      Accept: "application/json",
+      "Accept-Language": "pt-BR,pt;q=0.9",
+      "User-Agent": "TEMPO-Pelotas/2.0 (+https://tempopelotas.com.br)",
+    },
+    signal: AbortSignal.timeout(WEATHER_SOURCE_REQUEST_TIMEOUT_MS.inmet),
   });
+  if (!response.ok) throw new Error(`INMET respondeu com HTTP ${response.status}.`);
+  return (await response.json()) as unknown;
 }
 
-function severityFrom(infoXml: string): { severity: InmetAlertSeverity; label: string } {
-  const severity = normalizeText(tagText(infoXml, "severity"));
-  const colors = [...parameterValues(infoXml, "cor"), ...parameterValues(infoXml, "color")]
-    .join(" ")
-    .toLowerCase();
-  if (severity.includes("extreme") || colors.includes("ff0000")) {
+function severityFromText(value: string): { severity: InmetAlertSeverity; label: string } {
+  const normalized = normalizeText(value);
+  if (/grande perigo|extreme|extremo|vermelh|ff0000/.test(normalized)) {
     return { severity: "great-danger", label: "Grande perigo" };
   }
-  if (severity.includes("severe") || colors.includes("ff9900") || colors.includes("ffa500")) {
+  if (/perigo|severe|severo|laranja|ff9900|ffa500/.test(normalized)) {
     return { severity: "danger", label: "Perigo" };
   }
-  if (severity.includes("moderate") || colors.includes("ffff00")) {
+  if (/potencial|moderate|moderado|amarel|ffff00/.test(normalized)) {
     return { severity: "potential", label: "Perigo potencial" };
   }
   return { severity: "unknown", label: "Aviso meteorológico" };
@@ -133,12 +177,20 @@ function relevanceFrom(text: string, codes: string[]): InmetAlertRelevance | nul
   return regional ? "regional" : "state";
 }
 
+function parameterValues(infoXml: string, includes: string) {
+  return tagBlocks(infoXml, "parameter").flatMap((block) => {
+    const name = normalizeText(tagText(block, "valueName"));
+    return name.includes(includes) ? [tagText(block, "value")] : [];
+  });
+}
+
 function parseCapAlert(xml: string, fallbackUrl: string): InmetAlert | null {
   const infoBlocks = tagBlocks(xml, "info");
   const info =
     infoBlocks.find((block) => normalizeText(tagText(block, "language")).startsWith("pt")) ??
     infoBlocks[0];
   if (!info) return null;
+
   const areaBlocks = tagBlocks(info, "area");
   const areas = unique(areaBlocks.map((area) => tagText(area, "areaDesc")));
   const municipalityValues = parameterValues(info, "municip");
@@ -154,16 +206,18 @@ function parseCapAlert(xml: string, fallbackUrl: string): InmetAlert | null {
   const description = tagText(info, "description");
   const instruction = tagText(info, "instruction");
   const relevance = relevanceFrom(
-    [event, headline, description, instruction, areas.join(" "), municipalities.join(" ")].join(
-      " ",
-    ),
+    [event, headline, description, instruction, areas.join(" "), municipalities.join(" ")].join(" "),
     municipalityCodes,
   );
   if (!relevance) return null;
+
   const startsAt = safeDate(tagText(info, "onset") || tagText(info, "effective"));
   const expiresAt = safeDate(tagText(info, "expires"));
   if (expiresAt && new Date(expiresAt).getTime() < Date.now()) return null;
-  const severity = severityFrom(info);
+  const severity = severityFromText(
+    [tagText(info, "severity"), ...parameterValues(info, "cor"), ...parameterValues(info, "color")].join(" "),
+  );
+
   return {
     id: tagText(xml, "identifier") || fallbackUrl,
     event,
@@ -184,6 +238,68 @@ function parseCapAlert(xml: string, fallbackUrl: string): InmetAlert | null {
   };
 }
 
+function toTextArray(value: unknown) {
+  if (Array.isArray(value)) return unique(value.flatMap((item) => toTextArray(item)));
+  const text = asText(value);
+  return text ? unique(text.split(/[,;|\n]+/)) : [];
+}
+
+function parseJsonAlert(record: JsonRecord, index: number): InmetAlert | null {
+  const event = asText(findValue(record, ["evento", "event", "tipo", "aviso", "titulo", "headline"]));
+  const headline = asText(findValue(record, ["headline", "titulo", "aviso", "evento", "event"])) ?? event;
+  if (!event && !headline) return null;
+
+  const description = asText(findValue(record, ["descricao", "description", "riscos", "risco", "detalhes"])) ?? "";
+  const instruction =
+    asText(findValue(record, ["instrucoes", "instruction", "recomendacoes", "orientacoes"])) ?? "";
+  const startsAt = safeDate(
+    asText(findValue(record, ["inicio", "onset", "effective", "data_inicio", "dataInicial"])),
+  );
+  const expiresAt = safeDate(
+    asText(findValue(record, ["fim", "expires", "data_fim", "dataFinal", "validade"])),
+  );
+  if (expiresAt && new Date(expiresAt).getTime() < Date.now()) return null;
+
+  const municipalities = toTextArray(
+    findValue(record, ["municipios", "municipalities", "cidades", "areas", "area"]),
+  );
+  const searchable = [event, headline, description, instruction, municipalities.join(" ")].join(" ");
+  const municipalityCodes = unique([
+    PELOTAS_IBGE_CODE,
+    ...(searchable.match(/\b\d{7}\b/g) ?? []),
+  ]);
+  const severity = severityFromText(
+    asText(findValue(record, ["severidade", "severity", "grau", "nivel", "cor", "color"])) ?? "",
+  );
+  const identifier =
+    asText(findValue(record, ["id", "identifier", "codigo", "codigo_aviso"])) ??
+    `inmet-pelotas-${startsAt ?? index}`;
+  const officialUrl =
+    safeOfficialUrl(
+      asText(findValue(record, ["url", "link", "web", "link_aviso"])) ?? "",
+      PORTAL_URL,
+    ) ?? PORTAL_URL;
+
+  return {
+    id: identifier,
+    event: event ?? headline ?? "Aviso meteorológico",
+    headline: headline ?? event ?? "Aviso meteorológico",
+    description,
+    instruction,
+    severity: severity.severity,
+    severityLabel: severity.label,
+    relevance: "pelotas",
+    period: startsAt && new Date(startsAt).getTime() > Date.now() ? "upcoming" : "active",
+    startsAt,
+    expiresAt,
+    sentAt: safeDate(asText(findValue(record, ["enviado", "sent", "data_envio", "publicado"]))),
+    areas: municipalities,
+    municipalities: municipalities.length ? municipalities : ["Pelotas"],
+    municipalityCodes,
+    officialUrl,
+  };
+}
+
 function detailUrls(feedXml: string, feedUrl: string) {
   const values = [
     ...tagBlocks(feedXml, "item").flatMap((item) => [tagText(item, "link"), tagText(item, "guid")]),
@@ -196,7 +312,29 @@ function detailUrls(feedXml: string, feedUrl: string) {
     .slice(0, MAX_DETAIL_REQUESTS);
 }
 
-function unavailable(error: string, feedUrl = FEED_URLS[0]): InmetAlerts {
+function response(alerts: InmetAlert[], feedUrl: string): InmetAlerts {
+  const normalized = alerts
+    .filter((alert, index, all) => all.findIndex((item) => item.id === alert.id) === index)
+    .sort((first, second) => {
+      const relevanceRank = { pelotas: 0, regional: 1, state: 2 } as const;
+      return relevanceRank[first.relevance] - relevanceRank[second.relevance];
+    });
+
+  return {
+    status: "live",
+    alerts: normalized,
+    counts: {
+      total: normalized.length,
+      pelotas: normalized.filter((alert) => alert.relevance === "pelotas").length,
+      regional: normalized.filter((alert) => alert.relevance === "regional").length,
+      state: normalized.filter((alert) => alert.relevance === "state").length,
+    },
+    source: { name: "INMET", feedUrl, portalUrl: PORTAL_URL, fetchedAt: new Date().toISOString() },
+    error: null,
+  };
+}
+
+function unavailable(error: string, feedUrl = MUNICIPAL_ALERTS_URL): InmetAlerts {
   return {
     status: "unavailable",
     alerts: [],
@@ -206,7 +344,22 @@ function unavailable(error: string, feedUrl = FEED_URLS[0]): InmetAlerts {
   };
 }
 
-export async function fetchInmetAlerts(): Promise<InmetAlerts> {
+async function fetchMunicipalAlerts() {
+  const payload = await fetchJson(MUNICIPAL_ALERTS_URL);
+  const records = collectRecords(payload);
+  const alerts = records.flatMap((record, index) => {
+    const parsed = parseJsonAlert(record, index);
+    return parsed ? [parsed] : [];
+  });
+
+  const payloadIsEmpty = Array.isArray(payload) && payload.length === 0;
+  if (!payloadIsEmpty && records.length > 0 && alerts.length === 0) {
+    throw new Error("O endpoint municipal do INMET retornou uma estrutura não reconhecida.");
+  }
+  return response(alerts, MUNICIPAL_ALERTS_URL);
+}
+
+async function fetchRssAlerts() {
   const attempts = await Promise.allSettled(
     FEED_URLS.map(async (feedUrl) => {
       const feedXml = await fetchText(feedUrl);
@@ -214,45 +367,38 @@ export async function fetchInmetAlerts(): Promise<InmetAlerts> {
       const settled = await Promise.allSettled(
         urls.map(async (url) => parseCapAlert(await fetchText(url), url)),
       );
-      const alerts = settled
-        .flatMap((result) => (result.status === "fulfilled" && result.value ? [result.value] : []))
-        .filter((alert, index, all) => all.findIndex((item) => item.id === alert.id) === index)
-        .sort((a, b) => {
-          const relevanceRank = { pelotas: 0, regional: 1, state: 2 } as const;
-          return relevanceRank[a.relevance] - relevanceRank[b.relevance];
-        });
-      return {
-        status: "live",
-        alerts,
-        counts: {
-          total: alerts.length,
-          pelotas: alerts.filter((alert) => alert.relevance === "pelotas").length,
-          regional: alerts.filter((alert) => alert.relevance === "regional").length,
-          state: alerts.filter((alert) => alert.relevance === "state").length,
-        },
-        source: {
-          name: "INMET",
-          feedUrl,
-          portalUrl: PORTAL_URL,
-          fetchedAt: new Date().toISOString(),
-        },
-        error: null,
-      } satisfies InmetAlerts;
+      const alerts = settled.flatMap((result) =>
+        result.status === "fulfilled" && result.value ? [result.value] : [],
+      );
+      return response(alerts, feedUrl);
     }),
   );
 
   for (const attempt of attempts) {
     if (attempt.status === "fulfilled") return attempt.value;
   }
-
-  const errors = attempts.flatMap((attempt) =>
-    attempt.status === "rejected"
-      ? [
-          attempt.reason instanceof Error
-            ? attempt.reason.message
-            : "Falha desconhecida ao consultar o INMET.",
-        ]
-      : [],
+  throw new Error(
+    unique(
+      attempts.flatMap((attempt) =>
+        attempt.status === "rejected" && attempt.reason instanceof Error
+          ? [attempt.reason.message]
+          : [],
+      ),
+    ).join(" ") || "Os feeds do INMET não puderam ser consultados.",
   );
-  return unavailable(unique(errors).join(" ") || "Os avisos do INMET não puderam ser consultados.");
+}
+
+export async function fetchInmetAlerts(): Promise<InmetAlerts> {
+  try {
+    return await fetchMunicipalAlerts();
+  } catch (municipalError) {
+    try {
+      return await fetchRssAlerts();
+    } catch (rssError) {
+      const messages = [municipalError, rssError]
+        .map((error) => (error instanceof Error ? error.message : null))
+        .filter((message): message is string => Boolean(message));
+      return unavailable(unique(messages).join(" ") || "Os avisos do INMET não puderam ser consultados.");
+    }
+  }
 }
