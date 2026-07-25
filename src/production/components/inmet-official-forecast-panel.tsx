@@ -7,16 +7,25 @@ import "./inmet-official-forecast-panel.css";
 
 const INMET_PORTAL_URL = "https://portal.inmet.gov.br/";
 
+type ForecastIconName = "sun" | "cloud" | "rain" | "storm" | "fog" | "wind";
+
 function formatDate(value: string | null) {
-  if (!value) return "Data não informada";
-  const date = new Date(`${value}T12:00:00-03:00`);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    weekday: "short",
-    day: "2-digit",
-    month: "2-digit",
-  }).format(date);
+  if (!value) return { weekday: "Data", date: "não informada" };
+
+  const parsed = new Date(`${value}T12:00:00-03:00`);
+  if (Number.isNaN(parsed.getTime())) return { weekday: "Previsão", date: value };
+
+  return {
+    weekday: new Intl.DateTimeFormat("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      weekday: "long",
+    }).format(parsed),
+    date: new Intl.DateTimeFormat("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      day: "2-digit",
+      month: "short",
+    }).format(parsed),
+  };
 }
 
 function temperatureRange(period: InmetForecastPeriod) {
@@ -24,6 +33,104 @@ function temperatureRange(period: InmetForecastPeriod) {
   if (period.minimum === null) return `Máx. ${period.maximum}°`;
   if (period.maximum === null) return `Mín. ${period.minimum}°`;
   return `${period.minimum}° / ${period.maximum}°`;
+}
+
+function humidityRange(period: InmetForecastPeriod) {
+  if (period.humidityMinimum === null && period.humidityMaximum === null) return null;
+  return `${period.humidityMinimum ?? "—"}% a ${period.humidityMaximum ?? "—"}%`;
+}
+
+function windLabel(period: InmetForecastPeriod) {
+  const value = [period.windDirection, period.windIntensity].filter(Boolean).join(" · ");
+  return value || null;
+}
+
+function resolveForecastIcon(summary: string): ForecastIconName {
+  const normalized = summary
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLocaleLowerCase("pt-BR");
+
+  if (/trovoad|temporal|raio/.test(normalized)) return "storm";
+  if (/chuva|garoa|precipit|pancada/.test(normalized)) return "rain";
+  if (/nevoeiro|nevoa|cerra[cç][aã]o/.test(normalized)) return "fog";
+  if (/vento|rajada/.test(normalized)) return "wind";
+  if (/sol|ensolarado|ceu claro|poucas nuvens/.test(normalized)) return "sun";
+  return "cloud";
+}
+
+function ForecastIcon({ name }: { name: ForecastIconName }) {
+  const paths = {
+    sun: (
+      <>
+        <circle cx="12" cy="12" r="3.5" />
+        <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4" />
+      </>
+    ),
+    cloud: <path d="M6.5 18h10.1a4.4 4.4 0 0 0 .7-8.7A5.7 5.7 0 0 0 6.5 11 3.5 3.5 0 0 0 6.5 18Z" />,
+    rain: (
+      <>
+        <path d="M6.5 15h10.1a4.4 4.4 0 0 0 .7-8.7A5.7 5.7 0 0 0 6.5 8 3.5 3.5 0 0 0 6.5 15Z" />
+        <path d="m8 18-1 2M12 18l-1 2M16 18l-1 2" />
+      </>
+    ),
+    storm: (
+      <>
+        <path d="M6.5 14h10.1a4.4 4.4 0 0 0 .7-8.7A5.7 5.7 0 0 0 6.5 7 3.5 3.5 0 0 0 6.5 14Z" />
+        <path d="m13 15-3 4h3l-2 3" />
+      </>
+    ),
+    fog: (
+      <>
+        <path d="M6.5 13h10.1a4.4 4.4 0 0 0 .7-8.7A5.7 5.7 0 0 0 6.5 6 3.5 3.5 0 0 0 6.5 13Z" />
+        <path d="M4 17h16M6 20h12" />
+      </>
+    ),
+    wind: <path d="M3 8h11c3.5 0 3.5-5 .2-5-1.8 0-2.7.9-2.7 2.5M3 13h15c3.5 0 3.5 6 .2 6-1.8 0-2.7-.9-2.7-2.5M3 18h7" />,
+  } satisfies Record<ForecastIconName, React.ReactNode>;
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <g
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.65"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        {paths[name]}
+      </g>
+    </svg>
+  );
+}
+
+function PeriodMetrics({ period }: { period: InmetForecastPeriod }) {
+  const temperature = temperatureRange(period);
+  const humidity = humidityRange(period);
+  const wind = windLabel(period);
+
+  return (
+    <dl className="inmet-official-metrics">
+      {temperature ? (
+        <div className="is-temperature">
+          <dt>Temperatura</dt>
+          <dd>{temperature}</dd>
+        </div>
+      ) : null}
+      {humidity ? (
+        <div>
+          <dt>Umidade</dt>
+          <dd>{humidity}</dd>
+        </div>
+      ) : null}
+      {wind ? (
+        <div>
+          <dt>Vento</dt>
+          <dd>{wind}</dd>
+        </div>
+      ) : null}
+    </dl>
+  );
 }
 
 export function InmetOfficialForecastPanel({
@@ -34,77 +141,111 @@ export function InmetOfficialForecastPanel({
   station: InmetStationReference["station"];
 }) {
   const visiblePeriods = periods.slice(0, 4);
+  const featuredPeriod = visiblePeriods[0] ?? null;
+  const nextPeriods = visiblePeriods.slice(1);
 
   return (
     <section className="inmet-official-panel" aria-labelledby="inmet-official-title">
-      <header>
-        <div>
-          <span>Referência institucional</span>
-          <h2 id="inmet-official-title">Previsão oficial do INMET para Pelotas</h2>
+      <header className="inmet-official-header">
+        <div className="inmet-official-heading">
+          <div className="inmet-official-institution">
+            <strong>INMET</strong>
+            <span>Previsão municipal oficial</span>
+          </div>
+          <h2 id="inmet-official-title">Previsão oficial para Pelotas</h2>
           <p>
-            Síntese municipal oficial apresentada separadamente da previsão horária por modelos.
+            Leitura institucional por períodos, apresentada separadamente da previsão horária por
+            modelos e das medições observadas em estação.
           </p>
         </div>
-        <a href={INMET_PORTAL_URL} target="_blank" rel="noreferrer">
-          Consultar o INMET <span aria-hidden="true">↗</span>
-        </a>
+
+        <aside className="inmet-official-reference" aria-label="Referência da previsão oficial">
+          <span>Município monitorado</span>
+          <strong>Pelotas, RS</strong>
+          <small>Código IBGE 4314407</small>
+          <a href={INMET_PORTAL_URL} target="_blank" rel="noreferrer">
+            Abrir portal do INMET <span aria-hidden="true">↗</span>
+          </a>
+        </aside>
       </header>
 
-      {visiblePeriods.length > 0 ? (
-        <div className="inmet-official-grid">
-          {visiblePeriods.map((period) => {
-            const range = temperatureRange(period);
-            return (
-              <article key={period.id}>
-                <div className="inmet-official-period-heading">
-                  <span>{formatDate(period.date)}</span>
-                  <strong>{period.period}</strong>
-                </div>
-                <p>{period.summary}</p>
-                <dl>
-                  {range ? (
+      {featuredPeriod ? (
+        <div className="inmet-official-forecast-layout">
+          <article className="inmet-official-featured">
+            <div className="inmet-official-card-topline">
+              <div>
+                <span>{formatDate(featuredPeriod.date).weekday}</span>
+                <strong>{formatDate(featuredPeriod.date).date}</strong>
+              </div>
+              <b>{featuredPeriod.period}</b>
+            </div>
+
+            <div className="inmet-official-featured-summary">
+              <span className="inmet-official-icon is-featured">
+                <ForecastIcon name={resolveForecastIcon(featuredPeriod.summary)} />
+              </span>
+              <div>
+                <small>Síntese oficial</small>
+                <h3>{featuredPeriod.summary}</h3>
+              </div>
+            </div>
+
+            <PeriodMetrics period={featuredPeriod} />
+          </article>
+
+          <div className="inmet-official-next-periods" aria-label="Próximos períodos da previsão oficial">
+            {nextPeriods.map((period) => {
+              const formattedDate = formatDate(period.date);
+              return (
+                <article key={period.id}>
+                  <div className="inmet-official-card-topline">
                     <div>
-                      <dt>Temperatura</dt>
-                      <dd>{range}</dd>
+                      <span>{formattedDate.weekday}</span>
+                      <strong>{formattedDate.date}</strong>
                     </div>
-                  ) : null}
-                  {period.humidityMinimum !== null || period.humidityMaximum !== null ? (
-                    <div>
-                      <dt>Umidade</dt>
-                      <dd>
-                        {period.humidityMinimum ?? "—"}% a {period.humidityMaximum ?? "—"}%
-                      </dd>
-                    </div>
-                  ) : null}
-                  {period.windDirection || period.windIntensity ? (
-                    <div>
-                      <dt>Vento</dt>
-                      <dd>{[period.windDirection, period.windIntensity].filter(Boolean).join(" · ")}</dd>
-                    </div>
-                  ) : null}
-                </dl>
-              </article>
-            );
-          })}
+                    <b>{period.period}</b>
+                  </div>
+
+                  <div className="inmet-official-compact-summary">
+                    <span className="inmet-official-icon">
+                      <ForecastIcon name={resolveForecastIcon(period.summary)} />
+                    </span>
+                    <h3>{period.summary}</h3>
+                  </div>
+
+                  <PeriodMetrics period={period} />
+                </article>
+              );
+            })}
+          </div>
         </div>
       ) : (
         <div className="inmet-official-unavailable">
-          A previsão municipal oficial está temporariamente indisponível. A previsão horária do portal
-          continua operando de forma independente.
+          <strong>Previsão oficial temporariamente indisponível</strong>
+          <span>
+            A previsão horária do portal continua operando de forma independente enquanto uma nova
+            consulta ao INMET é realizada.
+          </span>
         </div>
       )}
 
-      <footer>
-        <span>
-          Fonte: INMET · código IBGE de Pelotas 4314407
-        </span>
-        {station ? (
+      <footer className="inmet-official-footer">
+        <div>
+          <strong>Como interpretar esta seção</strong>
           <span>
-            Estação de referência: {station.name}
-            {station.code ? ` (${station.code})` : ""}. A medição atual do portal permanece vinculada à
-            Embrapa Clima Temperado.
+            O INMET fornece a previsão municipal oficial. A condição atual exibida no portal continua
+            vinculada à medição observada da Embrapa Clima Temperado.
           </span>
-        ) : null}
+        </div>
+        <div>
+          <span>Fonte: Instituto Nacional de Meteorologia — INMET</span>
+          {station ? (
+            <span>
+              Estação oficial de referência: {station.name}
+              {station.code ? ` (${station.code})` : ""}.
+            </span>
+          ) : null}
+        </div>
       </footer>
     </section>
   );
