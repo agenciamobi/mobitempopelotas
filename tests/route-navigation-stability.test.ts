@@ -7,22 +7,29 @@ const navigationCompat = readFileSync("src/production/compat/navigation.ts", "ut
 const navigationCss = readFileSync("src/components/layout/route-navigation.css", "utf8");
 const router = readFileSync("src/router.tsx", "utf8");
 
-test("site shell follows the route that has actually resolved", () => {
-  assert.match(layout, /state\.resolvedLocation\.pathname/);
+test("site shell follows the resolved route with a hydration-safe fallback", () => {
+  assert.match(
+    layout,
+    /state\.resolvedLocation\?\.pathname \?\? state\.location\?\.pathname \?\? "\/"/,
+  );
   assert.match(layout, /standaloneRoutes\.has\(resolvedPathname\)/);
   assert.match(layout, /\[resolvedPathname\]/);
-  assert.doesNotMatch(layout, /select: \(state\) => state\.location\.pathname/);
+  assert.doesNotMatch(layout, /state\.resolvedLocation\.pathname/);
 });
 
-test("standalone production shell also remains on the resolved route", () => {
-  assert.match(navigationCompat, /state\.resolvedLocation\.pathname/);
-  assert.doesNotMatch(navigationCompat, /state\.location\.pathname/);
+test("standalone production shell uses the same safe resolved-route priority", () => {
+  assert.match(
+    navigationCompat,
+    /state\.resolvedLocation\?\.pathname \?\? state\.location\?\.pathname \?\? "\/"/,
+  );
+  assert.doesNotMatch(navigationCompat, /state\.resolvedLocation\.pathname/);
 });
 
 test("route loading uses a lightweight progress indicator instead of another shell", () => {
   assert.match(layout, /function RouteNavigationProgress/);
   assert.match(layout, /className={`route-navigation-progress/);
   assert.match(layout, /aria-busy=\{isLoading\}/);
+  assert.match(layout, /Boolean\(state\.isLoading\)/);
   assert.doesNotMatch(layout, /isLoading[\s\S]*<Header \/>[\s\S]*<Header \/>/);
   assert.match(navigationCss, /position:\s*fixed/);
   assert.match(navigationCss, /height:\s*3px/);
