@@ -1,4 +1,10 @@
-import { absoluteUrl, WEBSITE_JSON_LD_ID } from "./site-config";
+import {
+  ORGANIZATION_JSON_LD_ID,
+  SOCIAL_IMAGE_URL,
+  WEBSITE_JSON_LD_ID,
+  absoluteUrl,
+  createPelotasPlaceJsonLd,
+} from "./site-config";
 
 export type BreadcrumbJsonLdItem = {
   name: string;
@@ -11,6 +17,11 @@ export type EditorialPageJsonLdOptions = {
   path: string;
   breadcrumbs: readonly BreadcrumbJsonLdItem[];
   about?: string | readonly string[];
+};
+
+export type FaqJsonLdItem = {
+  question: string;
+  answer: string;
 };
 
 export type DatasetVariable = {
@@ -60,6 +71,7 @@ export function createEditorialPageJsonLd(options: EditorialPageJsonLdOptions) {
   const pageId = `${pageUrl}#webpage`;
   const breadcrumbId = `${pageUrl}#breadcrumb`;
   const about = Array.isArray(options.about) ? options.about : options.about ? [options.about] : [];
+  const pelotas = createPelotasPlaceJsonLd();
 
   return {
     "@context": "https://schema.org",
@@ -71,8 +83,19 @@ export function createEditorialPageJsonLd(options: EditorialPageJsonLdOptions) {
         description: options.description,
         url: pageUrl,
         isPartOf: { "@id": WEBSITE_JSON_LD_ID },
+        publisher: { "@id": ORGANIZATION_JSON_LD_ID },
         inLanguage: "pt-BR",
         breadcrumb: { "@id": breadcrumbId },
+        contentLocation: pelotas,
+        spatialCoverage: pelotas,
+        primaryImageOfPage: {
+          "@type": "ImageObject",
+          url: SOCIAL_IMAGE_URL,
+        },
+        speakable: {
+          "@type": "SpeakableSpecification",
+          cssSelector: ["h1", ".editorial-answer-summary"],
+        },
         ...(about.length > 0
           ? {
               about: about.map((name) => ({
@@ -88,6 +111,27 @@ export function createEditorialPageJsonLd(options: EditorialPageJsonLdOptions) {
         itemListElement: breadcrumbItems(options.breadcrumbs),
       },
     ],
+  };
+}
+
+export function createFaqPageJsonLd(path: string, faqs: readonly FaqJsonLdItem[]) {
+  const pageUrl = absoluteUrl(path);
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": `${pageUrl}#faq`,
+    url: pageUrl,
+    isPartOf: { "@id": WEBSITE_JSON_LD_ID },
+    inLanguage: "pt-BR",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
   };
 }
 
