@@ -1,5 +1,12 @@
 export type WeatherIconName =
-  "sun" | "moon" | "partly-cloudy" | "partly-cloudy-night" | "cloud" | "rain" | "storm" | "wind";
+  | "sun"
+  | "moon"
+  | "partly-cloudy"
+  | "partly-cloudy-night"
+  | "cloud"
+  | "rain"
+  | "storm"
+  | "wind";
 
 export type HourlyForecast = {
   time: string;
@@ -48,6 +55,16 @@ export type CurrentWeather = {
   source: CurrentWeatherSource;
 };
 
+export type AstronomyData = {
+  date: string | null;
+  sunrise: string | null;
+  sunset: string | null;
+  moonPhase: string | null;
+  season: string | null;
+  solarSource: string | null;
+  lunarSource: string | null;
+};
+
 export type RegionalWeather = {
   city: string;
   temperature: number;
@@ -61,6 +78,7 @@ export type WeatherData = {
   hourly: HourlyForecast[];
   daily: DailyForecast[];
   regional: RegionalWeather[];
+  astronomy?: AstronomyData;
   source: {
     name: string;
     url: string;
@@ -104,6 +122,15 @@ export const fallbackWeatherData: WeatherData = {
   hourly: [],
   daily: [],
   regional: [],
+  astronomy: {
+    date: null,
+    sunrise: null,
+    sunset: null,
+    moonPhase: null,
+    season: null,
+    solarSource: null,
+    lunarSource: null,
+  },
   source: {
     name: "Dados meteorológicos indisponíveis",
     url: "/metodologia",
