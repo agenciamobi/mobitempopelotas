@@ -125,6 +125,21 @@ test("footer organizes navigation, sources and status as operational information
   assert.match(footerFixCss, /display:none!important;content:none!important/);
 });
 
+test("developer credit stays centered and the PWA launcher does not cover it", () => {
+  assert.match(
+    footerFixCss,
+    /\.editorial-footer-base\{grid-template-columns:minmax\(0,1fr\) auto minmax\(0,1fr\)!important\}/,
+  );
+  assert.match(footerFixCss, /\.editorial-footer-base>p\{grid-column:2;justify-self:center/);
+  assert.match(footerFixCss, /background:linear-gradient\(135deg,#061a2a,#0a4054\)!important/);
+  assert.match(footerFixCss, /\.pwa-launcher\{[\s\S]*color:#fff!important/);
+  assert.match(footerFixCss, /backdrop-filter:none!important/);
+  assert.match(footerFixCss, /body:has\(\.pwa-launcher\) \.site-shell/);
+  assert.match(footerFixCss, /var\(--mobile-tab-height,68px\) \+ 76px/);
+  assert.match(footerFixCss, /left:50%!important/);
+  assert.match(footerFixCss, /transform:translateX\(-50%\)!important/);
+});
+
 test("homepage final visual layers remain usable on tablet and mobile", () => {
   assert.match(homeWaterCss, /@media \(max-width: 980px\)/);
   assert.match(homeWaterCss, /@media \(max-width: 720px\)/);
