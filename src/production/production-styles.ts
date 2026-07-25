@@ -123,3 +123,4 @@ import "./styles/home-weekly-radar-usability-v47.css";
 import "./styles/internal-home-cohesion-v48.css";
 import "./styles/internal-home-cohesion-v48-fix.css";
 import "./styles/home-water-editorial-v49.css";
+import "./styles/home-closing-editorial-v50.css";
