@@ -1,0 +1,873 @@
+/* Internal v54 — página Tempo Hoje como referência visual para as páginas internas. */
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] {
+  --today-frame: min(calc(100vw - var(--portal-frame-gap)), var(--portal-frame-max));
+  --today-line: rgba(7, 30, 47, 0.105);
+  --today-navy: #071e2f;
+  --today-muted: #58717d;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today {
+  display: grid !important;
+  gap: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Primeira dobra. */
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-page-header {
+  min-height: clamp(440px, 43vw, 610px);
+  background:
+    radial-gradient(circle at 91% 7%, rgba(94, 44, 237, 0.08), transparent 28rem),
+    radial-gradient(circle at 6% 100%, rgba(24, 189, 205, 0.12), transparent 30rem),
+    linear-gradient(145deg, #f9fcfb 0%, #f5faf9 58%, #f3f5fb 100%) !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-page-header > div:first-child {
+  max-width: 930px;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today .forecast-page-header h1 {
+  max-width: 930px;
+  font-size: clamp(3.15rem, 5.15vw, 5.85rem) !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today .forecast-page-description {
+  max-width: 720px;
+  font-size: clamp(1rem, 1.15vw, 1.12rem);
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today .forecast-quality {
+  position: relative;
+  display: grid;
+  width: min(100%, 390px);
+  min-width: 0;
+  gap: 0;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.92) !important;
+  border-radius: 22px !important;
+  background: #fff !important;
+  box-shadow: 0 18px 42px rgba(7, 30, 47, 0.14) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today .forecast-quality::before {
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, #18bdcd, #5e2ced, #e70b85);
+  content: "";
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today .forecast-quality > span {
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  gap: 9px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--today-line);
+  color: #617985;
+  font-size: 0.74rem;
+  font-weight: 760;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today .forecast-quality > span:last-child {
+  border-bottom: 0;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today .forecast-confidence {
+  color: #071e2f !important;
+  font-size: 0.82rem !important;
+  font-weight: 850 !important;
+}
+
+/* Navegação por capítulos. */
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-navigation {
+  display: flex;
+  width: var(--today-frame);
+  min-height: 58px;
+  margin: 18px auto 0;
+  padding: 6px;
+  overflow-x: auto;
+  border: 1px solid var(--today-line);
+  border-radius: 17px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 12px 30px rgba(7, 30, 47, 0.045);
+  scrollbar-width: none;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-navigation::-webkit-scrollbar {
+  display: none;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-navigation a {
+  display: inline-flex;
+  min-width: max-content;
+  min-height: 44px;
+  flex: 1 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border-radius: 12px;
+  color: #526c78;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-navigation a:first-child {
+  background: #071e2f;
+  color: #fff;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-navigation a:hover,
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-navigation a:focus-visible {
+  background: rgba(24, 189, 205, 0.09);
+  color: #071e2f;
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-navigation a:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(24, 189, 205, 0.42);
+}
+
+/* Agora: medição observada e previsão do dia claramente separadas. */
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-today-hero {
+  display: grid !important;
+  width: var(--today-frame);
+  min-height: 430px;
+  margin: clamp(24px, 3vw, 42px) auto 0 !important;
+  padding: 14px !important;
+  grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr) !important;
+  gap: 14px !important;
+  border: 1px solid var(--today-line) !important;
+  border-radius: clamp(22px, 1.8vw, 30px) !important;
+  background:
+    radial-gradient(circle at 96% 5%, rgba(94, 44, 237, 0.075), transparent 22rem),
+    linear-gradient(150deg, #f8fbfa, #eef5f4) !important;
+  box-shadow: 0 20px 54px rgba(7, 30, 47, 0.075) !important;
+  scroll-margin-top: 112px;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-main {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  align-content: center;
+  overflow: hidden;
+  padding: clamp(28px, 4vw, 58px) !important;
+  border: 0 !important;
+  border-radius: clamp(18px, 1.5vw, 24px) !important;
+  background:
+    radial-gradient(circle at 85% 16%, rgba(24, 189, 205, 0.21), transparent 19rem),
+    radial-gradient(circle at 4% 100%, rgba(94, 44, 237, 0.16), transparent 20rem),
+    linear-gradient(145deg, #061a2a, #082d42 64%, #0b4257) !important;
+  color: #fff;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-main::after {
+  position: absolute;
+  right: -90px;
+  bottom: -110px;
+  width: 260px;
+  height: 260px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 50%;
+  box-shadow: 0 0 0 40px rgba(255, 255, 255, 0.025);
+  content: "";
+  pointer-events: none;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-main .forecast-kicker {
+  color: #78e6ee !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-main h2 {
+  max-width: 620px;
+  color: #fff !important;
+  font-size: clamp(2rem, 3.15vw, 3.5rem) !important;
+  line-height: 1 !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-now-reading {
+  position: relative;
+  z-index: 1;
+  gap: clamp(20px, 3vw, 38px) !important;
+  margin-top: clamp(30px, 4vw, 52px) !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-now-icon {
+  width: clamp(92px, 9vw, 132px) !important;
+  height: clamp(92px, 9vw, 132px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: clamp(24px, 2vw, 34px) !important;
+  background: rgba(255, 255, 255, 0.075) !important;
+  color: #79e8ef !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-now-icon svg {
+  width: clamp(54px, 5vw, 76px);
+  height: clamp(54px, 5vw, 76px);
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-now-reading strong {
+  font-size: clamp(5rem, 8.2vw, 8.6rem) !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-now-reading span {
+  color: #fff;
+  font-size: clamp(1rem, 1.25vw, 1.18rem) !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-now-reading small {
+  max-width: 430px;
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.67) !important;
+  font-size: 0.76rem !important;
+  line-height: 1.5;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range {
+  display: grid;
+  min-width: 0;
+  align-content: center;
+  justify-items: stretch;
+  padding: clamp(28px, 3.5vw, 48px) !important;
+  border: 1px solid rgba(7, 30, 47, 0.09) !important;
+  border-radius: clamp(18px, 1.5vw, 24px) !important;
+  background:
+    radial-gradient(circle at 95% 4%, rgba(94, 44, 237, 0.12), transparent 16rem),
+    #fff !important;
+  color: #071e2f !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range > span {
+  color: #087c8a !important;
+  font-size: 0.68rem !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range > strong {
+  color: #071e2f;
+  font-size: clamp(2.9rem, 4.7vw, 5rem) !important;
+  line-height: 0.92;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range > small {
+  max-width: 430px;
+  color: #647c87 !important;
+  font-size: 0.76rem;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range-details {
+  display: grid;
+  margin: clamp(26px, 3.5vw, 42px) 0 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid var(--today-line);
+  border-bottom: 1px solid var(--today-line);
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range-details > div {
+  display: grid;
+  min-width: 0;
+  min-height: 78px;
+  align-content: center;
+  gap: 7px;
+  padding: 13px 14px;
+  border-right: 1px solid var(--today-line);
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range-details > div:first-child {
+  padding-left: 0;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range-details > div:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range-details dt {
+  color: #758b95;
+  font-size: 0.59rem;
+  font-weight: 820;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range-details dd {
+  margin: 0;
+  color: #071e2f;
+  font-size: 0.84rem;
+  font-weight: 850;
+  line-height: 1.3;
+}
+
+/* Avisos e medição local. */
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-active-alert {
+  width: var(--today-frame);
+  margin: 16px auto 0 !important;
+  padding: 16px 18px !important;
+  border-radius: 16px !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-current-metrics {
+  display: grid !important;
+  width: var(--today-frame);
+  margin: clamp(24px, 3vw, 40px) auto 0 !important;
+  padding: 0 !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  scroll-margin-top: 112px;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article {
+  position: relative;
+  min-height: 154px !important;
+  align-content: center !important;
+  gap: 8px !important;
+  padding: clamp(18px, 2vw, 28px) !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: #18bdcd;
+  content: "";
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article:nth-child(4n + 2)::before {
+  background: #5e2ced;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article:nth-child(4n + 3)::before {
+  background: #e70b85;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article:nth-child(4n)::before {
+  background: #f27035;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics svg {
+  width: 28px !important;
+  height: 28px !important;
+  margin-bottom: 8px !important;
+  color: #087c8a !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics span {
+  color: #718892 !important;
+  font-size: 0.66rem !important;
+  font-weight: 760;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics strong {
+  color: #071e2f;
+  font-size: clamp(1rem, 1.15vw, 1.18rem) !important;
+  line-height: 1.25;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics small {
+  color: #718892 !important;
+  line-height: 1.45;
+}
+
+/* Linha do tempo horária. */
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-hourly-section {
+  position: relative;
+  width: var(--today-frame);
+  margin: clamp(42px, 5vw, 72px) auto 0 !important;
+  padding: clamp(42px, 5vw, 72px) var(--portal-content-gutter) !important;
+  overflow: hidden;
+  border: 1px solid var(--today-line) !important;
+  border-radius: clamp(22px, 1.8vw, 30px) !important;
+  background:
+    radial-gradient(circle at 96% 2%, rgba(24, 189, 205, 0.08), transparent 22rem),
+    linear-gradient(150deg, #f9fcfb, #f1f7f6) !important;
+  box-shadow: 0 18px 48px rgba(7, 30, 47, 0.055) !important;
+  scroll-margin-top: 112px;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-hourly-section::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #18bdcd, #5e2ced 62%, #e70b85);
+  content: "";
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-hourly-section .forecast-section-heading > a {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  padding: 0 15px;
+  border: 1px solid rgba(7, 30, 47, 0.11);
+  border-radius: 999px;
+  background: #fff;
+  color: #071e2f !important;
+  text-decoration: none;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-hourly-grid {
+  display: flex !important;
+  gap: 10px !important;
+  padding: 2px 2px 12px;
+  overflow-x: auto;
+  scroll-padding-inline: 2px;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: rgba(24, 189, 205, 0.42) transparent;
+  scrollbar-width: thin;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-hourly-grid article {
+  display: grid;
+  min-width: 148px;
+  min-height: 218px !important;
+  flex: 1 0 148px;
+  place-items: start;
+  align-content: center;
+  gap: 11px !important;
+  padding: 20px 18px !important;
+  border: 1px solid rgba(7, 30, 47, 0.085) !important;
+  border-radius: 18px !important;
+  background: rgba(255, 255, 255, 0.84) !important;
+  text-align: left !important;
+  scroll-snap-align: start;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-hourly-grid article:first-child {
+  border-color: #071e2f !important;
+  background:
+    radial-gradient(circle at 90% 8%, rgba(24, 189, 205, 0.2), transparent 10rem),
+    #071e2f !important;
+  color: #fff;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-hourly-grid article > span:first-child {
+  color: #58717d;
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-hourly-grid article:first-child > span:first-child,
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-hourly-grid article:first-child small {
+  color: rgba(255, 255, 255, 0.68) !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-hourly-grid svg {
+  width: 40px;
+  height: 40px;
+  color: #168fa3 !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-hourly-grid article:first-child svg {
+  color: #79e8ef !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-hourly-grid strong {
+  color: #071e2f;
+  font-size: 2rem !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-hourly-grid article:first-child strong {
+  color: #fff;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-hourly-grid small {
+  color: #6c838e !important;
+  font-size: 0.66rem !important;
+  line-height: 1.4;
+}
+
+/* Síntese editorial do dia. */
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-guidance {
+  position: relative;
+  width: var(--today-frame);
+  margin: clamp(42px, 5vw, 72px) auto 0 !important;
+  padding: clamp(44px, 5vw, 74px) var(--portal-content-gutter) !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: clamp(22px, 1.8vw, 30px) !important;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(94, 44, 237, 0.25), transparent 24rem),
+    radial-gradient(circle at 8% 92%, rgba(24, 189, 205, 0.18), transparent 24rem),
+    linear-gradient(142deg, #061a2a, #082b3e 66%, #09394b) !important;
+  color: #fff;
+  box-shadow: 0 24px 60px rgba(7, 30, 47, 0.17) !important;
+  scroll-margin-top: 112px;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-guidance .forecast-kicker {
+  color: #78e6ee !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-guidance .forecast-section-heading h2 {
+  color: #fff !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-guidance-grid {
+  gap: 12px !important;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-guidance-grid article,
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-guidance-grid article.forecast-guidance-caution {
+  position: relative;
+  min-height: 220px;
+  padding: clamp(24px, 3vw, 38px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.13) !important;
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.065) !important;
+  color: #fff;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-guidance-grid article::before {
+  display: block;
+  width: 34px;
+  height: 3px;
+  margin-bottom: 22px;
+  border-radius: 999px;
+  background: #18bdcd;
+  content: "";
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-guidance-grid article.forecast-guidance-caution::before {
+  background: #f27035;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-guidance-grid strong {
+  color: #fff;
+  font-size: 1rem;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-guidance-grid li,
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-guidance-grid p {
+  color: rgba(255, 255, 255, 0.72) !important;
+  font-size: 0.8rem !important;
+  line-height: 1.65 !important;
+}
+
+/* Continuidade e transparência. */
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related {
+  display: grid;
+  width: var(--today-frame);
+  margin: 18px auto 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--today-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related > a {
+  display: flex;
+  min-width: 0;
+  min-height: 96px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 22px;
+  border-right: 1px solid var(--today-line);
+  color: #071e2f;
+  text-decoration: none;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related > a:last-child {
+  border-right: 0;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related > a > span {
+  display: grid;
+  gap: 6px;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related small {
+  color: #087c8a;
+  font-size: 0.6rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related strong {
+  font-size: 0.88rem;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related svg {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+  color: #5e2ced;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related > a:hover,
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related > a:focus-visible {
+  background: rgba(24, 189, 205, 0.06);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-source-note {
+  display: grid;
+  width: var(--today-frame);
+  min-height: 72px;
+  margin: 14px auto 0 !important;
+  padding: 16px 20px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--today-line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.64);
+  color: #647c87;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-source-note > svg {
+  width: 22px;
+  height: 22px;
+  color: #087c8a;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-source-note > p {
+  margin: 0;
+  color: #647c87;
+  font-size: 0.7rem;
+  line-height: 1.55;
+}
+
+/* Conteúdo de resposta, FAQ e links relacionados. */
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .site-container--topic > .editorial-answer-section {
+  position: relative;
+  width: var(--today-frame);
+  margin: clamp(42px, 5vw, 72px) auto 0;
+  padding: clamp(42px, 5vw, 72px) var(--portal-content-gutter);
+  overflow: hidden;
+  border: 1px solid var(--today-line);
+  border-radius: clamp(22px, 1.8vw, 30px);
+  background:
+    radial-gradient(circle at 96% 4%, rgba(94, 44, 237, 0.07), transparent 24rem),
+    linear-gradient(150deg, #f9fcfb, #f2f7f6);
+  box-shadow: 0 18px 48px rgba(7, 30, 47, 0.055);
+  scroll-margin-top: 112px;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .editorial-answer-section::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #18bdcd, #5e2ced 62%, #e70b85);
+  content: "";
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .editorial-answer-copy h2 {
+  max-width: 17ch;
+  font-size: clamp(2.2rem, 4vw, 4.35rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .editorial-answer-facts {
+  counter-reset: today-fact;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .editorial-answer-facts li {
+  counter-increment: today-fact;
+  padding: 18px 18px 18px 58px;
+  border: 1px solid rgba(7, 30, 47, 0.08);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .editorial-answer-facts li::before {
+  top: 15px;
+  left: 16px;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 9px;
+  background: #071e2f;
+  color: #fff;
+  font-size: 0.64rem;
+  font-weight: 850;
+  box-shadow: none;
+  content: counter(today-fact, decimal-leading-zero);
+}
+
+@media (max-width: 1120px) {
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-today-hero {
+    grid-template-columns: minmax(0, 1.05fr) minmax(300px, 0.95fr) !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-current-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article:nth-child(3n) {
+    border-right: 0 !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article:nth-child(-n + 3) {
+    border-bottom: 1px solid var(--today-line) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-page-header {
+    min-height: 0;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-navigation {
+    width: calc(100vw - 20px);
+    margin-top: 12px;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-navigation a {
+    flex: 0 0 auto;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-today-hero {
+    width: calc(100vw - 20px);
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr) !important;
+    padding: 9px !important;
+    border-radius: 20px !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-main,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range {
+    padding: 26px 22px !important;
+    border-radius: 16px !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-now-reading {
+    align-items: flex-end;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-now-icon {
+    width: 82px !important;
+    height: 82px !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-now-icon svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-now-reading strong {
+    font-size: clamp(4.3rem, 20vw, 6rem) !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-active-alert,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-current-metrics,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-hourly-section,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-guidance,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-source-note,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .site-container--topic > .editorial-answer-section {
+    width: calc(100vw - 20px);
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-current-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article:nth-child(3n) {
+    border-right: 1px solid var(--today-line) !important;
+    border-bottom: 1px solid var(--today-line) !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article:nth-child(2n) {
+    border-right: 0 !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article:nth-last-child(-n + 2) {
+    border-bottom: 0 !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-hourly-section,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-guidance,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .site-container--topic > .editorial-answer-section {
+    padding: 38px 18px !important;
+    border-radius: 20px !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-guidance-grid,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related > a,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related > a:last-child {
+    min-height: 82px;
+    border-right: 0;
+    border-bottom: 1px solid var(--today-line);
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related > a:last-child {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range-details {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range-details > div,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range-details > div:first-child,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range-details > div:last-child {
+    min-height: 62px;
+    padding: 11px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--today-line);
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-range-details > div:last-child {
+    border-bottom: 0;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-now-reading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-current-metrics {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article:nth-child(2n),
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article:nth-last-child(-n + 2) {
+    min-height: 112px !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--today-line) !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-current-metrics > article:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-hourly-grid article {
+    min-width: 136px;
+    flex-basis: 136px;
+  }
+
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-page--today > .forecast-source-note {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-navigation a,
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .forecast-today-related > a {
+    transition: none !important;
+    transform: none !important;
+  }
+}
