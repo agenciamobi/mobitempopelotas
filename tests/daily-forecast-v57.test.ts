@@ -6,12 +6,14 @@ const sharedComponent = readFileSync("src/components/weather/DailyForecastPagesV
 const sharedStyles = readFileSync("src/components/weather/DailyForecastPagesV2.css", "utf8");
 const todayComponent = readFileSync("src/components/weather/TodayForecastPageV4.tsx", "utf8");
 const todayStyles = readFileSync("src/components/weather/TodayForecastPageV4.css", "utf8");
+const todayRefinement = readFileSync("src/components/weather/TodayForecastPageV4Refinement.css", "utf8");
 const todayRoute = readFileSync("src/routes/tempo-hoje-pelotas.tsx", "utf8");
 const tomorrowRoute = readFileSync("src/routes/tempo-amanha-pelotas.tsx", "utf8");
 
 test("today uses its compact dedicated experience while tomorrow remains isolated", () => {
   assert.match(todayRoute, /TodayForecastPageV4/);
   assert.match(todayRoute, /components\/weather\/TodayForecastPageV4/);
+  assert.match(todayRoute, /TodayForecastPageV4Refinement\.css/);
   assert.doesNotMatch(todayRoute, /TodayForecastPageV[23]/);
   assert.match(tomorrowRoute, /TomorrowForecastPageV2/);
   assert.match(sharedComponent, /export function TomorrowForecastPageV2/);
@@ -25,6 +27,8 @@ test("measurement and visual-condition availability are treated as separate stat
   assert.match(todayComponent, /today-v4-unavailable-panel/);
   assert.match(todayComponent, /A previsão por modelo continua ativa/);
   assert.match(todayComponent, /Consultar estação/);
+  assert.match(todayRefinement, /is-measurement-unavailable \.today-v4-chapters/);
+  assert.match(todayRefinement, /grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/);
 });
 
 test("the today hero remains driven by real values and source semantics", () => {
@@ -49,14 +53,15 @@ test("the page selects the most relevant severe alert and keeps validity explici
   assert.match(todayComponent, /today-v4-alert is-\$\{relevantAlert\.severity\}/);
 });
 
-test("the remaining-day window excludes the current slot", () => {
-  assert.match(todayComponent, /const futureHours = nextHours\.length > 1 \? nextHours\.slice\(1\) : \[\]/);
-  assert.match(todayComponent, /const comparisonHours = futureHours\.length \? futureHours : nextHours/);
+test("the remaining-day window always excludes the current slot", () => {
+  assert.match(todayComponent, /const futureHours = nextHours\.slice\(1\)/);
+  assert.doesNotMatch(todayComponent, /comparisonHours/);
+  assert.match(todayComponent, /maxBy\(futureHours, \(hour\) => hour\.temperature\)/);
+  assert.match(todayComponent, /futureHours\.filter/);
+  assert.match(todayComponent, /maxBy\(futureHours, strongestWind\)/);
+  assert.match(todayComponent, /\{futureHours\.length > 0 \? \(/);
   assert.match(todayComponent, /Depois de agora/);
   assert.match(todayComponent, /horários futuros comparados/);
-  assert.match(todayComponent, /hottestHour/);
-  assert.match(todayComponent, /wettestHour/);
-  assert.match(todayComponent, /windiestHour/);
 });
 
 test("current metrics disclose provenance and the integrity panel is concise", () => {
