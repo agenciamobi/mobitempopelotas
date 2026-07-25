@@ -14,6 +14,7 @@ import {
 import { HomeEditorialDashboard } from "@/production/components/home-editorial-dashboard-semantic";
 import { HomeSectionNavigation } from "@/production/components/home-section-navigation";
 import { InmetAlertsPanel } from "@/production/components/inmet-alerts-panel";
+import { InmetOfficialForecastPanel } from "@/production/components/inmet-official-forecast-panel";
 import { SafetyAlertBanner } from "@/production/components/safety-alerts";
 import { SiteFooter } from "@/production/components/site-footer";
 import { SiteHeader } from "@/production/components/site-header";
@@ -115,6 +116,10 @@ export function ProductionHome({
 
       <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
         <InmetAlertsPanel data={inmetAlerts} variant="home" />
+        <InmetOfficialForecastPanel
+          periods={recoveredData.weather.inmetForecast}
+          station={recoveredData.weather.inmetStation}
+        />
         <SafetyAlertBanner banner={featuredSafetyBanner} />
         <HomeSectionNavigation />
         <HomeEditorialDashboard
