@@ -114,7 +114,7 @@ function formatDateTime(value: string | null) {
 }
 
 function redemetSourceCard(redemet: RedemetOverview): SourceCard {
-  const products = [redemet.radar, redemet.satellite, redemet.storms];
+  const products = [redemet.radar, redemet.satellite, redemet.inmetSatellite, redemet.storms];
   const configured = products.filter((source) => source.configured).length;
   const available = products.filter((source) => source.available).length;
   const timestamps = products
@@ -128,15 +128,15 @@ function redemetSourceCard(redemet: RedemetOverview): SourceCard {
 
   return {
     id: "redemet",
-    name: "Radar, satélite e trovoadas",
-    organization: "REDEMET / DECEA",
-    role: "Observação meteorológica regional",
+    name: "Radar, satélites e trovoadas",
+    organization: "REDEMET / DECEA e INMET",
+    role: "Observação visual regional",
     description:
       available > 0
-        ? `${available} de ${products.length} produtos responderam nesta consulta. Radar e satélite são exibidos como observação complementar; STSC informa ocorrências de trovoada sem classificar risco local.`
+        ? `${available} de ${products.length} produtos responderam nesta consulta. A REDEMET fornece radar, satélite regional e STSC; o INMET complementa com imagens GOES da Região Sul.`
         : configured === products.length
-          ? "A integração está configurada no servidor, mas os produtos não entregaram quadros utilizáveis nesta consulta. Nenhuma imagem ou ocorrência é estimada pelo portal."
-          : "A integração server-side está preparada, mas ainda não foi reconhecida integralmente pelo ambiente de execução.",
+          ? "As integrações estão configuradas no servidor, mas os produtos não entregaram quadros utilizáveis nesta consulta. Nenhuma imagem ou ocorrência é estimada pelo portal."
+          : "As integrações server-side estão preparadas, mas ainda não foram reconhecidas integralmente pelo ambiente de execução.",
     status,
     fetchedAt,
     url: "https://redemet.decea.mil.br/",
@@ -169,14 +169,14 @@ function createSourceCards(
     },
     {
       id: "inmet",
-      name: "Avisos meteorológicos oficiais",
+      name: "Previsão, avisos e referência oficial",
       organization: "INMET",
-      role: "Alertas",
+      role: "Previsão e alertas oficiais",
       description:
-        "Avisos oficiais filtrados por relevância para Pelotas, Zona Sul e Rio Grande do Sul, sem alteração do conteúdo de segurança.",
+        "Previsão municipal para o código IBGE de Pelotas, avisos oficiais por geocódigo e metadados da estação meteorológica de referência. Esses dados complementam, sem substituir, a medição atual da Embrapa.",
       status: sourceHealth.inmet.status,
       fetchedAt: sourceHealth.inmet.fetchedAt,
-      url: "https://avisos.inmet.gov.br/",
+      url: "https://portal.inmet.gov.br/",
       icon: AlertTriangle,
     },
     {
@@ -199,7 +199,7 @@ function createSourceCards(
       role: "Previsão global",
       description: usesMetNorway
         ? "Contingência global usada quando o provedor principal não responde, preservando como ausentes os campos que o modelo não publica."
-        : "Condições modeladas, previsão horária e previsão diária usadas como base global para temperatura, chuva e vento.",
+        : "Previsão horária e diária detalhada usada como base global para temperatura, chuva e vento, sem ser apresentada como medição atual.",
       status: usesMetNorway ? sourceHealth["met-norway"].status : sourceHealth["open-meteo"].status,
       fetchedAt: usesMetNorway
         ? sourceHealth["met-norway"].fetchedAt
@@ -270,9 +270,9 @@ export function MethodologyPage({ weather, level, redemet }: MethodologyPageProp
           <p className="methodology-kicker">Transparência operacional</p>
           <h1>De onde vêm os dados do Tempo Pelotas</h1>
           <p className="methodology-lead">
-            O portal combina medições locais, alertas oficiais, observação regional e modelos de
-            previsão. Esta página mostra a função de cada fonte, como os dados são verificados e
-            quais limites precisam ser considerados antes de tomar decisões.
+            O portal combina medições locais, alertas e previsões oficiais, observação regional e
+            modelos de previsão. Esta página mostra a função de cada fonte, como os dados são
+            verificados e quais limites precisam ser considerados antes de tomar decisões.
           </p>
         </div>
 
