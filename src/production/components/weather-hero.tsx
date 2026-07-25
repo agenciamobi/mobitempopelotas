@@ -1,5 +1,6 @@
 import Link from "@/production/compat/NextLink";
 import type { ReactNode } from "react";
+
 import type { CppmetForecastItem } from "@/production/lib/cppmet-forecast";
 import { WeatherIcon } from "@/production/components/weather-icon";
 import {
@@ -22,8 +23,6 @@ type WeatherHeroProps = {
 type HeroMetricIconName = "humidity" | "wind" | "pressure" | "direction";
 
 type HeroPresentation = {
-  title: string;
-  highlightedTitle: string;
   description: string;
   primaryAction: {
     href: string;
@@ -39,9 +38,7 @@ type HeroPresentation = {
 
 const heroPresentationByLevel = {
   normal: {
-    title: "Veja as condições para hoje.",
-    highlightedTitle: "Planeje o restante do dia.",
-    description: "Consulte a medição local disponível e veja a previsão para as próximas horas.",
+    description: "Consulte as condições para agora e a previsão para as próximas horas.",
     primaryAction: {
       href: "/tempo-hoje-pelotas",
       label: "Ver previsão de hoje",
@@ -54,8 +51,6 @@ const heroPresentationByLevel = {
     photoCredit: "Foto: Sebastian2112 / CC BY-SA 4.0",
   },
   attention: {
-    title: "O tempo pode mudar nas próximas horas.",
-    highlightedTitle: "Confira quando as condições pioram.",
     description:
       "Veja quando a chance de chuva e de rajadas aumenta e consulte os avisos oficiais antes de sair.",
     primaryAction: {
@@ -70,8 +65,6 @@ const heroPresentationByLevel = {
     photoCredit: "Foto: Kane Morley / CC BY-SA 4.0",
   },
   warning: {
-    title: "Há risco de tempo forte.",
-    highlightedTitle: "Acompanhe chuva, vento e alertas.",
     description:
       "Consulte os avisos oficiais e os horários com maior risco de chuva intensa, temporal ou rajadas fortes.",
     primaryAction: {
@@ -91,104 +84,11 @@ function capitalizeSentence(value: string) {
   return value.replace(/^./, (character) => character.toUpperCase());
 }
 
-function normalizeForMatch(value: string) {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLocaleLowerCase("pt-BR");
-}
-
-function getDynamicTitle(weather: WeatherData, level: AdvisoryLevel, cppmetSummary: string | null) {
-  const today = weather.daily[0];
-  const normalizedSummary = normalizeForMatch(cppmetSummary ?? "");
-  const has = (pattern: RegExp) => pattern.test(normalizedSummary);
-
-  if (level === "warning") {
-    return {
-      title: "Há risco de tempo forte.",
-      highlightedTitle: "Acompanhe chuva, vento e alertas.",
-    };
-  }
-
-  if (level === "attention") {
-    if ((today?.windGust ?? 0) >= 50 || has(/vento|rajada/)) {
-      return {
-        title: "O vento pode ganhar força.",
-        highlightedTitle: "Veja os horários com rajadas mais intensas.",
-      };
-    }
-
-    return {
-      title: "A chuva pode ganhar intensidade.",
-      highlightedTitle: "Veja os horários mais instáveis.",
-    };
-  }
-
-  if (has(/temporal|trovoada|pancada|instabil/)) {
-    return {
-      title: "O tempo pode ficar instável.",
-      highlightedTitle: "Acompanhe chuva, vento e trovoadas.",
-    };
-  }
-
-  if ((today?.rainChance ?? 0) >= 60 || has(/chuva|garoa|precipit/)) {
-    return {
-      title: "A chuva deve marcar o dia.",
-      highlightedTitle: "Veja quando a intensidade aumenta.",
-    };
-  }
-
-  if (has(/nevoeiro|nevoa|visibilidade/)) {
-    return {
-      title: "A visibilidade pode ficar reduzida.",
-      highlightedTitle: "Consulte as condições antes de sair.",
-    };
-  }
-
-  if (has(/nublado|encoberto|muitas nuvens|nebulosidade/)) {
-    return {
-      title: "O céu permanece com muitas nuvens.",
-      highlightedTitle: "Acompanhe a evolução ao longo do dia.",
-    };
-  }
-
-  if (has(/sol|ensolarado|ceu claro|poucas nuvens/)) {
-    return {
-      title: "O dia terá períodos de sol.",
-      highlightedTitle: "Confira temperatura e vento.",
-    };
-  }
-
-  if (today && today.max <= 15) {
-    return {
-      title: "O frio permanece em Pelotas.",
-      highlightedTitle: "Confira mínima e máxima previstas.",
-    };
-  }
-
-  if (today && today.max >= 30) {
-    return {
-      title: "O calor ganha destaque.",
-      highlightedTitle: "Planeje os horários do dia.",
-    };
-  }
-
-  return {
-    title: "Veja as condições para hoje.",
-    highlightedTitle: "Planeje o restante do dia.",
-  };
-}
-
-function getCurrentSourceMeta(current: WeatherData["current"]) {
-  if (!current.available) return "Medição recente indisponível · Embrapa Clima Temperado";
-
-  const updateTime = current.source.observedAt
-    ? `Leitura das ${current.source.observedAt}`
-    : current.updatedAt
-      ? `Atualizada em ${current.updatedAt}`
-      : "Leitura recente";
-
-  return `${updateTime} · ${current.source.name}`;
+function getCurrentUpdateMeta(current: WeatherData["current"]) {
+  if (!current.available) return "Leitura recente indisponível";
+  if (current.updatedAt) return `Atualizada em ${current.updatedAt}`;
+  if (current.source.observedAt) return `Leitura das ${current.source.observedAt}`;
+  return "Leitura recente";
 }
 
 function getOfficialAlertReason(count: number) {
@@ -267,11 +167,6 @@ export function WeatherHero({
   const resolvedLevel = advisoryLevel ?? advisory.level;
   const presentation = heroPresentationByLevel[resolvedLevel];
   const today = weather.daily[0];
-  const dynamicTitle = getDynamicTitle(
-    weather,
-    resolvedLevel,
-    cppmetForecast?.item.summary ?? null,
-  );
   const description = cppmetForecast?.item.summary ?? presentation.description;
   const officialAlertReason =
     officialAlertCount > 0 ? getOfficialAlertReason(officialAlertCount) : null;
@@ -280,7 +175,7 @@ export function WeatherHero({
   const reasons = [officialAlertReason, ...weatherReasons]
     .filter((reason): reason is string => Boolean(reason))
     .slice(0, 2);
-  const currentSourceMeta = getCurrentSourceMeta(current);
+  const currentUpdateMeta = getCurrentUpdateMeta(current);
   const nextHourForecast = !current.available ? (weather.hourly[0] ?? null) : null;
   const heroIcon = resolveHeroWeatherIcon(weather, cppmetForecast?.item.summary);
   const heroCondition = weatherConditionLabels[heroIcon];
@@ -299,25 +194,18 @@ export function WeatherHero({
 
       <div className="weather-hero-content">
         <div className="weather-hero-copy">
-          <h1 id="weather-hero-title">
-            {dynamicTitle.title} <span>{dynamicTitle.highlightedTitle}</span>
+          <h1 id="weather-hero-title" className="weather-hero-seo-title">
+            Tempo em Pelotas hoje
           </h1>
+          <p className="weather-hero-headline">{heroCondition} agora em Pelotas.</p>
           <p className="weather-hero-description">{description}</p>
-          {cppmetForecast ? (
-            <p className="weather-hero-description-source">
-              Previsão elaborada pelo{" "}
-              <a href={cppmetForecast.sourceUrl} target="_blank" rel="noreferrer">
-                CPPMet/UFPel <span aria-hidden="true">↗</span>
-              </a>
-            </p>
-          ) : null}
 
           {today ? (
             <dl className="weather-hero-daily-facts" aria-label="Resumo da previsão de hoje">
               <div>
-                <dt>Máx. e mín. previstas</dt>
+                <dt>Mín. e máx. previstas</dt>
                 <dd>
-                  {today.max}° <small>/ {today.min}°</small>
+                  {today.min}° <small>/ {today.max}°</small>
                 </dd>
               </div>
               <div>
@@ -362,17 +250,17 @@ export function WeatherHero({
           className={`weather-hero-now${current.available ? "" : " is-unavailable"}`}
           aria-label={
             current.available
-              ? "Medição atual da Embrapa em Pelotas"
-              : "Medição atual da Embrapa indisponível"
+              ? "Condições para agora em Pelotas, com medição numérica observada e condição estimada"
+              : "Medição atual indisponível e previsão da próxima hora"
           }
         >
           <div className="weather-hero-now-heading">
             <div>
               <span>Pelotas, RS</span>
-              <small>{currentSourceMeta}</small>
+              <small>{currentUpdateMeta}</small>
             </div>
             <span className="weather-hero-live">
-              <i aria-hidden="true" /> {current.available ? "Medição" : "Indisponível"}
+              <i aria-hidden="true" /> {current.available ? "Agora" : "Indisponível"}
             </span>
           </div>
 
@@ -382,7 +270,7 @@ export function WeatherHero({
                 <div className="weather-hero-icon weather-hero-icon--condition">
                   <WeatherIcon
                     name={heroIcon}
-                    title={`Condição prevista para este período: ${heroCondition}`}
+                    title={`Condição estimada para agora: ${heroCondition}`}
                   />
                   <small>{heroCondition}</small>
                 </div>
@@ -437,7 +325,7 @@ export function WeatherHero({
                   <strong>{metricValue(nextHourForecast.temperature, "°")}</strong>
                   <div>
                     <span>Previsão da próxima hora</span>
-                    <small>Medição recente da Embrapa indisponível</small>
+                    <small>Medição recente indisponível</small>
                   </div>
                 </div>
               </div>
@@ -461,20 +349,14 @@ export function WeatherHero({
               </div>
 
               <div className="weather-hero-current-unavailable">
-                <p>
-                  Valores acima são de previsão meteorológica e não representam uma medição da
-                  estação.
-                </p>
-                <Link href="/estacao-embrapa-pelotas">Consultar a estação Embrapa</Link>
+                <p>Os valores acima são de previsão e não representam uma medição da estação.</p>
+                <Link href="/estacao-embrapa-pelotas">Consultar a estação</Link>
               </div>
             </>
           ) : (
             <div className="weather-hero-current-unavailable">
               <strong>Medição atual indisponível</strong>
-              <p>
-                A Embrapa não forneceu uma leitura recente e verificável. Nenhum valor de previsão
-                foi usado como condição atual.
-              </p>
+              <p>Nenhum valor previsto foi usado como condição observada.</p>
               <Link href="/estacao-embrapa-pelotas">Consultar a estação</Link>
             </div>
           )}
