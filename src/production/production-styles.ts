@@ -116,3 +116,4 @@ import "./styles/home-hourly-editorial-v40.css";
 import "./styles/home-hourly-condition-v41.css";
 import "./styles/home-hourly-spacing-fixes-v42.css";
 import "./styles/home-hero-edge-to-edge-v43.css";
+import "./styles/home-weekly-trend-v44.css";
