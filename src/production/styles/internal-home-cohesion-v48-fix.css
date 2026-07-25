@@ -1,0 +1,39 @@
+/* Complemento v48 — mantém todos os atalhos operacionais no rodapé interno. */
+
+.site-shell--topic .editorial-footer__operational {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 0;
+  padding: clamp(24px, 3vw, 40px) 0 0;
+  border: 0;
+  border-top: 1px solid var(--footer-line);
+}
+
+.site-shell--topic .editorial-footer__operational > .editorial-footer__eyebrow {
+  grid-column: 1 / -1;
+  margin: 0 0 12px;
+}
+
+.site-shell--topic .editorial-footer__operational-link {
+  min-height: 76px;
+  padding: 10px clamp(14px, 2vw, 24px);
+  border-bottom: 0;
+  border-right: 1px solid var(--footer-line);
+}
+
+.site-shell--topic .editorial-footer__operational-link:last-child {
+  border-right: 0;
+}
+
+@media (max-width: 760px) {
+  .site-shell--topic .editorial-footer__operational {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .site-shell--topic .editorial-footer__operational-link,
+  .site-shell--topic .editorial-footer__operational-link:last-child {
+    border-right: 0;
+    border-bottom: 1px solid var(--footer-line);
+  }
+}
