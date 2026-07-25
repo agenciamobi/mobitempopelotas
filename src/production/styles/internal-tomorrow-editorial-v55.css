@@ -1,0 +1,875 @@
+/* Internal v55 — planejamento editorial para /tempo-amanha-pelotas. */
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] {
+  --tomorrow-frame: min(calc(100vw - var(--portal-frame-gap)), var(--portal-frame-max));
+  --tomorrow-line: rgba(7, 30, 47, 0.105);
+  --tomorrow-navy: #071e2f;
+  --tomorrow-muted: #58717d;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial {
+  display: grid !important;
+  gap: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Primeira dobra. */
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-header {
+  min-height: clamp(440px, 43vw, 610px);
+  background:
+    radial-gradient(circle at 92% 8%, rgba(242, 112, 53, 0.09), transparent 28rem),
+    radial-gradient(circle at 7% 100%, rgba(24, 189, 205, 0.12), transparent 30rem),
+    linear-gradient(145deg, #f9fcfb 0%, #f6faf8 56%, #fbf6f2 100%) !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-header > div:first-child {
+  max-width: 950px;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-header h1 {
+  max-width: 950px;
+  font-size: clamp(3.1rem, 5.1vw, 5.8rem) !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-header p:not(.tomorrow-kicker) {
+  max-width: 730px;
+  font-size: clamp(1rem, 1.15vw, 1.12rem);
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-quality {
+  position: relative;
+  display: grid;
+  width: min(100%, 390px);
+  min-width: 0;
+  gap: 0;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.92) !important;
+  border-radius: 22px !important;
+  background: #fff !important;
+  box-shadow: 0 18px 42px rgba(7, 30, 47, 0.14) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-quality::before {
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, #18bdcd, #5e2ced, #f27035);
+  content: "";
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-quality > span {
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  gap: 9px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--tomorrow-line);
+  color: #617985;
+  font-size: 0.74rem;
+  font-weight: 760;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-quality > span:last-child {
+  border-bottom: 0;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-quality-label strong {
+  color: #071e2f;
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-quality-label svg {
+  width: 17px;
+  height: 17px;
+  color: #168f83;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-quality-low .tomorrow-quality-label svg {
+  color: #b91c1c;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-quality-medium .tomorrow-quality-label svg {
+  color: #a16207;
+}
+
+/* Navegação por capítulos. */
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-navigation {
+  display: flex;
+  width: var(--tomorrow-frame);
+  min-height: 58px;
+  margin: 18px auto 0;
+  padding: 6px;
+  overflow-x: auto;
+  border: 1px solid var(--tomorrow-line);
+  border-radius: 17px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 12px 30px rgba(7, 30, 47, 0.045);
+  scrollbar-width: none;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-navigation::-webkit-scrollbar {
+  display: none;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-navigation a {
+  display: inline-flex;
+  min-width: max-content;
+  min-height: 44px;
+  flex: 1 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  border-radius: 12px;
+  color: #526c78;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-navigation a:first-child {
+  background: #071e2f;
+  color: #fff;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-navigation a:hover,
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-navigation a:focus-visible {
+  background: rgba(242, 112, 53, 0.09);
+  color: #071e2f;
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-navigation a:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(242, 112, 53, 0.42);
+}
+
+/* Resumo do próximo dia. */
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-hero {
+  display: grid !important;
+  width: var(--tomorrow-frame);
+  min-height: 430px;
+  margin: clamp(24px, 3vw, 42px) auto 0 !important;
+  padding: 14px !important;
+  grid-template-columns: minmax(0, 1.18fr) minmax(330px, 0.82fr) !important;
+  gap: 14px !important;
+  border: 1px solid var(--tomorrow-line) !important;
+  border-radius: clamp(22px, 1.8vw, 30px) !important;
+  background:
+    radial-gradient(circle at 96% 5%, rgba(242, 112, 53, 0.075), transparent 22rem),
+    linear-gradient(150deg, #f8fbfa, #f5f2ef) !important;
+  color: #071e2f !important;
+  box-shadow: 0 20px 54px rgba(7, 30, 47, 0.075) !important;
+  scroll-margin-top: 112px;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-condition {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: clamp(22px, 3.5vw, 46px) !important;
+  overflow: hidden;
+  padding: clamp(30px, 4vw, 58px) !important;
+  border: 0 !important;
+  border-radius: clamp(18px, 1.5vw, 24px) !important;
+  background:
+    radial-gradient(circle at 87% 14%, rgba(24, 189, 205, 0.22), transparent 20rem),
+    radial-gradient(circle at 3% 100%, rgba(94, 44, 237, 0.15), transparent 20rem),
+    linear-gradient(145deg, #061a2a, #082d42 64%, #0b4257) !important;
+  color: #fff;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-condition::after {
+  position: absolute;
+  right: -92px;
+  bottom: -112px;
+  width: 265px;
+  height: 265px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 50%;
+  box-shadow: 0 0 0 42px rgba(255, 255, 255, 0.025);
+  content: "";
+  pointer-events: none;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-condition .tomorrow-kicker {
+  color: #78e6ee !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-condition h2 {
+  max-width: 620px;
+  color: #fff !important;
+  font-size: clamp(2.25rem, 3.5vw, 4.25rem) !important;
+  line-height: 0.98 !important;
+  text-wrap: balance;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-condition > div > span {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 0.86rem;
+  font-weight: 760;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-icon {
+  position: relative;
+  z-index: 1;
+  width: clamp(100px, 9vw, 136px) !important;
+  height: clamp(100px, 9vw, 136px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: clamp(26px, 2vw, 36px) !important;
+  background: rgba(255, 255, 255, 0.075) !important;
+  color: #79e8ef !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-icon svg {
+  width: clamp(58px, 5vw, 80px);
+  height: clamp(58px, 5vw, 80px);
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-temperature-panel {
+  display: grid;
+  min-width: 0;
+  align-content: center;
+  padding: clamp(28px, 3.5vw, 50px);
+  border: 1px solid rgba(7, 30, 47, 0.085);
+  border-radius: clamp(18px, 1.5vw, 24px);
+  background:
+    radial-gradient(circle at 95% 5%, rgba(242, 112, 53, 0.11), transparent 17rem),
+    rgba(255, 255, 255, 0.9);
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-temperature-panel > .tomorrow-kicker {
+  color: #a4431b;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-temperature-range {
+  display: grid;
+  margin: clamp(26px, 3vw, 42px) 0 0;
+  padding: 0 !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-temperature-range > div {
+  display: grid;
+  gap: 10px;
+  padding-right: clamp(18px, 2.5vw, 34px);
+  border-right: 1px solid var(--tomorrow-line);
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-temperature-range > div:last-child {
+  padding-right: 0;
+  padding-left: clamp(18px, 2.5vw, 34px);
+  border-right: 0;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-temperature-range dt {
+  color: #708690 !important;
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-temperature-range dd {
+  color: #071e2f;
+  font-size: clamp(3.5rem, 5vw, 5.6rem) !important;
+  font-weight: 760;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-temperature-panel > p:last-child {
+  max-width: 360px;
+  margin: clamp(24px, 3vw, 38px) 0 0;
+  color: #607984;
+  font-size: 0.78rem;
+  line-height: 1.65;
+}
+
+/* Aviso oficial. */
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-alert {
+  width: var(--tomorrow-frame);
+  min-height: 76px;
+  margin: 14px auto 0;
+  padding: 14px 18px !important;
+  border-color: rgba(242, 112, 53, 0.26) !important;
+  border-radius: 17px !important;
+  background: linear-gradient(90deg, rgba(242, 112, 53, 0.1), rgba(255, 255, 255, 0.84)) !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-alert a {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: #071e2f;
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Indicadores contínuos. */
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-metrics {
+  position: relative;
+  display: grid !important;
+  width: var(--tomorrow-frame);
+  margin: 14px auto 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  overflow: hidden;
+  border: 1px solid var(--tomorrow-line) !important;
+  border-radius: clamp(18px, 1.5vw, 24px) !important;
+  background: rgba(255, 255, 255, 0.84) !important;
+  box-shadow: 0 14px 36px rgba(7, 30, 47, 0.045) !important;
+  scroll-margin-top: 112px;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics article {
+  position: relative;
+  min-height: 180px !important;
+  padding: clamp(24px, 2.7vw, 38px) !important;
+  border: 0 !important;
+  border-right: 1px solid var(--tomorrow-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics article:last-child {
+  border-right: 0 !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics article::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: #18bdcd;
+  content: "";
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics article:nth-child(2)::before {
+  background: #5e2ced;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics article:nth-child(3)::before {
+  background: #f27035;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics article:nth-child(4)::before {
+  background: #e70b85;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics svg {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 18px;
+  color: #168fa3;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics span,
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics small {
+  color: #718892 !important;
+  font-size: 0.68rem !important;
+  font-weight: 760;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics strong {
+  color: #071e2f;
+  font-size: clamp(1.45rem, 2vw, 2.25rem) !important;
+  line-height: 1.1;
+}
+
+/* Planejamento numerado. */
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-planning {
+  position: relative;
+  width: var(--tomorrow-frame);
+  margin: clamp(42px, 5vw, 72px) auto 0 !important;
+  padding: clamp(44px, 5vw, 74px) var(--portal-content-gutter) !important;
+  overflow: hidden;
+  border: 1px solid var(--tomorrow-line) !important;
+  border-radius: clamp(22px, 1.8vw, 30px) !important;
+  background:
+    radial-gradient(circle at 94% 4%, rgba(242, 112, 53, 0.09), transparent 24rem),
+    linear-gradient(150deg, #f9fcfb, #f4f7f4) !important;
+  box-shadow: 0 18px 48px rgba(7, 30, 47, 0.055) !important;
+  scroll-margin-top: 112px;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-planning::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #18bdcd, #5e2ced 56%, #f27035);
+  content: "";
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-section-heading {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end !important;
+  gap: clamp(28px, 4vw, 62px) !important;
+  margin-bottom: clamp(30px, 4vw, 52px) !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-section-heading > div {
+  padding-left: clamp(15px, 1.6vw, 22px);
+  border-left: 3px solid #18bdcd;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-section-heading h2 {
+  max-width: 820px;
+  color: #071e2f;
+  font-size: clamp(2.35rem, 4vw, 4.5rem) !important;
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.062em;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-section-heading > a {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  padding: 0 15px;
+  border: 1px solid rgba(7, 30, 47, 0.11);
+  border-radius: 999px;
+  background: #fff;
+  color: #071e2f !important;
+  text-decoration: none;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 !important;
+  overflow: hidden;
+  border: 1px solid var(--tomorrow-line);
+  border-radius: 21px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid article {
+  position: relative;
+  min-height: 220px !important;
+  padding: clamp(26px, 3vw, 42px) !important;
+  border: 0 !important;
+  border-right: 1px solid var(--tomorrow-line) !important;
+  border-bottom: 1px solid var(--tomorrow-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid article:nth-child(2n) {
+  border-right: 0 !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid article:nth-last-child(-n + 2) {
+  border-bottom: 0 !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid article > span {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  margin-bottom: 24px;
+  place-items: center;
+  border-radius: 50%;
+  background: #071e2f;
+  color: #fff;
+  font-size: 0.66rem;
+  font-weight: 850;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid article:nth-child(2) > span {
+  background: #5e2ced;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid article:nth-child(3) > span {
+  background: #f27035;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid article:nth-child(4) > span {
+  background: #e70b85;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid strong {
+  color: #071e2f;
+  font-size: 1rem;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid p {
+  max-width: 54ch;
+  margin-top: 14px;
+  color: #58717d !important;
+  font-size: 0.82rem !important;
+  line-height: 1.7 !important;
+}
+
+/* FAQ institucional. */
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-faq {
+  position: relative;
+  width: var(--tomorrow-frame);
+  margin: clamp(42px, 5vw, 72px) auto 0 !important;
+  padding: clamp(44px, 5vw, 74px) var(--portal-content-gutter) !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: clamp(22px, 1.8vw, 30px) !important;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(94, 44, 237, 0.25), transparent 24rem),
+    radial-gradient(circle at 8% 92%, rgba(24, 189, 205, 0.18), transparent 24rem),
+    linear-gradient(142deg, #061a2a, #082b3e 66%, #09394b) !important;
+  color: #fff;
+  box-shadow: 0 24px 60px rgba(7, 30, 47, 0.17) !important;
+  scroll-margin-top: 112px;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-faq .tomorrow-section-heading > div {
+  border-left-color: #78e6ee;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-faq .tomorrow-kicker {
+  color: #78e6ee !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-faq .tomorrow-section-heading h2 {
+  color: #fff !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-faq .tomorrow-section-heading > p {
+  max-width: 420px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.8rem;
+  line-height: 1.65;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-faq-list {
+  display: grid;
+  gap: 10px !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-faq-list details {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.13) !important;
+  border-radius: 17px !important;
+  background: rgba(255, 255, 255, 0.065) !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-faq-list summary {
+  position: relative;
+  min-height: 64px;
+  padding: 20px 54px 20px 20px !important;
+  color: #fff !important;
+  font-size: 0.84rem;
+  font-weight: 800;
+  list-style: none;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-faq-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-faq-list summary::after {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  color: #78e6ee;
+  font-size: 1.2rem;
+  content: "+";
+  transform: translateY(-50%);
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-faq-list details[open] summary::after {
+  content: "−";
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-faq-list details[open] summary {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-faq-list p {
+  max-width: 80ch;
+  padding: 18px 20px 22px !important;
+  color: rgba(255, 255, 255, 0.72) !important;
+  font-size: 0.8rem !important;
+  line-height: 1.7 !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-faq-list summary:focus-visible {
+  outline: 3px solid rgba(120, 230, 238, 0.48);
+  outline-offset: -4px;
+}
+
+/* Continuidade e transparência. */
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links {
+  display: grid !important;
+  width: var(--tomorrow-frame);
+  margin: 18px auto 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  overflow: hidden;
+  border: 1px solid var(--tomorrow-line);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  scroll-margin-top: 112px;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links > a {
+  display: flex;
+  min-width: 0;
+  min-height: 104px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 22px !important;
+  border: 0 !important;
+  border-right: 1px solid var(--tomorrow-line) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #071e2f !important;
+  text-decoration: none;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links > a:last-child {
+  border-right: 0 !important;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links > a > span {
+  display: grid;
+  gap: 6px;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links small {
+  color: #a4431b;
+  font-size: 0.6rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links strong {
+  font-size: 0.88rem;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links svg {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 auto;
+  color: #5e2ced;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links > a:hover,
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links > a:focus-visible {
+  background: rgba(242, 112, 53, 0.06) !important;
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-source-note {
+  display: grid;
+  width: var(--tomorrow-frame);
+  min-height: 72px;
+  margin: 14px auto 0 !important;
+  padding: 16px 20px;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--tomorrow-line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.64);
+  color: #647c87;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-source-note > svg {
+  width: 22px;
+  height: 22px;
+  color: #a4431b;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-source-note > p {
+  margin: 0;
+  color: #647c87;
+  font-size: 0.7rem;
+  line-height: 1.55;
+}
+
+.site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > :is(.tomorrow-planning, .tomorrow-faq, .tomorrow-related-links, .tomorrow-source-note) {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 620px;
+}
+
+@media (max-width: 1120px) {
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.72fr) !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links > a:nth-child(2) {
+    border-right: 0 !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links > a:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--tomorrow-line) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-header {
+    min-height: 0;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-quality {
+    width: 100%;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-navigation {
+    width: calc(100vw - 20px);
+    margin-top: 10px;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-navigation a {
+    padding-inline: 15px;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-hero {
+    width: calc(100vw - 20px);
+    min-height: 0;
+    grid-template-columns: 1fr !important;
+    padding: 10px !important;
+    border-radius: 20px !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-condition {
+    min-height: 310px;
+    padding: 26px 22px !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-temperature-panel {
+    padding: 26px 22px;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-alert,
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-metrics,
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-planning,
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-faq,
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links,
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-source-note {
+    width: calc(100vw - 20px);
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics article:nth-child(2n) {
+    border-right: 0 !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics article:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--tomorrow-line) !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-section-heading {
+    grid-template-columns: 1fr !important;
+    align-items: start !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-section-heading > p {
+    max-width: 620px;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-planning,
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-faq {
+    padding: 42px 20px !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid article,
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid article:nth-child(2n),
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid article:nth-last-child(-n + 2) {
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--tomorrow-line) !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-guidance-grid article:last-child {
+    border-bottom: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-condition {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-icon {
+    width: 84px !important;
+    height: 84px !important;
+    border-radius: 22px !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-icon svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-temperature-range dd {
+    font-size: 3.2rem !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > .tomorrow-metrics,
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links {
+    grid-template-columns: 1fr !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics article,
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics article:nth-child(2n),
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links > a,
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links > a:nth-child(2),
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links > a:last-child {
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--tomorrow-line) !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-metrics article:last-child,
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-related-links > a:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-source-note {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] :is(
+      .tomorrow-navigation a,
+      .tomorrow-related-links > a
+    ) {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .site-shell--topic[data-topic="tempo-amanha-pelotas"] .tomorrow-page--editorial > :is(
+      .tomorrow-planning,
+      .tomorrow-faq,
+      .tomorrow-related-links,
+      .tomorrow-source-note
+    ) {
+    content-visibility: visible;
+  }
+}
