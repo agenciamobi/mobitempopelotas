@@ -9,12 +9,20 @@ import "./Header.css";
 type MenuId = "monitoring" | "water";
 
 const editorialPrimaryLinks = [
-  { label: "Agora", to: "/" },
-  { label: "Hoje", to: "/tempo-hoje-pelotas" },
-  { label: "Amanhã", to: "/tempo-amanha-pelotas" },
-  { label: "7 dias", to: "/previsao-7-dias-pelotas" },
-  { label: "Chuva", to: "/chuva-em-pelotas" },
-  { label: "Vento", to: "/vento-em-pelotas" },
+  { label: "Agora", ariaLabel: "Ver o tempo agora em Pelotas", to: "/" },
+  { label: "Hoje", ariaLabel: "Ver a previsão do tempo para hoje em Pelotas", to: "/tempo-hoje-pelotas" },
+  {
+    label: "Amanhã",
+    ariaLabel: "Ver a previsão do tempo para amanhã em Pelotas",
+    to: "/tempo-amanha-pelotas",
+  },
+  {
+    label: "7 dias",
+    ariaLabel: "Ver a previsão do tempo para os próximos 7 dias em Pelotas",
+    to: "/previsao-7-dias-pelotas",
+  },
+  { label: "Chuva", ariaLabel: "Ver a previsão de chuva em Pelotas", to: "/chuva-em-pelotas" },
+  { label: "Vento", ariaLabel: "Ver vento e rajadas em Pelotas", to: "/vento-em-pelotas" },
 ] as const;
 
 const megaMenus = [
@@ -118,11 +126,31 @@ const megaMenus = [
 ] as const;
 
 const mobileNavigation = [
-  { label: "Agora", to: "/", icon: "⌂" },
-  { label: "Hoje", to: "/tempo-hoje-pelotas", icon: "☀" },
-  { label: "7 dias", to: "/previsao-7-dias-pelotas", icon: "▦" },
-  { label: "Águas", to: "/situacao-hidrologica-pelotas", icon: "≈" },
-  { label: "Alertas", to: "/alertas", icon: "!" },
+  { label: "Agora", ariaLabel: "Tempo agora em Pelotas", to: "/", icon: "⌂" },
+  {
+    label: "Hoje",
+    ariaLabel: "Previsão do tempo para hoje em Pelotas",
+    to: "/tempo-hoje-pelotas",
+    icon: "☀",
+  },
+  {
+    label: "7 dias",
+    ariaLabel: "Previsão do tempo para 7 dias em Pelotas",
+    to: "/previsao-7-dias-pelotas",
+    icon: "▦",
+  },
+  {
+    label: "Águas",
+    ariaLabel: "Situação das águas em Pelotas e na Lagoa dos Patos",
+    to: "/situacao-hidrologica-pelotas",
+    icon: "≈",
+  },
+  {
+    label: "Alertas",
+    ariaLabel: "Avisos meteorológicos oficiais para Pelotas",
+    to: "/alertas",
+    icon: "!",
+  },
 ] as const;
 
 function isActivePath(pathname: string, to: string) {
@@ -177,8 +205,15 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
             </div>
 
             <nav className="editorial-utility-navigation" aria-label="Links institucionais">
-              <Link to="/metodologia">Fontes e metodologia</Link>
-              <Link to="/cameras-ao-vivo-pelotas">Câmeras ao vivo</Link>
+              <Link to="/metodologia" aria-label="Conhecer as fontes e a metodologia do Tempo Pelotas">
+                Fontes e metodologia
+              </Link>
+              <Link
+                to="/cameras-ao-vivo-pelotas"
+                aria-label="Ver câmeras ao vivo de Pelotas e região"
+              >
+                Câmeras ao vivo
+              </Link>
             </nav>
           </div>
         </div>
@@ -190,8 +225,11 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
                 className="production-brand-logo"
                 src="/brand/tempo-pelotas-purple.svg"
                 alt=""
-                width={10694}
-                height={1552}
+                width={344}
+                height={50}
+                loading="eager"
+                decoding="async"
+                fetchPriority="high"
                 draggable={false}
               />
             </Link>
@@ -208,7 +246,7 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
             <Link
               className={`production-alert-link is-${advisoryLevel}${alertsActive ? " is-active" : ""}`}
               to="/alertas"
-              aria-label="Consultar avisos oficiais"
+              aria-label="Consultar avisos meteorológicos oficiais para Pelotas"
               aria-current={alertsActive ? "page" : undefined}
             >
               <span className="production-alert-icon" aria-hidden="true">
@@ -233,6 +271,7 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
                     key={item.to}
                     to={item.to}
                     className={active ? "is-active" : undefined}
+                    aria-label={item.ariaLabel}
                     aria-current={active ? "page" : undefined}
                   >
                     {item.label}
@@ -272,6 +311,7 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
                       className={`mega-navigation-trigger${isActive ? " is-active" : ""}${isOpen ? " is-open" : ""}`}
                       type="button"
                       aria-expanded={isOpen}
+                      aria-haspopup="true"
                       aria-controls={`mega-menu-${menu.id}`}
                       onClick={() =>
                         setOpenMenu((current) => (current === menu.id ? null : menu.id))
@@ -293,6 +333,10 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
                         <Link
                           className={`mega-navigation-feature is-${menu.id}`}
                           to={menu.featured.to}
+                          aria-label={`${menu.featured.label}. ${menu.featured.description}`}
+                          aria-current={
+                            isActivePath(pathname, menu.featured.to) ? "page" : undefined
+                          }
                         >
                           <small>{menu.featured.eyebrow}</small>
                           <strong>{menu.featured.label}</strong>
@@ -308,7 +352,14 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
                               <h2>{section.title}</h2>
                               <div>
                                 {section.links.map((link) => (
-                                  <Link to={link.to} key={link.to}>
+                                  <Link
+                                    to={link.to}
+                                    key={link.to}
+                                    aria-label={`${link.label}. ${link.description}`}
+                                    aria-current={
+                                      isActivePath(pathname, link.to) ? "page" : undefined
+                                    }
+                                  >
                                     <span aria-hidden="true" />
                                     <strong>{link.label}</strong>
                                     <small>{link.description}</small>
@@ -340,6 +391,7 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
               key={item.to}
               to={item.to}
               className={active ? "is-active" : undefined}
+              aria-label={item.ariaLabel}
               aria-current={active ? "page" : undefined}
             >
               <span aria-hidden="true">{item.icon}</span>
