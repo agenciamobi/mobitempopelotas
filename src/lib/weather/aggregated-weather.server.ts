@@ -1,5 +1,5 @@
 import { fetchOfficialWeatherSources } from "./official-sources.server";
-import type { EmbrapaObservation } from "./official-sources.types";
+import type { EmbrapaObservation, InmetForecastPeriod } from "./official-sources.types";
 import { fetchPelotasWeather, type WeatherBaselineData } from "./weather-baseline.server";
 import type { CurrentWeather, DailyForecast, ForecastSourceKey, WeatherHomeData } from "./types";
 import type {
@@ -123,7 +123,6 @@ function compareCurrentSources(
     scope: "current",
     field: "windSpeed",
     referenceSource: referenceKey,
-
     comparisonSource: "embrapa",
     referenceValue: baseline.windSpeed,
     comparisonValue: observation.current.windSpeed,
@@ -217,21 +216,85 @@ function compareDailyForecasts(
   return discrepancies;
 }
 
+function compareInmetForecasts(
+  daily: DailyForecast[],
+  periods: InmetForecastPeriod[],
+  referenceKey: ForecastSourceKey,
+) {
+  const discrepancies: WeatherDiscrepancy[] = [];
+  const dailyByDate = new Map(daily.map((day) => [day.date.slice(0, 10), day]));
+  const officialByDate = new Map<string, { minimum: number | null; maximum: number | null }>();
+
+  for (const period of periods) {
+    if (!period.date) continue;
+    const current = officialByDate.get(period.date) ?? { minimum: null, maximum: null };
+    const minimum =
+      period.minimum === null
+        ? current.minimum
+        : current.minimum === null
+          ? period.minimum
+          : Math.min(current.minimum, period.minimum);
+    const maximum =
+      period.maximum === null
+        ? current.maximum
+        : current.maximum === null
+          ? period.maximum
+          : Math.max(current.maximum, period.maximum);
+    officialByDate.set(period.date, { minimum, maximum });
+  }
+
+  for (const [date, officialDay] of officialByDate) {
+    const baselineDay = dailyByDate.get(date);
+    if (!baselineDay) continue;
+
+    addDiscrepancy(discrepancies, {
+      scope: "daily",
+      field: "minimum",
+      referenceSource: referenceKey,
+      comparisonSource: "inmet",
+      referenceValue: baselineDay.min,
+      comparisonValue: officialDay.minimum,
+      noticeThreshold: 3,
+      significantThreshold: 5,
+      unit: "°C",
+      day: date,
+    });
+    addDiscrepancy(discrepancies, {
+      scope: "daily",
+      field: "maximum",
+      referenceSource: referenceKey,
+      comparisonSource: "inmet",
+      referenceValue: baselineDay.max,
+      comparisonValue: officialDay.maximum,
+      noticeThreshold: 3,
+      significantThreshold: 5,
+      unit: "°C",
+      day: date,
+    });
+  }
+
+  return discrepancies;
+}
+
 function calculateQualityScore(options: {
   baseline: WeatherHomeData;
   embrapaUsable: boolean;
   embrapaStatus: EmbrapaObservation["status"];
-  inmetLive: boolean;
+  inmetAlertsLive: boolean;
+  inmetForecastLive: boolean;
+  inmetStationLive: boolean;
   cppmetLive: boolean;
   discrepancies: WeatherDiscrepancy[];
 }) {
   let score = 0;
-  if (options.baseline.current) score += 35;
+  if (options.baseline.current) score += 30;
   if (options.baseline.hourly.length > 0) score += 10;
   if (options.baseline.daily.length > 0) score += 15;
   if (options.embrapaUsable) score += options.embrapaStatus === "live" ? 20 : 12;
-  if (options.inmetLive) score += 10;
-  if (options.cppmetLive) score += 10;
+  if (options.inmetAlertsLive) score += 5;
+  if (options.inmetForecastLive) score += 10;
+  if (options.inmetStationLive) score += 5;
+  if (options.cppmetLive) score += 5;
 
   const notices = options.discrepancies.filter((item) => item.severity === "notice").length;
   const significant = options.discrepancies.filter(
@@ -259,6 +322,15 @@ function createSources(
     observation.status !== "unavailable" &&
     observationAgeMinutes !== null &&
     observationAgeMinutes > OBSERVATION_MAX_AGE_MINUTES;
+  const inmetServices = [official.inmet, official.inmetForecast, official.inmetStation];
+  const inmetLiveCount = inmetServices.filter((source) => source.status === "live").length;
+  const inmetErrors = Array.from(
+    new Set(inmetServices.map((source) => source.error).filter((error): error is string => Boolean(error))),
+  );
+  const inmetFetchedAt = inmetServices
+    .map((source) => source.source.fetchedAt)
+    .sort()
+    .at(-1) ?? new Date().toISOString();
 
   return {
     "open-meteo": createProviderHealth(baseline.providers["open-meteo"], "open-meteo"),
@@ -275,11 +347,11 @@ function createSources(
     },
     inmet: {
       source: "inmet",
-      status: official.inmet.status,
-      role: "alerts",
-      fetchedAt: official.inmet.source.fetchedAt,
-      usable: official.inmet.status === "live",
-      reason: official.inmet.error,
+      status: inmetLiveCount === inmetServices.length ? "live" : inmetLiveCount > 0 ? "partial" : "unavailable",
+      role: "official",
+      fetchedAt: inmetFetchedAt,
+      usable: inmetLiveCount > 0,
+      reason: inmetErrors.length ? inmetErrors.join(" ") : null,
     },
     cppmet: {
       source: "cppmet",
@@ -299,6 +371,8 @@ function buildNotes(options: {
   usingContingency: boolean;
   sources: Record<WeatherSourceKey, WeatherSourceHealth>;
   discrepancies: WeatherDiscrepancy[];
+  inmetForecastLive: boolean;
+  inmetStationName: string | null;
 }) {
   const notes: string[] = [];
 
@@ -310,16 +384,12 @@ function buildNotes(options: {
     );
   }
   if (options.usingContingency) {
-    notes.push(
-      "Open-Meteo não respondeu; a previsão foi assumida pela contingência do MET Norway.",
-    );
+    notes.push("Open-Meteo não respondeu; a previsão foi assumida pela contingência do MET Norway.");
   } else {
     const contingencyKey: ForecastSourceKey =
       options.selectedForecastKey === "open-meteo" ? "met-norway" : "open-meteo";
     if (!options.sources[contingencyKey].usable) {
-      notes.push(
-        "Contingência do MET Norway indisponível no momento; Open-Meteo segue como fonte ativa.",
-      );
+      notes.push("Contingência do MET Norway indisponível no momento; Open-Meteo segue como fonte ativa.");
     }
   }
   if (options.sources.embrapa.status === "stale") {
@@ -327,7 +397,17 @@ function buildNotes(options: {
       "Última leitura da Embrapa está desatualizada; nenhum valor de modelo foi apresentado como observação.",
     );
   }
-
+  if (options.inmetForecastLive) {
+    notes.push("A previsão oficial municipal do INMET complementa a grade horária do Open-Meteo.");
+  }
+  if (options.inmetStationName) {
+    notes.push(
+      `O INMET identificou ${options.inmetStationName} como estação de referência; seus metadados não substituem a medição local da Embrapa.`,
+    );
+  }
+  if (options.sources.cppmet.usable) {
+    notes.push("O CPPMet/UFPel permanece como contexto meteorológico regional.");
+  }
   if (options.discrepancies.length > 0) {
     notes.push("Foram detectadas diferenças relevantes entre as fontes disponíveis.");
   }
@@ -370,6 +450,7 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
 
   const discrepancies = [
     ...compareCurrentSources(baseline.current, observation, embrapaUsable, baseline.source.key),
+    ...compareInmetForecasts(baseline.daily, official.inmetForecast.periods, baseline.source.key),
     ...compareDailyForecasts(baseline.daily, official.cppmet.items, baseline.source.key),
   ];
   const sources = createSources(
@@ -384,7 +465,9 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     baseline,
     embrapaUsable,
     embrapaStatus: observation.status,
-    inmetLive: official.inmet.status === "live",
+    inmetAlertsLive: official.inmet.status === "live",
+    inmetForecastLive: official.inmetForecast.status === "live",
+    inmetStationLive: official.inmetStation.status === "live",
     cppmetLive: official.cppmet.status === "live",
     discrepancies,
   });
@@ -413,6 +496,8 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
     daily: baseline.daily,
     observation,
     alerts: official.inmet.alerts,
+    inmetForecast: official.inmetForecast.periods,
+    inmetStation: official.inmetStation.station,
     officialForecast: official.cppmet.items,
     sources,
     quality: {
@@ -431,6 +516,8 @@ export async function fetchAggregatedPelotasWeather(): Promise<AggregatedWeather
         usingContingency,
         sources,
         discrepancies,
+        inmetForecastLive: official.inmetForecast.status === "live",
+        inmetStationName: official.inmetStation.station?.name ?? null,
       }),
     },
     source: {
