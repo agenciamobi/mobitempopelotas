@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { WeatherHistoryPage } from "@/components/history/WeatherHistoryPage";
+import { HISTORY_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
-import { createEditorialPageJsonLd } from "@/lib/structured-data";
+import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 import { getPelotasWeatherHistory } from "@/lib/weather/history.functions";
 
 const PAGE_TITLE = "Como foi o tempo nos últimos 30 dias em Pelotas";
@@ -21,8 +23,15 @@ export const Route = createFileRoute("/historico-climatico-pelotas")({
           { name: "Início", path: "/" },
           { name: "Histórico climático recente", path: PAGE_PATH },
         ],
-        about: ["Histórico meteorológico de Pelotas", "Chuva e temperatura recentes"],
+        about: [
+          "Histórico meteorológico de Pelotas",
+          "Chuva e temperatura recentes",
+          "Rajadas de vento observadas",
+          "Últimos 30 dias em Pelotas",
+          "Dados meteorológicos históricos",
+        ],
       }),
+      createFaqPageJsonLd(PAGE_PATH, HISTORY_EDITORIAL_CONTENT.faqs),
     ]),
   loader: () => getPelotasWeatherHistory(),
   staleTime: 6 * 60 * 60 * 1_000,
@@ -31,5 +40,11 @@ export const Route = createFileRoute("/historico-climatico-pelotas")({
 
 function HistoricoClimaticoPage() {
   const history = Route.useLoaderData();
-  return <WeatherHistoryPage history={history} />;
+
+  return (
+    <>
+      <WeatherHistoryPage history={history} />
+      <EditorialContentSection id="como-interpretar-historico-recente" content={HISTORY_EDITORIAL_CONTENT} />
+    </>
+  );
 }
