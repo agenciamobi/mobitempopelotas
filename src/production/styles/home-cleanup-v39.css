@@ -1,0 +1,76 @@
+/* Home v39 — limpeza editorial, sem alterar a rastreabilidade da página de metodologia. */
+
+.site-shell--home-editorial .weather-hero-seo-title {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  border: 0 !important;
+  margin: -1px !important;
+  white-space: nowrap !important;
+}
+
+.site-shell--home-editorial .weather-hero-headline {
+  max-width: 710px;
+  margin: 0;
+  color: #5e2ced;
+  font-size: clamp(2.9rem, 4.65vw, 4.95rem);
+  font-weight: 790;
+  line-height: 0.95;
+  letter-spacing: -0.068em;
+  text-wrap: balance;
+}
+
+.site-shell--home-editorial .weather-hero--attention .weather-hero-headline,
+.site-shell--home-editorial .weather-hero--warning .weather-hero-headline {
+  color: #c94f28;
+}
+
+.site-shell--home-editorial .inmet-official-footer {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+.site-shell--home-editorial .inmet-official-footer > div:first-child {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.site-shell--home-editorial .inmet-official-footer > div:first-child strong,
+.site-shell--home-editorial .inmet-official-footer > div:first-child span {
+  display: inline;
+  max-width: none;
+}
+
+.site-shell--home-editorial .inmet-official-footer > div:last-child {
+  display: none !important;
+}
+
+@media (max-width: 1180px) and (min-width: 901px) {
+  .site-shell--home-editorial .weather-hero-headline {
+    font-size: clamp(2.7rem, 4.35vw, 4.15rem);
+  }
+}
+
+@media (max-width: 900px) {
+  .site-shell--home-editorial .weather-hero-headline {
+    font-size: clamp(2.55rem, 8.7vw, 3.9rem);
+  }
+}
+
+@media (max-width: 680px) {
+  .site-shell--home-editorial .weather-hero-headline {
+    font-size: clamp(2.2rem, 10vw, 3rem);
+  }
+
+  .site-shell--home-editorial .inmet-official-footer > div:first-child {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
