@@ -81,9 +81,12 @@ test("consulta primeiro a MetSul e mantém a Usina do Gasômetro como contingên
   assert.match(source, /Cota de transbordamento|FLOOD_REFERENCE_METERS = 3/);
 });
 
-test("a homepage identifica visualmente qual régua e fonte estão em uso", () => {
+test("a homepage identifica apenas a régua usada, sem expor o provedor no rótulo", () => {
   assert.match(semanticDashboard, /guaibaReferenceLabel/);
-  assert.match(semanticDashboard, /dashboardProps\.guaiba\.station/);
-  assert.match(semanticDashboard, /dashboardProps\.guaiba\.source\.name/);
+  assert.match(semanticDashboard, /guaibaReferenceLabel:\s*dashboardProps\.guaiba\.station/);
+  assert.doesNotMatch(
+    semanticDashboard,
+    /guaibaReferenceLabel:[^\n]*dashboardProps\.guaiba\.source\.name/,
+  );
   assert.match(semanticDashboard, /normalizedText === "Referência adicional"/);
 });
