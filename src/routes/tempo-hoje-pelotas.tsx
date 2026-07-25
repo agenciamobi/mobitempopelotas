@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { TodayForecastPage } from "@/components/weather/ForecastPages";
+import { TODAY_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
-import { createEditorialPageJsonLd } from "@/lib/structured-data";
+import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 const PAGE_TITLE = "Tempo hoje em Pelotas";
@@ -21,8 +23,14 @@ export const Route = createFileRoute("/tempo-hoje-pelotas")({
           { name: "Início", path: "/" },
           { name: "Tempo hoje em Pelotas", path: PAGE_PATH },
         ],
-        about: ["Previsão do tempo", "Condições meteorológicas em Pelotas"],
+        about: [
+          "Previsão do tempo",
+          "Condições meteorológicas em Pelotas",
+          "Temperatura atual em Pelotas",
+          "Previsão por hora em Pelotas",
+        ],
       }),
+      createFaqPageJsonLd(PAGE_PATH, TODAY_EDITORIAL_CONTENT.faqs),
     ]),
   loader: () => getWeatherIntelligence(),
   staleTime: 5 * 60 * 1_000,
@@ -31,5 +39,11 @@ export const Route = createFileRoute("/tempo-hoje-pelotas")({
 
 function TempoHojePage() {
   const weather = Route.useLoaderData();
-  return <TodayForecastPage data={weather} />;
+
+  return (
+    <>
+      <TodayForecastPage data={weather} />
+      <EditorialContentSection id="como-interpretar-hoje" content={TODAY_EDITORIAL_CONTENT} />
+    </>
+  );
 }
