@@ -10,6 +10,10 @@ const tomorrowCss = readFileSync(
   "src/production/styles/internal-tomorrow-editorial-v55.css",
   "utf8",
 );
+const tomorrowFixCss = readFileSync(
+  "src/production/styles/internal-tomorrow-editorial-v55-fix.css",
+  "utf8",
+);
 const cssEntry = readFileSync("src/production/production-styles.css", "utf8");
 const tsEntry = readFileSync("src/production/production-styles.ts", "utf8");
 
@@ -60,14 +64,22 @@ test("tomorrow editorial CSS is route scoped and follows the internal visual sys
   );
 });
 
-test("tomorrow editorial layer follows today layer in both production entries", () => {
+test("tomorrow metrics remain a compact continuous strip", () => {
+  assert.match(tomorrowFixCss, /\.tomorrow-page--editorial[\s\S]*> \.tomorrow-metrics/);
+  assert.match(tomorrowFixCss, /padding:\s*0 !important/);
+});
+
+test("tomorrow editorial layers follow today layer in both production entries", () => {
   const todayLayer = "internal-today-editorial-v54.css";
   const tomorrowLayer = "internal-tomorrow-editorial-v55.css";
+  const tomorrowFixLayer = "internal-tomorrow-editorial-v55-fix.css";
 
-  assert.match(cssEntry, new RegExp(tomorrowLayer.replace(".", "\\.")));
-  assert.match(tsEntry, new RegExp(tomorrowLayer.replace(".", "\\.")));
+  assert.match(cssEntry, new RegExp(tomorrowFixLayer.replace(".", "\\.")));
+  assert.match(tsEntry, new RegExp(tomorrowFixLayer.replace(".", "\\.")));
   assert.ok(cssEntry.indexOf(todayLayer) < cssEntry.indexOf(tomorrowLayer));
+  assert.ok(cssEntry.indexOf(tomorrowLayer) < cssEntry.indexOf(tomorrowFixLayer));
   assert.ok(tsEntry.indexOf(todayLayer) < tsEntry.indexOf(tomorrowLayer));
+  assert.ok(tsEntry.indexOf(tomorrowLayer) < tsEntry.indexOf(tomorrowFixLayer));
 });
 
 test("tomorrow page remains usable on tablet, mobile and reduced-motion settings", () => {
