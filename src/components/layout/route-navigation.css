@@ -1,0 +1,60 @@
+/* Feedback de navegação sem duplicar shell, header ou conteúdo. */
+.route-navigation-progress {
+  position: fixed;
+  z-index: 100000;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  overflow: hidden;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.route-navigation-progress.is-visible {
+  opacity: 1;
+}
+
+.route-navigation-progress > span {
+  display: block;
+  width: 42%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #18bdcd, #5e2ced 58%, #e70b85);
+  box-shadow: 0 0 12px rgba(24, 189, 205, 0.42);
+  transform: translateX(-110%);
+  animation: route-navigation-progress 920ms cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+
+.site-shell[data-route-loading="true"] .site-main {
+  cursor: progress;
+}
+
+@keyframes route-navigation-progress {
+  0% {
+    transform: translateX(-110%);
+  }
+
+  55% {
+    width: 58%;
+  }
+
+  100% {
+    width: 42%;
+    transform: translateX(255%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-navigation-progress {
+    transition: none;
+  }
+
+  .route-navigation-progress > span {
+    width: 100%;
+    animation: none;
+    transform: none;
+  }
+}
