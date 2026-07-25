@@ -1,0 +1,6 @@
+/* Complemento v55 — impede que a régua genérica de capítulos crie padding na faixa de indicadores. */
+.site-shell--topic[data-topic="tempo-amanha-pelotas"]
+  .tomorrow-page--editorial
+  > .tomorrow-metrics {
+  padding: 0 !important;
+}
