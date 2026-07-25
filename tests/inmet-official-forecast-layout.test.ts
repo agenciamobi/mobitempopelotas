@@ -12,7 +12,7 @@ const refinement = readFileSync(
 );
 
 test("official INMET forecast heading keeps only the essential title and description", () => {
-  assert.match(component, /<h2 id="inmet-official-title">Previsão oficial para Pelotas<\/h2>/);
+  assert.match(component, /<h2 id="inmet-official-title">Previsão do tempo para Pelotas<\/h2>/);
   assert.doesNotMatch(component, />INMET<\/strong>/);
   assert.doesNotMatch(component, /Previsão municipal oficial/);
   assert.doesNotMatch(component, /Município monitorado/);
