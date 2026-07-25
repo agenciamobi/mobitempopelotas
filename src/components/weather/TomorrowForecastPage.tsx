@@ -3,12 +3,14 @@ import {
   AlertTriangle,
   ArrowLeft,
   ArrowRight,
+  CheckCircle2,
   Cloud,
   CloudLightning,
   CloudMoon,
   CloudRain,
   CloudSun,
   Droplets,
+  Info,
   Moon,
   Sun,
   Thermometer,
@@ -140,16 +142,16 @@ export function TomorrowForecastPage({ data }: { data: WeatherIntelligenceData }
   };
 
   return (
-    <div className="tomorrow-page">
+    <div className="tomorrow-page tomorrow-page--editorial">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema).replace(/</g, "\u003c") }}
       />
 
       <header className="tomorrow-header">
         <div>
-          <Link className="tomorrow-back-link" to="/">
-            <ArrowLeft aria-hidden="true" /> Tempo agora
+          <Link className="tomorrow-back-link" to="/tempo-hoje-pelotas">
+            <ArrowLeft aria-hidden="true" /> Previsão de hoje
           </Link>
           <p className="tomorrow-kicker">Previsão para o próximo dia</p>
           <h1>Tempo amanhã em Pelotas: {condition.toLocaleLowerCase("pt-BR")}</h1>
@@ -159,14 +161,36 @@ export function TomorrowForecastPage({ data }: { data: WeatherIntelligenceData }
           </p>
         </div>
 
-        <div className="tomorrow-quality" aria-label="Qualidade dos dados meteorológicos">
-          <strong>{confidenceLabels[weather.quality.confidence]}</strong>
+        <div
+          className={`tomorrow-quality tomorrow-quality-${weather.quality.confidence}`}
+          aria-label="Qualidade dos dados meteorológicos"
+        >
+          <span className="tomorrow-quality-label">
+            {weather.quality.confidence === "high" ? (
+              <CheckCircle2 aria-hidden="true" />
+            ) : (
+              <Info aria-hidden="true" />
+            )}
+            <strong>{confidenceLabels[weather.quality.confidence]}</strong>
+          </span>
           <span>Índice {weather.quality.score}/100</span>
           <span>{weather.quality.forecastProvider ?? "Modelo meteorológico disponível"}</span>
         </div>
       </header>
 
-      <section className="tomorrow-hero" aria-labelledby="tomorrow-condition-title">
+      <nav className="tomorrow-navigation" aria-label="Navegação da previsão de amanhã">
+        <a href="#resumo-amanha">Resumo</a>
+        <a href="#indicadores-amanha">Indicadores</a>
+        <a href="#planejamento-amanha">Planejamento</a>
+        <a href="#perguntas-amanha">Perguntas</a>
+        <a href="#proximos-passos-amanha">Continue consultando</a>
+      </nav>
+
+      <section
+        className="tomorrow-hero"
+        id="resumo-amanha"
+        aria-labelledby="tomorrow-condition-title"
+      >
         <div className="tomorrow-condition">
           <span className="tomorrow-icon">
             <WeatherIcon name={tomorrow.icon} size={72} />
@@ -178,16 +202,22 @@ export function TomorrowForecastPage({ data }: { data: WeatherIntelligenceData }
           </div>
         </div>
 
-        <dl className="tomorrow-temperature-range">
-          <div>
-            <dt>Máxima</dt>
-            <dd>{tomorrow.max}°</dd>
-          </div>
-          <div>
-            <dt>Mínima</dt>
-            <dd>{tomorrow.min}°</dd>
-          </div>
-        </dl>
+        <div className="tomorrow-temperature-panel">
+          <p className="tomorrow-kicker">Faixa térmica prevista</p>
+          <dl className="tomorrow-temperature-range" aria-label="Temperaturas previstas para amanhã">
+            <div>
+              <dt>Máxima</dt>
+              <dd>{tomorrow.max}°</dd>
+            </div>
+            <div>
+              <dt>Mínima</dt>
+              <dd>{tomorrow.min}°</dd>
+            </div>
+          </dl>
+          <p>
+            Amplitude de {amplitude}°C entre a menor e a maior temperatura previstas para o dia.
+          </p>
+        </div>
       </section>
 
       {relevantAlert ? (
@@ -205,7 +235,11 @@ export function TomorrowForecastPage({ data }: { data: WeatherIntelligenceData }
         </section>
       ) : null}
 
-      <section className="tomorrow-metrics" aria-label="Resumo da previsão para amanhã">
+      <section
+        className="tomorrow-metrics"
+        id="indicadores-amanha"
+        aria-label="Resumo da previsão para amanhã"
+      >
         <article>
           <Droplets aria-hidden="true" />
           <span>Chance de chuva</span>
@@ -236,7 +270,11 @@ export function TomorrowForecastPage({ data }: { data: WeatherIntelligenceData }
         </article>
       </section>
 
-      <section className="tomorrow-section" aria-labelledby="tomorrow-planning-title">
+      <section
+        className="tomorrow-section tomorrow-planning"
+        id="planejamento-amanha"
+        aria-labelledby="tomorrow-planning-title"
+      >
         <div className="tomorrow-section-heading">
           <div>
             <p className="tomorrow-kicker">Planejamento do próximo dia</p>
@@ -247,14 +285,17 @@ export function TomorrowForecastPage({ data }: { data: WeatherIntelligenceData }
 
         <div className="tomorrow-guidance-grid">
           <article>
+            <span>01</span>
             <strong>Chuva e volume</strong>
             <p>{rainAnswer(tomorrow)}</p>
           </article>
           <article>
+            <span>02</span>
             <strong>Vento e rajadas</strong>
             <p>{windAnswer(tomorrow)}</p>
           </article>
           <article>
+            <span>03</span>
             <strong>Comparação com hoje</strong>
             <p>
               {today
@@ -263,6 +304,7 @@ export function TomorrowForecastPage({ data }: { data: WeatherIntelligenceData }
             </p>
           </article>
           <article>
+            <span>04</span>
             <strong>Atualizações</strong>
             <p>
               A previsão pode mudar conforme novas rodadas dos modelos. Consulte novamente antes de
@@ -272,12 +314,17 @@ export function TomorrowForecastPage({ data }: { data: WeatherIntelligenceData }
         </div>
       </section>
 
-      <section className="tomorrow-section" aria-labelledby="tomorrow-faq-title">
+      <section
+        className="tomorrow-section tomorrow-faq"
+        id="perguntas-amanha"
+        aria-labelledby="tomorrow-faq-title"
+      >
         <div className="tomorrow-section-heading">
           <div>
             <p className="tomorrow-kicker">Dúvidas comuns</p>
             <h2 id="tomorrow-faq-title">Perguntas sobre o tempo de amanhã</h2>
           </div>
+          <p>Respostas diretas com base nos valores publicados pela previsão ativa.</p>
         </div>
 
         <div className="tomorrow-faq-list">
@@ -290,23 +337,49 @@ export function TomorrowForecastPage({ data }: { data: WeatherIntelligenceData }
         </div>
       </section>
 
-      <div className="tomorrow-related-links" aria-label="Outras previsões">
+      <nav
+        className="tomorrow-related-links"
+        id="proximos-passos-amanha"
+        aria-label="Outras previsões"
+      >
         <Link to="/tempo-hoje-pelotas">
-          Previsão de hoje <ArrowRight aria-hidden="true" />
+          <span>
+            <small>Condição atual</small>
+            <strong>Previsão de hoje</strong>
+          </span>
+          <ArrowRight aria-hidden="true" />
+        </Link>
+        <Link to="/previsao-7-dias-pelotas">
+          <span>
+            <small>Planejamento</small>
+            <strong>Previsão para 7 dias</strong>
+          </span>
+          <ArrowRight aria-hidden="true" />
         </Link>
         <Link to="/chuva-em-pelotas">
-          Chuva em Pelotas <ArrowRight aria-hidden="true" />
+          <span>
+            <small>Precipitação</small>
+            <strong>Chuva em Pelotas</strong>
+          </span>
+          <ArrowRight aria-hidden="true" />
         </Link>
         <Link to="/vento-em-pelotas">
-          Vento e rajadas <ArrowRight aria-hidden="true" />
+          <span>
+            <small>Condição regional</small>
+            <strong>Vento e rajadas</strong>
+          </span>
+          <ArrowRight aria-hidden="true" />
         </Link>
-      </div>
+      </nav>
 
-      <p className="tomorrow-source-note">
-        Previsão consolidada em {formatFetchedAt(weather.source.fetchedAt)}. Fonte principal:{" "}
-        {weather.quality.forecastProvider ?? "modelo meteorológico disponível"}, enriquecida com
-        fontes oficiais e regionais quando disponíveis.
-      </p>
+      <aside className="tomorrow-source-note" aria-label="Origem e atualização dos dados">
+        <Info aria-hidden="true" />
+        <p>
+          Previsão consolidada em {formatFetchedAt(weather.source.fetchedAt)}. Fonte principal: {" "}
+          {weather.quality.forecastProvider ?? "modelo meteorológico disponível"}, enriquecida com
+          fontes oficiais e regionais quando disponíveis.
+        </p>
+      </aside>
     </div>
   );
 }
