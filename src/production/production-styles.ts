@@ -112,3 +112,4 @@ import "./styles/inmet-editorial-v36.css";
 import "./styles/home-supporting-editorial-v37.css";
 import "./styles/home-hero-astronomy-v38.css";
 import "./styles/home-cleanup-v39.css";
+import "./styles/home-hourly-editorial-v40.css";
