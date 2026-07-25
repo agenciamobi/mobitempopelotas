@@ -1,0 +1,96 @@
+/* Hero v38 — informações solares, lunares e sazonais no card Agora. */
+
+.site-shell--home-editorial .weather-hero-astronomy {
+  display: grid;
+  gap: 10px;
+  margin-top: 0;
+  padding-top: 14px;
+  border-top: 1px solid rgba(7, 30, 47, 0.1);
+}
+
+.site-shell--home-editorial .weather-hero-astronomy-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+}
+
+.site-shell--home-editorial .weather-hero-astronomy-item {
+  display: grid;
+  min-width: 0;
+  min-height: 78px;
+  align-content: center;
+  justify-items: center;
+  gap: 4px;
+  padding: 8px 6px;
+  border-right: 1px solid rgba(7, 30, 47, 0.09);
+  text-align: center;
+}
+
+.site-shell--home-editorial .weather-hero-astronomy-item:last-child {
+  border-right: 0;
+}
+
+.site-shell--home-editorial .weather-hero-astronomy-item svg {
+  width: 23px;
+  height: 23px;
+  margin-bottom: 2px;
+  fill: none;
+  stroke: #087c8a;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.site-shell--home-editorial .weather-hero-astronomy-item span {
+  overflow: hidden;
+  max-width: 100%;
+  color: #718690;
+  font-size: 0.48rem;
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.site-shell--home-editorial .weather-hero-astronomy-item strong {
+  max-width: 100%;
+  color: #071e2f;
+  font-size: 0.65rem;
+  font-weight: 850;
+  line-height: 1.22;
+  text-wrap: balance;
+}
+
+.site-shell--home-editorial .weather-hero-astronomy-source {
+  display: block;
+  padding: 0 4px 1px;
+  color: #82959e;
+  font-size: 0.47rem;
+  line-height: 1.35;
+  text-align: center;
+}
+
+@media (max-width: 620px) {
+  .site-shell--home-editorial .weather-hero-astronomy-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-shell--home-editorial .weather-hero-astronomy-item {
+    min-height: 66px;
+    border-bottom: 1px solid rgba(7, 30, 47, 0.08);
+  }
+
+  .site-shell--home-editorial .weather-hero-astronomy-item:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .site-shell--home-editorial .weather-hero-astronomy-item:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .site-shell--home-editorial .weather-hero-astronomy-source {
+    font-size: 0.44rem;
+  }
+}
