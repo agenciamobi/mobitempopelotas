@@ -126,3 +126,4 @@ import "./styles/home-water-editorial-v49.css";
 import "./styles/home-closing-editorial-v50.css";
 import "./styles/footer-editorial-v51.css";
 import "./styles/footer-editorial-v51-fix.css";
+import "./styles/header-megamenu-editorial-v52.css";
