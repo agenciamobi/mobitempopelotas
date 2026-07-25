@@ -120,3 +120,4 @@ import "./styles/home-weekly-trend-v44.css";
 import "./styles/home-radar-editorial-v45.css";
 import "./styles/home-radar-embrapa-cohesion-v46.css";
 import "./styles/home-weekly-radar-usability-v47.css";
+import "./styles/internal-home-cohesion-v48.css";
