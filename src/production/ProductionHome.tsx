@@ -1,7 +1,9 @@
-import { useMemo } from "react";
+import { Link } from "@tanstack/react-router";
+import { useMemo, type CSSProperties } from "react";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { HomeExplorePortal } from "@/components/weather/HomeExplorePortal";
+import type { WeatherCameraData } from "@/lib/cameras/cameras.types";
 import type { GuaibaObservationData } from "@/lib/hydrology/guaiba.server";
 import type { LagoonMonitoringNetworkData } from "@/lib/hydrology/lagoon-network.server";
 import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
@@ -41,22 +43,61 @@ const unavailableSource = {
   forecastUrl: "/metodologia",
 } satisfies WeatherData["source"];
 
+type CameraHeroStyle = CSSProperties & {
+  "--home-live-camera-image"?: string;
+};
+
+function getLiveLaranjalCamera(cameraData: WeatherCameraData) {
+  const camera = cameraData.cameras.find((item) => item.id === "laranjal");
+  if (
+    !camera ||
+    camera.status !== "online" ||
+    camera.broadcastStatus !== "live" ||
+    !camera.thumbnailUrl
+  ) {
+    return null;
+  }
+
+  try {
+    const previewUrl = new URL(camera.thumbnailUrl);
+    if (previewUrl.protocol !== "https:") return null;
+
+    const fetchedAt = new Date(cameraData.source.fetchedAt).getTime();
+    if (Number.isFinite(fetchedAt)) {
+      previewUrl.searchParams.set("tempo-pelotas", String(Math.floor(fetchedAt / 180_000)));
+    }
+
+    return {
+      ...camera,
+      previewUrl: previewUrl.toString(),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export function ProductionHome({
   data,
   laranjal,
   guaiba,
   lagoon,
+  cameraData,
 }: {
   data: WeatherIntelligenceData;
   laranjal: LaranjalLevelData;
   guaiba: GuaibaObservationData;
   lagoon: LagoonMonitoringNetworkData;
+  cameraData: WeatherCameraData;
 }) {
   const recoveredData = useOpenMeteoIntelligenceRecovery(data);
   const weather = useMemo(
     () => toProductionWeatherData(recoveredData.weather),
     [recoveredData.weather],
   );
+  const liveLaranjalCamera = useMemo(() => getLiveLaranjalCamera(cameraData), [cameraData]);
+  const cameraHeroStyle: CameraHeroStyle | undefined = liveLaranjalCamera
+    ? { "--home-live-camera-image": `url("${liveLaranjalCamera.previewUrl}")` }
+    : undefined;
   const hasUsableWeather = Boolean(
     weather.current.available || weather.hourly.length > 0 || weather.daily.length > 0,
   );
@@ -111,14 +152,29 @@ export function ProductionHome({
   return (
     <div className="site-shell site-shell--home site-shell--home-editorial">
       <SiteHeader advisoryLevel={headerLevel} variant="hero" />
-      <WeatherHero
-        weather={weather}
-        advisoryLevel={headerLevel}
-        officialAlertCount={pelotasOfficialAlerts.length}
-        cppmetForecast={
-          cppmetToday ? { item: cppmetToday, sourceUrl: "https://wp.ufpel.edu.br/cppmet/" } : null
-        }
-      />
+      <div
+        className={`home-hero-camera-shell${liveLaranjalCamera ? " has-live-camera" : ""}`}
+        style={cameraHeroStyle}
+      >
+        <WeatherHero
+          weather={weather}
+          advisoryLevel={headerLevel}
+          officialAlertCount={pelotasOfficialAlerts.length}
+          cppmetForecast={
+            cppmetToday ? { item: cppmetToday, sourceUrl: "https://wp.ufpel.edu.br/cppmet/" } : null
+          }
+        />
+        {liveLaranjalCamera ? (
+          <Link
+            className="home-hero-camera-source"
+            to="/cameras-ao-vivo-pelotas"
+            aria-label="Abrir a câmera ao vivo da Praia do Laranjal"
+          >
+            <span><i aria-hidden="true" /> Câmera do Laranjal ao vivo</span>
+            <small>Imagem atual da transmissão</small>
+          </Link>
+        ) : null}
+      </div>
       <HeroAstronomyPortal astronomy={weather.astronomy} />
 
       <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
