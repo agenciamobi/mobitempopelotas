@@ -91,6 +91,11 @@ function createHighlights(weather: AggregatedWeatherData) {
     highlights.push(`Hoje: ${today.min} °C a ${today.max} °C, com ${rain}.`);
   }
 
+  const inmetPeriod = weather.inmetForecast[0];
+  if (inmetPeriod?.summary) {
+    highlights.push(`INMET: ${withFinalPunctuation(inmetPeriod.summary)}`);
+  }
+
   const cppmetToday = weather.officialForecast[0];
   if (cppmetToday?.summary) {
     highlights.push(`CPPMet: ${withFinalPunctuation(cppmetToday.summary)}`);
