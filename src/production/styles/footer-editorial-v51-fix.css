@@ -31,5 +31,8 @@
 @media(prefers-reduced-motion:reduce){
   .pwa-launcher{transition:none!important}
   .pwa-launcher:hover{transform:none!important}
-  @media(max-width:900px){.pwa-launcher,.pwa-launcher:hover{transform:translateX(-50%)!important}}
+}
+
+@media(prefers-reduced-motion:reduce) and (max-width:900px){
+  .pwa-launcher,.pwa-launcher:hover{transform:translateX(-50%)!important}
 }
