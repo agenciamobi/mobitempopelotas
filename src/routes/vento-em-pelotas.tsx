@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { WindPage } from "@/components/weather/RainWindPages";
+import { WIND_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
-import { createEditorialPageJsonLd } from "@/lib/structured-data";
+import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 const PAGE_TITLE = "Vento em Pelotas";
@@ -21,8 +23,14 @@ export const Route = createFileRoute("/vento-em-pelotas")({
           { name: "Início", path: "/" },
           { name: "Vento em Pelotas", path: PAGE_PATH },
         ],
-        about: ["Previsão de vento", "Rajadas de vento em Pelotas"],
+        about: [
+          "Previsão de vento em Pelotas",
+          "Rajadas de vento em Pelotas",
+          "Direção do vento em Pelotas",
+          "Vento por hora em Pelotas",
+        ],
       }),
+      createFaqPageJsonLd(PAGE_PATH, WIND_EDITORIAL_CONTENT.faqs),
     ]),
   loader: () => getWeatherIntelligence(),
   staleTime: 5 * 60 * 1_000,
@@ -31,5 +39,14 @@ export const Route = createFileRoute("/vento-em-pelotas")({
 
 function VentoPage() {
   const weather = Route.useLoaderData();
-  return <WindPage data={weather} />;
+
+  return (
+    <>
+      <WindPage data={weather} />
+      <EditorialContentSection
+        id="como-interpretar-a-previsao-de-vento"
+        content={WIND_EDITORIAL_CONTENT}
+      />
+    </>
+  );
 }
