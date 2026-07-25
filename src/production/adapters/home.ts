@@ -42,9 +42,7 @@ function resolveAstronomy(data: AggregatedWeatherData): AstronomyData {
   const sunrise =
     inmetPeriod?.sunrise ?? data.current?.sunrise ?? data.observation.current.sunrise ?? null;
   const sunset = inmetPeriod?.sunset ?? data.current?.sunset ?? data.observation.current.sunset ?? null;
-  const hasInmetSolarContext = Boolean(
-    inmetPeriod?.sunrise || inmetPeriod?.sunset || inmetPeriod?.season,
-  );
+  const hasInmetSunTimes = Boolean(inmetPeriod?.sunrise || inmetPeriod?.sunset);
 
   return {
     date,
@@ -52,11 +50,12 @@ function resolveAstronomy(data: AggregatedWeatherData): AstronomyData {
     sunset,
     moonPhase: calculateMoonPhase(date),
     season: inmetPeriod?.season ?? null,
-    solarSource: hasInmetSolarContext
+    solarSource: hasInmetSunTimes
       ? "INMET"
       : sunrise || sunset
         ? "Embrapa Clima Temperado"
         : null,
+    seasonSource: inmetPeriod?.season ? "INMET" : null,
     lunarSource: "Cálculo astronômico",
   };
 }
