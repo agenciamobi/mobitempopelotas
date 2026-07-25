@@ -71,6 +71,10 @@ export function createEditorialPageJsonLd(options: EditorialPageJsonLdOptions) {
   const pageId = `${pageUrl}#webpage`;
   const breadcrumbId = `${pageUrl}#breadcrumb`;
   const about = Array.isArray(options.about) ? options.about : options.about ? [options.about] : [];
+  const aboutEntities = about.map((name) => ({
+    "@type": "Thing",
+    name,
+  }));
   const pelotas = createPelotasPlaceJsonLd();
 
   return {
@@ -80,14 +84,20 @@ export function createEditorialPageJsonLd(options: EditorialPageJsonLdOptions) {
         "@type": "WebPage",
         "@id": pageId,
         name: options.name,
+        headline: options.name,
         description: options.description,
         url: pageUrl,
         isPartOf: { "@id": WEBSITE_JSON_LD_ID },
         publisher: { "@id": ORGANIZATION_JSON_LD_ID },
         inLanguage: "pt-BR",
+        isAccessibleForFree: true,
         breadcrumb: { "@id": breadcrumbId },
         contentLocation: pelotas,
         spatialCoverage: pelotas,
+        audience: {
+          "@type": "PeopleAudience",
+          geographicArea: pelotas,
+        },
         primaryImageOfPage: {
           "@type": "ImageObject",
           url: SOCIAL_IMAGE_URL,
@@ -96,12 +106,14 @@ export function createEditorialPageJsonLd(options: EditorialPageJsonLdOptions) {
           "@type": "SpeakableSpecification",
           cssSelector: ["h1", ".editorial-answer-summary"],
         },
-        ...(about.length > 0
+        potentialAction: {
+          "@type": "ReadAction",
+          target: pageUrl,
+        },
+        ...(aboutEntities.length > 0
           ? {
-              about: about.map((name) => ({
-                "@type": "Thing",
-                name,
-              })),
+              about: aboutEntities,
+              keywords: about.join(", "),
             }
           : {}),
       },
