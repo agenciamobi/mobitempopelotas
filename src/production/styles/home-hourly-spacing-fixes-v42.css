@@ -1,0 +1,108 @@
+/* Home v42 — corrige o ritmo vertical e remove ornamentos conflitantes da previsão. */
+
+/* A seção ainda herdava o padding amplo de .home-story, somado ao padding do cabeçalho v40. */
+.site-shell--home-editorial .home-story--forecast {
+  padding: 0 !important;
+}
+
+.site-shell--home-editorial .home-story--forecast > .home-story-heading {
+  padding-top: clamp(28px, 3.2vw, 44px);
+  padding-bottom: clamp(26px, 3vw, 40px);
+}
+
+/* A ação de avisos deve funcionar como botão, sem herdar cor e sublinhado de links editoriais. */
+.site-shell--home-editorial .home-story--forecast .home-advisory-strip > a,
+.site-shell--home-editorial .home-story--forecast .home-advisory-strip > a:visited {
+  display: inline-flex !important;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 18px;
+  border: 1px solid #071e2f;
+  border-radius: 999px;
+  background: #071e2f;
+  color: #fff !important;
+  box-shadow: 0 10px 24px rgba(7, 30, 47, 0.12);
+  font-size: 0.72rem;
+  font-weight: 850;
+  line-height: 1;
+  text-decoration: none !important;
+  text-decoration-color: transparent !important;
+  white-space: nowrap;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-advisory-strip > a::after {
+  content: "→";
+  color: currentColor;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-advisory-strip > a:hover {
+  border-color: #0c344a;
+  background: #0c344a;
+  color: #fff !important;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-advisory-strip > a:focus-visible {
+  outline: 3px solid rgba(24, 189, 205, 0.34);
+  outline-offset: 4px;
+}
+
+/* Tendência: elimina linhas laterais e conectores verticais que fragmentavam a leitura. */
+.site-shell--home-editorial .home-story--forecast .home-next-days::before,
+.site-shell--home-editorial .home-story--forecast .home-next-days::after,
+.site-shell--home-editorial .home-story--forecast .home-next-days__heading::before,
+.site-shell--home-editorial .home-story--forecast .home-next-days__heading::after,
+.site-shell--home-editorial .home-story--forecast .home-next-days__list article:first-child::before,
+.site-shell--home-editorial .home-story--forecast .home-next-days__tomorrow-summary::before,
+.site-shell--home-editorial .home-story--forecast .home-next-days__tomorrow-summary::after {
+  display: none !important;
+  content: none !important;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-next-days {
+  margin-top: clamp(28px, 3.5vw, 48px);
+  padding-bottom: clamp(26px, 3vw, 42px);
+}
+
+.site-shell--home-editorial .home-story--forecast .home-next-days__heading {
+  border: 0 !important;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-next-days__list article:first-child {
+  transform: none !important;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-next-days__tomorrow-summary {
+  border-left: 1px solid rgba(7, 30, 47, 0.1);
+}
+
+.site-shell--home-editorial .home-story--forecast .home-inline-links {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+@media (max-width: 760px) {
+  .site-shell--home-editorial .home-story--forecast > .home-story-heading {
+    padding-top: 24px;
+    padding-bottom: 26px;
+  }
+
+  .site-shell--home-editorial .home-story--forecast .home-advisory-strip > a {
+    width: fit-content;
+    min-height: 40px;
+  }
+
+  .site-shell--home-editorial .home-story--forecast .home-next-days {
+    margin-top: 26px;
+    padding-bottom: 26px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell--home-editorial .home-story--forecast .home-advisory-strip > a {
+    transition: none;
+  }
+}
