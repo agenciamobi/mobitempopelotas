@@ -49,20 +49,21 @@ export function EditorialContentSection({ id, content }: EditorialContentSection
           <h3>Informações relacionadas</h3>
 
           <ul>
-            {content.relatedLinks.map((link) => (
-              <li key={link.href}>
-                <Link
-                  to={link.href}
-                  aria-label={`${link.label}. ${link.description}`}
-                >
-                  <span>
-                    <strong>{link.label}</strong>
-                    <small>{link.description}</small>
-                  </span>
-                  <span aria-hidden="true">→</span>
-                </Link>
-              </li>
-            ))}
+            {content.relatedLinks.map((link, index) => {
+              const descriptionId = `${id}-related-${index + 1}-description`;
+
+              return (
+                <li key={link.href}>
+                  <Link to={link.href} aria-describedby={descriptionId}>
+                    <span>
+                      <strong>{link.label}</strong>
+                      <small id={descriptionId}>{link.description}</small>
+                    </span>
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
       </div>
