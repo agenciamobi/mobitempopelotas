@@ -6,69 +6,18 @@ import type { AdvisoryLevel } from "@/production/lib/weather-insights";
 
 import "./Header.css";
 
-type MenuId = "forecast" | "monitoring" | "water";
+type MenuId = "monitoring" | "water";
+
+const editorialPrimaryLinks = [
+  { label: "Agora", to: "/" },
+  { label: "Hoje", to: "/tempo-hoje-pelotas" },
+  { label: "Amanhã", to: "/tempo-amanha-pelotas" },
+  { label: "7 dias", to: "/previsao-7-dias-pelotas" },
+  { label: "Chuva", to: "/chuva-em-pelotas" },
+  { label: "Vento", to: "/vento-em-pelotas" },
+] as const;
 
 const megaMenus = [
-  {
-    id: "forecast",
-    label: "Previsão",
-    activePaths: [
-      "/",
-      "/tempo-hoje-pelotas",
-      "/tempo-amanha-pelotas",
-      "/previsao-7-dias-pelotas",
-      "/chuva-em-pelotas",
-      "/vento-em-pelotas",
-    ],
-    featured: {
-      eyebrow: "Tempo agora",
-      label: "Condições atuais em Pelotas",
-      to: "/",
-      description: "Temperatura, chuva, vento e evolução das próximas horas.",
-    },
-    sections: [
-      {
-        title: "Planeje o dia",
-        links: [
-          {
-            label: "Previsão de hoje",
-            to: "/tempo-hoje-pelotas",
-            description: "Detalhes por hora e condições do dia.",
-          },
-          {
-            label: "Tempo amanhã",
-            to: "/tempo-amanha-pelotas",
-            description: "Chuva, temperaturas e rajadas do próximo dia.",
-          },
-          {
-            label: "Próximos 7 dias",
-            to: "/previsao-7-dias-pelotas",
-            description: "Tendência completa para a semana.",
-          },
-        ],
-      },
-      {
-        title: "Entenda a previsão",
-        links: [
-          {
-            label: "Chuva em Pelotas",
-            to: "/chuva-em-pelotas",
-            description: "Probabilidade, volume e períodos mais críticos.",
-          },
-          {
-            label: "Vento e rajadas",
-            to: "/vento-em-pelotas",
-            description: "Direção, velocidade e rajadas previstas.",
-          },
-          {
-            label: "Histórico climático",
-            to: "/historico-climatico-pelotas",
-            description: "Contexto e comportamento recente do tempo.",
-          },
-        ],
-      },
-    ],
-  },
   {
     id: "monitoring",
     label: "Monitoramento",
@@ -80,34 +29,34 @@ const megaMenus = [
       "/metodologia",
     ],
     featured: {
-      eyebrow: "Observação local",
-      label: "Câmeras e medições da região",
-      to: "/cameras-ao-vivo-pelotas",
-      description: "Acompanhe céu, visibilidade e dados registrados em Pelotas.",
+      eyebrow: "Observação regional",
+      label: "Radar, satélites e estações",
+      to: "/radar-e-satelite-pelotas",
+      description: "Acompanhe imagens meteorológicas, medições locais e a evolução recente do tempo.",
     },
     sections: [
       {
-        title: "Medições e imagens",
+        title: "Ao vivo e observado",
         links: [
-          {
-            label: "Estação Embrapa",
-            to: "/estacao-embrapa-pelotas",
-            description: "Dados observados na estação de Pelotas.",
-          },
           {
             label: "Radar e satélite",
             to: "/radar-e-satelite-pelotas",
-            description: "Produtos regionais da REDEMET e trovoadas detectadas.",
+            description: "REDEMET, INMET e ocorrências regionais de trovoadas.",
+          },
+          {
+            label: "Estação Embrapa",
+            to: "/estacao-embrapa-pelotas",
+            description: "Dados medidos pela estação de Pelotas.",
           },
           {
             label: "Câmeras ao vivo",
             to: "/cameras-ao-vivo-pelotas",
-            description: "Imagens locais e estado da transmissão.",
+            description: "Imagens locais e estado das transmissões.",
           },
         ],
       },
       {
-        title: "Histórico e transparência",
+        title: "Contexto e transparência",
         links: [
           {
             label: "Histórico climático",
@@ -117,7 +66,7 @@ const megaMenus = [
           {
             label: "Fontes e metodologia",
             to: "/metodologia",
-            description: "Origem, limites e atualização dos dados.",
+            description: "Origem, função, limites e atualização dos dados.",
           },
         ],
       },
@@ -181,12 +130,17 @@ function isActivePath(pathname: string, to: string) {
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 
+function alertLabel(level: AdvisoryLevel) {
+  if (level === "warning") return "Alerta ativo";
+  if (level === "attention") return "Atenção";
+  return "Avisos oficiais";
+}
+
 export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryLevel }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const headerRef = useRef<HTMLElement>(null);
   const [openMenu, setOpenMenu] = useState<MenuId | null>(null);
   const alertsActive = isActivePath(pathname, "/alertas");
-  const camerasActive = isActivePath(pathname, "/cameras-ao-vivo-pelotas");
 
   useEffect(() => {
     setOpenMenu(null);
@@ -212,6 +166,23 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
         className="site-header production-header"
         data-advisory-level={advisoryLevel}
       >
+        <div className="editorial-utility-bar">
+          <div className="editorial-utility-inner">
+            <div className="editorial-utility-context">
+              <span className="editorial-location">
+                <i aria-hidden="true" /> Pelotas, Rio Grande do Sul
+              </span>
+              <span className="editorial-utility-separator" aria-hidden="true" />
+              <span>Informação meteorológica local, oficial e regional</span>
+            </div>
+
+            <nav className="editorial-utility-navigation" aria-label="Links institucionais">
+              <Link to="/metodologia">Fontes e metodologia</Link>
+              <Link to="/cameras-ao-vivo-pelotas">Câmeras ao vivo</Link>
+            </nav>
+          </div>
+        </div>
+
         <div className="production-header-inner">
           <div className="production-branding">
             <Link className="production-brand" to="/" aria-label="Tempo Pelotas — página inicial">
@@ -226,96 +197,14 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
             </Link>
           </div>
 
-          <nav className="mega-navigation" aria-label="Navegação principal">
-            {megaMenus.map((menu) => {
-              const isOpen = openMenu === menu.id;
-              const isActive = menu.activePaths.some((path) => isActivePath(pathname, path));
-
-              return (
-                <div
-                  className={`mega-navigation-item${isOpen ? " is-open" : ""}`}
-                  key={menu.id}
-                  onMouseEnter={() => setOpenMenu(menu.id)}
-                  onMouseLeave={() =>
-                    setOpenMenu((current) => (current === menu.id ? null : current))
-                  }
-                  onBlur={(event) => {
-                    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-                      setOpenMenu((current) => (current === menu.id ? null : current));
-                    }
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key !== "Escape") return;
-                    event.preventDefault();
-                    setOpenMenu(null);
-                    event.currentTarget.querySelector<HTMLElement>("button")?.focus();
-                  }}
-                >
-                  <button
-                    className={`mega-navigation-trigger${isActive ? " is-active" : ""}${isOpen ? " is-open" : ""}`}
-                    type="button"
-                    aria-expanded={isOpen}
-                    aria-controls={`mega-menu-${menu.id}`}
-                    onClick={() => setOpenMenu((current) => (current === menu.id ? null : menu.id))}
-                    onFocus={() => setOpenMenu(menu.id)}
-                  >
-                    <span>{menu.label}</span>
-                    <svg viewBox="0 0 12 8" aria-hidden="true">
-                      <path d="m1.5 1.5 4.5 4 4.5-4" />
-                    </svg>
-                  </button>
-
-                  <div
-                    className="mega-navigation-panel"
-                    id={`mega-menu-${menu.id}`}
-                    aria-hidden={!isOpen}
-                  >
-                    <div className="mega-navigation-surface">
-                      <Link
-                        className={`mega-navigation-feature is-${menu.id}`}
-                        to={menu.featured.to}
-                      >
-                        <small>{menu.featured.eyebrow}</small>
-                        <strong>{menu.featured.label}</strong>
-                        <span>{menu.featured.description}</span>
-                        <b>
-                          Explorar <i aria-hidden="true">→</i>
-                        </b>
-                      </Link>
-
-                      <div className="mega-navigation-columns">
-                        {menu.sections.map((section) => (
-                          <section key={section.title}>
-                            <h2>{section.title}</h2>
-                            <div>
-                              {section.links.map((link) => (
-                                <Link to={link.to} key={link.to}>
-                                  <span aria-hidden="true" />
-                                  <strong>{link.label}</strong>
-                                  <small>{link.description}</small>
-                                </Link>
-                              ))}
-                            </div>
-                          </section>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </nav>
+          <div className="editorial-masthead-copy">
+            <span>Portal meteorológico regional</span>
+            <strong>Previsão, observação e águas de Pelotas</strong>
+          </div>
 
           <div className="production-header-actions">
             <AuthAccountAction />
 
-            <Link
-              className={`production-camera-link${camerasActive ? " is-active" : ""}`}
-              to="/cameras-ao-vivo-pelotas"
-              aria-current={camerasActive ? "page" : undefined}
-            >
-              Câmeras ao vivo
-            </Link>
             <Link
               className={`production-alert-link is-${advisoryLevel}${alertsActive ? " is-active" : ""}`}
               to="/alertas"
@@ -328,9 +217,113 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
                   <path d="M12 9v4.5M12 17h.01" />
                 </svg>
               </span>
-              <strong>Consultar</strong>
+              <strong>{alertLabel(advisoryLevel)}</strong>
               <i aria-hidden="true">→</i>
             </Link>
+          </div>
+        </div>
+
+        <div className="editorial-navigation-shell">
+          <div className="editorial-navigation-inner">
+            <nav className="editorial-direct-navigation" aria-label="Editorias de previsão">
+              {editorialPrimaryLinks.map((item) => {
+                const active = isActivePath(pathname, item.to);
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={active ? "is-active" : undefined}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <span className="editorial-navigation-divider" aria-hidden="true" />
+
+            <nav className="mega-navigation" aria-label="Demais editorias">
+              {megaMenus.map((menu) => {
+                const isOpen = openMenu === menu.id;
+                const isActive = menu.activePaths.some((path) => isActivePath(pathname, path));
+
+                return (
+                  <div
+                    className={`mega-navigation-item${isOpen ? " is-open" : ""}`}
+                    key={menu.id}
+                    onMouseEnter={() => setOpenMenu(menu.id)}
+                    onMouseLeave={() =>
+                      setOpenMenu((current) => (current === menu.id ? null : current))
+                    }
+                    onBlur={(event) => {
+                      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                        setOpenMenu((current) => (current === menu.id ? null : current));
+                      }
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key !== "Escape") return;
+                      event.preventDefault();
+                      setOpenMenu(null);
+                      event.currentTarget.querySelector<HTMLElement>("button")?.focus();
+                    }}
+                  >
+                    <button
+                      className={`mega-navigation-trigger${isActive ? " is-active" : ""}${isOpen ? " is-open" : ""}`}
+                      type="button"
+                      aria-expanded={isOpen}
+                      aria-controls={`mega-menu-${menu.id}`}
+                      onClick={() =>
+                        setOpenMenu((current) => (current === menu.id ? null : menu.id))
+                      }
+                      onFocus={() => setOpenMenu(menu.id)}
+                    >
+                      <span>{menu.label}</span>
+                      <svg viewBox="0 0 12 8" aria-hidden="true">
+                        <path d="m1.5 1.5 4.5 4 4.5-4" />
+                      </svg>
+                    </button>
+
+                    <div
+                      className="mega-navigation-panel"
+                      id={`mega-menu-${menu.id}`}
+                      aria-hidden={!isOpen}
+                    >
+                      <div className="mega-navigation-surface">
+                        <Link
+                          className={`mega-navigation-feature is-${menu.id}`}
+                          to={menu.featured.to}
+                        >
+                          <small>{menu.featured.eyebrow}</small>
+                          <strong>{menu.featured.label}</strong>
+                          <span>{menu.featured.description}</span>
+                          <b>
+                            Explorar <i aria-hidden="true">→</i>
+                          </b>
+                        </Link>
+
+                        <div className="mega-navigation-columns">
+                          {menu.sections.map((section) => (
+                            <section key={section.title}>
+                              <h2>{section.title}</h2>
+                              <div>
+                                {section.links.map((link) => (
+                                  <Link to={link.to} key={link.to}>
+                                    <span aria-hidden="true" />
+                                    <strong>{link.label}</strong>
+                                    <small>{link.description}</small>
+                                  </Link>
+                                ))}
+                              </div>
+                            </section>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </nav>
           </div>
         </div>
       </header>
