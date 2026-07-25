@@ -98,6 +98,11 @@ function transformDashboardNode(
   const props = node.props;
   const className = typeof props.className === "string" ? props.className : "";
   const isDomElement = typeof node.type === "string";
+
+  if (isDomElement && node.type === "section" && hasClass(className, "home-explore-story")) {
+    return null;
+  }
+
   const nextContext: SemanticContext = {
     currentHour:
       context.currentHour || (node.type === "article" && hasClass(className, "is-current")),
