@@ -1,12 +1,19 @@
 /* Hero v35 — rótulo contextual da leitura atual. */
 
-.site-shell--home-editorial .weather-hero-live {
-  font-size: 0;
+.site-shell--home-editorial .weather-hero-now .weather-hero-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0 !important;
 }
 
-.site-shell--home-editorial .weather-hero-live::after {
+.site-shell--home-editorial .weather-hero-now .weather-hero-live > i {
+  flex: 0 0 auto;
+}
+
+.site-shell--home-editorial .weather-hero-now .weather-hero-live::after {
   content: "AGORA";
-  font-size: 0.55rem;
+  font-size: 0.55rem !important;
   font-weight: 820;
   letter-spacing: 0.06em;
   line-height: 1;
