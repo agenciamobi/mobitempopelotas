@@ -5,8 +5,9 @@ import type { AggregatedWeatherData } from "@/lib/weather/aggregated-weather.typ
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import type { EmbrapaObservationData } from "@/production/lib/embrapa-observation";
 import type { InmetAlertsData } from "@/production/lib/inmet-alerts";
+import { calculateMoonPhase } from "@/production/lib/astronomy";
 import type { WeatherAiSummaries } from "@/production/lib/weather-ai-summary";
-import type { CurrentWeather, WeatherData } from "@/production/lib/weather-data";
+import type { AstronomyData, CurrentWeather, WeatherData } from "@/production/lib/weather-data";
 
 function formatUpdatedAt(value: string | null | undefined) {
   if (!value) return null;
@@ -21,8 +22,43 @@ function formatUpdatedAt(value: string | null | undefined) {
   }).format(date);
 }
 
+function localDateKey() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
 function forecastTimeLabel(value: string) {
   return value.trim().toLocaleLowerCase("pt-BR") === "agora" ? "Próxima hora" : value;
+}
+
+function resolveAstronomy(data: AggregatedWeatherData): AstronomyData {
+  const inmetPeriod =
+    data.inmetForecast.find((period) => period.sunrise || period.sunset || period.season) ?? null;
+  const date = inmetPeriod?.date ?? localDateKey();
+  const sunrise =
+    inmetPeriod?.sunrise ?? data.current?.sunrise ?? data.observation.current.sunrise ?? null;
+  const sunset = inmetPeriod?.sunset ?? data.current?.sunset ?? data.observation.current.sunset ?? null;
+  const hasInmetSolarContext = Boolean(
+    inmetPeriod?.sunrise || inmetPeriod?.sunset || inmetPeriod?.season,
+  );
+
+  return {
+    date,
+    sunrise,
+    sunset,
+    moonPhase: calculateMoonPhase(date),
+    season: inmetPeriod?.season ?? null,
+    solarSource: hasInmetSolarContext
+      ? "INMET"
+      : sunrise || sunset
+        ? "Embrapa Clima Temperado"
+        : null,
+    lunarSource: "Cálculo astronômico",
+  };
 }
 
 function unavailableCurrent(data: AggregatedWeatherData): CurrentWeather {
@@ -105,6 +141,7 @@ export function toProductionWeatherData(data: AggregatedWeatherData): WeatherDat
     })),
     // O mapa operacional usa REDEMET. Não criamos marcadores de condição atual a partir de modelos.
     regional: [],
+    astronomy: resolveAstronomy(data),
     source: {
       name: "MOBI Tempo Pelotas",
       url: "/metodologia",
