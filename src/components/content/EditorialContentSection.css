@@ -8,6 +8,8 @@
     #ffffff;
   box-shadow: 0 1.25rem 3.5rem color-mix(in srgb, #071e2f 8%, transparent);
   color: #102b3c;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 900px;
 }
 
 .editorial-answer-intro,
