@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { RainPage } from "@/components/weather/RainWindPages";
+import { RAIN_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
-import { createEditorialPageJsonLd } from "@/lib/structured-data";
+import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 const PAGE_TITLE = "Chuva em Pelotas";
@@ -21,8 +23,14 @@ export const Route = createFileRoute("/chuva-em-pelotas")({
           { name: "Início", path: "/" },
           { name: "Chuva em Pelotas", path: PAGE_PATH },
         ],
-        about: ["Previsão de chuva", "Precipitação em Pelotas"],
+        about: [
+          "Previsão de chuva em Pelotas",
+          "Probabilidade de chuva em Pelotas",
+          "Volume de precipitação em Pelotas",
+          "Chuva por hora em Pelotas",
+        ],
       }),
+      createFaqPageJsonLd(PAGE_PATH, RAIN_EDITORIAL_CONTENT.faqs),
     ]),
   loader: () => getWeatherIntelligence(),
   staleTime: 5 * 60 * 1_000,
@@ -31,5 +39,14 @@ export const Route = createFileRoute("/chuva-em-pelotas")({
 
 function ChuvaPage() {
   const weather = Route.useLoaderData();
-  return <RainPage data={weather} />;
+
+  return (
+    <>
+      <RainPage data={weather} />
+      <EditorialContentSection
+        id="como-interpretar-a-previsao-de-chuva"
+        content={RAIN_EDITORIAL_CONTENT}
+      />
+    </>
+  );
 }
