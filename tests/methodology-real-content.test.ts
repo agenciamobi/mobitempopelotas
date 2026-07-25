@@ -55,8 +55,8 @@ test("o conteúdo explica corretamente os limites das réguas e das previsões",
   assert.match(component, /Cada régua possui referência vertical e cota próprias/);
   assert.match(component, /não devem ser comparados diretamente/);
   assert.match(component, /não prevê\s+o nível do Laranjal apenas a partir do Guaíba/);
-  assert.match(component, /modelo global principal/);
-  assert.match(component, /modelo global de contingência/);
+  assert.match(component, /Modelo global principal/);
+  assert.match(component, /Modelo global de contingência/);
 });
 
 test("links externos e capítulos permanecem acessíveis", () => {
