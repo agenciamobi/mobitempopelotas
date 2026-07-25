@@ -37,6 +37,7 @@ function formatDateTime(value: string | null) {
 function AlertCard({ alert }: { alert: InmetAlert }) {
   const critical = alert.severity === "danger" || alert.severity === "great-danger";
   const Icon = critical ? ShieldAlert : AlertTriangle;
+  const alertTitle = alert.headline || alert.event;
 
   return (
     <article className={`alerts-card alerts-card-${alert.severity}`}>
@@ -51,7 +52,7 @@ function AlertCard({ alert }: { alert: InmetAlert }) {
           <span>{alert.relevance === "pelotas" ? "Pelotas" : "Abrangência regional"}</span>
         </div>
 
-        <h2>{alert.headline || alert.event}</h2>
+        <h2>{alertTitle}</h2>
         <p>
           {alert.description || "O INMET não forneceu uma descrição detalhada para este aviso."}
         </p>
@@ -86,7 +87,13 @@ function AlertCard({ alert }: { alert: InmetAlert }) {
         ) : null}
       </div>
 
-      <a className="alerts-official-link" href={alert.officialUrl} target="_blank" rel="noreferrer">
+      <a
+        className="alerts-official-link"
+        href={alert.officialUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Abrir o aviso oficial “${alertTitle}” no site do INMET, em nova aba`}
+      >
         Abrir no INMET <ArrowUpRight aria-hidden="true" />
       </a>
     </article>
@@ -103,7 +110,11 @@ export function WeatherAlertsPage({ data }: { data: WeatherIntelligenceData }) {
     <div className="alerts-page">
       <header className="alerts-page-header">
         <div>
-          <Link className="alerts-back-link" to="/">
+          <Link
+            className="alerts-back-link"
+            to="/"
+            aria-label="Voltar ao tempo agora em Pelotas"
+          >
             <ArrowLeft aria-hidden="true" /> Tempo agora
           </Link>
           <p className="alerts-kicker">Avisos oficiais</p>
