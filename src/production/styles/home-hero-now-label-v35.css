@@ -1,0 +1,18 @@
+/* Hero v35 — rótulo contextual da leitura atual. */
+
+.site-shell--home-editorial .weather-hero-live {
+  font-size: 0;
+}
+
+.site-shell--home-editorial .weather-hero-live::after {
+  content: "AGORA";
+  font-size: 0.55rem;
+  font-weight: 820;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.site-shell--home-editorial .weather-hero-now.is-unavailable .weather-hero-live::after {
+  content: "INDISPONÍVEL";
+}
