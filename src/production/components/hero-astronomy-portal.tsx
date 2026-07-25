@@ -6,6 +6,11 @@ import { createPortal } from "react-dom";
 import type { AstronomyData } from "@/production/lib/weather-data";
 
 type AstronomyIconName = "sunrise" | "sunset" | "moon" | "season";
+type AstronomyItemData = {
+  icon: AstronomyIconName;
+  label: string;
+  value: string;
+};
 
 function AstronomyIcon({ name }: { name: AstronomyIconName }) {
   if (name === "moon") {
@@ -36,15 +41,7 @@ function AstronomyIcon({ name }: { name: AstronomyIconName }) {
   );
 }
 
-function AstronomyItem({
-  icon,
-  label,
-  value,
-}: {
-  icon: AstronomyIconName;
-  label: string;
-  value: string;
-}) {
+function AstronomyItem({ icon, label, value }: AstronomyItemData) {
   return (
     <div className="weather-hero-astronomy-item">
       <AstronomyIcon name={icon} />
@@ -61,31 +58,30 @@ export function HeroAstronomyPortal({ astronomy }: { astronomy?: AstronomyData }
     setTarget(document.querySelector<HTMLElement>(".weather-hero-now"));
   }, []);
 
-  const items = useMemo(
-    () =>
-      [
-        astronomy?.sunrise
-          ? { icon: "sunrise" as const, label: "Nascer do sol", value: astronomy.sunrise }
-          : null,
-        astronomy?.sunset
-          ? { icon: "sunset" as const, label: "Pôr do sol", value: astronomy.sunset }
-          : null,
-        astronomy?.moonPhase
-          ? { icon: "moon" as const, label: "Lua", value: astronomy.moonPhase }
-          : null,
-        astronomy?.season
-          ? { icon: "season" as const, label: "Estação", value: astronomy.season }
-          : null,
-      ].filter((item): item is NonNullable<typeof item> => Boolean(item)),
-    [astronomy],
-  );
+  const items = useMemo<AstronomyItemData[]>(() => {
+    const result: AstronomyItemData[] = [];
+    if (astronomy?.sunrise) {
+      result.push({ icon: "sunrise", label: "Nascer do sol", value: astronomy.sunrise });
+    }
+    if (astronomy?.sunset) {
+      result.push({ icon: "sunset", label: "Pôr do sol", value: astronomy.sunset });
+    }
+    if (astronomy?.moonPhase) {
+      result.push({ icon: "moon", label: "Lua", value: astronomy.moonPhase });
+    }
+    if (astronomy?.season) {
+      result.push({ icon: "season", label: "Estação", value: astronomy.season });
+    }
+    return result;
+  }, [astronomy]);
 
   if (!target || items.length === 0) return null;
 
-  const solarLabel = astronomy?.solarSource
-    ? `Horários solares${astronomy.season ? " e estação" : ""}: ${astronomy.solarSource}`
-    : null;
-  const lunarLabel = astronomy?.lunarSource ? `Lua: ${astronomy.lunarSource}` : null;
+  const sourceLabels = [
+    astronomy?.solarSource ? `Horários solares: ${astronomy.solarSource}` : null,
+    astronomy?.seasonSource ? `Estação: ${astronomy.seasonSource}` : null,
+    astronomy?.lunarSource ? `Lua: ${astronomy.lunarSource}` : null,
+  ].filter((label): label is string => Boolean(label));
 
   return createPortal(
     <section className="weather-hero-astronomy" aria-label="Informações astronômicas de Pelotas">
@@ -94,10 +90,8 @@ export function HeroAstronomyPortal({ astronomy }: { astronomy?: AstronomyData }
           <AstronomyItem key={item.label} {...item} />
         ))}
       </div>
-      {solarLabel || lunarLabel ? (
-        <small className="weather-hero-astronomy-source">
-          {[solarLabel, lunarLabel].filter(Boolean).join(" · ")}
-        </small>
+      {sourceLabels.length > 0 ? (
+        <small className="weather-hero-astronomy-source">{sourceLabels.join(" · ")}</small>
       ) : null}
     </section>,
     target,
