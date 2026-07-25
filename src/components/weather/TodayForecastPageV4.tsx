@@ -188,7 +188,7 @@ export function TodayForecastPageV4({ data }: { data: WeatherIntelligenceData })
   const current = weather.current;
   const today = weather.daily[0];
   const nextHours = weather.hourly.slice(0, 12);
-  const futureHours = nextHours.length > 1 ? nextHours.slice(1) : [];
+  const futureHours = nextHours.slice(1);
 
   if (!current && !today && nextHours.length === 0) return <ForecastUnavailable />;
 
@@ -207,11 +207,10 @@ export function TodayForecastPageV4({ data }: { data: WeatherIntelligenceData })
       ? `A medição atual está temporariamente indisponível, mas a previsão de hoje permanece ativa: mínima de ${today.min}°, máxima de ${today.max}° e ${today.rainChance === null ? "probabilidade de chuva não informada" : `${today.rainChance}% de chance máxima de chuva`}.`
       : recoveredData.brief.summary;
   const relevantAlert = pickRelevantAlert(weather.alerts);
-  const comparisonHours = futureHours.length ? futureHours : nextHours;
-  const hottestHour = maxBy(comparisonHours, (hour) => hour.temperature);
-  const rainyHours = comparisonHours.filter((hour) => hour.precipitationProbability !== null);
+  const hottestHour = maxBy(futureHours, (hour) => hour.temperature);
+  const rainyHours = futureHours.filter((hour) => hour.precipitationProbability !== null);
   const wettestHour = maxBy(rainyHours, (hour) => hour.precipitationProbability ?? 0);
-  const windiestHour = maxBy(comparisonHours, strongestWind);
+  const windiestHour = maxBy(futureHours, strongestWind);
   const hourlyMinimum = nextHours.length ? Math.min(...nextHours.map((hour) => hour.temperature)) : 0;
   const hourlyMaximum = nextHours.length ? Math.max(...nextHours.map((hour) => hour.temperature)) : 0;
   const hourlyRange = Math.max(1, hourlyMaximum - hourlyMinimum);
@@ -219,7 +218,7 @@ export function TodayForecastPageV4({ data }: { data: WeatherIntelligenceData })
     alert: relevantAlert,
     rainChance: today?.rainChance,
     maximum: today?.max,
-    futureHours: comparisonHours,
+    futureHours,
   });
   const summaryOrigin = recoveredData.intelligence.origin === "gemini"
     ? `Síntese assistida por ${recoveredData.intelligence.model ?? "Gemini"}`
@@ -307,9 +306,9 @@ export function TodayForecastPageV4({ data }: { data: WeatherIntelligenceData })
         </section>
       ) : null}
 
-      {comparisonHours.length > 0 ? (
+      {futureHours.length > 0 ? (
         <section className="today-v4-window" aria-labelledby="today-v4-window-title">
-          <header><div><p className="today-v4-kicker">Depois de agora</p><h2 id="today-v4-window-title">O que mais deve mudar nas próximas horas</h2></div><span>{comparisonHours.length} horários futuros comparados</span></header>
+          <header><div><p className="today-v4-kicker">Depois de agora</p><h2 id="today-v4-window-title">O que mais deve mudar nas próximas horas</h2></div><span>{futureHours.length} horários futuros comparados</span></header>
           <div className="today-v4-window-grid">
             <article><Thermometer aria-hidden="true" /><span>Maior temperatura</span><strong>{hottestHour ? `${hottestHour.temperature}°` : "—"}</strong><small>{hottestHour?.time ?? "Horário não informado"}</small></article>
             <article><Droplets aria-hidden="true" /><span>Maior chance de chuva</span><strong>{wettestHour?.precipitationProbability === null || !wettestHour ? "Não informada" : `${wettestHour.precipitationProbability}%`}</strong><small>{wettestHour?.time ?? "Fonte sem probabilidade"}</small></article>
