@@ -1,0 +1,32 @@
+/* Integração final da rota Tempo Hoje com o bloco editorial externo ao componente. */
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] {
+  --today-v3-ink: #071e2f;
+  --today-v3-muted: #5d7480;
+  --today-v3-line: rgb(7 30 47 / 10%);
+  --today-v3-cyan: #18bdcd;
+  --today-v3-purple: #5e2ced;
+  --today-v3-magenta: #e70b85;
+  --today-v3-orange: #f27035;
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .editorial-answer-section {
+  color: var(--today-v3-ink);
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .editorial-answer-faq details,
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .editorial-answer-related a {
+  border-color: var(--today-v3-line);
+  background: rgb(255 255 255 / 82%);
+}
+
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .editorial-answer-faq summary:focus-visible,
+.site-shell--topic[data-topic="tempo-hoje-pelotas"] .editorial-answer-related a:focus-visible {
+  outline: 3px solid rgb(24 189 205 / 38%);
+  outline-offset: 3px;
+}
+
+@media (max-width: 720px) {
+  .site-shell--topic[data-topic="tempo-hoje-pelotas"] .editorial-answer-section {
+    border-radius: 1.5rem;
+  }
+}
