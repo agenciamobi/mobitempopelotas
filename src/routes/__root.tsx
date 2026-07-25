@@ -11,7 +11,6 @@ import mapLibreCss from "maplibre-gl/dist/maplibre-gl.css?url";
 import { useEffect, type ReactNode } from "react";
 
 import { SiteLayout } from "@/components/layout/SiteLayout";
-import { PushNotificationsManager } from "@/components/pwa/PushNotificationsManager";
 import { PwaManager } from "@/components/pwa/PwaManager";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 import {
@@ -24,6 +23,27 @@ import {
 } from "@/lib/site-config";
 import productionCss from "@/production/production-styles.css?url";
 import appCss from "../styles.css?url";
+
+const ONESIGNAL_SDK_URL = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
+const ONESIGNAL_INIT_SCRIPT = `
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+window.OneSignalDeferred.push(async function(OneSignal) {
+  await OneSignal.init({
+    appId: "94e94002-7b9e-4b02-8661-62ad9080e3d3",
+    safari_web_id: "web.onesignal.auto.66c89079-ab76-4c24-84be-2fca07f56f6c",
+    serviceWorkerPath: "push/onesignal/OneSignalSDKWorker.js",
+    serviceWorkerParam: { scope: "/push/onesignal/" },
+    allowLocalhostAsSecureOrigin:
+      window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1",
+    notifyButton: {
+      enable: true,
+      position: "bottom-left",
+      size: "medium",
+      offset: { bottom: "18px", left: "18px" },
+    },
+  });
+});
+`;
 
 function NotFoundComponent() {
   return (
@@ -130,6 +150,8 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="pt-BR">
       <head>
         <HeadContent />
+        <script src={ONESIGNAL_SDK_URL} defer />
+        <script dangerouslySetInnerHTML={{ __html: ONESIGNAL_INIT_SCRIPT }} />
       </head>
       <body>
         {children}
@@ -147,7 +169,6 @@ function RootComponent() {
       <SiteLayout>
         <Outlet />
       </SiteLayout>
-      <PushNotificationsManager />
       <PwaManager />
     </QueryClientProvider>
   );
