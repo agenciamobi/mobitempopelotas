@@ -143,7 +143,7 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
     : "Previsão do tempo para hoje em Pelotas";
 
   return (
-    <div className="forecast-page">
+    <div className="forecast-page forecast-page--today">
       <ForecastPageHeader
         kicker="Previsão de hoje"
         title={title}
@@ -151,7 +151,19 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
         data={recoveredData}
       />
 
-      <section className="forecast-today-hero" aria-labelledby="today-summary-title">
+      <nav className="forecast-today-navigation" aria-label="Navegação da previsão de hoje">
+        <a href="#agora">Agora</a>
+        <a href="#medicao-atual">Medição local</a>
+        <a href="#proximas-horas">Próximas horas</a>
+        <a href="#leitura-do-dia">Leitura do dia</a>
+        <a href="#como-interpretar-hoje">Como interpretar</a>
+      </nav>
+
+      <section
+        className="forecast-today-hero"
+        id="agora"
+        aria-labelledby="today-summary-title"
+      >
         <div className="forecast-today-main">
           <p className="forecast-kicker">Observação local</p>
           <h2 id="today-summary-title">
@@ -160,15 +172,16 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
           {current ? (
             <div className="forecast-now-reading">
               <span className="forecast-now-icon">
-                <Gauge aria-hidden="true" size={62} strokeWidth={1.55} />
+                <WeatherIcon name={current.icon} size={68} />
               </span>
               <div>
                 <strong>{current.temperature === null ? "—" : `${current.temperature}°`}</strong>
-                <span>Embrapa Clima Temperado</span>
+                <span>{current.condition ?? "Condição observada"}</span>
                 <small>
+                  Embrapa Clima Temperado ·{" "}
                   {current.feelsLike === null
-                    ? "Sensação térmica não informada"
-                    : `Sensação de ${current.feelsLike}°`}
+                    ? "sensação térmica não informada"
+                    : `sensação de ${current.feelsLike}°`}
                 </small>
               </div>
             </div>
@@ -193,9 +206,29 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
           </strong>
           <small>
             {today
-              ? `${today.rainChance === null ? "Probabilidade de chuva não informada" : `${today.rainChance}% de chance de chuva`} · ${today.precipitationMm} mm previstos`
+              ? "Valores previstos por modelo meteorológico para o restante do dia."
               : "Previsão diária em atualização"}
           </small>
+          <dl className="forecast-today-range-details">
+            <div>
+              <dt>Chuva</dt>
+              <dd>
+                {today?.rainChance === null || !today
+                  ? "Não informada"
+                  : `${today.rainChance}%`}
+              </dd>
+            </div>
+            <div>
+              <dt>Acumulado</dt>
+              <dd>{today ? `${today.precipitationMm} mm` : "—"}</dd>
+            </div>
+            <div>
+              <dt>Rajada</dt>
+              <dd>
+                {today?.windGust === null || !today ? "Não informada" : `${today.windGust} km/h`}
+              </dd>
+            </div>
+          </dl>
         </div>
       </section>
 
@@ -219,6 +252,7 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
       {current ? (
         <section
           className="forecast-current-metrics"
+          id="medicao-atual"
           aria-label="Detalhes da medição atual da Embrapa"
         >
           <article>
@@ -256,7 +290,11 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
       ) : null}
 
       {weather.hourly.length > 0 ? (
-        <section className="forecast-content-section" aria-labelledby="today-hourly-title">
+        <section
+          className="forecast-content-section forecast-hourly-section"
+          id="proximas-horas"
+          aria-labelledby="today-hourly-title"
+        >
           <div className="forecast-section-heading">
             <div>
               <p className="forecast-kicker">Próximas horas</p>
@@ -265,9 +303,16 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
             <Link to="/chuva-em-pelotas">Detalhes da chuva</Link>
           </div>
 
-          <div className="forecast-hourly-grid">
+          <div className="forecast-hourly-grid" aria-label="Previsão horária para hoje">
             {weather.hourly.map((hour) => (
-              <article key={hour.time}>
+              <article
+                key={hour.time}
+                aria-label={`${hour.time}: ${hour.temperature} graus, ${
+                  hour.precipitationProbability === null
+                    ? "probabilidade de chuva não informada"
+                    : `${hour.precipitationProbability}% de chance de chuva`
+                } e vento de ${hour.windSpeed} quilômetros por hora`}
+              >
                 <span>{hour.time}</span>
                 <WeatherIcon name={hour.icon} />
                 <strong>{hour.temperature}°</strong>
@@ -285,6 +330,7 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
 
       <section
         className="forecast-content-section forecast-guidance"
+        id="leitura-do-dia"
         aria-labelledby="today-guidance-title"
       >
         <div className="forecast-section-heading">
@@ -322,10 +368,37 @@ export function TodayForecastPage({ data }: { data: WeatherIntelligenceData }) {
         </div>
       </section>
 
-      <p className="forecast-source-note">
-        Dados consolidados em {formatFetchedAt(weather.source.fetchedAt)} a partir de Embrapa,
-        INMET, CPPMet/UFPel e {weather.quality.forecastProvider ?? "modelo meteorológico"}.
-      </p>
+      <nav className="forecast-today-related" aria-label="Continue consultando a previsão">
+        <Link to="/tempo-amanha-pelotas">
+          <span>
+            <small>Próximo período</small>
+            <strong>Previsão para amanhã</strong>
+          </span>
+          <ArrowRight aria-hidden="true" />
+        </Link>
+        <Link to="/previsao-7-dias-pelotas">
+          <span>
+            <small>Planejamento</small>
+            <strong>Previsão para 7 dias</strong>
+          </span>
+          <ArrowRight aria-hidden="true" />
+        </Link>
+        <Link to="/radar-e-satelite-pelotas">
+          <span>
+            <small>Observação regional</small>
+            <strong>Radar e satélite</strong>
+          </span>
+          <ArrowRight aria-hidden="true" />
+        </Link>
+      </nav>
+
+      <aside className="forecast-source-note" aria-label="Origem e atualização dos dados">
+        <Info aria-hidden="true" />
+        <p>
+          Dados consolidados em {formatFetchedAt(weather.source.fetchedAt)} a partir de Embrapa,
+          INMET, CPPMet/UFPel e {weather.quality.forecastProvider ?? "modelo meteorológico"}.
+        </p>
+      </aside>
     </div>
   );
 }
