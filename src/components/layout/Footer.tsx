@@ -202,7 +202,7 @@ export function Footer({ source }: { source?: WeatherData["source"] }) {
             <span>Fontes meteorológicas e locais</span>
             <p>
               Embrapa Clima Temperado · INMET · CPPMet/UFPel · Open-Meteo · REDEMET/DECEA ·
-              LabHidroSens/UFPel · Nível Guaíba · FURG & Portos RS
+              LabHidroSens/UFPel · MetSul/TideSat · Nível Guaíba · FURG & Portos RS
             </p>
           </div>
 
