@@ -1,0 +1,53 @@
+/*
+ * Header editorial v30 — isolamento da estrutura atual.
+ *
+ * O projeto ainda mantém folhas históricas que estilizam `.site-header` como
+ * uma barra única. O componente atual usa uma classe própria para preservar
+ * as três faixas editoriais: utilidades, masthead e editorias.
+ */
+
+.editorial-site-header.production-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  isolation: isolate;
+  display: block;
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 10px 34px rgba(7, 30, 47, 0.08);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
+}
+
+.editorial-site-header.production-header::before,
+.editorial-site-header.production-header::after {
+  display: none;
+  content: none;
+}
+
+.editorial-site-header .editorial-utility-bar,
+.editorial-site-header .production-header-inner,
+.editorial-site-header .editorial-navigation-shell {
+  position: relative;
+  width: 100%;
+  margin: 0;
+}
+
+.editorial-site-header .editorial-utility-inner,
+.editorial-site-header .production-header-inner,
+.editorial-site-header .editorial-navigation-inner {
+  max-width: 1480px;
+}
+
+@media (max-width: 900px) {
+  .editorial-site-header.production-header {
+    box-shadow: 0 8px 24px rgba(7, 30, 47, 0.09);
+  }
+}
