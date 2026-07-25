@@ -18,7 +18,7 @@ export const getRedemetOverview = createServerFn({ method: "GET" }).handler(
     const [radar, satellite, inmetSatellite, storms] = await Promise.all([
       withRedemetLastGood("radar:10", () => fetchRedemetRadar(10)),
       withRedemetLastGood("satellite:realcada:10", () => fetchRedemetSatellite("realcada", 10)),
-      fetchInmetSatellite(10),
+      withRedemetLastGood("satellite:inmet:goes:s:iv:10", () => fetchInmetSatellite(10)),
       withRedemetLastGood("storms:20", () => fetchRedemetStorms(20)),
     ]);
 
