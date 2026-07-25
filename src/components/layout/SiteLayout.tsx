@@ -37,9 +37,9 @@ function RouteNavigationProgress({ isLoading }: { isLoading: boolean }) {
 
 export function SiteLayout({ children, forceShell = false }: SiteLayoutProps) {
   const resolvedPathname = useRouterState({
-    select: (state) => state.resolvedLocation.pathname,
+    select: (state) => state.resolvedLocation?.pathname ?? state.location?.pathname ?? "/",
   });
-  const isLoading = useRouterState({ select: (state) => state.isLoading });
+  const isLoading = useRouterState({ select: (state) => Boolean(state.isLoading) });
   const mainRef = useRef<HTMLElement>(null);
   const firstRender = useRef(true);
   const [announcement, setAnnouncement] = useState("");
