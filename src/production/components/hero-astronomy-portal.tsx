@@ -77,12 +77,6 @@ export function HeroAstronomyPortal({ astronomy }: { astronomy?: AstronomyData }
 
   if (!target || items.length === 0) return null;
 
-  const sourceLabels = [
-    astronomy?.solarSource ? `Horários solares: ${astronomy.solarSource}` : null,
-    astronomy?.seasonSource ? `Estação: ${astronomy.seasonSource}` : null,
-    astronomy?.lunarSource ? `Lua: ${astronomy.lunarSource}` : null,
-  ].filter((label): label is string => Boolean(label));
-
   return createPortal(
     <section className="weather-hero-astronomy" aria-label="Informações astronômicas de Pelotas">
       <div className="weather-hero-astronomy-grid" data-items={items.length}>
@@ -90,9 +84,6 @@ export function HeroAstronomyPortal({ astronomy }: { astronomy?: AstronomyData }
           <AstronomyItem key={item.label} {...item} />
         ))}
       </div>
-      {sourceLabels.length > 0 ? (
-        <small className="weather-hero-astronomy-source">{sourceLabels.join(" · ")}</small>
-      ) : null}
     </section>,
     target,
   );
