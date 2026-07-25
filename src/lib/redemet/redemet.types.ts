@@ -16,9 +16,10 @@ export type RedemetImageFrame = {
 export type RedemetImageLayerResponse = {
   configured: boolean;
   available: boolean;
-  provider: "REDEMET / DECEA";
+  provider: "REDEMET / DECEA" | "INMET";
   product: string;
   sourceLabel: string;
+  officialUrl?: string;
   frames: RedemetImageFrame[];
   currentIndex: number;
   updatedAt: string;
@@ -54,5 +55,6 @@ export type RedemetSatelliteType = "realcada" | "ir" | "vis";
 export type RedemetOverview = {
   radar: RedemetImageLayerResponse;
   satellite: RedemetImageLayerResponse;
+  inmetSatellite: RedemetImageLayerResponse;
   storms: RedemetStormLayerResponse;
 };
