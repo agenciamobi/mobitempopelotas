@@ -1,0 +1,3 @@
+/* Footer v51 fix — mantém o estado ativo sem alterar a grade interna do link. */
+.site-shell .editorial-footer-group a[aria-current=page]{padding-left:12px!important;box-shadow:inset 3px 0 0 #18bdcd}
+.site-shell .editorial-footer-group a[aria-current=page]:before{display:none!important;content:none!important}
