@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { MethodologyPage } from "@/components/methodology/MethodologyPage";
+import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
+import { getLagoonMonitoringNetwork } from "@/lib/hydrology/lagoon-network.functions";
 import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
 import { createPageHead } from "@/lib/page-meta";
 import { getRedemetOverview } from "@/lib/redemet/redemet.functions";
@@ -29,18 +31,26 @@ export const Route = createFileRoute("/metodologia")({
           "Embrapa Clima Temperado",
           "INMET",
           "CPPMet/UFPel",
+          "Open-Meteo e MET Norway",
           "REDEMET/DECEA",
+          "LabHidroSens/UFPel",
+          "Régua do Cais Mauá",
+          "MetSul e TideSat Global",
+          "FURG e Portos RS",
           "Monitoramento hidrológico da Lagoa dos Patos",
         ],
       }),
     ]),
   loader: async () => {
-    const [weather, level, redemet] = await Promise.all([
+    const [weather, level, redemet, guaiba, lagoon] = await Promise.all([
       getWeatherIntelligence(),
       getLaranjalLevelData(),
       getRedemetOverview(),
+      getGuaibaObservation(),
+      getLagoonMonitoringNetwork(),
     ]);
-    return { weather, level, redemet };
+
+    return { weather, level, redemet, guaiba, lagoon };
   },
   staleTime: 60 * 1_000,
   component: MetodologiaPage,
@@ -48,5 +58,14 @@ export const Route = createFileRoute("/metodologia")({
 
 function MetodologiaPage() {
   const data = Route.useLoaderData();
-  return <MethodologyPage weather={data.weather} level={data.level} redemet={data.redemet} />;
+
+  return (
+    <MethodologyPage
+      weather={data.weather}
+      level={data.level}
+      redemet={data.redemet}
+      guaiba={data.guaiba}
+      lagoon={data.lagoon}
+    />
+  );
 }
