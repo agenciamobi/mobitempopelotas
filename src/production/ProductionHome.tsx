@@ -128,7 +128,6 @@ export function ProductionHome({
         <HomeSectionNavigation />
         <HomeEditorialDashboard
           weather={weather}
-          summaries={summaries}
           advisoryLevel={headerLevel}
           observation={observation}
           laranjal={laranjal}
