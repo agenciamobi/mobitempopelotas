@@ -18,6 +18,7 @@ type WeatherHeroProps = {
     item: CppmetForecastItem;
     sourceUrl: string;
   } | null;
+  liveCameraBackground?: ReactNode;
 };
 
 type HeroMetricIconName = "humidity" | "wind" | "pressure" | "direction";
@@ -161,6 +162,7 @@ export function WeatherHero({
   advisoryLevel,
   officialAlertCount = 0,
   cppmetForecast = null,
+  liveCameraBackground = null,
 }: WeatherHeroProps) {
   const { current } = weather;
   const advisory = getWeatherAdvisory(weather);
@@ -188,6 +190,7 @@ export function WeatherHero({
       aria-labelledby="weather-hero-title"
     >
       <div className="weather-hero-photo" aria-hidden="true" />
+      {liveCameraBackground}
       <div className="weather-hero-overlay" aria-hidden="true" />
       <div className="weather-hero-orbit weather-hero-orbit--one" aria-hidden="true" />
       <div className="weather-hero-orbit weather-hero-orbit--two" aria-hidden="true" />
