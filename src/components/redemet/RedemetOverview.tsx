@@ -18,6 +18,7 @@ import type {
 } from "@/lib/redemet/redemet.types";
 
 import "./RedemetOverview.css";
+import "./RedemetOverview.sources.css";
 
 const REDEMET_URL = "https://redemet.decea.mil.br/";
 
@@ -226,7 +227,9 @@ function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
 
 export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
   const imagerySources = [data.radar, data.satellite, data.inmetSatellite];
-  const availableSources = [...imagerySources, data.storms].filter((source) => source.available).length;
+  const availableSources = [...imagerySources, data.storms].filter(
+    (source) => source.available,
+  ).length;
   const configuredSources = [...imagerySources, data.storms].filter(
     (source) => source.configured,
   ).length;
