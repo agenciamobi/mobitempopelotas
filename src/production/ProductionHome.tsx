@@ -13,6 +13,7 @@ import {
 } from "@/production/adapters/home";
 import { HeroAstronomyPortal } from "@/production/components/hero-astronomy-portal";
 import { HomeEditorialDashboard } from "@/production/components/home-editorial-dashboard-semantic";
+import { HomeHourlyConditionPortal } from "@/production/components/home-hourly-condition-portal";
 import { HomeSectionNavigation } from "@/production/components/home-section-navigation";
 import { InmetAlertsPanel } from "@/production/components/inmet-alerts-panel";
 import { InmetOfficialForecastPanel } from "@/production/components/inmet-official-forecast-panel";
@@ -133,6 +134,7 @@ export function ProductionHome({
           guaiba={guaiba}
           lagoon={lagoon}
         />
+        <HomeHourlyConditionPortal hours={weather.hourly} />
       </main>
 
       <SiteFooter source={weather.source} />
