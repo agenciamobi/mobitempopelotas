@@ -18,6 +18,7 @@ import {
 import { HeroAstronomyPortal } from "@/production/components/hero-astronomy-portal";
 import { HomeEditorialDashboard } from "@/production/components/home-editorial-dashboard-semantic";
 import { HomeHourlyConditionPortal } from "@/production/components/home-hourly-condition-portal";
+import { HomeLiveCameraBackground } from "@/production/components/home-live-camera-background";
 import { HomeSectionNavigation } from "@/production/components/home-section-navigation";
 import { HomeTrendEditorialPortal } from "@/production/components/home-trend-editorial-portal";
 import { InmetAlertsPanel } from "@/production/components/inmet-alerts-panel";
@@ -53,6 +54,7 @@ function getLiveLaranjalCamera(cameraData: WeatherCameraData) {
     !camera ||
     camera.status !== "online" ||
     camera.broadcastStatus !== "live" ||
+    !camera.embedUrl ||
     !camera.thumbnailUrl
   ) {
     return null;
@@ -163,6 +165,14 @@ export function ProductionHome({
           cppmetForecast={
             cppmetToday ? { item: cppmetToday, sourceUrl: "https://wp.ufpel.edu.br/cppmet/" } : null
           }
+          liveCameraBackground={
+            liveLaranjalCamera ? (
+              <HomeLiveCameraBackground
+                embedUrl={liveLaranjalCamera.embedUrl}
+                title={liveLaranjalCamera.streamTitle ?? liveLaranjalCamera.name}
+              />
+            ) : null
+          }
         />
         {liveLaranjalCamera ? (
           <Link
@@ -170,8 +180,10 @@ export function ProductionHome({
             to="/cameras-ao-vivo-pelotas"
             aria-label="Abrir a câmera ao vivo da Praia do Laranjal"
           >
-            <span><i aria-hidden="true" /> Câmera do Laranjal ao vivo</span>
-            <small>Imagem atual da transmissão</small>
+            <span>
+              <i aria-hidden="true" /> Câmera do Laranjal ao vivo
+            </span>
+            <small>Céu e clima em tempo real</small>
           </Link>
         ) : null}
       </div>
