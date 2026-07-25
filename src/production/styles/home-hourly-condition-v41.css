@@ -1,0 +1,60 @@
+/* Home v41 — condição textual por horário, vinculada ao mesmo ícone da previsão. */
+
+.site-shell--home-editorial .home-story--forecast .home-hourly-story article {
+  grid-template-rows: minmax(44px, auto) 70px minmax(72px, auto) minmax(36px, auto);
+}
+
+.site-shell--home-editorial .home-story--forecast .home-hourly-story__topline {
+  display: grid;
+  min-height: 44px;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-content: start;
+  align-items: start;
+  gap: 0.25rem 0.65rem;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-hourly-story__topline > span:first-child {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  white-space: nowrap;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-hourly-story__condition {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: end;
+  max-width: 112px;
+  color: #42626f;
+  font-size: 0.58rem !important;
+  font-weight: 780 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.25;
+  text-align: right;
+  text-transform: none;
+  text-wrap: balance;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-hourly-story__topline b {
+  grid-column: 2;
+  grid-row: 2;
+  justify-self: end;
+  margin: 0;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-hourly-story__weather {
+  align-self: center;
+}
+
+@media (max-width: 760px) {
+  .site-shell--home-editorial .home-story--forecast .home-hourly-story article {
+    min-height: 232px;
+    grid-template-rows: minmax(46px, auto) 66px minmax(70px, auto) minmax(36px, auto);
+  }
+
+  .site-shell--home-editorial .home-story--forecast .home-hourly-story__condition {
+    max-width: 104px;
+    font-size: 0.56rem !important;
+  }
+}
