@@ -1,0 +1,28 @@
+/* Ajustes finais da página de hoje para estados sem medição atual. */
+.today-v4-page.is-measurement-unavailable .today-v4-chapters {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.today-v4-page.is-measurement-unavailable .today-v4-hero {
+  min-height: clamp(26rem, 35vw, 32rem);
+}
+
+@media (max-width: 900px) {
+  .today-v4-page.is-measurement-unavailable .today-v4-chapters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .today-v4-page.is-measurement-unavailable .today-v4-chapters a:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .today-v4-page.is-measurement-unavailable .today-v4-chapters a:nth-child(n + 3) {
+    border-top: 1px solid var(--today-v4-line);
+  }
+}
+
+@media (max-width: 680px) {
+  .today-v4-page.is-measurement-unavailable .today-v4-chapters {
+    grid-template-columns: 1fr;
+  }
+}
