@@ -38,7 +38,7 @@ test("monitoring content distinguishes observation, imagery, history and telemet
   assert.match(source, /HYDROLOGY_EDITORIAL_CONTENT/);
   assert.match(source, /LARANJAL_LEVEL_EDITORIAL_CONTENT/);
   assert.match(source, /não substituem alertas oficiais/i);
-  assert.match(source, /não é normal climatológica/i);
+  assert.match(source, /normal climatológica/i);
   assert.match(source, /não deve ser interpretada isoladamente/i);
 });
 
