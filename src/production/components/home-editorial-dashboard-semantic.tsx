@@ -295,7 +295,7 @@ export function HomeEditorialDashboard(dashboardProps: HomeEditorialDashboardPro
       currentLevel: dashboardProps.guaiba.currentLevel,
       threshold: dashboardProps.guaiba.floodReference,
     }),
-    guaibaReferenceLabel: `${dashboardProps.guaiba.station} · ${dashboardProps.guaiba.source.name.replace(" / ", "/")}`,
+    guaibaReferenceLabel: dashboardProps.guaiba.station,
   };
   const stationStates = dashboardProps.lagoon.observations.map((station) => ({
     city: station.station.city,
