@@ -1,10 +1,12 @@
 import { useMemo } from "react";
 
+import { EditorialContentSection } from "@/components/content/EditorialContentSection";
+import { HomeExplorePortal } from "@/components/weather/HomeExplorePortal";
 import type { GuaibaObservationData } from "@/lib/hydrology/guaiba.server";
 import type { LagoonMonitoringNetworkData } from "@/lib/hydrology/lagoon-network.server";
 import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
+import { HOME_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
-import { HomeExplorePortal } from "@/components/weather/HomeExplorePortal";
 import {
   toProductionAlerts,
   toProductionObservation,
@@ -78,6 +80,7 @@ export function ProductionHome({
             </p>
           </section>
           <HomeExplorePortal />
+          <EditorialContentSection id="como-interpretar-o-tempo" content={HOME_EDITORIAL_CONTENT} />
         </main>
         <SiteFooter source={unavailableSource} />
       </div>
@@ -136,6 +139,7 @@ export function ProductionHome({
         />
         <HomeHourlyConditionPortal hours={weather.hourly} />
         <HomeTrendEditorialPortal weather={weather} narrative={summaries.tomorrow} />
+        <EditorialContentSection id="como-interpretar-o-tempo" content={HOME_EDITORIAL_CONTENT} />
       </main>
 
       <SiteFooter source={weather.source} />
