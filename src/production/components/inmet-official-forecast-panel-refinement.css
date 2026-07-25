@@ -1,0 +1,38 @@
+/* Refinamento do cabeçalho oficial: conteúdo essencial e continuidade com o aviso INMET. */
+.inmet-official-panel {
+  margin-top: 0;
+}
+
+.home-inmet-alerts + .inmet-official-panel {
+  margin-top: 0;
+}
+
+.inmet-official-header {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: 0;
+  padding: clamp(2rem, 4vw, 3.25rem);
+}
+
+.inmet-official-heading {
+  max-width: 980px;
+  gap: 0.9rem;
+}
+
+.inmet-official-heading h2 {
+  max-width: 900px;
+}
+
+.inmet-official-heading > p {
+  max-width: 760px;
+}
+
+@media (max-width: 680px) {
+  .inmet-official-panel {
+    margin-top: 0;
+  }
+
+  .inmet-official-header {
+    padding: 1.4rem;
+  }
+}
