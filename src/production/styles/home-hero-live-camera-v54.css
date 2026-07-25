@@ -1,0 +1,114 @@
+/* Home v54 — imagem da transmissão do Laranjal como fundo da área meteorológica. */
+.home-hero-camera-shell {
+  position: relative;
+}
+
+.home-hero-camera-shell.has-live-camera .weather-hero-photo {
+  background-image:
+    var(--home-live-camera-image),
+    image-set(
+      url("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Amanhecer_na_Praia_do_Laranjal.jpg/1920px-Amanhecer_na_Praia_do_Laranjal.jpg") 1x,
+      url("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Amanhecer_na_Praia_do_Laranjal.jpg/2560px-Amanhecer_na_Praia_do_Laranjal.jpg") 2x
+    );
+  background-position: center 50%, center 55%;
+  background-size: cover, cover;
+  filter: saturate(0.86) contrast(1.04) brightness(0.82);
+  transform: none;
+}
+
+.home-hero-camera-shell.has-live-camera .weather-hero-overlay {
+  background:
+    linear-gradient(180deg, rgb(4 20 32 / 4%), rgb(4 20 32 / 38%)),
+    linear-gradient(105deg, rgb(7 30 47 / 14%), transparent 42%, rgb(94 44 237 / 10%));
+}
+
+.home-hero-camera-shell.has-live-camera .weather-hero-credit {
+  display: none;
+}
+
+.home-hero-camera-source {
+  position: absolute;
+  z-index: 7;
+  bottom: 1.35rem;
+  left: calc(55.5% + clamp(1.25rem, 2.5vw, 2.5rem));
+  display: grid;
+  width: fit-content;
+  max-width: min(19rem, 34vw);
+  gap: 0.16rem;
+  padding: 0.58rem 0.75rem;
+  border: 1px solid rgb(255 255 255 / 28%);
+  border-radius: 0.75rem;
+  background: rgb(5 28 43 / 78%);
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 0.7rem 1.8rem rgb(4 20 32 / 22%);
+}
+
+.home-hero-camera-source > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  font-size: 0.66rem;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.home-hero-camera-source i {
+  width: 0.48rem;
+  height: 0.48rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #18bdcd;
+  box-shadow: 0 0 0 0.24rem rgb(24 189 205 / 16%);
+}
+
+.home-hero-camera-source small {
+  color: rgb(255 255 255 / 65%);
+  font-size: 0.57rem;
+  line-height: 1.35;
+}
+
+.home-hero-camera-source:hover,
+.home-hero-camera-source:focus-visible {
+  border-color: rgb(126 235 241 / 66%);
+  background: rgb(5 28 43 / 92%);
+  outline: 3px solid rgb(24 189 205 / 24%);
+  outline-offset: 3px;
+}
+
+@media (max-width: 900px) {
+  .home-hero-camera-shell.has-live-camera .weather-hero-photo {
+    background-position: center 48%, center 55%;
+  }
+
+  .home-hero-camera-source {
+    top: 10.6rem;
+    bottom: auto;
+    left: 1.55rem;
+    max-width: calc(100% - 3.1rem);
+    padding: 0.48rem 0.62rem;
+    border-radius: 0.65rem;
+  }
+}
+
+@media (max-width: 620px) {
+  .home-hero-camera-shell.has-live-camera .weather-hero-photo {
+    background-position: center 46%, center 55%;
+  }
+
+  .home-hero-camera-source {
+    top: 8.55rem;
+    left: 1.05rem;
+    max-width: calc(100% - 2.1rem);
+  }
+
+  .home-hero-camera-source small {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-camera-source {
+    scroll-behavior: auto;
+  }
+}
