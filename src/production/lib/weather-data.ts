@@ -62,6 +62,7 @@ export type AstronomyData = {
   moonPhase: string | null;
   season: string | null;
   solarSource: string | null;
+  seasonSource: string | null;
   lunarSource: string | null;
 };
 
@@ -129,6 +130,7 @@ export const fallbackWeatherData: WeatherData = {
     moonPhase: null,
     season: null,
     solarSource: null,
+    seasonSource: null,
     lunarSource: null,
   },
   source: {
