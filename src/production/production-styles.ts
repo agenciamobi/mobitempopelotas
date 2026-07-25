@@ -1,4 +1,4 @@
-// Ordem idêntica ao app/layout.tsx da produção Vercel.
+// Ordem idêntica à entrada global de estilos da interface de produção.
 import "./styles/globals.css";
 import "./styles/topic-pages.css";
 import "./styles/home.css";
