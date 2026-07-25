@@ -1,0 +1,208 @@
+.editorial-answer-section {
+  margin: clamp(2.75rem, 7vw, 5.5rem) 0 0;
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  border: 1px solid color-mix(in srgb, #16364b 14%, transparent);
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, #ffffff 96%, #18bdcd 4%), #ffffff),
+    #ffffff;
+  box-shadow: 0 1.25rem 3.5rem color-mix(in srgb, #071e2f 8%, transparent);
+  color: #102b3c;
+}
+
+.editorial-answer-intro,
+.editorial-answer-grid {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.editorial-answer-intro {
+  grid-template-columns: minmax(0, 1.15fr) minmax(17rem, 0.85fr);
+  align-items: start;
+}
+
+.editorial-answer-grid {
+  grid-template-columns: minmax(0, 1.15fr) minmax(17rem, 0.85fr);
+  margin-top: clamp(2rem, 5vw, 3.5rem);
+  padding-top: clamp(1.75rem, 4vw, 2.75rem);
+  border-top: 1px solid color-mix(in srgb, #16364b 12%, transparent);
+}
+
+.editorial-answer-eyebrow {
+  margin: 0 0 0.55rem;
+  color: #5e2ced;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.editorial-answer-copy h2,
+.editorial-answer-grid h3 {
+  margin: 0;
+  color: #071e2f;
+  text-wrap: balance;
+}
+
+.editorial-answer-copy h2 {
+  max-width: 20ch;
+  font-size: clamp(1.65rem, 4vw, 2.65rem);
+  line-height: 1.08;
+}
+
+.editorial-answer-grid h3 {
+  font-size: clamp(1.2rem, 2.4vw, 1.55rem);
+  line-height: 1.2;
+}
+
+.editorial-answer-summary {
+  max-width: 68ch;
+  margin: 1rem 0 0;
+  color: #294657;
+  font-size: clamp(1rem, 1.7vw, 1.12rem);
+  line-height: 1.72;
+}
+
+.editorial-answer-facts,
+.editorial-answer-related ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.editorial-answer-facts {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.editorial-answer-facts li {
+  position: relative;
+  padding: 0.95rem 1rem 0.95rem 2.5rem;
+  border-radius: 1rem;
+  background: #f1f7f9;
+  color: #294657;
+  line-height: 1.55;
+}
+
+.editorial-answer-facts li::before {
+  position: absolute;
+  top: 1.05rem;
+  left: 1rem;
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 999px;
+  background: #18bdcd;
+  box-shadow: 0 0 0 0.28rem color-mix(in srgb, #18bdcd 18%, transparent);
+  content: "";
+}
+
+.editorial-answer-faq-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.editorial-answer-faq-list details {
+  border: 1px solid color-mix(in srgb, #16364b 13%, transparent);
+  border-radius: 0.95rem;
+  background: #ffffff;
+}
+
+.editorial-answer-faq-list summary {
+  min-height: 2.75rem;
+  padding: 0.95rem 1rem;
+  color: #102b3c;
+  font-weight: 750;
+  line-height: 1.45;
+  cursor: pointer;
+}
+
+.editorial-answer-faq-list summary:focus-visible,
+.editorial-answer-related a:focus-visible {
+  outline: 3px solid color-mix(in srgb, #5e2ced 42%, transparent);
+  outline-offset: 3px;
+}
+
+.editorial-answer-faq-list details[open] summary {
+  border-bottom: 1px solid color-mix(in srgb, #16364b 10%, transparent);
+}
+
+.editorial-answer-faq-list details p {
+  margin: 0;
+  padding: 0.95rem 1rem 1.1rem;
+  color: #3d5968;
+  line-height: 1.65;
+}
+
+.editorial-answer-related ul {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.editorial-answer-related a {
+  display: flex;
+  min-height: 4.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid color-mix(in srgb, #16364b 13%, transparent);
+  border-radius: 0.95rem;
+  background: #ffffff;
+  color: #102b3c;
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.editorial-answer-related a:hover {
+  border-color: color-mix(in srgb, #5e2ced 42%, transparent);
+  box-shadow: 0 0.8rem 1.8rem color-mix(in srgb, #071e2f 8%, transparent);
+  transform: translateY(-1px);
+}
+
+.editorial-answer-related a > span:first-child {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.editorial-answer-related strong {
+  font-size: 0.98rem;
+}
+
+.editorial-answer-related small {
+  color: #567080;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.editorial-answer-related a > span:last-child {
+  flex: 0 0 auto;
+  color: #5e2ced;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 780px) {
+  .editorial-answer-section {
+    padding: 1.25rem;
+    border-radius: 1.2rem;
+  }
+
+  .editorial-answer-intro,
+  .editorial-answer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .editorial-answer-copy h2 {
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editorial-answer-related a {
+    transition: none;
+  }
+}
