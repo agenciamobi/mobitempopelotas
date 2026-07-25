@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { reconcileDailyTemperatures } from "@/lib/weather/daily-temperature-reconciliation";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import type {
   DailyForecast,
@@ -297,6 +298,10 @@ export function recoverWeatherIntelligenceFromOpenMeteo(
   );
   if (!production) return null;
 
+  const reconciledDaily = reconcileDailyTemperatures(
+    production.daily,
+    data.weather.inmetForecast,
+  );
   const hourly = production.hourly.map((hour) => ({
     time: hour.time === "Próxima hora" ? "Agora" : hour.time,
     temperature: hour.temperature,
@@ -305,7 +310,7 @@ export function recoverWeatherIntelligenceFromOpenMeteo(
     windGust: hour.windGust,
     icon: hour.icon,
   }));
-  const daily = production.daily.map((day) => ({
+  const daily = reconciledDaily.map((day) => ({
     weekday: day.weekday,
     date: day.date,
     min: day.min,
@@ -361,7 +366,7 @@ export function recoverWeatherIntelligenceFromOpenMeteo(
       },
       message,
     },
-    brief: recoveredBrief(data, production.hourly, production.daily),
+    brief: recoveredBrief(data, production.hourly, reconciledDaily),
     intelligence: {
       ...data.intelligence,
       origin: "deterministic",
