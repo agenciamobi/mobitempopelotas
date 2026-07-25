@@ -117,6 +117,7 @@ export function CameraExplorer({ cameras }: CameraExplorerProps) {
                     src={selectedCamera.thumbnailUrl}
                     alt=""
                     loading="lazy"
+                    decoding="async"
                     referrerPolicy="no-referrer"
                   />
                 ) : null}
@@ -188,7 +189,12 @@ export function CameraExplorer({ cameras }: CameraExplorerProps) {
           </dl>
 
           {selectedCamera.publicUrl ? (
-            <a href={selectedCamera.publicUrl} target="_blank" rel="noreferrer">
+            <a
+              href={selectedCamera.publicUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Abrir ${selectedCamera.name} no provedor externo, em nova aba`}
+            >
               Abrir no provedor <ExternalLink aria-hidden="true" />
             </a>
           ) : null}
