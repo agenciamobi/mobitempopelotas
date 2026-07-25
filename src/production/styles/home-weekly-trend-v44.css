@@ -1,0 +1,157 @@
+/* Home v44 — tendência semanal em uma única composição editorial. */
+
+.site-shell--home-editorial .home-story--forecast .home-next-days {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: clamp(20px, 2.2vw, 30px) !important;
+  width: 100%;
+  margin: clamp(26px, 3.2vw, 44px) 0 0 !important;
+  padding: 0 var(--portal-content-gutter) clamp(24px, 3vw, 38px) !important;
+  box-sizing: border-box;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-next-days__heading {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 7px !important;
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-next-days__heading .eyebrow {
+  margin: 0;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-next-days__heading > strong {
+  max-width: 780px;
+  color: #071e2f;
+  font-size: clamp(1.55rem, 2.35vw, 2.35rem);
+  font-weight: 780;
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-next-days__list {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  align-items: stretch;
+  gap: clamp(10px, 1vw, 14px) !important;
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  border: 0 !important;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-next-days__list article,
+.site-shell--home-editorial .home-story--forecast .home-next-days__list article:first-child,
+.site-shell--home-editorial .home-story--forecast .home-next-days__list article:last-child {
+  width: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: clamp(18px, 1.55vw, 24px) !important;
+  box-sizing: border-box;
+}
+
+/* O resumo isolado deixa de existir visual e semanticamente na leitura da página. */
+.site-shell--home-editorial .home-story--forecast .home-next-days__tomorrow-summary {
+  display: none !important;
+}
+
+.site-shell--home-editorial
+  .home-story--forecast
+  .home-next-days__list
+  article:first-child
+  > .home-next-days__tomorrow-inline {
+  order: 3;
+  display: grid;
+  gap: 5px;
+  margin: 0;
+  padding: 13px 0 2px;
+  border-top: 1px solid rgba(94, 44, 237, 0.13);
+}
+
+.site-shell--home-editorial .home-next-days__tomorrow-inline > strong {
+  color: #071e2f;
+  font-size: 0.88rem;
+  font-weight: 850;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+}
+
+.site-shell--home-editorial .home-next-days__tomorrow-inline > p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: #58717d;
+  font-size: 0.69rem;
+  line-height: 1.48;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.site-shell--home-editorial
+  .home-story--forecast
+  .home-next-days__list
+  article:first-child
+  > .home-next-days__rain-meter {
+  order: 4 !important;
+}
+
+.site-shell--home-editorial
+  .home-story--forecast
+  .home-next-days__list
+  article:first-child
+  > .home-next-days__temperatures {
+  order: 5 !important;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-inline-links {
+  grid-column: auto !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  width: 100%;
+  margin: 0 !important;
+  padding: 20px 0 0 !important;
+  border-top: 1px solid rgba(7, 30, 47, 0.1);
+}
+
+@media (max-width: 1180px) {
+  .site-shell--home-editorial .home-story--forecast .home-next-days__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .site-shell--home-editorial .home-story--forecast .home-next-days {
+    gap: 18px !important;
+    margin-top: 24px !important;
+    padding-right: var(--portal-content-gutter) !important;
+    padding-bottom: 24px !important;
+    padding-left: var(--portal-content-gutter) !important;
+  }
+
+  .site-shell--home-editorial .home-story--forecast .home-next-days__heading > strong {
+    font-size: clamp(1.45rem, 7.5vw, 2rem);
+  }
+
+  .site-shell--home-editorial .home-story--forecast .home-next-days__list {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .site-shell--home-editorial .home-story--forecast .home-next-days__list article,
+  .site-shell--home-editorial .home-story--forecast .home-next-days__list article:first-child,
+  .site-shell--home-editorial .home-story--forecast .home-next-days__list article:last-child {
+    padding: 18px !important;
+  }
+
+  .site-shell--home-editorial .home-next-days__tomorrow-inline > p {
+    -webkit-line-clamp: 4;
+  }
+}
