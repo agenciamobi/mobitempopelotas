@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { RedemetOverview } from "@/components/redemet/RedemetOverview";
+import { RADAR_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
 import { getRedemetOverview } from "@/lib/redemet/redemet.functions";
-import { createEditorialPageJsonLd } from "@/lib/structured-data";
+import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 
 const PAGE_TITLE = "Radar meteorológico, satélite e trovoadas em Pelotas";
 const PAGE_DESCRIPTION =
@@ -25,8 +27,11 @@ export const Route = createFileRoute("/radar-e-satelite-pelotas")({
           "Radar meteorológico de Canguçu",
           "Imagens de satélite sobre Pelotas",
           "Monitoramento regional de trovoadas",
+          "Precipitação na Zona Sul do Rio Grande do Sul",
+          "REDEMET e INMET",
         ],
       }),
+      createFaqPageJsonLd(PAGE_PATH, RADAR_EDITORIAL_CONTENT.faqs),
     ]),
   loader: async () => getRedemetOverview(),
   staleTime: 60 * 1_000,
@@ -35,5 +40,11 @@ export const Route = createFileRoute("/radar-e-satelite-pelotas")({
 
 function RedemetPage() {
   const data = Route.useLoaderData();
-  return <RedemetOverview data={data} />;
+
+  return (
+    <>
+      <RedemetOverview data={data} />
+      <EditorialContentSection id="como-interpretar-radar-satelite" content={RADAR_EDITORIAL_CONTENT} />
+    </>
+  );
 }
