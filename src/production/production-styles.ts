@@ -110,3 +110,4 @@ import "./styles/home-hero-editorial-v34.css";
 import "./styles/home-hero-now-label-v35.css";
 import "./styles/inmet-editorial-v36.css";
 import "./styles/home-supporting-editorial-v37.css";
+import "./styles/home-hero-astronomy-v38.css";
