@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import type {
   InmetForecastPeriod,
   InmetStationReference,
@@ -87,7 +89,7 @@ function ForecastIcon({ name }: { name: ForecastIconName }) {
       </>
     ),
     wind: <path d="M3 8h11c3.5 0 3.5-5 .2-5-1.8 0-2.7.9-2.7 2.5M3 13h15c3.5 0 3.5 6 .2 6-1.8 0-2.7-.9-2.7-2.5M3 18h7" />,
-  } satisfies Record<ForecastIconName, React.ReactNode>;
+  } satisfies Record<ForecastIconName, ReactNode>;
 
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true">
