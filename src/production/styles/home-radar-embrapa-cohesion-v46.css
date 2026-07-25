@@ -1,0 +1,443 @@
+/* Home v46 — radar em duas colunas, Embrapa editorial clara e ritmo contínuo da previsão. */
+
+/* -------------------------------------------------------------------------- */
+/* Previsão hora a hora: elimina o intervalo herdado entre cabeçalho e aviso. */
+/* -------------------------------------------------------------------------- */
+
+.site-shell--home-editorial .home-story--forecast {
+  display: block !important;
+  gap: 0 !important;
+  row-gap: 0 !important;
+}
+
+.site-shell--home-editorial .home-story--forecast > .home-story-heading {
+  margin: 0 !important;
+}
+
+.site-shell--home-editorial
+  .home-story--forecast
+  > .home-story-heading
+  + .home-advisory-strip {
+  margin-top: 0 !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Radar e satélite: texto à esquerda e monitoramento à direita no desktop.   */
+/* -------------------------------------------------------------------------- */
+
+.site-shell--home-editorial .home-map-story {
+  grid-template-columns: minmax(300px, 0.58fr) minmax(0, 1.42fr) !important;
+  grid-template-rows: auto !important;
+  align-items: start !important;
+  gap: clamp(36px, 4.5vw, 76px) !important;
+  padding-top: clamp(42px, 4.8vw, 68px) !important;
+  padding-bottom: clamp(44px, 5vw, 72px) !important;
+  contain: layout paint style;
+}
+
+.site-shell--home-editorial .home-map-story__copy {
+  grid-column: 1;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: auto !important;
+  align-content: start;
+  gap: 12px !important;
+  padding-top: clamp(8px, 1.2vw, 18px);
+}
+
+.site-shell--home-editorial .home-map-story__copy > .eyebrow,
+.site-shell--home-editorial .home-map-story__copy > h2,
+.site-shell--home-editorial .home-map-story__copy > p,
+.site-shell--home-editorial .home-map-story__copy > p:not(.home-map-story__hint),
+.site-shell--home-editorial .home-map-story__copy > .home-map-story__hint {
+  grid-column: 1 !important;
+  grid-row: auto !important;
+}
+
+.site-shell--home-editorial .home-map-story__copy > h2 {
+  max-width: 520px;
+  margin: 4px 0 12px;
+  font-size: clamp(2.65rem, 3.85vw, 4.55rem);
+  line-height: 0.96;
+}
+
+.site-shell--home-editorial .home-map-story__copy > p {
+  max-width: 470px;
+  font-size: clamp(0.92rem, 1vw, 1.02rem);
+  line-height: 1.68;
+}
+
+.site-shell--home-editorial .home-map-story__copy > .home-map-story__hint {
+  max-width: 470px;
+  margin-top: 10px;
+  padding-top: 18px;
+}
+
+.site-shell--home-editorial .home-map-story__frame {
+  grid-column: 2;
+  min-width: 0;
+  contain: paint;
+  border-radius: clamp(18px, 1.55vw, 24px);
+  box-shadow: 0 18px 44px rgba(7, 30, 47, 0.085);
+}
+
+.site-shell--home-editorial .home-map-story .map-canvas {
+  min-height: clamp(560px, 42vw, 650px);
+}
+
+/* Reduz superfícies translúcidas caras sem comprometer a leitura do mapa. */
+.site-shell--home-editorial .home-map-story .map-layer-switcher,
+.site-shell--home-editorial .home-map-story .radar-player,
+.site-shell--home-editorial .home-map-story [class*="sourceBadge"],
+.site-shell--home-editorial .home-map-story [class*="satelliteSwitcher"] {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.site-shell--home-editorial .home-map-story .map-layer-switcher {
+  background: rgba(7, 30, 47, 0.94);
+  box-shadow: 0 8px 22px rgba(2, 12, 20, 0.18);
+}
+
+.site-shell--home-editorial .home-map-story .radar-player {
+  box-shadow: 0 12px 30px rgba(2, 12, 20, 0.22);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Medições da Embrapa: seção clara, institucional e editorial.               */
+/* -------------------------------------------------------------------------- */
+
+.site-shell--home-editorial .home-observation-story {
+  position: relative;
+  isolation: isolate;
+  display: grid !important;
+  width: min(calc(100vw - var(--portal-frame-gap)), var(--portal-frame-max));
+  max-width: var(--portal-frame-max);
+  grid-template-columns: minmax(300px, 0.68fr) minmax(0, 1.32fr) !important;
+  align-items: center !important;
+  gap: clamp(42px, 5.5vw, 88px) !important;
+  margin: clamp(30px, 4vw, 58px) 0 0 50% !important;
+  padding: clamp(42px, 4.8vw, 66px) var(--portal-content-gutter) !important;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 1px solid rgba(7, 30, 47, 0.1) !important;
+  border-radius: clamp(20px, 1.7vw, 28px) !important;
+  background:
+    radial-gradient(circle at 94% 8%, rgba(94, 44, 237, 0.055), transparent 25rem),
+    radial-gradient(circle at 4% 100%, rgba(24, 189, 205, 0.075), transparent 25rem),
+    #f8fbfa !important;
+  box-shadow: 0 18px 48px rgba(7, 30, 47, 0.065) !important;
+  color: #071e2f;
+  transform: translateX(-50%);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 560px;
+}
+
+.site-shell--home-editorial .home-observation-story::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 2;
+  width: auto;
+  height: 3px;
+  background: linear-gradient(90deg, #18bdcd, #5e2ced 62%, #e70b85);
+  mask-image: none;
+  content: "";
+  pointer-events: none;
+}
+
+.site-shell--home-editorial .home-observation-story::after {
+  display: none !important;
+  content: none !important;
+}
+
+.site-shell--home-editorial .home-observation-story__intro {
+  max-width: 500px;
+}
+
+.site-shell--home-editorial .home-observation-story__intro .eyebrow {
+  color: #087c8a;
+}
+
+.site-shell--home-editorial .home-observation-story h2 {
+  max-width: 560px;
+  margin: 12px 0 0;
+  color: #071e2f;
+  font-size: clamp(2.65rem, 4vw, 4.75rem);
+  font-weight: 790;
+  line-height: 0.96;
+  letter-spacing: -0.068em;
+  text-wrap: balance;
+}
+
+.site-shell--home-editorial .home-observation-story__intro > p {
+  max-width: 480px;
+  margin: 22px 0 0;
+  color: #58717d;
+  font-size: clamp(0.92rem, 1vw, 1.02rem);
+  line-height: 1.7;
+}
+
+.site-shell--home-editorial .home-observation-story__intro > a,
+.site-shell--home-editorial .home-observation-story__intro > a:visited {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 14px;
+  margin-top: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #071e2f;
+  box-shadow: none;
+  font-size: 0.82rem;
+  font-weight: 850;
+  text-decoration: underline;
+  text-decoration-color: rgba(24, 189, 205, 0.52);
+  text-underline-offset: 6px;
+}
+
+.site-shell--home-editorial .home-observation-story__reading {
+  display: grid !important;
+  grid-template-columns: minmax(210px, 0.64fr) minmax(0, 1.36fr) !important;
+  min-width: 0;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 1px solid rgba(7, 30, 47, 0.11) !important;
+  border-radius: clamp(18px, 1.45vw, 24px) !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.site-shell--home-editorial .home-observation-temperature {
+  display: grid;
+  min-height: 300px;
+  align-content: center;
+  gap: 12px;
+  padding: clamp(28px, 3vw, 42px) !important;
+  border-right: 1px solid rgba(7, 30, 47, 0.1) !important;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(24, 189, 205, 0.12), transparent 13rem),
+    #f0f7f6;
+}
+
+.site-shell--home-editorial .home-observation-temperature small {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 30px;
+  align-items: center;
+  gap: 8px;
+  max-width: 250px;
+  padding: 6px 10px;
+  border: 1px solid rgba(24, 189, 205, 0.24);
+  border-radius: 999px;
+  background: rgba(24, 189, 205, 0.08);
+  color: #087c8a;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.site-shell--home-editorial .home-observation-temperature small::before {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #18bdcd;
+  box-shadow: 0 0 0 5px rgba(24, 189, 205, 0.11);
+  content: "";
+}
+
+.site-shell--home-editorial .home-observation-temperature strong {
+  margin-top: 8px;
+  color: #071e2f;
+  font-size: clamp(5.1rem, 6.7vw, 7.6rem);
+  line-height: 0.84;
+}
+
+.site-shell--home-editorial .home-observation-temperature span {
+  color: #58717d;
+  font-size: 0.92rem;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dl {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  align-content: stretch;
+  margin: 0;
+  padding: 0 !important;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dl > div {
+  display: grid;
+  min-height: 150px;
+  align-content: center;
+  gap: 9px;
+  padding: clamp(20px, 2.3vw, 32px) !important;
+  border-right: 1px solid rgba(7, 30, 47, 0.09) !important;
+  border-bottom: 1px solid rgba(7, 30, 47, 0.09) !important;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dl > div:nth-child(2n) {
+  border-right: 0 !important;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dl > div:nth-last-child(-n + 2) {
+  border-bottom: 0 !important;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dt {
+  color: #708690;
+  font-size: 0.66rem;
+  font-weight: 800;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.055em;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dd {
+  margin: 0;
+  color: #071e2f;
+  font-size: clamp(1.25rem, 1.55vw, 1.65rem);
+  font-weight: 880;
+  line-height: 1.15;
+}
+
+.site-shell--home-editorial .home-observation-story__unavailable {
+  min-height: 280px;
+  border: 1px solid rgba(7, 30, 47, 0.1);
+  background: #fff;
+}
+
+.site-shell--home-editorial .home-observation-story__unavailable strong {
+  color: #071e2f;
+}
+
+.site-shell--home-editorial .home-observation-story__unavailable span {
+  color: #58717d;
+}
+
+@media (max-width: 1180px) {
+  .site-shell--home-editorial .home-map-story {
+    grid-template-columns: minmax(260px, 0.5fr) minmax(0, 1.5fr) !important;
+    gap: 34px !important;
+  }
+
+  .site-shell--home-editorial .home-map-story__copy > h2 {
+    font-size: clamp(2.45rem, 4vw, 3.8rem);
+  }
+
+  .site-shell--home-editorial .home-observation-story {
+    grid-template-columns: minmax(260px, 0.58fr) minmax(0, 1.42fr) !important;
+    gap: 38px !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .site-shell--home-editorial .home-map-story,
+  .site-shell--home-editorial .home-observation-story {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .site-shell--home-editorial .home-map-story__copy,
+  .site-shell--home-editorial .home-map-story__frame {
+    grid-column: 1;
+  }
+
+  .site-shell--home-editorial .home-map-story__copy {
+    max-width: 760px;
+    padding-top: 0;
+  }
+
+  .site-shell--home-editorial .home-map-story__copy > h2,
+  .site-shell--home-editorial .home-map-story__copy > p,
+  .site-shell--home-editorial .home-map-story__copy > .home-map-story__hint {
+    max-width: 720px;
+  }
+
+  .site-shell--home-editorial .home-observation-story {
+    gap: 32px !important;
+  }
+
+  .site-shell--home-editorial .home-observation-story__intro {
+    max-width: 720px;
+  }
+}
+
+@media (max-width: 700px) {
+  .site-shell--home-editorial .home-story--forecast > .home-story-heading {
+    margin-bottom: 0 !important;
+  }
+
+  .site-shell--home-editorial .home-map-story {
+    gap: 24px !important;
+    padding-top: 32px !important;
+    padding-bottom: 36px !important;
+  }
+
+  .site-shell--home-editorial .home-map-story__copy > h2 {
+    font-size: clamp(2.2rem, 10vw, 3.25rem);
+  }
+
+  .site-shell--home-editorial .home-map-story .map-canvas {
+    min-height: 500px;
+  }
+
+  .site-shell--home-editorial .home-observation-story {
+    gap: 26px !important;
+    padding-top: 34px !important;
+    padding-bottom: 34px !important;
+    contain-intrinsic-size: auto 780px;
+  }
+
+  .site-shell--home-editorial .home-observation-story h2 {
+    font-size: clamp(2.35rem, 10.5vw, 3.55rem);
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .site-shell--home-editorial .home-observation-temperature {
+    min-height: 0;
+    padding: 28px !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(7, 30, 47, 0.1) !important;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading dl > div {
+    min-height: 118px;
+    padding: 18px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-shell--home-editorial .home-observation-story__reading dl {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading dl > div,
+  .site-shell--home-editorial .home-observation-story__reading dl > div:nth-child(2n),
+  .site-shell--home-editorial
+    .home-observation-story__reading
+    dl
+    > div:nth-last-child(-n + 2) {
+    min-height: 96px;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(7, 30, 47, 0.09) !important;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading dl > div:last-child {
+    border-bottom: 0 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell--home-editorial .home-map-story,
+  .site-shell--home-editorial .home-observation-story {
+    content-visibility: visible;
+  }
+}
