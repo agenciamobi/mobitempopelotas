@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
-import { TodayForecastPageV3 } from "@/components/weather/TodayForecastPageV3";
-import "@/components/weather/TodayForecastPageV3Refinement.css";
+import { TodayForecastPageV4 } from "@/components/weather/TodayForecastPageV4";
 import { TODAY_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
@@ -45,7 +44,7 @@ function TempoHojePage() {
 
   return (
     <>
-      <TodayForecastPageV3 data={weather} />
+      <TodayForecastPageV4 data={weather} />
       <EditorialContentSection id="como-interpretar-hoje" content={TODAY_EDITORIAL_CONTENT} />
     </>
   );
