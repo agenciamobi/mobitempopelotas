@@ -28,6 +28,7 @@ type SemanticContext = {
   laranjalUnavailable: boolean;
   stationUnavailable: boolean;
   guaibaContext: boolean;
+  waterFooter: boolean;
 };
 
 type WaterVisualStates = {
@@ -57,6 +58,30 @@ const editorialCopyReplacements: Record<string, string> = {
   "Próximos dias": "Tendência do tempo",
   "Previsão para os próximos dias": "Como o tempo deve evoluir na semana",
 };
+
+function WaterTrendLegend() {
+  return (
+    <div
+      className="home-water-trend-legend"
+      role="list"
+      aria-label="Legenda das tendências do nível da água"
+    >
+      <span className="is-falling" role="listitem">
+        <i aria-hidden="true" />
+        Baixando
+      </span>
+      <span className="is-rising" role="listitem">
+        <i aria-hidden="true" />
+        Subindo
+      </span>
+      <span className="is-stable" role="listitem">
+        <i aria-hidden="true" />
+        Estável
+      </span>
+      <small>As cores indicam a direção da tendência; cada local usa uma régua própria.</small>
+    </div>
+  );
+}
 
 function getTextContent(node: ReactNode): string {
   if (typeof node === "string" || typeof node === "number") return String(node);
@@ -115,6 +140,7 @@ function transformDashboardNode(
       context.stationUnavailable ||
       (node.type === "article" && hasClass(className, "is-unavailable")),
     guaibaContext: context.guaibaContext || hasClass(className, "home-water-context"),
+    waterFooter: context.waterFooter || hasClass(className, "home-water-story__footer"),
   };
 
   if (node.type === WeatherIcon && nextContext.currentHour) {
@@ -159,6 +185,15 @@ function transformDashboardNode(
 
   const textContent = getTextContent(props.children);
   const normalizedText = textContent.trim();
+
+  if (
+    isDomElement &&
+    node.type === "p" &&
+    nextContext.waterFooter &&
+    normalizedText.startsWith("Compare a tendência de cada estação")
+  ) {
+    return <WaterTrendLegend />;
+  }
 
   if (
     isDomElement &&
@@ -265,6 +300,7 @@ export function HomeEditorialDashboard(dashboardProps: HomeEditorialDashboardPro
       laranjalUnavailable: false,
       stationUnavailable: false,
       guaibaContext: false,
+      waterFooter: false,
     },
     waterStates,
     stationStates,
