@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { HydrologyOverviewPage } from "@/components/hydrology/HydrologyPages";
+import { HYDROLOGY_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
 import { getLagoonMonitoringNetwork } from "@/lib/hydrology/lagoon-network.functions";
 import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
 import { createPageHead } from "@/lib/page-meta";
-import { createEditorialPageJsonLd } from "@/lib/structured-data";
+import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 const PAGE_TITLE = "Situação das águas em Pelotas";
@@ -28,8 +30,12 @@ export const Route = createFileRoute("/situacao-hidrologica-pelotas")({
           "Nível da Lagoa dos Patos",
           "Estação Laranjal",
           "Monitoramento hidrológico regional",
+          "Situação das águas em Pelotas",
+          "Telemetria da Lagoa dos Patos",
+          "Influência do vento no nível da lagoa",
         ],
       }),
+      createFaqPageJsonLd(PAGE_PATH, HYDROLOGY_EDITORIAL_CONTENT.faqs),
     ]),
   loader: async () => {
     const [weather, level, guaiba, lagoon] = await Promise.all([
@@ -46,12 +52,16 @@ export const Route = createFileRoute("/situacao-hidrologica-pelotas")({
 
 function SituacaoHidrologicaPage() {
   const data = Route.useLoaderData();
+
   return (
-    <HydrologyOverviewPage
-      weather={data.weather}
-      level={data.level}
-      guaiba={data.guaiba}
-      lagoon={data.lagoon}
-    />
+    <>
+      <HydrologyOverviewPage
+        weather={data.weather}
+        level={data.level}
+        guaiba={data.guaiba}
+        lagoon={data.lagoon}
+      />
+      <EditorialContentSection id="como-interpretar-situacao-das-aguas" content={HYDROLOGY_EDITORIAL_CONTENT} />
+    </>
   );
 }
