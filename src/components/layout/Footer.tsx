@@ -122,7 +122,7 @@ export function Footer({ source }: { source?: WeatherData["source"] }) {
             <Link className="editorial-footer-brand" to="/" aria-label="Tempo Pelotas — página inicial">
               <img
                 className="editorial-footer-brand-logo"
-                src="/brand/tempo-pelotas-header"
+                src="/brand/tempo-pelotas-purple.svg"
                 alt=""
                 width={344}
                 height={50}
@@ -229,7 +229,11 @@ export function Footer({ source }: { source?: WeatherData["source"] }) {
             >
               Privacidade e dados
             </Link>
-            <a href="/feed" type="application/feed+json" aria-label="Abrir o feed de dados do Tempo Pelotas">
+            <a
+              href="/feed"
+              type="application/feed+json"
+              aria-label="Abrir o feed JSON de dados do Tempo Pelotas"
+            >
               Feed de dados
             </a>
           </nav>
