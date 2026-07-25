@@ -34,6 +34,7 @@ type SemanticContext = {
 type WaterVisualStates = {
   laranjal: WaterLevelVisualState;
   guaiba: WaterLevelVisualState;
+  guaibaReferenceLabel: string;
 };
 
 type StationVisualState = {
@@ -188,6 +189,19 @@ function transformDashboardNode(
 
   if (
     isDomElement &&
+    node.type === "span" &&
+    nextContext.guaibaContext &&
+    normalizedText === "Referência adicional"
+  ) {
+    return cloneElement(
+      node as ReactElement<ElementProps>,
+      undefined,
+      waterStates.guaibaReferenceLabel,
+    );
+  }
+
+  if (
+    isDomElement &&
     node.type === "p" &&
     nextContext.waterFooter &&
     normalizedText.startsWith("Compare a tendência de cada estação")
@@ -281,6 +295,7 @@ export function HomeEditorialDashboard(dashboardProps: HomeEditorialDashboardPro
       currentLevel: dashboardProps.guaiba.currentLevel,
       threshold: dashboardProps.guaiba.floodReference,
     }),
+    guaibaReferenceLabel: `${dashboardProps.guaiba.station} · ${dashboardProps.guaiba.source.name.replace(" / ", "/")}`,
   };
   const stationStates = dashboardProps.lagoon.observations.map((station) => ({
     city: station.station.city,
