@@ -37,7 +37,10 @@ function asText(value: unknown) {
 
 function asNumber(value: unknown) {
   if (value === null || value === undefined || value === "") return null;
-  const normalized = typeof value === "string" ? value.replace(",", ".").replace(/[^\d.-]/g, "") : value;
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (typeof value !== "string") return null;
+  const normalized = value.replace(",", ".").replace(/[^\d.-]/g, "");
+  if (!normalized || normalized === "-" || normalized === "." || normalized === "-.") return null;
   const number = Number(normalized);
   return Number.isFinite(number) ? number : null;
 }
