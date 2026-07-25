@@ -68,6 +68,7 @@ function ImageLayerPanel({
       : layer.provider === "INMET"
         ? "Satélite GOES complementar"
         : "Satélite regional";
+  const sourceName = layer.provider === "INMET" ? "INMET" : "REDEMET";
 
   useEffect(() => {
     setSelectedIndex(layer.currentIndex);
@@ -97,6 +98,8 @@ function ImageLayerPanel({
               src={selectedFrame.imageUrl}
               alt={`${layer.product}, quadro de ${formatDateTime(selectedFrame.observedAt)}`}
               loading={kind === "radar" ? "eager" : "lazy"}
+              decoding="async"
+              fetchPriority={kind === "radar" ? "high" : "auto"}
             />
             <figcaption>
               <span>{selectedFrame.label}</span>
@@ -149,8 +152,13 @@ function ImageLayerPanel({
 
       <footer>
         <span>{layer.sourceLabel}</span>
-        <a href={layer.officialUrl ?? REDEMET_URL} target="_blank" rel="noreferrer">
-          Consultar {layer.provider === "INMET" ? "o INMET" : "a REDEMET"}
+        <a
+          href={layer.officialUrl ?? REDEMET_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Consultar ${layer.product} no site do ${sourceName}, em nova aba`}
+        >
+          Consultar {sourceName === "INMET" ? "o INMET" : "a REDEMET"}
           <ExternalLink aria-hidden="true" />
         </a>
       </footer>
