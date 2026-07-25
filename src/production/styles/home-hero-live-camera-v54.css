@@ -1,9 +1,10 @@
-/* Home v54 — imagem da transmissão do Laranjal como fundo da área meteorológica. */
+/* Home v54 — transmissão do Laranjal como fundo visual da área meteorológica. */
 .home-hero-camera-shell {
   position: relative;
 }
 
 .home-hero-camera-shell.has-live-camera .weather-hero-photo {
+  z-index: -5;
   background-image:
     var(--home-live-camera-image),
     image-set(
@@ -16,10 +17,41 @@
   transform: none;
 }
 
+.weather-hero-live-camera {
+  position: absolute;
+  z-index: -4;
+  inset: 0 0 0 auto;
+  width: 44.5%;
+  overflow: hidden;
+  border-radius: 0 0 clamp(22px, 1.7vw, 28px) 0;
+  background-image: var(--home-live-camera-image);
+  background-position: center 50%;
+  background-size: cover;
+  pointer-events: none;
+}
+
+.weather-hero-live-camera iframe {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(1.46);
+  transform-origin: center;
+  transition: opacity 0.7s ease;
+}
+
+.weather-hero-live-camera.is-ready iframe {
+  opacity: 1;
+}
+
 .home-hero-camera-shell.has-live-camera .weather-hero-overlay {
   background:
-    linear-gradient(180deg, rgb(4 20 32 / 4%), rgb(4 20 32 / 38%)),
-    linear-gradient(105deg, rgb(7 30 47 / 14%), transparent 42%, rgb(94 44 237 / 10%));
+    linear-gradient(180deg, rgb(4 20 32 / 5%), rgb(4 20 32 / 42%)),
+    linear-gradient(105deg, rgb(7 30 47 / 18%), transparent 42%, rgb(94 44 237 / 11%));
 }
 
 .home-hero-camera-shell.has-live-camera .weather-hero-credit {
@@ -81,6 +113,20 @@
     background-position: center 48%, center 55%;
   }
 
+  .weather-hero-live-camera {
+    inset: 10px 10px auto;
+    width: auto;
+    height: 218px;
+    border-radius: 16px;
+  }
+
+  .weather-hero-live-camera iframe {
+    width: 100%;
+    height: 56.25vw;
+    min-height: 100%;
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+
   .home-hero-camera-source {
     top: 10.6rem;
     bottom: auto;
@@ -96,6 +142,10 @@
     background-position: center 46%, center 55%;
   }
 
+  .weather-hero-live-camera {
+    height: 182px;
+  }
+
   .home-hero-camera-source {
     top: 8.55rem;
     left: 1.05rem;
@@ -108,7 +158,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-hero-camera-source {
-    scroll-behavior: auto;
+  .weather-hero-live-camera iframe {
+    display: none;
+    transition: none;
   }
 }
