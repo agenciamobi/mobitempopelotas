@@ -125,3 +125,4 @@ import "./styles/internal-home-cohesion-v48-fix.css";
 import "./styles/home-water-editorial-v49.css";
 import "./styles/home-closing-editorial-v50.css";
 import "./styles/footer-editorial-v51.css";
+import "./styles/footer-editorial-v51-fix.css";
