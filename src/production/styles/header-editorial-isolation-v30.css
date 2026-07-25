@@ -2,11 +2,12 @@
  * Header editorial v30 — isolamento da estrutura atual.
  *
  * O projeto ainda mantém folhas históricas que estilizam `.site-header` como
- * uma barra única. O componente atual usa uma classe própria para preservar
- * as três faixas editoriais: utilidades, masthead e editorias.
+ * uma barra única. Esta camada é carregada por último e neutraliza somente a
+ * composição externa do Header atual, preservando as três faixas editoriais:
+ * utilidades, masthead e editorias.
  */
 
-.editorial-site-header.production-header {
+.site-header.production-header {
   position: sticky;
   top: 0;
   z-index: 60;
@@ -20,34 +21,41 @@
   overflow: visible;
   border: 0;
   border-radius: 0;
+  grid-template-columns: none;
+  grid-template-rows: none;
+  grid-template-areas: none;
+  align-items: initial;
+  gap: 0;
   background: rgba(255, 255, 255, 0.97);
   box-shadow: 0 10px 34px rgba(7, 30, 47, 0.08);
   -webkit-backdrop-filter: blur(18px) saturate(135%);
   backdrop-filter: blur(18px) saturate(135%);
 }
 
-.editorial-site-header.production-header::before,
-.editorial-site-header.production-header::after {
+.site-shell > .site-header.production-header::before,
+.site-shell > .site-header.production-header::after,
+.site-shell--home-editorial > .site-header.production-header::before,
+.site-shell--home-editorial > .site-header.production-header::after {
   display: none;
   content: none;
 }
 
-.editorial-site-header .editorial-utility-bar,
-.editorial-site-header .production-header-inner,
-.editorial-site-header .editorial-navigation-shell {
+.site-header.production-header .editorial-utility-bar,
+.site-header.production-header .production-header-inner,
+.site-header.production-header .editorial-navigation-shell {
   position: relative;
   width: 100%;
   margin: 0;
 }
 
-.editorial-site-header .editorial-utility-inner,
-.editorial-site-header .production-header-inner,
-.editorial-site-header .editorial-navigation-inner {
+.site-header.production-header .editorial-utility-inner,
+.site-header.production-header .production-header-inner,
+.site-header.production-header .editorial-navigation-inner {
   max-width: 1480px;
 }
 
 @media (max-width: 900px) {
-  .editorial-site-header.production-header {
+  .site-header.production-header {
     box-shadow: 0 8px 24px rgba(7, 30, 47, 0.09);
   }
 }
