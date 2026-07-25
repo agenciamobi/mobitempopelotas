@@ -1,0 +1,236 @@
+/* Home v45 — radar e satélite como monitoramento editorial de largura integral. */
+
+.site-shell--home-editorial .home-map-story {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: clamp(24px, 3vw, 40px) !important;
+  width: 100%;
+  margin: 0 !important;
+  padding: clamp(38px, 4.5vw, 66px) var(--portal-content-gutter)
+    clamp(42px, 5vw, 74px) !important;
+  box-sizing: border-box;
+  border-top: 1px solid rgba(7, 30, 47, 0.1);
+  border-bottom: 1px solid rgba(7, 30, 47, 0.1);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 920px;
+}
+
+.site-shell--home-editorial .home-map-story::before {
+  position: absolute;
+  top: 0;
+  right: var(--portal-content-gutter);
+  left: var(--portal-content-gutter);
+  height: 3px;
+  background: linear-gradient(90deg, #18bdcd, #5e2ced 62%, #e70b85);
+  content: "";
+}
+
+.site-shell--home-editorial .home-map-story__copy {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(320px, 0.58fr);
+  grid-template-rows: auto auto 1fr;
+  align-items: start;
+  gap: 8px clamp(42px, 6vw, 96px);
+  width: 100%;
+  margin: 0;
+}
+
+.site-shell--home-editorial .home-map-story__copy > .eyebrow {
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0;
+}
+
+.site-shell--home-editorial .home-map-story__copy > h2 {
+  grid-column: 1;
+  grid-row: 2 / span 2;
+  max-width: 830px;
+  margin: 5px 0 0;
+  color: #071e2f;
+  font-size: clamp(2.45rem, 4.4vw, 4.9rem);
+  font-weight: 790;
+  line-height: 0.95;
+  letter-spacing: -0.07em;
+  text-wrap: balance;
+}
+
+.site-shell--home-editorial .home-map-story__copy > p {
+  grid-column: 2;
+  margin: 0;
+  color: #58717d;
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  line-height: 1.7;
+}
+
+.site-shell--home-editorial .home-map-story__copy > p:not(.home-map-story__hint) {
+  grid-row: 2;
+}
+
+.site-shell--home-editorial .home-map-story__copy > .home-map-story__hint {
+  grid-row: 3;
+  margin-top: 10px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(7, 30, 47, 0.11);
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+.site-shell--home-editorial .home-map-story__frame {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgba(7, 30, 47, 0.12);
+  border-radius: clamp(20px, 1.8vw, 28px);
+  background: #e7efed;
+  box-shadow: 0 22px 58px rgba(7, 30, 47, 0.1);
+}
+
+.site-shell--home-editorial .home-map-story .map-panel {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.site-shell--home-editorial .home-map-story .map-panel-heading {
+  display: none;
+}
+
+.site-shell--home-editorial .home-map-story .map-canvas {
+  min-height: clamp(520px, 51vw, 670px);
+  border: 0;
+  border-radius: 0;
+}
+
+.site-shell--home-editorial .home-map-story .map-panel > p {
+  margin: 0;
+  padding: 14px clamp(16px, 2vw, 24px) 16px;
+  border-top: 1px solid rgba(7, 30, 47, 0.1);
+  background: rgba(255, 255, 255, 0.84);
+  color: #647887;
+  font-size: 0.68rem;
+  line-height: 1.55;
+}
+
+.site-shell--home-editorial .home-map-story .map-layer-switcher {
+  top: 18px;
+  left: 18px;
+  gap: 2px;
+  padding: 4px;
+  border-color: rgba(255, 255, 255, 0.22);
+  border-radius: 12px;
+  background: rgba(7, 30, 47, 0.88);
+  box-shadow: 0 10px 28px rgba(2, 12, 20, 0.22);
+}
+
+.site-shell--home-editorial .home-map-story .map-layer-switcher button {
+  min-height: 36px;
+  border-radius: 9px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.site-shell--home-editorial .home-map-story .map-layer-switcher button:hover:not(:disabled),
+.site-shell--home-editorial .home-map-story .map-layer-switcher button:focus-visible:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.site-shell--home-editorial .home-map-story .map-layer-switcher button.is-active {
+  background: #fff;
+  color: #071e2f;
+  box-shadow: none;
+}
+
+.site-shell--home-editorial .home-map-story .radar-player {
+  border-radius: 16px;
+  background: rgba(5, 20, 31, 0.9);
+  box-shadow: 0 16px 36px rgba(2, 12, 20, 0.26);
+}
+
+.site-shell--home-editorial .home-map-story .map-loading {
+  background:
+    radial-gradient(circle at 76% 18%, rgba(94, 44, 237, 0.12), transparent 22rem),
+    radial-gradient(circle at 20% 82%, rgba(24, 189, 205, 0.15), transparent 24rem),
+    linear-gradient(145deg, #edf4f1, #dfeae6);
+}
+
+@media (max-width: 900px) {
+  .site-shell--home-editorial .home-map-story {
+    gap: 26px !important;
+    padding-top: 36px !important;
+    padding-bottom: 44px !important;
+    contain-intrinsic-size: auto 840px;
+  }
+
+  .site-shell--home-editorial .home-map-story__copy {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    gap: 8px;
+  }
+
+  .site-shell--home-editorial .home-map-story__copy > .eyebrow,
+  .site-shell--home-editorial .home-map-story__copy > h2,
+  .site-shell--home-editorial .home-map-story__copy > p,
+  .site-shell--home-editorial .home-map-story__copy > p:not(.home-map-story__hint),
+  .site-shell--home-editorial .home-map-story__copy > .home-map-story__hint {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .site-shell--home-editorial .home-map-story__copy > h2 {
+    max-width: 720px;
+    margin-bottom: 10px;
+  }
+
+  .site-shell--home-editorial .home-map-story__copy > p {
+    max-width: 720px;
+  }
+
+  .site-shell--home-editorial .home-map-story .map-canvas {
+    min-height: 560px;
+  }
+}
+
+@media (max-width: 640px) {
+  .site-shell--home-editorial .home-map-story {
+    gap: 22px !important;
+    padding-top: 30px !important;
+    padding-bottom: 34px !important;
+    contain-intrinsic-size: auto 760px;
+  }
+
+  .site-shell--home-editorial .home-map-story__copy > h2 {
+    font-size: clamp(2.15rem, 11vw, 3.3rem);
+  }
+
+  .site-shell--home-editorial .home-map-story__frame {
+    border-radius: 18px;
+  }
+
+  .site-shell--home-editorial .home-map-story .map-canvas {
+    min-height: 520px;
+  }
+
+  .site-shell--home-editorial .home-map-story .map-layer-switcher {
+    top: 12px;
+    right: 12px;
+    left: 12px;
+    max-width: none;
+  }
+
+  .site-shell--home-editorial .home-map-story .map-layer-switcher button {
+    flex: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell--home-editorial .home-map-story {
+    content-visibility: visible;
+  }
+}
