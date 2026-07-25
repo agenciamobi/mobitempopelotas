@@ -59,6 +59,12 @@ function isGeminiEnabled() {
 function compactWeatherContext(weather: AggregatedWeatherData) {
   return {
     status: weather.status,
+    observationPolicy: {
+      currentConditionsSource: "Embrapa Clima Temperado",
+      officialForecastAndAlertsSource: "INMET",
+      detailedHourlyForecastSource: weather.quality.forecastProvider,
+      regionalContextSource: "CPPMet / UFPel",
+    },
     current: weather.current,
     currentProvenance: weather.currentProvenance,
     daily: weather.daily.slice(0, 7),
@@ -71,6 +77,25 @@ function compactWeatherContext(weather: AggregatedWeatherData) {
       startsAt: alert.startsAt,
       expiresAt: alert.expiresAt,
     })),
+    inmetMunicipalForecast: weather.inmetForecast.slice(0, 12).map((period) => ({
+      date: period.date,
+      period: period.period,
+      summary: period.summary,
+      minimum: period.minimum,
+      maximum: period.maximum,
+      humidityMinimum: period.humidityMinimum,
+      humidityMaximum: period.humidityMaximum,
+      windDirection: period.windDirection,
+      windIntensity: period.windIntensity,
+    })),
+    inmetReferenceStation: weather.inmetStation
+      ? {
+          code: weather.inmetStation.code,
+          name: weather.inmetStation.name,
+          municipality: weather.inmetStation.municipality,
+          state: weather.inmetStation.state,
+        }
+      : null,
     cppmetForecast: weather.officialForecast.slice(0, 7).map((day) => ({
       day: day.day,
       summary: day.summary,
@@ -95,6 +120,8 @@ function buildPrompt(weather: AggregatedWeatherData) {
   const prompt = [
     "Produza uma síntese meteorológica objetiva para moradores de Pelotas, RS.",
     "Use exclusivamente os dados JSON fornecidos. Não invente valores, horários, alertas ou recomendações.",
+    "Condições atuais são medições apenas quando currentSource for Embrapa; não trate previsão do INMET, Open-Meteo ou MET Norway como observação atual.",
+    "Use o INMET como previsão municipal e alertas oficiais, o provedor global como detalhamento temporal e o CPPMet/UFPel como contexto regional.",
     "Destaque condições atuais, tendência do dia e alertas oficiais quando existirem.",
     "Quando houver baixa confiança, fonte degradada ou divergência significativa, informe isso em cautions.",
     "Não mencione Gemini, inteligência artificial, prompt ou processamento interno.",
