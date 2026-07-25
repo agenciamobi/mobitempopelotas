@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { CameraPage } from "@/components/cameras/CameraPage";
+import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { getWeatherCameras } from "@/lib/cameras/cameras.functions";
+import { CAMERAS_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
-import { createEditorialPageJsonLd } from "@/lib/structured-data";
+import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 const PAGE_TITLE = "Câmeras do Laranjal e pontos de observação em Pelotas";
@@ -22,8 +24,14 @@ export const Route = createFileRoute("/cameras-ao-vivo-pelotas")({
           { name: "Início", path: "/" },
           { name: "Câmeras e observação visual", path: PAGE_PATH },
         ],
-        about: ["Câmera da Praia do Laranjal", "Observação visual do tempo em Pelotas"],
+        about: [
+          "Câmera da Praia do Laranjal",
+          "Observação visual do tempo em Pelotas",
+          "Câmeras ao vivo em Pelotas",
+          "Condições visuais na Lagoa dos Patos",
+        ],
       }),
+      createFaqPageJsonLd(PAGE_PATH, CAMERAS_EDITORIAL_CONTENT.faqs),
     ]),
   loader: async () => {
     const [cameraData, weather] = await Promise.all([
@@ -38,5 +46,11 @@ export const Route = createFileRoute("/cameras-ao-vivo-pelotas")({
 
 function CamerasPage() {
   const data = Route.useLoaderData();
-  return <CameraPage cameraData={data.cameraData} weather={data.weather} />;
+
+  return (
+    <>
+      <CameraPage cameraData={data.cameraData} weather={data.weather} />
+      <EditorialContentSection id="como-interpretar-cameras" content={CAMERAS_EDITORIAL_CONTENT} />
+    </>
+  );
 }
