@@ -61,6 +61,12 @@ function ImageLayerPanel({
   const [selectedIndex, setSelectedIndex] = useState(layer.currentIndex);
   const selectedFrame = layer.frames[selectedIndex] ?? layer.frames.at(-1) ?? null;
   const Icon = kind === "radar" ? Radar : Satellite;
+  const category =
+    kind === "radar"
+      ? "Radar regional"
+      : layer.provider === "INMET"
+        ? "Satélite GOES complementar"
+        : "Satélite regional";
 
   useEffect(() => {
     setSelectedIndex(layer.currentIndex);
@@ -76,7 +82,7 @@ function ImageLayerPanel({
         <div className="redemet-layer-title">
           <Icon aria-hidden="true" />
           <div>
-            <span>{kind === "radar" ? "Radar regional" : "Imagem de satélite"}</span>
+            <span>{category}</span>
             <h2>{layer.product}</h2>
           </div>
         </div>
@@ -142,8 +148,8 @@ function ImageLayerPanel({
 
       <footer>
         <span>{layer.sourceLabel}</span>
-        <a href={REDEMET_URL} target="_blank" rel="noreferrer">
-          Consultar a REDEMET
+        <a href={layer.officialUrl ?? REDEMET_URL} target="_blank" rel="noreferrer">
+          Consultar {layer.provider === "INMET" ? "o INMET" : "a REDEMET"}
           <ExternalLink aria-hidden="true" />
         </a>
       </footer>
@@ -210,8 +216,8 @@ function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
       <div className="redemet-storm-warning">
         <AlertTriangle aria-hidden="true" />
         <p>
-          Para decisões de segurança, confirme a situação em{" "}
-          <Link to="/alertas">Avisos oficiais</Link> e nos canais das autoridades.
+          Para decisões de segurança, confirme a situação em <Link to="/alertas">Avisos oficiais</Link>{" "}
+          e nos canais das autoridades.
         </p>
       </div>
     </article>
@@ -219,10 +225,9 @@ function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
 }
 
 export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
-  const availableSources = [data.radar, data.satellite, data.storms].filter(
-    (source) => source.available,
-  ).length;
-  const configuredSources = [data.radar, data.satellite, data.storms].filter(
+  const imagerySources = [data.radar, data.satellite, data.inmetSatellite];
+  const availableSources = [...imagerySources, data.storms].filter((source) => source.available).length;
+  const configuredSources = [...imagerySources, data.storms].filter(
     (source) => source.configured,
   ).length;
 
@@ -231,33 +236,37 @@ export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
       <section className="redemet-hero" aria-labelledby="redemet-page-title">
         <div>
           <p>Observação meteorológica regional</p>
-          <h1 id="redemet-page-title">Radar, satélite e trovoadas próximos de Pelotas</h1>
+          <h1 id="redemet-page-title">Radar, satélites e trovoadas próximos de Pelotas</h1>
           <span>
-            Produtos públicos da REDEMET/DECEA organizados pelo Tempo Pelotas, com acesso protegido
-            à API e imagens entregues por proxy seguro.
+            Radar e trovoadas da REDEMET/DECEA, com imagens de satélite da REDEMET e do INMET
+            apresentadas como fontes complementares e identificadas separadamente.
           </span>
         </div>
 
-        <aside aria-label="Estado da integração REDEMET">
+        <aside aria-label="Estado das integrações de imagens meteorológicas">
           <Radar aria-hidden="true" />
-          <strong>{availableSources}/3</strong>
-          <span>fontes respondendo</span>
+          <strong>{availableSources}/4</strong>
+          <span>camadas respondendo</span>
           <small>
-            {configuredSources === 3
-              ? "Integração configurada no servidor"
-              : "Código pronto; configuração de produção pendente"}
+            {configuredSources === 4
+              ? "Fontes públicas e integração REDEMET configuradas"
+              : "A integração REDEMET depende da configuração do servidor"}
           </small>
         </aside>
       </section>
 
       <section className="redemet-explainer" aria-label="Como interpretar os produtos">
         <article>
-          <strong>Radar</strong>
+          <strong>Radar REDEMET</strong>
           <span>Ajuda a visualizar ecos de precipitação e sua evolução recente.</span>
         </article>
         <article>
-          <strong>Satélite</strong>
-          <span>Mostra a distribuição e o desenvolvimento de nebulosidade em escala regional.</span>
+          <strong>Satélite REDEMET</strong>
+          <span>Apresenta nebulosidade regional com os produtos disponibilizados pelo DECEA.</span>
+        </article>
+        <article>
+          <strong>Satélite INMET</strong>
+          <span>Complementa a leitura de nuvens com o GOES para a Região Sul.</span>
         </article>
         <article>
           <strong>STSC</strong>
@@ -265,9 +274,13 @@ export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
         </article>
       </section>
 
-      <section className="redemet-layers" aria-label="Produtos REDEMET">
+      <section className="redemet-layers" aria-label="Radar e satélite da REDEMET">
         <ImageLayerPanel layer={data.radar} kind="radar" />
         <ImageLayerPanel layer={data.satellite} kind="satellite" />
+      </section>
+
+      <section className="redemet-layers redemet-layers--single" aria-label="Satélite do INMET">
+        <ImageLayerPanel layer={data.inmetSatellite} kind="satellite" />
       </section>
 
       <StormLayerPanel layer={data.storms} />
