@@ -9,7 +9,7 @@ const SATELLITE = "GOES";
 const AREA = "S";
 const PRODUCT = "IV";
 const REQUEST_TIMEOUT_MS = 8_000;
-const IMAGE_PROXY_PATH = "/api/inmet/satellite-image";
+const IMAGE_PROXY_PATH = "/api/redemet/image";
 const SOUTH_BOUNDS = { west: -58.8, south: -35.2, east: -47.0, north: -22.0 };
 
 type JsonRecord = Record<string, unknown>;
@@ -75,7 +75,7 @@ function observedAt(date: DateToken, hour: HourToken) {
 }
 
 function imageProxyUrl(date: string, hour: string) {
-  const params = new URLSearchParams({ date, hour });
+  const params = new URLSearchParams({ provider: "inmet", date, hour });
   return `${IMAGE_PROXY_PATH}?${params.toString()}`;
 }
 
