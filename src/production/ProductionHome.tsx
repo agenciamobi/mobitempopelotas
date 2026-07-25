@@ -15,6 +15,7 @@ import { HeroAstronomyPortal } from "@/production/components/hero-astronomy-port
 import { HomeEditorialDashboard } from "@/production/components/home-editorial-dashboard-semantic";
 import { HomeHourlyConditionPortal } from "@/production/components/home-hourly-condition-portal";
 import { HomeSectionNavigation } from "@/production/components/home-section-navigation";
+import { HomeTrendEditorialPortal } from "@/production/components/home-trend-editorial-portal";
 import { InmetAlertsPanel } from "@/production/components/inmet-alerts-panel";
 import { InmetOfficialForecastPanel } from "@/production/components/inmet-official-forecast-panel";
 import { SafetyAlertBanner } from "@/production/components/safety-alerts";
@@ -135,6 +136,7 @@ export function ProductionHome({
           lagoon={lagoon}
         />
         <HomeHourlyConditionPortal hours={weather.hourly} />
+        <HomeTrendEditorialPortal weather={weather} narrative={summaries.tomorrow} />
       </main>
 
       <SiteFooter source={weather.source} />
