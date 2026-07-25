@@ -20,6 +20,10 @@ const homeClosingCss = readFileSync(
   "src/production/styles/home-closing-editorial-v50.css",
   "utf8",
 );
+const footerCss = readFileSync(
+  "src/production/styles/footer-editorial-v51.css",
+  "utf8",
+);
 const productionHome = readFileSync("src/production/ProductionHome.tsx", "utf8");
 const semanticDashboard = readFileSync(
   "src/production/components/home-editorial-dashboard-semantic.tsx",
@@ -32,6 +36,7 @@ test("final editorial layers preserve their cascade order", () => {
     "internal-home-cohesion-v48-fix.css",
     "home-water-editorial-v49.css",
     "home-closing-editorial-v50.css",
+    "footer-editorial-v51.css",
   ];
 
   for (const layer of finalLayers) {
@@ -97,6 +102,22 @@ test("homepage answer section closes with an accessible institutional surface", 
   assert.match(homeClosingCss, /outline:\s*3px solid rgba\(120, 230, 238, 0\.45\)/);
 });
 
+test("footer follows the portal frame without restarting at hero scale", () => {
+  assert.match(footerCss, /#como-interpretar-o-tempo\.editorial-answer-section\{margin-bottom:0!important\}/);
+  assert.match(footerCss, /\.editorial-footer-shell\{margin-top:clamp\(12px,1\.7vw,24px\)!important/);
+  assert.match(footerCss, /\.editorial-footer-brand-logo\{width:clamp\(170px,17vw,240px\)!important/);
+  assert.match(footerCss, /font-size:clamp\(2\.35rem,3\.65vw,4\.35rem\)!important/);
+  assert.doesNotMatch(footerCss, /6\.45rem/);
+});
+
+test("footer organizes navigation, sources and status as operational information", () => {
+  assert.match(footerCss, /counter-reset:footer-group/);
+  assert.match(footerCss, /counter\(footer-group,decimal-leading-zero\)/);
+  assert.match(footerCss, /\.editorial-footer-transparency\{grid-template-columns:minmax\(0,1\.08fr\)/);
+  assert.match(footerCss, /linear-gradient\(135deg,#061a2a,#082b3e 66%,#09394b\)/);
+  assert.match(footerCss, /aria-current=page/);
+});
+
 test("homepage final visual layers remain usable on tablet and mobile", () => {
   assert.match(homeWaterCss, /@media \(max-width: 980px\)/);
   assert.match(homeWaterCss, /@media \(max-width: 720px\)/);
@@ -104,4 +125,8 @@ test("homepage final visual layers remain usable on tablet and mobile", () => {
   assert.match(homeClosingCss, /@media \(max-width: 820px\)/);
   assert.match(homeClosingCss, /@media \(max-width: 520px\)/);
   assert.match(homeClosingCss, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(footerCss, /@media\(max-width:1080px\)/);
+  assert.match(footerCss, /@media\(max-width:880px\)/);
+  assert.match(footerCss, /@media\(max-width:620px\)/);
+  assert.match(footerCss, /@media\(prefers-reduced-motion:reduce\)/);
 });
