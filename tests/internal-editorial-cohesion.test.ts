@@ -24,6 +24,10 @@ const footerCss = readFileSync(
   "src/production/styles/footer-editorial-v51.css",
   "utf8",
 );
+const footerFixCss = readFileSync(
+  "src/production/styles/footer-editorial-v51-fix.css",
+  "utf8",
+);
 const productionHome = readFileSync("src/production/ProductionHome.tsx", "utf8");
 const semanticDashboard = readFileSync(
   "src/production/components/home-editorial-dashboard-semantic.tsx",
@@ -37,6 +41,7 @@ test("final editorial layers preserve their cascade order", () => {
     "home-water-editorial-v49.css",
     "home-closing-editorial-v50.css",
     "footer-editorial-v51.css",
+    "footer-editorial-v51-fix.css",
   ];
 
   for (const layer of finalLayers) {
@@ -116,6 +121,8 @@ test("footer organizes navigation, sources and status as operational information
   assert.match(footerCss, /\.editorial-footer-transparency\{grid-template-columns:minmax\(0,1\.08fr\)/);
   assert.match(footerCss, /linear-gradient\(135deg,#061a2a,#082b3e 66%,#09394b\)/);
   assert.match(footerCss, /aria-current=page/);
+  assert.match(footerFixCss, /box-shadow:inset 3px 0 0 #18bdcd/);
+  assert.match(footerFixCss, /display:none!important;content:none!important/);
 });
 
 test("homepage final visual layers remain usable on tablet and mobile", () => {
