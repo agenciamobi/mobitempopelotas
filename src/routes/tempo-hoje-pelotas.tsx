@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
-import { TodayForecastPageV2 } from "@/components/weather/DailyForecastPagesV2";
+import { TodayForecastPageV3 } from "@/components/weather/TodayForecastPageV3";
 import { TODAY_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
@@ -28,6 +28,8 @@ export const Route = createFileRoute("/tempo-hoje-pelotas")({
           "Condições meteorológicas em Pelotas",
           "Temperatura atual em Pelotas",
           "Previsão por hora em Pelotas",
+          "Medição meteorológica da Embrapa em Pelotas",
+          "Alertas meteorológicos do INMET em Pelotas",
         ],
       }),
       createFaqPageJsonLd(PAGE_PATH, TODAY_EDITORIAL_CONTENT.faqs),
@@ -42,7 +44,7 @@ function TempoHojePage() {
 
   return (
     <>
-      <TodayForecastPageV2 data={weather} />
+      <TodayForecastPageV3 data={weather} />
       <EditorialContentSection id="como-interpretar-hoje" content={TODAY_EDITORIAL_CONTENT} />
     </>
   );
