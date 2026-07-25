@@ -42,6 +42,10 @@ function normalizedKey(value: string) {
     .toLowerCase();
 }
 
+function normalizedToken(value: string) {
+  return normalizedKey(value).replace(/[^a-z0-9]/g, "");
+}
+
 function findValue(record: JsonRecord, keys: readonly string[]) {
   const normalized = new Map(Object.entries(record).map(([key, value]) => [normalizedKey(key), value]));
   for (const key of keys) {
@@ -63,7 +67,10 @@ function asText(value: unknown) {
 
 function asNumber(value: unknown) {
   if (value === null || value === undefined || value === "") return null;
-  const normalized = typeof value === "string" ? value.replace(",", ".").replace(/[^\d.-]/g, "") : value;
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (typeof value !== "string") return null;
+  const normalized = value.replace(",", ".").replace(/[^\d.-]/g, "");
+  if (!normalized || normalized === "-" || normalized === "." || normalized === "-.") return null;
   const number = Number(normalized);
   return Number.isFinite(number) ? number : null;
 }
@@ -90,7 +97,7 @@ function periodFrom(value: unknown, path: string[]) {
     integral: "Dia inteiro",
   };
   for (const segment of [...path].reverse()) {
-    const normalized = normalizedKey(segment).replace(/[^a-z]/g, "");
+    const normalized = normalizedToken(segment);
     if (labels[normalized]) return labels[normalized];
   }
   return "Previsão diária";
@@ -146,15 +153,16 @@ function deduplicatePeriods(periods: InmetForecastPeriod[]) {
     const key = [period.date, normalizedKey(period.period), normalizedKey(period.summary)].join("|");
     if (!unique.has(key)) unique.set(key, period);
   }
+  const periodOrder = ["madrugada", "manha", "tarde", "noite", "diainteiro", "previsaodiaria"];
+
   return [...unique.values()]
     .sort((first, second) => {
       const dateOrder = (first.date ?? "9999-99-99").localeCompare(second.date ?? "9999-99-99");
       if (dateOrder !== 0) return dateOrder;
-      const periodOrder = ["madrugada", "manha", "tarde", "noite", "dia inteiro", "previsao diaria"];
-      return (
-        periodOrder.indexOf(normalizedKey(first.period)) -
-        periodOrder.indexOf(normalizedKey(second.period))
-      );
+      const firstIndex = periodOrder.indexOf(normalizedToken(first.period));
+      const secondIndex = periodOrder.indexOf(normalizedToken(second.period));
+      return (firstIndex < 0 ? periodOrder.length : firstIndex) -
+        (secondIndex < 0 ? periodOrder.length : secondIndex);
     })
     .slice(0, 24);
 }
