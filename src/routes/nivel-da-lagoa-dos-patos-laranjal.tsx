@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { LaranjalLevelPage } from "@/components/hydrology/HydrologyPages";
+import { LARANJAL_LEVEL_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
 import { createPageHead } from "@/lib/page-meta";
-import { createEditorialPageJsonLd } from "@/lib/structured-data";
+import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 const PAGE_TITLE = "Nível da Lagoa dos Patos no Laranjal";
@@ -23,8 +25,15 @@ export const Route = createFileRoute("/nivel-da-lagoa-dos-patos-laranjal")({
           { name: "Situação das águas", path: "/situacao-hidrologica-pelotas" },
           { name: "Nível da Lagoa no Laranjal", path: PAGE_PATH },
         ],
-        about: ["Nível da Lagoa dos Patos", "Estação Laranjal", "Praia do Laranjal"],
+        about: [
+          "Nível da Lagoa dos Patos",
+          "Estação Laranjal",
+          "Praia do Laranjal",
+          "Telemetria hidrológica em Pelotas",
+          "Tendência do nível da água no Laranjal",
+        ],
       }),
+      createFaqPageJsonLd(PAGE_PATH, LARANJAL_LEVEL_EDITORIAL_CONTENT.faqs),
     ]),
   loader: async () => {
     const [weather, level] = await Promise.all([getWeatherIntelligence(), getLaranjalLevelData()]);
@@ -36,5 +45,11 @@ export const Route = createFileRoute("/nivel-da-lagoa-dos-patos-laranjal")({
 
 function NivelLagoaPage() {
   const data = Route.useLoaderData();
-  return <LaranjalLevelPage weather={data.weather} level={data.level} />;
+
+  return (
+    <>
+      <LaranjalLevelPage weather={data.weather} level={data.level} />
+      <EditorialContentSection id="como-interpretar-nivel-laranjal" content={LARANJAL_LEVEL_EDITORIAL_CONTENT} />
+    </>
+  );
 }
