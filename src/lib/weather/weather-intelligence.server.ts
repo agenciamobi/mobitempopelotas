@@ -1,5 +1,6 @@
 import { fetchAggregatedPelotasWeather } from "./aggregated-weather.server";
 import type { AggregatedWeatherData, WeatherSourceKey } from "./aggregated-weather.types";
+import { reconcileDailyTemperatures } from "./daily-temperature-reconciliation";
 import { generateGeminiWeatherBrief } from "./gemini-weather.server";
 import type { WeatherBrief, WeatherIntelligenceData } from "./weather-intelligence.types";
 
@@ -154,7 +155,14 @@ export function createDeterministicWeatherBrief(weather: AggregatedWeatherData):
 }
 
 export async function fetchWeatherIntelligence(): Promise<WeatherIntelligenceData> {
-  const weather = await fetchAggregatedPelotasWeather();
+  const aggregatedWeather = await fetchAggregatedPelotasWeather();
+  const weather: AggregatedWeatherData = {
+    ...aggregatedWeather,
+    daily: reconcileDailyTemperatures(
+      aggregatedWeather.daily,
+      aggregatedWeather.inmetForecast,
+    ),
+  };
   const deterministicBrief = createDeterministicWeatherBrief(weather);
   const gemini = await generateGeminiWeatherBrief(weather);
   const generatedBrief = gemini.status === "generated" ? gemini.brief : null;
