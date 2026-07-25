@@ -28,6 +28,9 @@ const WIND_INTENSITY_KEYS = ["int_vento", "vento_intensidade", "intensidade_vent
 const ICON_KEYS = ["icone", "ícone", "icon", "codigo", "código"] as const;
 const PERIOD_KEYS = ["periodo", "período", "turno"] as const;
 const DATE_KEYS = ["data", "date", "dia"] as const;
+const SUNRISE_KEYS = ["nascer", "nascer_sol", "nascer_do_sol", "sunrise"] as const;
+const SUNSET_KEYS = ["ocaso", "por_do_sol", "pôr_do_sol", "sunset"] as const;
+const SEASON_KEYS = ["estacao", "estação", "estacao_ano", "season"] as const;
 
 function asRecord(value: unknown): JsonRecord | null {
   return value !== null && typeof value === "object" && !Array.isArray(value)
@@ -119,6 +122,9 @@ function collectForecastPeriods(value: unknown, path: string[] = []): InmetForec
   const windDirection = asText(findValue(record, WIND_DIRECTION_KEYS));
   const windIntensity = asText(findValue(record, WIND_INTENSITY_KEYS));
   const icon = asText(findValue(record, ICON_KEYS));
+  const sunrise = asText(findValue(record, SUNRISE_KEYS));
+  const sunset = asText(findValue(record, SUNSET_KEYS));
+  const season = asText(findValue(record, SEASON_KEYS));
   const date = dateFrom(findValue(record, DATE_KEYS), path);
   const period = periodFrom(findValue(record, PERIOD_KEYS), path);
 
@@ -137,6 +143,9 @@ function collectForecastPeriods(value: unknown, path: string[] = []): InmetForec
             windDirection,
             windIntensity,
             icon,
+            sunrise,
+            sunset,
+            season,
           } satisfies InmetForecastPeriod,
         ]
       : [];
