@@ -16,8 +16,29 @@ const relevanceLabels: Record<InmetAlertRelevance, string> = {
   state: "Outras áreas do RS",
 };
 
+const severityRank: Record<InmetAlert["severity"], number> = {
+  unknown: 0,
+  potential: 1,
+  danger: 2,
+  "great-danger": 3,
+};
+
+const relevanceRank: Record<InmetAlert["relevance"], number> = {
+  pelotas: 0,
+  regional: 1,
+  state: 2,
+};
+
+const periodRank: Record<InmetAlert["period"], number> = {
+  active: 0,
+  upcoming: 1,
+};
+
 function formatDateTime(value: string | null) {
-  if (!value) return "Horário não informado";
+  if (!value) return null;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
 
   return new Intl.DateTimeFormat("pt-BR", {
     timeZone: "America/Sao_Paulo",
@@ -25,18 +46,23 @@ function formatDateTime(value: string | null) {
     month: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(value));
+  }).format(date);
 }
 
 function periodLabel(alert: InmetAlert) {
   const start = formatDateTime(alert.startsAt);
   const end = formatDateTime(alert.expiresAt);
 
-  if (!alert.expiresAt)
-    return alert.period === "upcoming"
-      ? `Previsto para começar em ${start}`
-      : `Em vigor desde ${start}`;
-  return alert.period === "upcoming" ? `Previsto entre ${start} e ${end}` : `Em vigor até ${end}`;
+  if (alert.period === "upcoming") {
+    if (start && end) return `Previsto entre ${start} e ${end}`;
+    if (start) return `Previsto para começar em ${start}`;
+    if (end) return `Programado até ${end}`;
+    return "Período previsto não informado pelo INMET";
+  }
+
+  if (end) return `Em vigor até ${end}`;
+  if (start) return `Em vigor desde ${start}`;
+  return "Em vigor — horário não informado pelo INMET";
 }
 
 function relevanceSummary(data: InmetAlertsData) {
@@ -79,6 +105,25 @@ function homeAlertCountLabel(data: InmetAlertsData) {
   return `${data.counts.total} ${data.counts.total === 1 ? "aviso no RS" : "avisos no RS"}`;
 }
 
+function compareHomeAlerts(first: InmetAlert, second: InmetAlert) {
+  const relevanceDifference = relevanceRank[first.relevance] - relevanceRank[second.relevance];
+  if (relevanceDifference !== 0) return relevanceDifference;
+
+  const periodDifference = periodRank[first.period] - periodRank[second.period];
+  if (periodDifference !== 0) return periodDifference;
+
+  const severityDifference = severityRank[second.severity] - severityRank[first.severity];
+  if (severityDifference !== 0) return severityDifference;
+
+  const firstTime = new Date(first.sentAt ?? first.startsAt ?? 0).getTime();
+  const secondTime = new Date(second.sentAt ?? second.startsAt ?? 0).getTime();
+  return secondTime - firstTime;
+}
+
+function primaryHomeAlert(data: InmetAlertsData) {
+  return [...data.alerts].sort(compareHomeAlerts)[0] ?? null;
+}
+
 function AlertRow({ alert }: { alert: InmetAlert }) {
   const areaText =
     alert.areas[0] ||
@@ -119,14 +164,15 @@ function AlertRow({ alert }: { alert: InmetAlert }) {
 function HomePanel({ data }: { data: InmetAlertsData }) {
   if (data.status !== "live" || data.alerts.length === 0) return null;
 
-  const primary =
-    data.alerts.find((alert) => alert.relevance === "pelotas") ??
-    data.alerts.find((alert) => alert.relevance === "regional") ??
-    data.alerts[0];
+  const primary = primaryHomeAlert(data);
+  if (!primary) return null;
 
   return (
     <section
       className={`home-inmet-alerts severity-${primary.severity}`}
+      data-alert-period={primary.period}
+      data-alert-severity={primary.severity}
+      aria-label={`${primary.severityLabel}. ${displayHeadline(primary)}. ${periodLabel(primary)}`}
       aria-labelledby="home-inmet-title"
     >
       <div className="home-inmet-alerts__main">
@@ -285,8 +331,8 @@ export function InmetAlertsPanel({ data, variant = "page" }: InmetAlertsPanelPro
 
       <footer className="inmet-alerts-footer">
         <p>
-          Última atualização: {formatDateTime(data.source.fetchedAt)}. Consulte a área completa e as
-          orientações no aviso original.
+          Última atualização: {formatDateTime(data.source.fetchedAt) ?? "horário não informado"}.
+          Consulte a área completa e as orientações no aviso original.
         </p>
         <a href={data.source.portalUrl} target="_blank" rel="noreferrer">
           Abrir site oficial do INMET <span aria-hidden="true">↗</span>
