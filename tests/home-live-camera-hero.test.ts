@@ -17,6 +17,10 @@ const proportionalStyles = readFileSync(
   "src/production/styles/home-hero-proportional-v62.css",
   "utf8",
 );
+const nativeScaleStyles = readFileSync(
+  "src/production/styles/home-live-camera-native-scale-v63.css",
+  "utf8",
+);
 const styleImports = readFileSync("src/production/production-styles.ts", "utf8");
 const globalStyles = readFileSync("src/production/production-styles.css", "utf8");
 
@@ -58,7 +62,7 @@ test("live camera source remains identified and links to the camera page", () =>
   assert.match(productionHome, /aria-label="Abrir a câmera ao vivo da Praia do Laranjal"/);
 });
 
-test("camera keeps a 16:9 signal while the final layer reduces excessive cropping", () => {
+test("camera keeps a 16:9 signal while the final layer removes additional zoom", () => {
   assert.match(cameraStyles, /var\(--home-live-camera-image\)/);
   assert.match(cameraStyles, /image-set\(/);
   assert.match(cameraStyles, /\.weather-hero-live-camera/);
@@ -68,11 +72,9 @@ test("camera keeps a 16:9 signal while the final layer reduces excessive croppin
   assert.match(cameraStyles, /height:\s*100%/);
   assert.match(cameraStyles, /aspect-ratio:\s*16\s*\/\s*9/);
   assert.match(cameraStyles, /scale\(var\(--home-live-camera-crop\)\)/);
-  assert.match(proportionalStyles, /--home-live-camera-crop:\s*1\.28/);
-  assert.match(proportionalStyles, /--home-live-camera-crop:\s*1\.22/);
-  assert.match(proportionalStyles, /--home-live-camera-crop:\s*1\.18/);
   assert.match(proportionalStyles, /aspect-ratio:\s*16\s*\/\s*9/);
-  assert.doesNotMatch(proportionalStyles, /--home-live-camera-crop:\s*1\.54/);
+  assert.match(nativeScaleStyles, /--home-live-camera-crop:\s*1\s*;/);
+  assert.doesNotMatch(nativeScaleStyles, /--home-live-camera-crop:\s*1\.[1-9]/);
   assert.match(cameraStyles, /overflow:\s*hidden/);
   assert.match(cameraStyles, /opacity:\s*0/);
   assert.match(cameraStyles, /\.is-ready iframe\s*\{[\s\S]*opacity:\s*1/);
@@ -80,12 +82,14 @@ test("camera keeps a 16:9 signal while the final layer reduces excessive croppin
   assert.match(cameraStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("proportional camera layer is loaded after the live camera base layer", () => {
+test("native camera scale is loaded after all proportional hero refinements", () => {
   const tsCamera = styleImports.indexOf("home-hero-live-camera-v54.css");
   const tsProportional = styleImports.indexOf("home-hero-proportional-v62.css");
+  const tsNative = styleImports.indexOf("home-live-camera-native-scale-v63.css");
   const cssCamera = globalStyles.indexOf("home-hero-live-camera-v54.css");
   const cssProportional = globalStyles.indexOf("home-hero-proportional-v62.css");
+  const cssNative = globalStyles.indexOf("home-live-camera-native-scale-v63.css");
 
-  assert.ok(tsCamera >= 0 && tsProportional > tsCamera);
-  assert.ok(cssCamera >= 0 && cssProportional > cssCamera);
+  assert.ok(tsCamera >= 0 && tsProportional > tsCamera && tsNative > tsProportional);
+  assert.ok(cssCamera >= 0 && cssProportional > cssCamera && cssNative > cssProportional);
 });
