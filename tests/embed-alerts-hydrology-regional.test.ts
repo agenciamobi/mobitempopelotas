@@ -4,6 +4,7 @@ import test from "node:test";
 
 const embedRoute = readFileSync("src/routes/embed/nivel-laranjal.tsx", "utf8");
 const embedComponent = readFileSync("src/components/embed/LaranjalLevelEmbed.tsx", "utf8");
+const embedIsolation = readFileSync("src/components/embed/LaranjalEmbedIsolation.css", "utf8");
 const embedScript = readFileSync("src/routes/widgets/nivel-laranjal[.]js.ts", "utf8");
 const embedApi = readFileSync("src/routes/api/widgets/nivel-laranjal.ts", "utf8");
 const embedGuide = readFileSync("src/components/embed/LaranjalEmbedGuide.tsx", "utf8");
@@ -25,6 +26,7 @@ const regionalFunctions = readFileSync(
 
 test("Laranjal widget is standalone, responsive and publicly reusable", () => {
   assert.match(embedRoute, /createFileRoute\("\/embed\/nivel-laranjal"\)/);
+  assert.match(embedRoute, /LaranjalEmbedIsolation\.css/);
   assert.match(siteLayout, /"\/embed\/nivel-laranjal"/);
   assert.match(embedComponent, /tempo-pelotas:widget-resize/);
   assert.match(embedComponent, /ResizeObserver/);
@@ -36,6 +38,9 @@ test("Laranjal widget is standalone, responsive and publicly reusable", () => {
   assert.match(embedApi, /series/);
   assert.match(embedGuide, /Código de incorporação/);
   assert.match(embedGuide, /navigator\.clipboard\.writeText/);
+  assert.match(embedIsolation, /\.pwa-launcher/);
+  assert.match(embedIsolation, /\.push-launcher/);
+  assert.match(embedIsolation, /onesignal-bell-container/);
 });
 
 test("alerts page uses the homepage editorial first-fold language", () => {
