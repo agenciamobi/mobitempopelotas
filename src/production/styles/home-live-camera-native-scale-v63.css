@@ -1,0 +1,5 @@
+/* Home v63 — teste da transmissão do Laranjal sem ampliação adicional. */
+
+.site-shell--home-editorial .weather-hero-live-camera {
+  --home-live-camera-crop: 1;
+}
