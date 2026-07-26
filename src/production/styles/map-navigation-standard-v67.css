@@ -1,0 +1,44 @@
+/* Mapas v67 — controles estáveis e marcadores compactos em qualquer modo. */
+
+.map-layer-switcher {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(330px, calc(100% - 96px));
+  max-width: none;
+  overflow: visible;
+}
+
+.map-layer-switcher button {
+  width: 100%;
+  min-width: 0;
+  padding-inline: 10px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.map-layer-switcher button.is-active {
+  transform: none;
+}
+
+@media (max-width: 640px) {
+  .map-layer-switcher {
+    right: 12px;
+    left: 12px;
+    width: auto;
+    max-width: none;
+    overflow: visible;
+    scrollbar-width: auto;
+  }
+
+  .map-layer-switcher button {
+    min-height: 42px;
+    padding-inline: 6px;
+    font-size: 0.64rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .map-layer-switcher button {
+    font-size: 0.58rem;
+  }
+}
