@@ -5,15 +5,9 @@
 
 .home-hero-camera-shell.has-live-camera .weather-hero-photo {
   z-index: -5;
-  background-image:
-    var(--home-live-camera-image),
-    image-set(
-      url("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Amanhecer_na_Praia_do_Laranjal.jpg/1920px-Amanhecer_na_Praia_do_Laranjal.jpg") 1x,
-      url("https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Amanhecer_na_Praia_do_Laranjal.jpg/2560px-Amanhecer_na_Praia_do_Laranjal.jpg") 2x
-    );
-  background-position: center 50%, center 55%;
-  background-size: cover, cover;
-  filter: saturate(0.86) contrast(1.04) brightness(0.82);
+  background: transparent;
+  filter: none;
+  opacity: 0;
   transform: none;
 }
 
@@ -26,17 +20,13 @@
   width: 44.5%;
   overflow: hidden;
   border-radius: 0 0 clamp(22px, 1.7vw, 28px) 0;
-  background-color: #071e2f;
-  background-image: var(--home-live-camera-image);
-  background-position: center 50%;
-  background-size: cover;
+  background: transparent;
   pointer-events: none;
 }
 
 /*
- * A transmissão contém letterboxing dentro do próprio sinal. O iframe mantém
- * 16:9 e recebe um recorte calibrado de 1.54x: as barras incorporadas ficam
- * fora da área visível, sem deformar a imagem ou alterar sua proporção.
+ * O iframe mantém a proporção original da transmissão. As camadas finais de
+ * geometria controlam o enquadramento responsivo sem depender de thumbnail.
  */
 .weather-hero-live-camera iframe {
   position: absolute;
@@ -52,7 +42,7 @@
   pointer-events: none;
   transform: translate(-50%, -50%) scale(var(--home-live-camera-crop));
   transform-origin: center;
-  transition: opacity 0.7s ease;
+  transition: opacity 0.35s ease;
   will-change: opacity, transform;
 }
 
@@ -61,9 +51,7 @@
 }
 
 .home-hero-camera-shell.has-live-camera .weather-hero-overlay {
-  background:
-    linear-gradient(180deg, rgb(4 20 32 / 5%), rgb(4 20 32 / 42%)),
-    linear-gradient(105deg, rgb(7 30 47 / 18%), transparent 42%, rgb(94 44 237 / 11%));
+  background: transparent;
 }
 
 .home-hero-camera-shell.has-live-camera .weather-hero-credit {
@@ -121,10 +109,6 @@
 }
 
 @media (max-width: 900px) {
-  .home-hero-camera-shell.has-live-camera .weather-hero-photo {
-    background-position: center 48%, center 55%;
-  }
-
   .weather-hero-live-camera {
     inset: 10px 10px auto;
     width: auto;
@@ -132,7 +116,6 @@
     border-radius: 16px;
   }
 
-  /* Em superfícies largas e baixas, o player cobre pelo eixo horizontal. */
   .weather-hero-live-camera iframe {
     width: 100%;
     height: auto;
@@ -152,10 +135,6 @@
 }
 
 @media (max-width: 620px) {
-  .home-hero-camera-shell.has-live-camera .weather-hero-photo {
-    background-position: center 46%, center 55%;
-  }
-
   .weather-hero-live-camera {
     height: 182px;
   }
@@ -173,7 +152,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .weather-hero-live-camera iframe {
-    display: none;
+    display: block;
     transition: none;
   }
 }
