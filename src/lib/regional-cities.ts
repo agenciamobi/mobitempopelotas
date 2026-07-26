@@ -11,6 +11,8 @@ export type RegionalCity = {
   descriptor: string;
 };
 
+export const REGIONAL_HOME_CITY_SLUG = "pelotas-rs";
+
 export const REGIONAL_CITIES: RegionalCity[] = [
   { slug: "pelotas-rs", name: "Pelotas", state: "RS", ibgeCode: "4314407", latitude: -31.7654, longitude: -52.3376, group: "Pelotas e entorno", descriptor: "principal centro urbano da Zona Sul do Rio Grande do Sul" },
   { slug: "capao-do-leao-rs", name: "Capão do Leão", state: "RS", ibgeCode: "4304663", latitude: -31.7565, longitude: -52.4889, group: "Pelotas e entorno", descriptor: "município vizinho a Pelotas e conectado à dinâmica meteorológica regional" },
@@ -42,8 +44,12 @@ export function findRegionalCity(slug: string) {
   return REGIONAL_CITIES.find((city) => city.slug === slug) ?? null;
 }
 
+export function isRegionalHomeCity(city: RegionalCity) {
+  return city.slug === REGIONAL_HOME_CITY_SLUG;
+}
+
 export function regionalCityPath(city: RegionalCity) {
-  return `/tempo-em/${city.slug}`;
+  return isRegionalHomeCity(city) ? "/" : `/tempo-em/${city.slug}`;
 }
 
 export const REGIONAL_CITY_GROUPS = Array.from(
