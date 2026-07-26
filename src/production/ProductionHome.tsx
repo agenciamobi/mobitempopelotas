@@ -78,6 +78,13 @@ function getLiveLaranjalCamera(cameraData: WeatherCameraData) {
   }
 }
 
+function strongestHourlyWindSpeed(weather: WeatherData) {
+  return weather.hourly.slice(0, 24).reduce<number | null>((strongest, hour) => {
+    if (!Number.isFinite(hour.windSpeed)) return strongest;
+    return strongest === null ? hour.windSpeed : Math.max(strongest, hour.windSpeed);
+  }, null);
+}
+
 export function ProductionHome({
   data,
   laranjal,
@@ -146,6 +153,7 @@ export function ProductionHome({
     advisoryRank[officialLevel] > advisoryRank[advisory.level] ? officialLevel : advisory.level;
   const featuredSafetyBanner = getFeaturedSafetyBanner(pelotasOfficialAlerts.length > 0);
   const cppmetToday = recoveredData.weather.officialForecast[0] ?? null;
+  const forecastWindSpeedKmh = strongestHourlyWindSpeed(weather);
   const mainClassName =
     pelotasOfficialAlerts.length > 0
       ? "home-editorial-main has-official-alerts"
@@ -194,6 +202,7 @@ export function ProductionHome({
         <InmetOfficialForecastPanel
           periods={recoveredData.weather.inmetForecast}
           station={recoveredData.weather.inmetStation}
+          forecastWindSpeedKmh={forecastWindSpeedKmh}
         />
         <SafetyAlertBanner banner={featuredSafetyBanner} />
         <HomeSectionNavigation />
