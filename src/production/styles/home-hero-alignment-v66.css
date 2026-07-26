@@ -1,0 +1,84 @@
+/* Home v66 — alinhamento consistente dos motivos e ações do hero. */
+
+.site-shell--home-editorial .weather-hero-reasons {
+  display: grid;
+  width: min(100%, 620px);
+  max-width: 620px;
+  gap: 0.68rem;
+  margin-top: clamp(0.9rem, 1.25vw, 1.1rem);
+}
+
+.site-shell--home-editorial .weather-hero-reasons span {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-height: 0;
+  align-items: flex-start;
+  gap: 0.68rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #8f421f;
+  font-size: 0.65rem;
+  font-weight: 720;
+  line-height: 1.48;
+  text-wrap: pretty;
+}
+
+.site-shell--home-editorial .weather-hero-reasons span::before {
+  position: static;
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  margin-top: 0.31em;
+  border-radius: 999px;
+  background: var(--hero-status);
+  box-shadow: 0 0 0 4px var(--hero-status-ring);
+  content: "";
+}
+
+.site-shell--home-editorial .weather-hero-actions {
+  display: flex;
+  width: min(100%, 620px);
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.15rem;
+  margin-top: clamp(1.3rem, 1.7vw, 1.55rem);
+}
+
+.site-shell--home-editorial .weather-hero-primary,
+.site-shell--home-editorial .weather-hero-secondary {
+  flex: 0 0 auto;
+}
+
+.site-shell--home-editorial .weather-hero-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@media (max-width: 680px) {
+  .site-shell--home-editorial .weather-hero-reasons,
+  .site-shell--home-editorial .weather-hero-actions {
+    width: 100%;
+    max-width: none;
+  }
+
+  .site-shell--home-editorial .weather-hero-actions {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.72rem;
+  }
+
+  .site-shell--home-editorial .weather-hero-primary {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .site-shell--home-editorial .weather-hero-secondary {
+    width: fit-content;
+    min-height: 2.25rem;
+  }
+}
