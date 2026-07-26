@@ -4,6 +4,17 @@ import test from "node:test";
 
 const packageJson = JSON.parse(readFileSync("package.json", "utf8")) as {
   scripts?: Record<string, string>;
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+};
+const packageLock = JSON.parse(readFileSync("package-lock.json", "utf8")) as {
+  packages?: Record<
+    string,
+    {
+      dependencies?: Record<string, string>;
+      devDependencies?: Record<string, string>;
+    }
+  >;
 };
 const generator = readFileSync("scripts/generate-route-tree.mjs", "utf8");
 
@@ -30,4 +41,11 @@ test("route generator discovers all exported file routes recursively", () => {
   assert.match(generator, /routeTree\.gen\.ts regenerado/);
   assert.match(generator, /_addFileChildren\(rootRouteChildren\)/);
   assert.match(generator, /_addFileTypes<FileRouteTypes>\(\)/);
+});
+
+test("package manifest remains compatible with npm ci lock metadata", () => {
+  const lockedRoot = packageLock.packages?.[""];
+  assert.ok(lockedRoot, "package-lock.json deve conter os metadados do projeto raiz");
+  assert.deepEqual(packageJson.dependencies, lockedRoot.dependencies);
+  assert.deepEqual(packageJson.devDependencies, lockedRoot.devDependencies);
 });
