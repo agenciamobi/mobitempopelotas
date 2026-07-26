@@ -44,8 +44,10 @@ test("Laranjal widget is standalone, responsive and publicly reusable", () => {
   assert.match(embedScript, /https:\/\/tempopelotas\.com\.br\/embed\/nivel-laranjal/);
   assert.match(embedScript, /iframe\.style\.width = "100%"/);
   assert.match(embedScript, /MutationObserver/);
-  assert.match(embedScript, /allow-scripts allow-same-origin allow-popups/);
+  assert.match(embedScript, /allow-popups-to-escape-sandbox/);
   assert.match(embedScript, /TempoPelotasNivelLaranjal/);
+  assert.match(embedScript, /version: 1/);
+  assert.match(embedScript, /Cross-Origin-Resource-Policy/);
   assert.match(embedApi, /Access-Control-Allow-Origin/);
   assert.match(embedApi, /currentLevel/);
   assert.match(embedApi, /series/);
