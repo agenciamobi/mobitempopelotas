@@ -24,22 +24,31 @@
   width: 44.5%;
   overflow: hidden;
   border-radius: 0 0 clamp(22px, 1.7vw, 28px) 0;
+  background-color: #071e2f;
   background-image: var(--home-live-camera-image);
   background-position: center 50%;
   background-size: cover;
   pointer-events: none;
 }
 
+/*
+ * O player mantém 16:9 real e cobre a coluna pelo eixo vertical. A coluna do
+ * hero é mais alta e estreita que o vídeo; por isso o excesso horizontal é
+ * recortado, em vez de o YouTube criar letterboxing acima e abaixo.
+ */
 .weather-hero-live-camera iframe {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 100%;
+  width: auto;
   height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  aspect-ratio: 16 / 9;
   border: 0;
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, -50%) scale(1.46);
+  transform: translate(-50%, -50%) scale(1.08);
   transform-origin: center;
   transition: opacity 0.7s ease;
 }
@@ -120,11 +129,14 @@
     border-radius: 16px;
   }
 
+  /* Em superfícies largas e baixas, o player cobre pelo eixo horizontal. */
   .weather-hero-live-camera iframe {
     width: 100%;
-    height: 56.25vw;
+    height: auto;
+    min-width: 100%;
     min-height: 100%;
-    transform: translate(-50%, -50%) scale(1.04);
+    aspect-ratio: 16 / 9;
+    transform: translate(-50%, -50%) scale(1.08);
   }
 
   .home-hero-camera-source {
@@ -144,6 +156,10 @@
 
   .weather-hero-live-camera {
     height: 182px;
+  }
+
+  .weather-hero-live-camera iframe {
+    transform: translate(-50%, -50%) scale(1.1);
   }
 
   .home-hero-camera-source {
