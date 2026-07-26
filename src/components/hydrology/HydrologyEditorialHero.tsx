@@ -72,7 +72,7 @@ export function HydrologyEditorialHero({
         </div>
 
         <div className="hydrology-editorial-actions">
-          <a href="#leitura-laranjal">
+          <a href="#hydrology-level-title">
             Ver leitura e histórico <ArrowRight aria-hidden="true" />
           </a>
           {overview ? (
