@@ -69,18 +69,14 @@ test("cada URL do sitemap possui um módulo de rota real", () => {
   }
 });
 
-test(
-  "o sitemap corresponde à árvore gerada pelo TanStack Router",
-  { skip: process.env.ROUTE_TREE_REQUIRED !== "1" },
-  () => {
-    const routerPaths = generatedRoutePaths();
+test("o sitemap corresponde à árvore gerada pelo TanStack Router", () => {
+  const routerPaths = generatedRoutePaths();
 
-    for (const route of PUBLIC_ROUTES) {
-      const expectedPath = generatedRoutePath(route.path);
-      assert.ok(routerPaths.has(expectedPath), `a árvore gerada não contém ${expectedPath}`);
-    }
-  },
-);
+  for (const route of PUBLIC_ROUTES) {
+    const expectedPath = generatedRoutePath(route.path);
+    assert.ok(routerPaths.has(expectedPath), `a árvore gerada não contém ${expectedPath}`);
+  }
+});
 
 test("preserva páginas essenciais para visitantes leigos", () => {
   const paths = new Set(PUBLIC_ROUTES.map((route) => route.path));
