@@ -5,24 +5,33 @@
 
 .locationMarker {
   display: grid;
-  min-width: 108px;
+  min-width: 0;
+  max-width: 150px;
   gap: 2px;
-  padding: 9px 12px;
+  padding: 8px 10px;
   border: 2px solid rgba(255, 255, 255, 0.92);
-  border-radius: 16px 16px 16px 4px;
+  border-radius: 14px 14px 14px 4px;
   box-shadow: 0 12px 28px rgba(7, 30, 47, 0.22);
   font-family: inherit;
   line-height: 1.1;
   pointer-events: none;
 }
 
+.locationMarker strong,
+.locationMarker span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .locationMarker strong {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 900;
 }
 
 .locationMarker span {
-  font-size: 0.56rem;
+  max-width: 126px;
+  font-size: 0.54rem;
   font-weight: 720;
   opacity: 0.76;
 }
@@ -43,7 +52,9 @@
   z-index: 6;
   top: 164px;
   left: 24px;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(330px, calc(100% - 96px));
   gap: 4px;
   padding: 5px;
   border: 1px solid rgba(255, 255, 255, 0.82);
@@ -54,8 +65,10 @@
 }
 
 .satelliteSwitcher button {
+  width: 100%;
+  min-width: 0;
   min-height: 32px;
-  padding: 6px 10px;
+  padding: 6px 8px;
   border: 0;
   border-radius: 10px;
   background: transparent;
@@ -64,6 +77,8 @@
   font: inherit;
   font-size: 0.6rem;
   font-weight: 820;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .satelliteSwitcher button:hover,
@@ -188,6 +203,10 @@
     top: 152px;
     left: 16px;
   }
+
+  .locationMarker span {
+    display: none;
+  }
 }
 
 @media (max-width: 640px) {
@@ -207,18 +226,25 @@
 
   .satelliteSwitcher {
     top: 143px;
+    right: 12px;
     left: 12px;
-    max-width: calc(100% - 24px);
-    overflow-x: auto;
+    width: auto;
+    max-width: none;
+    overflow: visible;
   }
 
   .satelliteSwitcher button {
-    flex: 0 0 auto;
+    min-height: 38px;
+    padding-inline: 5px;
   }
 
   .locationMarker {
-    min-width: 94px;
-    padding: 8px 10px;
+    max-width: 92px;
+    padding: 7px 8px;
+  }
+
+  .locationMarker strong {
+    font-size: 0.6rem;
   }
 
   .stormCounter {
@@ -246,13 +272,8 @@
     font-size: 0.58rem;
   }
 
-  .satelliteSwitcher {
-    right: 12px;
-  }
-
   .satelliteSwitcher button {
-    flex: 1;
-    padding-inline: 7px;
+    font-size: 0.56rem;
   }
 }
 
