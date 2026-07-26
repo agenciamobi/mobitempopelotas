@@ -6,7 +6,7 @@ import type { AdvisoryLevel } from "@/production/lib/weather-insights";
 
 import "./Header.css";
 
-type MenuId = "monitoring" | "water";
+type MenuId = "monitoring" | "region" | "water";
 
 const editorialPrimaryLinks = [
   { label: "Agora", ariaLabel: "Ver o tempo agora em Pelotas", to: "/" },
@@ -87,6 +87,37 @@ const megaMenus = [
     ],
   },
   {
+    id: "region",
+    label: "Região",
+    activePaths: ["/tempo-na-regiao-sul-rs", "/tempo-em/"],
+    featured: {
+      eyebrow: "Central local",
+      label: "Tempo por cidade na Zona Sul",
+      to: "/tempo-na-regiao-sul-rs",
+      description: "Previsão local e avisos municipais para Pelotas, Costa Doce, fronteira e Campanha.",
+    },
+    sections: [
+      {
+        title: "Pelotas e entorno",
+        links: [
+          { label: "Pelotas", href: "/tempo-em/pelotas-rs", description: "Previsão completa para o centro regional." },
+          { label: "Capão do Leão", href: "/tempo-em/capao-do-leao-rs", description: "Tempo no município vizinho a Pelotas." },
+          { label: "Canguçu", href: "/tempo-em/cangucu-rs", description: "Condições na Serra do Sudeste." },
+          { label: "Morro Redondo", href: "/tempo-em/morro-redondo-rs", description: "Previsão para a área serrana próxima." },
+        ],
+      },
+      {
+        title: "Costa e fronteira",
+        links: [
+          { label: "Rio Grande", href: "/tempo-em/rio-grande-rs", description: "Porto, Lagoa dos Patos e litoral." },
+          { label: "São Lourenço do Sul", href: "/tempo-em/sao-lourenco-do-sul-rs", description: "Previsão na Costa Doce." },
+          { label: "Jaguarão", href: "/tempo-em/jaguarao-rs", description: "Tempo na fronteira com o Uruguai." },
+          { label: "Santa Vitória do Palmar", href: "/tempo-em/santa-vitoria-do-palmar-rs", description: "Condições no extremo sul." },
+        ],
+      },
+    ],
+  },
+  {
     id: "water",
     label: "Águas",
     activePaths: ["/situacao-hidrologica-pelotas", "/nivel-da-lagoa-dos-patos-laranjal"],
@@ -146,10 +177,10 @@ const mobileNavigation = [
     icon: "▦",
   },
   {
-    label: "Águas",
-    ariaLabel: "Situação das águas em Pelotas e na Lagoa dos Patos",
-    to: "/situacao-hidrologica-pelotas",
-    icon: "≈",
+    label: "Região",
+    ariaLabel: "Consultar previsão por cidade na Zona Sul do Rio Grande do Sul",
+    to: "/tempo-na-regiao-sul-rs",
+    icon: "⌖",
   },
   {
     label: "Alertas",
@@ -357,20 +388,32 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
                             <section key={section.title}>
                               <h2>{section.title}</h2>
                               <div>
-                                {section.links.map((link) => (
-                                  <Link
-                                    to={link.to}
-                                    key={link.to}
-                                    aria-label={`${link.label}. ${link.description}`}
-                                    aria-current={
-                                      isActivePath(pathname, link.to) ? "page" : undefined
-                                    }
-                                  >
-                                    <span aria-hidden="true" />
-                                    <strong>{link.label}</strong>
-                                    <small>{link.description}</small>
-                                  </Link>
-                                ))}
+                                {section.links.map((link) => {
+                                  const content = (
+                                    <>
+                                      <span aria-hidden="true" />
+                                      <strong>{link.label}</strong>
+                                      <small>{link.description}</small>
+                                    </>
+                                  );
+
+                                  return "href" in link ? (
+                                    <a href={link.href} key={link.href}>
+                                      {content}
+                                    </a>
+                                  ) : (
+                                    <Link
+                                      to={link.to}
+                                      key={link.to}
+                                      aria-label={`${link.label}. ${link.description}`}
+                                      aria-current={
+                                        isActivePath(pathname, link.to) ? "page" : undefined
+                                      }
+                                    >
+                                      {content}
+                                    </Link>
+                                  );
+                                })}
                               </div>
                             </section>
                           ))}
