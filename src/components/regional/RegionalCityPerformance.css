@@ -1,0 +1,31 @@
+.regional-city-page > section[id],
+.regional-city-page > footer {
+  scroll-margin-top: 7.5rem;
+}
+
+.regional-city-page > section:nth-of-type(n + 3),
+.regional-city-page > footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 760px;
+}
+
+.regional-city-page > footer {
+  contain-intrinsic-size: auto 120px;
+}
+
+@media (max-width: 700px) {
+  .regional-city-page > section[id],
+  .regional-city-page > footer {
+    scroll-margin-top: 5.75rem;
+  }
+
+  .regional-city-page > section:nth-of-type(n + 3) {
+    contain-intrinsic-size: auto 560px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .regional-city-page {
+    scroll-behavior: auto;
+  }
+}
