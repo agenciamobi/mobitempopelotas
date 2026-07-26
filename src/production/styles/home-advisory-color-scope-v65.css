@@ -1,0 +1,47 @@
+/* Home v65 — cores de atenção restritas aos elementos que comunicam risco. */
+
+.site-shell--home-editorial .weather-hero-headline,
+.site-shell--home-editorial .weather-hero--attention .weather-hero-headline,
+.site-shell--home-editorial .weather-hero--warning .weather-hero-headline {
+  color: #5e2ced;
+}
+
+.site-shell--home-editorial .weather-hero-primary {
+  background: #071e2f;
+  color: #fff;
+  box-shadow: 0 12px 26px rgb(7 30 47 / 16%);
+}
+
+.site-shell--home-editorial .weather-hero-primary:hover,
+.site-shell--home-editorial .weather-hero-primary:focus-visible {
+  background: #103b55;
+  box-shadow: 0 16px 32px rgb(7 30 47 / 20%);
+}
+
+.site-shell--home-editorial .weather-hero-primary[href="/alertas"] {
+  background: var(--hero-accent);
+  color: #fff;
+  box-shadow: 0 12px 26px rgb(var(--hero-accent-rgb) / 20%);
+}
+
+.site-shell--home-editorial .weather-hero-primary[href="/alertas"]:hover,
+.site-shell--home-editorial .weather-hero-primary[href="/alertas"]:focus-visible {
+  filter: brightness(0.96) saturate(1.04);
+  box-shadow: 0 16px 34px rgb(var(--hero-accent-rgb) / 25%);
+}
+
+.site-shell--home-editorial .weather-hero-secondary {
+  color: #16384a;
+}
+
+.site-shell--home-editorial .weather-hero-secondary:hover,
+.site-shell--home-editorial .weather-hero-secondary:focus-visible {
+  color: #5e2ced;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell--home-editorial .weather-hero-primary[href="/alertas"]:hover,
+  .site-shell--home-editorial .weather-hero-primary[href="/alertas"]:focus-visible {
+    filter: none;
+  }
+}
