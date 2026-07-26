@@ -12,8 +12,10 @@ const serverEntry = readFileSync("src/server.ts", "utf8");
 const siteLayout = readFileSync("src/components/layout/SiteLayout.tsx", "utf8");
 const alerts = readFileSync("src/components/weather/WeatherAlertsPage.tsx", "utf8");
 const alertsStyles = readFileSync("src/components/weather/WeatherAlertsHomepageVisual.css", "utf8");
+const alertsRefinements = readFileSync("src/components/weather/WeatherAlertsRefinements.css", "utf8");
 const hydrologyHero = readFileSync("src/components/hydrology/HydrologyEditorialHero.tsx", "utf8");
 const hydrologyRouteStyles = readFileSync("src/components/hydrology/HydrologyEditorialRoute.css", "utf8");
+const hydrologyRefinements = readFileSync("src/components/hydrology/HydrologyEditorialRefinements.css", "utf8");
 const levelRoute = readFileSync("src/routes/nivel-da-lagoa-dos-patos-laranjal.tsx", "utf8");
 const overviewRoute = readFileSync("src/routes/situacao-hidrologica-pelotas.tsx", "utf8");
 const resilientWeather = readFileSync(
@@ -24,6 +26,13 @@ const regionalFunctions = readFileSync(
   "src/lib/weather/regional-city-weather.functions.ts",
   "utf8",
 );
+const regionalAlertPriority = readFileSync(
+  "src/lib/weather/regional-alert-priority.ts",
+  "utf8",
+);
+const regionalHero = readFileSync("src/components/regional/RegionalCityHero.tsx", "utf8");
+const regionalPage = readFileSync("src/components/regional/RegionalCityWeatherPage.tsx", "utf8");
+const regionalRefinements = readFileSync("src/components/regional/RegionalCityRefinements.css", "utf8");
 
 test("Laranjal widget is standalone, responsive and publicly reusable", () => {
   assert.match(embedRoute, /createFileRoute\("\/embed\/nivel-laranjal"\)/);
@@ -34,6 +43,9 @@ test("Laranjal widget is standalone, responsive and publicly reusable", () => {
   assert.match(embedScript, /data-tempo-pelotas-nivel-laranjal/);
   assert.match(embedScript, /https:\/\/tempopelotas\.com\.br\/embed\/nivel-laranjal/);
   assert.match(embedScript, /iframe\.style\.width = "100%"/);
+  assert.match(embedScript, /MutationObserver/);
+  assert.match(embedScript, /allow-scripts allow-same-origin allow-popups/);
+  assert.match(embedScript, /TempoPelotasNivelLaranjal/);
   assert.match(embedApi, /Access-Control-Allow-Origin/);
   assert.match(embedApi, /currentLevel/);
   assert.match(embedApi, /series/);
@@ -62,10 +74,12 @@ test("alerts page uses the homepage editorial first-fold language", () => {
   assert.match(alerts, /featured \? "#aviso-prioritario" : "#resumo-alertas"/);
   assert.match(alertsStyles, /grid-template-columns:\s*minmax\(0, 1\.14fr\)/);
   assert.match(alertsStyles, /color:\s*#5e2ced/);
-  assert.match(alertsStyles, /@media \(max-width:\s*620px\)/);
+  assert.match(alertsRefinements, /min-height:\s*clamp\(460px/);
+  assert.match(alertsRefinements, /#resumo-alertas/);
+  assert.match(alertsRefinements, /@media \(max-width:\s*620px\)/);
 });
 
-test("hydrology pages share a data-led editorial hero and hide the legacy first fold", () => {
+test("hydrology pages share a compact data-led editorial hero", () => {
   assert.match(hydrologyHero, /Acompanhe as águas que influenciam Pelotas/);
   assert.match(hydrologyHero, /Nível da Lagoa dos Patos no Laranjal/);
   assert.match(hydrologyHero, /level\.currentLevel/);
@@ -73,6 +87,8 @@ test("hydrology pages share a data-led editorial hero and hide the legacy first 
   assert.match(hydrologyRouteStyles, /\.hydrology-page-header/);
   assert.match(hydrologyRouteStyles, /\.hydrology-detail-header/);
   assert.match(hydrologyRouteStyles, /display:\s*none/);
+  assert.match(hydrologyRefinements, /min-height:\s*clamp\(470px/);
+  assert.match(hydrologyRefinements, /#hydrology-level-title/);
   assert.match(levelRoute, /HydrologyEditorialHero level=\{data\.level\} variant="detail"/);
   assert.match(overviewRoute, /HydrologyEditorialHero level=\{data\.level\} variant="overview"/);
   assert.match(levelRoute, /LaranjalEmbedGuide/);
@@ -93,4 +109,20 @@ test("regional city loader recovers every incomplete weather group", () => {
   assert.match(resilientWeather, /currentFromPayload/);
   assert.match(resilientWeather, /hourlyFromPayload/);
   assert.match(resilientWeather, /dailyFromPayload/);
+});
+
+test("regional city pages share alert priority, pt-BR metrics and router links", () => {
+  assert.match(regionalAlertPriority, /hasVerifiedRegionalAlertSemantics/);
+  assert.match(regionalAlertPriority, /regionalAlertPeriod/);
+  assert.match(regionalAlertPriority, /selectPriorityRegionalAlert/);
+  assert.match(regionalAlertPriority, /great-danger": 3/);
+  assert.match(regionalHero, /selectPriorityRegionalAlert/);
+  assert.match(regionalHero, /Intl\.NumberFormat\("pt-BR"/);
+  assert.match(regionalHero, /regional-city-hero/);
+  assert.match(regionalPage, /selectPriorityRegionalAlert/);
+  assert.match(regionalPage, /to="\/tempo-em\/\$citySlug"/);
+  assert.match(regionalPage, /aria-label=\{`Consultar o aviso oficial/);
+  assert.match(regionalRefinements, /min-height:\s*clamp\(470px/);
+  assert.match(regionalRefinements, /#previsao-horaria-regional/);
+  assert.match(regionalRefinements, /@media \(max-width:\s*620px\)/);
 });
