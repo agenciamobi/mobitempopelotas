@@ -1,10 +1,14 @@
 /* global self, caches, fetch, Response, URL */
 
-const CACHE_VERSION = "tempo-pelotas-v3";
+const CACHE_VERSION = "tempo-pelotas-v4";
 const APP_SHELL_CACHE = `${CACHE_VERSION}-app-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_FALLBACK_URL = "/offline.html";
-const OPTIONAL_APP_SHELL_URLS = ["/manifest.webmanifest", "/brand/tempo-pelotas-icon.svg"];
+const OPTIONAL_APP_SHELL_URLS = [
+  "/manifest.webmanifest",
+  "/brand/tempo-pelotas-icon.png",
+  "/brand/tempo-pelotas-maskable.png",
+];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -123,8 +127,8 @@ self.addEventListener("push", (event) => {
   const title = data.title || "Tempo Pelotas";
   const options = {
     body: data.body || "Há uma nova informação para Pelotas.",
-    icon: data.icon || "/brand/tempo-pelotas-icon.svg",
-    badge: data.badge || "/brand/tempo-pelotas-icon.svg",
+    icon: data.icon || "/brand/tempo-pelotas-icon.png",
+    badge: data.badge || "/brand/tempo-pelotas-icon.png",
     tag: data.tag || "tempo-pelotas",
     renotify: Boolean(data.renotify),
     requireInteraction: Boolean(data.requireInteraction),
