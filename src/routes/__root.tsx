@@ -11,6 +11,7 @@ import mapLibreCss from "maplibre-gl/dist/maplibre-gl.css?url";
 import { useEffect, type ReactNode } from "react";
 
 import { SiteLayout } from "@/components/layout/SiteLayout";
+import { PwaAppExperience } from "@/components/pwa/PwaAppExperience";
 import { PwaManager } from "@/components/pwa/PwaManager";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 import {
@@ -125,7 +126,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: SITE_TITLE },
       { name: "description", content: SITE_DESCRIPTION },
       { name: "application-name", content: SITE_NAME },
@@ -196,6 +197,7 @@ function RootComponent() {
       <SiteLayout>
         <Outlet />
       </SiteLayout>
+      <PwaAppExperience />
       <PwaManager />
     </QueryClientProvider>
   );
