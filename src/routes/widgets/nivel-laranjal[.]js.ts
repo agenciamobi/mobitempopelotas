@@ -17,7 +17,10 @@ const SCRIPT = String.raw`(function () {
     iframe.referrerPolicy = "strict-origin-when-cross-origin";
     iframe.setAttribute("scrolling", "no");
     iframe.setAttribute("allowtransparency", "true");
-    iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-popups");
+    iframe.setAttribute(
+      "sandbox",
+      "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+    );
     iframe.style.display = "block";
     iframe.style.width = "100%";
     iframe.style.height = container.dataset.height || "470px";
@@ -43,7 +46,7 @@ const SCRIPT = String.raw`(function () {
     return;
   }
 
-  window[globalKey] = { mountAll: mountAll };
+  window[globalKey] = { version: 1, mount: mount, mountAll: mountAll };
 
   window.addEventListener("message", function (event) {
     if (event.origin !== "https://tempopelotas.com.br") return;
@@ -88,6 +91,7 @@ export const Route = createFileRoute("/widgets/nivel-laranjal.js")({
             "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
             "CDN-Cache-Control": "max-age=3600, stale-while-revalidate=86400",
             "Content-Type": "application/javascript; charset=utf-8",
+            "Cross-Origin-Resource-Policy": "cross-origin",
             "X-Content-Type-Options": "nosniff",
           },
         }),
