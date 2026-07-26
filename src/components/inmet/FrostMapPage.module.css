@@ -141,7 +141,7 @@
 .stationNavigation button {
   width: 100%;
   min-width: 0;
-  min-height: 42px;
+  min-height: 44px;
   padding: 8px 10px;
   border: 0;
   border-radius: 12px;
@@ -160,7 +160,8 @@
 .stationNavigation button:focus-visible {
   background: #eaf1f3;
   color: #071e2f;
-  outline: none;
+  outline: 2px solid rgb(24 189 205 / 38%);
+  outline-offset: 1px;
 }
 
 .periodNavigation button.active,
@@ -172,14 +173,32 @@
 
 .mapShell {
   position: relative;
-  min-height: 640px;
+  height: clamp(500px, 48vw, 680px);
+  min-height: 0;
   overflow: hidden;
+  overscroll-behavior: contain;
   border: 1px solid rgb(7 30 47 / 10%);
   border-radius: 24px;
   background: #e8f0ed;
 }
 
 .map { position: absolute; inset: 0; }
+
+.mapShell :global(.maplibregl-ctrl-bottom-right) {
+  right: 12px;
+  bottom: 12px;
+}
+
+.mapShell :global(.maplibregl-ctrl-group) {
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 10px 26px rgb(7 30 47 / 16%);
+}
+
+.mapShell :global(.maplibregl-ctrl-group button) {
+  width: 42px;
+  height: 42px;
+}
 
 .legend {
   position: absolute;
@@ -253,7 +272,7 @@
 .summary strong { font-size: 1.15rem; }
 
 .listSection { padding: clamp(20px, 3vw, 40px); }
-.tableWrapper { overflow-x: auto; border: 1px solid rgb(7 30 47 / 9%); border-radius: 18px; }
+.tableWrapper { overflow-x: auto; overscroll-behavior-inline: contain; border: 1px solid rgb(7 30 47 / 9%); border-radius: 18px; scrollbar-width: thin; }
 .tableWrapper table { width: 100%; border-collapse: collapse; min-width: 720px; }
 .tableWrapper th,
 .tableWrapper td { padding: 14px 16px; border-bottom: 1px solid rgb(7 30 47 / 8%); text-align: left; }
@@ -308,19 +327,49 @@
   .heading,
   .listSection > header { align-items: flex-start; flex-direction: column; }
   .periodNavigation { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .mapShell { min-height: 520px; border-radius: 18px; }
-  .legend { right: 10px; bottom: 10px; left: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
+  .periodNavigation button,
+  .stationNavigation button { font-size: 0.64rem; }
+  .mapShell { height: clamp(440px, 118vw, 560px); min-height: 0; border-radius: 18px; }
+  .mapShell :global(.maplibregl-ctrl-bottom-right) { right: 8px; bottom: 8px; }
+  .mapShell :global(.maplibregl-ctrl-group button) { width: 44px; height: 44px; }
+  .legend {
+    top: 10px;
+    right: 10px;
+    bottom: auto;
+    left: 10px;
+    min-width: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px 10px;
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
   .legend strong { grid-column: 1 / -1; }
+  .legend span { font-size: 0.58rem; }
   .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .summary div:nth-child(2) { border-right: 0; }
   .summary div:nth-child(-n + 2) { border-bottom: 1px solid rgb(7 30 47 / 9%); }
+  .tableWrapper th:first-child,
+  .tableWrapper td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    min-width: 190px;
+    background: #fff;
+    box-shadow: 10px 0 18px -18px rgb(7 30 47 / 45%);
+  }
+  .tableWrapper th:first-child { z-index: 2; background: #f4f8f8; }
   .methodology { padding: 28px 20px; }
 }
 
 @media (max-width: 420px) {
-  .stationNavigation { grid-template-columns: 1fr; }
-  .mapShell { min-height: 480px; }
-  .legend { font-size: 0.56rem; }
+  .stationNavigation { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stationNavigation button { padding-inline: 6px; font-size: 0.6rem; }
+  .mapShell { height: clamp(430px, 128vw, 520px); }
+  .legend { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .legend { backdrop-filter: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
