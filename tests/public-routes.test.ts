@@ -14,13 +14,21 @@ const CRITICAL_PUBLIC_ROUTES = [
   "/situacao-hidrologica-pelotas",
   "/nivel-da-lagoa-dos-patos-laranjal",
   "/cameras-ao-vivo-pelotas",
+  "/tempo-na-regiao-sul-rs",
   "/metodologia",
   "/privacidade-e-dados",
 ] as const;
 
 function routeModuleUrl(path: string) {
+  if (path.startsWith("/tempo-em/")) {
+    return new URL("../src/routes/tempo-em/$citySlug.tsx", import.meta.url);
+  }
   const filename = path === "/" ? "index.tsx" : `${path.slice(1)}.tsx`;
   return new URL(`../src/routes/${filename}`, import.meta.url);
+}
+
+function generatedRoutePath(path: string) {
+  return path.startsWith("/tempo-em/") ? "/tempo-em/$citySlug" : path;
 }
 
 function generatedRoutePaths() {
@@ -68,7 +76,8 @@ test(
     const routerPaths = generatedRoutePaths();
 
     for (const route of PUBLIC_ROUTES) {
-      assert.ok(routerPaths.has(route.path), `a árvore gerada não contém ${route.path}`);
+      const expectedPath = generatedRoutePath(route.path);
+      assert.ok(routerPaths.has(expectedPath), `a árvore gerada não contém ${expectedPath}`);
     }
   },
 );
@@ -95,5 +104,9 @@ test("mantém atualização frequente nas páginas operacionais", () => {
 
   for (const path of hourlyRoutes) {
     assert.equal(routeMap.get(path)?.changeFrequency, "hourly", `${path} deve ser horária`);
+  }
+
+  for (const route of PUBLIC_ROUTES.filter((item) => item.path.startsWith("/tempo-em/"))) {
+    assert.equal(route.changeFrequency, "hourly", `${route.path} deve ser horária`);
   }
 });
