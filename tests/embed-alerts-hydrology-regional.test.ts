@@ -40,6 +40,9 @@ test("Laranjal widget is standalone, responsive and publicly reusable", () => {
   assert.match(siteLayout, /"\/embed\/nivel-laranjal"/);
   assert.match(embedComponent, /tempo-pelotas:widget-resize/);
   assert.match(embedComponent, /ResizeObserver/);
+  assert.match(embedComponent, /document\.referrer/);
+  assert.match(embedComponent, /targetOrigin/);
+  assert.match(embedComponent, /removeEventListener\("load", report\)/);
   assert.match(embedScript, /data-tempo-pelotas-nivel-laranjal/);
   assert.match(embedScript, /https:\/\/tempopelotas\.com\.br\/embed\/nivel-laranjal/);
   assert.match(embedScript, /iframe\.style\.width = "100%"/);
@@ -48,7 +51,12 @@ test("Laranjal widget is standalone, responsive and publicly reusable", () => {
   assert.match(embedScript, /TempoPelotasNivelLaranjal/);
   assert.match(embedScript, /version: 1/);
   assert.match(embedScript, /Cross-Origin-Resource-Policy/);
+  assert.match(embedScript, /X-Robots-Tag/);
   assert.match(embedApi, /Access-Control-Allow-Origin/);
+  assert.match(embedApi, /Access-Control-Allow-Methods/);
+  assert.match(embedApi, /Access-Control-Max-Age/);
+  assert.match(embedApi, /Cross-Origin-Resource-Policy/);
+  assert.match(embedApi, /X-Robots-Tag/);
   assert.match(embedApi, /currentLevel/);
   assert.match(embedApi, /series/);
   assert.match(embedGuide, /Código de incorporação/);
@@ -59,11 +67,15 @@ test("Laranjal widget is standalone, responsive and publicly reusable", () => {
 });
 
 test("only the public embed document accepts third-party framing", () => {
-  assert.match(serverEntry, /pathname !== "\/embed\/nivel-laranjal"/);
+  assert.match(serverEntry, /pathname !== LARANJAL_EMBED_PATH/);
   assert.match(serverEntry, /headers\.delete\("X-Frame-Options"\)/);
   assert.match(serverEntry, /frame-ancestors/);
   assert.match(serverEntry, /Cross-Origin-Resource-Policy", "cross-origin"/);
   assert.match(serverEntry, /camera=\(\), microphone=\(\), geolocation=\(\)/);
+  assert.match(serverEntry, /X-Robots-Tag", "noindex, nofollow"/);
+  assert.match(serverEntry, /EMBED_CACHE_CONTROL/);
+  assert.match(serverEntry, /response\.ok/);
+  assert.match(serverEntry, /Cache-Control", "no-store"/);
 });
 
 test("alerts page uses the homepage editorial first-fold language", () => {
