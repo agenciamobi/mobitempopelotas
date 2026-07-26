@@ -42,11 +42,11 @@ jobs:
       - name: Contratos rápidos
         run: npm run test:contracts
 
+      - name: Gerar e verificar árvore preventiva
+        run: npm run routes:generate && npm run routes:check
+
       - name: Build de produção
         run: npm run build
-
-      - name: Verificar árvore gerada
-        run: npm run routes:check
 
       - name: Contrato das rotas públicas
         run: npm run test:routes
