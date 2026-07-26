@@ -9,7 +9,7 @@ const PAGE_DESCRIPTION =
   "Central de consulta meteorológica para Pelotas, Costa Doce, Fronteira Sul e Campanha, com páginas locais de previsão e avisos do INMET.";
 const PAGE_PATH = "/tempo-na-regiao-sul-rs";
 
-export const Route = createFileRoute(PAGE_PATH)({
+export const Route = createFileRoute("/tempo-na-regiao-sul-rs")({
   head: () =>
     createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
       createEditorialPageJsonLd({
