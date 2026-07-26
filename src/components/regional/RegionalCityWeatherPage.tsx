@@ -1,6 +1,17 @@
+import { Link } from "@tanstack/react-router";
 import { AlertTriangle, ArrowRight, CloudRain, Compass, Wind } from "lucide-react";
 
-import { REGIONAL_CITIES, regionalCityPath } from "@/lib/regional-cities";
+import {
+  REGIONAL_CITIES,
+  isRegionalHomeCity,
+  regionalCityPath,
+  type RegionalCity,
+} from "@/lib/regional-cities";
+import {
+  hasVerifiedRegionalAlertSemantics,
+  regionalAlertPeriod,
+  selectPriorityRegionalAlert,
+} from "@/lib/weather/regional-alert-priority";
 import type {
   RegionalCityAlert,
   RegionalCityWeatherData,
@@ -10,10 +21,17 @@ import { RegionalCityHourlySection } from "./RegionalCityHourlySection";
 import { formatRegionalDateTime } from "./regional-time-format";
 
 import "./RegionalCityPerformance.css";
+import "./RegionalCityRefinements.css";
 import styles from "./RegionalCityWeatherPage.module.css";
 
+const regionalNumberFormat = new Intl.NumberFormat("pt-BR", {
+  maximumFractionDigits: 1,
+});
+
 function metric(value: number | null, suffix: string) {
-  return value === null || !Number.isFinite(value) ? "—" : `${value}${suffix}`;
+  return value === null || !Number.isFinite(value)
+    ? "—"
+    : `${regionalNumberFormat.format(value)}${suffix}`;
 }
 
 function maximum(values: Array<number | null>) {
@@ -21,27 +39,45 @@ function maximum(values: Array<number | null>) {
   return usable.length > 0 ? Math.max(...usable) : null;
 }
 
-function validDate(value: string | null) {
-  if (!value) return false;
-  return Number.isFinite(new Date(value).getTime());
-}
-
-function hasVerifiedAlertSemantics(alert: RegionalCityAlert) {
-  return alert.severity !== "unknown" && validDate(alert.startsAt) && validDate(alert.expiresAt);
-}
-
 function severityColor(alert: RegionalCityAlert) {
-  if (!hasVerifiedAlertSemantics(alert)) return "neutral";
+  if (!hasVerifiedRegionalAlertSemantics(alert)) return "neutral";
   if (alert.severity === "great-danger") return "red";
   if (alert.severity === "danger") return "orange";
   if (alert.severity === "potential") return "yellow";
   return "neutral";
 }
 
+function alertTimingLabel(alert: RegionalCityAlert) {
+  const period = regionalAlertPeriod(alert);
+  if (period === "active") return "Em vigor agora";
+  if (period === "upcoming") return "Aviso programado";
+  return "Período em validação";
+}
+
+function CityLink({ city }: { city: RegionalCity }) {
+  if (isRegionalHomeCity(city)) {
+    return (
+      <Link to="/">
+        <span>{city.name}</span>
+        <small>{city.descriptor}</small>
+        <ArrowRight aria-hidden="true" />
+      </Link>
+    );
+  }
+
+  return (
+    <Link to="/tempo-em/$citySlug" params={{ citySlug: city.slug }}>
+      <span>{city.name}</span>
+      <small>{city.descriptor}</small>
+      <ArrowRight aria-hidden="true" />
+    </Link>
+  );
+}
+
 export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherData }) {
   const city = data.city;
   const current = data.current;
-  const activeAlert = data.alerts.items[0] ?? null;
+  const priorityAlert = selectPriorityRegionalAlert(data.alerts.items);
   const alertsUnavailable = data.alerts.status === "unavailable";
   const related = REGIONAL_CITIES.filter(
     (item) => item.slug !== city.slug && item.group === city.group,
@@ -70,33 +106,38 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
 
       <RegionalCityHero data={data} />
 
-      {activeAlert ? (
+      {priorityAlert ? (
         <section
           id="avisos-municipais"
-          className={`${styles.alert} ${styles[`alert${severityColor(activeAlert)}`]}`}
+          className={`${styles.alert} ${styles[`alert${severityColor(priorityAlert)}`]}`}
         >
           <AlertTriangle aria-hidden="true" />
           <div>
             <span>
-              {hasVerifiedAlertSemantics(activeAlert)
-                ? `${activeAlert.severityLabel} · INMET`
+              {hasVerifiedRegionalAlertSemantics(priorityAlert)
+                ? `${priorityAlert.severityLabel} · INMET · ${alertTimingLabel(priorityAlert)}`
                 : "Aviso oficial do INMET · classificação em validação"}
             </span>
-            <h2>{activeAlert.event}</h2>
+            <h2>{priorityAlert.event}</h2>
             <p>
-              {activeAlert.description ||
+              {priorityAlert.description ||
                 `Aviso meteorológico com abrangência informada para ${city.name}.`}
             </p>
-            {activeAlert.instruction ? (
-              <p><strong>Orientações:</strong> {activeAlert.instruction}</p>
+            {priorityAlert.instruction ? (
+              <p><strong>Orientações:</strong> {priorityAlert.instruction}</p>
             ) : null}
             <small>
-              {hasVerifiedAlertSemantics(activeAlert)
-                ? `${formatRegionalDateTime(activeAlert.startsAt)} até ${formatRegionalDateTime(activeAlert.expiresAt)}`
+              {hasVerifiedRegionalAlertSemantics(priorityAlert)
+                ? `${formatRegionalDateTime(priorityAlert.startsAt)} até ${formatRegionalDateTime(priorityAlert.expiresAt)}`
                 : "Período completo ainda não reconhecido pelo portal; confirme no aviso original."}
             </small>
           </div>
-          <a href={activeAlert.officialUrl} target="_blank" rel="noopener noreferrer">
+          <a
+            href={priorityAlert.officialUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Consultar o aviso oficial “${priorityAlert.event}” no site do INMET, em nova aba`}
+          >
             Consultar aviso oficial <ArrowRight aria-hidden="true" />
           </a>
         </section>
@@ -208,18 +249,12 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
             <span className={styles.eyebrow}>{city.group}</span>
             <h2 id="related-cities-title">Consulte cidades próximas</h2>
           </div>
-          <a href="/tempo-na-regiao-sul-rs">
+          <Link to="/tempo-na-regiao-sul-rs">
             Ver todas as cidades <ArrowRight aria-hidden="true" />
-          </a>
+          </Link>
         </header>
         <div>
-          {related.map((item) => (
-            <a href={regionalCityPath(item)} key={item.slug}>
-              <span>{item.name}</span>
-              <small>{item.descriptor}</small>
-              <ArrowRight aria-hidden="true" />
-            </a>
-          ))}
+          {related.map((item) => <CityLink city={item} key={item.slug} />)}
         </div>
       </section>
 
