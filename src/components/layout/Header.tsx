@@ -34,6 +34,7 @@ const megaMenus = [
       "/historico-climatico-pelotas",
       "/cameras-ao-vivo-pelotas",
       "/radar-e-satelite-pelotas",
+      "/mapa-de-geadas-rio-grande-do-sul",
       "/metodologia",
     ],
     featured: {
@@ -50,6 +51,11 @@ const megaMenus = [
             label: "Radar e satélite",
             to: "/radar-e-satelite-pelotas",
             description: "REDEMET, INMET e ocorrências regionais de trovoadas.",
+          },
+          {
+            label: "Mapa de geadas",
+            to: "/mapa-de-geadas-rio-grande-do-sul",
+            description: "Ocorrências observadas pelas estações do INMET no Rio Grande do Sul.",
           },
           {
             label: "Estação Embrapa",
