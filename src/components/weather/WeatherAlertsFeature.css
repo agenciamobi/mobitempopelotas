@@ -1,0 +1,148 @@
+.alerts-featured {
+  --featured-accent: #eab308;
+  display: grid;
+  padding: clamp(1.25rem, 3vw, 2.2rem);
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+  align-items: stretch;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  border: 1px solid color-mix(in srgb, var(--featured-accent) 28%, transparent);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 95% 5%, color-mix(in srgb, var(--featured-accent) 12%, transparent), transparent 26rem),
+    #fff;
+  box-shadow: 0 24px 64px rgba(7, 30, 47, 0.09);
+}
+
+.alerts-featured-danger { --featured-accent: #f27035; }
+.alerts-featured-great-danger { --featured-accent: #b91c1c; }
+.alerts-featured-unknown { --featured-accent: #168fa3; }
+
+.alerts-featured-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: clamp(0.5rem, 1.8vw, 1.35rem);
+}
+
+.alerts-featured-badge {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0 0.75rem;
+  border-radius: 999px;
+  background: var(--featured-accent);
+  color: #fff;
+  font-size: 0.64rem;
+  font-weight: 880;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.alerts-featured-badge svg {
+  width: 16px;
+  height: 16px;
+}
+
+.alerts-featured .alerts-kicker {
+  margin-top: 1.7rem;
+  color: color-mix(in srgb, var(--featured-accent) 76%, #071e2f);
+}
+
+.alerts-featured h2 {
+  max-width: 850px;
+  margin: 0;
+  color: #071e2f;
+  font-size: clamp(2.3rem, 4.8vw, 5.35rem);
+  line-height: 0.95;
+  letter-spacing: -0.065em;
+  text-wrap: balance;
+}
+
+.alerts-featured-description {
+  max-width: 780px;
+  margin: 1.2rem 0 0;
+  color: #587181;
+  font-size: clamp(0.86rem, 1vw, 1rem);
+  line-height: 1.65;
+}
+
+.alerts-featured-period {
+  display: grid;
+  width: 100%;
+  margin: 1.45rem 0 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid rgba(7, 30, 47, 0.09);
+  border-radius: 17px;
+}
+
+.alerts-featured-period div {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.9rem 1rem;
+  border-right: 1px solid rgba(7, 30, 47, 0.09);
+}
+
+.alerts-featured-period div:last-child { border-right: 0; }
+.alerts-featured-period dt {
+  color: #82949d;
+  font-size: 0.56rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.alerts-featured-period dd {
+  margin: 0;
+  color: #355564;
+  font-size: 0.7rem;
+  font-weight: 760;
+}
+
+.alerts-featured-instruction {
+  width: 100%;
+  margin-top: 1.1rem;
+  padding: 1rem 1.05rem;
+  border-left: 4px solid var(--featured-accent);
+  border-radius: 0 14px 14px 0;
+  background: color-mix(in srgb, var(--featured-accent) 7%, #fff);
+}
+.alerts-featured-instruction strong { color: #263f4c; font-size: 0.72rem; }
+.alerts-featured-instruction p { margin: 0.45rem 0 0; color: #5f7480; font-size: 0.73rem; line-height: 1.6; }
+
+.alerts-featured-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin-top: 1.25rem;
+}
+.alerts-featured-actions a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 820;
+}
+.alerts-featured-actions a:first-child { background: #071e2f; color: #fff; }
+.alerts-featured-actions a:last-child { border: 1px solid rgba(7, 30, 47, 0.1); color: #315462; }
+.alerts-featured-actions svg { width: 15px; }
+
+@media (max-width: 980px) {
+  .alerts-featured { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 620px) {
+  .alerts-featured { padding: 0.85rem; border-radius: 22px; }
+  .alerts-featured-copy { padding: 0.8rem; }
+  .alerts-featured h2 { font-size: clamp(2.15rem, 12vw, 3.5rem); }
+  .alerts-featured-period { grid-template-columns: 1fr; }
+  .alerts-featured-period div { grid-template-columns: 1fr auto; border-right: 0; border-bottom: 1px solid rgba(7, 30, 47, 0.09); }
+  .alerts-featured-period div:last-child { border-bottom: 0; }
+  .alerts-featured-actions { align-items: stretch; flex-direction: column; width: 100%; }
+  .alerts-featured-actions a { justify-content: space-between; width: 100%; }
+}
