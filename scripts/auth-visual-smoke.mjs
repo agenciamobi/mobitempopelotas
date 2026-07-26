@@ -13,14 +13,12 @@ const viewports = [
 ];
 const routes = [
   {
-    name: "entrar",
-    path: "/entrar?next=%2Fminha-conta",
-    expectedHeading: "Personalize alertas sem perder o acesso público",
-  },
-  {
-    name: "minha-conta-sem-configuracao",
-    path: "/minha-conta",
-    expectedHeading: "A área de conta ainda não está ativa neste ambiente",
+    name: "conta",
+    path: "/conta",
+    expectedHeadings: [
+      "Personalize alertas sem perder o acesso público",
+      "A área de conta ainda não está ativa neste ambiente",
+    ],
   },
 ];
 
@@ -47,20 +45,22 @@ try {
       await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => undefined);
       await page.waitForTimeout(500);
 
-      const audit = await page.evaluate((expectedHeading) => {
+      const audit = await page.evaluate((expectedHeadings) => {
         const root = document.documentElement;
         const heading = document.querySelector(".login-card h1");
         const robots = document.querySelector('meta[name="robots"]')?.getAttribute("content") ?? "";
+        const headingText = heading?.textContent?.trim() ?? null;
 
         return {
           title: document.title,
-          heading: heading?.textContent?.trim() ?? null,
+          heading: headingText,
           hasLoginCard: Boolean(document.querySelector(".login-card")),
           noindex: robots.includes("noindex"),
           horizontalOverflow: Math.max(0, root.scrollWidth - root.clientWidth),
-          headingMatches: heading?.textContent?.trim() === expectedHeading,
+          headingMatches: headingText ? expectedHeadings.includes(headingText) : false,
+          pathname: window.location.pathname,
         };
-      }, route.expectedHeading);
+      }, route.expectedHeadings);
 
       if (!audit.title) throw new Error(`${route.name}: documento sem título.`);
       if (!audit.hasLoginCard) throw new Error(`${route.name}: cartão editorial ausente.`);
@@ -69,6 +69,9 @@ try {
         throw new Error(
           `${route.name}: título principal inesperado: ${audit.heading ?? "ausente"}.`,
         );
+      }
+      if (audit.pathname !== "/conta") {
+        throw new Error(`${route.name}: rota final inesperada: ${audit.pathname}.`);
       }
       if (audit.horizontalOverflow > 2) {
         throw new Error(`${route.name}: overflow horizontal de ${audit.horizontalOverflow}px.`);
