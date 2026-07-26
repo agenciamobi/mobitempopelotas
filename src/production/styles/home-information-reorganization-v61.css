@@ -1,0 +1,194 @@
+/* Home v61 — elimina repetições do hero e leva contexto astronômico à previsão horária. */
+
+.site-shell--home-editorial .weather-hero-daily-facts {
+  display: none;
+}
+
+.site-shell--home-editorial .weather-hero-copy .weather-hero-actions {
+  margin-top: clamp(1.25rem, 2vw, 1.8rem);
+}
+
+.site-shell--home-editorial .home-story--forecast > .home-story-heading {
+  grid-template-columns: minmax(0, 0.82fr) minmax(560px, 1.18fr);
+  grid-template-rows: auto auto;
+  align-items: stretch;
+  column-gap: clamp(40px, 6vw, 96px);
+  row-gap: 0;
+}
+
+.site-shell--home-editorial
+  .home-story--forecast
+  > .home-story-heading
+  > div:first-child {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: center;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-today-facts {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: end;
+}
+
+.site-shell--home-editorial .home-forecast-astronomy {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  border-bottom: 1px solid rgb(7 30 47 / 11%);
+  background: linear-gradient(180deg, rgb(255 255 255 / 22%), rgb(24 189 205 / 2%));
+}
+
+.site-shell--home-editorial .home-forecast-astronomy-grid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.site-shell--home-editorial .home-forecast-astronomy-grid[data-items="1"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.site-shell--home-editorial .home-forecast-astronomy-grid[data-items="2"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.site-shell--home-editorial .home-forecast-astronomy-grid[data-items="3"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.site-shell--home-editorial .home-forecast-astronomy-item {
+  display: grid;
+  min-width: 0;
+  min-height: 88px;
+  align-content: center;
+  justify-items: start;
+  gap: 0.25rem;
+  padding: 0.9rem clamp(0.8rem, 1.3vw, 1.2rem);
+  border-right: 1px solid rgb(7 30 47 / 9%);
+}
+
+.site-shell--home-editorial .home-forecast-astronomy-item:first-child {
+  padding-left: 0;
+}
+
+.site-shell--home-editorial .home-forecast-astronomy-item:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.site-shell--home-editorial .home-forecast-astronomy-item svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  margin-bottom: 0.1rem;
+  fill: none;
+  stroke: #087c8a;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.site-shell--home-editorial .home-forecast-astronomy-item span {
+  color: #708690;
+  font-size: 0.52rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.site-shell--home-editorial .home-forecast-astronomy-item strong {
+  max-width: 100%;
+  color: #071e2f;
+  font-size: 0.7rem;
+  font-weight: 870;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.site-shell--home-editorial .inmet-official-metrics .is-wind dd {
+  display: grid;
+  gap: 0.22rem;
+}
+
+.site-shell--home-editorial .inmet-official-metrics .is-wind dd > span {
+  color: inherit;
+  font: inherit;
+}
+
+.site-shell--home-editorial .inmet-official-metrics .is-wind dd > small {
+  color: #087c8a;
+  font-size: 0.64rem;
+  font-weight: 780;
+  line-height: 1.35;
+}
+
+@media (max-width: 1100px) {
+  .site-shell--home-editorial .home-story--forecast > .home-story-heading {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    gap: 1.6rem;
+  }
+
+  .site-shell--home-editorial
+    .home-story--forecast
+    > .home-story-heading
+    > div:first-child,
+  .site-shell--home-editorial .home-story--forecast .home-today-facts,
+  .site-shell--home-editorial .home-forecast-astronomy {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .site-shell--home-editorial
+    .home-story--forecast
+    > .home-story-heading
+    > div:first-child {
+    align-self: start;
+  }
+}
+
+@media (max-width: 700px) {
+  .site-shell--home-editorial .home-story--forecast .home-today-facts,
+  .site-shell--home-editorial .home-forecast-astronomy-grid,
+  .site-shell--home-editorial .home-forecast-astronomy-grid[data-items="3"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-shell--home-editorial .home-forecast-astronomy-item {
+    min-height: 76px;
+    padding: 0.8rem;
+    border-bottom: 1px solid rgb(7 30 47 / 8%);
+  }
+
+  .site-shell--home-editorial .home-forecast-astronomy-item:first-child {
+    padding-left: 0.8rem;
+  }
+
+  .site-shell--home-editorial .home-forecast-astronomy-item:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .site-shell--home-editorial .home-forecast-astronomy-item:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 430px) {
+  .site-shell--home-editorial .home-story--forecast .home-today-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .site-shell--home-editorial .home-story--forecast .home-today-facts > div,
+  .site-shell--home-editorial .home-story--forecast .home-today-facts > div:first-child,
+  .site-shell--home-editorial .home-story--forecast .home-today-facts > div:last-child {
+    min-height: 68px;
+    padding-inline: 0;
+    border-right: 0;
+    border-bottom: 1px solid rgb(7 30 47 / 8%);
+  }
+
+  .site-shell--home-editorial .home-story--forecast .home-today-facts > div:last-child {
+    border-bottom: 0;
+  }
+}
