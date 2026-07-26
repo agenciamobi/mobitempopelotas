@@ -1,6 +1,6 @@
 /* global self, caches, fetch, Response, URL */
 
-const CACHE_VERSION = "tempo-pelotas-v2";
+const CACHE_VERSION = "tempo-pelotas-v3";
 const APP_SHELL_CACHE = `${CACHE_VERSION}-app-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_FALLBACK_URL = "/offline.html";
@@ -30,16 +30,18 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(
-          keys
-            .filter((key) => key !== APP_SHELL_CACHE && key !== RUNTIME_CACHE)
-            .map((key) => caches.delete(key)),
+    Promise.all([
+      caches
+        .keys()
+        .then((keys) =>
+          Promise.all(
+            keys
+              .filter((key) => key !== APP_SHELL_CACHE && key !== RUNTIME_CACHE)
+              .map((key) => caches.delete(key)),
+          ),
         ),
-      )
-      .then(() => self.clients.claim()),
+      self.registration.navigationPreload?.enable(),
+    ]).then(() => self.clients.claim()),
   );
 });
 
@@ -49,9 +51,11 @@ self.addEventListener("message", (event) => {
   }
 });
 
-async function onlineOnlyNavigation(request) {
+async function onlineOnlyNavigation(event) {
   try {
-    return await fetch(request);
+    const preloadResponse = await event.preloadResponse;
+    if (preloadResponse) return preloadResponse;
+    return await fetch(event.request);
   } catch {
     return (await caches.match(OFFLINE_FALLBACK_URL)) || Response.error();
   }
@@ -86,7 +90,7 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname.startsWith("/api/")) return;
 
   if (request.mode === "navigate") {
-    event.respondWith(onlineOnlyNavigation(request));
+    event.respondWith(onlineOnlyNavigation(event));
     return;
   }
 
