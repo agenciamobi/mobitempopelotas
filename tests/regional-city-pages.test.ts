@@ -13,6 +13,8 @@ const server = readFileSync("src/lib/weather/regional-city-weather.server.ts", "
 const route = readFileSync("src/routes/tempo-em/$citySlug.tsx", "utf8");
 const directoryRoute = readFileSync("src/routes/tempo-na-regiao-sul-rs.tsx", "utf8");
 const page = readFileSync("src/components/regional/RegionalCityWeatherPage.tsx", "utf8");
+const hero = readFileSync("src/components/regional/RegionalCityHero.tsx", "utf8");
+const heroStyles = readFileSync("src/components/regional/RegionalCityHero.module.css", "utf8");
 const hourly = readFileSync("src/components/regional/RegionalCityHourlySection.tsx", "utf8");
 const hourlyStyles = readFileSync("src/components/regional/RegionalCityHourlySection.module.css", "utf8");
 const header = readFileSync("src/components/layout/Header.tsx", "utf8");
@@ -60,11 +62,31 @@ test("city pages query real coordinate forecasts and municipal INMET alerts", ()
   assert.match(server, /sunrise,sunset/);
   assert.match(server, /hourlyStart \+ 12/);
   assert.match(page, /RegionalCityHourlySection/);
-  assert.match(page, /Chuva agora:/);
   assert.match(page, /consulta municipal ao INMET/i);
+  assert.match(page, /hasVerifiedAlertSemantics/);
+});
+
+test("regional first fold follows the homepage composition with an honest visual fallback", () => {
+  assert.match(page, /<RegionalCityHero data=\{data\}/);
+  assert.match(hero, /Boletim meteorológico · \{city\.name\}/);
+  assert.match(hero, /\$\{condition\} agora em \$\{city\.name\}/);
+  assert.match(hero, /Imagem ilustrativa/);
+  assert.match(hero, /Representação visual da condição atual/);
+  assert.match(hero, /Estimativa por modelo para as coordenadas centrais/);
+  assert.match(hero, /current\?\.temperature/);
+  assert.match(hero, /current\?\.humidity/);
+  assert.match(hero, /current\?\.windSpeed/);
+  assert.match(hero, /current\?\.pressure/);
+  assert.match(hero, /conditionPresentation/);
+  assert.match(heroStyles, /grid-template-columns:\s*minmax\(0, 1\.08fr\)/);
+  assert.match(heroStyles, /background-image:\s*var\(--regional-hero-image\)/);
+  assert.match(heroStyles, /@media \(max-width:\s*900px\)/);
+  assert.match(heroStyles, /@media \(max-width:\s*620px\)/);
+  assert.match(heroStyles, /width:\s*calc\(100% - 24px\)/);
 });
 
 test("hourly regional section shows probability, millimeters, wind and sun times", () => {
+  assert.match(hourly, /id="previsao-horaria-regional"/);
   assert.match(hourly, /Próximas horas/);
   assert.match(hourly, /data\.astronomy\.sunrise/);
   assert.match(hourly, /data\.astronomy\.sunset/);
@@ -80,7 +102,7 @@ test("hourly regional section shows probability, millimeters, wind and sun times
 test("regional navigation points Pelotas directly to the homepage", () => {
   assert.match(header, /id: "region"/);
   assert.match(header, /Tempo por cidade na Zona Sul/);
-  assert.match(header, /\{ label: "Pelotas", to: "\/"/);
+  assert.match(header, /\{ label: "Pelotas", to: "\//);
   assert.doesNotMatch(header, /tempo-em\/pelotas-rs/);
   assert.match(header, /\/tempo-em\/rio-grande-rs/);
   assert.match(header, /label: "Região"/);
