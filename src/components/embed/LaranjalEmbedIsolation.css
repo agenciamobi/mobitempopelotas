@@ -1,0 +1,20 @@
+html,
+body {
+  overflow-x: hidden;
+  background: transparent !important;
+}
+
+.pwa-launcher,
+.push-launcher,
+.OneSignal,
+.onesignal-bell-container,
+#onesignal-slidedown-container,
+#onesignal-bell-container,
+iframe[title*="OneSignal"] {
+  display: none !important;
+}
+
+.route-navigation-progress,
+.visually-hidden[aria-live] {
+  display: none !important;
+}
