@@ -14,16 +14,22 @@
   "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/brand/tempo-pelotas-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/brand/tempo-pelotas-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/brand/tempo-pelotas-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/brand/tempo-pelotas-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "maskable"
+      "purpose": "any"
     }
   ],
   "shortcuts": [
