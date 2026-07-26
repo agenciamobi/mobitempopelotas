@@ -21,6 +21,10 @@ const nativeScaleStyles = readFileSync(
   "src/production/styles/home-live-camera-native-scale-v63.css",
   "utf8",
 );
+const exactGeometryStyles = readFileSync(
+  "src/production/styles/home-live-camera-exact-geometry-v64.css",
+  "utf8",
+);
 const styleImports = readFileSync("src/production/production-styles.ts", "utf8");
 const globalStyles = readFileSync("src/production/production-styles.css", "utf8");
 
@@ -62,34 +66,45 @@ test("live camera source remains identified and links to the camera page", () =>
   assert.match(productionHome, /aria-label="Abrir a câmera ao vivo da Praia do Laranjal"/);
 });
 
-test("camera keeps a 16:9 signal while the final layer removes additional zoom", () => {
+test("camera uses native scale and exact 16:9 iframe geometry", () => {
   assert.match(cameraStyles, /var\(--home-live-camera-image\)/);
   assert.match(cameraStyles, /image-set\(/);
   assert.match(cameraStyles, /\.weather-hero-live-camera/);
-  assert.match(cameraStyles, /--home-live-camera-crop:\s*1\.54/);
-  assert.match(cameraStyles, /\.weather-hero-live-camera iframe/);
-  assert.match(cameraStyles, /width:\s*auto/);
-  assert.match(cameraStyles, /height:\s*100%/);
-  assert.match(cameraStyles, /aspect-ratio:\s*16\s*\/\s*9/);
   assert.match(cameraStyles, /scale\(var\(--home-live-camera-crop\)\)/);
   assert.match(proportionalStyles, /aspect-ratio:\s*16\s*\/\s*9/);
   assert.match(nativeScaleStyles, /--home-live-camera-crop:\s*1\s*;/);
-  assert.doesNotMatch(nativeScaleStyles, /--home-live-camera-crop:\s*1\.[1-9]/);
+  assert.match(exactGeometryStyles, /\.weather-hero-live-camera iframe/);
+  assert.match(exactGeometryStyles, /inset:\s*0/);
+  assert.match(exactGeometryStyles, /width:\s*100%/);
+  assert.match(exactGeometryStyles, /height:\s*100%/);
+  assert.match(exactGeometryStyles, /min-width:\s*0/);
+  assert.match(exactGeometryStyles, /min-height:\s*0/);
+  assert.match(exactGeometryStyles, /aspect-ratio:\s*16\s*\/\s*9/);
+  assert.match(exactGeometryStyles, /transform:\s*none/);
+  assert.match(exactGeometryStyles, /@media \(min-width:\s*901px\)[\s\S]*top:\s*50%[\s\S]*translateY\(-50%\)/);
   assert.match(cameraStyles, /overflow:\s*hidden/);
   assert.match(cameraStyles, /opacity:\s*0/);
   assert.match(cameraStyles, /\.is-ready iframe\s*\{[\s\S]*opacity:\s*1/);
-  assert.match(cameraStyles, /\.weather-hero-credit\s*\{[\s\S]*display:\s*none/);
   assert.match(cameraStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("native camera scale is loaded after all proportional hero refinements", () => {
+test("exact geometry is loaded after scale and proportional refinements", () => {
   const tsCamera = styleImports.indexOf("home-hero-live-camera-v54.css");
   const tsProportional = styleImports.indexOf("home-hero-proportional-v62.css");
   const tsNative = styleImports.indexOf("home-live-camera-native-scale-v63.css");
+  const tsGeometry = styleImports.indexOf("home-live-camera-exact-geometry-v64.css");
   const cssCamera = globalStyles.indexOf("home-hero-live-camera-v54.css");
   const cssProportional = globalStyles.indexOf("home-hero-proportional-v62.css");
   const cssNative = globalStyles.indexOf("home-live-camera-native-scale-v63.css");
+  const cssGeometry = globalStyles.indexOf("home-live-camera-exact-geometry-v64.css");
 
-  assert.ok(tsCamera >= 0 && tsProportional > tsCamera && tsNative > tsProportional);
-  assert.ok(cssCamera >= 0 && cssProportional > cssCamera && cssNative > cssProportional);
+  assert.ok(
+    tsCamera >= 0 && tsProportional > tsCamera && tsNative > tsProportional && tsGeometry > tsNative,
+  );
+  assert.ok(
+    cssCamera >= 0 &&
+      cssProportional > cssCamera &&
+      cssNative > cssProportional &&
+      cssGeometry > cssNative,
+  );
 });
