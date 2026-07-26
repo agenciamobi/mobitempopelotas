@@ -19,6 +19,8 @@ function record(value: unknown): JsonRecord | null {
 }
 
 function numberValue(value: unknown) {
+  if (value === null || value === undefined || typeof value === "boolean") return null;
+  if (typeof value === "string" && !value.trim()) return null;
   const number = typeof value === "number" ? value : Number(value);
   return Number.isFinite(number) ? number : null;
 }
@@ -32,7 +34,9 @@ function numberArray(value: unknown) {
 }
 
 function stringArray(value: unknown) {
-  return Array.isArray(value) ? value.map(stringValue).filter((item): item is string => Boolean(item)) : [];
+  return Array.isArray(value)
+    ? value.map(stringValue).filter((item): item is string => Boolean(item))
+    : [];
 }
 
 function rounded(value: number | null, digits = 0) {
@@ -101,7 +105,11 @@ function nearestHourlyIndex(times: string[], target: string) {
     : exactOrNext - 1;
 }
 
-function currentFromPayload(payload: JsonRecord, hourly: JsonRecord, fallbackIndex: number): RegionalCityCurrentWeather | null {
+function currentFromPayload(
+  payload: JsonRecord,
+  hourly: JsonRecord,
+  fallbackIndex: number,
+): RegionalCityCurrentWeather | null {
   const current = record(payload.current);
   const times = stringArray(hourly.time);
   const value = (key: string) => {
@@ -187,19 +195,64 @@ function dailyFromPayload(daily: JsonRecord): RegionalCityDailyForecast[] {
   }));
 }
 
-function hasUsableCurrent(data: RegionalCityWeatherData) {
+function isFiniteMetric(value: number | null) {
+  return value !== null && Number.isFinite(value);
+}
+
+function hasCompleteCurrent(data: RegionalCityWeatherData) {
   const current = data.current;
   return Boolean(
     current &&
-      [current.temperature, current.feelsLike, current.humidity, current.pressure, current.windSpeed].some(
-        (value) => value !== null && Number.isFinite(value),
-      ),
+      [current.temperature, current.feelsLike, current.humidity, current.pressure, current.windSpeed]
+        .every(isFiniteMetric),
   );
+}
+
+function hasUsefulHourly(data: RegionalCityWeatherData) {
+  return (
+    data.hourly.length >= 6 &&
+    data.hourly.slice(0, 6).every((hour) => isFiniteMetric(hour.temperature))
+  );
+}
+
+function hasUsefulDaily(data: RegionalCityWeatherData) {
+  return (
+    data.daily.length >= 5 &&
+    data.daily.slice(0, 5).every(
+      (day) => isFiniteMetric(day.minimum) && isFiniteMetric(day.maximum),
+    )
+  );
+}
+
+function needsRecovery(data: RegionalCityWeatherData) {
+  return !hasCompleteCurrent(data) || !hasUsefulHourly(data) || !hasUsefulDaily(data);
+}
+
+function mergeCurrent(
+  primary: RegionalCityCurrentWeather | null,
+  recovered: RegionalCityCurrentWeather,
+): RegionalCityCurrentWeather {
+  if (!primary) return recovered;
+  return {
+    temperature: primary.temperature ?? recovered.temperature,
+    feelsLike: primary.feelsLike ?? recovered.feelsLike,
+    condition:
+      primary.condition && primary.condition !== "Condição em atualização"
+        ? primary.condition
+        : recovered.condition,
+    humidity: primary.humidity ?? recovered.humidity,
+    pressure: primary.pressure ?? recovered.pressure,
+    precipitationMm: primary.precipitationMm ?? recovered.precipitationMm,
+    windSpeed: primary.windSpeed ?? recovered.windSpeed,
+    windGust: primary.windGust ?? recovered.windGust,
+    windDirection: primary.windDirection ?? recovered.windDirection,
+    observedAt: primary.observedAt ?? recovered.observedAt,
+  };
 }
 
 export async function fetchResilientRegionalCityWeather(slug: string) {
   const primary = await fetchPrimaryRegionalCityWeather(slug);
-  if (!primary || hasUsableCurrent(primary)) return primary;
+  if (!primary || !needsRecovery(primary)) return primary;
 
   try {
     const response = await fetch(forecastUrl(primary.city.latitude, primary.city.longitude), {
@@ -213,18 +266,24 @@ export async function fetchResilientRegionalCityWeather(slug: string) {
     const daily = record(payload.daily) ?? {};
     const times = stringArray(hourly.time);
     const index = Math.max(0, nearestHourlyIndex(times, localHourKey()));
-    const current = currentFromPayload(payload, hourly, index);
-    if (!current) return primary;
-    const dailyRows = dailyFromPayload(daily);
+    const recoveredCurrent = currentFromPayload(payload, hourly, index);
+    if (!recoveredCurrent && !primary.current) return primary;
+
+    const recoveredHourly = hourlyFromPayload(hourly, index);
+    const recoveredDaily = dailyFromPayload(daily);
     const sunrise = stringArray(daily.sunrise)[0] ?? null;
     const sunset = stringArray(daily.sunset)[0] ?? null;
 
     return {
       ...primary,
       status: primary.alerts.status === "live" ? "live" : "partial",
-      current,
-      hourly: hourlyFromPayload(hourly, index),
-      daily: dailyRows.length > 0 ? dailyRows : primary.daily,
+      current: recoveredCurrent ? mergeCurrent(primary.current, recoveredCurrent) : primary.current,
+      hourly: hasUsefulHourly(primary) ? primary.hourly : recoveredHourly,
+      daily: hasUsefulDaily(primary)
+        ? primary.daily
+        : recoveredDaily.length > 0
+          ? recoveredDaily
+          : primary.daily,
       astronomy: {
         sunrise: sunrise ?? primary.astronomy.sunrise,
         sunset: sunset ?? primary.astronomy.sunset,
