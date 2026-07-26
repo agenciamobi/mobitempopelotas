@@ -80,6 +80,14 @@ function MiniChart({ data }: { data: LaranjalLevelData }) {
   );
 }
 
+function parentMessageOrigin() {
+  try {
+    return document.referrer ? new URL(document.referrer).origin : "*";
+  } catch {
+    return "*";
+  }
+}
+
 export function LaranjalLevelEmbed({ data }: { data: LaranjalLevelData }) {
   const rootRef = useRef<HTMLElement>(null);
   const trend = trendPresentation(data.trendCmPerHour);
@@ -90,6 +98,7 @@ export function LaranjalLevelEmbed({ data }: { data: LaranjalLevelData }) {
     const root = rootRef.current;
     if (!root || window.parent === window) return;
 
+    const targetOrigin = parentMessageOrigin();
     const report = () => {
       window.parent.postMessage(
         {
@@ -97,7 +106,7 @@ export function LaranjalLevelEmbed({ data }: { data: LaranjalLevelData }) {
           widget: "nivel-laranjal",
           height: Math.ceil(root.getBoundingClientRect().height + 2),
         },
-        "*",
+        targetOrigin,
       );
     };
 
@@ -105,7 +114,10 @@ export function LaranjalLevelEmbed({ data }: { data: LaranjalLevelData }) {
     const observer = new ResizeObserver(report);
     observer.observe(root);
     window.addEventListener("load", report, { once: true });
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("load", report);
+    };
   }, []);
 
   return (
