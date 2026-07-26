@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight, MapPin } from "lucide-react";
 import type { CSSProperties } from "react";
 
+import { selectPriorityRegionalAlert } from "@/lib/weather/regional-alert-priority";
 import type { RegionalCityWeatherData } from "@/lib/weather/regional-city-weather.types";
 import { WeatherIcon } from "@/production/components/weather-icon";
 import type { WeatherIconName } from "@/production/lib/weather-data";
@@ -30,8 +31,14 @@ const PHOTOS = {
     "https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1400&q=72",
 } as const;
 
+const regionalNumberFormat = new Intl.NumberFormat("pt-BR", {
+  maximumFractionDigits: 1,
+});
+
 function metric(value: number | null, suffix: string) {
-  return value === null || !Number.isFinite(value) ? "—" : `${String(value).replace(".", ",")}${suffix}`;
+  return value === null || !Number.isFinite(value)
+    ? "—"
+    : `${regionalNumberFormat.format(value)}${suffix}`;
 }
 
 function maximum(values: Array<number | null>) {
@@ -79,7 +86,7 @@ function conditionPresentation(condition: string | null, observedAt: string | nu
 
 export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
   const { city, current } = data;
-  const activeAlert = data.alerts.items[0] ?? null;
+  const priorityAlert = selectPriorityRegionalAlert(data.alerts.items);
   const today = data.daily[0] ?? null;
   const highestRainChance = maximum(data.daily.map((day) => day.rainChance));
   const strongestGust = maximum(data.daily.map((day) => day.windGust));
@@ -92,12 +99,12 @@ export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
     ? `A estimativa atual indica ${metric(current.temperature, "°")}, sensação de ${metric(current.feelsLike, "°")} e vento de ${metric(current.windSpeed, " km/h")}. Consulte a evolução por hora e a previsão dos próximos dias.`
     : `Os dados meteorológicos para ${city.name} estão sendo atualizados. A página continuará consultando automaticamente as fontes do portal.`;
   const reasons = [
-    activeAlert ? `${city.name} está incluída em aviso oficial do INMET` : null,
+    priorityAlert ? `${city.name} está incluída em aviso oficial do INMET` : null,
     highestRainChance !== null && highestRainChance >= 50
-      ? `A chance de chuva chega a ${highestRainChance}%`
+      ? `A chance de chuva chega a ${regionalNumberFormat.format(highestRainChance)}%`
       : null,
     strongestGust !== null && strongestGust >= 40
-      ? `As rajadas podem chegar a ${strongestGust} km/h`
+      ? `As rajadas podem chegar a ${regionalNumberFormat.format(strongestGust)} km/h`
       : null,
   ]
     .filter((reason): reason is string => Boolean(reason))
@@ -108,8 +115,11 @@ export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
   } as CSSProperties;
 
   return (
-    <section className={styles.hero} aria-labelledby="regional-city-hero-title">
-      <div className={styles.copy}>
+    <section
+      className={`${styles.hero} regional-city-hero`}
+      aria-labelledby="regional-city-hero-title"
+    >
+      <div className={`${styles.copy} regional-city-hero-copy`}>
         <Link className={styles.back} to="/tempo-na-regiao-sul-rs">
           Central regional <ArrowRight aria-hidden="true" />
         </Link>
@@ -126,12 +136,18 @@ export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
         ) : null}
 
         <div className={styles.actions}>
-          <a className={styles.primaryAction} href={activeAlert ? "#avisos-municipais" : "#previsao-horaria-regional"}>
-            {activeAlert ? "Consultar aviso municipal" : "Ver previsão por hora"}
+          <a
+            className={styles.primaryAction}
+            href={priorityAlert ? "#avisos-municipais" : "#previsao-horaria-regional"}
+          >
+            {priorityAlert ? "Consultar aviso municipal" : "Ver previsão por hora"}
             <span aria-hidden="true">→</span>
           </a>
-          <a className={styles.secondaryAction} href={activeAlert ? "#previsao-horaria-regional" : "#previsao-7-dias-regional"}>
-            {activeAlert ? "Ver previsão por hora" : "Ver próximos 7 dias"}
+          <a
+            className={styles.secondaryAction}
+            href={priorityAlert ? "#previsao-horaria-regional" : "#previsao-7-dias-regional"}
+          >
+            {priorityAlert ? "Ver previsão por hora" : "Ver próximos 7 dias"}
           </a>
         </div>
 
@@ -140,14 +156,23 @@ export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
         </div>
       </div>
 
-      <div className={styles.media} style={mediaStyle}>
-        <article className={styles.nowCard} aria-label={`Condição meteorológica estimada para ${city.name}`}>
+      <div className={`${styles.media} regional-city-hero-media`} style={mediaStyle}>
+        <article
+          className={`${styles.nowCard} regional-city-now-card`}
+          aria-label={`Condição meteorológica estimada para ${city.name}`}
+        >
           <header>
             <div>
               <strong>{city.name}, RS</strong>
-              <small>{current ? `Atualizada em ${formatRegionalDateTime(current.observedAt)}` : "Dados em atualização"}</small>
+              <small>
+                {current
+                  ? `Atualizada em ${formatRegionalDateTime(current.observedAt)}`
+                  : "Dados em atualização"}
+              </small>
             </div>
-            <span className={styles.nowStatus}><i aria-hidden="true" /> Agora</span>
+            <span className={styles.nowStatus}>
+              <i aria-hidden="true" /> {current ? "Agora" : "Atualizando"}
+            </span>
           </header>
 
           <div className={styles.temperatureRow}>
@@ -169,7 +194,11 @@ export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
 
           <footer>
             <span>Estimativa por modelo para as coordenadas centrais</span>
-            {today ? <small>{metric(today.minimum, "°")} / {metric(today.maximum, "°")} previstos hoje</small> : null}
+            {today ? (
+              <small>
+                {metric(today.minimum, "°")} / {metric(today.maximum, "°")} previstos hoje
+              </small>
+            ) : null}
           </footer>
         </article>
 
