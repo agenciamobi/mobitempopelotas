@@ -36,10 +36,15 @@ test("frost map clusters points instead of rendering permanent city labels", () 
   assert.doesNotMatch(component, /new maplibregl\.Marker/);
 });
 
-test("frost controls keep equal widths and reorganize for mobile", () => {
+test("frost controls keep equal widths and reorganize without overlap on mobile", () => {
   assert.match(styles, /grid-template-columns:\s*repeat\(6, minmax\(0, 1fr\)\)/);
   assert.match(styles, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
   assert.match(styles, /@media \(max-width:\s*700px\)[\s\S]*repeat\(3, minmax\(0, 1fr\)\)/);
+  assert.match(styles, /min-height:\s*44px/);
+  assert.match(styles, /\.maplibregl-ctrl-group button/);
+  assert.match(styles, /top:\s*10px;[\s\S]*bottom:\s*auto/);
+  assert.match(styles, /position:\s*sticky;[\s\S]*min-width:\s*190px/);
+  assert.doesNotMatch(styles, /@media \(max-width:\s*420px\)[\s\S]*stationNavigation \{ grid-template-columns:\s*1fr/);
 });
 
 test("frost page is public, indexable and reachable from portal navigation", () => {
