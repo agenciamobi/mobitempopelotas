@@ -134,3 +134,4 @@ import "./styles/home-information-reorganization-v61.css";
 import "./styles/home-hero-proportional-v62.css";
 import "./styles/home-live-camera-native-scale-v63.css";
 import "./styles/home-live-camera-exact-geometry-v64.css";
+import "./styles/home-advisory-color-scope-v65.css";
