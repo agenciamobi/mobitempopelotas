@@ -18,7 +18,12 @@ function formatDateTime(value: string | null) {
 }
 
 function metric(value: number | null, suffix: string) {
-  return value === null ? "—" : `${value}${suffix}`;
+  return value === null || !Number.isFinite(value) ? "—" : `${value}${suffix}`;
+}
+
+function maximum(values: Array<number | null>) {
+  const usable = values.filter((value): value is number => value !== null && Number.isFinite(value));
+  return usable.length > 0 ? Math.max(...usable) : null;
 }
 
 function severityColor(severity: string) {
@@ -32,10 +37,13 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
   const city = data.city;
   const current = data.current;
   const activeAlert = data.alerts.items[0] ?? null;
+  const alertsUnavailable = data.alerts.status === "unavailable";
   const related = REGIONAL_CITIES.filter(
     (item) => item.slug !== city.slug && item.group === city.group,
   ).slice(0, 5);
   const title = `Tempo em ${city.name}, RS`;
+  const highestRainChance = maximum(data.daily.map((day) => day.rainChance));
+  const strongestGust = maximum(data.daily.map((day) => day.windGust));
   const schema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -101,13 +109,22 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
             <span>{activeAlert.severityLabel} · INMET</span>
             <h2>{activeAlert.event}</h2>
             <p>{activeAlert.description || `Aviso meteorológico com abrangência informada para ${city.name}.`}</p>
-            <small>
-              {formatDateTime(activeAlert.startsAt)} até {formatDateTime(activeAlert.expiresAt)}
-            </small>
+            <small>{formatDateTime(activeAlert.startsAt)} até {formatDateTime(activeAlert.expiresAt)}</small>
           </div>
           <a href={activeAlert.officialUrl} target="_blank" rel="noopener noreferrer">
             Consultar aviso oficial <ArrowRight aria-hidden="true" />
           </a>
+        </section>
+      ) : alertsUnavailable ? (
+        <section className={styles.noAlert}>
+          <AlertTriangle aria-hidden="true" />
+          <div>
+            <strong>Consulta municipal ao INMET temporariamente indisponível</strong>
+            <p>
+              Não é possível afirmar que {city.name} está sem avisos neste momento. Consulte o portal
+              oficial do INMET e os canais da Defesa Civil até a próxima atualização automática.
+            </p>
+          </div>
         </section>
       ) : (
         <section className={styles.noAlert}>
@@ -126,12 +143,12 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
         <article>
           <CloudRain aria-hidden="true" />
           <span>Maior chance de chuva</span>
-          <strong>{metric(Math.max(...data.daily.map((day) => day.rainChance ?? 0)), "%")}</strong>
+          <strong>{metric(highestRainChance, "%")}</strong>
         </article>
         <article>
           <Wind aria-hidden="true" />
           <span>Rajada mais forte</span>
-          <strong>{metric(Math.max(...data.daily.map((day) => day.windGust ?? 0)), " km/h")}</strong>
+          <strong>{metric(strongestGust, " km/h")}</strong>
         </article>
         <article>
           <Compass aria-hidden="true" />
@@ -148,20 +165,24 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
           </div>
           <small>Modelo Open-Meteo · atualização automática</small>
         </header>
-        <div className={styles.forecastGrid}>
-          {data.daily.map((day) => (
-            <article key={day.date}>
-              <header><strong>{day.weekday}</strong><small>{day.date.split("-").reverse().slice(0, 2).join("/")}</small></header>
-              <h3>{day.condition}</h3>
-              <div className={styles.range}><strong>{metric(day.maximum, "°")}</strong><span>{metric(day.minimum, "°")}</span></div>
-              <dl>
-                <div><dt>Chuva</dt><dd>{metric(day.rainChance, "%")}</dd></div>
-                <div><dt>Volume</dt><dd>{metric(day.precipitationMm, " mm")}</dd></div>
-                <div><dt>Rajada</dt><dd>{metric(day.windGust, " km/h")}</dd></div>
-              </dl>
-            </article>
-          ))}
-        </div>
+        {data.daily.length > 0 ? (
+          <div className={styles.forecastGrid}>
+            {data.daily.map((day) => (
+              <article key={day.date}>
+                <header><strong>{day.weekday}</strong><small>{day.date.split("-").reverse().slice(0, 2).join("/")}</small></header>
+                <h3>{day.condition}</h3>
+                <div className={styles.range}><strong>{metric(day.maximum, "°")}</strong><span>{metric(day.minimum, "°")}</span></div>
+                <dl>
+                  <div><dt>Chuva</dt><dd>{metric(day.rainChance, "%")}</dd></div>
+                  <div><dt>Volume</dt><dd>{metric(day.precipitationMm, " mm")}</dd></div>
+                  <div><dt>Rajada</dt><dd>{metric(day.windGust, " km/h")}</dd></div>
+                </dl>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className={styles.forecastUnavailable}>A previsão dos próximos dias está temporariamente indisponível.</p>
+        )}
       </section>
 
       <section className={styles.context}>
