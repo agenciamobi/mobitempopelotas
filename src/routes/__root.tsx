@@ -151,9 +151,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: mapLibreCss },
       { rel: "stylesheet", href: productionCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "icon", href: "/favicon.ico" },
+      { rel: "icon", href: "/brand/tempo-pelotas-icon.png", type: "image/png", sizes: "192x192" },
       { rel: "icon", href: "/brand/tempo-pelotas-icon.svg", type: "image/svg+xml" },
-      { rel: "apple-touch-icon", href: "/brand/tempo-pelotas-icon.svg" },
+      { rel: "apple-touch-icon", href: "/brand/tempo-pelotas-icon.png", sizes: "192x192" },
       {
         rel: "alternate",
         type: "application/feed+json",
