@@ -20,10 +20,21 @@ export type RegionalCityCurrentWeather = {
   condition: string;
   humidity: number | null;
   pressure: number | null;
+  precipitationMm: number | null;
   windSpeed: number | null;
   windGust: number | null;
   windDirection: string | null;
   observedAt: string | null;
+};
+
+export type RegionalCityHourlyForecast = {
+  time: string;
+  temperature: number | null;
+  rainChance: number | null;
+  precipitationMm: number | null;
+  windSpeed: number | null;
+  windGust: number | null;
+  condition: string;
 };
 
 export type RegionalCityDailyForecast = {
@@ -41,7 +52,12 @@ export type RegionalCityWeatherData = {
   status: "live" | "partial" | "unavailable";
   city: RegionalCity;
   current: RegionalCityCurrentWeather | null;
+  hourly: RegionalCityHourlyForecast[];
   daily: RegionalCityDailyForecast[];
+  astronomy: {
+    sunrise: string | null;
+    sunset: string | null;
+  };
   alerts: {
     status: "live" | "unavailable";
     items: RegionalCityAlert[];
