@@ -6,7 +6,7 @@ import { reconcileDailyTemperatures } from "@/lib/weather/daily-temperature-reco
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import type { EmbrapaObservationData } from "@/production/lib/embrapa-observation";
 import type { InmetAlertsData } from "@/production/lib/inmet-alerts";
-import { calculateMoonPhase } from "@/production/lib/astronomy";
+import { resolveMoonPhase } from "@/production/lib/astronomy";
 import type { WeatherAiSummaries } from "@/production/lib/weather-ai-summary";
 import type { AstronomyData, CurrentWeather, WeatherData } from "@/production/lib/weather-data";
 
@@ -44,12 +44,13 @@ function resolveAstronomy(data: AggregatedWeatherData): AstronomyData {
     inmetPeriod?.sunrise ?? data.current?.sunrise ?? data.observation.current.sunrise ?? null;
   const sunset = inmetPeriod?.sunset ?? data.current?.sunset ?? data.observation.current.sunset ?? null;
   const hasInmetSunTimes = Boolean(inmetPeriod?.sunrise || inmetPeriod?.sunset);
+  const lunar = resolveMoonPhase(date);
 
   return {
     date,
     sunrise,
     sunset,
-    moonPhase: calculateMoonPhase(date),
+    moonPhase: lunar.name,
     season: inmetPeriod?.season ?? null,
     solarSource: hasInmetSunTimes
       ? "INMET"
@@ -57,7 +58,7 @@ function resolveAstronomy(data: AggregatedWeatherData): AstronomyData {
         ? "Embrapa Clima Temperado"
         : null,
     seasonSource: inmetPeriod?.season ? "INMET" : null,
-    lunarSource: "Cálculo astronômico",
+    lunarSource: lunar.source,
   };
 }
 
