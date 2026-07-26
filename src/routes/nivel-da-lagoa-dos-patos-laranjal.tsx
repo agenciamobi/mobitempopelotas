@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
+import { LaranjalEmbedGuide } from "@/components/embed/LaranjalEmbedGuide";
 import { HydrologyEditorialHero } from "@/components/hydrology/HydrologyEditorialHero";
 import "@/components/hydrology/HydrologyEditorialRoute.css";
 import { LaranjalLevelPage } from "@/components/hydrology/HydrologyPages";
@@ -52,6 +53,7 @@ function NivelLagoaPage() {
     <div className="hydrology-editorial-route">
       <HydrologyEditorialHero level={data.level} variant="detail" />
       <LaranjalLevelPage weather={data.weather} level={data.level} />
+      <LaranjalEmbedGuide />
       <EditorialContentSection id="como-interpretar-nivel-laranjal" content={LARANJAL_LEVEL_EDITORIAL_CONTENT} />
     </div>
   );
