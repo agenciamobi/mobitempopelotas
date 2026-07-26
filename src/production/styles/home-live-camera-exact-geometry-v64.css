@@ -1,4 +1,4 @@
-/* Home v64 — iframe e container da live com geometria 16:9 exata. */
+/* Home v64 — mídia da live com geometria 16:9 exata em todas as resoluções. */
 
 .site-shell--home-editorial .weather-hero-live-camera iframe {
   inset: 0;
@@ -11,7 +11,9 @@
 }
 
 @media (min-width: 1181px) {
-  .site-shell--home-editorial .weather-hero-live-camera {
+  .home-hero-camera-shell.has-live-camera .weather-hero-photo,
+  .home-hero-camera-shell.has-live-camera .weather-hero-overlay,
+  .home-hero-camera-shell.has-live-camera .weather-hero-live-camera {
     top: 50%;
     right: 0;
     bottom: auto;
@@ -19,10 +21,11 @@
     width: 44.5%;
     height: auto;
     aspect-ratio: 16 / 9;
+    border-radius: 0 0 clamp(22px, 1.7vw, 28px) 0;
     transform: translateY(-50%);
   }
 
-  .site-shell--home-editorial .weather-hero-now {
+  .home-hero-camera-shell.has-live-camera .weather-hero-now {
     transform: translateX(clamp(10px, 1vw, 18px));
     border-color: rgb(255 255 255 / 82%);
     background: rgb(255 255 255 / 96%);
@@ -30,7 +33,7 @@
     backdrop-filter: blur(10px) saturate(116%);
   }
 
-  .site-shell--home-editorial .home-hero-camera-source {
+  .home-hero-camera-shell.has-live-camera .home-hero-camera-source {
     bottom: 1rem;
     padding: 0.46rem 0.62rem;
     border-color: rgb(255 255 255 / 23%);
@@ -41,7 +44,9 @@
 }
 
 @media (max-width: 1180px) and (min-width: 901px) {
-  .site-shell--home-editorial .weather-hero-live-camera {
+  .home-hero-camera-shell.has-live-camera .weather-hero-photo,
+  .home-hero-camera-shell.has-live-camera .weather-hero-overlay,
+  .home-hero-camera-shell.has-live-camera .weather-hero-live-camera {
     top: 50%;
     right: 0;
     bottom: auto;
@@ -49,10 +54,11 @@
     width: 44.5%;
     height: auto;
     aspect-ratio: 16 / 9;
+    border-radius: 0 0 clamp(20px, 1.7vw, 26px) 0;
     transform: translateY(-50%);
   }
 
-  .site-shell--home-editorial .weather-hero-now {
+  .home-hero-camera-shell.has-live-camera .weather-hero-now {
     transform: translateX(8px);
     box-shadow: 0 12px 30px rgb(7 30 47 / 15%);
     backdrop-filter: blur(10px) saturate(116%);
@@ -60,7 +66,9 @@
 }
 
 @media (max-width: 900px) {
-  .site-shell--home-editorial .weather-hero-live-camera {
+  .home-hero-camera-shell.has-live-camera .weather-hero-photo,
+  .home-hero-camera-shell.has-live-camera .weather-hero-overlay,
+  .home-hero-camera-shell.has-live-camera .weather-hero-live-camera {
     top: 8px;
     right: 8px;
     bottom: auto;
@@ -68,26 +76,53 @@
     width: auto;
     height: auto;
     aspect-ratio: 16 / 9;
+    border-radius: 14px;
     transform: none;
   }
 
-  .site-shell--home-editorial .weather-hero-now {
+  .home-hero-camera-shell.has-live-camera .weather-hero-now {
     transform: none;
     box-shadow: 0 12px 28px rgb(7 30 47 / 16%);
     backdrop-filter: blur(10px) saturate(116%);
   }
 
-  .site-shell--home-editorial .home-hero-camera-source {
+  .home-hero-camera-shell.has-live-camera .home-hero-camera-source {
     background: rgb(5 28 43 / 76%);
     box-shadow: 0 0.4rem 1rem rgb(4 20 32 / 15%);
   }
 }
 
 @media (max-width: 620px) {
-  .site-shell--home-editorial .weather-hero-live-camera {
+  .home-hero-camera-shell.has-live-camera .weather-hero-photo,
+  .home-hero-camera-shell.has-live-camera .weather-hero-overlay,
+  .home-hero-camera-shell.has-live-camera .weather-hero-live-camera {
     top: 6px;
     right: 6px;
     left: 6px;
+    border-radius: 12px;
+  }
+}
+
+/* Em desktops baixos, o launcher não deve encobrir as métricas do card meteorológico. */
+@media (min-width: 901px) and (max-height: 900px) {
+  .pwa-launcher {
+    right: max(0.55rem, env(safe-area-inset-right));
+    bottom: max(0.55rem, env(safe-area-inset-bottom));
+    min-height: 2.35rem;
+    gap: 0.4rem;
+    padding: 0.3rem 0.68rem 0.3rem 0.34rem;
+    font-size: 0.68rem;
+    box-shadow: 0 0.55rem 1.45rem rgb(3 20 31 / 18%);
+  }
+
+  .pwa-launcher > span {
+    width: 1.65rem;
+    height: 1.65rem;
+  }
+
+  .pwa-launcher svg {
+    width: 0.95rem;
+    height: 0.95rem;
   }
 }
 
