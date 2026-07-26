@@ -254,14 +254,16 @@
 
 .listSection { padding: clamp(20px, 3vw, 40px); }
 .tableWrapper { overflow-x: auto; border: 1px solid rgb(7 30 47 / 9%); border-radius: 18px; }
-table { width: 100%; border-collapse: collapse; min-width: 720px; }
-th, td { padding: 14px 16px; border-bottom: 1px solid rgb(7 30 47 / 8%); text-align: left; }
-th { background: #f4f8f8; color: #617887; font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; }
-td { color: #334f60; font-size: 0.72rem; }
-td strong, td small { display: block; }
-td strong { color: #071e2f; }
-td small { margin-top: 3px; color: #7a8d98; }
-tbody tr:last-child td { border-bottom: 0; }
+.tableWrapper table { width: 100%; border-collapse: collapse; min-width: 720px; }
+.tableWrapper th,
+.tableWrapper td { padding: 14px 16px; border-bottom: 1px solid rgb(7 30 47 / 8%); text-align: left; }
+.tableWrapper th { background: #f4f8f8; color: #617887; font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.tableWrapper td { color: #334f60; font-size: 0.72rem; }
+.tableWrapper td strong,
+.tableWrapper td small { display: block; }
+.tableWrapper td strong { color: #071e2f; }
+.tableWrapper td small { margin-top: 3px; color: #7a8d98; }
+.tableWrapper tbody tr:last-child td { border-bottom: 0; }
 
 .intensity { display: inline-flex; align-items: center; min-height: 28px; padding: 5px 9px; border-radius: 999px; color: #fff; font-size: 0.6rem; font-weight: 820; }
 
