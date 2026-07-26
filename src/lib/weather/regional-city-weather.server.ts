@@ -14,10 +14,9 @@ const TIMEZONE = "America/Sao_Paulo";
 const REQUEST_TIMEOUT_MS = 12_000;
 const CACHE_TTL_MS = 10 * 60 * 1_000;
 
-type CacheEntry = { storedAt: number; data: RegionalCityWeatherData };
-const cache = new Map<string, CacheEntry>();
-
+const cache = new Map<string, { storedAt: number; data: RegionalCityWeatherData }>();
 const nullableNumber = z.number().finite().nullable();
+
 const forecastSchema = z.object({
   current: z.object({
     time: z.string(),
@@ -25,10 +24,20 @@ const forecastSchema = z.object({
     apparent_temperature: nullableNumber,
     relative_humidity_2m: nullableNumber,
     pressure_msl: nullableNumber,
+    precipitation: nullableNumber,
     wind_speed_10m: nullableNumber,
     wind_gusts_10m: nullableNumber,
     wind_direction_10m: nullableNumber,
     weather_code: nullableNumber,
+  }),
+  hourly: z.object({
+    time: z.array(z.string()),
+    temperature_2m: z.array(nullableNumber),
+    precipitation_probability: z.array(nullableNumber),
+    precipitation: z.array(nullableNumber),
+    wind_speed_10m: z.array(nullableNumber),
+    wind_gusts_10m: z.array(nullableNumber),
+    weather_code: z.array(nullableNumber),
   }),
   daily: z.object({
     time: z.array(z.string()),
@@ -38,6 +47,8 @@ const forecastSchema = z.object({
     precipitation_sum: z.array(nullableNumber),
     wind_gusts_10m_max: z.array(nullableNumber),
     weather_code: z.array(nullableNumber),
+    sunrise: z.array(z.string()),
+    sunset: z.array(z.string()),
   }),
 });
 
@@ -78,7 +89,9 @@ function nestedText(value: unknown): string | null {
   const record = asRecord(value);
   if (!record) return null;
   for (const key of ["value", "valor", "label", "nome", "descricao", "date", "data", "codigo", "cor"]) {
-    const entry = Object.entries(record).find(([candidate]) => normalizeKey(candidate) === normalizeKey(key));
+    const entry = Object.entries(record).find(
+      ([candidate]) => normalizeKey(candidate) === normalizeKey(key),
+    );
     if (entry) return nestedText(entry[1]);
   }
   return null;
@@ -96,9 +109,13 @@ function findValue(record: JsonRecord, aliases: string[]) {
 function safeDate(value: string | null) {
   if (!value) return null;
   const normalized = value.trim().replace(/\s+(?:às|as)\s+/i, " ");
-  const brazilian = normalized.match(/^(\d{2})[\/-](\d{2})[\/-](20\d{2})(?:[ T]+(\d{1,2}):(\d{2}))?/);
+  const brazilian = normalized.match(
+    /^(\d{2})[\/-](\d{2})[\/-](20\d{2})(?:[ T]+(\d{1,2}):(\d{2}))?/,
+  );
   if (brazilian) {
-    const date = new Date(`${brazilian[3]}-${brazilian[2]}-${brazilian[1]}T${(brazilian[4] ?? "00").padStart(2, "0")}:${brazilian[5] ?? "00"}:00-03:00`);
+    const date = new Date(
+      `${brazilian[3]}-${brazilian[2]}-${brazilian[1]}T${(brazilian[4] ?? "00").padStart(2, "0")}:${brazilian[5] ?? "00"}:00-03:00`,
+    );
     return Number.isNaN(date.getTime()) ? null : date.toISOString();
   }
   const date = new Date(normalized);
@@ -135,6 +152,11 @@ function compass(value: number | null) {
   return directions[Math.round((((value % 360) + 360) % 360) / 45) % 8];
 }
 
+function rounded(value: number | null, digits = 0) {
+  if (value === null) return null;
+  return digits === 0 ? Math.round(value) : Number(value.toFixed(digits));
+}
+
 function forecastUrl(latitude: number, longitude: number) {
   const params = new URLSearchParams({
     latitude: String(latitude),
@@ -144,8 +166,12 @@ function forecastUrl(latitude: number, longitude: number) {
     temperature_unit: "celsius",
     wind_speed_unit: "kmh",
     precipitation_unit: "mm",
-    current: "temperature_2m,apparent_temperature,relative_humidity_2m,pressure_msl,wind_speed_10m,wind_gusts_10m,wind_direction_10m,weather_code",
-    daily: "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_gusts_10m_max",
+    current:
+      "temperature_2m,apparent_temperature,relative_humidity_2m,pressure_msl,precipitation,wind_speed_10m,wind_gusts_10m,wind_direction_10m,weather_code",
+    hourly:
+      "temperature_2m,precipitation_probability,precipitation,wind_speed_10m,wind_gusts_10m,weather_code",
+    daily:
+      "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_gusts_10m_max,sunrise,sunset",
   });
   return `${FORECAST_ENDPOINT}?${params.toString()}`;
 }
@@ -163,28 +189,47 @@ async function fetchForecast(city: NonNullable<ReturnType<typeof findRegionalCit
 
 function parseAlerts(payload: unknown, cityName: string): RegionalCityAlert[] {
   const alerts = collectRecords(payload).flatMap((record, index) => {
-    const event = nestedText(findValue(record, ["evento", "event", "tipo", "aviso", "titulo", "headline"]));
+    const event = nestedText(
+      findValue(record, ["evento", "event", "tipo", "aviso", "titulo", "headline"]),
+    );
     if (!event) return [];
-    const description = nestedText(findValue(record, ["descricao", "description", "riscos", "detalhes"])) ?? "";
-    const instruction = nestedText(findValue(record, ["instrucoes", "instruction", "recomendacoes", "orientacoes"])) ?? "";
-    const startsAt = safeDate(nestedText(findValue(record, ["inicio", "onset", "effective", "dataInicio", "dtInicio"])));
-    const expiresAt = safeDate(nestedText(findValue(record, ["fim", "expires", "dataFim", "dtFim", "validade"])));
+    const description =
+      nestedText(findValue(record, ["descricao", "description", "riscos", "detalhes"])) ?? "";
+    const instruction =
+      nestedText(
+        findValue(record, ["instrucoes", "instruction", "recomendacoes", "orientacoes"]),
+      ) ?? "";
+    const startsAt = safeDate(
+      nestedText(findValue(record, ["inicio", "onset", "effective", "dataInicio", "dtInicio"])),
+    );
+    const expiresAt = safeDate(
+      nestedText(findValue(record, ["fim", "expires", "dataFim", "dtFim", "validade"])),
+    );
     if (expiresAt && new Date(expiresAt).getTime() < Date.now()) return [];
-    const severity = severityFrom(nestedText(findValue(record, ["severidade", "severity", "grau", "nivel", "cor", "color"])) ?? "");
-    const id = nestedText(findValue(record, ["id", "identifier", "codigo", "codigoAviso"])) ?? `${cityName}-${startsAt ?? index}`;
-    return [{
-      id,
-      event,
-      description,
-      instruction,
-      severity: severity.severity,
-      severityLabel: severity.label,
-      startsAt,
-      expiresAt,
-      officialUrl: INMET_PORTAL_URL,
-    } satisfies RegionalCityAlert];
+    const severity = severityFrom(
+      nestedText(findValue(record, ["severidade", "severity", "grau", "nivel", "cor", "color"])) ??
+        "",
+    );
+    const id =
+      nestedText(findValue(record, ["id", "identifier", "codigo", "codigoAviso"])) ??
+      `${cityName}-${startsAt ?? index}`;
+    return [
+      {
+        id,
+        event,
+        description,
+        instruction,
+        severity: severity.severity,
+        severityLabel: severity.label,
+        startsAt,
+        expiresAt,
+        officialUrl: INMET_PORTAL_URL,
+      } satisfies RegionalCityAlert,
+    ];
   });
-  return alerts.filter((alert, index, all) => all.findIndex((item) => item.id === alert.id) === index);
+  return alerts.filter(
+    (alert, index, all) => all.findIndex((item) => item.id === alert.id) === index,
+  );
 }
 
 async function fetchAlerts(city: NonNullable<ReturnType<typeof findRegionalCity>>) {
@@ -201,7 +246,9 @@ async function fetchAlerts(city: NonNullable<ReturnType<typeof findRegionalCity>
   }
 }
 
-export async function fetchRegionalCityWeather(slug: string): Promise<RegionalCityWeatherData | null> {
+export async function fetchRegionalCityWeather(
+  slug: string,
+): Promise<RegionalCityWeatherData | null> {
   const city = findRegionalCity(slug);
   if (!city) return null;
   const cached = cache.get(slug);
@@ -209,50 +256,96 @@ export async function fetchRegionalCityWeather(slug: string): Promise<RegionalCi
 
   const [forecastResult, alerts] = await Promise.allSettled([fetchForecast(city), fetchAlerts(city)]);
   const fetchedAt = new Date().toISOString();
+  const alertData =
+    alerts.status === "fulfilled"
+      ? alerts.value
+      : { status: "unavailable" as const, items: [], sourceUrl: INMET_PORTAL_URL };
+
   if (forecastResult.status === "rejected") {
-    const data: RegionalCityWeatherData = {
+    return {
       status: "unavailable",
       city,
       current: null,
+      hourly: [],
       daily: [],
-      alerts: alerts.status === "fulfilled" ? alerts.value : { status: "unavailable", items: [], sourceUrl: INMET_PORTAL_URL },
-      source: { forecastName: "Open-Meteo", forecastUrl: OPEN_METEO_URL, alertsName: "INMET", fetchedAt },
+      astronomy: { sunrise: null, sunset: null },
+      alerts: alertData,
+      source: {
+        forecastName: "Open-Meteo",
+        forecastUrl: OPEN_METEO_URL,
+        alertsName: "INMET",
+        fetchedAt,
+      },
       message: "A previsão local está temporariamente indisponível.",
     };
-    return data;
   }
 
   const forecast = forecastResult.value;
   const current = forecast.current;
+  const hourlyStart = Math.max(
+    0,
+    forecast.hourly.time.findIndex((time) => time >= current.time),
+  );
+  const hourly = forecast.hourly.time.slice(hourlyStart, hourlyStart + 12).map((time, offset) => {
+    const index = hourlyStart + offset;
+    return {
+      time,
+      temperature: rounded(forecast.hourly.temperature_2m[index] ?? null),
+      rainChance: rounded(forecast.hourly.precipitation_probability[index] ?? null),
+      precipitationMm: rounded(forecast.hourly.precipitation[index] ?? null, 1),
+      windSpeed: rounded(forecast.hourly.wind_speed_10m[index] ?? null),
+      windGust: rounded(forecast.hourly.wind_gusts_10m[index] ?? null),
+      condition: weatherLabel(forecast.hourly.weather_code[index] ?? null),
+    };
+  });
   const daily = forecast.daily.time.map((date, index) => ({
     date,
-    weekday: index === 0 ? "Hoje" : new Intl.DateTimeFormat("pt-BR", { weekday: "short", timeZone: "UTC" }).format(new Date(`${date}T12:00:00Z`)).replace(".", ""),
-    minimum: forecast.daily.temperature_2m_min[index] === null ? null : Math.round(forecast.daily.temperature_2m_min[index] as number),
-    maximum: forecast.daily.temperature_2m_max[index] === null ? null : Math.round(forecast.daily.temperature_2m_max[index] as number),
-    rainChance: forecast.daily.precipitation_probability_max[index] === null ? null : Math.round(forecast.daily.precipitation_probability_max[index] as number),
-    precipitationMm: forecast.daily.precipitation_sum[index] === null ? null : Number((forecast.daily.precipitation_sum[index] as number).toFixed(1)),
-    windGust: forecast.daily.wind_gusts_10m_max[index] === null ? null : Math.round(forecast.daily.wind_gusts_10m_max[index] as number),
+    weekday:
+      index === 0
+        ? "Hoje"
+        : new Intl.DateTimeFormat("pt-BR", { weekday: "short", timeZone: "UTC" })
+            .format(new Date(`${date}T12:00:00Z`))
+            .replace(".", ""),
+    minimum: rounded(forecast.daily.temperature_2m_min[index] ?? null),
+    maximum: rounded(forecast.daily.temperature_2m_max[index] ?? null),
+    rainChance: rounded(forecast.daily.precipitation_probability_max[index] ?? null),
+    precipitationMm: rounded(forecast.daily.precipitation_sum[index] ?? null, 1),
+    windGust: rounded(forecast.daily.wind_gusts_10m_max[index] ?? null),
     condition: weatherLabel(forecast.daily.weather_code[index] ?? null),
   }));
-  const alertData = alerts.status === "fulfilled" ? alerts.value : { status: "unavailable" as const, items: [], sourceUrl: INMET_PORTAL_URL };
+
   const data: RegionalCityWeatherData = {
     status: alertData.status === "live" ? "live" : "partial",
     city,
     current: {
-      temperature: current.temperature_2m === null ? null : Math.round(current.temperature_2m),
-      feelsLike: current.apparent_temperature === null ? null : Math.round(current.apparent_temperature),
+      temperature: rounded(current.temperature_2m),
+      feelsLike: rounded(current.apparent_temperature),
       condition: weatherLabel(current.weather_code),
-      humidity: current.relative_humidity_2m === null ? null : Math.round(current.relative_humidity_2m),
-      pressure: current.pressure_msl === null ? null : Math.round(current.pressure_msl),
-      windSpeed: current.wind_speed_10m === null ? null : Math.round(current.wind_speed_10m),
-      windGust: current.wind_gusts_10m === null ? null : Math.round(current.wind_gusts_10m),
+      humidity: rounded(current.relative_humidity_2m),
+      pressure: rounded(current.pressure_msl),
+      precipitationMm: rounded(current.precipitation, 1),
+      windSpeed: rounded(current.wind_speed_10m),
+      windGust: rounded(current.wind_gusts_10m),
       windDirection: compass(current.wind_direction_10m),
       observedAt: current.time,
     },
+    hourly,
     daily,
+    astronomy: {
+      sunrise: forecast.daily.sunrise[0] ?? null,
+      sunset: forecast.daily.sunset[0] ?? null,
+    },
     alerts: alertData,
-    source: { forecastName: "Open-Meteo", forecastUrl: OPEN_METEO_URL, alertsName: "INMET", fetchedAt },
-    message: alertData.status === "unavailable" ? "A previsão está disponível, mas a consulta municipal de avisos do INMET apresentou restrição." : null,
+    source: {
+      forecastName: "Open-Meteo",
+      forecastUrl: OPEN_METEO_URL,
+      alertsName: "INMET",
+      fetchedAt,
+    },
+    message:
+      alertData.status === "unavailable"
+        ? "A previsão está disponível, mas a consulta municipal de avisos do INMET apresentou restrição."
+        : null,
   };
   cache.set(slug, { storedAt: Date.now(), data });
   return data;
