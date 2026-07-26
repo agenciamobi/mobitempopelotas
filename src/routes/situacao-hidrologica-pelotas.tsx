@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
+import { HydrologyEditorialHero } from "@/components/hydrology/HydrologyEditorialHero";
 import { HydrologyOverviewPage } from "@/components/hydrology/HydrologyPages";
 import { HYDROLOGY_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
@@ -54,7 +55,8 @@ function SituacaoHidrologicaPage() {
   const data = Route.useLoaderData();
 
   return (
-    <>
+    <div className="hydrology-editorial-route">
+      <HydrologyEditorialHero level={data.level} variant="overview" />
       <HydrologyOverviewPage
         weather={data.weather}
         level={data.level}
@@ -62,6 +64,6 @@ function SituacaoHidrologicaPage() {
         lagoon={data.lagoon}
       />
       <EditorialContentSection id="como-interpretar-situacao-das-aguas" content={HYDROLOGY_EDITORIAL_CONTENT} />
-    </>
+    </div>
   );
 }
