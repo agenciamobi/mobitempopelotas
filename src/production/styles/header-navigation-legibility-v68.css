@@ -1,0 +1,57 @@
+/* Header v68 — leitura maior sem aumentar excessivamente a altura do cabeçalho. */
+
+.editorial-navigation-inner {
+  min-height: 53px;
+}
+
+.editorial-direct-navigation a,
+.mega-navigation-trigger {
+  min-height: 52px;
+  font-size: clamp(0.73rem, 0.16vw + 0.69rem, 0.8rem);
+  font-weight: 810;
+  letter-spacing: 0.01em;
+}
+
+.editorial-direct-navigation a {
+  padding-inline: clamp(0.82rem, 1.05vw, 1.08rem);
+}
+
+.mega-navigation-trigger {
+  padding-inline: clamp(0.85rem, 1.05vw, 1.08rem);
+}
+
+.editorial-utility-inner {
+  font-size: 0.67rem;
+}
+
+.header-account-link,
+.production-alert-link strong {
+  font-size: 0.72rem;
+}
+
+.mega-navigation-feature.is-region {
+  background:
+    radial-gradient(circle at 15% 12%, rgb(24 189 205 / 20%), transparent 12rem),
+    radial-gradient(circle at 90% 90%, rgb(94 44 237 / 14%), transparent 15rem),
+    linear-gradient(145deg, #f0fbfb, #f7f5ff);
+}
+
+.mega-navigation-feature.is-region small {
+  color: #087d8a;
+}
+
+@media (max-width: 1260px) {
+  .editorial-direct-navigation a,
+  .mega-navigation-trigger {
+    padding-inline: 0.7rem;
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 1080px) {
+  .editorial-direct-navigation a,
+  .mega-navigation-trigger {
+    padding-inline: 0.58rem;
+    font-size: 0.68rem;
+  }
+}
