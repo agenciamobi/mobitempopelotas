@@ -21,7 +21,10 @@ import { HomeHourlyConditionPortal } from "@/production/components/home-hourly-c
 import { HomeLiveCameraBackground } from "@/production/components/home-live-camera-background";
 import { HomeSectionNavigation } from "@/production/components/home-section-navigation";
 import { HomeTrendEditorialPortal } from "@/production/components/home-trend-editorial-portal";
-import { InmetAlertsPanel } from "@/production/components/inmet-alerts-panel";
+import {
+  hasVerifiedInmetAlertSemantics,
+  InmetAlertsPanel,
+} from "@/production/components/inmet-alerts-panel";
 import { InmetOfficialForecastPanel } from "@/production/components/inmet-official-forecast-panel";
 import { SafetyAlertBanner } from "@/production/components/safety-alerts";
 import { SiteFooter } from "@/production/components/site-footer";
@@ -129,11 +132,12 @@ export function ProductionHome({
   const inmetAlerts = toProductionAlerts(recoveredData.weather);
   const advisory = getWeatherAdvisory(weather);
   const pelotasOfficialAlerts = inmetAlerts.alerts.filter((alert) => alert.relevance === "pelotas");
-  const officialLevel: AdvisoryLevel = pelotasOfficialAlerts.some(
+  const verifiedPelotasAlerts = pelotasOfficialAlerts.filter(hasVerifiedInmetAlertSemantics);
+  const officialLevel: AdvisoryLevel = verifiedPelotasAlerts.some(
     (alert) => alert.severity === "danger" || alert.severity === "great-danger",
   )
     ? "warning"
-    : pelotasOfficialAlerts.some((alert) => alert.severity === "potential")
+    : verifiedPelotasAlerts.some((alert) => alert.severity === "potential")
       ? "attention"
       : "normal";
   const headerLevel =
@@ -182,7 +186,7 @@ export function ProductionHome({
       <HeroAstronomyPortal astronomy={weather.astronomy} />
 
       <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
-        <InmetAlertsPanel data={inmetAlerts} variant="home" />
+        <InmetAlertsPanel data={inmetAlerts} variant="home" advisoryLevel={headerLevel} />
         <InmetOfficialForecastPanel
           periods={recoveredData.weather.inmetForecast}
           station={recoveredData.weather.inmetStation}
