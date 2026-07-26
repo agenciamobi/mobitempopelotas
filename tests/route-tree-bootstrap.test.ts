@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
@@ -18,8 +19,15 @@ const packageLock = JSON.parse(readFileSync("package-lock.json", "utf8")) as {
 };
 const generator = readFileSync("scripts/generate-route-tree.mjs", "utf8");
 const viteConfig = readFileSync("vite.config.ts", "utf8");
+const qualityWorkflow = readFileSync(".github/workflows/quality.yml", "utf8");
 
 const GENERATOR_COMMAND = "node scripts/generate-route-tree.mjs";
+
+function workflowStepPosition(command: string) {
+  const position = qualityWorkflow.indexOf(command);
+  assert.notEqual(position, -1, `workflow deve executar ${command}`);
+  return position;
+}
 
 test("route tree is generated before development, build, tests and typecheck", () => {
   assert.equal(packageJson.scripts?.["routes:generate"], GENERATOR_COMMAND);
@@ -64,8 +72,29 @@ test("route generator discovers all exported file routes recursively", () => {
   assert.match(generator, /Rota duplicada detectada/);
   assert.match(generator, /Identificador de rota duplicado/);
   assert.match(generator, /routeTree\.gen\.ts regenerado/);
+  assert.match(generator, /GeneratedFileRoute/);
   assert.match(generator, /_addFileChildren\(rootRouteChildren\)/);
   assert.match(generator, /_addFileTypes<FileRouteTypes>\(\)/);
+});
+
+test("committed route tree matches every discovered route module", () => {
+  const result = spawnSync(process.execPath, ["scripts/generate-route-tree.mjs", "--check"], {
+    encoding: "utf8",
+  });
+
+  assert.equal(
+    result.status,
+    0,
+    [result.stdout, result.stderr].filter(Boolean).join("\n") || "route tree check failed",
+  );
+});
+
+test("quality workflow checks the committed tree before production build", () => {
+  assert.doesNotMatch(qualityWorkflow, /routes:generate\s*&&\s*npm run routes:check/);
+  assert.ok(
+    workflowStepPosition("npm run routes:check") < workflowStepPosition("npm run build"),
+    "routes:check deve executar antes do build",
+  );
 });
 
 test("package manifest remains compatible with npm ci lock metadata", () => {
