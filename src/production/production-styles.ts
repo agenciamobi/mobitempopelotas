@@ -130,3 +130,4 @@ import "./styles/header-megamenu-editorial-v52.css";
 import "./styles/home-water-semantic-v53.css";
 import "./styles/home-hero-live-camera-v54.css";
 import "./styles/pwa-app-refinement-v60.css";
+import "./styles/home-information-reorganization-v61.css";
