@@ -8,6 +8,10 @@ type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
 
+const LARANJAL_EMBED_PATH = "/embed/nivel-laranjal";
+const EMBED_CACHE_CONTROL = "public, max-age=60, s-maxage=60, stale-while-revalidate=300";
+const EMBED_CDN_CACHE_CONTROL = "max-age=60, stale-while-revalidate=300";
+
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
 async function getServerEntry(): Promise<ServerEntry> {
@@ -57,7 +61,7 @@ function withFrameAncestors(policy: string | null, value: string) {
 
 function applyRouteResponseHeaders(request: Request, response: Response) {
   const pathname = new URL(request.url).pathname;
-  if (pathname !== "/embed/nivel-laranjal") return response;
+  if (pathname !== LARANJAL_EMBED_PATH) return response;
 
   const headers = new Headers(response.headers);
   headers.delete("X-Frame-Options");
@@ -68,6 +72,16 @@ function applyRouteResponseHeaders(request: Request, response: Response) {
   headers.set("Cross-Origin-Resource-Policy", "cross-origin");
   headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  headers.set("X-Robots-Tag", "noindex, nofollow");
+  headers.set("Content-Language", "pt-BR");
+
+  if (response.ok) {
+    headers.set("Cache-Control", EMBED_CACHE_CONTROL);
+    headers.set("CDN-Cache-Control", EMBED_CDN_CACHE_CONTROL);
+  } else {
+    headers.set("Cache-Control", "no-store");
+    headers.set("CDN-Cache-Control", "no-store");
+  }
 
   return new Response(response.body, {
     status: response.status,
