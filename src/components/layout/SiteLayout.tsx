@@ -11,7 +11,13 @@ type SiteLayoutProps = {
   forceShell?: boolean;
 };
 
-const standaloneRoutes = new Set(["/", "/entrar", "/minha-conta", "/privacidade-e-dados"]);
+const standaloneRoutes = new Set([
+  "/",
+  "/conta",
+  "/entrar",
+  "/minha-conta",
+  "/privacidade-e-dados",
+]);
 
 function pageAnnouncement() {
   const title = document.title.split("|")[0]?.trim();
