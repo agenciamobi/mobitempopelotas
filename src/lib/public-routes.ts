@@ -1,3 +1,5 @@
+import { REGIONAL_CITIES, regionalCityPath } from "./regional-cities";
+
 export type PublicRouteEntry = {
   path: string;
   changeFrequency: "hourly" | "daily" | "weekly" | "monthly";
@@ -19,6 +21,12 @@ export const PUBLIC_ROUTES: PublicRouteEntry[] = [
   { path: "/estacao-embrapa-pelotas", changeFrequency: "hourly", priority: 0.7 },
   { path: "/historico-climatico-pelotas", changeFrequency: "daily", priority: 0.7 },
   { path: "/cameras-ao-vivo-pelotas", changeFrequency: "hourly", priority: 0.7 },
+  { path: "/tempo-na-regiao-sul-rs", changeFrequency: "daily", priority: 0.85 },
+  ...REGIONAL_CITIES.map((city) => ({
+    path: regionalCityPath(city),
+    changeFrequency: "hourly" as const,
+    priority: city.slug === "pelotas-rs" ? 0.9 : 0.72,
+  })),
   { path: "/metodologia", changeFrequency: "monthly", priority: 0.6 },
   { path: "/privacidade-e-dados", changeFrequency: "monthly", priority: 0.5 },
 ];
