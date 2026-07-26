@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useMemo, type CSSProperties } from "react";
+import { useMemo } from "react";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { HomeExplorePortal } from "@/components/weather/HomeExplorePortal";
@@ -44,34 +44,24 @@ const unavailableSource = {
   forecastUrl: "/metodologia",
 } satisfies WeatherData["source"];
 
-type CameraHeroStyle = CSSProperties & {
-  "--home-live-camera-image"?: string;
-};
-
 function getLiveLaranjalCamera(cameraData: WeatherCameraData) {
   const camera = cameraData.cameras.find((item) => item.id === "laranjal");
   if (
     !camera ||
     camera.status !== "online" ||
     camera.broadcastStatus !== "live" ||
-    !camera.embedUrl ||
-    !camera.thumbnailUrl
+    !camera.embedUrl
   ) {
     return null;
   }
 
   try {
-    const previewUrl = new URL(camera.thumbnailUrl);
-    if (previewUrl.protocol !== "https:") return null;
-
-    const fetchedAt = new Date(cameraData.source.fetchedAt).getTime();
-    if (Number.isFinite(fetchedAt)) {
-      previewUrl.searchParams.set("tempo-pelotas", String(Math.floor(fetchedAt / 180_000)));
-    }
+    const embedUrl = new URL(camera.embedUrl);
+    if (embedUrl.protocol !== "https:") return null;
 
     return {
       ...camera,
-      previewUrl: previewUrl.toString(),
+      embedUrl: embedUrl.toString(),
     };
   } catch {
     return null;
@@ -104,9 +94,6 @@ export function ProductionHome({
     [recoveredData.weather],
   );
   const liveLaranjalCamera = useMemo(() => getLiveLaranjalCamera(cameraData), [cameraData]);
-  const cameraHeroStyle: CameraHeroStyle | undefined = liveLaranjalCamera
-    ? { "--home-live-camera-image": `url("${liveLaranjalCamera.previewUrl}")` }
-    : undefined;
   const hasUsableWeather = Boolean(
     weather.current.available || weather.hourly.length > 0 || weather.daily.length > 0,
   );
@@ -162,10 +149,7 @@ export function ProductionHome({
   return (
     <div className="site-shell site-shell--home site-shell--home-editorial">
       <SiteHeader advisoryLevel={headerLevel} variant="hero" />
-      <div
-        className={`home-hero-camera-shell${liveLaranjalCamera ? " has-live-camera" : ""}`}
-        style={cameraHeroStyle}
-      >
+      <div className={`home-hero-camera-shell${liveLaranjalCamera ? " has-live-camera" : ""}`}>
         <WeatherHero
           weather={weather}
           advisoryLevel={headerLevel}
