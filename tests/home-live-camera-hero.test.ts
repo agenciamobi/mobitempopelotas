@@ -71,13 +71,13 @@ test("live camera source remains identified and links to the camera page", () =>
   assert.match(productionHome, /aria-label="Abrir a câmera ao vivo da Praia do Laranjal"/);
 });
 
-test("camera has no visual fallback and keeps native 16:9 geometry", () => {
+test("camera has no visual fallback, overlay or geometric distortion", () => {
   assert.doesNotMatch(cameraStyles, /--home-live-camera-image/);
   assert.doesNotMatch(cameraStyles, /image-set\(/);
   assert.match(cameraStyles, /\.has-live-camera \.weather-hero-photo\s*\{[\s\S]*background:\s*transparent/);
   assert.match(cameraStyles, /\.has-live-camera \.weather-hero-photo\s*\{[\s\S]*opacity:\s*0/);
   assert.match(cameraStyles, /\.weather-hero-live-camera\s*\{[\s\S]*background:\s*transparent/);
-  assert.match(cameraStyles, /\.has-live-camera \.weather-hero-overlay\s*\{[\s\S]*background:\s*transparent/);
+  assert.match(exactGeometryStyles, /\.has-live-camera \.weather-hero-overlay\s*\{[\s\S]*display:\s*none/);
   assert.match(proportionalStyles, /aspect-ratio:\s*16\s*\/\s*9/);
   assert.match(nativeScaleStyles, /--home-live-camera-crop:\s*1\s*;/);
   assert.match(exactGeometryStyles, /\.weather-hero-live-camera iframe/);
@@ -94,35 +94,39 @@ test("camera has no visual fallback and keeps native 16:9 geometry", () => {
   assert.match(cameraStyles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*display:\s*block/);
 });
 
-test("transparent media layers and live iframe share the same responsive box", () => {
+test("transparent photo and live iframe share the same responsive media box", () => {
   assert.match(
     exactGeometryStyles,
-    /\.weather-hero-photo,\s*[\s\S]*\.weather-hero-overlay,\s*[\s\S]*\.weather-hero-live-camera\s*\{[\s\S]*width:\s*44\.5%[\s\S]*aspect-ratio:\s*16\s*\/\s*9[\s\S]*translateY\(-50%\)/,
+    /\.weather-hero-photo,\s*[\s\S]*\.weather-hero-live-camera\s*\{[\s\S]*width:\s*44\.5%[\s\S]*aspect-ratio:\s*16\s*\/\s*9[\s\S]*translateY\(-50%\)/,
   );
   assert.match(
     exactGeometryStyles,
-    /@media \(max-width:\s*900px\)[\s\S]*\.weather-hero-photo,[\s\S]*\.weather-hero-overlay,[\s\S]*\.weather-hero-live-camera[\s\S]*left:\s*8px[\s\S]*aspect-ratio:\s*16\s*\/\s*9/,
+    /@media \(max-width:\s*900px\)[\s\S]*\.weather-hero-photo,[\s\S]*\.weather-hero-live-camera[\s\S]*left:\s*8px[\s\S]*aspect-ratio:\s*16\s*\/\s*9/,
   );
   assert.match(
     exactGeometryStyles,
-    /@media \(max-width:\s*620px\)[\s\S]*\.weather-hero-photo,[\s\S]*\.weather-hero-overlay,[\s\S]*\.weather-hero-live-camera[\s\S]*left:\s*6px/,
+    /@media \(max-width:\s*620px\)[\s\S]*\.weather-hero-photo,[\s\S]*\.weather-hero-live-camera[\s\S]*left:\s*6px/,
   );
 });
 
-test("weather card and camera source receive restrained final polish", () => {
+test("weather card moves right on desktop and remains centered on mobile", () => {
   assert.match(
     exactGeometryStyles,
-    /\.has-live-camera \.weather-hero-now\s*\{[\s\S]*translateX\(clamp\(10px, 1vw, 18px\)\)/,
+    /@media \(min-width:\s*1181px\)[\s\S]*\.has-live-camera \.weather-hero-now\s*\{[\s\S]*translateX\(clamp\(28px, 2\.2vw, 46px\)\)/,
+  );
+  assert.match(
+    exactGeometryStyles,
+    /@media \(max-width:\s*1180px\) and \(min-width:\s*901px\)[\s\S]*translateX\(clamp\(10px, 1\.4vw, 18px\)\)/,
+  );
+  assert.match(
+    exactGeometryStyles,
+    /@media \(max-width:\s*900px\)[\s\S]*\.has-live-camera \.weather-hero-now\s*\{[\s\S]*transform:\s*none/,
   );
   assert.match(exactGeometryStyles, /box-shadow:\s*0 12px 30px rgb\(7 30 47 \/ 15%\)/);
   assert.match(exactGeometryStyles, /backdrop-filter:\s*blur\(10px\) saturate\(116%\)/);
   assert.match(
     exactGeometryStyles,
     /\.has-live-camera \.home-hero-camera-source\s*\{[\s\S]*background:\s*rgb\(5 28 43 \/ 72%\)/,
-  );
-  assert.match(
-    exactGeometryStyles,
-    /@media \(max-width:\s*900px\)[\s\S]*\.has-live-camera \.weather-hero-now\s*\{[\s\S]*transform:\s*none/,
   );
   assert.match(exactGeometryStyles, /prefers-reduced-transparency:\s*reduce/);
 });
