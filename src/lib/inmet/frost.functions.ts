@@ -13,6 +13,6 @@ export const getInmetFrostOverview = createServerFn({ method: "GET" }).handler(
       }),
     );
 
-    return fetchInmetFrostMap({ days: 30, stationType: "CONVENCIONAL", state: "RS" });
+    return fetchInmetFrostMap({ days: 30, stationType: "AUTOMATICA", state: "RS" });
   },
 );
