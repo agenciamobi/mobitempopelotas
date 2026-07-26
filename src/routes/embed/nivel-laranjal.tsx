@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import "@/components/embed/LaranjalEmbedIsolation.css";
 import { LaranjalLevelEmbed } from "@/components/embed/LaranjalLevelEmbed";
 import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
 
