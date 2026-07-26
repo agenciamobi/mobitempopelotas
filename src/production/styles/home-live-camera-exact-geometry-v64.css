@@ -21,7 +21,7 @@
     width: 44.5%;
     height: auto;
     aspect-ratio: 16 / 9;
-    border-radius: 0 0 clamp(22px, 1.7vw, 28px) 0;
+    border-radius: clamp(22px, 1.7vw, 28px);
     transform: translateY(-50%);
   }
 
@@ -54,7 +54,7 @@
     width: 44.5%;
     height: auto;
     aspect-ratio: 16 / 9;
-    border-radius: 0 0 clamp(20px, 1.7vw, 26px) 0;
+    border-radius: clamp(20px, 1.7vw, 26px);
     transform: translateY(-50%);
   }
 
