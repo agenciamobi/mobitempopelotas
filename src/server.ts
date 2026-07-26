@@ -45,6 +45,37 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+function withFrameAncestors(policy: string | null, value: string) {
+  const directives = (policy ?? "")
+    .split(";")
+    .map((directive) => directive.trim())
+    .filter(Boolean)
+    .filter((directive) => !directive.toLowerCase().startsWith("frame-ancestors"));
+  directives.push(`frame-ancestors ${value}`);
+  return `${directives.join("; ")};`;
+}
+
+function applyRouteResponseHeaders(request: Request, response: Response) {
+  const pathname = new URL(request.url).pathname;
+  if (pathname !== "/embed/nivel-laranjal") return response;
+
+  const headers = new Headers(response.headers);
+  headers.delete("X-Frame-Options");
+  headers.set(
+    "Content-Security-Policy",
+    withFrameAncestors(headers.get("Content-Security-Policy"), "*"),
+  );
+  headers.set("Cross-Origin-Resource-Policy", "cross-origin");
+  headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     const canonicalRedirect = createCanonicalRedirectResponse(request);
@@ -53,13 +84,15 @@ export default {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const normalized = await normalizeCatastrophicSsrResponse(response);
+      return applyRouteResponseHeaders(request, normalized);
     } catch (error) {
       console.error(error);
-      return new Response(renderErrorPage(), {
+      const response = new Response(renderErrorPage(), {
         status: 500,
         headers: { "content-type": "text/html; charset=utf-8" },
       });
+      return applyRouteResponseHeaders(request, response);
     }
   },
 };
