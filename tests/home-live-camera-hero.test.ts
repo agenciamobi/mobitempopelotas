@@ -34,26 +34,31 @@ test("homepage loads camera data together with weather and hydrology", () => {
   assert.match(homeRoute, /cameraData=\{cameraData\}/);
 });
 
-test("only a live Laranjal stream with secure preview and embed URLs reaches the hero", () => {
+test("a secure live Laranjal embed reaches the hero without requiring a thumbnail", () => {
   assert.match(productionHome, /item\.id === "laranjal"/);
   assert.match(productionHome, /camera\.status !== "online"/);
   assert.match(productionHome, /camera\.broadcastStatus !== "live"/);
   assert.match(productionHome, /!camera\.embedUrl/);
-  assert.match(productionHome, /!camera\.thumbnailUrl/);
-  assert.match(productionHome, /previewUrl\.protocol !== "https:"/);
-  assert.match(productionHome, /--home-live-camera-image/);
+  assert.doesNotMatch(productionHome, /!camera\.thumbnailUrl/);
+  assert.doesNotMatch(productionHome, /previewUrl/);
+  assert.doesNotMatch(productionHome, /--home-live-camera-image/);
   assert.match(productionHome, /HomeLiveCameraBackground/);
   assert.match(productionHome, /embedUrl=\{liveLaranjalCamera\.embedUrl\}/);
 });
 
-test("live player is silent, control-free, deferred and non-interactive", () => {
+test("live player is silent, immediate, retryable and non-interactive", () => {
   assert.match(liveBackground, /autoplay", "1"/);
   assert.match(liveBackground, /mute", "1"/);
   assert.match(liveBackground, /controls", "0"/);
   assert.match(liveBackground, /playsinline", "1"/);
   assert.match(liveBackground, /disablekb", "1"/);
-  assert.match(liveBackground, /window\.setTimeout\(\(\) => setShouldLoad\(true\), 700\)/);
-  assert.match(liveBackground, /prefers-reduced-motion: reduce/);
+  assert.match(liveBackground, /MAX_RELOAD_ATTEMPTS\s*=\s*2/);
+  assert.match(liveBackground, /PLAYER_RETRY_DELAY_MS\s*=\s*9_000/);
+  assert.match(liveBackground, /setAttempt\(\(current\) => Math\.min\(current \+ 1/);
+  assert.match(liveBackground, /loading="eager"/);
+  assert.match(liveBackground, /onError=\{retryPlayer\}/);
+  assert.doesNotMatch(liveBackground, /setShouldLoad/);
+  assert.doesNotMatch(liveBackground, /prefers-reduced-motion: reduce/);
   assert.match(liveBackground, /tabIndex=\{-1\}/);
   assert.match(liveBackground, /aria-hidden="true"/);
   assert.match(weatherHero, /\{liveCameraBackground\}/);
@@ -66,11 +71,13 @@ test("live camera source remains identified and links to the camera page", () =>
   assert.match(productionHome, /aria-label="Abrir a câmera ao vivo da Praia do Laranjal"/);
 });
 
-test("camera uses native scale and exact 16:9 iframe geometry", () => {
-  assert.match(cameraStyles, /var\(--home-live-camera-image\)/);
-  assert.match(cameraStyles, /image-set\(/);
-  assert.match(cameraStyles, /\.weather-hero-live-camera/);
-  assert.match(cameraStyles, /scale\(var\(--home-live-camera-crop\)\)/);
+test("camera has no visual fallback and keeps native 16:9 geometry", () => {
+  assert.doesNotMatch(cameraStyles, /--home-live-camera-image/);
+  assert.doesNotMatch(cameraStyles, /image-set\(/);
+  assert.match(cameraStyles, /\.has-live-camera \.weather-hero-photo\s*\{[\s\S]*background:\s*transparent/);
+  assert.match(cameraStyles, /\.has-live-camera \.weather-hero-photo\s*\{[\s\S]*opacity:\s*0/);
+  assert.match(cameraStyles, /\.weather-hero-live-camera\s*\{[\s\S]*background:\s*transparent/);
+  assert.match(cameraStyles, /\.has-live-camera \.weather-hero-overlay\s*\{[\s\S]*background:\s*transparent/);
   assert.match(proportionalStyles, /aspect-ratio:\s*16\s*\/\s*9/);
   assert.match(nativeScaleStyles, /--home-live-camera-crop:\s*1\s*;/);
   assert.match(exactGeometryStyles, /\.weather-hero-live-camera iframe/);
@@ -84,10 +91,10 @@ test("camera uses native scale and exact 16:9 iframe geometry", () => {
   assert.match(cameraStyles, /overflow:\s*hidden/);
   assert.match(cameraStyles, /opacity:\s*0/);
   assert.match(cameraStyles, /\.is-ready iframe\s*\{[\s\S]*opacity:\s*1/);
-  assert.match(cameraStyles, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(cameraStyles, /@media \(prefers-reduced-motion: reduce\)[\s\S]*display:\s*block/);
 });
 
-test("fallback, overlay and live iframe share the same responsive media box", () => {
+test("transparent media layers and live iframe share the same responsive box", () => {
   assert.match(
     exactGeometryStyles,
     /\.weather-hero-photo,\s*[\s\S]*\.weather-hero-overlay,\s*[\s\S]*\.weather-hero-live-camera\s*\{[\s\S]*width:\s*44\.5%[\s\S]*aspect-ratio:\s*16\s*\/\s*9[\s\S]*translateY\(-50%\)/,
