@@ -6,6 +6,8 @@ const advisoryStyles = readFileSync(
   "src/production/styles/home-advisory-color-scope-v65.css",
   "utf8",
 );
+const alertPanel = readFileSync("src/production/components/inmet-alerts-panel.tsx", "utf8");
+const productionHome = readFileSync("src/production/ProductionHome.tsx", "utf8");
 const styleImports = readFileSync("src/production/production-styles.ts", "utf8");
 const globalStyles = readFileSync("src/production/production-styles.css", "utf8");
 
@@ -24,7 +26,30 @@ test("ordinary hero actions stay neutral while the alert CTA keeps the risk toke
   assert.match(advisoryStyles, /\.weather-hero-secondary\s*\{[\s\S]*color:\s*#16384a/);
 });
 
-test("advisory color scope is the last production style layer", () => {
+test("INMET bar only adopts official colors after severity and validity are recognized", () => {
+  assert.match(alertPanel, /hasVerifiedInmetAlertSemantics/);
+  assert.match(alertPanel, /alert\.severity !== "unknown"/);
+  assert.match(alertPanel, /validDate\(alert\.startsAt\)/);
+  assert.match(alertPanel, /validDate\(alert\.expiresAt\)/);
+  assert.match(alertPanel, /data-alert-official-semantics=\{verified \? "verified" : "unverified"\}/);
+  assert.match(alertPanel, /Classificação em validação/);
+  assert.match(alertPanel, /advisory-\$\{advisoryLevel\}/);
+
+  assert.match(advisoryStyles, /\.home-inmet-alerts\.is-unverified\.advisory-normal/);
+  assert.match(advisoryStyles, /\.home-inmet-alerts\.is-unverified\.advisory-attention/);
+  assert.match(advisoryStyles, /\.home-inmet-alerts\.is-unverified\.advisory-warning/);
+  assert.match(advisoryStyles, /\.is-officially-classified\.severity-potential/);
+  assert.match(advisoryStyles, /\.is-officially-classified\.severity-danger/);
+  assert.match(advisoryStyles, /\.is-officially-classified\.severity-great-danger/);
+});
+
+test("unverified official alerts do not elevate the portal header by themselves", () => {
+  assert.match(productionHome, /verifiedPelotasAlerts = pelotasOfficialAlerts\.filter/);
+  assert.match(productionHome, /hasVerifiedInmetAlertSemantics/);
+  assert.match(productionHome, /<InmetAlertsPanel data=\{inmetAlerts\} variant="home" advisoryLevel=\{headerLevel\}/);
+});
+
+test("advisory color scope is loaded after live camera geometry", () => {
   const tsGeometry = styleImports.indexOf("home-live-camera-exact-geometry-v64.css");
   const tsAdvisory = styleImports.indexOf("home-advisory-color-scope-v65.css");
   const cssGeometry = globalStyles.indexOf("home-live-camera-exact-geometry-v64.css");
