@@ -23,6 +23,13 @@ const severityRank: Record<InmetAlert["severity"], number> = {
   "great-danger": 3,
 };
 
+const alertColorLabels: Record<InmetAlert["severity"], string> = {
+  potential: "Alerta amarelo",
+  danger: "Alerta laranja",
+  "great-danger": "Alerta vermelho",
+  unknown: "Aviso meteorológico",
+};
+
 const relevanceRank: Record<InmetAlert["relevance"], number> = {
   pelotas: 0,
   regional: 1,
@@ -87,6 +94,11 @@ function displayHeadline(alert: InmetAlert) {
   }
 
   return headline;
+}
+
+function homepageAlertTitle(alert: InmetAlert) {
+  const event = displayHeadline(alert).replace(/^Aviso de\s+/i, "");
+  return `${alertColorLabels[alert.severity]}: ${event}`;
 }
 
 function homeAreaLabel(alert: InmetAlert) {
@@ -166,13 +178,14 @@ function HomePanel({ data }: { data: InmetAlertsData }) {
 
   const primary = primaryHomeAlert(data);
   if (!primary) return null;
+  const title = homepageAlertTitle(primary);
 
   return (
     <section
       className={`home-inmet-alerts severity-${primary.severity}`}
       data-alert-period={primary.period}
       data-alert-severity={primary.severity}
-      aria-label={`${primary.severityLabel}. ${displayHeadline(primary)}. ${periodLabel(primary)}`}
+      aria-label={`${title}. ${periodLabel(primary)}`}
       aria-labelledby="home-inmet-title"
     >
       <div className="home-inmet-alerts__main">
@@ -185,7 +198,7 @@ function HomePanel({ data }: { data: InmetAlertsData }) {
             <span>Aviso oficial do INMET</span>
             <b>{primary.severityLabel}</b>
           </div>
-          <h2 id="home-inmet-title">{displayHeadline(primary)}</h2>
+          <h2 id="home-inmet-title">{title}</h2>
           <div className="home-inmet-alerts__meta">
             <span>
               <small>Abrangência</small>
