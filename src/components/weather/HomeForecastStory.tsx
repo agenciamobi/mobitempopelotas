@@ -14,6 +14,7 @@ import {
 
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import type { WeatherIconName } from "@/lib/weather/types";
+import { HourlyRainVolume } from "@/components/weather/HourlyRainVolume";
 
 import "./HomeForecastStory.css";
 
@@ -174,7 +175,7 @@ export function HomeForecastStory({ data }: { data: WeatherIntelligenceData }) {
                     <i aria-hidden="true">
                       <b style={{ width: `${rain.chance}%` }} />
                     </i>
-                    <small>{rain.label}</small>
+                    <HourlyRainVolume index={index} />
                   </div>
                   <span className="home-hourly-wind">
                     Rajada de até {hour.windGust ?? hour.windSpeed} km/h
