@@ -77,6 +77,11 @@ const footerGroups = [
         to: "/radar-e-satelite-pelotas",
       },
       {
+        label: "Mapa de geadas no RS",
+        ariaLabel: "Consultar ocorrências de geada registradas pelo INMET no Rio Grande do Sul",
+        to: "/mapa-de-geadas-rio-grande-do-sul",
+      },
+      {
         label: "Histórico climático",
         ariaLabel: "Consultar o histórico climático recente de Pelotas",
         to: "/historico-climatico-pelotas",
