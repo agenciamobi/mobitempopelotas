@@ -1,0 +1,45 @@
+/* Home v64 — iframe e container da live com geometria 16:9 exata. */
+
+.site-shell--home-editorial .weather-hero-live-camera iframe {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  aspect-ratio: 16 / 9;
+  transform: none;
+}
+
+@media (min-width: 901px) {
+  .site-shell--home-editorial .weather-hero-live-camera {
+    top: 50%;
+    right: 0;
+    bottom: auto;
+    left: auto;
+    width: 44.5%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    transform: translateY(-50%);
+  }
+}
+
+@media (max-width: 900px) {
+  .site-shell--home-editorial .weather-hero-live-camera {
+    top: 8px;
+    right: 8px;
+    bottom: auto;
+    left: 8px;
+    width: auto;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    transform: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .site-shell--home-editorial .weather-hero-live-camera {
+    top: 6px;
+    right: 6px;
+    left: 6px;
+  }
+}
