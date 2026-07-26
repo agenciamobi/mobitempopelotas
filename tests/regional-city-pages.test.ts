@@ -15,6 +15,7 @@ const directoryRoute = readFileSync("src/routes/tempo-na-regiao-sul-rs.tsx", "ut
 const page = readFileSync("src/components/regional/RegionalCityWeatherPage.tsx", "utf8");
 const hero = readFileSync("src/components/regional/RegionalCityHero.tsx", "utf8");
 const heroStyles = readFileSync("src/components/regional/RegionalCityHero.module.css", "utf8");
+const performanceStyles = readFileSync("src/components/regional/RegionalCityPerformance.css", "utf8");
 const hourly = readFileSync("src/components/regional/RegionalCityHourlySection.tsx", "utf8");
 const hourlyStyles = readFileSync("src/components/regional/RegionalCityHourlySection.module.css", "utf8");
 const header = readFileSync("src/components/layout/Header.tsx", "utf8");
@@ -78,11 +79,22 @@ test("regional first fold follows the homepage composition with an honest visual
   assert.match(hero, /current\?\.windSpeed/);
   assert.match(hero, /current\?\.pressure/);
   assert.match(hero, /conditionPresentation/);
+  assert.match(hero, /w=1400&q=72/);
+  assert.doesNotMatch(hero, /w=1800&q=82/);
   assert.match(heroStyles, /grid-template-columns:\s*minmax\(0, 1\.08fr\)/);
   assert.match(heroStyles, /background-image:\s*var\(--regional-hero-image\)/);
   assert.match(heroStyles, /@media \(max-width:\s*900px\)/);
   assert.match(heroStyles, /@media \(max-width:\s*620px\)/);
   assert.match(heroStyles, /width:\s*calc\(100% - 24px\)/);
+});
+
+test("regional pages defer lower sections and keep anchor navigation aligned", () => {
+  assert.match(page, /import "\.\/RegionalCityPerformance\.css"/);
+  assert.match(page, /regional-city-page/);
+  assert.match(performanceStyles, /content-visibility:\s*auto/);
+  assert.match(performanceStyles, /contain-intrinsic-size:\s*auto 760px/);
+  assert.match(performanceStyles, /scroll-margin-top:\s*7\.5rem/);
+  assert.match(performanceStyles, /@media \(max-width:\s*700px\)/);
 });
 
 test("hourly regional section shows probability, millimeters, wind and sun times", () => {
