@@ -2,7 +2,7 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#071e2f" />
     <title>Sem conexão | TEMPO Pelotas</title>
     <style>
@@ -16,78 +16,130 @@
       * { box-sizing: border-box; }
 
       body {
-        min-height: 100vh;
+        min-height: 100dvh;
         margin: 0;
         display: grid;
         place-items: center;
-        padding: 24px;
+        padding:
+          max(24px, env(safe-area-inset-top))
+          max(20px, env(safe-area-inset-right))
+          max(24px, env(safe-area-inset-bottom))
+          max(20px, env(safe-area-inset-left));
         background:
-          radial-gradient(circle at 80% 0%, rgba(24, 189, 205, 0.2), transparent 28rem),
+          radial-gradient(circle at 82% 0%, rgba(94, 44, 237, 0.1), transparent 22rem),
+          radial-gradient(circle at 12% 5%, rgba(24, 189, 205, 0.17), transparent 24rem),
           linear-gradient(180deg, #f7faf9 0%, #eaf0f3 100%);
       }
 
       main {
-        width: min(100%, 680px);
-        padding: clamp(28px, 6vw, 56px);
-        border: 1px solid rgba(7, 30, 47, 0.1);
-        border-radius: 32px;
-        background: rgba(255, 255, 255, 0.94);
+        position: relative;
+        width: min(100%, 620px);
+        overflow: hidden;
+        padding: clamp(28px, 6vw, 52px);
+        border: 1px solid rgba(7, 30, 47, 0.09);
+        border-radius: 30px;
+        background: rgba(255, 255, 255, 0.95);
         box-shadow: 0 28px 70px rgba(7, 30, 47, 0.12);
+      }
+
+      main::before {
+        position: absolute;
+        top: 0;
+        right: 24px;
+        left: 24px;
+        height: 3px;
+        border-radius: 0 0 999px 999px;
+        background: linear-gradient(90deg, #18bdcd 0 32%, #5e2ced 32% 66%, #e70b85 66% 100%);
+        content: "";
       }
 
       .brand {
         display: inline-flex;
         align-items: center;
         gap: 12px;
-        margin-bottom: 42px;
+        margin-bottom: clamp(30px, 6vw, 42px);
         color: inherit;
         text-decoration: none;
       }
 
-      .brand img { width: 52px; height: 52px; }
+      .brand img { width: 50px; height: 50px; }
       .brand strong { font-size: 1.05rem; letter-spacing: -0.03em; }
-      .eyebrow { color: #5e2ced; font-size: 0.78rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
-      h1 { margin: 12px 0 16px; font-size: clamp(2rem, 7vw, 3.8rem); line-height: 0.98; letter-spacing: -0.06em; }
-      p { margin: 0; color: #536a76; font-size: 1.05rem; line-height: 1.7; }
+      .eyebrow { color: #5e2ced; font-size: 0.72rem; font-weight: 850; letter-spacing: 0.11em; text-transform: uppercase; }
+      h1 { max-width: 12ch; margin: 12px 0 16px; font-size: clamp(2.15rem, 8vw, 3.8rem); line-height: 0.96; letter-spacing: -0.06em; }
+      p { margin: 0; color: #536a76; font-size: 0.96rem; line-height: 1.65; }
+
+      .status {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        width: fit-content;
+        margin-top: 24px;
+        padding: 9px 12px;
+        border-radius: 999px;
+        background: rgba(242, 112, 53, 0.09);
+        color: #8c4618;
+        font-size: 0.72rem;
+        font-weight: 800;
+      }
+
+      .status::before {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #f27035;
+        box-shadow: 0 0 0 5px rgba(242, 112, 53, 0.12);
+        content: "";
+      }
 
       .note {
-        margin-top: 28px;
-        padding: 18px 20px;
+        margin-top: 18px;
+        padding: 17px 18px;
         border-left: 4px solid #18bdcd;
-        border-radius: 0 16px 16px 0;
+        border-radius: 0 15px 15px 0;
         background: #f1f8f8;
         color: #294756;
+        font-size: 0.82rem;
       }
 
       button {
         width: 100%;
-        margin-top: 30px;
-        padding: 15px 20px;
+        min-height: 48px;
+        margin-top: 24px;
+        padding: 13px 18px;
         border: 0;
         border-radius: 999px;
         background: #071e2f;
         color: #fff;
         font: inherit;
-        font-weight: 800;
+        font-weight: 820;
         cursor: pointer;
       }
 
+      button:hover { background: #103b55; }
       button:focus-visible { outline: 4px solid rgba(24, 189, 205, 0.45); outline-offset: 4px; }
+      .automatic { display: block; margin-top: 12px; color: #738792; font-size: 0.68rem; line-height: 1.5; text-align: center; }
+
+      @media (max-width: 520px) {
+        main { padding: 30px 20px; border-radius: 24px; }
+        .brand img { width: 44px; height: 44px; }
+      }
     </style>
   </head>
   <body>
     <main>
       <a class="brand" href="/" aria-label="Voltar ao TEMPO Pelotas">
-        <img src="/brand/tempo-pelotas-icon.svg" alt="" width="52" height="52" />
+        <img src="/brand/tempo-pelotas-icon.svg" alt="" width="50" height="50" />
         <strong>TEMPO Pelotas</strong>
       </a>
 
-      <span class="eyebrow">Conexão indisponível</span>
-      <h1>Não foi possível atualizar os dados agora.</h1>
+      <span class="eyebrow">Aplicativo Tempo Pelotas</span>
+      <h1>Sem conexão para atualizar os dados.</h1>
       <p>
-        O portal precisa de internet para consultar as fontes de tempo, alertas e níveis das águas.
-        Quando a conexão voltar, tente novamente para receber as informações mais recentes.
+        Previsão, avisos e níveis das águas dependem de internet para consultar as fontes mais recentes.
+        O aplicativo tentará novamente assim que a conexão retornar.
       </p>
+
+      <div class="status" role="status">Aguardando conexão</div>
 
       <p class="note">
         Em situação de risco, não dependa apenas deste portal. Siga as orientações da Defesa Civil,
@@ -95,6 +147,13 @@
       </p>
 
       <button type="button" onclick="window.location.reload()">Tentar carregar novamente</button>
+      <small class="automatic">Esta tela será recarregada automaticamente quando a internet voltar.</small>
     </main>
+
+    <script>
+      window.addEventListener("online", function () {
+        window.location.reload();
+      });
+    </script>
   </body>
 </html>
