@@ -1,18 +1,31 @@
 import { Check, Code2, Copy, ExternalLink } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import "./LaranjalEmbedGuide.css";
 
 const EMBED_CODE = `<div data-tempo-pelotas-nivel-laranjal></div>\n<script async src="https://tempopelotas.com.br/widgets/nivel-laranjal.js"></script>`;
+const COPY_FEEDBACK_DURATION = 2200;
 
 export function LaranjalEmbedGuide() {
   const [copied, setCopied] = useState(false);
+  const resetTimerRef = useRef<number | null>(null);
+
+  useEffect(
+    () => () => {
+      if (resetTimerRef.current !== null) window.clearTimeout(resetTimerRef.current);
+    },
+    [],
+  );
 
   async function copyCode() {
     try {
       await navigator.clipboard.writeText(EMBED_CODE);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 2200);
+      if (resetTimerRef.current !== null) window.clearTimeout(resetTimerRef.current);
+      resetTimerRef.current = window.setTimeout(() => {
+        setCopied(false);
+        resetTimerRef.current = null;
+      }, COPY_FEEDBACK_DURATION);
     } catch {
       setCopied(false);
     }
@@ -39,13 +52,22 @@ export function LaranjalEmbedGuide() {
 
       <div className="laranjal-embed-guide-code">
         <header>
-          <div><Code2 aria-hidden="true" /><span>Código de incorporação</span></div>
-          <button type="button" onClick={copyCode}>
+          <div>
+            <Code2 aria-hidden="true" />
+            <span>Código de incorporação</span>
+          </div>
+          <button
+            type="button"
+            onClick={copyCode}
+            aria-label={copied ? "Código de incorporação copiado" : "Copiar código de incorporação"}
+          >
             {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
-            {copied ? "Copiado" : "Copiar"}
+            <span aria-live="polite">{copied ? "Copiado" : "Copiar"}</span>
           </button>
         </header>
-        <pre><code>{EMBED_CODE}</code></pre>
+        <pre tabIndex={0} aria-label="Código HTML para incorporar o widget">
+          <code>{EMBED_CODE}</code>
+        </pre>
         <small>
           Para limitar a largura, adicione <code>data-max-width="620px"</code> ao elemento <code>div</code>.
         </small>
