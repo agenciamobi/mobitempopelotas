@@ -8,6 +8,7 @@ const embedIsolation = readFileSync("src/components/embed/LaranjalEmbedIsolation
 const embedScript = readFileSync("src/routes/widgets/nivel-laranjal[.]js.ts", "utf8");
 const embedApi = readFileSync("src/routes/api/widgets/nivel-laranjal.ts", "utf8");
 const embedGuide = readFileSync("src/components/embed/LaranjalEmbedGuide.tsx", "utf8");
+const serverEntry = readFileSync("src/server.ts", "utf8");
 const siteLayout = readFileSync("src/components/layout/SiteLayout.tsx", "utf8");
 const alerts = readFileSync("src/components/weather/WeatherAlertsPage.tsx", "utf8");
 const alertsStyles = readFileSync("src/components/weather/WeatherAlertsHomepageVisual.css", "utf8");
@@ -43,10 +44,22 @@ test("Laranjal widget is standalone, responsive and publicly reusable", () => {
   assert.match(embedIsolation, /onesignal-bell-container/);
 });
 
+test("only the public embed document accepts third-party framing", () => {
+  assert.match(serverEntry, /pathname !== "\/embed\/nivel-laranjal"/);
+  assert.match(serverEntry, /headers\.delete\("X-Frame-Options"\)/);
+  assert.match(serverEntry, /frame-ancestors/);
+  assert.match(serverEntry, /Cross-Origin-Resource-Policy", "cross-origin"/);
+  assert.match(serverEntry, /camera=\(\), microphone=\(\), geolocation=\(\)/);
+});
+
 test("alerts page uses the homepage editorial first-fold language", () => {
   assert.match(alerts, /AlertsHero/);
   assert.match(alerts, /Alertas meteorológicos com contexto local/);
   assert.match(alerts, /alerts-editorial-panel/);
+  assert.match(alerts, /severityPriority/);
+  assert.match(alerts, /prioritizeAlerts/);
+  assert.match(alerts, /id="resumo-alertas"/);
+  assert.match(alerts, /featured \? "#aviso-prioritario" : "#resumo-alertas"/);
   assert.match(alertsStyles, /grid-template-columns:\s*minmax\(0, 1\.14fr\)/);
   assert.match(alertsStyles, /color:\s*#5e2ced/);
   assert.match(alertsStyles, /@media \(max-width:\s*620px\)/);
@@ -65,9 +78,14 @@ test("hydrology pages share a data-led editorial hero and hide the legacy first 
   assert.match(levelRoute, /LaranjalEmbedGuide/);
 });
 
-test("regional city loader retries coordinate weather when the primary current block is unavailable", () => {
+test("regional city loader recovers every incomplete weather group", () => {
   assert.match(regionalFunctions, /fetchResilientRegionalCityWeather/);
-  assert.match(resilientWeather, /hasUsableCurrent/);
+  assert.match(resilientWeather, /needsRecovery/);
+  assert.match(resilientWeather, /hasCompleteCurrent/);
+  assert.match(resilientWeather, /hasUsefulHourly/);
+  assert.match(resilientWeather, /hasUsefulDaily/);
+  assert.match(resilientWeather, /mergeCurrent/);
+  assert.match(resilientWeather, /value === null \|\| value === undefined/);
   assert.match(resilientWeather, /temperature_2m/);
   assert.match(resilientWeather, /relative_humidity_2m/);
   assert.match(resilientWeather, /pressure_msl/);
