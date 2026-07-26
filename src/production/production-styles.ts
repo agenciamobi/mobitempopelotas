@@ -133,3 +133,4 @@ import "./styles/pwa-app-refinement-v60.css";
 import "./styles/home-information-reorganization-v61.css";
 import "./styles/home-hero-proportional-v62.css";
 import "./styles/home-live-camera-native-scale-v63.css";
+import "./styles/home-live-camera-exact-geometry-v64.css";
