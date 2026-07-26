@@ -13,6 +13,10 @@ const cameraStyles = readFileSync(
   "src/production/styles/home-hero-live-camera-v54.css",
   "utf8",
 );
+const proportionalStyles = readFileSync(
+  "src/production/styles/home-hero-proportional-v62.css",
+  "utf8",
+);
 const styleImports = readFileSync("src/production/production-styles.ts", "utf8");
 const globalStyles = readFileSync("src/production/production-styles.css", "utf8");
 
@@ -54,7 +58,7 @@ test("live camera source remains identified and links to the camera page", () =>
   assert.match(productionHome, /aria-label="Abrir a câmera ao vivo da Praia do Laranjal"/);
 });
 
-test("camera video crops the letterbox embedded in the live signal", () => {
+test("camera keeps a 16:9 signal while the final layer reduces excessive cropping", () => {
   assert.match(cameraStyles, /var\(--home-live-camera-image\)/);
   assert.match(cameraStyles, /image-set\(/);
   assert.match(cameraStyles, /\.weather-hero-live-camera/);
@@ -64,23 +68,24 @@ test("camera video crops the letterbox embedded in the live signal", () => {
   assert.match(cameraStyles, /height:\s*100%/);
   assert.match(cameraStyles, /aspect-ratio:\s*16\s*\/\s*9/);
   assert.match(cameraStyles, /scale\(var\(--home-live-camera-crop\)\)/);
-  assert.match(cameraStyles, /@media \(max-width: 900px\)[\s\S]*width:\s*100%[\s\S]*height:\s*auto/);
-  assert.doesNotMatch(cameraStyles, /scale\(1\.08\)/);
-  assert.doesNotMatch(cameraStyles, /scale\(1\.1\)/);
+  assert.match(proportionalStyles, /--home-live-camera-crop:\s*1\.28/);
+  assert.match(proportionalStyles, /--home-live-camera-crop:\s*1\.22/);
+  assert.match(proportionalStyles, /--home-live-camera-crop:\s*1\.18/);
+  assert.match(proportionalStyles, /aspect-ratio:\s*16\s*\/\s*9/);
+  assert.doesNotMatch(proportionalStyles, /--home-live-camera-crop:\s*1\.54/);
   assert.match(cameraStyles, /overflow:\s*hidden/);
   assert.match(cameraStyles, /opacity:\s*0/);
   assert.match(cameraStyles, /\.is-ready iframe\s*\{[\s\S]*opacity:\s*1/);
   assert.match(cameraStyles, /\.weather-hero-credit\s*\{[\s\S]*display:\s*none/);
-  assert.match(cameraStyles, /@media \(max-width: 620px\)/);
   assert.match(cameraStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("live camera layer is loaded after the existing homepage refinements", () => {
-  const tsSemantic = styleImports.indexOf("home-water-semantic-v53.css");
+test("proportional camera layer is loaded after the live camera base layer", () => {
   const tsCamera = styleImports.indexOf("home-hero-live-camera-v54.css");
-  const cssSemantic = globalStyles.indexOf("home-water-semantic-v53.css");
+  const tsProportional = styleImports.indexOf("home-hero-proportional-v62.css");
   const cssCamera = globalStyles.indexOf("home-hero-live-camera-v54.css");
+  const cssProportional = globalStyles.indexOf("home-hero-proportional-v62.css");
 
-  assert.ok(tsSemantic >= 0 && tsCamera > tsSemantic);
-  assert.ok(cssSemantic >= 0 && cssCamera > cssSemantic);
+  assert.ok(tsCamera >= 0 && tsProportional > tsCamera);
+  assert.ok(cssCamera >= 0 && cssProportional > cssCamera);
 });
