@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+const MAX_RELOAD_ATTEMPTS = 2;
+const PLAYER_RETRY_DELAY_MS = 9_000;
 
 type HomeLiveCameraBackgroundProps = {
   embedUrl: string;
   title: string;
 };
 
-function buildBackgroundPlayerUrl(embedUrl: string) {
+function buildBackgroundPlayerUrl(embedUrl: string, attempt: number) {
   try {
     const url = new URL(embedUrl);
     if (url.protocol !== "https:") return null;
@@ -19,6 +22,7 @@ function buildBackgroundPlayerUrl(embedUrl: string) {
     url.searchParams.set("iv_load_policy", "3");
     url.searchParams.set("modestbranding", "1");
     url.searchParams.set("rel", "0");
+    url.searchParams.set("tp_reload", String(attempt));
 
     return url.toString();
   } catch {
@@ -30,38 +34,51 @@ export function HomeLiveCameraBackground({
   embedUrl,
   title,
 }: HomeLiveCameraBackgroundProps) {
-  const playerUrl = buildBackgroundPlayerUrl(embedUrl);
-  const [shouldLoad, setShouldLoad] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [isReady, setIsReady] = useState(false);
+  const playerUrl = useMemo(() => buildBackgroundPlayerUrl(embedUrl, attempt), [attempt, embedUrl]);
 
   useEffect(() => {
-    setShouldLoad(false);
+    setAttempt(0);
     setIsReady(false);
+  }, [embedUrl]);
 
-    if (!playerUrl) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  useEffect(() => {
+    if (!playerUrl || isReady || attempt >= MAX_RELOAD_ATTEMPTS) return;
 
-    const timer = window.setTimeout(() => setShouldLoad(true), 700);
+    const timer = window.setTimeout(() => {
+      setIsReady(false);
+      setAttempt((current) => Math.min(current + 1, MAX_RELOAD_ATTEMPTS));
+    }, PLAYER_RETRY_DELAY_MS);
+
     return () => window.clearTimeout(timer);
-  }, [playerUrl]);
+  }, [attempt, isReady, playerUrl]);
 
   if (!playerUrl) return null;
+
+  function retryPlayer() {
+    if (attempt >= MAX_RELOAD_ATTEMPTS) return;
+    setIsReady(false);
+    setAttempt((current) => Math.min(current + 1, MAX_RELOAD_ATTEMPTS));
+  }
 
   return (
     <div
       className={`weather-hero-live-camera${isReady ? " is-ready" : ""}`}
+      data-player-attempt={attempt}
       aria-hidden="true"
     >
-      {shouldLoad ? (
-        <iframe
-          src={playerUrl}
-          title={`${title} — transmissão visual ao vivo sem áudio`}
-          tabIndex={-1}
-          allow="autoplay; encrypted-media; picture-in-picture"
-          referrerPolicy="strict-origin-when-cross-origin"
-          onLoad={() => setIsReady(true)}
-        />
-      ) : null}
+      <iframe
+        key={`${embedUrl}-${attempt}`}
+        src={playerUrl}
+        title={`${title} — transmissão visual ao vivo sem áudio`}
+        tabIndex={-1}
+        loading="eager"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        referrerPolicy="strict-origin-when-cross-origin"
+        onLoad={() => setIsReady(true)}
+        onError={retryPlayer}
+      />
     </div>
   );
 }
