@@ -25,7 +25,7 @@ function forecastUrl() {
     latitude: String(PELOTAS.latitude),
     longitude: String(PELOTAS.longitude),
     timezone: "America/Sao_Paulo",
-    forecast_days: "1",
+    forecast_days: "2",
     precipitation_unit: "mm",
     current: "temperature_2m",
     hourly: "precipitation",
@@ -49,10 +49,10 @@ async function fetchHourlyPrecipitation() {
   const parsed = responseSchema.safeParse(await response.json());
   if (!parsed.success) throw new Error("Open-Meteo retornou uma série horária inválida");
 
-  const startIndex = Math.max(
-    0,
-    parsed.data.hourly.time.findIndex((time) => time >= parsed.data.current.time),
+  const foundIndex = parsed.data.hourly.time.findIndex(
+    (time) => time >= parsed.data.current.time,
   );
+  const startIndex = foundIndex === -1 ? 0 : foundIndex;
   const hours = [];
 
   for (let offset = 0; offset < 7; offset += 1) {
