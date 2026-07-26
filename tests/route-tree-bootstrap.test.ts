@@ -18,13 +18,24 @@ const packageLock = JSON.parse(readFileSync("package-lock.json", "utf8")) as {
 };
 const generator = readFileSync("scripts/generate-route-tree.mjs", "utf8");
 
-test("route tree is generated before development, build and typecheck", () => {
-  assert.equal(packageJson.scripts?.["routes:generate"], "node scripts/generate-route-tree.mjs");
+const GENERATOR_COMMAND = "node scripts/generate-route-tree.mjs";
+
+test("route tree is generated before development, build, tests and typecheck", () => {
+  assert.equal(packageJson.scripts?.["routes:generate"], GENERATOR_COMMAND);
+  assert.equal(packageJson.scripts?.["routes:check"], `${GENERATOR_COMMAND} --check`);
   assert.match(packageJson.scripts?.dev ?? "", /^node scripts\/generate-route-tree\.mjs && vite dev$/);
   assert.match(packageJson.scripts?.build ?? "", /^node scripts\/generate-route-tree\.mjs && vite build$/);
   assert.match(
     packageJson.scripts?.["build:dev"] ?? "",
     /^node scripts\/generate-route-tree\.mjs && vite build --mode development$/,
+  );
+  assert.match(
+    packageJson.scripts?.test ?? "",
+    /^node scripts\/generate-route-tree\.mjs && node --test tests\/\*\*\/\*\.test\.ts$/,
+  );
+  assert.match(
+    packageJson.scripts?.["test:routes"] ?? "",
+    /^node scripts\/generate-route-tree\.mjs && node --test tests\/public-routes\.test\.ts$/,
   );
   assert.match(
     packageJson.scripts?.typecheck ?? "",
@@ -34,8 +45,11 @@ test("route tree is generated before development, build and typecheck", () => {
 
 test("route generator discovers all exported file routes recursively", () => {
   assert.match(generator, /readdir\(directory, \{ withFileTypes: true \}\)/);
-  assert.match(generator, /createFileRoute/);
+  assert.match(generator, /CREATE_FILE_ROUTE_CALL_PATTERN/);
   assert.match(generator, /ROUTE_PATTERN/);
+  assert.match(generator, /expectedRoutePath/);
+  assert.match(generator, /deve declarar createFileRoute com um caminho literal/);
+  assert.match(generator, /Caminho incompatível/);
   assert.match(generator, /Rota duplicada detectada/);
   assert.match(generator, /Identificador de rota duplicado/);
   assert.match(generator, /routeTree\.gen\.ts regenerado/);
