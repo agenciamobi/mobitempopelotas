@@ -1,4 +1,5 @@
 import { Activity, ArrowDownRight, ArrowUpRight, Clock3, ExternalLink, Waves } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
 
@@ -80,12 +81,35 @@ function MiniChart({ data }: { data: LaranjalLevelData }) {
 }
 
 export function LaranjalLevelEmbed({ data }: { data: LaranjalLevelData }) {
+  const rootRef = useRef<HTMLElement>(null);
   const trend = trendPresentation(data.trendCmPerHour);
   const TrendIcon = trend.Icon;
   const live = data.status === "live";
 
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root || window.parent === window) return;
+
+    const report = () => {
+      window.parent.postMessage(
+        {
+          type: "tempo-pelotas:widget-resize",
+          widget: "nivel-laranjal",
+          height: Math.ceil(root.getBoundingClientRect().height + 2),
+        },
+        "*",
+      );
+    };
+
+    report();
+    const observer = new ResizeObserver(report);
+    observer.observe(root);
+    window.addEventListener("load", report, { once: true });
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <main className={styles.viewport}>
+    <main ref={rootRef} className={styles.viewport}>
       <article className={styles.card} aria-labelledby="embed-laranjal-title">
         <div className={styles.brandLine} aria-hidden="true" />
         <header className={styles.header}>
