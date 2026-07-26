@@ -45,9 +45,10 @@ jobs:
       - name: Build de produção
         run: npm run build
 
-      - name: Contrato da árvore de rotas
-        env:
-          ROUTE_TREE_REQUIRED: "1"
+      - name: Verificar árvore gerada
+        run: npm run routes:check
+
+      - name: Contrato das rotas públicas
         run: npm run test:routes
 
       - name: TypeScript
