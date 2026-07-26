@@ -17,6 +17,7 @@ const packageLock = JSON.parse(readFileSync("package-lock.json", "utf8")) as {
   >;
 };
 const generator = readFileSync("scripts/generate-route-tree.mjs", "utf8");
+const viteConfig = readFileSync("vite.config.ts", "utf8");
 
 const GENERATOR_COMMAND = "node scripts/generate-route-tree.mjs";
 
@@ -41,6 +42,16 @@ test("route tree is generated before development, build, tests and typecheck", (
     packageJson.scripts?.typecheck ?? "",
     /^node scripts\/generate-route-tree\.mjs && tsc --noEmit$/,
   );
+});
+
+test("direct Vite invocations generate routes before TanStack plugins are created", () => {
+  const bootstrapIndex = viteConfig.indexOf("execFileSync(process.execPath");
+  const configIndex = viteConfig.indexOf("export default defineConfig");
+
+  assert.ok(bootstrapIndex >= 0, "vite.config.ts deve executar o gerador de rotas");
+  assert.ok(configIndex > bootstrapIndex, "o bootstrap deve ocorrer antes da criação dos plugins");
+  assert.match(viteConfig, /scripts\/generate-route-tree\.mjs/);
+  assert.match(viteConfig, /stdio:\s*"inherit"/);
 });
 
 test("route generator discovers all exported file routes recursively", () => {
