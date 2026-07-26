@@ -6,6 +6,7 @@ const SOURCE_ROOT = resolve(PROJECT_ROOT, "src");
 const ROUTES_DIRECTORY = resolve(SOURCE_ROOT, "routes");
 const GENERATED_ROUTE_TREE = resolve(SOURCE_ROOT, "routeTree.gen.ts");
 const ROUTE_PATTERN = /export\s+const\s+Route\s*=\s*createFileRoute\(\s*(["'`])([^"'`]+)\1\s*\)/m;
+const CREATE_FILE_ROUTE_CALL_PATTERN = /\bcreateFileRoute\s*\(/m;
 const CHECK_ONLY = process.argv.includes("--check");
 
 async function walk(directory) {
@@ -53,14 +54,45 @@ function importPath(filePath) {
   return `./${sourceRelative}`;
 }
 
+function expectedRoutePath(filePath) {
+  const routeRelative = relative(ROUTES_DIRECTORY, filePath)
+    .replaceAll("\\", "/")
+    .replace(/\.(?:ts|tsx)$/, "")
+    .replaceAll("[.]", ".");
+  const segments = routeRelative.split("/").filter(Boolean);
+
+  if (segments.at(-1) === "index") segments.pop();
+  return segments.length === 0 ? "/" : `/${segments.join("/")}`;
+}
+
+function displayPath(filePath) {
+  return relative(PROJECT_ROOT, filePath).replaceAll("\\", "/");
+}
+
 async function discoverRoutes() {
   const files = await walk(ROUTES_DIRECTORY);
   const routes = [];
 
   for (const file of files) {
     const source = await readFile(file, "utf8");
+    const hasFileRouteCall = CREATE_FILE_ROUTE_CALL_PATTERN.test(source);
     const match = source.match(ROUTE_PATTERN);
-    if (!match?.[2]) continue;
+
+    if (!match?.[2]) {
+      if (hasFileRouteCall) {
+        throw new Error(
+          `A rota em ${displayPath(file)} deve declarar createFileRoute com um caminho literal.`,
+        );
+      }
+      continue;
+    }
+
+    const expectedPath = expectedRoutePath(file);
+    if (match[2] !== expectedPath) {
+      throw new Error(
+        `Caminho incompatível em ${displayPath(file)}: encontrado ${match[2]}, esperado ${expectedPath}.`,
+      );
+    }
 
     routes.push({
       path: match[2],
