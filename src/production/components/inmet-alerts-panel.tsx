@@ -4,10 +4,12 @@ import type {
   InmetAlertsData,
   InmetAlertRelevance,
 } from "@/production/lib/inmet-alerts";
+import type { AdvisoryLevel } from "@/production/lib/weather-insights";
 
 type InmetAlertsPanelProps = {
   data: InmetAlertsData;
   variant?: "home" | "page";
+  advisoryLevel?: AdvisoryLevel;
 };
 
 const relevanceLabels: Record<InmetAlertRelevance, string> = {
@@ -40,6 +42,19 @@ const periodRank: Record<InmetAlert["period"], number> = {
   active: 0,
   upcoming: 1,
 };
+
+function validDate(value: string | null) {
+  if (!value) return false;
+  return Number.isFinite(new Date(value).getTime());
+}
+
+export function hasVerifiedInmetAlertSemantics(alert: InmetAlert) {
+  return (
+    alert.severity !== "unknown" &&
+    validDate(alert.startsAt) &&
+    validDate(alert.expiresAt)
+  );
+}
 
 function formatDateTime(value: string | null) {
   if (!value) return null;
@@ -96,9 +111,11 @@ function displayHeadline(alert: InmetAlert) {
   return headline;
 }
 
-function homepageAlertTitle(alert: InmetAlert) {
+function homepageAlertTitle(alert: InmetAlert, verified: boolean) {
   const event = displayHeadline(alert).replace(/^Aviso de\s+/i, "");
-  return `${alertColorLabels[alert.severity]}: ${event}`;
+  return verified
+    ? `${alertColorLabels[alert.severity]}: ${event}`
+    : `Aviso meteorológico: ${event}`;
 }
 
 function homeAreaLabel(alert: InmetAlert) {
@@ -173,18 +190,28 @@ function AlertRow({ alert }: { alert: InmetAlert }) {
   );
 }
 
-function HomePanel({ data }: { data: InmetAlertsData }) {
+function HomePanel({
+  data,
+  advisoryLevel,
+}: {
+  data: InmetAlertsData;
+  advisoryLevel: AdvisoryLevel;
+}) {
   if (data.status !== "live" || data.alerts.length === 0) return null;
 
   const primary = primaryHomeAlert(data);
   if (!primary) return null;
-  const title = homepageAlertTitle(primary);
+  const verified = hasVerifiedInmetAlertSemantics(primary);
+  const title = homepageAlertTitle(primary, verified);
+  const colorClass = verified ? `severity-${primary.severity}` : `advisory-${advisoryLevel}`;
+  const statusLabel = verified ? primary.severityLabel : "Classificação em validação";
 
   return (
     <section
-      className={`home-inmet-alerts severity-${primary.severity}`}
+      className={`home-inmet-alerts ${colorClass}${verified ? " is-officially-classified" : " is-unverified"}`}
       data-alert-period={primary.period}
       data-alert-severity={primary.severity}
+      data-alert-official-semantics={verified ? "verified" : "unverified"}
       aria-label={`${title}. ${periodLabel(primary)}`}
       aria-labelledby="home-inmet-title"
     >
@@ -196,7 +223,7 @@ function HomePanel({ data }: { data: InmetAlertsData }) {
         <div className="home-inmet-alerts__copy">
           <div className="home-inmet-alerts__topline">
             <span>Aviso oficial do INMET</span>
-            <b>{primary.severityLabel}</b>
+            <b>{statusLabel}</b>
           </div>
           <h2 id="home-inmet-title">{title}</h2>
           <div className="home-inmet-alerts__meta">
@@ -222,8 +249,12 @@ function HomePanel({ data }: { data: InmetAlertsData }) {
   );
 }
 
-export function InmetAlertsPanel({ data, variant = "page" }: InmetAlertsPanelProps) {
-  if (variant === "home") return <HomePanel data={data} />;
+export function InmetAlertsPanel({
+  data,
+  variant = "page",
+  advisoryLevel = "normal",
+}: InmetAlertsPanelProps) {
+  if (variant === "home") return <HomePanel data={data} advisoryLevel={advisoryLevel} />;
 
   if (data.status === "unavailable") {
     return (
