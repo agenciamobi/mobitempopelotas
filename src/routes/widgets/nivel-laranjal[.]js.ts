@@ -4,6 +4,7 @@ const SCRIPT = String.raw`(function () {
   "use strict";
   var selector = "[data-tempo-pelotas-nivel-laranjal]";
   var embedUrl = "https://tempopelotas.com.br/embed/nivel-laranjal";
+  var globalKey = "TempoPelotasNivelLaranjal";
 
   function mount(container) {
     if (!container || container.dataset.tempoPelotasMounted === "true") return;
@@ -16,6 +17,7 @@ const SCRIPT = String.raw`(function () {
     iframe.referrerPolicy = "strict-origin-when-cross-origin";
     iframe.setAttribute("scrolling", "no");
     iframe.setAttribute("allowtransparency", "true");
+    iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-popups");
     iframe.style.display = "block";
     iframe.style.width = "100%";
     iframe.style.height = container.dataset.height || "470px";
@@ -30,9 +32,18 @@ const SCRIPT = String.raw`(function () {
     container.appendChild(iframe);
   }
 
-  function mountAll() {
-    document.querySelectorAll(selector).forEach(mount);
+  function mountAll(root) {
+    var scope = root && root.querySelectorAll ? root : document;
+    if (scope.matches && scope.matches(selector)) mount(scope);
+    scope.querySelectorAll(selector).forEach(mount);
   }
+
+  if (window[globalKey] && typeof window[globalKey].mountAll === "function") {
+    window[globalKey].mountAll(document);
+    return;
+  }
+
+  window[globalKey] = { mountAll: mountAll };
 
   window.addEventListener("message", function (event) {
     if (event.origin !== "https://tempopelotas.com.br") return;
@@ -45,10 +56,25 @@ const SCRIPT = String.raw`(function () {
     });
   });
 
+  function initialize() {
+    mountAll(document);
+    if (!("MutationObserver" in window) || !document.documentElement) return;
+
+    var observer = new MutationObserver(function (records) {
+      records.forEach(function (record) {
+        record.addedNodes.forEach(function (node) {
+          if (node && node.nodeType === 1) mountAll(node);
+        });
+      });
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    window[globalKey].observer = observer;
+  }
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", mountAll, { once: true });
+    document.addEventListener("DOMContentLoaded", initialize, { once: true });
   } else {
-    mountAll();
+    initialize();
   }
 })();`;
 
@@ -60,7 +86,7 @@ export const Route = createFileRoute("/widgets/nivel-laranjal.js")({
           headers: {
             "Access-Control-Allow-Origin": "*",
             "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
-            "CDN-Cache-Control": "max-age=86400, stale-while-revalidate=604800",
+            "CDN-Cache-Control": "max-age=3600, stale-while-revalidate=86400",
             "Content-Type": "application/javascript; charset=utf-8",
             "X-Content-Type-Options": "nosniff",
           },
