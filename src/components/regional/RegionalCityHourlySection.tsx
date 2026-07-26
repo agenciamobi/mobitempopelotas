@@ -13,7 +13,11 @@ function metric(value: number | null, suffix: string) {
 
 export function RegionalCityHourlySection({ data }: { data: RegionalCityWeatherData }) {
   return (
-    <section className={styles.section} aria-labelledby="regional-hourly-title">
+    <section
+      id="previsao-horaria-regional"
+      className={styles.section}
+      aria-labelledby="regional-hourly-title"
+    >
       <header className={styles.header}>
         <div>
           <span>Próximas horas</span>
