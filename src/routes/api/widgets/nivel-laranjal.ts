@@ -3,10 +3,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { fetchLaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
 
 const HEADERS = {
+  "Access-Control-Allow-Headers": "Accept, Content-Type",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Origin": "*",
+  "Access-Control-Max-Age": "86400",
   "Cache-Control": "public, max-age=60, stale-while-revalidate=240",
   "CDN-Cache-Control": "max-age=60, stale-while-revalidate=240",
+  "Content-Language": "pt-BR",
   "Content-Type": "application/json; charset=utf-8",
+  "Cross-Origin-Resource-Policy": "cross-origin",
   "X-Content-Type-Options": "nosniff",
   "X-Robots-Tag": "noindex, nofollow",
 } as const;
