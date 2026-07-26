@@ -54,16 +54,20 @@ test("live camera source remains identified and links to the camera page", () =>
   assert.match(productionHome, /aria-label="Abrir a câmera ao vivo da Praia do Laranjal"/);
 });
 
-test("camera video is responsive and preserves thumbnail and editorial fallbacks", () => {
+test("camera video uses a true cover crop without horizontal letterboxing", () => {
   assert.match(cameraStyles, /var\(--home-live-camera-image\)/);
   assert.match(cameraStyles, /image-set\(/);
   assert.match(cameraStyles, /\.weather-hero-live-camera/);
   assert.match(cameraStyles, /\.weather-hero-live-camera iframe/);
-  assert.match(cameraStyles, /scale\(1\.46\)/);
+  assert.match(cameraStyles, /width:\s*auto/);
+  assert.match(cameraStyles, /height:\s*100%/);
+  assert.match(cameraStyles, /aspect-ratio:\s*16\s*\/\s*9/);
+  assert.match(cameraStyles, /scale\(1\.08\)/);
+  assert.match(cameraStyles, /@media \(max-width: 900px\)[\s\S]*width:\s*100%[\s\S]*height:\s*auto/);
+  assert.match(cameraStyles, /overflow:\s*hidden/);
   assert.match(cameraStyles, /opacity:\s*0/);
   assert.match(cameraStyles, /\.is-ready iframe\s*\{[\s\S]*opacity:\s*1/);
   assert.match(cameraStyles, /\.weather-hero-credit\s*\{[\s\S]*display:\s*none/);
-  assert.match(cameraStyles, /@media \(max-width: 900px\)/);
   assert.match(cameraStyles, /@media \(max-width: 620px\)/);
   assert.match(cameraStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
