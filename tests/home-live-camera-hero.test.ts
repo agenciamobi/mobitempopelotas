@@ -81,11 +81,20 @@ test("camera uses native scale and exact 16:9 iframe geometry", () => {
   assert.match(exactGeometryStyles, /min-height:\s*0/);
   assert.match(exactGeometryStyles, /aspect-ratio:\s*16\s*\/\s*9/);
   assert.match(exactGeometryStyles, /transform:\s*none/);
-  assert.match(exactGeometryStyles, /@media \(min-width:\s*901px\)[\s\S]*top:\s*50%[\s\S]*translateY\(-50%\)/);
+  assert.match(exactGeometryStyles, /@media \(min-width:\s*1181px\)[\s\S]*top:\s*50%[\s\S]*translateY\(-50%\)/);
   assert.match(cameraStyles, /overflow:\s*hidden/);
   assert.match(cameraStyles, /opacity:\s*0/);
   assert.match(cameraStyles, /\.is-ready iframe\s*\{[\s\S]*opacity:\s*1/);
   assert.match(cameraStyles, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
+test("weather card and camera source receive restrained final polish", () => {
+  assert.match(exactGeometryStyles, /\.weather-hero-now\s*\{[\s\S]*translateX\(clamp\(10px, 1vw, 18px\)\)/);
+  assert.match(exactGeometryStyles, /box-shadow:\s*0 12px 30px rgb\(7 30 47 \/ 15%\)/);
+  assert.match(exactGeometryStyles, /backdrop-filter:\s*blur\(10px\) saturate\(116%\)/);
+  assert.match(exactGeometryStyles, /\.home-hero-camera-source\s*\{[\s\S]*background:\s*rgb\(5 28 43 \/ 72%\)/);
+  assert.match(exactGeometryStyles, /@media \(max-width:\s*900px\)[\s\S]*\.weather-hero-now\s*\{[\s\S]*transform:\s*none/);
+  assert.match(exactGeometryStyles, /prefers-reduced-transparency:\s*reduce/);
 });
 
 test("exact geometry is loaded after scale and proportional refinements", () => {
