@@ -41,7 +41,7 @@ export function AuthAccountAction() {
   return (
     <Link
       className={`header-account-link${authenticated ? " is-authenticated" : ""}`}
-      href={authenticated ? "/minha-conta" : "/entrar?next=/minha-conta"}
+      href="/conta"
       aria-label={authenticated ? "Abrir minha conta" : "Entrar na conta do Tempo Pelotas"}
     >
       {authenticated ? <span aria-hidden="true">✓</span> : null}
