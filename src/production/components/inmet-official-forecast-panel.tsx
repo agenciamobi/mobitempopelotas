@@ -46,6 +46,11 @@ function windLabel(period: InmetForecastPeriod) {
   return value || null;
 }
 
+function forecastWindSpeedLabel(value: number | null) {
+  if (value === null || !Number.isFinite(value)) return null;
+  return `${Math.round(value)} km/h previstos pelo modelo horário`;
+}
+
 function resolveForecastIcon(summary: string): ForecastIconName {
   const normalized = summary
     .normalize("NFD")
@@ -105,10 +110,17 @@ function ForecastIcon({ name }: { name: ForecastIconName }) {
   );
 }
 
-function PeriodMetrics({ period }: { period: InmetForecastPeriod }) {
+function PeriodMetrics({
+  period,
+  forecastWindSpeedKmh = null,
+}: {
+  period: InmetForecastPeriod;
+  forecastWindSpeedKmh?: number | null;
+}) {
   const temperature = temperatureRange(period);
   const humidity = humidityRange(period);
   const wind = windLabel(period);
+  const windSpeed = forecastWindSpeedLabel(forecastWindSpeedKmh);
 
   return (
     <dl className="inmet-official-metrics">
@@ -124,10 +136,13 @@ function PeriodMetrics({ period }: { period: InmetForecastPeriod }) {
           <dd>{humidity}</dd>
         </div>
       ) : null}
-      {wind ? (
-        <div>
+      {wind || windSpeed ? (
+        <div className="is-wind">
           <dt>Vento</dt>
-          <dd>{wind}</dd>
+          <dd>
+            {wind ? <span>{wind}</span> : null}
+            {windSpeed ? <small>{windSpeed}</small> : null}
+          </dd>
         </div>
       ) : null}
     </dl>
@@ -137,9 +152,11 @@ function PeriodMetrics({ period }: { period: InmetForecastPeriod }) {
 export function InmetOfficialForecastPanel({
   periods,
   station,
+  forecastWindSpeedKmh = null,
 }: {
   periods: InmetForecastPeriod[];
   station: InmetStationReference["station"];
+  forecastWindSpeedKmh?: number | null;
 }) {
   const visiblePeriods = periods.slice(0, 4);
   const featuredPeriod = visiblePeriods[0] ?? null;
@@ -178,7 +195,10 @@ export function InmetOfficialForecastPanel({
               </div>
             </div>
 
-            <PeriodMetrics period={featuredPeriod} />
+            <PeriodMetrics
+              period={featuredPeriod}
+              forecastWindSpeedKmh={forecastWindSpeedKmh}
+            />
           </article>
 
           <div className="inmet-official-next-periods" aria-label="Próximos períodos da previsão oficial">
