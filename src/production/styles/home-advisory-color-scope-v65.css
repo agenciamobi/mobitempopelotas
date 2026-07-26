@@ -42,18 +42,18 @@
 /*
  * A faixa só assume amarelo, laranja ou vermelho quando o portal reconhece
  * severidade, início e término do aviso oficial. Enquanto a semântica está
- * incompleta, acompanha o mesmo estado operacional usado pelos botões.
+ * incompleta, acompanha exatamente a paleta operacional do botão do header.
  */
 .site-shell--home-editorial .home-inmet-alerts.is-unverified.advisory-normal {
-  --risk: #071e2f;
+  --risk: #5e2ced;
 }
 
 .site-shell--home-editorial .home-inmet-alerts.is-unverified.advisory-attention {
-  --risk: #f27035;
+  --risk: #e7652f;
 }
 
 .site-shell--home-editorial .home-inmet-alerts.is-unverified.advisory-warning {
-  --risk: #d93636;
+  --risk: #cf342c;
 }
 
 .site-shell--home-editorial .home-inmet-alerts.is-unverified {
