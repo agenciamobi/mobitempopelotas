@@ -8,6 +8,8 @@ const pageRoute = readFileSync("src/routes/mapa-de-geadas-rio-grande-do-sul.tsx"
 const component = readFileSync("src/components/inmet/FrostMapPage.tsx", "utf8");
 const styles = readFileSync("src/components/inmet/FrostMapPage.module.css", "utf8");
 const publicRoutes = readFileSync("src/lib/public-routes.ts", "utf8");
+const header = readFileSync("src/components/layout/Header.tsx", "utf8");
+const footer = readFileSync("src/components/layout/Footer.tsx", "utf8");
 
 test("INMET frost integration uses the official endpoint and published intensity thresholds", () => {
   assert.match(server, /https:\/\/apitempo\.inmet\.gov\.br\/geada/);
@@ -40,9 +42,11 @@ test("frost controls keep equal widths and reorganize for mobile", () => {
   assert.match(styles, /@media \(max-width:\s*700px\)[\s\S]*repeat\(3, minmax\(0, 1fr\)\)/);
 });
 
-test("frost page is public, indexable and identifies observations rather than forecasts", () => {
+test("frost page is public, indexable and reachable from portal navigation", () => {
   assert.match(pageRoute, /mapa-de-geadas-rio-grande-do-sul/);
   assert.match(pageRoute, /registros do INMET/);
   assert.match(component, /observações passadas, não previsão/i);
   assert.match(publicRoutes, /mapa-de-geadas-rio-grande-do-sul/);
+  assert.match(header, /label:\s*"Mapa de geadas"/);
+  assert.match(footer, /label:\s*"Mapa de geadas no RS"/);
 });
