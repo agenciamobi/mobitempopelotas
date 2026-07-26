@@ -68,7 +68,7 @@ export function AccountPage({ snapshot }: { snapshot: AuthenticatedAccount }) {
       }
 
       if (result.code === "unauthenticated") {
-        window.location.assign("/entrar?next=/minha-conta");
+        window.location.assign("/conta");
         return;
       }
 
@@ -109,7 +109,7 @@ export function AccountPage({ snapshot }: { snapshot: AuthenticatedAccount }) {
       const result = (await response.json()) as { success?: boolean; error?: string };
 
       if (response.status === 401) {
-        window.location.assign("/entrar?next=/minha-conta");
+        window.location.assign("/conta");
         return;
       }
 
