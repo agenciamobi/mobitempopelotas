@@ -17,6 +17,7 @@ const standaloneRoutes = new Set([
   "/entrar",
   "/minha-conta",
   "/privacidade-e-dados",
+  "/embed/nivel-laranjal",
 ]);
 
 function pageAnnouncement() {
