@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { HydrologyEditorialHero } from "@/components/hydrology/HydrologyEditorialHero";
+import "@/components/hydrology/HydrologyEditorialRoute.css";
 import { LaranjalLevelPage } from "@/components/hydrology/HydrologyPages";
 import { LARANJAL_LEVEL_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
