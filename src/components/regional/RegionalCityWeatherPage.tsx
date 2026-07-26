@@ -3,6 +3,7 @@ import { AlertTriangle, ArrowRight, CloudRain, Compass, MapPin, Wind } from "luc
 
 import { REGIONAL_CITIES, regionalCityPath } from "@/lib/regional-cities";
 import type { RegionalCityWeatherData } from "@/lib/weather/regional-city-weather.types";
+import { RegionalCityHourlySection } from "./RegionalCityHourlySection";
 
 import styles from "./RegionalCityWeatherPage.module.css";
 
@@ -50,6 +51,7 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
     name: title,
     description: `Previsão do tempo, chuva, vento e avisos meteorológicos para ${city.name}, Rio Grande do Sul.`,
     url: `https://tempopelotas.com.br${regionalCityPath(city)}`,
+    dateModified: data.source.fetchedAt,
     about: {
       "@type": "Place",
       name: `${city.name}, Rio Grande do Sul`,
@@ -70,8 +72,8 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
           <span className={styles.eyebrow}>Central meteorológica regional</span>
           <h1>{title}</h1>
           <p>
-            Consulte a condição estimada agora, a previsão para sete dias, chuva, vento e avisos do
-            INMET para {city.name}. {city.name} é {city.descriptor}.
+            Consulte a condição estimada agora, a previsão para as próximas horas e sete dias, chuva,
+            vento e avisos do INMET para {city.name}. {city.name} é {city.descriptor}.
           </p>
           <div className={styles.location}>
             <MapPin aria-hidden="true" /> {city.group} · Rio Grande do Sul
@@ -98,7 +100,10 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
             <div><dt>Vento</dt><dd>{metric(current?.windSpeed ?? null, " km/h")}</dd></div>
             <div><dt>Pressão</dt><dd>{metric(current?.pressure ?? null, " hPa")}</dd></div>
           </dl>
-          <p>Dados de previsão por modelo. Não representam medição de uma estação local.</p>
+          <p>
+            Modelo para as coordenadas centrais. Chuva agora: {metric(current?.precipitationMm ?? null, " mm")}.
+            Não representa medição de uma estação local.
+          </p>
         </article>
       </section>
 
@@ -109,6 +114,7 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
             <span>{activeAlert.severityLabel} · INMET</span>
             <h2>{activeAlert.event}</h2>
             <p>{activeAlert.description || `Aviso meteorológico com abrangência informada para ${city.name}.`}</p>
+            {activeAlert.instruction ? <p><strong>Orientações:</strong> {activeAlert.instruction}</p> : null}
             <small>{formatDateTime(activeAlert.startsAt)} até {formatDateTime(activeAlert.expiresAt)}</small>
           </div>
           <a href={activeAlert.officialUrl} target="_blank" rel="noopener noreferrer">
@@ -157,6 +163,8 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
         </article>
       </section>
 
+      <RegionalCityHourlySection data={data} />
+
       <section className={styles.forecast} aria-labelledby="regional-forecast-title">
         <header>
           <div>
@@ -196,6 +204,7 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
           </p>
         </div>
         <ul>
+          <li><strong>Agora:</strong> estimativa horária do modelo para as coordenadas municipais.</li>
           <li><strong>Previsão:</strong> tendência produzida por modelo numérico para o município.</li>
           <li><strong>Aviso oficial:</strong> comunicado emitido pelo INMET para o código municipal.</li>
           <li><strong>Emergência:</strong> siga Defesa Civil, INMET e autoridades locais.</li>
@@ -224,8 +233,8 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
       <footer className={styles.sources}>
         <span>Fontes</span>
         <p>
-          Previsão: Open-Meteo. Avisos: Instituto Nacional de Meteorologia. Coordenação editorial e
-          apresentação: Tempo Pelotas.
+          Previsão por coordenadas: Open-Meteo. Avisos municipais: Instituto Nacional de Meteorologia.
+          Atualizado em {formatDateTime(data.source.fetchedAt)}. Apresentação: Tempo Pelotas.
         </p>
       </footer>
     </main>
