@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Map as MapLibreMap } from "maplibre-gl";
+import type { GeoJSONSource, Map as MapLibreMap } from "maplibre-gl";
 
 import type { FrostMapData, FrostStationType } from "@/lib/inmet/frost.types";
 
@@ -56,7 +56,9 @@ function createPopupContent(properties: Record<string, unknown>) {
 
   const temperature = document.createElement("span");
   const numericTemperature = Number(properties.minimumTemperature);
-  temperature.textContent = `Temperatura mínima: ${formatTemperature(Number.isFinite(numericTemperature) ? numericTemperature : null)}`;
+  temperature.textContent = `Temperatura mínima: ${formatTemperature(
+    Number.isFinite(numericTemperature) ? numericTemperature : null,
+  )}`;
 
   const intensity = document.createElement("b");
   intensity.textContent = String(properties.intensityLabel);
@@ -105,7 +107,10 @@ export function FrostMapPage({ initialData }: { initialData: FrostMapData }) {
     () =>
       data.stations
         .flatMap((station) => station.observations)
-        .sort((a, b) => b.date.localeCompare(a.date) || a.stationName.localeCompare(b.stationName, "pt-BR"))
+        .sort(
+          (a, b) =>
+            b.date.localeCompare(a.date) || a.stationName.localeCompare(b.stationName, "pt-BR"),
+        )
         .slice(0, 40),
     [data.stations],
   );
@@ -150,7 +155,6 @@ export function FrostMapPage({ initialData }: { initialData: FrostMapData }) {
             clusterMaxZoom: 8,
             clusterRadius: 44,
           });
-
           map.addLayer({
             id: CLUSTERS_LAYER_ID,
             type: "circle",
@@ -172,7 +176,6 @@ export function FrostMapPage({ initialData }: { initialData: FrostMapData }) {
               "circle-opacity": 0.94,
             },
           });
-
           map.addLayer({
             id: CLUSTER_COUNT_LAYER_ID,
             type: "symbol",
@@ -185,7 +188,6 @@ export function FrostMapPage({ initialData }: { initialData: FrostMapData }) {
             },
             paint: { "text-color": "#ffffff" },
           });
-
           map.addLayer({
             id: POINTS_LAYER_ID,
             type: "circle",
@@ -221,7 +223,6 @@ export function FrostMapPage({ initialData }: { initialData: FrostMapData }) {
               duration: 550,
             });
           });
-
           map.on("click", POINTS_LAYER_ID, (event) => {
             const feature = event.features?.[0];
             if (!feature || feature.geometry.type !== "Point") return;
@@ -230,7 +231,6 @@ export function FrostMapPage({ initialData }: { initialData: FrostMapData }) {
               .setDOMContent(createPopupContent(feature.properties ?? {}))
               .addTo(map);
           });
-
           for (const layerId of [CLUSTERS_LAYER_ID, POINTS_LAYER_ID]) {
             map.on("mouseenter", layerId, () => {
               map.getCanvas().style.cursor = "pointer";
@@ -275,19 +275,32 @@ export function FrostMapPage({ initialData }: { initialData: FrostMapData }) {
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !isMapLoaded) return;
-    const source = map.getSource(SOURCE_ID) as { setData: (value: typeof featureCollection) => void } | undefined;
-    source?.setData(featureCollection);
+
+    (map.getSource(SOURCE_ID) as GeoJSONSource | undefined)?.setData(featureCollection);
 
     if (data.stations.length === 0) {
       map.easeTo({ center: RS_CENTER, zoom: 5.3, duration: 500 });
       return;
     }
 
-    const bounds = data.stations.reduce(
-      (current, station) => current.extend([station.longitude, station.latitude]),
-      new (map.constructor as typeof MapLibreMap).LngLatBounds?.() as never,
-    );
-    void bounds;
+    const longitudes = data.stations.map((station) => station.longitude);
+    const latitudes = data.stations.map((station) => station.latitude);
+    const west = Math.min(...longitudes);
+    const east = Math.max(...longitudes);
+    const south = Math.min(...latitudes);
+    const north = Math.max(...latitudes);
+
+    if (west === east && south === north) {
+      map.easeTo({ center: [west, south], zoom: 8, duration: 550 });
+    } else {
+      map.fitBounds(
+        [
+          [west, south],
+          [east, north],
+        ],
+        { padding: 72, maxZoom: 8, duration: 650 },
+      );
+    }
   }, [data.stations, featureCollection, isMapLoaded]);
 
   useEffect(() => {
@@ -361,7 +374,6 @@ export function FrostMapPage({ initialData }: { initialData: FrostMapData }) {
               ))}
             </div>
           </fieldset>
-
           <fieldset>
             <legend>Tipo de estação</legend>
             <div className={styles.stationNavigation}>
@@ -386,7 +398,11 @@ export function FrostMapPage({ initialData }: { initialData: FrostMapData }) {
         </div>
 
         <div className={styles.mapShell} aria-busy={isRefreshing}>
-          <div ref={mapContainerRef} className={styles.map} aria-label="Mapa de ocorrências de geada no Rio Grande do Sul" />
+          <div
+            ref={mapContainerRef}
+            className={styles.map}
+            aria-label="Mapa de ocorrências de geada no Rio Grande do Sul"
+          />
           <div className={styles.legend} aria-label="Legenda de intensidade da geada">
             <strong>Intensidade</strong>
             <span><i className={styles.strong} />Forte</span>
@@ -395,10 +411,23 @@ export function FrostMapPage({ initialData }: { initialData: FrostMapData }) {
             <span><i className={styles.possible} />Possível ocorrência</span>
             <span><i className={styles.undefined} />Indefinida</span>
           </div>
-          <div className={`${styles.loading} ${isMapLoaded && !isRefreshing ? styles.hidden : ""}`} role="status">
+          <div
+            className={`${styles.loading} ${isMapLoaded && !isRefreshing ? styles.hidden : ""}`}
+            role="status"
+          >
             <span aria-hidden="true" />
-            <strong>{mapError ? "Mapa temporariamente indisponível" : isRefreshing ? "Atualizando registros" : "Carregando mapa de geadas"}</strong>
-            <small>{mapError ? "A lista de ocorrências continua disponível abaixo." : "Os pontos serão agrupados conforme o nível de zoom."}</small>
+            <strong>
+              {mapError
+                ? "Mapa temporariamente indisponível"
+                : isRefreshing
+                  ? "Atualizando registros"
+                  : "Carregando mapa de geadas"}
+            </strong>
+            <small>
+              {mapError
+                ? "A lista de ocorrências continua disponível abaixo."
+                : "Os pontos serão agrupados conforme o nível de zoom."}
+            </small>
           </div>
         </div>
 
@@ -424,14 +453,25 @@ export function FrostMapPage({ initialData }: { initialData: FrostMapData }) {
         {recentObservations.length > 0 ? (
           <div className={styles.tableWrapper}>
             <table>
-              <thead><tr><th>Estação</th><th>Data</th><th>Temperatura mínima</th><th>Intensidade</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>Estação</th><th>Data</th><th>Temperatura mínima</th><th>Intensidade</th>
+                </tr>
+              </thead>
               <tbody>
                 {recentObservations.map((observation) => (
                   <tr key={observation.id}>
-                    <td><strong>{observation.stationName} / {observation.state}</strong><small>{observation.stationCode}</small></td>
+                    <td>
+                      <strong>{observation.stationName} / {observation.state}</strong>
+                      <small>{observation.stationCode}</small>
+                    </td>
                     <td>{formatDate(observation.date)}</td>
                     <td>{formatTemperature(observation.minimumTemperature)}</td>
-                    <td><span className={`${styles.intensity} ${styles[observation.intensity]}`}>{observation.intensityLabel}</span></td>
+                    <td>
+                      <span className={`${styles.intensity} ${styles[observation.intensity]}`}>
+                        {observation.intensityLabel}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
