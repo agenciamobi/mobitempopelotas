@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const server = readFileSync("src/lib/inmet/frost.server.ts", "utf8");
+const functions = readFileSync("src/lib/inmet/frost.functions.ts", "utf8");
 const apiRoute = readFileSync("src/routes/api/inmet/geadas.ts", "utf8");
 const pageRoute = readFileSync("src/routes/mapa-de-geadas-rio-grande-do-sul.tsx", "utf8");
 const component = readFileSync("src/components/inmet/FrostMapPage.tsx", "utf8");
@@ -17,6 +18,12 @@ test("INMET frost integration uses the official endpoint and published intensity
   assert.match(server, /temperature < 3/);
   assert.match(server, /Possível ocorrência/);
   assert.match(server, /stationType === "AUTOMATICA"/);
+});
+
+test("frost map opens with automatic stations while preserving both station filters", () => {
+  assert.match(functions, /stationType:\s*"AUTOMATICA"/);
+  assert.match(component, /stationType === "AUTOMATICA"/);
+  assert.match(component, /stationType === "CONVENCIONAL"/);
 });
 
 test("frost API validates filters, limits the interval and caches responses", () => {
