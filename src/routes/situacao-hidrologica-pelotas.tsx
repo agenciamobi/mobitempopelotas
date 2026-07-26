@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { HydrologyEditorialHero } from "@/components/hydrology/HydrologyEditorialHero";
+import "@/components/hydrology/HydrologyEditorialRoute.css";
 import { HydrologyOverviewPage } from "@/components/hydrology/HydrologyPages";
 import { HYDROLOGY_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
