@@ -68,7 +68,7 @@ const megaMenus = [
       {
         title: "Pelotas e entorno",
         links: [
-          { label: "Pelotas", href: "/tempo-em/pelotas-rs", description: "Previsão completa para o centro regional." },
+          { label: "Pelotas", to: "/", description: "Central meteorológica completa de Pelotas." },
           { label: "Capão do Leão", href: "/tempo-em/capao-do-leao-rs", description: "Tempo no município vizinho a Pelotas." },
           { label: "Canguçu", href: "/tempo-em/cangucu-rs", description: "Condições na Serra do Sudeste." },
           { label: "Morro Redondo", href: "/tempo-em/morro-redondo-rs", description: "Previsão para a área serrana próxima." },
