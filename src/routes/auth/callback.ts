@@ -13,25 +13,24 @@ function redirectResponse(location: URL, headers = new Headers()) {
   return new Response(null, { status: 302, headers });
 }
 
-function loginErrorUrl(origin: string, code: "codigo" | "configuracao" | "oauth", next: string) {
-  const target = new URL("/entrar", origin);
+function loginErrorUrl(origin: string, code: "codigo" | "configuracao" | "oauth") {
+  const target = new URL("/conta", origin);
   target.searchParams.set("erro", code);
-  target.searchParams.set("next", next);
   return target;
 }
 
 async function exchangeGoogleCode(request: Request) {
   const url = new URL(request.url);
-  const next = safeNextPath(url.searchParams.get("next"), "/minha-conta");
+  const next = safeNextPath(url.searchParams.get("next"), "/conta");
   const code = url.searchParams.get("code");
   const config = getSupabaseServerConfig();
 
   if (!config.isPublicConfigured) {
-    return redirectResponse(loginErrorUrl(url.origin, "configuracao", next));
+    return redirectResponse(loginErrorUrl(url.origin, "configuracao"));
   }
 
   if (!code) {
-    return redirectResponse(loginErrorUrl(url.origin, "codigo", next));
+    return redirectResponse(loginErrorUrl(url.origin, "codigo"));
   }
 
   try {
@@ -43,7 +42,7 @@ async function exchangeGoogleCode(request: Request) {
         message: error.message,
         status: error.status,
       });
-      return redirectResponse(loginErrorUrl(url.origin, "oauth", next), responseHeaders);
+      return redirectResponse(loginErrorUrl(url.origin, "oauth"), responseHeaders);
     }
 
     return redirectResponse(new URL(next, url.origin), responseHeaders);
@@ -51,7 +50,7 @@ async function exchangeGoogleCode(request: Request) {
     console.error("[supabase-auth] Falha inesperada no callback OAuth", {
       message: error instanceof Error ? error.message : String(error),
     });
-    return redirectResponse(loginErrorUrl(url.origin, "oauth", next));
+    return redirectResponse(loginErrorUrl(url.origin, "oauth"));
   }
 }
 
