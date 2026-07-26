@@ -39,6 +39,50 @@
   color: #5e2ced;
 }
 
+/*
+ * A faixa só assume amarelo, laranja ou vermelho quando o portal reconhece
+ * severidade, início e término do aviso oficial. Enquanto a semântica está
+ * incompleta, acompanha o mesmo estado operacional usado pelos botões.
+ */
+.site-shell--home-editorial .home-inmet-alerts.is-unverified.advisory-normal {
+  --risk: #071e2f;
+}
+
+.site-shell--home-editorial .home-inmet-alerts.is-unverified.advisory-attention {
+  --risk: #f27035;
+}
+
+.site-shell--home-editorial .home-inmet-alerts.is-unverified.advisory-warning {
+  --risk: #d93636;
+}
+
+.site-shell--home-editorial .home-inmet-alerts.is-unverified {
+  border-color: color-mix(in srgb, var(--risk) 28%, rgb(7 30 47 / 9%));
+  background: color-mix(in srgb, var(--risk) 5.5%, white);
+}
+
+.site-shell--home-editorial .home-inmet-alerts.is-unverified .home-inmet-alerts__topline b {
+  border-color: color-mix(in srgb, var(--risk) 20%, transparent);
+  background: color-mix(in srgb, var(--risk) 9%, white);
+  color: color-mix(in srgb, var(--risk) 82%, #071e2f);
+}
+
+.site-shell--home-editorial .home-inmet-alerts.is-unverified .home-inmet-alerts__aside {
+  border-color: color-mix(in srgb, var(--risk) 18%, rgb(7 30 47 / 8%));
+}
+
+.site-shell--home-editorial .home-inmet-alerts.is-officially-classified.severity-potential {
+  --risk: #d6ae00;
+}
+
+.site-shell--home-editorial .home-inmet-alerts.is-officially-classified.severity-danger {
+  --risk: #ef7d2f;
+}
+
+.site-shell--home-editorial .home-inmet-alerts.is-officially-classified.severity-great-danger {
+  --risk: #d93636;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .site-shell--home-editorial .weather-hero-primary[href="/alertas"]:hover,
   .site-shell--home-editorial .weather-hero-primary[href="/alertas"]:focus-visible {
