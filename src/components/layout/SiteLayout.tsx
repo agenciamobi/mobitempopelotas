@@ -13,6 +13,7 @@ type SiteLayoutProps = {
 
 const standaloneRoutes = new Set([
   "/",
+  "/tempo-hoje-pelotas",
   "/conta",
   "/entrar",
   "/minha-conta",
