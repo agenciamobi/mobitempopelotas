@@ -21,13 +21,13 @@
 .site-shell--home-editorial .weather-hero-primary[href="/alertas"] {
   background: var(--hero-accent);
   color: #fff;
-  box-shadow: 0 12px 26px rgb(var(--hero-accent-rgb) / 20%);
+  box-shadow: 0 12px 26px rgba(var(--hero-accent-rgb), 0.2);
 }
 
 .site-shell--home-editorial .weather-hero-primary[href="/alertas"]:hover,
 .site-shell--home-editorial .weather-hero-primary[href="/alertas"]:focus-visible {
   filter: brightness(0.96) saturate(1.04);
-  box-shadow: 0 16px 34px rgb(var(--hero-accent-rgb) / 25%);
+  box-shadow: 0 16px 34px rgba(var(--hero-accent-rgb), 0.25);
 }
 
 .site-shell--home-editorial .weather-hero-secondary {
