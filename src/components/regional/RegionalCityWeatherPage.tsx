@@ -4,19 +4,9 @@ import { AlertTriangle, ArrowRight, CloudRain, Compass, MapPin, Wind } from "luc
 import { REGIONAL_CITIES, regionalCityPath } from "@/lib/regional-cities";
 import type { RegionalCityWeatherData } from "@/lib/weather/regional-city-weather.types";
 import { RegionalCityHourlySection } from "./RegionalCityHourlySection";
+import { formatRegionalDateTime } from "./regional-time-format";
 
 import styles from "./RegionalCityWeatherPage.module.css";
-
-function formatDateTime(value: string | null) {
-  if (!value) return "horário não informado";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat("pt-BR", {
-    dateStyle: "short",
-    timeStyle: "short",
-    timeZone: "America/Sao_Paulo",
-  }).format(date);
-}
 
 function metric(value: number | null, suffix: string) {
   return value === null || !Number.isFinite(value) ? "—" : `${value}${suffix}`;
@@ -86,7 +76,7 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
               <span>Estimativa atual</span>
               <strong>{city.name}, RS</strong>
             </div>
-            <small>{current ? formatDateTime(current.observedAt) : "em atualização"}</small>
+            <small>{current ? formatRegionalDateTime(current.observedAt) : "em atualização"}</small>
           </header>
           <div className={styles.temperatureRow}>
             <strong>{metric(current?.temperature ?? null, "°")}</strong>
@@ -115,7 +105,7 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
             <h2>{activeAlert.event}</h2>
             <p>{activeAlert.description || `Aviso meteorológico com abrangência informada para ${city.name}.`}</p>
             {activeAlert.instruction ? <p><strong>Orientações:</strong> {activeAlert.instruction}</p> : null}
-            <small>{formatDateTime(activeAlert.startsAt)} até {formatDateTime(activeAlert.expiresAt)}</small>
+            <small>{formatRegionalDateTime(activeAlert.startsAt)} até {formatRegionalDateTime(activeAlert.expiresAt)}</small>
           </div>
           <a href={activeAlert.officialUrl} target="_blank" rel="noopener noreferrer">
             Consultar aviso oficial <ArrowRight aria-hidden="true" />
@@ -234,7 +224,7 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
         <span>Fontes</span>
         <p>
           Previsão por coordenadas: Open-Meteo. Avisos municipais: Instituto Nacional de Meteorologia.
-          Atualizado em {formatDateTime(data.source.fetchedAt)}. Apresentação: Tempo Pelotas.
+          Atualizado em {formatRegionalDateTime(data.source.fetchedAt)}. Apresentação: Tempo Pelotas.
         </p>
       </footer>
     </main>
