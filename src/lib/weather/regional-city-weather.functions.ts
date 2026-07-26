@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { setResponseHeaders } from "@tanstack/react-start/server";
 import { z } from "zod";
 
-import { fetchRegionalCityWeather } from "./regional-city-weather.server";
+import { fetchResilientRegionalCityWeather } from "./regional-city-weather-resilient.server";
 
 export const getRegionalCityWeather = createServerFn({ method: "GET" })
   .validator(z.object({ slug: z.string().min(1).max(80) }))
@@ -13,5 +13,5 @@ export const getRegionalCityWeather = createServerFn({ method: "GET" })
         "CDN-Cache-Control": "max-age=600, stale-while-revalidate=1800",
       }),
     );
-    return fetchRegionalCityWeather(data.slug);
+    return fetchResilientRegionalCityWeather(data.slug);
   });
