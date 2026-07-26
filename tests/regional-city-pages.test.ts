@@ -2,7 +2,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-import { REGIONAL_CITIES, regionalCityPath } from "../src/lib/regional-cities.ts";
+import {
+  REGIONAL_CITIES,
+  REGIONAL_HOME_CITY_SLUG,
+  regionalCityPath,
+} from "../src/lib/regional-cities.ts";
 import { PUBLIC_ROUTES } from "../src/lib/public-routes.ts";
 
 const server = readFileSync("src/lib/weather/regional-city-weather.server.ts", "utf8");
@@ -24,12 +28,23 @@ test("regional registry has unique slugs, IBGE codes and valid coordinates", () 
   }
 });
 
-test("every regional city has a concrete sitemap URL served by the dynamic route", () => {
+test("Pelotas consolidates authority on the homepage while other cities remain indexable", () => {
   const publicPaths = new Set(PUBLIC_ROUTES.map((item) => item.path));
-  for (const city of REGIONAL_CITIES) {
+  const pelotas = REGIONAL_CITIES.find((city) => city.slug === REGIONAL_HOME_CITY_SLUG);
+
+  assert.ok(pelotas);
+  assert.equal(regionalCityPath(pelotas), "/");
+  assert.ok(publicPaths.has("/"));
+  assert.ok(!publicPaths.has("/tempo-em/pelotas-rs"));
+
+  for (const city of REGIONAL_CITIES.filter((item) => item.slug !== REGIONAL_HOME_CITY_SLUG)) {
     assert.ok(publicPaths.has(regionalCityPath(city)), `sitemap sem ${city.name}`);
   }
+
   assert.match(route, /createFileRoute\("\/tempo-em\/\$citySlug"\)/);
+  assert.match(route, /params\.citySlug === REGIONAL_HOME_CITY_SLUG/);
+  assert.match(route, /statusCode:\s*301/);
+  assert.match(route, /to:\s*"\/"/);
   assert.match(route, /getRegionalCityWeather/);
   assert.match(directoryRoute, /createFileRoute\("\/tempo-na-regiao-sul-rs"\)/);
 });
@@ -62,9 +77,11 @@ test("hourly regional section shows probability, millimeters, wind and sun times
   assert.match(hourlyStyles, /@media \(max-width:\s*620px\)/);
 });
 
-test("regional navigation is exposed in desktop and mobile header", () => {
+test("regional navigation points Pelotas directly to the homepage", () => {
   assert.match(header, /id: "region"/);
   assert.match(header, /Tempo por cidade na Zona Sul/);
+  assert.match(header, /\{ label: "Pelotas", to: "\/"/);
+  assert.doesNotMatch(header, /tempo-em\/pelotas-rs/);
   assert.match(header, /\/tempo-em\/rio-grande-rs/);
   assert.match(header, /label: "Região"/);
 });
