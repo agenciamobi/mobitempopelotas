@@ -47,7 +47,7 @@ export function GoogleLoginCard({ nextPath, errorCode }: { nextPath: string; err
     setError(null);
 
     const callback = new URL("/auth/callback", window.location.origin);
-    callback.searchParams.set("next", safeNextPath(nextPath, "/minha-conta"));
+    callback.searchParams.set("next", safeNextPath(nextPath, "/conta"));
 
     const { error: signInError } = await client.auth.signInWithOAuth({
       provider: "google",
