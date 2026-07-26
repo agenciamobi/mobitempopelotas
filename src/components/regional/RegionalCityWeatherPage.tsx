@@ -9,6 +9,7 @@ import { RegionalCityHero } from "./RegionalCityHero";
 import { RegionalCityHourlySection } from "./RegionalCityHourlySection";
 import { formatRegionalDateTime } from "./regional-time-format";
 
+import "./RegionalCityPerformance.css";
 import styles from "./RegionalCityWeatherPage.module.css";
 
 function metric(value: number | null, suffix: string) {
@@ -64,7 +65,7 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
   };
 
   return (
-    <main className={styles.page} id="conteudo-principal">
+    <main className={`${styles.page} regional-city-page`} id="conteudo-principal">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 
       <RegionalCityHero data={data} />
