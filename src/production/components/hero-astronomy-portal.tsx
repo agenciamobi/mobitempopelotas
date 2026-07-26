@@ -43,7 +43,7 @@ function AstronomyIcon({ name }: { name: AstronomyIconName }) {
 
 function AstronomyItem({ icon, label, value }: AstronomyItemData) {
   return (
-    <div className="weather-hero-astronomy-item">
+    <div className="home-forecast-astronomy-item">
       <AstronomyIcon name={icon} />
       <span>{label}</span>
       <strong>{value}</strong>
@@ -55,7 +55,11 @@ export function HeroAstronomyPortal({ astronomy }: { astronomy?: AstronomyData }
   const [target, setTarget] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    setTarget(document.querySelector<HTMLElement>(".weather-hero-now"));
+    setTarget(
+      document.querySelector<HTMLElement>(
+        ".home-story--forecast > .home-story-heading",
+      ),
+    );
   }, []);
 
   const items = useMemo<AstronomyItemData[]>(() => {
@@ -78,8 +82,8 @@ export function HeroAstronomyPortal({ astronomy }: { astronomy?: AstronomyData }
   if (!target || items.length === 0) return null;
 
   return createPortal(
-    <section className="weather-hero-astronomy" aria-label="Informações astronômicas de Pelotas">
-      <div className="weather-hero-astronomy-grid" data-items={items.length}>
+    <section className="home-forecast-astronomy" aria-label="Contexto solar, lunar e sazonal de Pelotas">
+      <div className="home-forecast-astronomy-grid" data-items={items.length}>
         {items.map((item) => (
           <AstronomyItem key={item.label} {...item} />
         ))}
