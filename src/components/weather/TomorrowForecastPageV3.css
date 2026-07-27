@@ -1,0 +1,780 @@
+/* Tomorrow v3 — concise retail planning page derived from /tempo-hoje-pelotas. */
+.tomorrow-v3-page {
+  --tomorrow-ink: #071e2f;
+  --tomorrow-muted: #5c7480;
+  --tomorrow-line: rgb(7 30 47 / 9%);
+  display: grid;
+  width: 100%;
+  gap: clamp(1rem, 1.8vw, 1.45rem);
+  padding-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+.tomorrow-v3-page > * {
+  width: 100%;
+  max-width: none;
+  justify-self: stretch;
+}
+
+.tomorrow-v3-page .eyebrow {
+  color: #a84722;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.tomorrow-v3-page h2 {
+  margin: 0;
+  color: var(--tomorrow-ink);
+  font-size: clamp(2rem, 4vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.065em;
+  line-height: 0.96;
+  text-wrap: balance;
+}
+
+.tomorrow-v3-page p {
+  color: var(--tomorrow-muted);
+  line-height: 1.65;
+}
+
+.tomorrow-v3-overview,
+.tomorrow-v3-comparison,
+.tomorrow-v3-planning,
+.tomorrow-v3-official,
+.tomorrow-v3-faq {
+  scroll-margin-top: 10rem;
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 720px;
+}
+
+.tomorrow-v3-overview {
+  display: grid;
+  padding: clamp(1.4rem, 3vw, 2.4rem);
+  grid-template-columns: minmax(0, 0.9fr) minmax(520px, 1.1fr);
+  align-items: stretch;
+  gap: clamp(1.2rem, 3vw, 2.5rem);
+  border: 1px solid var(--tomorrow-line);
+  border-radius: 1.35rem;
+  background:
+    radial-gradient(circle at 4% 12%, rgb(242 112 53 / 10%), transparent 23rem),
+    radial-gradient(circle at 96% 4%, rgb(94 44 237 / 8%), transparent 22rem),
+    rgb(255 255 255 / 94%);
+}
+
+.tomorrow-v3-overview__intro {
+  display: grid;
+  align-content: center;
+  gap: 0.75rem;
+  padding: clamp(0.35rem, 1vw, 0.8rem);
+}
+
+.tomorrow-v3-overview__intro h2 {
+  max-width: 13ch;
+}
+
+.tomorrow-v3-overview__intro p {
+  max-width: 43rem;
+  margin: 0;
+  font-size: clamp(0.82rem, 1vw, 0.96rem);
+}
+
+.tomorrow-v3-overview__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.tomorrow-v3-overview__cards article {
+  display: grid;
+  min-height: 12rem;
+  padding: 1.2rem;
+  grid-template-columns: 1.6rem minmax(0, 1fr);
+  align-content: start;
+  gap: 0.75rem;
+  border: 1px solid rgb(24 189 205 / 16%);
+  border-radius: 1rem;
+  background: rgb(248 254 254 / 92%);
+}
+
+.tomorrow-v3-overview__cards article.is-caution {
+  border-color: rgb(242 112 53 / 18%);
+  background: rgb(255 249 245 / 96%);
+}
+
+.tomorrow-v3-overview__cards article > svg {
+  width: 1.3rem;
+  height: 1.3rem;
+  margin-top: 0.05rem;
+  color: #0b909d;
+}
+
+.tomorrow-v3-overview__cards article.is-caution > svg {
+  color: #d75d2a;
+}
+
+.tomorrow-v3-overview__cards article > div {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.tomorrow-v3-overview__cards span {
+  color: #087d88;
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.tomorrow-v3-overview__cards .is-caution span {
+  color: #b84d21;
+}
+
+.tomorrow-v3-overview__cards strong {
+  color: var(--tomorrow-ink);
+  font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+  line-height: 1.2;
+}
+
+.tomorrow-v3-overview__cards small {
+  color: var(--tomorrow-muted);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.tomorrow-v3-comparison,
+.tomorrow-v3-planning,
+.tomorrow-v3-official,
+.tomorrow-v3-faq {
+  display: grid;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  padding: clamp(1.35rem, 2.7vw, 2.25rem);
+  border: 1px solid var(--tomorrow-line);
+  border-radius: 1.35rem;
+  background: rgb(255 255 255 / 94%);
+}
+
+.tomorrow-v3-comparison > header,
+.tomorrow-v3-planning > header,
+.tomorrow-v3-official > header,
+.tomorrow-v3-faq > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--tomorrow-line);
+}
+
+.tomorrow-v3-comparison > header > div,
+.tomorrow-v3-planning > header > div,
+.tomorrow-v3-official > header > div,
+.tomorrow-v3-faq > header > div {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.tomorrow-v3-comparison > header h2,
+.tomorrow-v3-planning > header h2,
+.tomorrow-v3-official > header h2,
+.tomorrow-v3-faq > header h2 {
+  max-width: 18ch;
+  font-size: clamp(1.85rem, 3.3vw, 3.3rem);
+}
+
+.tomorrow-v3-comparison > header a,
+.tomorrow-v3-planning > header a,
+.tomorrow-v3-official > header a {
+  flex: 0 0 auto;
+  color: var(--tomorrow-ink);
+  font-size: 0.7rem;
+  font-weight: 820;
+  text-decoration-color: #18bdcd;
+  text-underline-offset: 0.35rem;
+}
+
+.tomorrow-v3-comparison__days {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.tomorrow-v3-comparison__days > svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #5e2ced;
+}
+
+.tomorrow-v3-comparison__days article {
+  display: grid;
+  min-height: 9rem;
+  align-content: center;
+  gap: 0.45rem;
+  padding: 1.2rem;
+  border: 1px solid var(--tomorrow-line);
+  border-radius: 1rem;
+  background: #f8fbfb;
+}
+
+.tomorrow-v3-comparison__days article.is-tomorrow {
+  border-color: rgb(94 44 237 / 18%);
+  background:
+    radial-gradient(circle at 92% 8%, rgb(94 44 237 / 9%), transparent 10rem),
+    #fbf9ff;
+}
+
+.tomorrow-v3-comparison__days article > span {
+  color: #70858f;
+  font-size: 0.59rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.tomorrow-v3-comparison__days article.is-tomorrow > span {
+  color: #5e2ced;
+}
+
+.tomorrow-v3-comparison__days article strong {
+  color: var(--tomorrow-ink);
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  letter-spacing: -0.055em;
+}
+
+.tomorrow-v3-comparison__days article small {
+  color: var(--tomorrow-muted);
+  font-size: 0.7rem;
+  line-height: 1.5;
+}
+
+.tomorrow-v3-comparison__deltas {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--tomorrow-line);
+  border-radius: 0.9rem;
+}
+
+.tomorrow-v3-comparison__deltas > div {
+  display: grid;
+  min-height: 4.8rem;
+  align-content: center;
+  gap: 0.28rem;
+  padding: 0.85rem 1rem;
+  border-right: 1px solid var(--tomorrow-line);
+}
+
+.tomorrow-v3-comparison__deltas > div:last-child {
+  border-right: 0;
+}
+
+.tomorrow-v3-comparison__deltas dt {
+  color: #70858f;
+  font-size: 0.55rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tomorrow-v3-comparison__deltas dd {
+  margin: 0;
+  color: var(--tomorrow-ink);
+  font-size: 0.92rem;
+  font-weight: 850;
+}
+
+.tomorrow-v3-planning {
+  background:
+    radial-gradient(circle at 8% 0%, rgb(24 189 205 / 7%), transparent 22rem),
+    rgb(255 255 255 / 94%);
+}
+
+.tomorrow-v3-planning__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.tomorrow-v3-planning__grid article {
+  display: grid;
+  min-height: 15rem;
+  align-content: start;
+  gap: 0.65rem;
+  padding: 1.2rem;
+  border: 1px solid var(--tomorrow-line);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 92%);
+}
+
+.tomorrow-v3-planning__grid article.is-attention {
+  border-color: rgb(242 112 53 / 20%);
+  background: rgb(255 249 245 / 96%);
+}
+
+.tomorrow-v3-planning__grid article > svg {
+  width: 1.45rem;
+  height: 1.45rem;
+  color: #0b909d;
+}
+
+.tomorrow-v3-planning__grid article.is-attention > svg {
+  color: #d75d2a;
+}
+
+.tomorrow-v3-planning__grid article > span {
+  color: #70858f;
+  font-size: 0.57rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tomorrow-v3-planning__grid article strong {
+  color: var(--tomorrow-ink);
+  font-size: clamp(1.25rem, 2vw, 1.8rem);
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+
+.tomorrow-v3-planning__grid article p {
+  margin: 0;
+  font-size: 0.74rem;
+}
+
+.tomorrow-v3-official {
+  background:
+    radial-gradient(circle at 96% 8%, rgb(94 44 237 / 7%), transparent 23rem),
+    rgb(255 255 255 / 94%);
+}
+
+.tomorrow-v3-official__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.tomorrow-v3-official__grid article {
+  display: grid;
+  min-height: 14rem;
+  align-content: start;
+  gap: 0.65rem;
+  padding: 1.15rem;
+  border: 1px solid var(--tomorrow-line);
+  border-radius: 1rem;
+  background: #fbfdfd;
+}
+
+.tomorrow-v3-official__grid article.is-regional {
+  border-color: rgb(94 44 237 / 16%);
+  background: #fbf9ff;
+}
+
+.tomorrow-v3-official__grid article > span {
+  color: #087d88;
+  font-size: 0.57rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.tomorrow-v3-official__grid article.is-regional > span {
+  color: #5e2ced;
+}
+
+.tomorrow-v3-official__grid article > strong {
+  color: var(--tomorrow-ink);
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.tomorrow-v3-official__grid article > p {
+  margin: 0;
+  font-size: 0.72rem;
+}
+
+.tomorrow-v3-official__grid article > small {
+  margin-top: auto;
+  color: #5e2ced;
+  font-size: 0.68rem;
+  font-weight: 820;
+}
+
+.tomorrow-v3-official__grid dl {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.tomorrow-v3-official__grid dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.7rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--tomorrow-line);
+}
+
+.tomorrow-v3-official__grid dt {
+  color: #70858f;
+  font-size: 0.56rem;
+  font-weight: 800;
+}
+
+.tomorrow-v3-official__grid dd {
+  margin: 0;
+  color: var(--tomorrow-ink);
+  font-size: 0.61rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+.tomorrow-v3-official__unavailable {
+  display: flex;
+  min-height: 8rem;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem;
+  border: 1px dashed rgb(7 30 47 / 16%);
+  border-radius: 1rem;
+  background: #fafcfc;
+}
+
+.tomorrow-v3-official__unavailable > svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #087d88;
+}
+
+.tomorrow-v3-official__unavailable > div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.tomorrow-v3-official__unavailable strong {
+  color: var(--tomorrow-ink);
+}
+
+.tomorrow-v3-official__unavailable span {
+  color: var(--tomorrow-muted);
+  font-size: 0.72rem;
+}
+
+.tomorrow-v3-faq > header > p {
+  max-width: 38ch;
+  margin: 0;
+  font-size: 0.72rem;
+  text-align: right;
+}
+
+.tomorrow-v3-faq > div {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.tomorrow-v3-faq details {
+  border: 1px solid var(--tomorrow-line);
+  border-radius: 0.9rem;
+  background: #fff;
+}
+
+.tomorrow-v3-faq summary {
+  position: relative;
+  padding: 1rem 3rem 1rem 1rem;
+  color: var(--tomorrow-ink);
+  font-size: 0.82rem;
+  font-weight: 820;
+  cursor: pointer;
+  list-style: none;
+}
+
+.tomorrow-v3-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.tomorrow-v3-faq summary::after {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  color: #5e2ced;
+  content: "+";
+  font-size: 1.1rem;
+  transform: translateY(-50%);
+}
+
+.tomorrow-v3-faq details[open] summary::after {
+  content: "−";
+}
+
+.tomorrow-v3-faq details p {
+  max-width: 78ch;
+  margin: 0;
+  padding: 0 1rem 1rem;
+  font-size: 0.76rem;
+}
+
+.tomorrow-v3-related {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--tomorrow-line);
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.tomorrow-v3-related a {
+  display: flex;
+  min-height: 6.4rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-right: 1px solid var(--tomorrow-line);
+  color: var(--tomorrow-ink);
+  text-decoration: none;
+}
+
+.tomorrow-v3-related a:last-child {
+  border-right: 0;
+}
+
+.tomorrow-v3-related a > span {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.tomorrow-v3-related small {
+  color: #70858f;
+  font-size: 0.54rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.tomorrow-v3-related strong {
+  font-size: 0.82rem;
+}
+
+.tomorrow-v3-related svg {
+  width: 1rem;
+  height: 1rem;
+  color: #5e2ced;
+}
+
+.tomorrow-v3-related a:hover,
+.tomorrow-v3-related a:focus-visible {
+  background: #faf9ff;
+  outline: none;
+}
+
+.tomorrow-v3-source-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border-top: 1px solid var(--tomorrow-line);
+}
+
+.tomorrow-v3-source-note svg {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  margin-top: 0.16rem;
+  color: #087d88;
+}
+
+.tomorrow-v3-source-note p {
+  max-width: 90ch;
+  margin: 0;
+  font-size: 0.67rem;
+}
+
+.tomorrow-v3-unavailable {
+  display: grid;
+  min-height: 18rem;
+  padding: clamp(1.4rem, 3vw, 2.4rem);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid var(--tomorrow-line);
+  border-radius: 1.2rem;
+  background: #fff;
+}
+
+.tomorrow-v3-unavailable > svg {
+  width: 2rem;
+  height: 2rem;
+  color: #087d88;
+}
+
+.tomorrow-v3-unavailable > div {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.tomorrow-v3-unavailable span {
+  color: #087d88;
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.tomorrow-v3-unavailable h2,
+.tomorrow-v3-unavailable p {
+  margin: 0;
+}
+
+.tomorrow-v3-unavailable h2 {
+  color: var(--tomorrow-ink);
+  font-size: clamp(1.8rem, 3vw, 3rem);
+  letter-spacing: -0.055em;
+}
+
+.tomorrow-v3-unavailable a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--tomorrow-ink);
+  font-size: 0.72rem;
+  font-weight: 820;
+}
+
+@media (max-width: 1120px) {
+  .tomorrow-v3-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .tomorrow-v3-overview__intro h2 {
+    max-width: 18ch;
+  }
+
+  .tomorrow-v3-planning__grid,
+  .tomorrow-v3-related {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tomorrow-v3-related a:nth-child(2) {
+    border-right: 0;
+  }
+
+  .tomorrow-v3-related a:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--tomorrow-line);
+  }
+}
+
+@media (max-width: 900px) {
+  .tomorrow-v3-official__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tomorrow-v3-comparison__deltas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tomorrow-v3-comparison__deltas > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .tomorrow-v3-comparison__deltas > div:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--tomorrow-line);
+  }
+}
+
+@media (max-width: 700px) {
+  .tomorrow-v3-page {
+    gap: 0.85rem;
+  }
+
+  .tomorrow-v3-overview,
+  .tomorrow-v3-comparison,
+  .tomorrow-v3-planning,
+  .tomorrow-v3-official,
+  .tomorrow-v3-faq {
+    padding: 1rem;
+    border-radius: 1rem;
+  }
+
+  .tomorrow-v3-overview__cards,
+  .tomorrow-v3-planning__grid,
+  .tomorrow-v3-official__grid,
+  .tomorrow-v3-related {
+    grid-template-columns: 1fr;
+  }
+
+  .tomorrow-v3-overview__cards article,
+  .tomorrow-v3-planning__grid article,
+  .tomorrow-v3-official__grid article {
+    min-height: auto;
+  }
+
+  .tomorrow-v3-comparison > header,
+  .tomorrow-v3-planning > header,
+  .tomorrow-v3-official > header,
+  .tomorrow-v3-faq > header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .tomorrow-v3-faq > header > p {
+    max-width: none;
+    text-align: left;
+  }
+
+  .tomorrow-v3-comparison__days {
+    grid-template-columns: 1fr;
+  }
+
+  .tomorrow-v3-comparison__days > svg {
+    justify-self: center;
+    transform: rotate(90deg);
+  }
+
+  .tomorrow-v3-related a,
+  .tomorrow-v3-related a:nth-child(2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--tomorrow-line);
+  }
+
+  .tomorrow-v3-related a:last-child {
+    border-bottom: 0;
+  }
+
+  .tomorrow-v3-unavailable {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 460px) {
+  .tomorrow-v3-comparison__deltas {
+    grid-template-columns: 1fr;
+  }
+
+  .tomorrow-v3-comparison__deltas > div,
+  .tomorrow-v3-comparison__deltas > div:nth-child(2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--tomorrow-line);
+  }
+
+  .tomorrow-v3-comparison__deltas > div:last-child {
+    border-bottom: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tomorrow-v3-page * {
+    scroll-behavior: auto;
+  }
+}
+
+@media (forced-colors: active) {
+  .tomorrow-v3-overview,
+  .tomorrow-v3-comparison,
+  .tomorrow-v3-planning,
+  .tomorrow-v3-official,
+  .tomorrow-v3-faq,
+  .tomorrow-v3-related {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+}
