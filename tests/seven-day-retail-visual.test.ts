@@ -19,36 +19,57 @@ test("seven day route uses the retail shell with a dedicated hero", () => {
   assert.match(route, /SevenDayForecastPageV2/);
   assert.match(route, /pageClassName="internal-weather-shell--seven-day"/);
   assert.match(route, /hero=\{\(\{ weather: productionWeather, advisoryLevel, officialAlertCount \}\)/);
+  assert.match(route, /Veja a previsão de 7 dias para Pelotas/);
+  assert.match(route, /SEVEN_DAY_PAGE_CONTENT/);
+  assert.match(route, /Como interpretar a previsão dos próximos 7 dias/);
+  assert.match(route, /createFaqPageJsonLd\(PAGE_PATH, SEVEN_DAY_PAGE_CONTENT\.faqs\)/);
   assert.doesNotMatch(route, /SevenDayForecastPage\s/);
   assert.doesNotMatch(route, /components\/weather\/ForecastPages/);
 });
 
-test("weekly hero is derived from the seven daily forecasts", () => {
+test("weekly hero uses a useful search-oriented headline and clear metrics", () => {
   assert.match(hero, /weather\.daily\.slice\(0, 7\)/);
   assert.match(hero, /getRetailWeatherPhoto/);
-  assert.match(hero, /Sua semana em Pelotas/);
-  assert.match(hero, /organizada para planejar/);
+  assert.match(hero, /Previsão de 7 dias para Pelotas/);
+  assert.match(hero, /temperatura, chuva e vento/);
   assert.match(hero, /Menor mínima/);
-  assert.match(hero, /Maior chuva/);
-  assert.match(hero, /Rajada máxima/);
+  assert.match(hero, /Maior chance de chuva/);
+  assert.match(hero, /Rajada mais forte/);
+  assert.match(hero, /Faixa de temperatura dos próximos 7 dias/);
+  assert.match(hero, /Maior volume de chuva/);
+  assert.match(hero, /Fonte da previsão/);
   assert.match(hero, /today-retail-hero__current-photo/);
   assert.match(hero, /today-retail-hero__photo-credit/);
   assert.match(hero, /<h1/);
+  assert.doesNotMatch(hero, /Sua semana em Pelotas/);
+  assert.doesNotMatch(hero, /organizada para planejar/);
+  assert.doesNotMatch(hero, /como cenário de maior destaque/);
   assert.doesNotMatch(hero, /weather\.current\.temperature/);
 });
 
-test("weekly page compares days and separates trend, risk and official context", () => {
+test("weekly page answers comparison and planning questions in direct language", () => {
   assert.match(page, /weather\.daily\.slice\(0, 7\)/);
   assert.match(page, /InternalPageChapters/);
-  assert.match(page, /Compare os sete dias sem perder contexto/);
-  assert.match(page, /Como a faixa de temperatura muda/);
-  assert.match(page, /Os períodos que merecem nova consulta/);
-  assert.match(page, /INMET e CPPMet\/UFPel/);
+  assert.match(page, /Resumo da semana/);
+  assert.match(page, /Previsão diária/);
+  assert.match(page, /Temperatura, chuva e rajadas em cada dia/);
+  assert.match(page, /Mínimas e máximas ao longo dos próximos 7 dias/);
+  assert.match(page, /Dias com maior chance de chuva e rajadas mais fortes/);
+  assert.match(page, /O que INMET e CPPMet\/UFPel publicam para os próximos dias/);
+  assert.match(page, /Dia mais favorável/);
+  assert.match(page, /Dia que exige mais atenção/);
+  assert.match(page, /attentionDay/);
+  assert.match(page, /rainSummary/);
+  assert.match(page, /gustSummary/);
   assert.match(page, /riskScore/);
   assert.match(page, /rainRanking/);
   assert.match(page, /windRanking/);
   assert.match(page, /--week-low/);
-  assert.match(page, /Nenhum valor demonstrativo foi inserido/);
+  assert.match(page, /Nenhum valor foi estimado manualmente/);
+  assert.doesNotMatch(page, /Compare os sete dias sem perder contexto/);
+  assert.doesNotMatch(page, /Os períodos que merecem nova consulta/);
+  assert.doesNotMatch(page, /próximas rodadas/);
+  assert.doesNotMatch(page, /Nenhum valor demonstrativo foi inserido/);
   assert.doesNotMatch(page, /<h1/);
   assert.doesNotMatch(page, /ForecastPageHeader/);
   assert.doesNotMatch(page, /forecast-seven-day-list/);
