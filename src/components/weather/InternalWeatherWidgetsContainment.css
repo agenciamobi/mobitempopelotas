@@ -1,0 +1,137 @@
+/* Keep homepage-derived widgets inside the internal editorial rail. */
+.site-shell--home-editorial .internal-observation-widget {
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: clamp(2rem, 4vw, 3.75rem) !important;
+  grid-template-columns: minmax(260px, 0.68fr) minmax(0, 1.32fr) !important;
+  gap: clamp(2rem, 4vw, 4.5rem) !important;
+  transform: none !important;
+}
+
+.site-shell--home-editorial .internal-observation-widget::before {
+  inset: 0 0 auto !important;
+  width: auto !important;
+  height: 2px !important;
+}
+
+.site-shell--home-editorial
+  .internal-observation-widget
+  .home-observation-story__reading
+  dd {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.site-shell--home-editorial
+  .internal-observation-widget
+  .home-observation-story__reading
+  dd
+  > span {
+  color: #071e2f;
+  font-size: clamp(1.2rem, 1.5vw, 1.58rem);
+  font-weight: 880;
+  line-height: 1.15;
+}
+
+.site-shell--home-editorial
+  .internal-observation-widget
+  .home-observation-story__reading
+  dd
+  > small {
+  color: #82959d;
+  font-size: 0.49rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.site-shell--home-editorial
+  .internal-observation-widget
+  .home-observation-temperature
+  .internal-observation-status::before,
+.site-shell--home-editorial
+  .internal-observation-widget
+  .home-observation-temperature
+  .internal-observation-updated::before {
+  display: none;
+  content: none;
+}
+
+.site-shell--home-editorial
+  .internal-observation-widget
+  .home-observation-temperature
+  .internal-observation-status {
+  gap: 0.35rem;
+}
+
+.site-shell--home-editorial
+  .internal-observation-widget
+  .home-observation-temperature
+  .internal-observation-updated {
+  display: block;
+  width: auto;
+  min-height: 0;
+  max-width: none;
+  margin-top: 0.45rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #82959d;
+  font-size: 0.54rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.site-shell--home-editorial .internal-observation-widget .internal-observation-unavailable {
+  min-height: 13rem;
+}
+
+@media (max-width: 980px) {
+  .site-shell--home-editorial .internal-observation-widget {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 2rem !important;
+  }
+
+  .site-shell--home-editorial .internal-observation-widget .home-observation-story__intro {
+    max-width: 46rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .site-shell--home-editorial .internal-observation-widget {
+    gap: 1.5rem !important;
+    padding: 1.5rem !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .site-shell--home-editorial .internal-observation-widget {
+    padding: 1rem !important;
+    border-radius: 1rem !important;
+  }
+
+  .site-shell--home-editorial
+    .internal-observation-widget
+    .home-observation-story__reading
+    dl {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .site-shell--home-editorial
+    .internal-observation-widget
+    .home-observation-story__reading
+    dl
+    > div {
+    min-height: 6.5rem;
+    border-right: 0 !important;
+  }
+
+  .site-shell--home-editorial
+    .internal-observation-widget
+    .home-observation-story__reading
+    dl
+    > div:not(:last-child) {
+    border-bottom: 1px solid rgb(7 30 47 / 9%) !important;
+  }
+}
