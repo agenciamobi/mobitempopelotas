@@ -1,11 +1,12 @@
 import { z } from "zod";
 
-import type { DailyForecast, HourlyForecast, WeatherHomeData, WeatherIconName } from "./types";
+import type { DailyForecast, ForecastSourceKey, HourlyForecast, WeatherHomeData, WeatherIconName } from "./types";
 
 const FORECAST_ENDPOINT = "https://api.open-meteo.com/v1/forecast";
 const OPEN_METEO_URL = "https://open-meteo.com/";
 const TIMEZONE = "America/Sao_Paulo";
 const REQUEST_TIMEOUT_MS = 15_000;
+const HOURLY_FORECAST_LIMIT = 24;
 
 const PELOTAS = {
   city: "Pelotas",
@@ -17,6 +18,7 @@ const PELOTAS = {
 const finiteNumber = z.number().finite();
 const nullableFiniteNumber = finiteNumber.nullable();
 const nullableFiniteNumberArray = z.array(nullableFiniteNumber).min(1);
+const optionalNullableFiniteNumberArray = nullableFiniteNumberArray.optional();
 const timeArray = z.array(z.string().min(1)).min(1);
 
 const openMeteoResponseSchema = z
@@ -26,6 +28,7 @@ const openMeteoResponseSchema = z
       temperature_2m: nullableFiniteNumber,
       relative_humidity_2m: nullableFiniteNumber,
       apparent_temperature: nullableFiniteNumber,
+      dew_point_2m: nullableFiniteNumber.optional(),
       weather_code: nullableFiniteNumber,
       pressure_msl: nullableFiniteNumber,
       visibility: nullableFiniteNumber.optional(),
@@ -42,6 +45,16 @@ const openMeteoResponseSchema = z
       wind_gusts_10m: nullableFiniteNumberArray,
       weather_code: nullableFiniteNumberArray,
       is_day: nullableFiniteNumberArray,
+      relative_humidity_2m: optionalNullableFiniteNumberArray,
+      dew_point_2m: optionalNullableFiniteNumberArray,
+      pressure_msl: optionalNullableFiniteNumberArray,
+      visibility: optionalNullableFiniteNumberArray,
+      cloud_cover: optionalNullableFiniteNumberArray,
+      cloud_cover_low: optionalNullableFiniteNumberArray,
+      cloud_cover_mid: optionalNullableFiniteNumberArray,
+      cloud_cover_high: optionalNullableFiniteNumberArray,
+      cape: optionalNullableFiniteNumberArray,
+      boundary_layer_height: optionalNullableFiniteNumberArray,
     }),
     daily: z.object({
       time: timeArray,
@@ -60,7 +73,7 @@ const openMeteoResponseSchema = z
     const dailyLength = data.daily.time.length;
 
     for (const [key, values] of Object.entries(data.hourly)) {
-      if (values.length !== hourlyLength) {
+      if (Array.isArray(values) && values.length !== hourlyLength) {
         context.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["hourly", key],
@@ -152,7 +165,6 @@ function degreesToCompass(degrees: number | null | undefined) {
     "NO",
     "NNO",
   ];
-
   const normalizedDegrees = ((degrees % 360) + 360) % 360;
   return directions[Math.round(normalizedDegrees / 22.5) % directions.length];
 }
@@ -190,16 +202,27 @@ function roundOrNull(value: number | null | undefined) {
   return value === null || value === undefined ? null : Math.round(value);
 }
 
+function decimalOrNull(value: number | null | undefined) {
+  return value === null || value === undefined ? null : Number(value.toFixed(1));
+}
+
+function arrayValue(
+  values: Array<number | null> | undefined,
+  index: number,
+): number | null {
+  return values?.[index] ?? null;
+}
+
 function normalizeHourly(response: OpenMeteoResponse): HourlyForecast[] {
   const foundIndex = response.hourly.time.findIndex((time) => time >= response.current.time);
   const currentIndex = foundIndex === -1 ? 0 : foundIndex;
   const items: HourlyForecast[] = [];
 
-  for (let offset = 0; offset < 7; offset += 1) {
+  for (let offset = 0; offset < HOURLY_FORECAST_LIMIT; offset += 1) {
     const index = currentIndex + offset;
-    const time = response.hourly.time[index];
+    const timestamp = response.hourly.time[index];
     const temperature = response.hourly.temperature_2m[index];
-    if (!time || temperature === null || temperature === undefined) continue;
+    if (!timestamp || temperature === null || temperature === undefined) continue;
 
     const windSpeed = response.hourly.wind_speed_10m[index];
     if (windSpeed === null || windSpeed === undefined) continue;
@@ -212,7 +235,8 @@ function normalizeHourly(response: OpenMeteoResponse): HourlyForecast[] {
     const windGust = response.hourly.wind_gusts_10m[index];
 
     items.push({
-      time: offset === 0 ? "Agora" : `${formatClock(time)?.slice(0, 2) ?? "--"}h`,
+      time: offset === 0 ? "Agora" : `${formatClock(timestamp)?.slice(0, 2) ?? "--"}h`,
+      timestamp,
       temperature: Math.round(temperature),
       precipitationProbability:
         precipitationProbability === null || precipitationProbability === undefined
@@ -221,6 +245,22 @@ function normalizeHourly(response: OpenMeteoResponse): HourlyForecast[] {
       windSpeed: Math.round(windSpeed),
       windGust: windGust === null || windGust === undefined ? null : Math.round(windGust),
       icon: presentation.icon,
+      relativeHumidity: roundOrNull(arrayValue(response.hourly.relative_humidity_2m, index)),
+      dewPoint: decimalOrNull(arrayValue(response.hourly.dew_point_2m, index)),
+      pressure: roundOrNull(arrayValue(response.hourly.pressure_msl, index)),
+      visibilityKm: decimalOrNull(
+        arrayValue(response.hourly.visibility, index) === null
+          ? null
+          : (arrayValue(response.hourly.visibility, index) as number) / 1_000,
+      ),
+      cloudCover: roundOrNull(arrayValue(response.hourly.cloud_cover, index)),
+      cloudCoverLow: roundOrNull(arrayValue(response.hourly.cloud_cover_low, index)),
+      cloudCoverMid: roundOrNull(arrayValue(response.hourly.cloud_cover_mid, index)),
+      cloudCoverHigh: roundOrNull(arrayValue(response.hourly.cloud_cover_high, index)),
+      cape: roundOrNull(arrayValue(response.hourly.cape, index)),
+      boundaryLayerHeight: roundOrNull(
+        arrayValue(response.hourly.boundary_layer_height, index),
+      ),
     });
   }
 
@@ -271,6 +311,9 @@ function createUnavailableWeather(message: string): WeatherHomeData {
       key: "open-meteo",
       fetchedAt: new Date().toISOString(),
       isFallback: true,
+      model: "Open-Meteo Best Match",
+      modelRun: null,
+      temporalResolutionMinutes: 60,
     },
     message,
   };
@@ -295,6 +338,7 @@ export function normalizeOpenMeteoWeather(response: OpenMeteoResponse): WeatherH
         feelsLike: roundOrNull(response.current.apparent_temperature),
         condition: currentPresentation.label,
         humidity: roundOrNull(response.current.relative_humidity_2m),
+        dewPoint: decimalOrNull(response.current.dew_point_2m),
         pressure: roundOrNull(response.current.pressure_msl),
         windSpeed: roundOrNull(response.current.wind_speed_10m),
         windGust: roundOrNull(response.current.wind_gusts_10m),
@@ -305,7 +349,7 @@ export function normalizeOpenMeteoWeather(response: OpenMeteoResponse): WeatherH
             : Math.round(response.current.visibility / 1_000),
         sunrise: formatClock(response.daily.sunrise[0]),
         sunset: formatClock(response.daily.sunset[0]),
-        observedAt: formatClock(response.current.time),
+        observedAt: response.current.time,
         icon: currentPresentation.icon,
       }
     : null;
@@ -330,6 +374,9 @@ export function normalizeOpenMeteoWeather(response: OpenMeteoResponse): WeatherH
       key: "open-meteo",
       fetchedAt: new Date().toISOString(),
       isFallback: false,
+      model: "Open-Meteo Best Match",
+      modelRun: null,
+      temporalResolutionMinutes: 60,
     },
     message: null,
   };
@@ -350,6 +397,7 @@ export function createOpenMeteoForecastUrl() {
       "temperature_2m",
       "relative_humidity_2m",
       "apparent_temperature",
+      "dew_point_2m",
       "weather_code",
       "pressure_msl",
       "visibility",
@@ -360,7 +408,17 @@ export function createOpenMeteoForecastUrl() {
     ].join(","),
     hourly: [
       "temperature_2m",
+      "relative_humidity_2m",
+      "dew_point_2m",
       "precipitation_probability",
+      "pressure_msl",
+      "visibility",
+      "cloud_cover",
+      "cloud_cover_low",
+      "cloud_cover_mid",
+      "cloud_cover_high",
+      "cape",
+      "boundary_layer_height",
       "wind_speed_10m",
       "wind_gusts_10m",
       "weather_code",
@@ -430,10 +488,10 @@ export async function fetchPelotasWeather(): Promise<WeatherHomeData> {
     return normalizeOpenMeteoWeather(parsed.data);
   } catch (error) {
     logOpenMeteoError(error);
-    return createUnavailableWeather(
-      "Os dados meteorológicos estão temporariamente indisponíveis. Tente novamente em alguns minutos.",
-    );
+    return createUnavailableWeather("A previsão do Open-Meteo está temporariamente indisponível.");
   } finally {
     clearTimeout(timeout);
   }
 }
+
+export type { ForecastSourceKey };
