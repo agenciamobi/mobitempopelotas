@@ -1,0 +1,897 @@
+/* Seven-day forecast V2 — retail weekly planning system. */
+.seven-day-v2-page {
+  display: grid;
+  width: 100%;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.seven-day-v2-page > * {
+  width: 100%;
+  max-width: none;
+  justify-self: stretch;
+}
+
+.internal-weather-shell--seven-day .internal-page-chapters {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.internal-weather-shell--seven-day .internal-page-chapters a {
+  min-height: 4.85rem;
+  grid-template-columns: 1.7rem minmax(0, 1fr);
+  column-gap: 0.72rem;
+  row-gap: 0.14rem;
+  padding: 0.85rem 0.95rem;
+}
+
+.internal-weather-shell--seven-day .internal-page-chapters span,
+.internal-weather-shell--seven-day .internal-page-chapters small {
+  font-size: clamp(0.75rem, 0.72rem + 0.08vw, 0.82rem);
+}
+
+.internal-weather-shell--seven-day .internal-page-chapters strong {
+  overflow: visible;
+  font-size: 0.84rem;
+  line-height: 1.3;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.internal-weather-shell--seven-day .internal-page-chapters small {
+  overflow: visible;
+  color: #637b87;
+  line-height: 1.35;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.seven-day-v2-overview,
+.seven-day-v2-days,
+.seven-day-v2-trend,
+.seven-day-v2-risks,
+.seven-day-v2-official {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.35rem, 3vw, 2.5rem);
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1.3rem;
+  background:
+    radial-gradient(circle at 4% 5%, rgb(24 189 205 / 7%), transparent 23rem),
+    radial-gradient(circle at 96% 2%, rgb(94 44 237 / 5%), transparent 21rem),
+    rgb(255 255 255 / 96%);
+  box-shadow: 0 14px 36px rgb(7 30 47 / 4.5%);
+  content-visibility: auto;
+  contain-intrinsic-size: 650px;
+}
+
+.seven-day-v2-overview::before,
+.seven-day-v2-days::before,
+.seven-day-v2-trend::before,
+.seven-day-v2-risks::before,
+.seven-day-v2-official::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, #18bdcd 0 28%, #5e2ced 28% 60%, #e70b85 60% 82%, #f27035 82%);
+  content: "";
+}
+
+.seven-day-v2-overview,
+.seven-day-v2-overview__intro,
+.seven-day-v2-days,
+.seven-day-v2-trend,
+.seven-day-v2-risks,
+.seven-day-v2-official {
+  display: grid;
+}
+
+.seven-day-v2-overview {
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+}
+
+.seven-day-v2-overview__intro {
+  align-content: start;
+  gap: 0.8rem;
+}
+
+.seven-day-v2-page .eyebrow {
+  color: #078997;
+  font-size: clamp(0.75rem, 0.72rem + 0.08vw, 0.82rem);
+  font-weight: 850;
+  letter-spacing: 0.085em;
+  text-transform: uppercase;
+}
+
+.seven-day-v2-overview h2,
+.seven-day-v2-days h2,
+.seven-day-v2-trend h2,
+.seven-day-v2-risks h2,
+.seven-day-v2-official h2 {
+  margin: 0;
+  color: var(--portal-ink);
+  font-weight: 680;
+  letter-spacing: -0.065em;
+  line-height: 0.96;
+  text-wrap: balance;
+}
+
+.seven-day-v2-overview h2 {
+  max-width: 13ch;
+  font-size: clamp(2.35rem, 4vw, 4rem);
+}
+
+.seven-day-v2-overview__intro > p,
+.seven-day-v2-days > header p,
+.seven-day-v2-trend > header p,
+.seven-day-v2-risks > header p,
+.seven-day-v2-official > header p {
+  margin: 0;
+  color: #526d79;
+  font-size: clamp(0.88rem, 0.84rem + 0.1vw, 0.98rem);
+  line-height: 1.65;
+}
+
+.seven-day-v2-overview__cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.seven-day-v2-overview__cards article {
+  display: grid;
+  min-height: 10.5rem;
+  align-content: start;
+  gap: 0.8rem;
+  padding: 1.1rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 0.9rem;
+  background: rgb(255 255 255 / 88%);
+}
+
+.seven-day-v2-overview__cards article.is-best {
+  border-color: rgb(24 189 205 / 26%);
+  background: rgb(241 252 252 / 92%);
+}
+
+.seven-day-v2-overview__cards article.is-attention {
+  border-color: rgb(242 112 53 / 24%);
+  background: rgb(255 249 245 / 94%);
+}
+
+.seven-day-v2-overview__cards article > svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #078997;
+}
+
+.seven-day-v2-overview__cards article.is-attention > svg {
+  color: #c35425;
+}
+
+.seven-day-v2-overview__cards article > div {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.seven-day-v2-overview__cards span,
+.seven-day-v2-overview__cards small {
+  color: #637b87;
+  font-size: clamp(0.75rem, 0.72rem + 0.08vw, 0.82rem);
+  line-height: 1.4;
+}
+
+.seven-day-v2-overview__cards span {
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.seven-day-v2-overview__cards strong {
+  color: var(--portal-ink);
+  font-size: clamp(1.25rem, 2vw, 1.65rem);
+  letter-spacing: -0.04em;
+}
+
+.seven-day-v2-days,
+.seven-day-v2-trend,
+.seven-day-v2-risks,
+.seven-day-v2-official {
+  gap: 1rem;
+}
+
+.seven-day-v2-days > header,
+.seven-day-v2-trend > header,
+.seven-day-v2-risks > header,
+.seven-day-v2-official > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgb(7 30 47 / 8%);
+}
+
+.seven-day-v2-days > header > div,
+.seven-day-v2-trend > header > div,
+.seven-day-v2-risks > header > div,
+.seven-day-v2-official > header > div {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.seven-day-v2-days h2,
+.seven-day-v2-trend h2,
+.seven-day-v2-risks h2,
+.seven-day-v2-official h2 {
+  max-width: 18ch;
+  font-size: clamp(2rem, 3.5vw, 3.45rem);
+}
+
+.seven-day-v2-days > header > a,
+.seven-day-v2-official > header > a {
+  color: #5e2ced;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.seven-day-v2-days__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.seven-day-v2-days__grid > article {
+  --day-accent: #18bdcd;
+  display: grid;
+  min-width: 0;
+  min-height: 20rem;
+  align-content: space-between;
+  gap: 0.9rem;
+  padding: 1rem;
+  overflow: hidden;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 0.95rem;
+  background: rgb(250 252 253 / 94%);
+}
+
+.seven-day-v2-days__grid > article.tone-attention {
+  --day-accent: #5e2ced;
+  border-color: rgb(94 44 237 / 22%);
+  background: linear-gradient(155deg, rgb(250 247 255 / 96%), rgb(255 255 255 / 96%));
+}
+
+.seven-day-v2-days__grid > article.tone-high {
+  --day-accent: #e70b85;
+  border-color: rgb(231 11 133 / 24%);
+  background: linear-gradient(155deg, rgb(255 246 251 / 97%), rgb(255 252 249 / 97%));
+}
+
+.seven-day-v2-days__grid > article.is-today {
+  border-color: rgb(24 189 205 / 34%);
+  box-shadow: inset 0 3px 0 #18bdcd;
+}
+
+.seven-day-v2-days__grid article > header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 0.55rem;
+}
+
+.seven-day-v2-days__grid article > header > div {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.seven-day-v2-days__grid article > header strong {
+  color: var(--portal-ink);
+  font-size: 0.92rem;
+}
+
+.seven-day-v2-days__grid article > header span,
+.seven-day-v2-days__grid article > header b,
+.seven-day-v2-days__grid dt,
+.seven-day-v2-days__grid small {
+  font-size: clamp(0.72rem, 0.7rem + 0.06vw, 0.8rem);
+}
+
+.seven-day-v2-days__grid article > header span {
+  color: #637b87;
+}
+
+.seven-day-v2-days__grid article > header b {
+  padding: 0.3rem 0.45rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--day-accent), white 86%);
+  color: color-mix(in srgb, var(--day-accent), #071e2f 25%);
+  font-weight: 850;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.seven-day-v2-days__condition {
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+}
+
+.seven-day-v2-days__condition svg {
+  width: 2.8rem;
+  height: 2.8rem;
+  color: var(--day-accent);
+}
+
+.seven-day-v2-days__condition > strong {
+  color: var(--portal-ink);
+  font-size: clamp(1.65rem, 2.5vw, 2.15rem);
+  letter-spacing: -0.055em;
+  white-space: nowrap;
+}
+
+.seven-day-v2-days__condition > strong span {
+  color: #92a4ac;
+  font-weight: 500;
+}
+
+.seven-day-v2-days__grid dl {
+  display: grid;
+  margin: 0;
+  gap: 0.6rem;
+}
+
+.seven-day-v2-days__grid dl > div {
+  display: grid;
+  gap: 0.28rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgb(7 30 47 / 7%);
+}
+
+.seven-day-v2-days__grid dt {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #637b87;
+  font-weight: 760;
+}
+
+.seven-day-v2-days__grid dt svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  color: var(--day-accent);
+}
+
+.seven-day-v2-days__grid dd {
+  margin: 0;
+  color: var(--portal-ink);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.seven-day-v2-days__grid small {
+  color: #637b87;
+  line-height: 1.4;
+}
+
+.seven-day-v2-trend__list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.seven-day-v2-trend__list article {
+  display: grid;
+  min-height: 4.4rem;
+  grid-template-columns: minmax(90px, 0.18fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgb(7 30 47 / 7%);
+  border-radius: 0.75rem;
+  background: rgb(250 252 253 / 88%);
+}
+
+.seven-day-v2-trend__list article > strong {
+  color: var(--portal-ink);
+  font-size: 0.86rem;
+}
+
+.seven-day-v2-trend__list article > div {
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.seven-day-v2-trend__list article > div > span {
+  color: #526d79;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.seven-day-v2-trend__list article > div > span:last-child {
+  text-align: right;
+}
+
+.seven-day-v2-trend__list i {
+  position: relative;
+  display: block;
+  height: 0.55rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(7 30 47 / 7%);
+}
+
+.seven-day-v2-trend__list i b {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--week-low);
+  width: var(--week-span);
+  border-radius: inherit;
+  background: linear-gradient(90deg, #18bdcd, #5e2ced 62%, #e70b85);
+}
+
+.seven-day-v2-trend__facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.seven-day-v2-trend__facts article {
+  display: grid;
+  min-height: 7.5rem;
+  align-content: start;
+  gap: 0.4rem;
+  padding: 1rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 0.82rem;
+  background: rgb(255 255 255 / 88%);
+}
+
+.seven-day-v2-trend__facts svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: #078997;
+}
+
+.seven-day-v2-trend__facts span {
+  color: #637b87;
+  font-size: 0.78rem;
+}
+
+.seven-day-v2-trend__facts strong {
+  color: var(--portal-ink);
+  font-size: 1rem;
+}
+
+.seven-day-v2-risks__grid,
+.seven-day-v2-official__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.seven-day-v2-risks__grid > article,
+.seven-day-v2-official__grid > article {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  padding: 1.15rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 0.9rem;
+  background: rgb(255 255 255 / 90%);
+}
+
+.seven-day-v2-risks__grid > article.is-rain {
+  border-color: rgb(94 44 237 / 20%);
+  background: linear-gradient(145deg, rgb(250 247 255 / 96%), rgb(255 255 255 / 96%));
+}
+
+.seven-day-v2-risks__grid > article.is-wind {
+  border-color: rgb(231 11 133 / 18%);
+  background: linear-gradient(145deg, rgb(255 247 251 / 96%), rgb(255 255 255 / 96%));
+}
+
+.seven-day-v2-risks__title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.seven-day-v2-risks__title > svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #5e2ced;
+}
+
+.seven-day-v2-risks__grid > article.is-wind .seven-day-v2-risks__title > svg {
+  color: #e70b85;
+}
+
+.seven-day-v2-risks__title span {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.seven-day-v2-risks__title small,
+.seven-day-v2-official__grid > article > span {
+  color: #637b87;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.seven-day-v2-risks__title strong,
+.seven-day-v2-official__grid > article > strong {
+  color: var(--portal-ink);
+  font-size: 1rem;
+}
+
+.seven-day-v2-risks ol,
+.seven-day-v2-official__grid ul {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.seven-day-v2-risks li,
+.seven-day-v2-official__grid li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 0;
+  border-top: 1px solid rgb(7 30 47 / 7%);
+}
+
+.seven-day-v2-risks li > span {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.seven-day-v2-risks li strong,
+.seven-day-v2-risks li b,
+.seven-day-v2-official__grid li span {
+  color: var(--portal-ink);
+  font-size: 0.86rem;
+}
+
+.seven-day-v2-risks li small,
+.seven-day-v2-risks__grid > article > p,
+.seven-day-v2-official__grid p,
+.seven-day-v2-official__grid li p {
+  margin: 0;
+  color: #637b87;
+  font-size: clamp(0.78rem, 0.75rem + 0.07vw, 0.86rem);
+  line-height: 1.5;
+}
+
+.seven-day-v2-risks__grid > article > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  justify-self: start;
+  color: #5e2ced;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.seven-day-v2-risks__grid > article > a svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.seven-day-v2-official__grid > article.is-regional {
+  border-color: rgb(24 189 205 / 20%);
+}
+
+.seven-day-v2-official__grid li {
+  display: grid;
+  align-items: start;
+  gap: 0.25rem;
+}
+
+.seven-day-v2-official__unavailable {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 7rem;
+  padding: 1rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 0.82rem;
+  background: rgb(250 252 253 / 90%);
+}
+
+.seven-day-v2-official__unavailable > svg {
+  width: 1.3rem;
+  height: 1.3rem;
+  color: #078997;
+}
+
+.seven-day-v2-official__unavailable > div {
+  display: grid;
+  gap: 0.22rem;
+}
+
+.seven-day-v2-official__unavailable strong {
+  color: var(--portal-ink);
+  font-size: 0.92rem;
+}
+
+.seven-day-v2-official__unavailable span {
+  color: #637b87;
+  font-size: 0.82rem;
+}
+
+.seven-day-v2-related {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.seven-day-v2-related a {
+  display: flex;
+  min-height: 5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 0.82rem;
+  background: rgb(255 255 255 / 92%);
+  color: inherit;
+  text-decoration: none;
+}
+
+.seven-day-v2-related a > span {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.seven-day-v2-related small {
+  color: #637b87;
+  font-size: 0.76rem;
+}
+
+.seven-day-v2-related strong {
+  color: var(--portal-ink);
+  font-size: 0.9rem;
+}
+
+.seven-day-v2-related svg {
+  width: 1rem;
+  height: 1rem;
+  color: #5e2ced;
+}
+
+.seven-day-v2-source-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  color: #637b87;
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.seven-day-v2-source-note svg {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  margin-top: 0.18rem;
+  color: #078997;
+}
+
+.seven-day-v2-source-note p {
+  margin: 0;
+}
+
+.seven-day-v2-unavailable {
+  display: grid;
+  min-height: 24rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1.3rem;
+  background: rgb(255 255 255 / 94%);
+}
+
+.seven-day-v2-unavailable > svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #078997;
+}
+
+.seven-day-v2-unavailable > div {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.seven-day-v2-unavailable span {
+  color: #078997;
+  font-size: 0.76rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.seven-day-v2-unavailable h2 {
+  margin: 0;
+  color: var(--portal-ink);
+  font-size: clamp(2rem, 4vw, 3.6rem);
+}
+
+.seven-day-v2-unavailable p {
+  margin: 0;
+  color: #637b87;
+  font-size: 0.9rem;
+}
+
+.seven-day-v2-unavailable a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #5e2ced;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.seven-day-v2-page a:focus-visible {
+  outline: 3px solid rgb(24 189 205 / 38%);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .seven-day-v2-days__grid > article,
+  .seven-day-v2-related a,
+  .seven-day-v2-risks__grid > article {
+    transition:
+      transform 160ms ease,
+      border-color 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .seven-day-v2-days__grid > article:hover,
+  .seven-day-v2-related a:hover,
+  .seven-day-v2-risks__grid > article:hover {
+    border-color: rgb(24 189 205 / 28%);
+    transform: translateY(-1px);
+  }
+}
+
+@media (max-width: 1280px) {
+  .seven-day-v2-days__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .seven-day-v2-days__grid > article:last-child {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 1040px) {
+  .seven-day-v2-overview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .seven-day-v2-overview h2 {
+    max-width: 18ch;
+  }
+
+  .seven-day-v2-related {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .internal-weather-shell--seven-day .internal-page-chapters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .seven-day-v2-overview__cards,
+  .seven-day-v2-trend__facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .seven-day-v2-days__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .seven-day-v2-days__grid > article:last-child {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .seven-day-v2-days > header,
+  .seven-day-v2-trend > header,
+  .seven-day-v2-risks > header,
+  .seven-day-v2-official > header {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .seven-day-v2-overview__cards,
+  .seven-day-v2-risks__grid,
+  .seven-day-v2-official__grid,
+  .seven-day-v2-trend__facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .seven-day-v2-overview__cards article {
+    min-height: 0;
+  }
+
+  .seven-day-v2-trend__list article {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.55rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .seven-day-v2-overview,
+  .seven-day-v2-days,
+  .seven-day-v2-trend,
+  .seven-day-v2-risks,
+  .seven-day-v2-official {
+    padding: 1rem;
+    border-radius: 1rem;
+  }
+
+  .internal-weather-shell--seven-day .internal-page-chapters {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+  }
+
+  .internal-weather-shell--seven-day .internal-page-chapters a,
+  .internal-weather-shell--seven-day .internal-page-chapters a:nth-child(2),
+  .internal-weather-shell--seven-day .internal-page-chapters a:nth-child(-n + 2) {
+    min-width: 10.5rem;
+    flex: 0 0 10.5rem;
+    border-right: 1px solid rgb(7 30 47 / 8%);
+    border-bottom: 0;
+    scroll-snap-align: start;
+  }
+
+  .seven-day-v2-days__grid,
+  .seven-day-v2-related {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .seven-day-v2-days__grid > article {
+    min-height: 18rem;
+  }
+
+  .seven-day-v2-trend__list article > div {
+    grid-template-columns: 2.2rem minmax(0, 1fr) 2.2rem;
+    gap: 0.45rem;
+  }
+
+  .seven-day-v2-unavailable {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .seven-day-v2-page * {
+    scroll-behavior: auto;
+    transition: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .seven-day-v2-overview,
+  .seven-day-v2-days,
+  .seven-day-v2-trend,
+  .seven-day-v2-risks,
+  .seven-day-v2-official,
+  .seven-day-v2-days__grid > article {
+    background: Canvas;
+  }
+}
