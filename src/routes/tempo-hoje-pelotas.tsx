@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { TodayForecastPageV5 } from "@/components/weather/TodayForecastPageV5";
+import { TodayRetailHero } from "@/components/weather/TodayRetailHero";
 import { TODAY_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
@@ -14,7 +15,6 @@ import {
 } from "@/production/components/inmet-alerts-panel";
 import { SiteFooter } from "@/production/components/site-footer";
 import { SiteHeader } from "@/production/components/site-header";
-import { WeatherHero } from "@/production/components/weather-hero";
 import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-browser-recovery";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/production/lib/weather-insights";
 
@@ -84,8 +84,8 @@ function TempoHojeHomeVisual({ data }: { data: WeatherIntelligenceData }) {
 
   return (
     <div className="site-shell site-shell--home site-shell--home-editorial today-v5-home-shell">
-      <SiteHeader advisoryLevel={headerLevel} variant="hero" />
-      <WeatherHero
+      <SiteHeader advisoryLevel={headerLevel} />
+      <TodayRetailHero
         weather={productionWeather}
         advisoryLevel={headerLevel}
         officialAlertCount={pelotasOfficialAlerts.length}
