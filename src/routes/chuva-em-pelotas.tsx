@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
+import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
 import { RainPage } from "@/components/weather/RainWindPages";
 import { RAIN_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
@@ -41,12 +42,16 @@ function ChuvaPage() {
   const weather = Route.useLoaderData();
 
   return (
-    <>
+    <InternalWeatherPageShell
+      data={weather}
+      pageClassName="internal-weather-shell--rain"
+      showOfficialAlerts={false}
+    >
       <RainPage data={weather} />
       <EditorialContentSection
         id="como-interpretar-a-previsao-de-chuva"
         content={RAIN_EDITORIAL_CONTENT}
       />
-    </>
+    </InternalWeatherPageShell>
   );
 }
