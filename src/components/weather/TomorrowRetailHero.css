@@ -1,0 +1,97 @@
+/* Tomorrow forecast uses the Tempo Hoje retail system with a warmer planning accent. */
+.tomorrow-retail-hero {
+  background:
+    radial-gradient(circle at 8% 0%, rgb(242 112 53 / 13%), transparent 27rem),
+    radial-gradient(circle at 92% 4%, rgb(94 44 237 / 14%), transparent 29rem),
+    linear-gradient(135deg, #fff9f5 0%, #ffffff 49%, #f7f3ff 100%);
+}
+
+.tomorrow-retail-hero .today-retail-hero__eyebrow {
+  color: #a84722;
+}
+
+.tomorrow-retail-hero .today-retail-hero__eyebrow i {
+  background: linear-gradient(135deg, #f27035, #e70b85);
+  box-shadow: 0 0 0 0.28rem rgb(242 112 53 / 12%);
+}
+
+.tomorrow-retail-hero .today-retail-hero__copy h1 span {
+  color: #f27035;
+}
+
+.tomorrow-retail-hero .today-retail-hero__badges > span:first-child svg {
+  width: 0.8rem;
+  height: 0.8rem;
+  color: #f27035;
+}
+
+.tomorrow-retail-hero__current {
+  min-height: 25rem;
+  background: linear-gradient(145deg, #5323c9 0%, #6c2dcf 48%, #3c1a91 100%);
+}
+
+.tomorrow-retail-hero .today-retail-hero__current-photo {
+  background-image:
+    linear-gradient(180deg, rgb(24 11 44 / 14%), rgb(25 10 54 / 64%)),
+    linear-gradient(135deg, rgb(94 44 237 / 45%) 0%, rgb(242 112 53 / 22%) 58%, rgb(48 20 113 / 75%) 100%),
+    var(--today-retail-hero-photo);
+}
+
+.tomorrow-retail-hero .today-retail-hero__current header b i {
+  background: #ffbd99;
+  box-shadow: 0 0 0 0.22rem rgb(255 189 153 / 16%);
+}
+
+.tomorrow-retail-hero .today-retail-hero__weather-icon svg,
+.tomorrow-retail-hero .today-retail-hero__current-metrics svg {
+  color: #ffbd99;
+}
+
+.tomorrow-retail-hero .today-retail-hero__current-main > div:last-child > small {
+  color: rgb(255 255 255 / 58%);
+  font-size: 0.58rem;
+  font-weight: 700;
+}
+
+.tomorrow-retail-hero__tiles strong {
+  overflow-wrap: anywhere;
+}
+
+.tomorrow-retail-hero__tiles article:last-child strong {
+  font-size: clamp(0.68rem, 0.9vw, 0.82rem);
+  line-height: 1.25;
+}
+
+.tomorrow-retail-hero--attention .today-retail-hero__primary,
+.tomorrow-retail-hero--warning .today-retail-hero__primary {
+  background: linear-gradient(135deg, #ef5b4d, #cf342c);
+  box-shadow: 0 12px 26px rgb(207 52 44 / 24%);
+}
+
+@media (max-width: 920px) {
+  .tomorrow-retail-hero__current {
+    min-height: 23rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .tomorrow-retail-hero .today-retail-hero__copy h1 {
+    max-width: 12ch;
+  }
+
+  .tomorrow-retail-hero__current {
+    min-height: 22rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .tomorrow-retail-hero__tiles article:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (forced-colors: active) {
+  .tomorrow-retail-hero {
+    background: Canvas;
+  }
+}
