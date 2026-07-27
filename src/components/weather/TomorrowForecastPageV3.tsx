@@ -21,11 +21,11 @@ import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-br
 import "./TomorrowForecastPageV3.css";
 
 const chapters = [
-  { href: "#resumo-amanha", label: "Resumo", detail: "Leitura rápida" },
-  { href: "#comparacao-amanha", label: "Compare", detail: "Hoje e amanhã" },
-  { href: "#planejamento-amanha", label: "Planeje", detail: "Impactos na rotina" },
-  { href: "#contexto-oficial-amanha", label: "Contexto", detail: "INMET e UFPel" },
-  { href: "#perguntas-amanha", label: "Entenda", detail: "Respostas diretas" },
+  { href: "#resumo-amanha", label: "Previsão de amanhã", detail: "Temperatura, chuva e vento" },
+  { href: "#comparacao-amanha", label: "Compare com hoje", detail: "O que deve mudar" },
+  { href: "#planejamento-amanha", label: "Para sua rotina", detail: "Como se preparar" },
+  { href: "#contexto-oficial-amanha", label: "Fontes oficiais", detail: "INMET e UFPel" },
+  { href: "#perguntas-amanha", label: "Perguntas", detail: "Respostas rápidas" },
 ];
 
 type PlanningCard = {
@@ -51,7 +51,13 @@ function formatDateTime(value: string | null | undefined) {
 }
 
 function rainValue(day: DailyForecast) {
-  return day.rainChance === null ? "Não informada" : `${day.rainChance}%`;
+  return day.rainChance === null ? "Chance não informada" : `${day.rainChance}% de chance`;
+}
+
+function dayWeatherSummary(day: DailyForecast) {
+  const gust =
+    day.windGust === null ? "rajadas não informadas" : `rajadas de até ${day.windGust} km/h`;
+  return `${rainValue(day)} · ${gust}`;
 }
 
 function weekdayKey(value: string) {
@@ -95,54 +101,54 @@ function formatTemperatureDelta(value: number | null) {
 function formatPercentDelta(value: number | null) {
   if (value === null) return "Sem comparação";
   if (value === 0) return "Sem mudança";
-  return value > 0 ? `+${value} p.p.` : `${value} p.p.`;
+  return `${value > 0 ? "+" : ""}${value} pontos`;
 }
 
 function tomorrowTitle(day: DailyForecast) {
   if ((day.rainChance ?? 0) >= 60 || day.precipitationMm >= 10) {
-    return "A chuva deve orientar boa parte do planejamento";
+    return "A chuva deve ser o principal ponto de atenção amanhã";
   }
-  if ((day.windGust ?? 0) >= 50) return "As rajadas são o principal ponto de atenção";
-  if (day.max <= 18) return "O frio deve permanecer durante boa parte do dia";
-  if (day.max >= 30) return "O calor deve ganhar força ao longo do dia";
+  if ((day.windGust ?? 0) >= 50) return "As rajadas devem ser o principal ponto de atenção amanhã";
+  if (day.max <= 18) return "O frio deve permanecer durante boa parte de amanhã";
+  if (day.max >= 30) return "O calor deve ganhar força ao longo de amanhã";
   if (day.max - day.min >= 10) return "A variação de temperatura pede roupa em camadas";
-  return "A previsão indica um dia sem um único fator dominante";
+  return "Amanhã não apresenta um único fator de maior impacto";
 }
 
 function tomorrowSummary(day: DailyForecast) {
   const rain =
     day.rainChance === null
-      ? `${day.precipitationMm} mm estimados, sem percentual publicado`
-      : `${day.rainChance}% de chance e ${day.precipitationMm} mm estimados`;
+      ? `${day.precipitationMm} mm estimados, sem percentual de chance publicado`
+      : `${day.rainChance}% de chance de chuva e ${day.precipitationMm} mm estimados`;
   const wind =
-    day.windGust === null ? "rajadas não informadas" : `rajadas de até ${day.windGust} km/h`;
+    day.windGust === null ? "rajadas ainda não informadas" : `rajadas de até ${day.windGust} km/h`;
 
-  return `A temperatura deve variar de ${day.min}° a ${day.max}°. A previsão aponta ${rain} e ${wind}.`;
+  return `A temperatura deve ficar entre ${day.min}° e ${day.max}°. Para chuva, a previsão indica ${rain}; para o vento, ${wind}.`;
 }
 
 function buildPlanningCards(day: DailyForecast): PlanningCard[] {
   const amplitude = Math.max(0, day.max - day.min);
   const temperatureDescription =
     day.max >= 30
-      ? "Priorize hidratação, sombra e ajuste atividades externas para horários menos quentes."
+      ? "Priorize hidratação, sombra e atividades externas nos horários menos quentes."
       : day.max <= 18
-        ? "O dia tende a permanecer frio; considere proteção térmica durante os deslocamentos."
+        ? "O dia tende a permanecer frio; considere proteção térmica nos deslocamentos."
         : amplitude >= 10
-          ? "A diferença entre mínima e máxima favorece roupa em camadas ao longo do dia."
-          : "A faixa térmica prevista não indica mudanças bruscas entre mínima e máxima.";
+          ? "A diferença entre mínima e máxima favorece o uso de roupa em camadas."
+          : "A faixa de temperatura não indica mudança brusca entre mínima e máxima.";
 
   const rainDescription =
     day.rainChance === null
-      ? `O modelo estima ${day.precipitationMm} mm, mas não publicou probabilidade percentual.`
+      ? `O modelo estima ${day.precipitationMm} mm, mas não informou a chance percentual.`
       : day.rainChance >= 60 || day.precipitationMm >= 10
-        ? `Com ${day.rainChance}% de chance e ${day.precipitationMm} mm previstos, leve proteção para chuva e acompanhe novas rodadas.`
+        ? `Com ${day.rainChance}% de chance e ${day.precipitationMm} mm previstos, leve proteção e confira a atualização antes de sair.`
         : day.rainChance >= 30
-          ? `Há ${day.rainChance}% de chance. Vale manter uma alternativa coberta para compromissos mais sensíveis.`
-          : `A chance máxima é de ${day.rainChance}%, com baixo impacto esperado no planejamento geral.`;
+          ? `Há ${day.rainChance}% de chance. Mantenha uma alternativa coberta para compromissos sensíveis ao tempo.`
+          : `A chance máxima é de ${day.rainChance}%, com baixo impacto esperado neste momento.`;
 
   const windDescription =
     day.windGust === null
-      ? "A fonte ativa não publicou estimativa de rajadas para amanhã."
+      ? "A fonte principal ainda não informou as rajadas previstas para amanhã."
       : day.windGust >= 50
         ? `Rajadas de até ${day.windGust} km/h podem afetar estruturas leves e atividades ao ar livre.`
         : day.windGust >= 35
@@ -165,17 +171,16 @@ function buildPlanningCards(day: DailyForecast): PlanningCard[] {
       tone: (day.rainChance ?? 0) >= 60 || day.precipitationMm >= 10 ? "attention" : "normal",
     },
     {
-      label: "Vento",
-      title: day.windGust === null ? "Não informado" : `${day.windGust} km/h`,
+      label: "Rajadas",
+      title: day.windGust === null ? "Não informadas" : `${day.windGust} km/h`,
       description: windDescription,
       icon: Wind,
       tone: (day.windGust ?? 0) >= 35 ? "attention" : "normal",
     },
     {
-      label: "Nova consulta",
-      title: "Hoje à noite",
-      description:
-        "Os modelos recebem novas rodadas. Revise a previsão antes de dormir e novamente antes de sair.",
+      label: "Atualize a previsão",
+      title: "Hoje à noite e amanhã cedo",
+      description: "Confira novamente antes de dormir e perto do horário em que pretende sair.",
       icon: RefreshCw,
       tone: "normal",
     },
@@ -188,11 +193,11 @@ function ForecastUnavailable() {
       <RefreshCw aria-hidden="true" />
       <div>
         <span>Tempo Pelotas</span>
-        <h2 id="tomorrow-v3-unavailable-title">Os detalhes de amanhã estão em atualização</h2>
-        <p>Nenhum valor demonstrativo foi inserido. O portal tentará atualizar as fontes novamente.</p>
+        <h2 id="tomorrow-v3-unavailable-title">A previsão detalhada de amanhã está em atualização</h2>
+        <p>As fontes ainda não publicaram dados suficientes. Nenhum valor foi estimado manualmente.</p>
       </div>
       <Link to="/previsao-7-dias-pelotas">
-        Consultar previsão estendida <ArrowRight aria-hidden="true" />
+        Ver previsão de 7 dias <ArrowRight aria-hidden="true" />
       </Link>
     </section>
   );
@@ -227,20 +232,20 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
   const faqs = [
     {
       question: "Qual será a temperatura amanhã em Pelotas?",
-      answer: `A previsão indica mínima de ${tomorrow.min}°C e máxima de ${tomorrow.max}°C, com amplitude de ${amplitude}°C.`,
+      answer: `A previsão indica mínima de ${tomorrow.min}°C e máxima de ${tomorrow.max}°C, uma diferença de ${amplitude}°C ao longo do dia.`,
     },
     {
       question: "Vai chover amanhã em Pelotas?",
       answer:
         tomorrow.rainChance === null
-          ? `A fonte ativa não informou percentual de probabilidade, mas estima ${tomorrow.precipitationMm} mm.`
+          ? `A fonte principal não informou a chance percentual, mas estima ${tomorrow.precipitationMm} mm para o dia.`
           : `A maior chance prevista é de ${tomorrow.rainChance}%, com volume diário estimado de ${tomorrow.precipitationMm} mm.`,
     },
     {
       question: "Como estará o vento amanhã?",
       answer:
         tomorrow.windGust === null
-          ? "A fonte ativa não publicou uma estimativa de rajadas para amanhã."
+          ? "A fonte principal ainda não publicou a estimativa de rajadas para amanhã."
           : `As rajadas podem chegar a ${tomorrow.windGust} km/h durante o dia.`,
     },
   ];
@@ -269,7 +274,7 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
         aria-labelledby="tomorrow-v3-overview-title"
       >
         <div className="tomorrow-v3-overview__intro">
-          <span className="eyebrow">Leitura rápida</span>
+          <span className="eyebrow">Resumo da previsão</span>
           <h2 id="tomorrow-v3-overview-title">{tomorrowTitle(tomorrow)}</h2>
           <p>{tomorrowSummary(tomorrow)}</p>
         </div>
@@ -278,21 +283,25 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
           <article>
             <CheckCircle2 aria-hidden="true" />
             <div>
-              <span>Para organizar</span>
-              <strong>{amplitude >= 10 ? "Prepare-se para variação térmica" : "Faixa térmica relativamente estável"}</strong>
-              <small>Amplitude prevista de {amplitude}°C.</small>
+              <span>Faixa de temperatura</span>
+              <strong>
+                {amplitude >= 10
+                  ? "Prepare-se para uma mudança perceptível"
+                  : "Temperatura com menor variação"}
+              </strong>
+              <small>Mínima de {tomorrow.min}° e máxima de {tomorrow.max}°.</small>
             </div>
           </article>
           <article className="is-caution">
             <TriangleAlert aria-hidden="true" />
             <div>
-              <span>Revisar antes de sair</span>
+              <span>Atualize antes de sair</span>
               <strong>
                 {(tomorrow.rainChance ?? 0) >= 60 || (tomorrow.windGust ?? 0) >= 50
-                  ? "Chuva ou rajadas podem alterar a rotina"
-                  : "Acompanhe a atualização da noite"}
+                  ? "Chuva ou rajadas podem mudar seus planos"
+                  : "Confira a previsão novamente amanhã cedo"}
               </strong>
-              <small>Alertas oficiais e novas rodadas podem mudar a leitura.</small>
+              <small>Use também radar e avisos oficiais quando houver instabilidade.</small>
             </div>
           </article>
         </div>
@@ -305,10 +314,10 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
       >
         <header>
           <div>
-            <span className="eyebrow">Comparação</span>
-            <h2 id="tomorrow-v3-comparison-title">O que muda de hoje para amanhã</h2>
+            <span className="eyebrow">Hoje e amanhã</span>
+            <h2 id="tomorrow-v3-comparison-title">Como o tempo de amanhã deve mudar em relação a hoje</h2>
           </div>
-          <Link to="/tempo-hoje-pelotas">Rever a previsão de hoje</Link>
+          <Link to="/tempo-hoje-pelotas">Ver detalhes de hoje</Link>
         </header>
 
         <div className="tomorrow-v3-comparison__days">
@@ -317,7 +326,7 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
             {today ? (
               <>
                 <strong>{today.min}° / {today.max}°</strong>
-                <small>{rainValue(today)} de chuva · {today.windGust === null ? "rajadas não informadas" : `${today.windGust} km/h de rajada`}</small>
+                <small>{dayWeatherSummary(today)}</small>
               </>
             ) : (
               <><strong>Em atualização</strong><small>Sem valores para comparação.</small></>
@@ -327,15 +336,15 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
           <article className="is-tomorrow">
             <span>Amanhã</span>
             <strong>{tomorrow.min}° / {tomorrow.max}°</strong>
-            <small>{rainValue(tomorrow)} de chuva · {tomorrow.windGust === null ? "rajadas não informadas" : `${tomorrow.windGust} km/h de rajada`}</small>
+            <small>{dayWeatherSummary(tomorrow)}</small>
           </article>
         </div>
 
         <dl className="tomorrow-v3-comparison__deltas" aria-label="Diferenças previstas entre hoje e amanhã">
-          <div><dt>Máxima</dt><dd>{formatTemperatureDelta(maximumDelta)}</dd></div>
-          <div><dt>Mínima</dt><dd>{formatTemperatureDelta(minimumDelta)}</dd></div>
-          <div><dt>Chuva</dt><dd>{formatPercentDelta(rainDelta)}</dd></div>
-          <div><dt>Rajadas</dt><dd>{gustDelta === null ? "Sem comparação" : `${gustDelta > 0 ? "+" : ""}${gustDelta} km/h`}</dd></div>
+          <div><dt>Temperatura máxima</dt><dd>{formatTemperatureDelta(maximumDelta)}</dd></div>
+          <div><dt>Temperatura mínima</dt><dd>{formatTemperatureDelta(minimumDelta)}</dd></div>
+          <div><dt>Chance de chuva</dt><dd>{formatPercentDelta(rainDelta)}</dd></div>
+          <div><dt>Rajada máxima</dt><dd>{gustDelta === null ? "Sem comparação" : `${gustDelta > 0 ? "+" : ""}${gustDelta} km/h`}</dd></div>
         </dl>
       </section>
 
@@ -346,10 +355,10 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
       >
         <header>
           <div>
-            <span className="eyebrow">Planejamento do próximo dia</span>
-            <h2 id="tomorrow-v3-planning-title">Transforme a previsão em decisões simples</h2>
+            <span className="eyebrow">Para organizar o próximo dia</span>
+            <h2 id="tomorrow-v3-planning-title">Como se preparar para o tempo de amanhã</h2>
           </div>
-          <Link to="/previsao-7-dias-pelotas">Comparar com a semana</Link>
+          <Link to="/previsao-7-dias-pelotas">Ver próximos 7 dias</Link>
         </header>
 
         <div className="tomorrow-v3-planning__grid">
@@ -374,10 +383,10 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
       >
         <header>
           <div>
-            <span className="eyebrow">Contexto oficial e regional</span>
-            <h2 id="tomorrow-v3-official-title">O que INMET e CPPMet/UFPel acrescentam</h2>
+            <span className="eyebrow">Previsão oficial e regional</span>
+            <h2 id="tomorrow-v3-official-title">O que INMET e CPPMet/UFPel publicam para amanhã</h2>
           </div>
-          <Link to="/metodologia">Entender as fontes</Link>
+          <Link to="/metodologia">Como usamos cada fonte</Link>
         </header>
 
         {hasOfficialContext ? (
@@ -407,8 +416,8 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
           <div className="tomorrow-v3-official__unavailable">
             <Info aria-hidden="true" />
             <div>
-              <strong>Contexto oficial em atualização</strong>
-              <span>A previsão por modelo permanece disponível e identificada separadamente.</span>
+              <strong>INMET e CPPMet/UFPel ainda não publicaram contexto para amanhã</strong>
+              <span>A previsão principal continua disponível e identificada pela fonte utilizada.</span>
             </div>
           </div>
         )}
@@ -421,10 +430,10 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
       >
         <header>
           <div>
-            <span className="eyebrow">Respostas diretas</span>
-            <h2 id="tomorrow-v3-faq-title">Perguntas sobre o tempo de amanhã</h2>
+            <span className="eyebrow">Respostas rápidas</span>
+            <h2 id="tomorrow-v3-faq-title">Dúvidas sobre o tempo de amanhã em Pelotas</h2>
           </div>
-          <p>As respostas utilizam somente os valores publicados pelas fontes ativas.</p>
+          <p>As respostas usam os valores publicados pelas fontes disponíveis nesta atualização.</p>
         </header>
         <div>
           {faqs.map((faq) => (
@@ -437,16 +446,16 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
       </section>
 
       <nav className="tomorrow-v3-related" aria-label="Continue consultando o Tempo Pelotas">
-        <Link to="/tempo-hoje-pelotas"><span><small>Condição atual</small><strong>Previsão de hoje</strong></span><ArrowRight aria-hidden="true" /></Link>
-        <Link to="/previsao-7-dias-pelotas"><span><small>Planejamento</small><strong>Próximos 7 dias</strong></span><ArrowRight aria-hidden="true" /></Link>
-        <Link to="/chuva-em-pelotas"><span><small>Precipitação</small><strong>Chuva em Pelotas</strong></span><ArrowRight aria-hidden="true" /></Link>
-        <Link to="/vento-em-pelotas"><span><small>Condição regional</small><strong>Vento e rajadas</strong></span><ArrowRight aria-hidden="true" /></Link>
+        <Link to="/tempo-hoje-pelotas"><span><small>Condição atual</small><strong>Tempo hoje em Pelotas</strong></span><ArrowRight aria-hidden="true" /></Link>
+        <Link to="/previsao-7-dias-pelotas"><span><small>Planejamento semanal</small><strong>Previsão de 7 dias</strong></span><ArrowRight aria-hidden="true" /></Link>
+        <Link to="/chuva-em-pelotas"><span><small>Chuva</small><strong>Chance e volume por horário</strong></span><ArrowRight aria-hidden="true" /></Link>
+        <Link to="/vento-em-pelotas"><span><small>Vento</small><strong>Velocidade e rajadas</strong></span><ArrowRight aria-hidden="true" /></Link>
       </nav>
 
       <aside className="tomorrow-v3-source-note" aria-label="Origem e atualização da previsão">
         <Gauge aria-hidden="true" />
         <p>
-          Previsão consolidada em {formatDateTime(weather.source.fetchedAt)}. Fonte principal: {weather.quality.forecastProvider ?? "modelo meteorológico disponível"}, enriquecida com INMET e CPPMet/UFPel quando disponíveis.
+          Previsão atualizada em {formatDateTime(weather.source.fetchedAt)}. A fonte principal é {weather.quality.forecastProvider ?? "o modelo meteorológico disponível"}. INMET e CPPMet/UFPel aparecem como contexto complementar quando publicam dados para amanhã.
         </p>
       </aside>
     </div>
