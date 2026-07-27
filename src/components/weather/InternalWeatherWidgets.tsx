@@ -52,7 +52,10 @@ function formatDateTime(value: string | null | undefined) {
   }).format(date);
 }
 
-function sourceName(source: string | null | undefined, forecastProvider: string | null) {
+function sourceName(
+  source: string | null | undefined,
+  forecastProvider: string | null | undefined,
+) {
   if (source === "embrapa") return "Embrapa";
   if (source === "inmet") return "INMET";
   if (source === "cppmet") return "CPPMet/UFPel";
@@ -164,7 +167,7 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
             </small>
             <strong>{formatNumber(current.temperature)}°</strong>
             <span>
-              {current.feelsLike === null
+              {current.feelsLike === null || current.feelsLike === undefined
                 ? "Sensação não informada"
                 : `Sensação de ${formatNumber(current.feelsLike)} °C`}
             </span>
@@ -177,8 +180,10 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
             {metrics.map((metric) => (
               <div key={metric.label}>
                 <dt>{metric.label}</dt>
-                <dd>{metric.value}</dd>
-                <small>{metric.source}</small>
+                <dd>
+                  <span>{metric.value}</span>
+                  <small>{metric.source}</small>
+                </dd>
               </div>
             ))}
           </dl>
