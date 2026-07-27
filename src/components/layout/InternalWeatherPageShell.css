@@ -26,8 +26,9 @@
   box-sizing: border-box;
 }
 
-/* O hero de Hoje segue o mesmo eixo do masthead e das seções abaixo. */
-.internal-weather-shell--today .today-retail-hero__inner {
+/* Heroes retail compartilham o mesmo eixo do masthead e das seções abaixo. */
+.internal-weather-shell--today .today-retail-hero__inner,
+.internal-weather-shell--tomorrow .tomorrow-retail-hero__inner {
   width: 100%;
   max-width: var(--internal-weather-frame-max);
   margin-inline: auto;
@@ -53,6 +54,7 @@
 .internal-weather-main > .alerts-page,
 .internal-weather-main > .home-inmet-alerts,
 .internal-weather-main > .today-v5-page,
+.internal-weather-main > .tomorrow-v3-page,
 .internal-weather-main > .editorial-answer-section {
   margin-inline: 0;
 }
@@ -61,7 +63,10 @@
 .internal-weather-shell--today .today-v5-page,
 .internal-weather-shell--today .today-v5-page > *,
 .internal-weather-shell--today .home-inmet-alerts,
-.internal-weather-shell--today .editorial-answer-section {
+.internal-weather-shell--today .editorial-answer-section,
+.internal-weather-shell--tomorrow .tomorrow-v3-page,
+.internal-weather-shell--tomorrow .tomorrow-v3-page > *,
+.internal-weather-shell--tomorrow .home-inmet-alerts {
   width: 100%;
   max-width: none;
   justify-self: stretch;
