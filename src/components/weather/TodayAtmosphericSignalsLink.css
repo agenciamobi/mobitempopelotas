@@ -1,0 +1,36 @@
+.today-atmosphere__intro {
+  display: grid;
+  justify-items: start;
+  gap: 0.8rem;
+}
+
+.today-atmosphere__intro > a {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.58rem 0.78rem;
+  border: 1px solid rgb(94 44 237 / 18%);
+  border-radius: 999px;
+  color: #5e2ced;
+  font-size: 0.78rem;
+  font-weight: 790;
+  text-decoration: none;
+  background: rgb(94 44 237 / 5%);
+}
+
+.today-atmosphere__intro > a svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.today-atmosphere__intro > a:focus-visible {
+  outline: 3px solid rgb(24 189 205 / 42%);
+  outline-offset: 3px;
+}
+
+@media (forced-colors: active) {
+  .today-atmosphere__intro > a {
+    border: 1px solid LinkText;
+  }
+}
