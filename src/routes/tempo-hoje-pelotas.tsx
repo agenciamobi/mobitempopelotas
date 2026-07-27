@@ -11,7 +11,7 @@ import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.funct
 
 const PAGE_TITLE = "Tempo hoje em Pelotas";
 const PAGE_DESCRIPTION =
-  "Tempo hoje em Pelotas com condições atuais, previsão por hora, melhores janelas das próximas 12 horas, chuva, vento, radar e alertas oficiais.";
+  "Tempo hoje em Pelotas com condições atuais, previsão por hora, ponto de orvalho, nuvens, visibilidade, chuva, vento, radar e alertas oficiais.";
 const PAGE_PATH = "/tempo-hoje-pelotas";
 
 const TODAY_PAGE_CONTENT = {
@@ -19,17 +19,28 @@ const TODAY_PAGE_CONTENT = {
   eyebrow: "Entenda os dados",
   title: "O que foi medido e o que é previsão nesta página",
   answer:
-    "A condição atual usa a observação local quando a estação está disponível. Os horários futuros, máxima, mínima, chuva e rajadas são previsões do modelo identificado na página.",
+    "A condição atual usa a observação local quando a estação está disponível. Os horários futuros, máxima, mínima, chuva, rajadas, visibilidade e camadas de nuvens são previsões do modelo identificado na página. O sinal de neblina combina variáveis previstas e não confirma ocorrência local.",
   facts: [
-    "Temperatura, sensação térmica, umidade, pressão e vento atuais usam a observação local quando ela está disponível.",
-    "Máxima, mínima, chance de chuva, volume, rajadas e horários futuros são previsões meteorológicas.",
+    "Temperatura, sensação térmica, umidade, pressão, vento e ponto de orvalho atuais usam a observação local quando ela está disponível.",
+    "Máxima, mínima, chance de chuva, volume, rajadas, visibilidade, CAPE e nuvens por altitude são previsões meteorológicas.",
+    "Ponto de orvalho próximo da temperatura, umidade elevada, nuvens baixas e visibilidade reduzida podem indicar ambiente favorável à neblina, mas não garantem que ela ocorrerá em todo o município.",
     "Antes de sair, atualize a consulta e confira radar e avisos oficiais quando houver mudança rápida ou instabilidade.",
   ],
   faqs: [
     {
       question: "A temperatura mostrada agora foi medida?",
       answer:
-        "Quando há uma leitura local recente, sim. A página identifica a estação e o horário. Se a observação estiver indisponível, o portal informa que o valor atual foi estimado pelo modelo.",
+        "Quando há uma leitura local recente, sim. A página identifica a estação e o horário. Se a observação estiver indisponível, o portal mantém previsão e observação claramente separadas.",
+    },
+    {
+      question: "O que significa ponto de orvalho?",
+      answer:
+        "É a temperatura em que o ar precisaria chegar para ficar saturado. Quando ponto de orvalho e temperatura ficam próximos, aumenta a possibilidade de condensação, neblina ou sensação de ar muito úmido, dependendo também de vento, nuvens e visibilidade.",
+    },
+    {
+      question: "O sinal de neblina confirma que haverá nevoeiro?",
+      answer:
+        "Não. Ele combina ponto de orvalho, umidade, nuvens baixas e visibilidade prevista para destacar horários que merecem acompanhamento. A ocorrência pode variar entre bairros, áreas rurais e a orla.",
     },
     {
       question: "Chance de chuva e volume previsto são a mesma coisa?",
@@ -39,7 +50,7 @@ const TODAY_PAGE_CONTENT = {
     {
       question: "Quando devo conferir a previsão novamente?",
       answer:
-        "Confira perto do horário de saída e antes de atividades ao ar livre. Quando houver chuva, rajadas ou aviso oficial, consulte também radar e alertas.",
+        "Confira perto do horário de saída e antes de atividades ao ar livre. Quando houver chuva, rajadas, baixa visibilidade ou aviso oficial, consulte também radar e alertas.",
     },
   ],
   relatedLinks: [
@@ -52,6 +63,11 @@ const TODAY_PAGE_CONTENT = {
       label: "Chuva por horário em Pelotas",
       href: "/chuva-em-pelotas" as const,
       description: "Compare chance, volume e os períodos com maior possibilidade de chuva.",
+    },
+    {
+      label: "Radar e satélite em Pelotas",
+      href: "/radar-e-satelite-pelotas" as const,
+      description: "Compare chuva, nuvens, trovoadas e o horário das imagens meteorológicas.",
     },
     {
       label: "Avisos oficiais do INMET",
@@ -76,6 +92,10 @@ export const Route = createFileRoute("/tempo-hoje-pelotas")({
           "Previsão do tempo",
           "Condições meteorológicas em Pelotas",
           "Temperatura atual em Pelotas",
+          "Ponto de orvalho em Pelotas",
+          "Previsão de neblina e nuvens baixas em Pelotas",
+          "Visibilidade prevista em Pelotas",
+          "Camadas de nuvens baixas, médias e altas",
           "Previsão por hora em Pelotas",
           "Melhores horários para atividades ao ar livre em Pelotas",
           "Janelas de chuva e vento nas próximas horas",
