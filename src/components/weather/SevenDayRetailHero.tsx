@@ -68,9 +68,9 @@ function choosePhotoIcon(days: DailyForecast[]): WeatherIconName {
 function buildMetrics(days: DailyForecast[]): RetailMetric[] {
   if (days.length === 0) {
     return [
-      { label: "Mínima", value: "—", detail: "em atualização", icon: Thermometer },
-      { label: "Chuva", value: "—", detail: "em atualização", icon: CloudRain },
-      { label: "Rajadas", value: "—", detail: "em atualização", icon: Wind },
+      { label: "Menor mínima", value: "—", detail: "em atualização", icon: Thermometer },
+      { label: "Maior chance de chuva", value: "—", detail: "em atualização", icon: CloudRain },
+      { label: "Rajada mais forte", value: "—", detail: "em atualização", icon: Wind },
     ];
   }
 
@@ -90,13 +90,13 @@ function buildMetrics(days: DailyForecast[]): RetailMetric[] {
       icon: Thermometer,
     },
     {
-      label: "Maior chuva",
+      label: "Maior chance de chuva",
       value: formatValue(rainiest.rainChance, "%"),
       detail: rainiest.weekday,
       icon: CloudRain,
     },
     {
-      label: "Rajada máxima",
+      label: "Rajada mais forte",
       value: formatValue(windiest.windGust, " km/h"),
       detail: windiest.weekday,
       icon: Wind,
@@ -148,17 +148,17 @@ export function SevenDayRetailHero({
           </span>
 
           <h1 id="seven-day-retail-hero-title">
-            Sua semana em Pelotas, <span>organizada para planejar.</span>
+            Previsão de 7 dias para Pelotas: <span>temperatura, chuva e vento.</span>
           </h1>
 
           <p>
-            Compare temperatura, chuva e rajadas em uma única leitura. Identifique os dias mais
-            estáveis e os períodos que merecem nova consulta.
+            Compare mínima e máxima, chance e volume de chuva e rajadas previstos para cada dia.
+            Confirme novamente os dias mais distantes conforme eles se aproximarem.
           </p>
 
           <div className="today-retail-hero__badges" aria-label="Situação da previsão semanal">
             <span>
-              <CalendarRange aria-hidden="true" /> {days.length || 0} dias disponíveis
+              <CalendarRange aria-hidden="true" /> {days.length || 0} dias na previsão
             </span>
             {hasAlert ? (
               <Link className="is-alert" to="/alertas">
@@ -171,10 +171,10 @@ export function SevenDayRetailHero({
 
           <div className="today-retail-hero__actions">
             <a className="today-retail-hero__primary" href="#semana-dia-a-dia">
-              Comparar os sete dias <ArrowRight aria-hidden="true" />
+              Ver previsão dia a dia <ArrowRight aria-hidden="true" />
             </a>
             <a className="today-retail-hero__secondary" href="#riscos-da-semana">
-              Ver chuva e vento
+              Ver maiores chances de chuva
             </a>
           </div>
         </div>
@@ -195,7 +195,7 @@ export function SevenDayRetailHero({
               <header>
                 <div>
                   <span>Pelotas, RS</span>
-                  <small>Panorama semanal</small>
+                  <small>Previsão para os próximos 7 dias</small>
                 </div>
                 <b>
                   <i aria-hidden="true" /> 7 dias
@@ -204,17 +204,17 @@ export function SevenDayRetailHero({
 
               <div className="today-retail-hero__current-main">
                 <div className="today-retail-hero__weather-icon">
-                  <WeatherIcon name={iconName} title={`Condição de destaque da semana: ${condition}`} />
+                  <WeatherIcon name={iconName} title={`Condição de maior destaque da semana: ${condition}`} />
                 </div>
                 <div>
                   <strong>
                     {minimum === null || maximum === null ? "—" : `${minimum}°–${maximum}°`}
                   </strong>
-                  <span>{condition} como cenário de maior destaque</span>
+                  <span>Faixa de temperatura dos próximos 7 dias</span>
                   <small>
                     {rainyDays === 0
-                      ? "Sem dia com chuva relevante neste momento"
-                      : `${rainyDays} ${rainyDays === 1 ? "dia" : "dias"} com sinal de chuva`}
+                      ? "Sem dia com chuva relevante nesta atualização"
+                      : `${rainyDays} ${rainyDays === 1 ? "dia" : "dias"} com chance ou volume de chuva`}
                   </small>
                 </div>
               </div>
@@ -249,7 +249,7 @@ export function SevenDayRetailHero({
           <div className="today-retail-hero__tiles seven-day-retail-hero__tiles" aria-label="Destaques da semana">
             <article>
               <span>
-                <Thermometer aria-hidden="true" /> Dia mais quente
+                <Thermometer aria-hidden="true" /> Maior máxima
               </span>
               <strong>{warmest ? `${warmest.max}°` : "—"}</strong>
               <small>{warmest?.weekday ?? "Em atualização"}</small>
@@ -257,7 +257,7 @@ export function SevenDayRetailHero({
 
             <article className="is-rain">
               <span>
-                <CloudRain aria-hidden="true" /> Maior volume
+                <CloudRain aria-hidden="true" /> Maior volume de chuva
               </span>
               <strong>{rainiest ? `${rainiest.precipitation} mm` : "—"}</strong>
               <small>{rainiest?.weekday ?? "Em atualização"}</small>
@@ -265,7 +265,7 @@ export function SevenDayRetailHero({
 
             <article className="is-wind">
               <span>
-                <Thermometer aria-hidden="true" /> Noite mais fria
+                <Thermometer aria-hidden="true" /> Menor mínima
               </span>
               <strong>{coldest ? `${coldest.min}°` : "—"}</strong>
               <small>{coldest?.weekday ?? "Em atualização"}</small>
@@ -273,10 +273,10 @@ export function SevenDayRetailHero({
 
             <article className="is-sun">
               <span>
-                <Gauge aria-hidden="true" /> Fonte principal
+                <Gauge aria-hidden="true" /> Fonte da previsão
               </span>
               <strong>{weather.source.forecastName ?? weather.source.name}</strong>
-              <small>Previsão consolidada pelo portal</small>
+              <small>Modelo meteorológico principal</small>
             </article>
           </div>
         </div>
