@@ -91,7 +91,7 @@ export function TodayForecastPageV5({ data }: { data: WeatherIntelligenceData })
       <InternalForecastStory data={recoveredData} />
       <TodayWeatherResources data={recoveredData} />
       <InternalObservationWidget data={recoveredData} />
-      <TodayAtmosphericSignals data={recoveredData} />
+      <TodayAtmosphericSignals data={data} />
       <InternalPracticalSummary
         data={recoveredData}
         title={buildReadingTitle(recoveredData)}
