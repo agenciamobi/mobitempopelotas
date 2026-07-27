@@ -54,7 +54,7 @@ const CLIMATE_CONTENT = {
   ],
   relatedLinks: [
     {
-      label: "Histórico climático recente",
+      label: "Histórico meteorológico recente",
       href: "/historico-climatico-pelotas" as const,
       description: "Compare máximas, mínimas, chuva e rajadas dos últimos 30 dias completos.",
     },
