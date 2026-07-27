@@ -30,6 +30,10 @@ const internalShellStyles = readFileSync(
   "src/components/layout/InternalWeatherPageShell.css",
   "utf8",
 );
+const headerFrameStyles = readFileSync(
+  "src/production/styles/header-hero-fullwidth-v32.css",
+  "utf8",
+);
 const todayResources = readFileSync("src/components/weather/TodayWeatherResources.tsx", "utf8");
 const todayResourceStyles = readFileSync(
   "src/components/weather/TodayWeatherResources.css",
@@ -85,15 +89,46 @@ test("the shared shell codifies tempo hoje as the internal weather visual contra
   assert.match(internalShell, /hasVerifiedInmetAlertSemantics/);
   assert.match(internalShell, /toProductionWeatherData/);
   assert.match(internalShellStyles, /based on \/tempo-hoje-pelotas/);
-  assert.match(
-    internalShellStyles,
-    /width:\s*min\(var\(--editorial-max\), calc\(100% - 56px\)\)/,
-  );
   assert.match(internalShellStyles, /> \.daily-page/);
   assert.match(internalShellStyles, /> \.forecast-page/);
   assert.match(internalShellStyles, /> \.condition-page/);
   assert.match(internalShellStyles, /\.condition-page-header/);
   assert.match(internalShellStyles, /@media \(max-width: 680px\)/);
+});
+
+test("tempo hoje sections reuse the exact header container geometry", () => {
+  assert.match(headerFrameStyles, /--portal-frame-max:\s*1760px/);
+  assert.match(headerFrameStyles, /--portal-content-gutter:\s*clamp\(22px, 2\.4vw, 42px\)/);
+  assert.match(
+    headerFrameStyles,
+    /\.production-header-inner,[\s\S]*max-width:\s*var\(--portal-frame-max\)/,
+  );
+  assert.match(
+    internalShellStyles,
+    /--internal-weather-frame-max:\s*var\(--portal-frame-max, 1760px\)/,
+  );
+  assert.match(
+    internalShellStyles,
+    /--internal-weather-frame-gutter:\s*var\([\s\S]*--portal-content-gutter/,
+  );
+  assert.match(
+    internalShellStyles,
+    /\.site-shell--home-editorial\.internal-weather-shell \.internal-weather-main[\s\S]*width:\s*100%[\s\S]*max-width:\s*var\(--internal-weather-frame-max\)/,
+  );
+  assert.match(internalShellStyles, /padding-right:\s*var\(--internal-weather-frame-gutter\)/);
+  assert.match(internalShellStyles, /padding-left:\s*var\(--internal-weather-frame-gutter\)/);
+  assert.match(
+    internalShellStyles,
+    /\.internal-weather-shell--today \.today-retail-hero__inner[\s\S]*max-width:\s*var\(--internal-weather-frame-max\)/,
+  );
+  assert.match(
+    internalShellStyles,
+    /\.internal-weather-shell--today \.today-v5-page,[\s\S]*width:\s*100%[\s\S]*max-width:\s*none/,
+  );
+  assert.doesNotMatch(todayStyles, /calc\(100% - 56px\)/);
+  assert.doesNotMatch(todayStyles, /calc\(100% - 40px\)/);
+  assert.doesNotMatch(todayStyles, /calc\(100% - 28px\)/);
+  assert.doesNotMatch(todayStyles, /calc\(100% - 20px\)/);
 });
 
 test("the retail hero selects credited photography from the forecast condition", () => {
@@ -131,10 +166,6 @@ test("the retail hero remains a concise product-style weather showcase", () => {
 
 test("the retail hero stays on the editorial rail and adapts across breakpoints", () => {
   assert.match(todayRetailHeroStyles, /retail-style hero/);
-  assert.match(
-    todayRetailHeroStyles,
-    /width:\s*min\(var\(--editorial-max\), calc\(100% - 56px\)\)/,
-  );
   assert.match(todayRetailHeroStyles, /grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/);
   assert.match(todayRetailHeroStyles, /@media \(max-width: 920px\)/);
   assert.match(todayRetailHeroStyles, /@media \(max-width: 700px\)/);
@@ -196,16 +227,6 @@ test("today resources link to specialized rain wind radar and alert pages", () =
   assert.match(todayResources, /to: "\/alertas"/);
   assert.match(todayResources, /Recursos meteorológicos relacionados/);
   assert.match(todayResources, /não substituem avisos oficiais/);
-});
-
-test("today sections use one homepage width rail without a nested inset", () => {
-  assert.match(todayStyles, /width:\s*min\(var\(--editorial-max\), calc\(100% - 56px\)\)/);
-  assert.match(todayStyles, /padding:\s*clamp\(24px, 3vw, 44px\) 0 0/);
-  assert.match(todayStyles, /> \.today-v5-page/);
-  assert.match(todayStyles, /> \.editorial-answer-section/);
-  assert.match(todayStyles, /width:\s*100%/);
-  assert.match(todayStyles, /max-width:\s*none/);
-  assert.match(todayStyles, /justify-self:\s*stretch/);
 });
 
 test("reusable widgets preserve the homepage card language on desktop and mobile", () => {
