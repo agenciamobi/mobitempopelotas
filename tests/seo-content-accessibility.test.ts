@@ -7,6 +7,7 @@ const editorialRouteFiles = [
   "src/routes/chuva-em-pelotas.tsx",
   "src/routes/vento-em-pelotas.tsx",
   "src/routes/radar-e-satelite-pelotas.tsx",
+  "src/routes/meteograma-pelotas.tsx",
   "src/routes/estacao-embrapa-pelotas.tsx",
   "src/routes/historico-climatico-pelotas.tsx",
   "src/routes/cameras-ao-vivo-pelotas.tsx",
