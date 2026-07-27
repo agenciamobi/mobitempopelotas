@@ -1,0 +1,236 @@
+import { Link } from "@tanstack/react-router";
+import {
+  ArrowRight,
+  CloudRain,
+  Droplets,
+  Gauge,
+  ShieldAlert,
+  SunMedium,
+  Thermometer,
+  Wind,
+  type LucideIcon,
+} from "lucide-react";
+
+import { WeatherIcon } from "@/production/components/weather-icon";
+import {
+  resolveHeroWeatherIcon,
+  weatherConditionLabels,
+} from "@/production/lib/hero-weather-presentation";
+import type { WeatherData } from "@/production/lib/weather-data";
+import type { AdvisoryLevel } from "@/production/lib/weather-insights";
+
+import "./TodayRetailHero.css";
+
+type TodayRetailHeroProps = {
+  weather: WeatherData;
+  advisoryLevel: AdvisoryLevel;
+  officialAlertCount?: number;
+};
+
+type RetailMetric = {
+  label: string;
+  value: string;
+  detail: string;
+  icon: LucideIcon;
+};
+
+function formatValue(value: number | null, suffix = "") {
+  return value === null ? "—" : `${value}${suffix}`;
+}
+
+function updateLabel(weather: WeatherData) {
+  const current = weather.current;
+  if (current.updatedAt) return `Atualizado em ${current.updatedAt}`;
+  if (current.source.observedAt) return `Leitura das ${current.source.observedAt}`;
+  return current.available ? "Leitura recente" : "Dados em atualização";
+}
+
+function alertLabel(count: number) {
+  if (count === 1) return "1 aviso oficial para Pelotas";
+  return `${count} avisos oficiais para Pelotas`;
+}
+
+function buildCurrentMetrics(weather: WeatherData): RetailMetric[] {
+  const { current } = weather;
+  const nextHour = weather.hourly[0] ?? null;
+
+  if (!current.available && nextHour) {
+    return [
+      {
+        label: "Chuva",
+        value: formatValue(nextHour.precipitation, "%"),
+        detail: "na próxima hora",
+        icon: CloudRain,
+      },
+      {
+        label: "Vento",
+        value: formatValue(nextHour.windSpeed, " km/h"),
+        detail: "previsão horária",
+        icon: Wind,
+      },
+      {
+        label: "Rajada",
+        value: formatValue(nextHour.windGust, " km/h"),
+        detail: "máxima prevista",
+        icon: Gauge,
+      },
+    ];
+  }
+
+  return [
+    {
+      label: "Sensação",
+      value: formatValue(current.feelsLike, "°"),
+      detail: "percebida agora",
+      icon: Thermometer,
+    },
+    {
+      label: "Umidade",
+      value: formatValue(current.humidity, "%"),
+      detail: "medição local",
+      icon: Droplets,
+    },
+    {
+      label: "Vento",
+      value: formatValue(current.windSpeed, " km/h"),
+      detail: current.windDirection ?? "direção não informada",
+      icon: Wind,
+    },
+  ];
+}
+
+export function TodayRetailHero({
+  weather,
+  advisoryLevel,
+  officialAlertCount = 0,
+}: TodayRetailHeroProps) {
+  const { current } = weather;
+  const today = weather.daily[0] ?? null;
+  const nextHour = weather.hourly[0] ?? null;
+  const iconName = resolveHeroWeatherIcon(weather);
+  const condition = weatherConditionLabels[iconName];
+  const currentTemperature = current.available ? current.temperature : (nextHour?.temperature ?? null);
+  const metrics = buildCurrentMetrics(weather);
+  const sunrise = current.sunrise ?? weather.astronomy?.sunrise ?? null;
+  const sunset = current.sunset ?? weather.astronomy?.sunset ?? null;
+  const hasAlert = officialAlertCount > 0;
+
+  return (
+    <section
+      className={`today-retail-hero today-retail-hero--${advisoryLevel}`}
+      aria-labelledby="today-retail-hero-title"
+      data-official-alerts={hasAlert ? "true" : "false"}
+    >
+      <div className="today-retail-hero__inner">
+        <div className="today-retail-hero__copy">
+          <span className="today-retail-hero__eyebrow">
+            <i aria-hidden="true" /> Tempo hoje · Pelotas
+          </span>
+
+          <h1 id="today-retail-hero-title">
+            Seu dia em Pelotas, <span>organizado por horários.</span>
+          </h1>
+
+          <p>
+            {condition} agora. Consulte as melhores janelas, a chance de chuva e as rajadas antes de
+            definir a rotina.
+          </p>
+
+          <div className="today-retail-hero__badges" aria-label="Situação da previsão">
+            <span>{updateLabel(weather)}</span>
+            {hasAlert ? (
+              <Link className="is-alert" to="/alertas">
+                <ShieldAlert aria-hidden="true" /> {alertLabel(officialAlertCount)}
+              </Link>
+            ) : (
+              <span className="is-stable">Sem aviso oficial ativo para Pelotas</span>
+            )}
+          </div>
+
+          <div className="today-retail-hero__actions">
+            <a className="today-retail-hero__primary" href="#recursos-hoje">
+              Planejar próximas horas <ArrowRight aria-hidden="true" />
+            </a>
+            <a className="today-retail-hero__secondary" href="#previsao-hoje">
+              Ver previsão por hora
+            </a>
+          </div>
+        </div>
+
+        <div className="today-retail-hero__showcase">
+          <article className="today-retail-hero__current" aria-label="Condição atual em Pelotas">
+            <header>
+              <div>
+                <span>Pelotas, RS</span>
+                <small>{current.available ? "Observado agora" : "Próxima hora"}</small>
+              </div>
+              <b>
+                <i aria-hidden="true" /> {current.available ? "Agora" : "Previsão"}
+              </b>
+            </header>
+
+            <div className="today-retail-hero__current-main">
+              <div className="today-retail-hero__weather-icon">
+                <WeatherIcon name={iconName} title={`Condição em Pelotas: ${condition}`} />
+              </div>
+              <div>
+                <strong>{formatValue(currentTemperature, "°")}</strong>
+                <span>{condition}</span>
+              </div>
+            </div>
+
+            <div className="today-retail-hero__current-metrics">
+              {metrics.map((metric) => {
+                const Icon = metric.icon;
+                return (
+                  <div key={metric.label}>
+                    <Icon aria-hidden="true" />
+                    <span>
+                      <small>{metric.label}</small>
+                      <strong>{metric.value}</strong>
+                      <em>{metric.detail}</em>
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </article>
+
+          <div className="today-retail-hero__tiles" aria-label="Resumo do dia">
+            <article>
+              <span>
+                <Thermometer aria-hidden="true" /> Faixa do dia
+              </span>
+              <strong>{today ? `${today.min}° / ${today.max}°` : "Em atualização"}</strong>
+              <small>Mínima e máxima previstas</small>
+            </article>
+
+            <article className="is-rain">
+              <span>
+                <CloudRain aria-hidden="true" /> Chuva
+              </span>
+              <strong>{today?.rainChance === null || !today ? "—" : `${today.rainChance}%`}</strong>
+              <small>Maior chance prevista</small>
+            </article>
+
+            <article className="is-wind">
+              <span>
+                <Wind aria-hidden="true" /> Rajadas
+              </span>
+              <strong>{today?.windGust === null || !today ? "—" : `${today.windGust} km/h`}</strong>
+              <small>Máxima prevista hoje</small>
+            </article>
+
+            <article className="is-sun">
+              <span>
+                <SunMedium aria-hidden="true" /> Luz natural
+              </span>
+              <strong>{sunrise && sunset ? `${sunrise}–${sunset}` : "Em atualização"}</strong>
+              <small>Nascer e pôr do sol</small>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
