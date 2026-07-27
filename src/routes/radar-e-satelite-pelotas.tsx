@@ -1,15 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
+import { RadarForecastContext } from "@/components/redemet/RadarForecastContext";
 import { RedemetOverview } from "@/components/redemet/RedemetOverview";
 import { RADAR_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
 import { getRedemetOverview } from "@/lib/redemet/redemet.functions";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
+import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 const PAGE_TITLE = "Radar meteorológico e satélite em Pelotas";
 const PAGE_DESCRIPTION =
-  "Veja radar meteorológico, imagens de satélite e trovoadas na região de Pelotas, com sequência animada, horário de cada quadro e fontes da REDEMET/DECEA e do INMET.";
+  "Veja radar meteorológico, imagens de satélite e trovoadas na região de Pelotas, com sequência animada, horário de cada quadro, comparação com a previsão e fontes da REDEMET/DECEA e do INMET.";
 const PAGE_PATH = "/radar-e-satelite-pelotas";
 
 const RADAR_PAGE_CONTENT = {
@@ -17,13 +19,14 @@ const RADAR_PAGE_CONTENT = {
   eyebrow: "Entenda e compare as imagens",
   title: "Como usar radar, satélite e trovoadas para acompanhar o tempo em Pelotas",
   answer:
-    "Confira primeiro o horário de cada quadro e depois reproduza a sequência. O radar mostra ecos associados à precipitação; o satélite mostra cobertura e organização das nuvens; e a camada de trovoadas registra atividade elétrica detectada. Movimento nas imagens é observação do passado recente, não previsão do futuro.",
+    "Confira primeiro o horário de cada quadro e depois reproduza a sequência. O radar mostra ecos associados à precipitação; o satélite mostra cobertura e organização das nuvens; e a camada de trovoadas registra atividade elétrica detectada. A comparação horária usa uma previsão do modelo, enquanto o movimento nas imagens é observação do passado recente, não previsão do futuro.",
   facts: [
     "Reproduzir a sequência ajuda a perceber deslocamento e mudança, mas não garante que o mesmo movimento continuará.",
     "O radar oferece leitura regional e não confirma sozinho chuva em um endereço ou bairro específico.",
     "Nuvens no satélite não significam necessariamente precipitação no solo em Pelotas.",
     "Trovoada detectada é uma observação de atividade elétrica, não um aviso oficial de risco.",
     "Cada fonte tem horário próprio; compare produtos que representem períodos próximos.",
+    "Os valores meteorológicos exibidos junto ao radar pertencem à previsão mais próxima daquele horário e não são medidos pela imagem.",
   ],
   faqs: [
     {
@@ -51,6 +54,11 @@ const RADAR_PAGE_CONTENT = {
       answer:
         "Radar, satélite e trovoadas possuem produtos, rotinas e intervalos de atualização próprios. Por isso, compare o horário exibido em cada card e evite interpretar imagens de momentos muito diferentes como se fossem simultâneas.",
     },
+    {
+      question: "Os valores ao lado do radar foram medidos pela imagem?",
+      answer:
+        "Não. Temperatura, chance de chuva, vento, nuvens baixas e visibilidade vêm da hora válida mais próxima da grade de previsão. O quadro do radar continua sendo uma observação independente da REDEMET/DECEA.",
+    },
   ],
   relatedLinks: [
     {
@@ -66,7 +74,7 @@ const RADAR_PAGE_CONTENT = {
     {
       label: "Tempo hoje em Pelotas",
       href: "/tempo-hoje-pelotas" as const,
-      description: "Veja temperatura, chuva e vento previstos para as próximas horas.",
+      description: "Veja temperatura, chuva, vento, ponto de orvalho, nuvens e visibilidade.",
     },
   ],
 };
@@ -90,11 +98,18 @@ export const Route = createFileRoute("/radar-e-satelite-pelotas")({
           "REDEMET e INMET",
           "Horário das imagens meteorológicas",
           "Sequência de imagens de radar",
+          "Comparação entre radar e previsão horária",
         ],
       }),
       createFaqPageJsonLd(PAGE_PATH, RADAR_PAGE_CONTENT.faqs),
     ]),
-  loader: async () => getRedemetOverview(),
+  loader: async () => {
+    const [redemet, weather] = await Promise.all([
+      getRedemetOverview(),
+      getWeatherIntelligence(),
+    ]);
+    return { redemet, weather };
+  },
   staleTime: 60 * 1_000,
   component: RedemetPage,
 });
@@ -104,7 +119,8 @@ function RedemetPage() {
 
   return (
     <div className="radar-satellite-page">
-      <RedemetOverview data={data} />
+      <RedemetOverview data={data.redemet} />
+      <RadarForecastContext radar={data.redemet.radar} weather={data.weather} />
       <EditorialContentSection
         id="como-interpretar-radar-satelite"
         content={RADAR_PAGE_CONTENT}
