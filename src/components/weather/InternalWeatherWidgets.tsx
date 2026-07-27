@@ -45,6 +45,16 @@ function formatNumber(value: number | null | undefined, suffix = "") {
   }).format(value)}${suffix}`;
 }
 
+function formatWind(
+  speed: number | null | undefined,
+  direction: string | null | undefined,
+) {
+  const speedLabel = formatNumber(speed, " km/h");
+  return speed !== null && speed !== undefined && direction
+    ? `${speedLabel} · ${direction}`
+    : speedLabel;
+}
+
 function formatDateTime(value: string | null | undefined) {
   if (!value) return "horário não informado";
 
@@ -106,7 +116,7 @@ export function InternalForecastStory({
     <div
       className={`internal-forecast-widget${includeTrend ? " includes-trend" : " is-today-only"}`}
     >
-      <HomeForecastStory data={scopedData} />
+      <HomeForecastStory data={scopedData} context="today-page" />
     </div>
   );
 }
@@ -122,17 +132,17 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
   const metrics = current
     ? [
         {
-          label: "Umidade",
+          label: "Umidade do ar",
           value: formatNumber(current.humidity, "%"),
           source: sourceName(weather.currentProvenance.humidity, forecastProvider),
         },
         {
-          label: "Vento agora",
-          value: formatNumber(current.windSpeed, " km/h"),
+          label: "Vento observado",
+          value: formatWind(current.windSpeed, current.windDirection),
           source: sourceName(weather.currentProvenance.windSpeed, forecastProvider),
         },
         {
-          label: "Pressão",
+          label: "Pressão atmosférica",
           value: formatNumber(current.pressure, " hPa"),
           source: sourceName(weather.currentProvenance.pressure, forecastProvider),
         },
@@ -152,11 +162,11 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
       aria-labelledby="internal-observation-title"
     >
       <div className="home-observation-story__intro">
-        <span className="eyebrow">Medição local</span>
-        <h2 id="internal-observation-title">Medição local mais recente</h2>
-        <p>Leitura em Pelotas com a origem identificada em cada indicador.</p>
+        <span className="eyebrow">Condição atual</span>
+        <h2 id="internal-observation-title">O que a estação observa agora em Pelotas</h2>
+        <p>Temperatura, umidade, vento e pressão com a origem identificada em cada valor.</p>
         <Link to="/estacao-embrapa-pelotas">
-          Ver detalhes da estação <span aria-hidden="true">→</span>
+          Abrir dados completos da estação <span aria-hidden="true">→</span>
         </Link>
       </div>
 
@@ -166,22 +176,22 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
             <small className="internal-observation-status">
               {observed ? (
                 <>
-                  <CheckCircle2 aria-hidden="true" /> Observação Embrapa
+                  <CheckCircle2 aria-hidden="true" /> Dados observados pela Embrapa
                 </>
               ) : (
                 <>
-                  <Info aria-hidden="true" /> Atual complementada por modelo
+                  <Info aria-hidden="true" /> Valor atual estimado pelo modelo
                 </>
               )}
             </small>
             <strong>{formatNumber(current.temperature)}°</strong>
             <span>
               {current.feelsLike === null || current.feelsLike === undefined
-                ? "Sensação não informada"
-                : `Sensação de ${formatNumber(current.feelsLike)} °C`}
+                ? "Sensação térmica não informada"
+                : `Sensação térmica de ${formatNumber(current.feelsLike)}°`}
             </span>
             <small className="internal-observation-updated">
-              Atualizado em {formatDateTime(current.observedAt ?? weather.source.fetchedAt)}
+              Leitura atualizada em {formatDateTime(current.observedAt ?? weather.source.fetchedAt)}
             </small>
           </div>
 
@@ -200,8 +210,8 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
       ) : (
         <div className="home-observation-story__unavailable internal-observation-unavailable">
           <RefreshCw aria-hidden="true" />
-          <strong>Leitura local temporariamente indisponível</strong>
-          <span>A previsão por modelo continua ativa e separada da observação.</span>
+          <strong>Medição local indisponível agora</strong>
+          <span>A previsão continua disponível e identificada separadamente.</span>
         </div>
       )}
     </section>
@@ -213,11 +223,6 @@ export function InternalPracticalSummary({
   title,
   footer,
 }: InternalPracticalSummaryProps) {
-  const summaryOrigin =
-    data.intelligence.origin === "gemini"
-      ? `Síntese assistida por ${data.intelligence.model ?? "Gemini"}`
-      : "Síntese por regras do portal";
-
   return (
     <section
       className="internal-practical-widget"
@@ -225,16 +230,16 @@ export function InternalPracticalSummary({
       aria-labelledby="internal-practical-title"
     >
       <div className="internal-practical-widget__intro">
-        <span className="eyebrow">Leitura prática</span>
+        <span className="eyebrow">Para organizar a rotina</span>
         <h2 id="internal-practical-title">{title}</h2>
         <p>{data.brief.summary}</p>
-        <small>{summaryOrigin}. Dados vinculados às fontes meteorológicas.</small>
+        <small>Resumo do Tempo Pelotas com base nas fontes identificadas nesta página.</small>
       </div>
 
       <div className="internal-practical-widget__cards">
         <article>
           <span>
-            <CheckCircle2 aria-hidden="true" /> Para a rotina
+            <CheckCircle2 aria-hidden="true" /> Condições favoráveis
           </span>
           {data.brief.highlights.length ? (
             <ul>
@@ -243,13 +248,13 @@ export function InternalPracticalSummary({
               ))}
             </ul>
           ) : (
-            <p>Sem outros destaques para o período.</p>
+            <p>Nenhuma condição favorável adicional foi destacada.</p>
           )}
         </article>
 
         <article className="is-caution">
           <span>
-            <TriangleAlert aria-hidden="true" /> Pontos de atenção
+            <TriangleAlert aria-hidden="true" /> O que exige atenção
           </span>
           {data.brief.cautions.length ? (
             <ul>
@@ -258,7 +263,7 @@ export function InternalPracticalSummary({
               ))}
             </ul>
           ) : (
-            <p>Sem atenção adicional indicada pelas fontes.</p>
+            <p>Nenhum ponto adicional de atenção foi indicado.</p>
           )}
         </article>
       </div>
@@ -274,8 +279,8 @@ export function InternalNextStep() {
   return (
     <Link className="internal-next-step" to="/tempo-amanha-pelotas">
       <span>
-        <small>Próxima leitura</small>
-        <strong>Como fica o tempo amanhã</strong>
+        <small>Planeje o próximo dia</small>
+        <strong>Ver previsão para amanhã</strong>
       </span>
       <ArrowRight aria-hidden="true" />
     </Link>
