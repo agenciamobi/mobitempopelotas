@@ -20,6 +20,7 @@ export const PUBLIC_ROUTES: PublicRouteEntry[] = [
   { path: "/situacao-hidrologica-pelotas", changeFrequency: "hourly", priority: 0.8 },
   { path: "/nivel-da-lagoa-dos-patos-laranjal", changeFrequency: "hourly", priority: 0.8 },
   { path: "/estacao-embrapa-pelotas", changeFrequency: "hourly", priority: 0.7 },
+  { path: "/clima-em-pelotas", changeFrequency: "daily", priority: 0.78 },
   { path: "/historico-climatico-pelotas", changeFrequency: "daily", priority: 0.7 },
   { path: "/cameras-ao-vivo-pelotas", changeFrequency: "hourly", priority: 0.7 },
   { path: "/tempo-na-regiao-sul-rs", changeFrequency: "daily", priority: 0.85 },
