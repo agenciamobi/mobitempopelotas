@@ -29,7 +29,7 @@ type RainRetailHeroProps = {
 type RetailMetric = {
   label: string;
   value: string;
-  detail: string;
+  detail?: string;
   icon: LucideIcon;
 };
 
@@ -42,7 +42,21 @@ function formatChance(value: number | null | undefined) {
 }
 
 function formatMillimeters(value: number | null | undefined) {
-  return value === null || value === undefined ? "—" : `${value.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} mm`;
+  return value === null || value === undefined
+    ? "—"
+    : `${value.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} mm`;
+}
+
+function timeReference(value: string | null | undefined) {
+  if (!value) return "Horário em atualização";
+  const normalized = value.trim().toLocaleLowerCase("pt-BR");
+  if (normalized === "agora") return "Agora";
+  if (normalized === "próxima hora") return "Na próxima hora";
+  return `Por volta de ${value}`;
+}
+
+function alertLabel(count: number) {
+  return count === 1 ? "1 aviso oficial" : `${count} avisos oficiais`;
 }
 
 function choosePhotoIcon(weather: WeatherData): WeatherIconName {
@@ -76,8 +90,8 @@ export function RainRetailHero({
       !selected || (hour.precipitation ?? -1) > (selected.precipitation ?? -1) ? hour : selected,
     null,
   );
-  const rainiestDay = days.reduce<DailyForecast | null>(
-    (selected, day) => (!selected || rainScore(day) > rainScore(selected) ? day : selected),
+  const highestVolumeDay = days.reduce<DailyForecast | null>(
+    (selected, day) => (!selected || day.precipitation > selected.precipitation ? day : selected),
     null,
   );
   const wetHours = hours.filter((hour) => (hour.precipitation ?? 0) >= 30).length;
@@ -95,21 +109,18 @@ export function RainRetailHero({
   const hasAlert = officialAlertCount > 0;
   const metrics: RetailMetric[] = [
     {
-      label: "Volume hoje",
+      label: "Volume previsto hoje",
       value: formatMillimeters(today?.precipitation),
-      detail: "estimativa diária",
       icon: Droplets,
     },
     {
-      label: "Acumulado 7 dias",
+      label: "Total previsto em 7 dias",
       value: formatMillimeters(totalRain),
-      detail: "soma do modelo",
       icon: Gauge,
     },
     {
-      label: "Horas com sinal",
+      label: "Horários com 30% ou mais",
       value: `${wetHours} de ${hours.length || 0}`,
-      detail: "chance a partir de 30%",
       icon: Umbrella,
     },
   ];
@@ -128,33 +139,34 @@ export function RainRetailHero({
           </span>
 
           <h1 id="rain-retail-hero-title">
-            A chuva em Pelotas, <span>organizada por horário.</span>
+            Chuva em Pelotas: <span>chance por horário e volume previsto.</span>
           </h1>
 
           <p>
-            Veja quando a probabilidade aumenta, quanto pode acumular e quais períodos merecem nova
-            consulta antes de sair.
+            Veja a chance de chuva nas próximas 12 horas, o volume estimado para hoje e os dias com
+            maior possibilidade de precipitação.
           </p>
 
           <div className="today-retail-hero__badges" aria-label="Situação da previsão de chuva">
             <span>
-              <CloudRain aria-hidden="true" /> {wetHours} horários com chance a partir de 30%
+              <CloudRain aria-hidden="true" /> {wetHours}{" "}
+              {wetHours === 1 ? "horário com 30% ou mais" : "horários com 30% ou mais"}
             </span>
             {hasAlert ? (
               <Link className="is-alert" to="/alertas">
-                <ShieldAlert aria-hidden="true" /> {officialAlertCount} aviso(s) oficial(is)
+                <ShieldAlert aria-hidden="true" /> {alertLabel(officialAlertCount)}
               </Link>
             ) : (
-              <span className="is-stable">Sem aviso oficial listado para Pelotas</span>
+              <span className="is-stable">Sem aviso oficial de chuva listado para Pelotas</span>
             )}
           </div>
 
           <div className="today-retail-hero__actions">
             <a className="today-retail-hero__primary" href="#chuva-por-hora">
-              Ver chuva por horário <ArrowRight aria-hidden="true" />
+              Ver chance por horário <ArrowRight aria-hidden="true" />
             </a>
             <a className="today-retail-hero__secondary" href="#chuva-na-semana">
-              Comparar os próximos dias
+              Ver chuva nos próximos 7 dias
             </a>
           </div>
         </div>
@@ -171,7 +183,7 @@ export function RainRetailHero({
               <header>
                 <div>
                   <span>Pelotas, RS</span>
-                  <small>Próximas 12 horas</small>
+                  <small>Previsão para as próximas 12 horas</small>
                 </div>
                 <b>
                   <i aria-hidden="true" /> Chuva
@@ -180,12 +192,12 @@ export function RainRetailHero({
 
               <div className="today-retail-hero__current-main">
                 <div className="today-retail-hero__weather-icon">
-                  <WeatherIcon name={iconName} title="Cenário de chuva de maior destaque" />
+                  <WeatherIcon name={iconName} title="Condição associada à maior chance de chuva" />
                 </div>
                 <div>
                   <strong>{formatChance(peakHour?.precipitation)}</strong>
-                  <span>maior chance nas próximas horas</span>
-                  <small>{peakHour ? `por volta de ${peakHour.time}` : "horários em atualização"}</small>
+                  <span>Maior chance nas próximas 12 horas</span>
+                  <small>{timeReference(peakHour?.time)}</small>
                 </div>
               </div>
 
@@ -198,7 +210,7 @@ export function RainRetailHero({
                       <span>
                         <small>{metric.label}</small>
                         <strong>{metric.value}</strong>
-                        <em>{metric.detail}</em>
+                        {metric.detail ? <em>{metric.detail}</em> : null}
                       </span>
                     </div>
                   );
@@ -218,24 +230,24 @@ export function RainRetailHero({
 
           <div className="today-retail-hero__tiles rain-retail-hero__tiles" aria-label="Destaques da chuva">
             <article className="is-rain">
-              <span><CloudRain aria-hidden="true" /> Próxima maior chance</span>
+              <span><CloudRain aria-hidden="true" /> Horário com maior chance</span>
               <strong>{formatChance(peakHour?.precipitation)}</strong>
-              <small>{peakHour?.time ?? "Em atualização"}</small>
+              <small>{timeReference(peakHour?.time)}</small>
             </article>
             <article>
-              <span><Umbrella aria-hidden="true" /> Dia mais chuvoso</span>
-              <strong>{rainiestDay?.weekday ?? "—"}</strong>
-              <small>{formatMillimeters(rainiestDay?.precipitation)}</small>
+              <span><Umbrella aria-hidden="true" /> Dia com maior volume</span>
+              <strong>{highestVolumeDay?.weekday ?? "—"}</strong>
+              <small>{formatMillimeters(highestVolumeDay?.precipitation)}</small>
             </article>
             <article className="is-wind">
-              <span><Wind aria-hidden="true" /> Rajada com chuva</span>
+              <span><Wind aria-hidden="true" /> Rajada em período com chuva</span>
               <strong>{strongestWetGust === null ? "—" : `${strongestWetGust} km/h`}</strong>
-              <small>maior valor na janela úmida</small>
+              <small>Maior valor entre os horários com 30% ou mais</small>
             </article>
             <article className="is-sun">
-              <span><Gauge aria-hidden="true" /> Fonte principal</span>
+              <span><Gauge aria-hidden="true" /> Fonte da previsão</span>
               <strong>{weather.source.forecastName ?? weather.source.name}</strong>
-              <small>probabilidade e volume previstos</small>
+              <small>Chance e volume previstos pelo modelo</small>
             </article>
           </div>
         </div>
