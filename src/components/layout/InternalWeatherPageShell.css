@@ -28,7 +28,8 @@
 
 /* Heroes retail compartilham o mesmo eixo do masthead e das seções abaixo. */
 .internal-weather-shell--today .today-retail-hero__inner,
-.internal-weather-shell--tomorrow .tomorrow-retail-hero__inner {
+.internal-weather-shell--tomorrow .tomorrow-retail-hero__inner,
+.internal-weather-shell--seven-day .seven-day-retail-hero__inner {
   width: 100%;
   max-width: var(--internal-weather-frame-max);
   margin-inline: auto;
@@ -55,18 +56,23 @@
 .internal-weather-main > .home-inmet-alerts,
 .internal-weather-main > .today-v5-page,
 .internal-weather-main > .tomorrow-v3-page,
+.internal-weather-main > .seven-day-v2-page,
 .internal-weather-main > .editorial-answer-section {
   margin-inline: 0;
 }
 
-/* Cada seção de /tempo-hoje-pelotas ocupa integralmente o rail do header. */
+/* Cada página retail ocupa integralmente o rail do header. */
 .internal-weather-shell--today .today-v5-page,
 .internal-weather-shell--today .today-v5-page > *,
 .internal-weather-shell--today .home-inmet-alerts,
 .internal-weather-shell--today .editorial-answer-section,
 .internal-weather-shell--tomorrow .tomorrow-v3-page,
 .internal-weather-shell--tomorrow .tomorrow-v3-page > *,
-.internal-weather-shell--tomorrow .home-inmet-alerts {
+.internal-weather-shell--tomorrow .home-inmet-alerts,
+.internal-weather-shell--seven-day .seven-day-v2-page,
+.internal-weather-shell--seven-day .seven-day-v2-page > *,
+.internal-weather-shell--seven-day .home-inmet-alerts,
+.internal-weather-shell--seven-day .editorial-answer-section {
   width: 100%;
   max-width: none;
   justify-self: stretch;
