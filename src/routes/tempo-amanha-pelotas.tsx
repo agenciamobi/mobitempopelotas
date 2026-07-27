@@ -9,7 +9,7 @@ import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.funct
 
 const PAGE_TITLE = "Previsão do tempo para amanhã em Pelotas";
 const PAGE_DESCRIPTION =
-  "Planeje amanhã em Pelotas com mínima, máxima, chuva, rajadas, comparação com hoje e contexto do INMET e CPPMet/UFPel.";
+  "Veja o tempo amanhã em Pelotas com mínima, máxima, chance e volume de chuva, rajadas, comparação com hoje e previsões do INMET e CPPMet/UFPel.";
 const PAGE_PATH = "/tempo-amanha-pelotas";
 
 export const Route = createFileRoute("/tempo-amanha-pelotas")({
