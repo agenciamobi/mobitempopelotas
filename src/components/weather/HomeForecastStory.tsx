@@ -12,9 +12,9 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
+import { HourlyRainVolume } from "@/components/weather/HourlyRainVolume";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import type { WeatherIconName } from "@/lib/weather/types";
-import { HourlyRainVolume } from "@/components/weather/HourlyRainVolume";
 
 import "./HomeForecastStory.css";
 
@@ -30,6 +30,11 @@ const iconMap: Record<WeatherIconName, LucideIcon> = {
 };
 
 type RainLevel = "none" | "low" | "moderate" | "high" | "very-high";
+
+type HomeForecastStoryProps = {
+  data: WeatherIntelligenceData;
+  context?: "home" | "today-page";
+};
 
 function ForecastIcon({ name, size = 25 }: { name: WeatherIconName; size?: number }) {
   const Icon = iconMap[name];
@@ -48,6 +53,14 @@ function rainReading(value: number | null) {
 
 function formatNumber(value: number, maximumFractionDigits = 1) {
   return new Intl.NumberFormat("pt-BR", { maximumFractionDigits }).format(value);
+}
+
+function timeReference(value: string | null | undefined) {
+  if (!value) return "horário não informado";
+  const normalized = value.trim().toLocaleLowerCase("pt-BR");
+  if (normalized === "agora") return "agora";
+  if (normalized === "próxima hora") return "na próxima hora";
+  return `por volta de ${value}`;
 }
 
 function tomorrowHeadline(chance: number | null) {
@@ -72,8 +85,9 @@ function tomorrowDescription(
   return `${rainText}, com ${windText}.`;
 }
 
-export function HomeForecastStory({ data }: { data: WeatherIntelligenceData }) {
+export function HomeForecastStory({ data, context = "home" }: HomeForecastStoryProps) {
   const { hourly, daily, current } = data.weather;
+  const isTodayPage = context === "today-page";
   const visibleHours = hourly.slice(0, 7);
   const today = daily[0];
   const tomorrow = daily[1];
@@ -102,25 +116,31 @@ export function HomeForecastStory({ data }: { data: WeatherIntelligenceData }) {
     >
       <header className="home-forecast-heading">
         <div>
-          <span className="home-forecast-eyebrow">Previsão hora a hora</span>
-          <h2 id="home-forecast-title">Veja como o tempo deve mudar ao longo do dia</h2>
+          <span className="home-forecast-eyebrow">
+            {isTodayPage ? "Previsão por hora em Pelotas" : "Previsão hora a hora"}
+          </span>
+          <h2 id="home-forecast-title">
+            {isTodayPage
+              ? "Temperatura, chuva e vento nas próximas horas"
+              : "Veja como o tempo deve mudar ao longo do dia"}
+          </h2>
         </div>
 
         <dl className="home-forecast-facts" aria-label="Resumo da previsão de hoje">
           <div>
-            <dt>Temperatura máxima</dt>
+            <dt>{isTodayPage ? "Máxima prevista" : "Temperatura máxima"}</dt>
             <dd>{today.max}°</dd>
           </div>
           <div>
-            <dt>Temperatura mínima</dt>
+            <dt>{isTodayPage ? "Mínima prevista" : "Temperatura mínima"}</dt>
             <dd>{today.min}°</dd>
           </div>
           <div>
-            <dt>Chance de chuva</dt>
+            <dt>{isTodayPage ? "Maior chance de chuva" : "Chance de chuva"}</dt>
             <dd>{today.rainChance === null ? "—" : `${today.rainChance}%`}</dd>
           </div>
           <div>
-            <dt>Vento mais forte</dt>
+            <dt>{isTodayPage ? "Rajada máxima" : "Vento mais forte"}</dt>
             <dd>{today.windGust === null ? "—" : `${today.windGust} km/h`}</dd>
           </div>
         </dl>
@@ -130,7 +150,7 @@ export function HomeForecastStory({ data }: { data: WeatherIntelligenceData }) {
         <>
           <div className="home-forecast-window" aria-label="Resumo das próximas horas">
             <div>
-              <small>Janela exibida</small>
+              <small>{isTodayPage ? "Período mostrado" : "Janela exibida"}</small>
               <strong>{visibleHours.length} horários</strong>
               <span>{forecastWindow}</span>
             </div>
@@ -139,10 +159,10 @@ export function HomeForecastStory({ data }: { data: WeatherIntelligenceData }) {
             >
               <small>Maior chance de chuva</small>
               <strong>{rainReading(peakHour?.precipitationProbability ?? null).chance}%</strong>
-              <span>{peakHour ? `por volta de ${peakHour.time}` : "sem horário disponível"}</span>
+              <span>{timeReference(peakHour?.time)}</span>
             </div>
             <div>
-              <small>Rajada mais forte</small>
+              <small>{isTodayPage ? "Rajada máxima" : "Rajada mais forte"}</small>
               <strong>{strongestHourlyGust} km/h</strong>
               <span>nas próximas horas</span>
             </div>
@@ -161,7 +181,11 @@ export function HomeForecastStory({ data }: { data: WeatherIntelligenceData }) {
                 >
                   <div className="home-hourly-topline">
                     <span>{hour.time}</span>
-                    {index === 0 ? <b>Agora</b> : isPeak ? <b>Maior chance</b> : null}
+                    {index === 0 ? (
+                      <b>{isTodayPage ? "Próxima hora" : "Agora"}</b>
+                    ) : isPeak ? (
+                      <b>Maior chance</b>
+                    ) : null}
                   </div>
                   <div className="home-hourly-weather">
                     <ForecastIcon name={hour.icon} />
@@ -169,7 +193,7 @@ export function HomeForecastStory({ data }: { data: WeatherIntelligenceData }) {
                   </div>
                   <div className="home-hourly-rain">
                     <div>
-                      <span>Chuva</span>
+                      <span>{isTodayPage ? "Chance de chuva" : "Chuva"}</span>
                       <strong>{rain.chance}%</strong>
                     </div>
                     <i aria-hidden="true">
