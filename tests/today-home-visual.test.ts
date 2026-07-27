@@ -34,6 +34,10 @@ const headerFrameStyles = readFileSync(
   "src/production/styles/header-hero-fullwidth-v32.css",
   "utf8",
 );
+const homeForecastStory = readFileSync(
+  "src/components/weather/HomeForecastStory.tsx",
+  "utf8",
+);
 const todayResources = readFileSync("src/components/weather/TodayWeatherResources.tsx", "utf8");
 const todayResourceStyles = readFileSync(
   "src/components/weather/TodayWeatherResources.css",
@@ -192,13 +196,33 @@ test("the internal today page no longer renders another hero", () => {
   assert.match(todayComponent, /InternalPracticalSummary/);
 });
 
+test("today section navigation uses visitor-focused labels", () => {
+  assert.match(todayComponent, /Próximas horas/);
+  assert.match(todayComponent, /Melhor período/);
+  assert.match(todayComponent, /Condição atual/);
+  assert.match(todayComponent, /Para sua rotina/);
+  assert.match(todayComponent, /Entenda os dados/);
+  assert.doesNotMatch(todayComponent, /Valores e origem/);
+  assert.doesNotMatch(todayComponent, /Metodologia e FAQ/);
+});
+
+test("the internal hourly story uses page-specific useful copy", () => {
+  assert.match(internalWidgets, /context="today-page"/);
+  assert.match(homeForecastStory, /context\?: "home" \| "today-page"/);
+  assert.match(homeForecastStory, /Previsão por hora em Pelotas/);
+  assert.match(homeForecastStory, /Temperatura, chuva e vento nas próximas horas/);
+  assert.match(homeForecastStory, /timeReference/);
+  assert.match(homeForecastStory, /Próxima hora/);
+  assert.doesNotMatch(homeForecastStory, /por volta de \$\{peakHour\.time\}/);
+});
+
 test("forecast and observation widgets are derived from homepage components", () => {
   assert.match(internalWidgets, /HomeForecastStory/);
   assert.match(internalWidgets, /daily:\s*data\.weather\.daily\.slice\(0, 1\)/);
   assert.match(internalWidgets, /home-observation-story internal-observation-widget/);
   assert.match(internalWidgets, /home-observation-story__reading/);
   assert.match(internalWidgets, /home-observation-temperature/);
-  assert.match(internalWidgets, /Ver detalhes da estação/);
+  assert.match(internalWidgets, /Abrir dados completos da estação/);
 });
 
 test("today content is concise and keeps measurement provenance explicit", () => {
@@ -208,10 +232,12 @@ test("today content is concise and keeps measurement provenance explicit", () =>
   assert.match(internalWidgets, /currentProvenance\.sunset/);
   assert.match(internalWidgets, /highlights\.slice\(0, 2\)/);
   assert.match(internalWidgets, /cautions\.slice\(0, 2\)/);
-  assert.match(internalWidgets, /Observação Embrapa/);
-  assert.match(internalWidgets, /Atual complementada por modelo/);
-  assert.match(internalWidgets, /Para a rotina/);
-  assert.match(internalWidgets, /Pontos de atenção/);
+  assert.match(internalWidgets, /Dados observados pela Embrapa/);
+  assert.match(internalWidgets, /Valor atual estimado pelo modelo/);
+  assert.match(internalWidgets, /formatWind\(current\.windSpeed, current\.windDirection\)/);
+  assert.match(internalWidgets, /Condições favoráveis/);
+  assert.match(internalWidgets, /O que exige atenção/);
+  assert.doesNotMatch(internalWidgets, /Síntese assistida por/);
 });
 
 test("today planning resources derive decisions from the next 12 forecast hours", () => {
@@ -221,9 +247,10 @@ test("today planning resources derive decisions from the next 12 forecast hours"
   assert.match(todayResources, /precipitationProbability/);
   assert.match(todayResources, /hour\.windGust \?\? hour\.windSpeed/);
   assert.match(todayResources, /periodScore/);
-  assert.match(todayResources, /Melhor janela estimada/);
-  assert.match(todayResources, /Maior atenção/);
-  assert.match(todayResources, /Luz natural/);
+  assert.match(todayResources, /Período mais favorável/);
+  assert.match(todayResources, /Horário de maior atenção/);
+  assert.match(todayResources, /Luz do dia/);
+  assert.match(todayResources, /Qual é o melhor período para sair hoje/);
 });
 
 test("today resources link to specialized rain wind radar and alert pages", () => {
@@ -231,8 +258,19 @@ test("today resources link to specialized rain wind radar and alert pages", () =
   assert.match(todayResources, /to: "\/vento-em-pelotas"/);
   assert.match(todayResources, /to: "\/radar-e-satelite-pelotas"/);
   assert.match(todayResources, /to: "\/alertas"/);
-  assert.match(todayResources, /Recursos meteorológicos relacionados/);
-  assert.match(todayResources, /não substituem avisos oficiais/);
+  assert.match(todayResources, /Chuva por horário/);
+  assert.match(todayResources, /Vento e rajadas/);
+  assert.match(todayResources, /Avisos do INMET/);
+  assert.match(todayResources, /Use os períodos como orientação/);
+});
+
+test("today editorial answer explicitly separates observation and forecast", () => {
+  assert.match(todayRoute, /TODAY_PAGE_CONTENT/);
+  assert.match(todayRoute, /O que foi medido e o que é previsão nesta página/);
+  assert.match(todayRoute, /A temperatura mostrada agora foi medida/);
+  assert.match(todayRoute, /Chance de chuva e volume previsto são a mesma coisa/);
+  assert.match(todayRoute, /Avisos oficiais do INMET/);
+  assert.match(todayRoute, /createFaqPageJsonLd\(PAGE_PATH, TODAY_PAGE_CONTENT\.faqs\)/);
 });
 
 test("reusable widgets preserve the homepage card language on desktop and mobile", () => {
