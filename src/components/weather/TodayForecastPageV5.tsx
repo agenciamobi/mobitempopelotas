@@ -29,7 +29,9 @@ function strongestWind(data: WeatherIntelligenceData) {
 function highestRainChance(data: WeatherIntelligenceData) {
   return data.weather.hourly.slice(1, 12).reduce<number | null>((value, hour) => {
     if (hour.precipitationProbability === null) return value;
-    return value === null ? hour.precipitationProbability : Math.max(value, hour.precipitationProbability);
+    return value === null
+      ? hour.precipitationProbability
+      : Math.max(value, hour.precipitationProbability);
   }, null);
 }
 
@@ -38,7 +40,10 @@ function buildReadingTitle(data: WeatherIntelligenceData) {
   const rainChance = highestRainChance(data) ?? today?.rainChance ?? null;
   const wind = strongestWind(data);
   const hasActiveAlert = data.weather.alerts.some(
-    (alert) => alert.period === "active" && alert.relevance === "pelotas" && alert.severity !== "unknown",
+    (alert) =>
+      alert.period === "active" &&
+      alert.relevance === "pelotas" &&
+      alert.severity !== "unknown",
   );
 
   if (hasActiveAlert) return "Aviso oficial pede atenção durante o restante do dia";
