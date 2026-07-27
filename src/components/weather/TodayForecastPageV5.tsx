@@ -13,6 +13,7 @@ import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence
 import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-browser-recovery";
 
 import "./TodayForecastPageV5.css";
+import "./TodayTypographyRefinement.css";
 
 const chapters = [
   { href: "#previsao-hoje", label: "Hoje", detail: "Evolução por hora" },
