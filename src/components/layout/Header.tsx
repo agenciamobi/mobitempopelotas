@@ -26,6 +26,7 @@ const megaMenus = [
       "/historico-climatico-pelotas",
       "/cameras-ao-vivo-pelotas",
       "/radar-e-satelite-pelotas",
+      "/meteograma-pelotas",
       "/mapa-de-geadas-rio-grande-do-sul",
       "/metodologia",
     ],
@@ -48,6 +49,7 @@ const megaMenus = [
       {
         title: "Contexto e transparência",
         links: [
+          { label: "Meteograma 24–48h", to: "/meteograma-pelotas", description: "Temperatura, chuva, nuvens, visibilidade, pressão e vento hora a hora." },
           { label: "Histórico climático", to: "/historico-climatico-pelotas", description: "Compare temperatura, chuva e vento recentes." },
           { label: "Fontes e metodologia", to: "/metodologia", description: "Origem, função, limites e atualização dos dados." },
         ],
