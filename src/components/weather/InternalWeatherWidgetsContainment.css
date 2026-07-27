@@ -1,5 +1,5 @@
 /* Keep homepage-derived widgets inside the internal editorial rail. */
-.site-shell--home-editorial .internal-observation-widget {
+.site-shell--home-editorial .home-editorial-main .internal-observation-widget {
   width: 100% !important;
   max-width: none !important;
   margin: 0 !important;
@@ -9,13 +9,14 @@
   transform: none !important;
 }
 
-.site-shell--home-editorial .internal-observation-widget::before {
+.site-shell--home-editorial .home-editorial-main .internal-observation-widget::before {
   inset: 0 0 auto !important;
   width: auto !important;
   height: 2px !important;
 }
 
 .site-shell--home-editorial
+  .home-editorial-main
   .internal-observation-widget
   .home-observation-story__reading
   dd {
@@ -24,6 +25,7 @@
 }
 
 .site-shell--home-editorial
+  .home-editorial-main
   .internal-observation-widget
   .home-observation-story__reading
   dd
@@ -35,6 +37,7 @@
 }
 
 .site-shell--home-editorial
+  .home-editorial-main
   .internal-observation-widget
   .home-observation-story__reading
   dd
@@ -46,10 +49,12 @@
 }
 
 .site-shell--home-editorial
+  .home-editorial-main
   .internal-observation-widget
   .home-observation-temperature
   .internal-observation-status::before,
 .site-shell--home-editorial
+  .home-editorial-main
   .internal-observation-widget
   .home-observation-temperature
   .internal-observation-updated::before {
@@ -58,6 +63,7 @@
 }
 
 .site-shell--home-editorial
+  .home-editorial-main
   .internal-observation-widget
   .home-observation-temperature
   .internal-observation-status {
@@ -65,6 +71,7 @@
 }
 
 .site-shell--home-editorial
+  .home-editorial-main
   .internal-observation-widget
   .home-observation-temperature
   .internal-observation-updated {
@@ -83,35 +90,42 @@
   line-height: 1.4;
 }
 
-.site-shell--home-editorial .internal-observation-widget .internal-observation-unavailable {
+.site-shell--home-editorial
+  .home-editorial-main
+  .internal-observation-widget
+  .internal-observation-unavailable {
   min-height: 13rem;
 }
 
 @media (max-width: 980px) {
-  .site-shell--home-editorial .internal-observation-widget {
+  .site-shell--home-editorial .home-editorial-main .internal-observation-widget {
     grid-template-columns: minmax(0, 1fr) !important;
     gap: 2rem !important;
   }
 
-  .site-shell--home-editorial .internal-observation-widget .home-observation-story__intro {
+  .site-shell--home-editorial
+    .home-editorial-main
+    .internal-observation-widget
+    .home-observation-story__intro {
     max-width: 46rem;
   }
 }
 
 @media (max-width: 700px) {
-  .site-shell--home-editorial .internal-observation-widget {
+  .site-shell--home-editorial .home-editorial-main .internal-observation-widget {
     gap: 1.5rem !important;
     padding: 1.5rem !important;
   }
 }
 
 @media (max-width: 520px) {
-  .site-shell--home-editorial .internal-observation-widget {
+  .site-shell--home-editorial .home-editorial-main .internal-observation-widget {
     padding: 1rem !important;
     border-radius: 1rem !important;
   }
 
   .site-shell--home-editorial
+    .home-editorial-main
     .internal-observation-widget
     .home-observation-story__reading
     dl {
@@ -119,6 +133,7 @@
   }
 
   .site-shell--home-editorial
+    .home-editorial-main
     .internal-observation-widget
     .home-observation-story__reading
     dl
@@ -128,6 +143,7 @@
   }
 
   .site-shell--home-editorial
+    .home-editorial-main
     .internal-observation-widget
     .home-observation-story__reading
     dl
