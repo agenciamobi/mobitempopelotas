@@ -10,6 +10,10 @@ const internalWidgetStyles = readFileSync(
   "src/components/weather/InternalWeatherWidgets.css",
   "utf8",
 );
+const internalWidgetRefinement = readFileSync(
+  "src/components/weather/InternalWeatherWidgetsRefinement.css",
+  "utf8",
+);
 const siteLayout = readFileSync("src/components/layout/SiteLayout.tsx", "utf8");
 
 test("today forecast reuses the complete homepage shell and official alert widget", () => {
@@ -46,7 +50,7 @@ test("forecast and observation widgets are derived from homepage components", ()
   assert.match(internalWidgets, /home-observation-story internal-observation-widget/);
   assert.match(internalWidgets, /home-observation-story__reading/);
   assert.match(internalWidgets, /home-observation-temperature/);
-  assert.match(internalWidgets, /Abrir estação Embrapa/);
+  assert.match(internalWidgets, /Ver detalhes da estação/);
 });
 
 test("today content is concise and keeps measurement provenance explicit", () => {
@@ -54,10 +58,12 @@ test("today content is concise and keeps measurement provenance explicit", () =>
   assert.match(internalWidgets, /currentProvenance\.windSpeed/);
   assert.match(internalWidgets, /currentProvenance\.pressure/);
   assert.match(internalWidgets, /currentProvenance\.sunset/);
-  assert.match(internalWidgets, /highlights\.slice\(0, 3\)/);
-  assert.match(internalWidgets, /cautions\.slice\(0, 3\)/);
-  assert.match(internalWidgets, /Observação local operacional/);
-  assert.match(internalWidgets, /Condição atual complementada por modelo/);
+  assert.match(internalWidgets, /highlights\.slice\(0, 2\)/);
+  assert.match(internalWidgets, /cautions\.slice\(0, 2\)/);
+  assert.match(internalWidgets, /Observação Embrapa/);
+  assert.match(internalWidgets, /Atual complementada por modelo/);
+  assert.match(internalWidgets, /Para a rotina/);
+  assert.match(internalWidgets, /Pontos de atenção/);
 });
 
 test("today sections use one homepage width rail without a nested inset", () => {
@@ -82,4 +88,16 @@ test("reusable widgets preserve the homepage card language on desktop and mobile
   assert.match(internalWidgetStyles, /@media \(max-width: 520px\)/);
   assert.match(internalWidgetStyles, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(internalWidgetStyles, /@media \(forced-colors: active\)/);
+});
+
+test("tempo hoje v6 reduces visual density without removing core forecast data", () => {
+  assert.match(internalWidgets, /InternalWeatherWidgetsRefinement\.css/);
+  assert.match(internalWidgetRefinement, /Tempo Hoje v6/);
+  assert.match(internalWidgetRefinement, /grid-template-columns:\s*1\.35rem minmax\(0, 1fr\)/);
+  assert.match(internalWidgetRefinement, /min-height:\s*180px/);
+  assert.match(internalWidgetRefinement, /home-forecast-window[\s\S]*box-shadow:\s*none/);
+  assert.match(internalWidgetRefinement, /internal-observation-widget[\s\S]*rgb\(255 255 255 \/ 96%\)/);
+  assert.match(internalWidgetRefinement, /internal-practical-widget__cards article > span svg/);
+  assert.match(internalWidgetRefinement, /@media \(max-width: 700px\)/);
+  assert.match(internalWidgetRefinement, /@media \(max-width: 520px\)/);
 });
