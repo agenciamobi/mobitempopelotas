@@ -13,6 +13,7 @@ export const PUBLIC_ROUTES: PublicRouteEntry[] = [
   { path: "/previsao-7-dias-pelotas", changeFrequency: "daily", priority: 0.9 },
   { path: "/chuva-em-pelotas", changeFrequency: "hourly", priority: 0.8 },
   { path: "/vento-em-pelotas", changeFrequency: "hourly", priority: 0.8 },
+  { path: "/meteograma-pelotas", changeFrequency: "hourly", priority: 0.82 },
   { path: "/alertas", changeFrequency: "hourly", priority: 0.9 },
   { path: "/radar-e-satelite-pelotas", changeFrequency: "hourly", priority: 0.8 },
   { path: "/mapa-de-geadas-rio-grande-do-sul", changeFrequency: "daily", priority: 0.8 },
