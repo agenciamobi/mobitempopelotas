@@ -1,4 +1,5 @@
-import { Activity, CloudFog, Eye, Gauge, Layers3, Waves } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Activity, ArrowRight, CloudFog, Eye, Gauge, Layers3, Waves } from "lucide-react";
 
 import type { HourlyForecast } from "@/lib/weather/types";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
@@ -192,11 +193,16 @@ export function TodayAtmosphericSignals({ data }: { data: WeatherIntelligenceDat
           <span className="eyebrow">Umidade e estrutura da atmosfera</span>
           <h2 id="today-atmosphere-title">Ponto de orvalho, nuvens e visibilidade</h2>
         </div>
-        <p>
-          Estes sinais ajudam a interpretar abafamento, possibilidade de neblina, teto baixo e
-          instabilidade. Eles complementam a previsão e não substituem observação local, radar ou
-          avisos oficiais.
-        </p>
+        <div className="today-atmosphere__intro">
+          <p>
+            Estes sinais ajudam a interpretar abafamento, possibilidade de neblina, teto baixo e
+            instabilidade. Eles complementam a previsão e não substituem observação local, radar ou
+            avisos oficiais.
+          </p>
+          <Link to="/meteograma-pelotas">
+            Abrir meteograma de 24 e 48 horas <ArrowRight aria-hidden="true" />
+          </Link>
+        </div>
       </header>
 
       <div className="today-atmosphere__signals">
