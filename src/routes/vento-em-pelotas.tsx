@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
+import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
 import { WindPage } from "@/components/weather/RainWindPages";
 import { WIND_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
@@ -41,12 +42,16 @@ function VentoPage() {
   const weather = Route.useLoaderData();
 
   return (
-    <>
+    <InternalWeatherPageShell
+      data={weather}
+      pageClassName="internal-weather-shell--wind"
+      showOfficialAlerts={false}
+    >
       <WindPage data={weather} />
       <EditorialContentSection
         id="como-interpretar-a-previsao-de-vento"
         content={WIND_EDITORIAL_CONTENT}
       />
-    </>
+    </InternalWeatherPageShell>
   );
 }
