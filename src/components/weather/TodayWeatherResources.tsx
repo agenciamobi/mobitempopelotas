@@ -67,7 +67,9 @@ const resourceLinks: ResourceLink[] = [
 ];
 
 function maximum(values: Array<number | null | undefined>) {
-  const validValues = values.filter((value): value is number => value !== null && value !== undefined);
+  const validValues = values.filter(
+    (value): value is number => value !== null && value !== undefined,
+  );
   return validValues.length ? Math.max(...validValues) : null;
 }
 
@@ -121,20 +123,26 @@ function statusLabel(status: PeriodStatus) {
 }
 
 function statusAdvice(status: PeriodStatus) {
-  if (status === "stable") return "Tende a ser a faixa mais favorável para deslocamentos e tarefas externas.";
-  if (status === "moderate") return "Vale acompanhar mudanças de chuva e vento antes de sair.";
-  if (status === "attention") return "Planeje alternativas e confira o radar antes de atividades externas.";
+  if (status === "stable")
+    return "Tende a ser a faixa mais favorável para deslocamentos e tarefas externas.";
+  if (status === "moderate")
+    return "Vale acompanhar mudanças de chuva e vento antes de sair.";
+  if (status === "attention")
+    return "Planeje alternativas e confira o radar antes de atividades externas.";
   return "Evite depender de condições estáveis e acompanhe alertas e radar.";
 }
 
 function hourRisk(hour: HourlyForecast) {
-  return (hour.precipitationProbability ?? 25) + Math.max(0, (hour.windGust ?? hour.windSpeed) - 25) * 2;
+  return (
+    (hour.precipitationProbability ?? 25) +
+    Math.max(0, (hour.windGust ?? hour.windSpeed) - 25) * 2
+  );
 }
 
 function extractClock(value: string | null | undefined) {
   if (!value) return null;
   const matches = value.match(/\b(?:[01]?\d|2[0-3]):[0-5]\d\b/g);
-  return matches?.at(-1) ?? null;
+  return matches?.[0] ?? null;
 }
 
 function clockMinutes(value: string | null) {
@@ -147,7 +155,8 @@ function clockMinutes(value: string | null) {
 function daylightDuration(sunrise: string | null, sunset: string | null) {
   const sunriseMinutes = clockMinutes(sunrise);
   const sunsetMinutes = clockMinutes(sunset);
-  if (sunriseMinutes === null || sunsetMinutes === null || sunsetMinutes <= sunriseMinutes) return null;
+  if (sunriseMinutes === null || sunsetMinutes === null || sunsetMinutes <= sunriseMinutes)
+    return null;
 
   const duration = sunsetMinutes - sunriseMinutes;
   return `${Math.floor(duration / 60)}h ${String(duration % 60).padStart(2, "0")}min`;
@@ -161,7 +170,9 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
   const periods = buildPeriods(data.weather.hourly);
   if (!periods.length) return null;
 
-  const bestPeriod = periods.reduce((best, period) => (period.score < best.score ? period : best));
+  const bestPeriod = periods.reduce((best, period) =>
+    period.score < best.score ? period : best,
+  );
   const attentionHour = data.weather.hourly
     .slice(0, 12)
     .reduce<HourlyForecast | null>(
@@ -219,7 +230,11 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
             <Sunrise aria-hidden="true" /> Luz natural
           </span>
           <strong>{sunrise && sunset ? `${sunrise}–${sunset}` : "Em atualização"}</strong>
-          <small>{daylight ? `${daylight} entre nascer e pôr do sol.` : "Horários solares não informados."}</small>
+          <small>
+            {daylight
+              ? `${daylight} entre nascer e pôr do sol.`
+              : "Horários solares não informados."}
+          </small>
         </article>
       </div>
 
