@@ -18,6 +18,7 @@ const standaloneRoutes = new Set([
   "/previsao-7-dias-pelotas",
   "/chuva-em-pelotas",
   "/vento-em-pelotas",
+  "/alertas",
   "/conta",
   "/entrar",
   "/minha-conta",
