@@ -90,7 +90,7 @@ function createPath(points: ChartPoint[]) {
 
 export function WeatherHistoryChart({ days }: WeatherHistoryChartProps) {
   const [metric, setMetric] = useState<HistoryMetric>("temperature");
-  const [period, setPeriod] = useState<HistoryPeriod>(14);
+  const [period, setPeriod] = useState<HistoryPeriod>(30);
   const [selectedOffset, setSelectedOffset] = useState(0);
   const id = useId().replace(/:/g, "");
 
@@ -137,7 +137,7 @@ export function WeatherHistoryChart({ days }: WeatherHistoryChartProps) {
     );
     const area =
       longestPrimarySegment.length > 1
-        ? `${createPath(longestPrimarySegment)} L ${longestPrimarySegment.at(-1)?.x} ${HEIGHT - PADDING_BOTTOM} L ${longestPrimarySegment[0].x} ${HEIGHT - PADDING_BOTTOM} Z`
+        ? `${createPath(longestPrimarySegment)} L ${longestPrimarySegment.at(-1)?.x} ${HEIGHT - PADDING_BOTTOM} L ${longestPrimarySegment[0]?.x} ${HEIGHT - PADDING_BOTTOM} Z`
         : "";
 
     return { min, max, primary, secondary, primarySegments, secondarySegments, area };
