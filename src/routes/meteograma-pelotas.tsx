@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
 import { MeteogramHero, MeteogramPage } from "@/components/weather/MeteogramPage";
+import "@/components/weather/MeteogramRefinement.css";
 import { getPelotasMeteogram } from "@/lib/weather/meteogram.functions";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
