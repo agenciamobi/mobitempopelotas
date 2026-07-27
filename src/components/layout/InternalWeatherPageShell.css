@@ -15,6 +15,7 @@
 .internal-weather-main > *,
 .internal-weather-main > .daily-page,
 .internal-weather-main > .forecast-page,
+.internal-weather-main > .condition-page,
 .internal-weather-main > .editorial-answer-section {
   width: 100%;
   max-width: none;
@@ -22,18 +23,21 @@
 }
 
 .internal-weather-main > .daily-page,
-.internal-weather-main > .forecast-page {
+.internal-weather-main > .forecast-page,
+.internal-weather-main > .condition-page {
   margin-inline: 0;
 }
 
 .internal-weather-main .daily-page,
-.internal-weather-main .forecast-page {
+.internal-weather-main .forecast-page,
+.internal-weather-main .condition-page {
   --internal-retail-border: rgb(7 30 47 / 8%);
   --internal-retail-surface: rgb(255 255 255 / 94%);
 }
 
 .internal-weather-main .daily-hero,
-.internal-weather-main .forecast-page-header {
+.internal-weather-main .forecast-page-header,
+.internal-weather-main .condition-page-header {
   border: 1px solid var(--internal-retail-border);
   border-radius: 1.35rem;
   background:
@@ -47,7 +51,10 @@
 .internal-weather-main .forecast-week-summary article,
 .internal-weather-main .forecast-content-section,
 .internal-weather-main .daily-section,
-.internal-weather-main .daily-metrics article {
+.internal-weather-main .daily-metrics article,
+.internal-weather-main .condition-highlight,
+.internal-weather-main .condition-section,
+.internal-weather-main .condition-summary-grid article {
   border-color: var(--internal-retail-border);
   box-shadow: none;
 }
@@ -57,6 +64,19 @@
   border-radius: 0.8rem;
   background: rgb(255 255 255 / 88%);
   box-shadow: none;
+}
+
+.internal-weather-main .editorial-answer-section {
+  margin-inline: 0;
+}
+
+.internal-weather-main .editorial-answer-section > * {
+  max-width: none;
+}
+
+.internal-weather-main .editorial-answer-section p,
+.internal-weather-main .editorial-answer-section li {
+  max-width: 78ch;
 }
 
 @media (max-width: 820px) {
@@ -72,7 +92,8 @@
   }
 
   .internal-weather-main .daily-hero,
-  .internal-weather-main .forecast-page-header {
+  .internal-weather-main .forecast-page-header,
+  .internal-weather-main .condition-page-header {
     border-radius: 1rem;
   }
 }
@@ -85,7 +106,8 @@
 
 @media (forced-colors: active) {
   .internal-weather-main .daily-hero,
-  .internal-weather-main .forecast-page-header {
+  .internal-weather-main .forecast-page-header,
+  .internal-weather-main .condition-page-header {
     border: 1px solid CanvasText;
     background: Canvas;
     color: CanvasText;
