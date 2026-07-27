@@ -1,0 +1,597 @@
+.internal-weather-shell--history .history-hero {
+  width: 100%;
+  max-width: var(--internal-weather-frame-max, var(--portal-frame-max, 1760px));
+  margin-inline: auto;
+  padding: clamp(1rem, 2vw, 1.45rem) var(--internal-weather-frame-gutter, clamp(22px, 2.4vw, 42px)) 0;
+  box-sizing: border-box;
+}
+
+.history-hero--retail {
+  min-height: 0;
+  padding: 0;
+  grid-template-columns: minmax(0, 1.08fr) minmax(390px, 0.92fr);
+  align-items: stretch;
+  gap: clamp(1rem, 2.5vw, 2rem);
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.history-hero__content,
+.history-hero--retail .history-period-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 1.55rem;
+  box-shadow: 0 24px 70px rgb(7 30 47 / 16%);
+}
+
+.history-hero__content {
+  display: grid;
+  min-height: 500px;
+  align-content: end;
+  padding: clamp(2rem, 5vw, 4.8rem);
+  color: #fff;
+  background:
+    radial-gradient(circle at 94% 3%, rgb(94 44 237 / 24%), transparent 24rem),
+    radial-gradient(circle at 4% 100%, rgb(24 189 205 / 24%), transparent 28rem),
+    linear-gradient(145deg, #102437, #173e52 58%, #1f5260);
+}
+
+.history-hero__content .history-kicker {
+  color: #9cecf0;
+  font-size: 0.75rem;
+}
+
+.history-hero__content h1 {
+  max-width: 15ch;
+  margin: 0.72rem 0 0;
+  color: #fff;
+  font-size: clamp(3rem, 6vw, 6.2rem);
+  font-weight: 720;
+  letter-spacing: -0.08em;
+  line-height: 0.92;
+}
+
+.history-hero__content .history-lead {
+  max-width: 760px;
+  margin-top: 1.35rem;
+  color: rgb(255 255 255 / 74%);
+  font-size: clamp(0.96rem, 1.2vw, 1.08rem);
+  line-height: 1.7;
+}
+
+.history-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+.history-hero__actions a {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.72rem 1rem;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 790;
+  text-decoration: none;
+  background: rgb(255 255 255 / 8%);
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.history-hero__actions a:first-child {
+  border-color: #18bdcd;
+  color: #062538;
+  background: #9cecf0;
+}
+
+.history-hero__actions a:hover {
+  transform: translateY(-2px);
+  border-color: #8debf1;
+}
+
+.history-hero__actions svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.history-hero--retail .history-period-card {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  align-content: stretch;
+  gap: 1rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-color: rgb(7 30 47 / 8%);
+  background:
+    radial-gradient(circle at 100% 0, rgb(94 44 237 / 9%), transparent 22rem),
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 10%), transparent 20rem),
+    #fff;
+  backdrop-filter: none;
+}
+
+.history-hero--retail .history-period-card::before {
+  display: none;
+}
+
+.history-period-card > header {
+  display: grid;
+  gap: 0.35rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgb(7 30 47 / 8%);
+}
+
+.history-period-card > header > span {
+  color: #087f8d;
+  font-size: 0.75rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.history-period-card > header > strong {
+  color: var(--portal-ink);
+  font-size: clamp(2.2rem, 4.4vw, 4.25rem);
+  letter-spacing: -0.065em;
+  line-height: 0.95;
+}
+
+.history-period-card > header > small {
+  color: var(--portal-ink-soft);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.history-period-overview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.history-period-overview article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1rem;
+  background: rgb(247 251 252 / 90%);
+}
+
+.history-period-overview svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  color: #5e2ced;
+}
+
+.history-period-overview span {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.history-period-overview strong {
+  color: var(--portal-ink);
+  font-size: 1.35rem;
+  letter-spacing: -0.04em;
+}
+
+.history-period-overview small {
+  color: var(--portal-ink-soft);
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.history-period-source {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.history-period-source svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  color: #087f8d;
+}
+
+.history-period-source span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.history-period-source strong {
+  color: var(--portal-ink);
+  font-size: 0.88rem;
+}
+
+.history-period-source small,
+.history-period-card > footer {
+  color: var(--portal-ink-soft);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.history-period-card > footer {
+  padding-top: 0.8rem;
+  border-top: 1px solid rgb(7 30 47 / 8%);
+}
+
+.history-page--retail {
+  gap: clamp(1rem, 2vw, 1.5rem);
+  padding-bottom: 0;
+}
+
+.history-chapters {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1.1rem;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 10px 30px rgb(7 30 47 / 4%);
+}
+
+.history-chapters a {
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+  padding: 0.95rem 1rem;
+  color: var(--portal-ink);
+  text-decoration: none;
+  border-right: 1px solid rgb(7 30 47 / 7%);
+  transition: background 150ms ease;
+}
+
+.history-chapters a:last-child {
+  border-right: 0;
+}
+
+.history-chapters a:hover {
+  background: rgb(24 189 205 / 7%);
+}
+
+.history-chapters span {
+  color: #087f8d;
+  font-size: 0.75rem;
+  font-weight: 850;
+}
+
+.history-chapters strong {
+  font-size: 0.9rem;
+}
+
+.history-chapters small {
+  color: var(--portal-ink-soft);
+  font-size: 0.75rem;
+}
+
+.history-summary-section,
+.history-chart,
+.history-section,
+.history-unavailable,
+.history-methodology,
+.history-actions {
+  scroll-margin-top: 8rem;
+  border-radius: 1.5rem;
+}
+
+.history-summary-section {
+  padding: clamp(1.15rem, 3vw, 2rem);
+  border: 1px solid rgb(7 30 47 / 8%);
+  background: rgb(255 255 255 / 94%);
+  box-shadow: 0 18px 48px rgb(7 30 47 / 5%);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 650px;
+}
+
+.history-section-heading--compact {
+  margin-bottom: 1.2rem;
+}
+
+.history-chart-anchor {
+  min-width: 0;
+  scroll-margin-top: 8rem;
+}
+
+.history-chart-anchor > .history-chart {
+  margin: 0;
+}
+
+.history-page--retail .history-summary article,
+.history-page--retail .history-records article,
+.history-profile-grid article {
+  border-top: 4px solid #18bdcd;
+  border-radius: 1rem;
+}
+
+.history-page--retail .history-summary article:nth-child(2),
+.history-page--retail .history-records article:nth-child(2),
+.history-profile-grid article:nth-child(2) {
+  border-top-color: #5e2ced;
+}
+
+.history-page--retail .history-summary article:nth-child(3),
+.history-page--retail .history-records article:nth-child(3),
+.history-profile-grid article:nth-child(3) {
+  border-top-color: #087f8d;
+}
+
+.history-page--retail .history-summary article:nth-child(4),
+.history-page--retail .history-records article:nth-child(4),
+.history-profile-grid article:nth-child(4) {
+  border-top-color: #f27035;
+}
+
+.history-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.history-profile-grid article {
+  display: grid;
+  min-width: 0;
+  gap: 0.55rem;
+  padding: 1.1rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  background: #fff;
+}
+
+.history-profile-grid svg {
+  width: 1.55rem;
+  height: 1.55rem;
+  color: #087f8d;
+}
+
+.history-profile-grid span {
+  color: #607783;
+  font-size: 0.75rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.history-profile-grid strong {
+  color: var(--portal-ink);
+  font-size: clamp(1.5rem, 2.7vw, 2.2rem);
+  letter-spacing: -0.05em;
+}
+
+.history-profile-grid small {
+  color: var(--portal-ink-soft);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.history-coverage {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1rem;
+  background: #f7fbfc;
+}
+
+.history-coverage > div {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.history-coverage span,
+.history-coverage strong {
+  font-size: 0.75rem;
+}
+
+.history-coverage span {
+  color: #607783;
+  font-weight: 800;
+}
+
+.history-coverage strong {
+  color: var(--portal-ink);
+}
+
+.history-coverage i {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(7 30 47 / 7%);
+}
+
+.history-coverage b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #18bdcd, #5e2ced);
+}
+
+.history-table-intro {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+  color: #607783;
+}
+
+.history-table-intro svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: #5e2ced;
+}
+
+.history-table-intro span {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.history-table-intro strong {
+  color: var(--portal-ink);
+  font-size: 0.82rem;
+}
+
+.history-table-intro small {
+  font-size: 0.75rem;
+}
+
+.history-page--retail .history-kicker,
+.history-page--retail .history-summary span,
+.history-page--retail .history-records span,
+.history-page--retail .history-chart-reading > span,
+.history-page--retail .history-chart-reading > small,
+.history-page--retail .history-chart-tabs button,
+.history-page--retail .history-period button,
+.history-page--retail .history-days button span,
+.history-page--retail .history-days button strong,
+.history-page--retail .history-legend,
+.history-page--retail .history-records p,
+.history-page--retail .history-table thead th,
+.history-page--retail .history-unavailable small {
+  font-size: 0.75rem;
+}
+
+.history-page--retail .history-summary small,
+.history-page--retail .history-section-heading > p,
+.history-page--retail .history-chart-heading > div:first-child > p:last-child {
+  font-size: 0.8rem;
+}
+
+.history-methodology a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  margin-top: 1rem;
+  color: #5e2ced;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.history-methodology a svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.history-page--retail a:focus-visible,
+.history-page--retail button:focus-visible,
+.history-hero--retail a:focus-visible {
+  outline: 3px solid rgb(24 189 205 / 42%);
+  outline-offset: 3px;
+}
+
+@media (max-width: 1180px) {
+  .history-profile-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .history-hero--retail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .history-hero__content {
+    min-height: 430px;
+  }
+
+  .history-chapters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .history-chapters a:nth-child(3) {
+    border-right: 0;
+  }
+
+  .history-chapters a:nth-child(n + 4) {
+    border-top: 1px solid rgb(7 30 47 / 7%);
+  }
+
+  .history-coverage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .internal-weather-shell--history .history-hero {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+
+  .history-hero__content,
+  .history-hero--retail .history-period-card,
+  .history-summary-section,
+  .history-chart,
+  .history-section,
+  .history-unavailable,
+  .history-methodology,
+  .history-actions {
+    border-radius: 1.15rem;
+  }
+
+  .history-hero__content {
+    min-height: 390px;
+    padding: 1.45rem;
+  }
+
+  .history-hero__content h1 {
+    font-size: clamp(2.5rem, 13vw, 4.15rem);
+  }
+
+  .history-hero--retail .history-period-card {
+    padding: 1rem;
+  }
+
+  .history-chapters {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .history-chapters a {
+    min-width: 180px;
+    border-top: 0 !important;
+    border-right: 1px solid rgb(7 30 47 / 7%) !important;
+    scroll-snap-align: start;
+  }
+
+  .history-profile-grid,
+  .history-period-overview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .history-hero__actions a,
+  .history-chapters a {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .history-hero__content,
+  .history-hero--retail .history-period-card,
+  .history-summary-section,
+  .history-chart,
+  .history-section,
+  .history-unavailable,
+  .history-methodology,
+  .history-actions,
+  .history-profile-grid article,
+  .history-coverage {
+    border: 1px solid CanvasText;
+  }
+}
