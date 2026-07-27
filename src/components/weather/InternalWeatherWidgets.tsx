@@ -6,6 +6,7 @@ import { HomeForecastStory } from "@/components/weather/HomeForecastStory";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 
 import "./InternalWeatherWidgets.css";
+import "./InternalWeatherWidgetsContainment.css";
 
 type InternalPageChapter = {
   href: string;
