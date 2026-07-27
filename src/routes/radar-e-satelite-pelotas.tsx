@@ -7,24 +7,30 @@ import { createPageHead } from "@/lib/page-meta";
 import { getRedemetOverview } from "@/lib/redemet/redemet.functions";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 
-const PAGE_TITLE = "Radar e satélite em Pelotas";
+const PAGE_TITLE = "Radar meteorológico e satélite em Pelotas";
 const PAGE_DESCRIPTION =
-  "Acompanhe radar meteorológico, imagens de satélite e trovoadas próximas de Pelotas, com horário de cada quadro e fontes da REDEMET/DECEA e do INMET.";
+  "Veja radar meteorológico, imagens de satélite e trovoadas na região de Pelotas, com sequência animada, horário de cada quadro e fontes da REDEMET/DECEA e do INMET.";
 const PAGE_PATH = "/radar-e-satelite-pelotas";
 
 const RADAR_PAGE_CONTENT = {
   ...RADAR_EDITORIAL_CONTENT,
-  eyebrow: "Entenda as imagens meteorológicas",
-  title: "Como interpretar radar, satélite e trovoadas em Pelotas",
+  eyebrow: "Entenda e compare as imagens",
+  title: "Como usar radar, satélite e trovoadas para acompanhar o tempo em Pelotas",
   answer:
-    "O radar mostra ecos associados à precipitação; o satélite mostra cobertura e características das nuvens; e a camada de trovoadas registra atividade elétrica detectada na região. Esses produtos devem ser comparados pelo horário e não substituem avisos oficiais ou observação local.",
+    "Confira primeiro o horário de cada quadro e depois reproduza a sequência. O radar mostra ecos associados à precipitação; o satélite mostra cobertura e organização das nuvens; e a camada de trovoadas registra atividade elétrica detectada. Movimento nas imagens é observação do passado recente, não previsão do futuro.",
   facts: [
-    "O radar ajuda a acompanhar áreas associadas à chuva, mas não confirma sozinho que está chovendo exatamente no seu bairro.",
-    "Uma nuvem visível no satélite não significa necessariamente chuva no solo em Pelotas.",
-    "Trovoada detectada é uma observação regional de atividade elétrica, não um alerta meteorológico.",
-    "Confira sempre o horário: uma imagem antiga pode não representar a condição deste momento.",
+    "Reproduzir a sequência ajuda a perceber deslocamento e mudança, mas não garante que o mesmo movimento continuará.",
+    "O radar oferece leitura regional e não confirma sozinho chuva em um endereço ou bairro específico.",
+    "Nuvens no satélite não significam necessariamente precipitação no solo em Pelotas.",
+    "Trovoada detectada é uma observação de atividade elétrica, não um aviso oficial de risco.",
+    "Cada fonte tem horário próprio; compare produtos que representem períodos próximos.",
   ],
   faqs: [
+    {
+      question: "Como usar a reprodução automática dos quadros?",
+      answer:
+        "Selecione Reproduzir sequência para avançar pelos quadros disponíveis. Pause para examinar uma imagem, use a linha do tempo para escolher outro horário ou retorne ao Quadro mais recente. A sequência mostra observações passadas e recentes, não uma projeção futura.",
+    },
     {
       question: "O radar mostra se está chovendo exatamente no meu bairro?",
       answer:
@@ -41,9 +47,9 @@ const RADAR_PAGE_CONTENT = {
         "Não. Ela indica atividade elétrica detectada em uma área e horário. Alertas oficiais são emitidos por órgãos responsáveis com critérios próprios de risco, abrangência e validade.",
     },
     {
-      question: "Por que o horário da imagem é importante?",
+      question: "Por que duas fontes podem mostrar horários diferentes?",
       answer:
-        "Radar, satélite e trovoadas representam um momento específico. Como nuvens e áreas de chuva podem se deslocar rapidamente, um quadro antigo pode não descrever a situação atual.",
+        "Radar, satélite e trovoadas possuem produtos, rotinas e intervalos de atualização próprios. Por isso, compare o horário exibido em cada card e evite interpretar imagens de momentos muito diferentes como se fossem simultâneas.",
     },
   ],
   relatedLinks: [
@@ -83,6 +89,7 @@ export const Route = createFileRoute("/radar-e-satelite-pelotas")({
           "Precipitação na Zona Sul do Rio Grande do Sul",
           "REDEMET e INMET",
           "Horário das imagens meteorológicas",
+          "Sequência de imagens de radar",
         ],
       }),
       createFaqPageJsonLd(PAGE_PATH, RADAR_PAGE_CONTENT.faqs),
@@ -96,12 +103,12 @@ function RedemetPage() {
   const data = Route.useLoaderData();
 
   return (
-    <>
+    <div className="radar-satellite-page">
       <RedemetOverview data={data} />
       <EditorialContentSection
         id="como-interpretar-radar-satelite"
         content={RADAR_PAGE_CONTENT}
       />
-    </>
+    </div>
   );
 }
