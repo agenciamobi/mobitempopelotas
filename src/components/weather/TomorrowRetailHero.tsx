@@ -30,7 +30,7 @@ type TomorrowRetailHeroProps = {
 type RetailMetric = {
   label: string;
   value: string;
-  detail: string;
+  detail?: string;
   icon: LucideIcon;
 };
 
@@ -68,21 +68,18 @@ function differenceLabel(value: number | null) {
 function buildMetrics(tomorrow: DailyForecast | null): RetailMetric[] {
   return [
     {
-      label: "Mínima",
+      label: "Mínima prevista",
       value: formatValue(tomorrow?.min, "°"),
-      detail: "menor temperatura",
       icon: Thermometer,
     },
     {
-      label: "Chuva",
+      label: "Chance de chuva",
       value: formatValue(tomorrow?.rainChance, "%"),
-      detail: "maior chance prevista",
       icon: CloudRain,
     },
     {
-      label: "Rajadas",
+      label: "Rajada máxima",
       value: formatValue(tomorrow?.windGust, " km/h"),
-      detail: "máxima prevista",
       icon: Wind,
     },
   ];
@@ -121,12 +118,12 @@ export function TomorrowRetailHero({
           </span>
 
           <h1 id="tomorrow-retail-hero-title">
-            Amanhã em Pelotas, <span>organizado para você planejar.</span>
+            Tempo amanhã em Pelotas: <span>temperatura, chuva e vento.</span>
           </h1>
 
           <p>
             {tomorrow
-              ? `${condition}, com mínima de ${tomorrow.min}° e máxima de ${tomorrow.max}°. Confira chuva, vento e os principais impactos antes de fechar a rotina.`
+              ? `${condition}. A previsão indica mínima de ${tomorrow.min}° e máxima de ${tomorrow.max}°. Veja a chance de chuva, as rajadas e o que pode mudar sua rotina.`
               : "A previsão para amanhã está sendo atualizada pelas fontes meteorológicas do portal."}
           </p>
 
@@ -145,10 +142,10 @@ export function TomorrowRetailHero({
 
           <div className="today-retail-hero__actions">
             <a className="today-retail-hero__primary" href="#planejamento-amanha">
-              Planejar o próximo dia <ArrowRight aria-hidden="true" />
+              Ver como se preparar <ArrowRight aria-hidden="true" />
             </a>
             <Link className="today-retail-hero__secondary" to="/previsao-7-dias-pelotas">
-              Comparar com a semana
+              Ver próximos 7 dias
             </Link>
           </div>
         </div>
@@ -183,7 +180,6 @@ export function TomorrowRetailHero({
                 <div>
                   <strong>{formatValue(tomorrow?.max, "°")}</strong>
                   <span>{condition}</span>
-                  <small>Máxima prevista</small>
                 </div>
               </div>
 
@@ -196,7 +192,7 @@ export function TomorrowRetailHero({
                       <span>
                         <small>{metric.label}</small>
                         <strong>{metric.value}</strong>
-                        <em>{metric.detail}</em>
+                        {metric.detail ? <em>{metric.detail}</em> : null}
                       </span>
                     </div>
                   );
@@ -217,7 +213,7 @@ export function TomorrowRetailHero({
           <div className="today-retail-hero__tiles tomorrow-retail-hero__tiles" aria-label="Indicadores para amanhã">
             <article>
               <span>
-                <Gauge aria-hidden="true" /> Amplitude
+                <Gauge aria-hidden="true" /> Variação térmica
               </span>
               <strong>{formatValue(amplitude, "°")}</strong>
               <small>Diferença entre mínima e máxima</small>
@@ -225,26 +221,26 @@ export function TomorrowRetailHero({
 
             <article className="is-rain">
               <span>
-                <CloudRain aria-hidden="true" /> Volume
+                <CloudRain aria-hidden="true" /> Volume de chuva
               </span>
               <strong>{formatValue(tomorrow?.precipitation, " mm")}</strong>
-              <small>Acumulado diário estimado</small>
+              <small>Estimativa para o dia</small>
             </article>
 
             <article className="is-wind">
               <span>
-                <Thermometer aria-hidden="true" /> Comparação
+                <Thermometer aria-hidden="true" /> Máxima versus hoje
               </span>
               <strong>{differenceLabel(maximumDifference)}</strong>
-              <small>Variação da máxima prevista</small>
+              <small>Comparação entre as duas previsões</small>
             </article>
 
             <article className="is-sun">
               <span>
-                <CalendarDays aria-hidden="true" /> Atualização
+                <CalendarDays aria-hidden="true" /> Fonte da previsão
               </span>
               <strong>{weather.source.forecastName ?? weather.source.name}</strong>
-              <small>Fonte principal da previsão</small>
+              <small>Modelo meteorológico principal</small>
             </article>
           </div>
         </div>
