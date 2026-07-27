@@ -1,0 +1,81 @@
+/*
+ * Tempo Hoje — trilho único de largura.
+ *
+ * A página reutiliza .home-editorial-main, que já define o gutter externo da
+ * homepage. O refinamento visual anterior também aplicava padding horizontal
+ * ao mesmo elemento e criava um segundo recuo. Este arquivo mantém um único
+ * frame para todas as seções e para o conteúdo editorial complementar.
+ */
+.site-shell--home-editorial .today-v4-home-main {
+  width: min(var(--editorial-max), calc(100% - 56px));
+  max-width: var(--editorial-max);
+  margin-inline: auto;
+  padding: clamp(24px, 3vw, 44px) 0 0;
+  box-sizing: border-box;
+}
+
+.site-shell--home-editorial .today-v4-home-main > .today-v4-page,
+.site-shell--home-editorial .today-v4-home-main > .editorial-answer-section,
+.site-shell--home-editorial .today-v4-home-main .today-v4-page > .today-v4-hero,
+.site-shell--home-editorial .today-v4-home-main .today-v4-page > .today-v4-chapters,
+.site-shell--home-editorial .today-v4-home-main .today-v4-page > .today-v4-alert,
+.site-shell--home-editorial .today-v4-home-main .today-v4-page > .today-v4-window,
+.site-shell--home-editorial .today-v4-home-main .today-v4-page > .today-v4-observation,
+.site-shell--home-editorial .today-v4-home-main .today-v4-page > .today-v4-hourly,
+.site-shell--home-editorial .today-v4-home-main .today-v4-page > .today-v4-reading,
+.site-shell--home-editorial .today-v4-home-main .today-v4-page > .today-v4-closing,
+.site-shell--home-editorial .today-v4-home-main .today-v4-page > .today-v4-unavailable {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  margin-inline: 0;
+  justify-self: stretch;
+  box-sizing: border-box;
+}
+
+/*
+ * Os grids internos também ocupam todo o trilho. Limites de largura continuam
+ * restritos apenas aos textos, nunca ao bloco ou à linha divisória da seção.
+ */
+.site-shell--home-editorial .today-v4-home-main .today-v4-window > header,
+.site-shell--home-editorial .today-v4-home-main .today-v4-section-heading,
+.site-shell--home-editorial .today-v4-home-main .today-v4-window-grid,
+.site-shell--home-editorial .today-v4-home-main .today-v4-observation-layout,
+.site-shell--home-editorial .today-v4-home-main .today-v4-metrics,
+.site-shell--home-editorial .today-v4-home-main .today-v4-hourly-track,
+.site-shell--home-editorial .today-v4-home-main .today-v4-reading,
+.site-shell--home-editorial .today-v4-home-main .today-v4-closing,
+.site-shell--home-editorial .today-v4-home-main #como-interpretar-hoje .editorial-answer-intro,
+.site-shell--home-editorial .today-v4-home-main #como-interpretar-hoje .editorial-answer-grid {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  justify-self: stretch;
+  box-sizing: border-box;
+}
+
+/* Mantém o mesmo frame responsivo usado pela homepage em tablets. */
+@media (max-width: 900px) and (min-width: 621px) {
+  .site-shell--home-editorial .today-v4-home-main {
+    width: min(780px, calc(100% - 40px));
+  }
+}
+
+/*
+ * As áreas roláveis permanecem dentro do trilho. O recuo negativo anterior
+ * fazia capítulos e horas parecerem mais largos que as demais seções.
+ */
+@media (max-width: 820px) {
+  .site-shell--home-editorial .today-v4-home-main .today-v4-chapters,
+  .site-shell--home-editorial .today-v4-home-main .today-v4-page.is-measurement-unavailable .today-v4-chapters {
+    margin-right: 0;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 680px) {
+  .site-shell--home-editorial .today-v4-home-main .today-v4-hourly-track {
+    margin-right: 0;
+    padding-right: 0;
+  }
+}
