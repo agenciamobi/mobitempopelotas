@@ -1,0 +1,93 @@
+/* Shared visual contract for internal weather pages, based on /tempo-hoje-pelotas. */
+.internal-weather-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 4% 12%, rgb(24 189 205 / 5%), transparent 30rem),
+    radial-gradient(circle at 96% 18%, rgb(94 44 237 / 4%), transparent 28rem),
+    #f5f8f8;
+}
+
+.internal-weather-main {
+  width: min(var(--editorial-max), calc(100% - 56px));
+  padding: clamp(24px, 3vw, 44px) 0 0;
+}
+
+.internal-weather-main > *,
+.internal-weather-main > .daily-page,
+.internal-weather-main > .forecast-page,
+.internal-weather-main > .editorial-answer-section {
+  width: 100%;
+  max-width: none;
+  justify-self: stretch;
+}
+
+.internal-weather-main > .daily-page,
+.internal-weather-main > .forecast-page {
+  margin-inline: 0;
+}
+
+.internal-weather-main .daily-page,
+.internal-weather-main .forecast-page {
+  --internal-retail-border: rgb(7 30 47 / 8%);
+  --internal-retail-surface: rgb(255 255 255 / 94%);
+}
+
+.internal-weather-main .daily-hero,
+.internal-weather-main .forecast-page-header {
+  border: 1px solid var(--internal-retail-border);
+  border-radius: 1.35rem;
+  background:
+    radial-gradient(circle at 7% 8%, rgb(24 189 205 / 9%), transparent 22rem),
+    radial-gradient(circle at 94% 5%, rgb(94 44 237 / 7%), transparent 20rem),
+    var(--internal-retail-surface);
+  box-shadow: 0 13px 34px rgb(7 30 47 / 4.5%);
+}
+
+.internal-weather-main .daily-condition-card,
+.internal-weather-main .forecast-week-summary article,
+.internal-weather-main .forecast-content-section,
+.internal-weather-main .daily-section,
+.internal-weather-main .daily-metrics article {
+  border-color: var(--internal-retail-border);
+  box-shadow: none;
+}
+
+.internal-weather-main .daily-chapters,
+.internal-weather-main .forecast-today-navigation {
+  border-radius: 0.8rem;
+  background: rgb(255 255 255 / 88%);
+  box-shadow: none;
+}
+
+@media (max-width: 820px) {
+  .internal-weather-main {
+    width: min(780px, calc(100% - 40px));
+  }
+}
+
+@media (max-width: 680px) {
+  .internal-weather-main {
+    width: min(var(--editorial-max), calc(100% - 28px));
+    padding-top: 1rem;
+  }
+
+  .internal-weather-main .daily-hero,
+  .internal-weather-main .forecast-page-header {
+    border-radius: 1rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .internal-weather-main {
+    width: min(var(--editorial-max), calc(100% - 20px));
+  }
+}
+
+@media (forced-colors: active) {
+  .internal-weather-main .daily-hero,
+  .internal-weather-main .forecast-page-header {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+}
