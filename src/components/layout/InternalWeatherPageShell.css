@@ -29,7 +29,8 @@
 /* Heroes retail compartilham o mesmo eixo do masthead e das seções abaixo. */
 .internal-weather-shell--today .today-retail-hero__inner,
 .internal-weather-shell--tomorrow .tomorrow-retail-hero__inner,
-.internal-weather-shell--seven-day .seven-day-retail-hero__inner {
+.internal-weather-shell--seven-day .seven-day-retail-hero__inner,
+.internal-weather-shell--rain .rain-retail-hero__inner {
   width: 100%;
   max-width: var(--internal-weather-frame-max);
   margin-inline: auto;
@@ -57,6 +58,7 @@
 .internal-weather-main > .today-v5-page,
 .internal-weather-main > .tomorrow-v3-page,
 .internal-weather-main > .seven-day-v2-page,
+.internal-weather-main > .rain-v2-page,
 .internal-weather-main > .editorial-answer-section {
   margin-inline: 0;
 }
@@ -72,7 +74,11 @@
 .internal-weather-shell--seven-day .seven-day-v2-page,
 .internal-weather-shell--seven-day .seven-day-v2-page > *,
 .internal-weather-shell--seven-day .home-inmet-alerts,
-.internal-weather-shell--seven-day .editorial-answer-section {
+.internal-weather-shell--seven-day .editorial-answer-section,
+.internal-weather-shell--rain .rain-v2-page,
+.internal-weather-shell--rain .rain-v2-page > *,
+.internal-weather-shell--rain .home-inmet-alerts,
+.internal-weather-shell--rain .editorial-answer-section {
   width: 100%;
   max-width: none;
   justify-self: stretch;
