@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
 import { TomorrowForecastPageV2 } from "@/components/weather/DailyForecastPagesV2";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd } from "@/lib/structured-data";
@@ -37,5 +38,14 @@ export const Route = createFileRoute("/tempo-amanha-pelotas")({
 
 function TempoAmanhaPage() {
   const weather = Route.useLoaderData();
-  return <TomorrowForecastPageV2 data={weather} />;
+
+  return (
+    <InternalWeatherPageShell
+      data={weather}
+      pageClassName="internal-weather-shell--tomorrow"
+      showOfficialAlerts={false}
+    >
+      <TomorrowForecastPageV2 data={weather} />
+    </InternalWeatherPageShell>
+  );
 }
