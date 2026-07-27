@@ -1,0 +1,103 @@
+/* Condition-aware photography for the Tempo Hoje retail weather card. */
+.today-retail-hero__current {
+  isolation: isolate;
+  background: #32168f;
+}
+
+.today-retail-hero__current-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(180deg, rgb(16 10 49 / 18%), rgb(16 10 49 / 60%)),
+    linear-gradient(135deg, rgb(72 34 200 / 52%) 0%, rgb(94 44 237 / 42%) 52%, rgb(43 19 120 / 70%) 100%),
+    var(--today-retail-hero-photo);
+  background-position: center, center, var(--today-retail-hero-position, center);
+  background-size: cover;
+  transform: scale(1.025);
+  transition: transform 700ms ease;
+}
+
+.today-retail-hero--attention .today-retail-hero__current-photo {
+  background-image:
+    linear-gradient(180deg, rgb(25 12 43 / 16%), rgb(34 14 55 / 64%)),
+    linear-gradient(135deg, rgb(94 44 237 / 48%) 0%, rgb(183 61 126 / 34%) 58%, rgb(56 24 126 / 72%) 100%),
+    var(--today-retail-hero-photo);
+}
+
+.today-retail-hero--warning .today-retail-hero__current-photo {
+  background-image:
+    linear-gradient(180deg, rgb(35 7 17 / 15%), rgb(40 8 24 / 68%)),
+    linear-gradient(135deg, rgb(94 44 237 / 42%) 0%, rgb(202 45 91 / 38%) 58%, rgb(60 20 91 / 75%) 100%),
+    var(--today-retail-hero-photo);
+}
+
+.today-retail-hero__current-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1.1rem;
+  min-height: 100%;
+}
+
+.today-retail-hero__current-content > header,
+.today-retail-hero__current-content > .today-retail-hero__current-main,
+.today-retail-hero__current-content > .today-retail-hero__current-metrics {
+  position: relative;
+  z-index: 1;
+}
+
+.today-retail-hero__current-metrics {
+  background: rgb(255 255 255 / 10%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.today-retail-hero__photo-credit {
+  justify-self: end;
+  color: rgb(255 255 255 / 66%);
+  font-size: 0.46rem;
+  font-weight: 650;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+.today-retail-hero__photo-credit:hover,
+.today-retail-hero__photo-credit:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 0.18rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .today-retail-hero__current:hover .today-retail-hero__current-photo {
+    transform: scale(1.045);
+  }
+}
+
+@media (max-width: 700px) {
+  .today-retail-hero__current-photo {
+    background-position: center, center, var(--today-retail-hero-position-mobile, var(--today-retail-hero-position, center));
+  }
+
+  .today-retail-hero__photo-credit {
+    justify-self: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .today-retail-hero__current-photo {
+    transition: none;
+    transform: none;
+  }
+
+  .today-retail-hero__current:hover .today-retail-hero__current-photo {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .today-retail-hero__current-photo {
+    display: none;
+  }
+}
