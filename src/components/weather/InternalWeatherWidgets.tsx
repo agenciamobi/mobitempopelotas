@@ -1,5 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, CheckCircle2, Info, RefreshCw } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Info,
+  RefreshCw,
+  TriangleAlert,
+} from "lucide-react";
 import { useMemo, type ReactNode } from "react";
 
 import { HomeForecastStory } from "@/components/weather/HomeForecastStory";
@@ -7,6 +13,7 @@ import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence
 
 import "./InternalWeatherWidgets.css";
 import "./InternalWeatherWidgetsContainment.css";
+import "./InternalWeatherWidgetsRefinement.css";
 
 type InternalPageChapter = {
   href: string;
@@ -145,14 +152,11 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
       aria-labelledby="internal-observation-title"
     >
       <div className="home-observation-story__intro">
-        <span className="eyebrow">Medição local e procedência</span>
-        <h2 id="internal-observation-title">O que está sendo observado agora</h2>
-        <p>
-          A medição local e os campos complementados por modelo permanecem identificados sem
-          repetir a previsão principal.
-        </p>
+        <span className="eyebrow">Medição local</span>
+        <h2 id="internal-observation-title">Medição local mais recente</h2>
+        <p>Leitura em Pelotas com a origem identificada em cada indicador.</p>
         <Link to="/estacao-embrapa-pelotas">
-          Abrir estação Embrapa <span aria-hidden="true">→</span>
+          Ver detalhes da estação <span aria-hidden="true">→</span>
         </Link>
       </div>
 
@@ -162,11 +166,11 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
             <small className="internal-observation-status">
               {observed ? (
                 <>
-                  <CheckCircle2 aria-hidden="true" /> Observação local operacional
+                  <CheckCircle2 aria-hidden="true" /> Observação Embrapa
                 </>
               ) : (
                 <>
-                  <Info aria-hidden="true" /> Condição atual complementada por modelo
+                  <Info aria-hidden="true" /> Atual complementada por modelo
                 </>
               )}
             </small>
@@ -197,9 +201,7 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
         <div className="home-observation-story__unavailable internal-observation-unavailable">
           <RefreshCw aria-hidden="true" />
           <strong>Leitura local temporariamente indisponível</strong>
-          <span>
-            A previsão por modelo continua ativa e permanece separada da observação.
-          </span>
+          <span>A previsão por modelo continua ativa e separada da observação.</span>
         </div>
       )}
     </section>
@@ -226,35 +228,37 @@ export function InternalPracticalSummary({
         <span className="eyebrow">Leitura prática</span>
         <h2 id="internal-practical-title">{title}</h2>
         <p>{data.brief.summary}</p>
-        <small>
-          {summaryOrigin}. Os valores continuam vinculados às fontes estruturadas.
-        </small>
+        <small>{summaryOrigin}. Dados vinculados às fontes meteorológicas.</small>
       </div>
 
       <div className="internal-practical-widget__cards">
         <article>
-          <span>O que favorece a rotina</span>
+          <span>
+            <CheckCircle2 aria-hidden="true" /> Para a rotina
+          </span>
           {data.brief.highlights.length ? (
             <ul>
-              {data.brief.highlights.slice(0, 3).map((item) => (
+              {data.brief.highlights.slice(0, 2).map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
           ) : (
-            <p>Sem destaques adicionais para o período.</p>
+            <p>Sem outros destaques para o período.</p>
           )}
         </article>
 
         <article className="is-caution">
-          <span>O que exige atenção</span>
+          <span>
+            <TriangleAlert aria-hidden="true" /> Pontos de atenção
+          </span>
           {data.brief.cautions.length ? (
             <ul>
-              {data.brief.cautions.slice(0, 3).map((item) => (
+              {data.brief.cautions.slice(0, 2).map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
           ) : (
-            <p>Não há pontos de atenção relevantes nas fontes consultadas.</p>
+            <p>Sem atenção adicional indicada pelas fontes.</p>
           )}
         </article>
       </div>
@@ -270,8 +274,8 @@ export function InternalNextStep() {
   return (
     <Link className="internal-next-step" to="/tempo-amanha-pelotas">
       <span>
-        <small>Continue a consulta</small>
-        <strong>Ver a previsão para amanhã</strong>
+        <small>Próxima leitura</small>
+        <strong>Como fica o tempo amanhã</strong>
       </span>
       <ArrowRight aria-hidden="true" />
     </Link>
