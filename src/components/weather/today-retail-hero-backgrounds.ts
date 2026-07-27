@@ -1,13 +1,15 @@
 import type { WeatherIconName } from "@/production/lib/weather-data";
 import type { AdvisoryLevel } from "@/production/lib/weather-insights";
 
-export type TodayRetailHeroPhoto = {
+export type RetailWeatherHeroPhoto = {
   src: string;
   alt: string;
   credit: string;
   sourceHref: string;
   position: string;
 };
+
+export type TodayRetailHeroPhoto = RetailWeatherHeroPhoto;
 
 const photos = {
   clear: {
@@ -31,12 +33,12 @@ const photos = {
     sourceHref: "https://commons.wikimedia.org/wiki/File:Heavy_Rain.jpg",
     position: "center 52%",
   },
-} satisfies Record<string, TodayRetailHeroPhoto>;
+} satisfies Record<string, RetailWeatherHeroPhoto>;
 
-export function getTodayRetailHeroPhoto(
+export function getRetailWeatherPhoto(
   icon: WeatherIconName,
   advisoryLevel: AdvisoryLevel,
-): TodayRetailHeroPhoto {
+): RetailWeatherHeroPhoto {
   if (advisoryLevel === "warning" || icon === "storm" || icon === "rain") {
     return photos.rain;
   }
@@ -47,3 +49,5 @@ export function getTodayRetailHeroPhoto(
 
   return photos.calm;
 }
+
+export const getTodayRetailHeroPhoto = getRetailWeatherPhoto;
