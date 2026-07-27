@@ -5,6 +5,11 @@ import test from "node:test";
 const todayRoute = readFileSync("src/routes/tempo-hoje-pelotas.tsx", "utf8");
 const todayComponent = readFileSync("src/components/weather/TodayForecastPageV5.tsx", "utf8");
 const todayStyles = readFileSync("src/components/weather/TodayForecastPageV5.css", "utf8");
+const todayResources = readFileSync("src/components/weather/TodayWeatherResources.tsx", "utf8");
+const todayResourceStyles = readFileSync(
+  "src/components/weather/TodayWeatherResources.css",
+  "utf8",
+);
 const internalWidgets = readFileSync("src/components/weather/InternalWeatherWidgets.tsx", "utf8");
 const internalWidgetStyles = readFileSync(
   "src/components/weather/InternalWeatherWidgets.css",
@@ -40,6 +45,7 @@ test("the internal page no longer renders a second hero", () => {
   assert.doesNotMatch(todayComponent, /today-v4-hero/);
   assert.doesNotMatch(todayComponent, /<h1/);
   assert.match(todayComponent, /InternalForecastStory/);
+  assert.match(todayComponent, /TodayWeatherResources/);
   assert.match(todayComponent, /InternalObservationWidget/);
   assert.match(todayComponent, /InternalPracticalSummary/);
 });
@@ -64,6 +70,29 @@ test("today content is concise and keeps measurement provenance explicit", () =>
   assert.match(internalWidgets, /Atual complementada por modelo/);
   assert.match(internalWidgets, /Para a rotina/);
   assert.match(internalWidgets, /Pontos de atenção/);
+});
+
+test("today planning resources derive decisions from the next 12 forecast hours", () => {
+  assert.match(todayComponent, /href: "#recursos-hoje"/);
+  assert.match(todayComponent, /<TodayWeatherResources data=\{recoveredData\}/);
+  assert.match(todayResources, /hourly\.slice\(0, 12\)/);
+  assert.match(todayResources, /precipitationProbability/);
+  assert.match(todayResources, /hour\.windGust \?\? hour\.windSpeed/);
+  assert.match(todayResources, /periodScore/);
+  assert.match(todayResources, /Melhor janela estimada/);
+  assert.match(todayResources, /Maior atenção/);
+  assert.match(todayResources, /Luz natural/);
+  assert.match(todayResources, /current\?\.sunrise/);
+  assert.match(todayResources, /current\?\.sunset/);
+});
+
+test("today resources link to specialized rain wind radar and alert pages", () => {
+  assert.match(todayResources, /to: "\/chuva-em-pelotas"/);
+  assert.match(todayResources, /to: "\/vento-em-pelotas"/);
+  assert.match(todayResources, /to: "\/radar-e-satelite-pelotas"/);
+  assert.match(todayResources, /to: "\/alertas"/);
+  assert.match(todayResources, /Recursos meteorológicos relacionados/);
+  assert.match(todayResources, /não substituem avisos oficiais/);
 });
 
 test("today sections use one homepage width rail without a nested inset", () => {
@@ -100,4 +129,16 @@ test("tempo hoje v6 reduces visual density without removing core forecast data",
   assert.match(internalWidgetRefinement, /internal-practical-widget__cards article > span svg/);
   assert.match(internalWidgetRefinement, /@media \(max-width: 700px\)/);
   assert.match(internalWidgetRefinement, /@media \(max-width: 520px\)/);
+});
+
+test("today decision resources remain responsive and accessible", () => {
+  assert.match(todayResourceStyles, /decision resources derived from the next 12 forecast hours/);
+  assert.match(todayResourceStyles, /content-visibility:\s*auto/);
+  assert.match(todayResourceStyles, /grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\)/);
+  assert.match(todayResourceStyles, /@media \(max-width: 980px\)/);
+  assert.match(todayResourceStyles, /@media \(max-width: 760px\)/);
+  assert.match(todayResourceStyles, /@media \(max-width: 520px\)/);
+  assert.match(todayResourceStyles, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(todayResourceStyles, /@media \(forced-colors: active\)/);
+  assert.match(todayResourceStyles, /:focus-visible/);
 });
