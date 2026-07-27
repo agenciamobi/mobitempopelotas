@@ -38,6 +38,12 @@ function formatValue(value: number | null, suffix = "") {
   return value === null ? "—" : `${value}${suffix}`;
 }
 
+function extractClock(value: string | null | undefined) {
+  if (!value) return null;
+  const matches = value.match(/\b(?:[01]?\d|2[0-3]):[0-5]\d\b/g);
+  return matches?.[0] ?? null;
+}
+
 function updateLabel(weather: WeatherData) {
   const current = weather.current;
   if (current.updatedAt) return `Atualizado em ${current.updatedAt}`;
@@ -111,9 +117,10 @@ export function TodayRetailHero({
   const condition = weatherConditionLabels[iconName];
   const currentTemperature = current.available ? current.temperature : (nextHour?.temperature ?? null);
   const metrics = buildCurrentMetrics(weather);
-  const sunrise = current.sunrise ?? weather.astronomy?.sunrise ?? null;
-  const sunset = current.sunset ?? weather.astronomy?.sunset ?? null;
+  const sunrise = extractClock(current.sunrise ?? weather.astronomy?.sunrise);
+  const sunset = extractClock(current.sunset ?? weather.astronomy?.sunset);
   const hasAlert = officialAlertCount > 0;
+  const conditionMoment = current.available ? "agora" : "na próxima hora";
 
   return (
     <section
@@ -132,8 +139,8 @@ export function TodayRetailHero({
           </h1>
 
           <p>
-            {condition} agora. Consulte as melhores janelas, a chance de chuva e as rajadas antes de
-            definir a rotina.
+            {condition} {conditionMoment}. Consulte as melhores janelas, a chance de chuva e as
+            rajadas antes de definir a rotina.
           </p>
 
           <div className="today-retail-hero__badges" aria-label="Situação da previsão">
@@ -143,7 +150,7 @@ export function TodayRetailHero({
                 <ShieldAlert aria-hidden="true" /> {alertLabel(officialAlertCount)}
               </Link>
             ) : (
-              <span className="is-stable">Sem aviso oficial ativo para Pelotas</span>
+              <span className="is-stable">Sem aviso oficial listado para Pelotas</span>
             )}
           </div>
 
@@ -158,7 +165,14 @@ export function TodayRetailHero({
         </div>
 
         <div className="today-retail-hero__showcase">
-          <article className="today-retail-hero__current" aria-label="Condição atual em Pelotas">
+          <article
+            className="today-retail-hero__current"
+            aria-label={
+              current.available
+                ? "Condição observada agora em Pelotas"
+                : "Condição prevista para a próxima hora em Pelotas"
+            }
+          >
             <header>
               <div>
                 <span>Pelotas, RS</span>
@@ -209,7 +223,7 @@ export function TodayRetailHero({
               <span>
                 <CloudRain aria-hidden="true" /> Chuva
               </span>
-              <strong>{today?.rainChance === null || !today ? "—" : `${today.rainChance}%`}</strong>
+              <strong>{!today || today.rainChance === null ? "—" : `${today.rainChance}%`}</strong>
               <small>Maior chance prevista</small>
             </article>
 
@@ -217,7 +231,7 @@ export function TodayRetailHero({
               <span>
                 <Wind aria-hidden="true" /> Rajadas
               </span>
-              <strong>{today?.windGust === null || !today ? "—" : `${today.windGust} km/h`}</strong>
+              <strong>{!today || today.windGust === null ? "—" : `${today.windGust} km/h`}</strong>
               <small>Máxima prevista hoje</small>
             </article>
 
