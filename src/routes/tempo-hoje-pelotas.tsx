@@ -20,7 +20,7 @@ import { getWeatherAdvisory, type AdvisoryLevel } from "@/production/lib/weather
 
 const PAGE_TITLE = "Tempo hoje em Pelotas";
 const PAGE_DESCRIPTION =
-  "Condições atuais e previsão por hora para hoje em Pelotas, com chuva, vento, temperatura e alertas oficiais.";
+  "Tempo hoje em Pelotas com condições atuais, previsão por hora, melhores janelas das próximas 12 horas, chuva, vento, radar e alertas oficiais.";
 const PAGE_PATH = "/tempo-hoje-pelotas";
 const advisoryRank: Record<AdvisoryLevel, number> = { normal: 0, attention: 1, warning: 2 };
 
@@ -40,6 +40,8 @@ export const Route = createFileRoute("/tempo-hoje-pelotas")({
           "Condições meteorológicas em Pelotas",
           "Temperatura atual em Pelotas",
           "Previsão por hora em Pelotas",
+          "Melhores horários para atividades ao ar livre em Pelotas",
+          "Janelas de chuva e vento nas próximas horas",
           "Medição meteorológica da Embrapa em Pelotas",
           "Alertas meteorológicos do INMET em Pelotas",
         ],
