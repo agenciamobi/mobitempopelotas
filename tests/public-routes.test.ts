@@ -10,6 +10,7 @@ const CRITICAL_PUBLIC_ROUTES = [
   "/tempo-amanha-pelotas",
   "/previsao-7-dias-pelotas",
   "/meteograma-pelotas",
+  "/clima-em-pelotas",
   "/alertas",
   "/radar-e-satelite-pelotas",
   "/situacao-hidrologica-pelotas",
