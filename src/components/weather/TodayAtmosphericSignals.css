@@ -1,0 +1,310 @@
+.today-atmosphere {
+  display: grid;
+  scroll-margin-top: 120px;
+  gap: 1rem;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle at 100% 0, rgb(24 189 205 / 10%), transparent 24rem),
+    linear-gradient(145deg, rgb(255 255 255 / 98%), rgb(246 251 252 / 96%));
+  box-shadow: 0 18px 48px rgb(7 30 47 / 6%);
+  content-visibility: auto;
+  contain-intrinsic-size: 950px;
+}
+
+.today-atmosphere__heading {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(300px, 1fr);
+  align-items: end;
+  gap: 2rem;
+}
+
+.today-atmosphere__heading h2 {
+  max-width: 16ch;
+  margin: 0.42rem 0 0;
+  color: var(--portal-ink);
+  font-size: clamp(1.85rem, 3.8vw, 3.35rem);
+  font-weight: 690;
+  letter-spacing: -0.06em;
+  line-height: 0.98;
+}
+
+.today-atmosphere__heading p {
+  max-width: 72ch;
+  margin: 0;
+  color: var(--portal-ink-soft);
+  font-size: 0.94rem;
+  line-height: 1.68;
+}
+
+.today-atmosphere__signals {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.today-atmosphere__signals article {
+  display: grid;
+  min-width: 0;
+  min-height: 190px;
+  align-content: start;
+  gap: 0.72rem;
+  padding: 1.15rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-top: 4px solid #18bdcd;
+  border-radius: 1.1rem;
+  background: rgb(255 255 255 / 94%);
+}
+
+.today-atmosphere__signals article.is-attention {
+  border-top-color: #d49a29;
+}
+
+.today-atmosphere__signals article.is-high {
+  border-top-color: #d5684c;
+}
+
+.today-atmosphere__signals article.is-low {
+  border-top-color: #41a982;
+}
+
+.today-atmosphere__signals article.is-unknown {
+  border-top-color: #8798a1;
+}
+
+.today-atmosphere__signals article > span {
+  display: flex;
+  align-items: center;
+  gap: 0.48rem;
+  color: #087f8d;
+  font-size: 0.76rem;
+  font-weight: 850;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.today-atmosphere__signals article > span svg {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+}
+
+.today-atmosphere__signals article > strong {
+  color: var(--portal-ink);
+  font-size: clamp(1.25rem, 2.2vw, 1.8rem);
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+
+.today-atmosphere__signals article > small {
+  color: var(--portal-ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.today-atmosphere__clouds {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.05rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1.15rem;
+  background: rgb(255 255 255 / 86%);
+}
+
+.today-atmosphere__clouds > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.today-atmosphere__clouds > header > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.today-atmosphere__clouds > header svg {
+  width: 1.45rem;
+  height: 1.45rem;
+  color: #5e2ced;
+}
+
+.today-atmosphere__clouds > header span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.today-atmosphere__clouds > header strong {
+  color: var(--portal-ink);
+  font-size: 1rem;
+}
+
+.today-atmosphere__clouds > header small {
+  color: var(--portal-ink-soft);
+  font-size: 0.78rem;
+}
+
+.today-atmosphere__legend {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 0.45rem !important;
+}
+
+.today-atmosphere__legend span {
+  display: inline-flex !important;
+  min-height: 28px;
+  align-items: center;
+  padding: 0.32rem 0.55rem;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 780;
+}
+
+.today-atmosphere__legend .is-low,
+.today-atmosphere__cloud-grid .is-low {
+  background: #18bdcd;
+}
+
+.today-atmosphere__legend .is-mid,
+.today-atmosphere__cloud-grid .is-mid {
+  background: #5e2ced;
+}
+
+.today-atmosphere__legend .is-high,
+.today-atmosphere__cloud-grid .is-high {
+  background: #9d7bf4;
+}
+
+.today-atmosphere__cloud-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.today-atmosphere__cloud-grid article {
+  display: grid;
+  min-width: 0;
+  gap: 0.52rem;
+  padding: 0.85rem;
+  border: 1px solid rgb(7 30 47 / 7%);
+  border-radius: 0.9rem;
+  background: #fff;
+}
+
+.today-atmosphere__cloud-grid article > strong {
+  color: var(--portal-ink);
+  font-size: 0.9rem;
+}
+
+.today-atmosphere__cloud-grid article > div {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(7 30 47 / 7%);
+}
+
+.today-atmosphere__cloud-grid article > div > span {
+  display: block;
+  min-width: 2px;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.today-atmosphere__cloud-grid article > small {
+  color: var(--portal-ink-soft);
+  font-size: 0.75rem;
+}
+
+.today-atmosphere__footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1rem;
+  background: rgb(241 248 250 / 88%);
+}
+
+.today-atmosphere__footer > svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: 0 0 auto;
+  color: #087f8d;
+}
+
+.today-atmosphere__footer > span {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.today-atmosphere__footer strong {
+  color: var(--portal-ink);
+  font-size: 0.88rem;
+}
+
+.today-atmosphere__footer small {
+  color: var(--portal-ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 1180px) {
+  .today-atmosphere__signals {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .today-atmosphere__cloud-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 860px) {
+  .today-atmosphere__heading {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.8rem;
+  }
+
+  .today-atmosphere__heading h2 {
+    max-width: 20ch;
+  }
+}
+
+@media (max-width: 680px) {
+  .today-atmosphere {
+    padding: 1rem;
+    border-radius: 1.2rem;
+  }
+
+  .today-atmosphere__signals,
+  .today-atmosphere__cloud-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .today-atmosphere__signals article {
+    min-height: 0;
+  }
+
+  .today-atmosphere__clouds > header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .today-atmosphere * {
+    scroll-behavior: auto;
+  }
+}
+
+@media (forced-colors: active) {
+  .today-atmosphere,
+  .today-atmosphere__signals article,
+  .today-atmosphere__clouds,
+  .today-atmosphere__cloud-grid article,
+  .today-atmosphere__footer {
+    border: 1px solid CanvasText;
+  }
+}
