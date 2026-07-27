@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
-  CalendarClock,
   CheckCircle2,
   CloudRain,
   Gauge,
@@ -64,11 +63,26 @@ function weekdayKey(value: string) {
     .replace(/[^a-z]/g, "");
 }
 
+function forecastWeekdayKey(day: DailyForecast) {
+  const supplied = weekdayKey(day.weekday);
+  if (supplied !== "hoje" && supplied !== "amanha") return supplied;
+
+  const parsed = new Date(`${day.date.slice(0, 10)}T12:00:00-03:00`);
+  if (Number.isNaN(parsed.getTime())) return supplied;
+
+  return weekdayKey(
+    new Intl.DateTimeFormat("pt-BR", {
+      weekday: "long",
+      timeZone: "America/Sao_Paulo",
+    }).format(parsed),
+  );
+}
+
 function findCppmetContext(
   tomorrow: DailyForecast,
   items: CppmetForecastItem[],
 ): CppmetForecastItem | null {
-  const target = weekdayKey(tomorrow.weekday);
+  const target = forecastWeekdayKey(tomorrow);
   return items.find((item) => weekdayKey(item.day) === target) ?? null;
 }
 
@@ -196,17 +210,17 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
   const maximumDelta = today ? tomorrow.max - today.max : null;
   const minimumDelta = today ? tomorrow.min - today.min : null;
   const rainDelta =
-    today?.rainChance === null || tomorrow.rainChance === null || !today
-      ? null
-      : tomorrow.rainChance - today.rainChance;
+    today && today.rainChance !== null && tomorrow.rainChance !== null
+      ? tomorrow.rainChance - today.rainChance
+      : null;
   const gustDelta =
-    today?.windGust === null || tomorrow.windGust === null || !today
-      ? null
-      : tomorrow.windGust - today.windGust;
+    today && today.windGust !== null && tomorrow.windGust !== null
+      ? tomorrow.windGust - today.windGust
+      : null;
   const planningCards = buildPlanningCards(tomorrow);
   const tomorrowDate = tomorrow.date.slice(0, 10);
   const inmetPeriods = weather.inmetForecast
-    .filter((period) => period.date === tomorrowDate)
+    .filter((period) => period.date?.slice(0, 10) === tomorrowDate)
     .slice(0, 3);
   const cppmetContext = findCppmetContext(tomorrow, weather.officialForecast);
   const hasOfficialContext = inmetPeriods.length > 0 || Boolean(cppmetContext);
