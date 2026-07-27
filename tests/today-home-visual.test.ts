@@ -150,9 +150,15 @@ test("the retail hero selects credited photography from the forecast condition",
   assert.match(todayRetailPhotoStyles, /forced-colors/);
 });
 
-test("the retail hero remains a concise product-style weather showcase", () => {
-  assert.match(todayRetailHero, /Seu dia em Pelotas/);
-  assert.match(todayRetailHero, /organizado por horários/);
+test("the retail hero uses a useful headline and concise current metrics", () => {
+  assert.match(todayRetailHero, /Tempo hoje em Pelotas/);
+  assert.match(todayRetailHero, /previsão por hora, chuva e vento/);
+  assert.doesNotMatch(todayRetailHero, /Seu dia em Pelotas/);
+  assert.doesNotMatch(todayRetailHero, /organizado por horários/);
+  assert.doesNotMatch(todayRetailHero, /percebida agora/);
+  assert.doesNotMatch(todayRetailHero, /medição local/);
+  assert.match(todayRetailHero, /formatWind\(current\.windSpeed, current\.windDirection\)/);
+  assert.match(todayRetailHero, /metric\.detail \? <em>\{metric\.detail\}<\/em> : null/);
   assert.match(todayRetailHero, /today-retail-hero__current/);
   assert.match(todayRetailHero, /today-retail-hero__tiles/);
   assert.match(todayRetailHero, /Planejar próximas horas/);
