@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
 import { WeatherAlertsPage } from "@/components/weather/WeatherAlertsPage";
 import "@/components/weather/WeatherAlertsRefinements.css";
 import { createPageHead } from "@/lib/page-meta";
@@ -32,5 +33,14 @@ export const Route = createFileRoute("/alertas")({
 
 function AlertasPage() {
   const weather = Route.useLoaderData();
-  return <WeatherAlertsPage data={weather} />;
+
+  return (
+    <InternalWeatherPageShell
+      data={weather}
+      pageClassName="internal-weather-shell--alerts"
+      showOfficialAlerts={false}
+    >
+      <WeatherAlertsPage data={weather} />
+    </InternalWeatherPageShell>
+  );
 }
