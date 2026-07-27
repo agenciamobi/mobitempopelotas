@@ -10,6 +10,7 @@ import {
   Wind,
   type LucideIcon,
 } from "lucide-react";
+import type { CSSProperties } from "react";
 
 import { WeatherIcon } from "@/production/components/weather-icon";
 import {
@@ -19,7 +20,9 @@ import {
 import type { WeatherData } from "@/production/lib/weather-data";
 import type { AdvisoryLevel } from "@/production/lib/weather-insights";
 
+import { getTodayRetailHeroPhoto } from "./today-retail-hero-backgrounds";
 import "./TodayRetailHero.css";
+import "./TodayRetailHeroPhoto.css";
 
 type TodayRetailHeroProps = {
   weather: WeatherData;
@@ -121,12 +124,18 @@ export function TodayRetailHero({
   const sunset = extractClock(current.sunset ?? weather.astronomy?.sunset);
   const hasAlert = officialAlertCount > 0;
   const conditionMoment = current.available ? "agora" : "na próxima hora";
+  const photo = getTodayRetailHeroPhoto(iconName, advisoryLevel);
+  const photoStyle = {
+    "--today-retail-hero-photo": `url("${photo.src}")`,
+    "--today-retail-hero-position": photo.position,
+  } as CSSProperties;
 
   return (
     <section
       className={`today-retail-hero today-retail-hero--${advisoryLevel}`}
       aria-labelledby="today-retail-hero-title"
       data-official-alerts={hasAlert ? "true" : "false"}
+      data-weather-photo={iconName}
     >
       <div className="today-retail-hero__inner">
         <div className="today-retail-hero__copy">
@@ -167,46 +176,64 @@ export function TodayRetailHero({
         <div className="today-retail-hero__showcase">
           <article
             className="today-retail-hero__current"
+            style={photoStyle}
             aria-label={
               current.available
                 ? "Condição observada agora em Pelotas"
                 : "Condição prevista para a próxima hora em Pelotas"
             }
           >
-            <header>
-              <div>
-                <span>Pelotas, RS</span>
-                <small>{current.available ? "Observado agora" : "Próxima hora"}</small>
-              </div>
-              <b>
-                <i aria-hidden="true" /> {current.available ? "Agora" : "Previsão"}
-              </b>
-            </header>
+            <div
+              className="today-retail-hero__current-photo"
+              role="img"
+              aria-label={photo.alt}
+            />
 
-            <div className="today-retail-hero__current-main">
-              <div className="today-retail-hero__weather-icon">
-                <WeatherIcon name={iconName} title={`Condição em Pelotas: ${condition}`} />
-              </div>
-              <div>
-                <strong>{formatValue(currentTemperature, "°")}</strong>
-                <span>{condition}</span>
-              </div>
-            </div>
+            <div className="today-retail-hero__current-content">
+              <header>
+                <div>
+                  <span>Pelotas, RS</span>
+                  <small>{current.available ? "Observado agora" : "Próxima hora"}</small>
+                </div>
+                <b>
+                  <i aria-hidden="true" /> {current.available ? "Agora" : "Previsão"}
+                </b>
+              </header>
 
-            <div className="today-retail-hero__current-metrics">
-              {metrics.map((metric) => {
-                const Icon = metric.icon;
-                return (
-                  <div key={metric.label}>
-                    <Icon aria-hidden="true" />
-                    <span>
-                      <small>{metric.label}</small>
-                      <strong>{metric.value}</strong>
-                      <em>{metric.detail}</em>
-                    </span>
-                  </div>
-                );
-              })}
+              <div className="today-retail-hero__current-main">
+                <div className="today-retail-hero__weather-icon">
+                  <WeatherIcon name={iconName} title={`Condição em Pelotas: ${condition}`} />
+                </div>
+                <div>
+                  <strong>{formatValue(currentTemperature, "°")}</strong>
+                  <span>{condition}</span>
+                </div>
+              </div>
+
+              <div className="today-retail-hero__current-metrics">
+                {metrics.map((metric) => {
+                  const Icon = metric.icon;
+                  return (
+                    <div key={metric.label}>
+                      <Icon aria-hidden="true" />
+                      <span>
+                        <small>{metric.label}</small>
+                        <strong>{metric.value}</strong>
+                        <em>{metric.detail}</em>
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <a
+                className="today-retail-hero__photo-credit"
+                href={photo.sourceHref}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Foto: {photo.credit}
+              </a>
             </div>
           </article>
 
