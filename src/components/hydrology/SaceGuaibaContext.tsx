@@ -231,19 +231,29 @@ export function SaceGuaibaContext({ data }: { data: SaceGuaibaData }) {
             <span>{stationCards.length} exibidas</span>
           </div>
 
-          <div className="sace-stations-grid">
-            {stationCards.map((station) => (
-              <article key={station.id}>
-                <div>
-                  <i style={{ backgroundColor: station.alertColor }} aria-hidden="true" />
-                  <span>{station.riverSystem}</span>
-                </div>
-                <h3>{station.name}</h3>
-                <p>{stationDescription(station)}</p>
-                <strong>{station.alertLabel}</strong>
-              </article>
-            ))}
-          </div>
+          {stationCards.length ? (
+            <div className="sace-stations-grid">
+              {stationCards.map((station) => (
+                <article key={station.id}>
+                  <div>
+                    <i style={{ backgroundColor: station.alertColor }} aria-hidden="true" />
+                    <span>{station.riverSystem}</span>
+                  </div>
+                  <h3>{station.name}</h3>
+                  <p>{stationDescription(station)}</p>
+                  <strong>{station.alertLabel}</strong>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="sace-unavailable">
+              <Activity aria-hidden="true" />
+              <div>
+                <strong>Nenhuma estação corresponde a este filtro</strong>
+                <p>O quadro atual não possui estação nesta seleção. Escolha outro sistema ou retorne a Todas.</p>
+              </div>
+            </div>
+          )}
         </>
       ) : (
         <div className="sace-unavailable">
@@ -265,7 +275,7 @@ export function SaceGuaibaContext({ data }: { data: SaceGuaibaData }) {
             Fonte: {data.source.name}. Consulta do portal em {formatDateTime(data.source.fetchedAt)}.
           </small>
         </span>
-        <a href={data.source.url} target="_blank" rel="noreferrer">
+        <a href={data.source.url} target="_blank" rel="noopener noreferrer">
           Abrir SACE Guaíba <ArrowUpRight aria-hidden="true" />
         </a>
       </footer>
