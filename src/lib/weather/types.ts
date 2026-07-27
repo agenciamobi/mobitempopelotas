@@ -46,6 +46,7 @@ export type HourlyForecast = {
   timestamp?: string;
   temperature: number;
   precipitationProbability: number | null;
+  precipitationMm?: number | null;
   windSpeed: number;
   windGust: number | null;
   icon: WeatherIconName;
