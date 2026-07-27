@@ -16,11 +16,11 @@ import "./TodayForecastPageV5.css";
 import "./TodayTypographyRefinement.css";
 
 const chapters = [
-  { href: "#previsao-hoje", label: "Hoje", detail: "Evolução por hora" },
-  { href: "#recursos-hoje", label: "Planeje", detail: "Janelas e atalhos" },
-  { href: "#medicao-atual", label: "Medição local", detail: "Valores e origem" },
-  { href: "#leitura-do-dia", label: "Leitura prática", detail: "Impacto na rotina" },
-  { href: "#como-interpretar-hoje", label: "Entenda", detail: "Metodologia e FAQ" },
+  { href: "#previsao-hoje", label: "Próximas horas", detail: "Temperatura, chuva e vento" },
+  { href: "#recursos-hoje", label: "Melhor período", detail: "Janelas para sair" },
+  { href: "#medicao-atual", label: "Condição atual", detail: "Leitura da estação" },
+  { href: "#leitura-do-dia", label: "Para sua rotina", detail: "O que merece atenção" },
+  { href: "#como-interpretar-hoje", label: "Entenda os dados", detail: "Medição, previsão e FAQ" },
 ];
 
 function strongestWind(data: WeatherIntelligenceData) {
