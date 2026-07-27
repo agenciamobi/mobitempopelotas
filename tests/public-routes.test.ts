@@ -9,6 +9,7 @@ const CRITICAL_PUBLIC_ROUTES = [
   "/tempo-hoje-pelotas",
   "/tempo-amanha-pelotas",
   "/previsao-7-dias-pelotas",
+  "/meteograma-pelotas",
   "/alertas",
   "/radar-e-satelite-pelotas",
   "/situacao-hidrologica-pelotas",
@@ -91,6 +92,7 @@ test("mantém atualização frequente nas páginas operacionais", () => {
   const hourlyRoutes = [
     "/",
     "/tempo-hoje-pelotas",
+    "/meteograma-pelotas",
     "/alertas",
     "/radar-e-satelite-pelotas",
     "/situacao-hidrologica-pelotas",
