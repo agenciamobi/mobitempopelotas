@@ -75,6 +75,9 @@ export type AggregatedWeatherQuality = {
   currentSource: "embrapa" | ForecastSourceKey | null;
   forecastSource: ForecastSourceKey | null;
   forecastProvider: string | null;
+  forecastModel?: string | null;
+  forecastModelRun?: string | null;
+  forecastTemporalResolutionMinutes?: number | null;
   degradedSources: WeatherSourceKey[];
   observationAgeMinutes: number | null;
   discrepancies: WeatherDiscrepancy[];
