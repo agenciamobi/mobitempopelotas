@@ -17,7 +17,7 @@ test("the reused homepage observation cannot escape the internal editorial rail"
   assert.match(containment, /Keep homepage-derived widgets inside the internal editorial rail/);
   assert.match(
     containment,
-    /\.site-shell--home-editorial \.internal-observation-widget\s*\{[\s\S]*width:\s*100% !important/,
+    /\.site-shell--home-editorial \.home-editorial-main \.internal-observation-widget\s*\{[\s\S]*width:\s*100% !important/,
   );
   assert.match(containment, /max-width:\s*none !important/);
   assert.match(containment, /margin:\s*0 !important/);
@@ -26,7 +26,10 @@ test("the reused homepage observation cannot escape the internal editorial rail"
 });
 
 test("observation source labels remain secondary and do not inherit the main value style", () => {
-  assert.match(widgets, /<dd>[\s\S]*<span>\{metric\.value\}<\/span>[\s\S]*<small>\{metric\.source\}<\/small>/);
+  assert.match(
+    widgets,
+    /<dd>[\s\S]*<span>\{metric\.value\}<\/span>[\s\S]*<small>\{metric\.source\}<\/small>/,
+  );
   assert.match(containment, /dd\s*>\s*small[\s\S]*font-size:\s*0\.49rem/);
   assert.match(containment, /internal-observation-updated::before[\s\S]*content:\s*none/);
   assert.match(containment, /internal-observation-updated[\s\S]*background:\s*transparent/);
