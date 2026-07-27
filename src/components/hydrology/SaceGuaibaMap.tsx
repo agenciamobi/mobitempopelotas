@@ -52,10 +52,12 @@ export function SaceGuaibaMap({
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const collection = useMemo(() => stationCollection(stations), [stations]);
+  const initialCollectionRef = useRef(collection);
 
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
     let cancelled = false;
+    let styleLoaded = false;
 
     void import("maplibre-gl")
       .then((maplibregl) => {
@@ -81,6 +83,7 @@ export function SaceGuaibaMap({
 
         map.once("load", () => {
           if (cancelled) return;
+          styleLoaded = true;
 
           layers.slice(0, 2).forEach((layer, index) => {
             const sourceId = `sace-wms-${index}`;
@@ -99,7 +102,10 @@ export function SaceGuaibaMap({
             });
           });
 
-          map.addSource(STATIONS_SOURCE_ID, { type: "geojson", data: collection });
+          map.addSource(STATIONS_SOURCE_ID, {
+            type: "geojson",
+            data: initialCollectionRef.current,
+          });
           map.addLayer({
             id: STATIONS_LAYER_ID,
             type: "circle",
@@ -136,7 +142,9 @@ export function SaceGuaibaMap({
 
           setLoaded(true);
         });
-        map.on("error", () => setFailed(true));
+        map.on("error", () => {
+          if (!styleLoaded) setFailed(true);
+        });
       })
       .catch(() => setFailed(true));
 
@@ -145,7 +153,7 @@ export function SaceGuaibaMap({
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, [bounds, collection, layers]);
+  }, [bounds, layers]);
 
   useEffect(() => {
     if (!loaded || !mapRef.current) return;
