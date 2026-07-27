@@ -1,0 +1,633 @@
+/* Tempo Hoje — retail-style hero, isolated from the homepage photographic hero. */
+.today-retail-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(2.1rem, 4.8vw, 4.8rem) 0 clamp(1.7rem, 3.8vw, 3.5rem);
+  border-bottom: 1px solid rgb(7 30 47 / 7%);
+  border-radius: 0 0 clamp(1.5rem, 3vw, 2.5rem) clamp(1.5rem, 3vw, 2.5rem);
+  background:
+    radial-gradient(circle at 8% 0%, rgb(24 189 205 / 15%), transparent 26rem),
+    radial-gradient(circle at 92% 4%, rgb(94 44 237 / 14%), transparent 28rem),
+    linear-gradient(135deg, #f5fbfb 0%, #ffffff 50%, #f6f2ff 100%);
+  box-shadow: 0 18px 46px rgb(7 30 47 / 7%);
+}
+
+.today-retail-hero::before,
+.today-retail-hero::after {
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  content: "";
+}
+
+.today-retail-hero::before {
+  top: -8rem;
+  right: 12%;
+  width: 19rem;
+  height: 19rem;
+  border: 1px solid rgb(94 44 237 / 9%);
+}
+
+.today-retail-hero::after {
+  right: -6rem;
+  bottom: -9rem;
+  width: 23rem;
+  height: 23rem;
+  border: 1px solid rgb(24 189 205 / 11%);
+}
+
+.today-retail-hero__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(520px, 1.18fr);
+  align-items: center;
+  width: min(var(--editorial-max), calc(100% - 56px));
+  margin-inline: auto;
+  gap: clamp(2rem, 5vw, 5.5rem);
+}
+
+.today-retail-hero__copy {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.today-retail-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.52rem;
+  color: #087d88;
+  font-size: 0.63rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.today-retail-hero__eyebrow i {
+  width: 0.48rem;
+  height: 0.48rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #18bdcd, #5e2ced);
+  box-shadow: 0 0 0 0.28rem rgb(24 189 205 / 11%);
+}
+
+.today-retail-hero__copy h1 {
+  max-width: 11.5ch;
+  margin: 0;
+  color: var(--portal-ink);
+  font-size: clamp(3rem, 5.8vw, 6rem);
+  font-weight: 690;
+  letter-spacing: -0.075em;
+  line-height: 0.9;
+}
+
+.today-retail-hero__copy h1 span {
+  color: #5e2ced;
+}
+
+.today-retail-hero__copy > p {
+  max-width: 41rem;
+  margin: 0;
+  color: #526b78;
+  font-size: clamp(0.84rem, 1.05vw, 1rem);
+  line-height: 1.65;
+}
+
+.today-retail-hero__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.today-retail-hero__badges > span,
+.today-retail-hero__badges > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  min-height: 2rem;
+  padding: 0.48rem 0.68rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 82%);
+  color: #526b78;
+  font-size: 0.58rem;
+  font-weight: 780;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.today-retail-hero__badges > a svg {
+  width: 0.82rem;
+  height: 0.82rem;
+}
+
+.today-retail-hero__badges .is-alert {
+  border-color: rgb(242 112 53 / 24%);
+  background: rgb(255 247 242 / 94%);
+  color: #b64d20;
+}
+
+.today-retail-hero__badges .is-stable {
+  border-color: rgb(24 189 205 / 20%);
+  color: #087d88;
+}
+
+.today-retail-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7rem;
+  padding-top: 0.25rem;
+}
+
+.today-retail-hero__primary,
+.today-retail-hero__secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  border-radius: 0.78rem;
+  font-size: 0.73rem;
+  font-weight: 840;
+  text-decoration: none;
+}
+
+.today-retail-hero__primary {
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #f27035 0%, #ef5b2b 100%);
+  box-shadow: 0 12px 26px rgb(242 112 53 / 24%);
+  color: #fff;
+}
+
+.today-retail-hero__primary svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.today-retail-hero__secondary {
+  padding: 0.75rem 0.35rem;
+  border-radius: 0;
+  color: var(--portal-ink);
+  text-decoration: underline;
+  text-decoration-color: #18bdcd;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.42rem;
+}
+
+.today-retail-hero__showcase {
+  display: grid;
+  gap: 0.7rem;
+  min-width: 0;
+}
+
+.today-retail-hero__current {
+  position: relative;
+  display: grid;
+  gap: 1.1rem;
+  min-height: 24rem;
+  padding: clamp(1.25rem, 2.6vw, 2.1rem);
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle at 86% 12%, rgb(24 189 205 / 42%), transparent 17rem),
+    radial-gradient(circle at 8% 100%, rgb(231 11 133 / 24%), transparent 19rem),
+    linear-gradient(145deg, #4822c8 0%, #5e2ced 48%, #3c1aa3 100%);
+  box-shadow: 0 24px 54px rgb(52 28 142 / 24%);
+  color: #fff;
+}
+
+.today-retail-hero__current::after {
+  position: absolute;
+  top: -8rem;
+  right: -7rem;
+  width: 20rem;
+  height: 20rem;
+  border: 1px solid rgb(255 255 255 / 13%);
+  border-radius: 999px;
+  content: "";
+}
+
+.today-retail-hero__current header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.today-retail-hero__current header > div {
+  display: grid;
+  gap: 0.16rem;
+}
+
+.today-retail-hero__current header span {
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.today-retail-hero__current header small {
+  color: rgb(255 255 255 / 68%);
+  font-size: 0.55rem;
+  font-weight: 650;
+}
+
+.today-retail-hero__current header b {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.36rem;
+  min-height: 1.9rem;
+  padding: 0.42rem 0.6rem;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 11%);
+  font-size: 0.55rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.today-retail-hero__current header b i {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: #6af2e6;
+  box-shadow: 0 0 0 0.22rem rgb(106 242 230 / 15%);
+}
+
+.today-retail-hero__current-main {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 7.4rem minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+}
+
+.today-retail-hero__weather-icon {
+  display: grid;
+  width: 7.4rem;
+  height: 7.4rem;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 1.7rem;
+  background: rgb(255 255 255 / 10%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 15%);
+}
+
+.today-retail-hero__weather-icon svg {
+  width: 5.2rem;
+  height: 5.2rem;
+  color: #6af2e6;
+}
+
+.today-retail-hero__current-main > div:last-child {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.today-retail-hero__current-main strong {
+  font-size: clamp(4.7rem, 8vw, 7.2rem);
+  font-weight: 720;
+  letter-spacing: -0.085em;
+  line-height: 0.78;
+}
+
+.today-retail-hero__current-main span {
+  color: rgb(255 255 255 / 78%);
+  font-size: 0.75rem;
+  font-weight: 720;
+}
+
+.today-retail-hero__current-metrics {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: auto;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: 0.95rem;
+  background: rgb(255 255 255 / 8%);
+}
+
+.today-retail-hero__current-metrics > div {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.85rem;
+  border-right: 1px solid rgb(255 255 255 / 13%);
+}
+
+.today-retail-hero__current-metrics > div:last-child {
+  border-right: 0;
+}
+
+.today-retail-hero__current-metrics svg {
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.12rem;
+  color: #6af2e6;
+}
+
+.today-retail-hero__current-metrics span {
+  display: grid;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.today-retail-hero__current-metrics small {
+  color: rgb(255 255 255 / 63%);
+  font-size: 0.48rem;
+  font-weight: 780;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.today-retail-hero__current-metrics strong {
+  overflow: hidden;
+  font-size: 0.72rem;
+  font-weight: 830;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.today-retail-hero__current-metrics em {
+  overflow: hidden;
+  color: rgb(255 255 255 / 58%);
+  font-size: 0.47rem;
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.today-retail-hero__tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.today-retail-hero__tiles article {
+  display: grid;
+  align-content: start;
+  gap: 0.34rem;
+  min-width: 0;
+  min-height: 7rem;
+  padding: 0.82rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 0.9rem;
+  background: rgb(255 255 255 / 88%);
+  box-shadow: 0 9px 22px rgb(7 30 47 / 4.5%);
+}
+
+.today-retail-hero__tiles article > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  color: #607783;
+  font-size: 0.5rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.today-retail-hero__tiles article > span svg {
+  width: 0.82rem;
+  height: 0.82rem;
+  color: #078997;
+}
+
+.today-retail-hero__tiles article > strong {
+  overflow-wrap: anywhere;
+  color: var(--portal-ink);
+  font-size: clamp(0.95rem, 1.35vw, 1.25rem);
+  font-weight: 790;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.today-retail-hero__tiles article > small {
+  color: #718792;
+  font-size: 0.5rem;
+  line-height: 1.38;
+}
+
+.today-retail-hero__tiles article.is-rain > span svg {
+  color: #5e2ced;
+}
+
+.today-retail-hero__tiles article.is-wind > span svg {
+  color: #e70b85;
+}
+
+.today-retail-hero__tiles article.is-sun > span svg {
+  color: #f27035;
+}
+
+.today-retail-hero--attention .today-retail-hero__current,
+.today-retail-hero--warning .today-retail-hero__current {
+  background:
+    radial-gradient(circle at 86% 12%, rgb(242 112 53 / 35%), transparent 17rem),
+    radial-gradient(circle at 8% 100%, rgb(231 11 133 / 24%), transparent 19rem),
+    linear-gradient(145deg, #4b22c8 0%, #5e2ced 50%, #391994 100%);
+}
+
+.today-retail-hero--warning .today-retail-hero__badges .is-alert {
+  border-color: rgb(231 11 133 / 24%);
+  background: rgb(255 244 250 / 94%);
+  color: #b30769;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .today-retail-hero__primary,
+  .today-retail-hero__badges > a,
+  .today-retail-hero__tiles article {
+    transition:
+      transform 160ms ease,
+      border-color 160ms ease,
+      box-shadow 160ms ease;
+  }
+
+  .today-retail-hero__primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 15px 30px rgb(242 112 53 / 30%);
+  }
+
+  .today-retail-hero__badges > a:hover,
+  .today-retail-hero__tiles article:hover {
+    border-color: rgb(24 189 205 / 28%);
+    transform: translateY(-1px);
+  }
+}
+
+.today-retail-hero a:focus-visible {
+  outline: 3px solid rgb(24 189 205 / 42%);
+  outline-offset: 3px;
+}
+
+@media (max-width: 1160px) {
+  .today-retail-hero__inner {
+    grid-template-columns: minmax(0, 0.72fr) minmax(470px, 1.28fr);
+    gap: 2rem;
+  }
+
+  .today-retail-hero__copy h1 {
+    font-size: clamp(3rem, 5.3vw, 5.1rem);
+  }
+
+  .today-retail-hero__tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 920px) {
+  .today-retail-hero {
+    padding-top: 2rem;
+  }
+
+  .today-retail-hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+    width: min(780px, calc(100% - 40px));
+  }
+
+  .today-retail-hero__copy {
+    max-width: 46rem;
+  }
+
+  .today-retail-hero__copy h1 {
+    max-width: 12ch;
+  }
+
+  .today-retail-hero__showcase {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .today-retail-hero__current {
+    min-height: 22rem;
+  }
+
+  .today-retail-hero__tiles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .today-retail-hero {
+    padding: 1.5rem 0 1.35rem;
+    border-radius: 0 0 1.35rem 1.35rem;
+  }
+
+  .today-retail-hero__inner {
+    width: min(var(--editorial-max), calc(100% - 28px));
+    gap: 1.35rem;
+  }
+
+  .today-retail-hero__copy h1 {
+    font-size: clamp(2.8rem, 13vw, 4.4rem);
+  }
+
+  .today-retail-hero__current {
+    min-height: 0;
+    padding: 1.05rem;
+    border-radius: 1.15rem;
+  }
+
+  .today-retail-hero__current-main {
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+  }
+
+  .today-retail-hero__weather-icon {
+    width: 5.5rem;
+    height: 5.5rem;
+    border-radius: 1.25rem;
+  }
+
+  .today-retail-hero__weather-icon svg {
+    width: 3.9rem;
+    height: 3.9rem;
+  }
+
+  .today-retail-hero__current-main strong {
+    font-size: clamp(4rem, 19vw, 5.8rem);
+  }
+
+  .today-retail-hero__current-metrics {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .today-retail-hero__current-metrics > div {
+    grid-template-columns: 1rem minmax(0, 1fr);
+    border-right: 0;
+    border-bottom: 1px solid rgb(255 255 255 / 13%);
+  }
+
+  .today-retail-hero__current-metrics > div:last-child {
+    border-bottom: 0;
+  }
+
+  .today-retail-hero__tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .today-retail-hero__inner {
+    width: min(var(--editorial-max), calc(100% - 20px));
+  }
+
+  .today-retail-hero__copy {
+    gap: 0.8rem;
+  }
+
+  .today-retail-hero__copy h1 {
+    font-size: clamp(2.55rem, 13.8vw, 3.65rem);
+  }
+
+  .today-retail-hero__actions,
+  .today-retail-hero__primary,
+  .today-retail-hero__secondary {
+    width: 100%;
+  }
+
+  .today-retail-hero__secondary {
+    min-height: 2.5rem;
+  }
+
+  .today-retail-hero__current header {
+    align-items: center;
+  }
+
+  .today-retail-hero__tiles article {
+    min-height: 6.4rem;
+    padding: 0.72rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .today-retail-hero *,
+  .today-retail-hero *::before,
+  .today-retail-hero *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .today-retail-hero,
+  .today-retail-hero__current,
+  .today-retail-hero__tiles article,
+  .today-retail-hero__badges > span,
+  .today-retail-hero__badges > a {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+}
