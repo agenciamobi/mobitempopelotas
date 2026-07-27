@@ -1,14 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
-import { TomorrowForecastPageV2 } from "@/components/weather/DailyForecastPagesV2";
+import { TomorrowForecastPageV3 } from "@/components/weather/TomorrowForecastPageV3";
+import { TomorrowRetailHero } from "@/components/weather/TomorrowRetailHero";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 const PAGE_TITLE = "Previsão do tempo para amanhã em Pelotas";
 const PAGE_DESCRIPTION =
-  "Veja a previsão do tempo para amanhã em Pelotas, com máxima, mínima, chance de chuva, volume previsto e rajadas de vento.";
+  "Planeje amanhã em Pelotas com mínima, máxima, chuva, rajadas, comparação com hoje e contexto do INMET e CPPMet/UFPel.";
 const PAGE_PATH = "/tempo-amanha-pelotas";
 
 export const Route = createFileRoute("/tempo-amanha-pelotas")({
@@ -28,6 +29,7 @@ export const Route = createFileRoute("/tempo-amanha-pelotas")({
           "Chuva amanhã em Pelotas",
           "Temperatura amanhã em Pelotas",
           "Vento amanhã em Pelotas",
+          "Planejamento meteorológico em Pelotas",
         ],
       }),
     ]),
@@ -43,9 +45,15 @@ function TempoAmanhaPage() {
     <InternalWeatherPageShell
       data={weather}
       pageClassName="internal-weather-shell--tomorrow"
-      showOfficialAlerts={false}
+      hero={({ weather: productionWeather, advisoryLevel, officialAlertCount }) => (
+        <TomorrowRetailHero
+          weather={productionWeather}
+          advisoryLevel={advisoryLevel}
+          officialAlertCount={officialAlertCount}
+        />
+      )}
     >
-      <TomorrowForecastPageV2 data={weather} />
+      <TomorrowForecastPageV3 data={weather} />
     </InternalWeatherPageShell>
   );
 }
