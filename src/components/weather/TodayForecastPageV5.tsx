@@ -8,6 +8,7 @@ import {
   InternalPageChapters,
   InternalPracticalSummary,
 } from "@/components/weather/InternalWeatherWidgets";
+import { TodayWeatherResources } from "@/components/weather/TodayWeatherResources";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-browser-recovery";
 
@@ -15,6 +16,7 @@ import "./TodayForecastPageV5.css";
 
 const chapters = [
   { href: "#previsao-hoje", label: "Hoje", detail: "Evolução por hora" },
+  { href: "#recursos-hoje", label: "Planeje", detail: "Janelas e atalhos" },
   { href: "#medicao-atual", label: "Medição local", detail: "Valores e origem" },
   { href: "#leitura-do-dia", label: "Leitura prática", detail: "Impacto na rotina" },
   { href: "#como-interpretar-hoje", label: "Entenda", detail: "Metodologia e FAQ" },
@@ -84,6 +86,7 @@ export function TodayForecastPageV5({ data }: { data: WeatherIntelligenceData })
     <div className="today-v5-page">
       <InternalPageChapters items={chapters} label="Navegação da previsão de hoje" />
       <InternalForecastStory data={recoveredData} />
+      <TodayWeatherResources data={recoveredData} />
       <InternalObservationWidget data={recoveredData} />
       <InternalPracticalSummary
         data={recoveredData}
