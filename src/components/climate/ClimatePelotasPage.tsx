@@ -78,12 +78,12 @@ function seasonForMonth(month: number): SeasonId {
   return "spring";
 }
 
-function currentSeason(history: WeatherHistoryData) {
+function currentSeason(history: WeatherHistoryData): Season {
   const reference = history.source.periodEnd
     ? new Date(`${history.source.periodEnd}T12:00:00-03:00`)
     : new Date();
   const month = Number.isNaN(reference.getTime()) ? new Date().getMonth() + 1 : reference.getMonth() + 1;
-  return seasons.find((season) => season.id === seasonForMonth(month)) ?? seasons[0];
+  return seasons.find((season) => season.id === seasonForMonth(month)) ?? seasons[0]!;
 }
 
 function formatDate(value: string | null) {
