@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
+import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
 import { SevenDayForecastPage } from "@/components/weather/ForecastPages";
 import { SEVEN_DAY_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
@@ -41,12 +42,15 @@ function PrevisaoSeteDiasPage() {
   const weather = Route.useLoaderData();
 
   return (
-    <>
+    <InternalWeatherPageShell
+      data={weather}
+      pageClassName="internal-weather-shell--seven-day"
+    >
       <SevenDayForecastPage data={weather} />
       <EditorialContentSection
         id="como-interpretar-a-previsao-semanal"
         content={SEVEN_DAY_EDITORIAL_CONTENT}
       />
-    </>
+    </InternalWeatherPageShell>
   );
 }
