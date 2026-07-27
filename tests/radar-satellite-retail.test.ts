@@ -4,12 +4,14 @@ import test from "node:test";
 
 const route = readFileSync("src/routes/radar-e-satelite-pelotas.tsx", "utf8");
 const page = readFileSync("src/components/redemet/RedemetOverview.tsx", "utf8");
+const context = readFileSync("src/components/redemet/RadarForecastContext.tsx", "utf8");
+const contextStyles = readFileSync("src/components/redemet/RadarForecastContext.css", "utf8");
 const baseStyles = readFileSync("src/components/redemet/RedemetRetail.css", "utf8");
 const refinementStyles = readFileSync(
   "src/components/redemet/RedemetRetailRefinement.css",
   "utf8",
 );
-const styles = `${baseStyles}\n${refinementStyles}`;
+const styles = `${baseStyles}\n${refinementStyles}\n${contextStyles}`;
 
 const remValues = [...styles.matchAll(/font-size:\s*(0\.\d+)rem/g)].map((match) =>
   Number(match[1]),
@@ -17,12 +19,13 @@ const remValues = [...styles.matchAll(/font-size:\s*(0\.\d+)rem/g)].map((match) 
 
 test("radar route uses direct SEO copy and page-specific editorial content", () => {
   assert.match(route, /Radar meteorológico e satélite em Pelotas/);
-  assert.match(route, /sequência animada, horário de cada quadro/);
+  assert.match(route, /sequência animada, horário de cada quadro, comparação com a previsão/);
   assert.match(route, /RADAR_PAGE_CONTENT/);
   assert.match(route, /Como usar radar, satélite e trovoadas para acompanhar o tempo em Pelotas/);
   assert.match(route, /Como usar a reprodução automática dos quadros/);
-  assert.match(route, /Movimento nas imagens é observação do passado recente, não previsão do futuro/);
+  assert.match(route, /movimento nas imagens é observação do passado recente, não previsão do futuro/);
   assert.match(route, /Por que duas fontes podem mostrar horários diferentes/);
+  assert.match(route, /Os valores ao lado do radar foram medidos pela imagem/);
   assert.match(route, /createFaqPageJsonLd\(PAGE_PATH, RADAR_PAGE_CONTENT\.faqs\)/);
   assert.match(route, /className="radar-satellite-page"/);
   assert.match(route, /Sequência de imagens de radar/);
@@ -76,6 +79,24 @@ test("radar, satellite and storms remain explicitly distinct", () => {
   assert.match(page, /Imagem meteorológica ajuda a acompanhar, mas não define o risco sozinha/);
 });
 
+test("latest radar frame is compared with the nearest valid forecast hour", () => {
+  assert.match(route, /getWeatherIntelligence/);
+  assert.match(route, /Promise\.all/);
+  assert.match(route, /<RadarForecastContext radar=\{data\.redemet\.radar\} weather=\{data\.weather\}/);
+  assert.match(context, /nearestForecastHour/);
+  assert.match(context, /hour\.timestamp/);
+  assert.match(context, /difference > 3 \* 60 \* 60 \* 1_000/);
+  assert.match(context, /O que a previsão indicava no horário do radar/);
+  assert.match(context, /O radar é uma imagem observada pela REDEMET/);
+  assert.match(context, /não são medidos pelo radar/);
+  assert.match(context, /Temperatura prevista/);
+  assert.match(context, /Chance de chuva/);
+  assert.match(context, /Rajada prevista/);
+  assert.match(context, /Nuvens baixas/);
+  assert.match(context, /Visibilidade prevista/);
+  assert.match(context, /Movimento entre quadros anteriores não representa previsão futura/);
+});
+
 test("radar retail layout follows the portal rail and keeps controls aligned", () => {
   assert.match(baseStyles, /max-width:\s*var\(--portal-frame-max, 1760px\)/);
   assert.match(baseStyles, /padding:\s*0 var\(--portal-content-gutter/);
@@ -86,6 +107,11 @@ test("radar retail layout follows the portal rail and keeps controls aligned", (
   assert.match(refinementStyles, /\.redemet-frame-tools/);
   assert.match(refinementStyles, /\.redemet-storm-controls/);
   assert.match(refinementStyles, /content-visibility:\s*auto/);
+  assert.match(contextStyles, /\.radar-forecast-context/);
+  assert.match(contextStyles, /grid-template-columns:\s*repeat\(5, minmax\(0, 1fr\)\)/);
+  assert.match(contextStyles, /@media \(max-width: 1180px\)/);
+  assert.match(contextStyles, /@media \(max-width: 860px\)/);
+  assert.match(contextStyles, /@media \(max-width: 700px\)/);
   assert.match(refinementStyles, /@media \(max-width: 1320px\)/);
   assert.match(refinementStyles, /@media \(max-width: 920px\)/);
   assert.match(refinementStyles, /@media \(max-width: 700px\)/);
