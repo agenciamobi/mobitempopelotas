@@ -20,7 +20,7 @@ const photos = {
   calm: {
     src: "https://commons.wikimedia.org/wiki/Special:Redirect/file/Sunset_over_Calm_Lake.jpg?width=1920",
     alt: "Céu com nuvens sobre um lago ao entardecer",
-    credit: "Kane Morley · CC BY 2.0",
+    credit: "Kane Morley · CC BY-SA 4.0",
     sourceHref: "https://commons.wikimedia.org/wiki/File:Sunset_over_Calm_Lake.jpg",
     position: "center 46%",
   },
