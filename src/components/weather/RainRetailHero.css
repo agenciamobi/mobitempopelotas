@@ -1,0 +1,76 @@
+/* Chuva em Pelotas — retail hero variation. */
+.rain-retail-hero {
+  background:
+    radial-gradient(circle at 7% 10%, rgb(24 189 205 / 10%), transparent 28rem),
+    radial-gradient(circle at 96% 8%, rgb(94 44 237 / 9%), transparent 30rem),
+    linear-gradient(180deg, #f8fbfb 0%, #f3f7f8 100%);
+}
+
+.rain-retail-hero__copy h1 span {
+  color: #168fa3;
+}
+
+.rain-retail-hero__copy > p {
+  max-width: 44rem;
+}
+
+.rain-retail-hero__current {
+  min-height: 25rem;
+}
+
+.rain-retail-hero__current .today-retail-hero__current-photo {
+  background:
+    linear-gradient(180deg, rgb(6 26 44 / 14%), rgb(6 24 42 / 58%)),
+    linear-gradient(145deg, rgb(28 92 132 / 30%), rgb(72 34 200 / 42%)),
+    var(--today-retail-hero-photo) var(--today-retail-hero-position, center) / cover no-repeat;
+}
+
+.rain-retail-hero__current .today-retail-hero__weather-icon {
+  color: #76f3eb;
+}
+
+.rain-retail-hero__current-main > div:last-child > strong {
+  font-size: clamp(4.2rem, 6.5vw, 7rem);
+}
+
+.rain-retail-hero__current-main > div:last-child > small {
+  display: block;
+  margin-top: 0.28rem;
+  color: rgb(255 255 255 / 66%);
+  font-size: clamp(0.76rem, 0.72rem + 0.08vw, 0.84rem);
+}
+
+.rain-retail-hero__tiles article {
+  min-height: 8.3rem;
+}
+
+.rain-retail-hero__tiles article > strong {
+  font-size: clamp(1rem, 1.35vw, 1.35rem);
+}
+
+.internal-weather-shell--rain .rain-retail-hero__inner {
+  width: 100%;
+  max-width: var(--internal-weather-frame-max);
+  margin-inline: auto;
+  padding-right: var(--internal-weather-frame-gutter);
+  padding-left: var(--internal-weather-frame-gutter);
+  box-sizing: border-box;
+}
+
+@media (max-width: 920px) {
+  .rain-retail-hero__current {
+    min-height: 22rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .rain-retail-hero__current-main > div:last-child > strong {
+    font-size: clamp(3.6rem, 18vw, 5.2rem);
+  }
+}
+
+@media (forced-colors: active) {
+  .rain-retail-hero__current .today-retail-hero__current-photo {
+    display: none;
+  }
+}
