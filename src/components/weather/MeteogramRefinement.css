@@ -1,0 +1,24 @@
+.meteogram-chapters span,
+.meteogram-selected > header span,
+.meteogram-selected-grid span,
+.meteogram-volume-grid strong,
+.meteogram-volume-grid small,
+.meteogram-method > div:last-child span {
+  font-size: 0.75rem;
+}
+
+.meteogram-volume-grid {
+  grid-auto-columns: minmax(32px, 1fr);
+  grid-auto-flow: column;
+  grid-template-columns: none;
+}
+
+.meteogram-volume-grid article {
+  min-width: 32px;
+}
+
+@media (max-width: 680px) {
+  .meteogram-volume-grid {
+    grid-auto-columns: minmax(36px, 1fr);
+  }
+}
