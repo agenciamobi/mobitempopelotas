@@ -1,0 +1,24 @@
+.hydrology-editorial-route > .sace-context {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  justify-self: stretch;
+  scroll-margin-top: 8rem;
+}
+
+.sace-context .sace-map-panel,
+.sace-context .sace-map-toolbar,
+.sace-context .sace-stations-grid,
+.sace-context .sace-system-grid {
+  min-width: 0;
+}
+
+.sace-context .sace-stations-grid article > div span {
+  font-size: 0.75rem;
+}
+
+@media (max-width: 700px) {
+  .hydrology-editorial-route > .sace-context {
+    scroll-margin-top: 6rem;
+  }
+}
