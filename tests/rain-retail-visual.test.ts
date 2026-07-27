@@ -15,31 +15,54 @@ test("rain route uses the shared shell with a dedicated retail hero", () => {
   assert.match(route, /RainForecastPageV2/);
   assert.match(route, /pageClassName="internal-weather-shell--rain"/);
   assert.match(route, /hero=\{\(\{ weather: productionWeather, advisoryLevel, officialAlertCount \}\)/);
+  assert.match(route, /Veja a chance de chuva em Pelotas/);
+  assert.match(route, /RAIN_PAGE_CONTENT/);
+  assert.match(route, /Como ler chance e volume de chuva em Pelotas/);
+  assert.match(route, /createFaqPageJsonLd\(PAGE_PATH, RAIN_PAGE_CONTENT\.faqs\)/);
   assert.doesNotMatch(route, /RainPage/);
   assert.doesNotMatch(route, /showOfficialAlerts=\{false\}/);
 });
 
-test("rain hero separates probability, volume and timing", () => {
-  assert.match(hero, /A chuva em Pelotas/);
-  assert.match(hero, /organizada por horário/);
-  assert.match(hero, /Maior chance próxima/);
-  assert.match(hero, /Volume hoje/);
-  assert.match(hero, /Acumulado 7 dias/);
-  assert.match(hero, /Horas com sinal/);
+test("rain hero separates chance, volume and timing in direct language", () => {
+  assert.match(hero, /Chuva em Pelotas/);
+  assert.match(hero, /chance por horário e volume previsto/);
+  assert.match(hero, /Maior chance nas próximas 12 horas/);
+  assert.match(hero, /Volume previsto hoje/);
+  assert.match(hero, /Total previsto em 7 dias/);
+  assert.match(hero, /Horários com 30% ou mais/);
+  assert.match(hero, /Horário com maior chance/);
+  assert.match(hero, /Dia com maior volume/);
+  assert.match(hero, /Rajada em período com chuva/);
+  assert.match(hero, /Fonte da previsão/);
+  assert.match(hero, /timeReference/);
+  assert.match(hero, /alertLabel/);
   assert.match(hero, /getRetailWeatherPhoto/);
   assert.match(hero, /today-retail-hero__current-photo/);
   assert.match(hero, /<h1/);
+  assert.doesNotMatch(hero, /organizada por horário/);
+  assert.doesNotMatch(hero, /aviso\(s\) oficial\(is\)/);
+  assert.doesNotMatch(hero, /Dia mais chuvoso/);
 });
 
-test("rain page is decision-focused and has no duplicate hero", () => {
+test("rain page answers when, how much and which period in direct language", () => {
   assert.match(page, /InternalPageChapters/);
   assert.match(page, /buildWindows/);
-  assert.match(page, /Probabilidade indica a chance de ocorrência/);
-  assert.match(page, /Quando a probabilidade aumenta/);
-  assert.match(page, /Chance e volume não significam a mesma coisa/);
-  assert.match(page, /Transforme a previsão em decisões simples/);
-  assert.match(page, /Alertas e previsão do INMET/);
-  assert.match(page, /Nenhum valor demonstrativo foi inserido/);
+  assert.match(page, /Resumo da chuva/);
+  assert.match(page, /Chance de chuva nas próximas 12 horas/);
+  assert.match(page, /Chance e volume de chuva em cada dia/);
+  assert.match(page, /Quais períodos têm menor e maior chance de chuva/);
+  assert.match(page, /O que o INMET publica sobre chuva em Pelotas/);
+  assert.match(page, /Período com menor chance/);
+  assert.match(page, /Período com maior chance/);
+  assert.match(page, /Chance de chuva indica a possibilidade de precipitação/);
+  assert.match(page, /activeAlertLabel/);
+  assert.match(page, /officialPeriodLabel/);
+  assert.match(page, /Nenhum valor foi estimado manualmente/);
+  assert.doesNotMatch(page, /A próxima janela relevante/);
+  assert.doesNotMatch(page, /Transforme a previsão em decisões simples/);
+  assert.doesNotMatch(page, /ativo\(s\)/);
+  assert.doesNotMatch(page, /período\(s\)/);
+  assert.doesNotMatch(page, /Nenhum valor demonstrativo foi inserido/);
   assert.doesNotMatch(page, /<h1/);
   assert.doesNotMatch(page, /PageHeader/);
   assert.doesNotMatch(page, /QualitySummary/);
