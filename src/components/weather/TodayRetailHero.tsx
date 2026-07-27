@@ -33,12 +33,17 @@ type TodayRetailHeroProps = {
 type RetailMetric = {
   label: string;
   value: string;
-  detail: string;
+  detail?: string;
   icon: LucideIcon;
 };
 
 function formatValue(value: number | null, suffix = "") {
   return value === null ? "—" : `${value}${suffix}`;
+}
+
+function formatWind(value: number | null, direction: string | null) {
+  const speed = formatValue(value, " km/h");
+  return value !== null && direction ? `${speed} · ${direction}` : speed;
 }
 
 function extractClock(value: string | null | undefined) {
@@ -90,19 +95,16 @@ function buildCurrentMetrics(weather: WeatherData): RetailMetric[] {
     {
       label: "Sensação",
       value: formatValue(current.feelsLike, "°"),
-      detail: "percebida agora",
       icon: Thermometer,
     },
     {
       label: "Umidade",
       value: formatValue(current.humidity, "%"),
-      detail: "medição local",
       icon: Droplets,
     },
     {
       label: "Vento",
-      value: formatValue(current.windSpeed, " km/h"),
-      detail: current.windDirection ?? "direção não informada",
+      value: formatWind(current.windSpeed, current.windDirection),
       icon: Wind,
     },
   ];
@@ -144,12 +146,12 @@ export function TodayRetailHero({
           </span>
 
           <h1 id="today-retail-hero-title">
-            Seu dia em Pelotas, <span>organizado por horários.</span>
+            Tempo hoje em Pelotas: <span>previsão por hora, chuva e vento.</span>
           </h1>
 
           <p>
-            {condition} {conditionMoment}. Consulte as melhores janelas, a chance de chuva e as
-            rajadas antes de definir a rotina.
+            {condition} {conditionMoment}. Acompanhe como temperatura, chuva e vento mudam nas
+            próximas horas e escolha os melhores períodos para sair.
           </p>
 
           <div className="today-retail-hero__badges" aria-label="Situação da previsão">
@@ -219,7 +221,7 @@ export function TodayRetailHero({
                       <span>
                         <small>{metric.label}</small>
                         <strong>{metric.value}</strong>
-                        <em>{metric.detail}</em>
+                        {metric.detail ? <em>{metric.detail}</em> : null}
                       </span>
                     </div>
                   );
