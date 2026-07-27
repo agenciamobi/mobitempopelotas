@@ -4,61 +4,94 @@ import test from "node:test";
 
 const route = readFileSync("src/routes/radar-e-satelite-pelotas.tsx", "utf8");
 const page = readFileSync("src/components/redemet/RedemetOverview.tsx", "utf8");
-const styles = readFileSync("src/components/redemet/RedemetRetail.css", "utf8");
+const baseStyles = readFileSync("src/components/redemet/RedemetRetail.css", "utf8");
+const refinementStyles = readFileSync(
+  "src/components/redemet/RedemetRetailRefinement.css",
+  "utf8",
+);
+const styles = `${baseStyles}\n${refinementStyles}`;
 
 const remValues = [...styles.matchAll(/font-size:\s*(0\.\d+)rem/g)].map((match) =>
   Number(match[1]),
 );
 
 test("radar route uses direct SEO copy and page-specific editorial content", () => {
-  assert.match(route, /Radar e satélite em Pelotas/);
-  assert.match(route, /Acompanhe radar meteorológico, imagens de satélite e trovoadas/);
+  assert.match(route, /Radar meteorológico e satélite em Pelotas/);
+  assert.match(route, /sequência animada, horário de cada quadro/);
   assert.match(route, /RADAR_PAGE_CONTENT/);
-  assert.match(route, /Como interpretar radar, satélite e trovoadas em Pelotas/);
+  assert.match(route, /Como usar radar, satélite e trovoadas para acompanhar o tempo em Pelotas/);
+  assert.match(route, /Como usar a reprodução automática dos quadros/);
+  assert.match(route, /Movimento nas imagens é observação do passado recente, não previsão do futuro/);
+  assert.match(route, /Por que duas fontes podem mostrar horários diferentes/);
   assert.match(route, /createFaqPageJsonLd\(PAGE_PATH, RADAR_PAGE_CONTENT\.faqs\)/);
-  assert.match(route, /Horário das imagens meteorológicas/);
+  assert.match(route, /className="radar-satellite-page"/);
+  assert.match(route, /Sequência de imagens de radar/);
 });
 
-test("radar page is organized around observation tasks instead of technical products", () => {
+test("radar page provides source freshness and actionable observation guidance", () => {
   assert.match(page, /InternalPageChapters/);
-  assert.match(page, /Visão geral/);
-  assert.match(page, /Radar e satélite em Pelotas/);
-  assert.match(page, /chuva, nuvens e trovoadas/);
-  assert.match(page, /Sinais de precipitação na região de Pelotas/);
-  assert.match(page, /Nuvens sobre Pelotas e a Região Sul/);
-  assert.match(page, /Trovoadas detectadas no quadro selecionado/);
-  assert.match(page, /Imagem meteorológica não é alerta automático/);
+  assert.match(page, /Radar meteorológico e satélite em Pelotas/);
+  assert.match(page, /acompanhe chuva, nuvens e trovoadas/);
   assert.match(page, /latestObservedAt/);
-  assert.match(page, /Observado em \{formatDateTime\(selectedFrame\.observedAt\)\}/);
-  assert.match(page, /Imagem \{selectedIndex \+ 1\} de \{layer\.frames\.length\}/);
-  assert.match(page, /Abrir fonte oficial/);
-  assert.match(page, /avisos oficiais para Pelotas/);
+  assert.match(page, /getFreshness/);
+  assert.match(page, /FreshnessBadge/);
+  assert.match(page, /SourceSummaryCard/);
+  assert.match(page, /Horário e sequência de cada fonte/);
+  assert.match(page, /Radar regional/);
+  assert.match(page, /Satélite REDEMET/);
+  assert.match(page, /Satélite INMET/);
+  assert.match(page, /Trovoadas STSC/);
+  assert.match(page, /Confira o horário/);
+  assert.match(page, /Reproduza a sequência/);
+  assert.match(page, /Compare produtos diferentes/);
+  assert.match(page, /Confirme risco e orientação/);
   assert.doesNotMatch(page, /camadas respondendo/);
   assert.doesNotMatch(page, /Transparência operacional/);
   assert.doesNotMatch(page, /Fonte respondendo/);
 });
 
-test("radar, satellite and storms remain explicitly distinct", () => {
-  assert.match(page, /Radar: sinais de precipitação/);
-  assert.match(page, /Satélite: cobertura de nuvens/);
-  assert.match(page, /Trovoadas: atividade elétrica/);
-  assert.match(page, /Nuvem visível não confirma chuva no solo/);
-  assert.match(page, /Detecção de trovoada não é aviso meteorológico/);
-  assert.match(page, /O radar pode mostrar ecos sem confirmar chuva no seu bairro/);
+test("image and storm timelines include playback and recovery controls", () => {
+  assert.match(page, /useFramePlayback/);
+  assert.match(page, /FRAME_INTERVAL_MS/);
+  assert.match(page, /window\.setInterval/);
+  assert.match(page, /Reproduzir sequência/);
+  assert.match(page, /Pausar sequência/);
+  assert.match(page, /Quadro mais recente/);
+  assert.match(page, /Abrir imagem/);
+  assert.match(page, /aria-pressed=\{playback\.isPlaying\}/);
+  assert.match(page, /playback\.showLatest/);
+  assert.match(page, /playback\.selectFrame/);
+  assert.match(page, /redemet-storm-controls/);
+  assert.match(page, /Observado em \{formatDateTime\(selectedFrame\.observedAt\)\}/);
 });
 
-test("radar retail layout follows the portal rail and remains readable", () => {
-  assert.match(styles, /max-width:\s*var\(--portal-frame-max, 1760px\)/);
-  assert.match(styles, /padding:\s*0 var\(--portal-content-gutter/);
-  assert.match(styles, /grid-template-columns:\s*repeat\(5, minmax\(0, 1fr\)\)/);
-  assert.match(styles, /grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/);
-  assert.match(styles, /\.redemet-layer-card\.is-featured/);
-  assert.match(styles, /@media \(max-width: 1180px\)/);
-  assert.match(styles, /@media \(max-width: 920px\)/);
-  assert.match(styles, /@media \(max-width: 700px\)/);
-  assert.match(styles, /@media \(max-width: 480px\)/);
-  assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.match(styles, /@media \(forced-colors: active\)/);
-  assert.match(styles, /:focus-visible/);
+test("radar, satellite and storms remain explicitly distinct", () => {
+  assert.match(page, /Radar meteorológico · REDEMET\/DECEA/);
+  assert.match(page, /Ecos associados à precipitação/);
+  assert.match(page, /Cobertura e evolução das nuvens sobre a Região Sul/);
+  assert.match(page, /Nuvens no satélite não significam necessariamente chuva/);
+  assert.match(page, /Trovoadas detectadas na sequência selecionada/);
+  assert.match(page, /Detecção de trovoada não é aviso meteorológico/);
+  assert.match(page, /A imagem é regional e não confirma precipitação em um endereço específico/);
+  assert.match(page, /Imagem meteorológica ajuda a acompanhar, mas não define o risco sozinha/);
+});
+
+test("radar retail layout follows the portal rail and keeps controls aligned", () => {
+  assert.match(baseStyles, /max-width:\s*var\(--portal-frame-max, 1760px\)/);
+  assert.match(baseStyles, /padding:\s*0 var\(--portal-content-gutter/);
+  assert.match(refinementStyles, /\.radar-satellite-page > \.editorial-answer-section/);
+  assert.match(refinementStyles, /grid-template-columns:\s*repeat\(4, minmax\(0, 1fr\)\)/);
+  assert.match(refinementStyles, /\.redemet-layer-card\.is-featured/);
+  assert.match(refinementStyles, /grid-template-areas:[\s\S]*"previous timeline next"[\s\S]*"tools tools tools"/);
+  assert.match(refinementStyles, /\.redemet-frame-tools/);
+  assert.match(refinementStyles, /\.redemet-storm-controls/);
+  assert.match(refinementStyles, /content-visibility:\s*auto/);
+  assert.match(refinementStyles, /@media \(max-width: 1320px\)/);
+  assert.match(refinementStyles, /@media \(max-width: 920px\)/);
+  assert.match(refinementStyles, /@media \(max-width: 700px\)/);
+  assert.match(refinementStyles, /@media \(max-width: 480px\)/);
+  assert.match(refinementStyles, /@media \(prefers-reduced-motion: reduce\)/);
+  assert.match(refinementStyles, /@media \(forced-colors: active\)/);
+  assert.match(refinementStyles, /:focus-visible/);
   assert.ok(remValues.every((value) => value >= 0.75), "microtext must remain readable");
 });
