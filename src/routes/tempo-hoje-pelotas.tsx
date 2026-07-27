@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
-import { TodayForecastPageV4 } from "@/components/weather/TodayForecastPageV4";
-import "@/components/weather/TodayForecastPageV4Refinement.css";
-import "@/components/weather/TodayForecastPageV4WidthRefinement.css";
+import { TodayForecastPageV5 } from "@/components/weather/TodayForecastPageV5";
 import { TODAY_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
@@ -12,6 +10,7 @@ import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence
 import { toProductionAlerts, toProductionWeatherData } from "@/production/adapters/home";
 import {
   hasVerifiedInmetAlertSemantics,
+  InmetAlertsPanel,
 } from "@/production/components/inmet-alerts-panel";
 import { SiteFooter } from "@/production/components/site-footer";
 import { SiteHeader } from "@/production/components/site-header";
@@ -74,11 +73,11 @@ function TempoHojeHomeVisual({ data }: { data: WeatherIntelligenceData }) {
   const headerLevel =
     advisoryRank[officialLevel] > advisoryRank[advisory.level] ? officialLevel : advisory.level;
   const mainClassName = pelotasOfficialAlerts.length
-    ? "home-editorial-main today-v4-home-main has-official-alerts"
-    : "home-editorial-main today-v4-home-main";
+    ? "home-editorial-main today-v5-home-main has-official-alerts"
+    : "home-editorial-main today-v5-home-main";
 
   return (
-    <div className="site-shell site-shell--home site-shell--home-editorial today-v4-home-shell">
+    <div className="site-shell site-shell--home site-shell--home-editorial today-v5-home-shell">
       <SiteHeader advisoryLevel={headerLevel} variant="hero" />
       <WeatherHero
         weather={productionWeather}
@@ -87,7 +86,8 @@ function TempoHojeHomeVisual({ data }: { data: WeatherIntelligenceData }) {
       />
 
       <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
-        <TodayForecastPageV4 data={data} />
+        <InmetAlertsPanel data={inmetAlerts} variant="home" advisoryLevel={headerLevel} />
+        <TodayForecastPageV5 data={data} />
         <EditorialContentSection id="como-interpretar-hoje" content={TODAY_EDITORIAL_CONTENT} />
       </main>
 
