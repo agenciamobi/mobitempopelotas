@@ -52,7 +52,7 @@ const megaMenus = [
         links: [
           { label: "Clima de Pelotas", to: "/clima-em-pelotas", description: "Estações do ano, fatores locais, normais e diferença entre tempo e clima." },
           { label: "Meteograma 24–48h", to: "/meteograma-pelotas", description: "Temperatura, chuva, nuvens, visibilidade, pressão e vento hora a hora." },
-          { label: "Histórico climático", to: "/historico-climatico-pelotas", description: "Compare temperatura, chuva e vento recentes." },
+          { label: "Histórico de 30 dias", to: "/historico-climatico-pelotas", description: "Compare máximas, mínimas, chuva e rajadas recentes." },
           { label: "Fontes e metodologia", to: "/metodologia", description: "Origem, função, limites e atualização dos dados." },
         ],
       },
