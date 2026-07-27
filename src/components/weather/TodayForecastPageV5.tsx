@@ -8,6 +8,7 @@ import {
   InternalPageChapters,
   InternalPracticalSummary,
 } from "@/components/weather/InternalWeatherWidgets";
+import { TodayAtmosphericSignals } from "@/components/weather/TodayAtmosphericSignals";
 import { TodayWeatherResources } from "@/components/weather/TodayWeatherResources";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-browser-recovery";
@@ -19,6 +20,7 @@ const chapters = [
   { href: "#previsao-hoje", label: "Próximas horas", detail: "Temperatura, chuva e vento" },
   { href: "#recursos-hoje", label: "Melhor período", detail: "Janelas para sair" },
   { href: "#medicao-atual", label: "Condição atual", detail: "Leitura da estação" },
+  { href: "#atmosfera-hoje", label: "Atmosfera", detail: "Orvalho, nuvens e visibilidade" },
   { href: "#leitura-do-dia", label: "Para sua rotina", detail: "O que merece atenção" },
   { href: "#como-interpretar-hoje", label: "Entenda os dados", detail: "Medição, previsão e FAQ" },
 ];
@@ -89,6 +91,7 @@ export function TodayForecastPageV5({ data }: { data: WeatherIntelligenceData })
       <InternalForecastStory data={recoveredData} />
       <TodayWeatherResources data={recoveredData} />
       <InternalObservationWidget data={recoveredData} />
+      <TodayAtmosphericSignals data={recoveredData} />
       <InternalPracticalSummary
         data={recoveredData}
         title={buildReadingTitle(recoveredData)}
