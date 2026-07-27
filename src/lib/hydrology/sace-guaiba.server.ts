@@ -8,7 +8,8 @@ const BOUNDS_URL = `${SACE_BASE_URL}/api/geojson/bounds`;
 const WMS_CONFIG_URL = `${SACE_BASE_URL}/wms-config`;
 const REQUEST_TIMEOUT_MS = 8_000;
 
-const nullableNumber = z.number().finite().nullable().optional();
+const finiteNumber = z.number().finite();
+const nullableNumber = finiteNumber.nullable().optional();
 const nullableString = z.string().nullable().optional();
 
 const stationPropertiesSchema = z
@@ -18,8 +19,8 @@ const stationPropertiesSchema = z
     sigla: z.string().optional().default(""),
     rio: z.string().optional().default(""),
     localizacao: z.string().optional().default(""),
-    latitude: z.number().finite(),
-    longitude: z.number().finite(),
+    latitude: finiteNumber,
+    longitude: finiteNumber,
     areaDrenagem: nullableNumber,
     tipoAlerta: z.string().optional().default("SEM_INFORMACAO"),
     corAlerta: nullableString,
@@ -35,7 +36,7 @@ const stationsSchema = z.object({
       type: z.literal("Feature"),
       geometry: z.object({
         type: z.literal("Point"),
-        coordinates: z.tuple([z.number().finite(), z.number().finite()]),
+        coordinates: z.tuple([finiteNumber, finiteNumber]),
       }),
       properties: stationPropertiesSchema,
     }),
@@ -45,9 +46,9 @@ const stationsSchema = z.object({
 const alertLegendSchema = z.array(
   z
     .object({
-      prioridade: z.number().finite(),
+      prioridade: finiteNumber.nullable().optional(),
       tipoAlerta: z.string().min(1),
-      ordemLegenda: z.number().finite(),
+      ordemLegenda: finiteNumber,
       nome: z.string().min(1),
       cor: z.string().min(1),
     })
@@ -55,10 +56,10 @@ const alertLegendSchema = z.array(
 );
 
 const boundsSchema = z.object({
-  minx: z.number().finite(),
-  miny: z.number().finite(),
-  maxx: z.number().finite(),
-  maxy: z.number().finite(),
+  minx: finiteNumber,
+  miny: finiteNumber,
+  maxx: finiteNumber,
+  maxy: finiteNumber,
 });
 
 const wmsConfigSchema = z.object({
@@ -79,6 +80,15 @@ const wmsConfigSchema = z.object({
   ),
 });
 
+export type SaceRiverSystem =
+  | "Guaíba e Delta"
+  | "Jacuí"
+  | "Taquari-Antas"
+  | "Caí"
+  | "Sinos"
+  | "Gravataí"
+  | "Outros afluentes";
+
 export type SaceGuaibaStation = {
   id: number;
   name: string;
@@ -96,17 +106,8 @@ export type SaceGuaibaStation = {
   transmitting: boolean;
 };
 
-export type SaceRiverSystem =
-  | "Guaíba e Delta"
-  | "Jacuí"
-  | "Taquari-Antas"
-  | "Caí"
-  | "Sinos"
-  | "Gravataí"
-  | "Outros afluentes";
-
 export type SaceGuaibaLegendItem = {
-  priority: number;
+  priority: number | null;
   alertType: string;
   order: number;
   label: string;
@@ -152,8 +153,12 @@ function normalizeHexColor(value: string | null | undefined, fallback: string) {
     : fallback;
 }
 
-function riverSystem(value: string): SaceRiverSystem {
-  const normalized = value.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+function normalizeText(value: string) {
+  return value.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+}
+
+function resolveRiverSystem(value: string): SaceRiverSystem {
+  const normalized = normalizeText(value);
   if (/guaiba|delta do jacui|cais maua|gasometro|ipanema/.test(normalized)) return "Guaíba e Delta";
   if (/taquari|antas/.test(normalized)) return "Taquari-Antas";
   if (/jacui/.test(normalized)) return "Jacuí";
@@ -164,43 +169,53 @@ function riverSystem(value: string): SaceRiverSystem {
 }
 
 function fallbackAlertLabel(type: string) {
-  const normalized = type.toUpperCase();
-  if (normalized === "NORMAL") return "Normal";
-  if (normalized === "SEM_INFORMACAO") return "Sem transmissão";
-  if (normalized === "BAIXO") return "Cota de Atenção";
-  if (normalized === "MEDIO") return "Cota de Alerta";
-  if (normalized === "ALTO") return "Situação elevada";
+  if (type === "NORMAL") return "Normal";
+  if (type === "SEM_INFORMACAO") return "Sem transmissão";
+  if (type === "BAIXO") return "Cota de Atenção";
+  if (type === "MEDIO") return "Cota de Alerta";
+  if (type === "ALTO") return "Situação elevada";
   return "Situação não informada";
 }
 
-function isTransmitting(type: string, label: string) {
-  return type.toUpperCase() !== "SEM_INFORMACAO" && !/sem transmiss/i.test(label);
+function stationIsAboveNormal(station: SaceGuaibaStation) {
+  return station.transmitting && station.alertType !== "NORMAL";
 }
 
-function isAboveNormal(station: SaceGuaibaStation) {
-  return station.transmitting && station.alertType.toUpperCase() !== "NORMAL";
+function normalizeLegend(payload: unknown) {
+  const parsed = alertLegendSchema.safeParse(payload);
+  if (!parsed.success) return [];
+
+  return parsed.data
+    .map<SaceGuaibaLegendItem>((item) => ({
+      priority: item.prioridade ?? null,
+      alertType: item.tipoAlerta.trim().toUpperCase(),
+      order: item.ordemLegenda,
+      label: item.nome.trim(),
+      color: normalizeHexColor(item.cor, "#78909c"),
+    }))
+    .sort((first, second) => first.order - second.order);
 }
 
 function normalizeStations(
   payload: z.infer<typeof stationsSchema>,
   legend: SaceGuaibaLegendItem[],
-): SaceGuaibaStation[] {
-  const legendByLabel = new Map(legend.map((item) => [item.label.toLowerCase(), item]));
+) {
+  const legendByLabel = new Map(legend.map((item) => [normalizeText(item.label), item]));
   const legendByType = new Map<string, SaceGuaibaLegendItem[]>();
   for (const item of legend) {
-    const items = legendByType.get(item.alertType.toUpperCase()) ?? [];
-    items.push(item);
-    legendByType.set(item.alertType.toUpperCase(), items);
+    const values = legendByType.get(item.alertType) ?? [];
+    values.push(item);
+    legendByType.set(item.alertType, values);
   }
 
-  return payload.features.map((feature) => {
+  return payload.features.map<SaceGuaibaStation>((feature) => {
     const properties = feature.properties;
-    const alertType = properties.tipoAlerta.trim() || "SEM_INFORMACAO";
+    const alertType = (properties.tipoAlerta.trim() || "SEM_INFORMACAO").toUpperCase();
     const explicitLabel = properties.nomeFiltroAlerta?.trim() || "";
     const alertLabel = explicitLabel || fallbackAlertLabel(alertType);
     const matchedLegend =
-      legendByLabel.get(alertLabel.toLowerCase()) ?? legendByType.get(alertType.toUpperCase())?.at(-1);
-    const transmitting = isTransmitting(alertType, alertLabel);
+      legendByLabel.get(normalizeText(alertLabel)) ?? legendByType.get(alertType)?.at(-1);
+    const transmitting = alertType !== "SEM_INFORMACAO" && !/sem transmiss/i.test(alertLabel);
 
     return {
       id: properties.id,
@@ -215,17 +230,17 @@ function normalizeStations(
       alertLabel,
       alertColor: normalizeHexColor(properties.corAlerta, matchedLegend?.color ?? "#78909c"),
       legendOrder: properties.ordemLegenda ?? matchedLegend?.order ?? null,
-      riverSystem: riverSystem(`${properties.rio} ${properties.nome}`),
+      riverSystem: resolveRiverSystem(`${properties.rio} ${properties.nome}`),
       transmitting,
     };
   });
 }
 
-function highlightStations(stations: SaceGuaibaStation[]) {
+function selectHighlightedStations(stations: SaceGuaibaStation[]) {
   const elevated = stations
-    .filter(isAboveNormal)
+    .filter(stationIsAboveNormal)
     .sort((first, second) => (first.legendOrder ?? 99) - (second.legendOrder ?? 99));
-  const strategicPatterns = [
+  const patterns = [
     /cais mau[aá]/i,
     /gas[oô]metro/i,
     /estrel/i,
@@ -235,7 +250,7 @@ function highlightStations(stations: SaceGuaibaStation[]) {
     /campo bom/i,
     /barca do ca[ií]/i,
   ];
-  const strategic = strategicPatterns
+  const strategic = patterns
     .map((pattern) => stations.find((station) => pattern.test(station.name)))
     .filter((station): station is SaceGuaibaStation => Boolean(station));
 
@@ -245,13 +260,12 @@ function highlightStations(stations: SaceGuaibaStation[]) {
   );
 }
 
-function networkCounts(stations: SaceGuaibaStation[]) {
+function countStations(stations: SaceGuaibaStation[]) {
   const transmitting = stations.filter((station) => station.transmitting).length;
   const normal = stations.filter(
-    (station) => station.transmitting && station.alertType.toUpperCase() === "NORMAL",
+    (station) => station.transmitting && station.alertType === "NORMAL",
   ).length;
-  const aboveNormal = stations.filter(isAboveNormal).length;
-
+  const aboveNormal = stations.filter(stationIsAboveNormal).length;
   return {
     total: stations.length,
     transmitting,
@@ -261,8 +275,8 @@ function networkCounts(stations: SaceGuaibaStation[]) {
   };
 }
 
-function systemCounts(stations: SaceGuaibaStation[]) {
-  const systems: SaceRiverSystem[] = [
+function countSystems(stations: SaceGuaibaStation[]) {
+  const names: SaceRiverSystem[] = [
     "Guaíba e Delta",
     "Jacuí",
     "Taquari-Antas",
@@ -271,13 +285,21 @@ function systemCounts(stations: SaceGuaibaStation[]) {
     "Gravataí",
     "Outros afluentes",
   ];
-
-  return systems
+  return names
     .map((name) => {
       const matching = stations.filter((station) => station.riverSystem === name);
-      return { name, total: matching.length, aboveNormal: matching.filter(isAboveNormal).length };
+      return { name, total: matching.length, aboveNormal: matching.filter(stationIsAboveNormal).length };
     })
     .filter((item) => item.total > 0);
+}
+
+function source(fetchedAt: Date) {
+  return {
+    name: "SACE Guaíba / Serviço Geológico do Brasil" as const,
+    url: SACE_PUBLIC_URL,
+    fetchedAt: fetchedAt.toISOString(),
+    endpoints: [STATIONS_URL, ALERTS_URL, BOUNDS_URL, WMS_CONFIG_URL],
+  };
 }
 
 function unavailableData(error: string, fetchedAt = new Date()): SaceGuaibaData {
@@ -290,12 +312,7 @@ function unavailableData(error: string, fetchedAt = new Date()): SaceGuaibaData 
     layers: [],
     counts: { total: 0, transmitting: 0, normal: 0, aboveNormal: 0, withoutTransmission: 0 },
     systems: [],
-    source: {
-      name: "SACE Guaíba / Serviço Geológico do Brasil",
-      url: SACE_PUBLIC_URL,
-      fetchedAt: fetchedAt.toISOString(),
-      endpoints: [STATIONS_URL, ALERTS_URL, BOUNDS_URL, WMS_CONFIG_URL],
-    },
+    source: source(fetchedAt),
     error,
   };
 }
@@ -333,27 +350,13 @@ export async function fetchSaceGuaibaData(): Promise<SaceGuaibaData> {
     return unavailableData("O SACE Guaíba respondeu com uma estrutura de estações inesperada.", fetchedAt);
   }
 
-  const parsedLegend =
-    legendResult.status === "fulfilled" ? alertLegendSchema.safeParse(legendResult.value) : null;
-  const legend: SaceGuaibaLegendItem[] = parsedLegend?.success
-    ? parsedLegend.data
-        .map((item) => ({
-          priority: item.prioridade,
-          alertType: item.tipoAlerta,
-          order: item.ordemLegenda,
-          label: item.nome,
-          color: normalizeHexColor(item.cor, "#78909c"),
-        }))
-        .sort((first, second) => first.order - second.order)
-    : [];
+  const legend = normalizeLegend(legendResult.status === "fulfilled" ? legendResult.value : null);
   const stations = normalizeStations(parsedStations.data, legend);
-
   const parsedBounds =
     boundsResult.status === "fulfilled" ? boundsSchema.safeParse(boundsResult.value) : null;
   const bounds: SaceGuaibaData["bounds"] = parsedBounds?.success
     ? [parsedBounds.data.minx, parsedBounds.data.miny, parsedBounds.data.maxx, parsedBounds.data.maxy]
     : null;
-
   const parsedWms = wmsResult.status === "fulfilled" ? wmsConfigSchema.safeParse(wmsResult.value) : null;
   const layers: SaceGuaibaLayer[] = parsedWms?.success
     ? parsedWms.data.camadas
@@ -368,27 +371,22 @@ export async function fetchSaceGuaibaData(): Promise<SaceGuaibaData> {
         }))
     : [];
 
-  const errors = [
-    legendResult.status === "rejected" || !parsedLegend?.success ? "legenda oficial" : null,
-    boundsResult.status === "rejected" || !parsedBounds?.success ? "limites da bacia" : null,
-    wmsResult.status === "rejected" || !parsedWms?.success ? "camadas cartográficas" : null,
+  const missing = [
+    legend.length === 0 ? "legenda oficial" : null,
+    bounds === null ? "limites da bacia" : null,
+    layers.length === 0 ? "camadas cartográficas" : null,
   ].filter((item): item is string => Boolean(item));
 
   return {
-    status: errors.length ? "partial" : "live",
+    status: missing.length ? "partial" : "live",
     stations,
-    highlightedStations: highlightStations(stations),
+    highlightedStations: selectHighlightedStations(stations),
     legend,
     bounds,
     layers,
-    counts: networkCounts(stations),
-    systems: systemCounts(stations),
-    source: {
-      name: "SACE Guaíba / Serviço Geológico do Brasil",
-      url: SACE_PUBLIC_URL,
-      fetchedAt: fetchedAt.toISOString(),
-      endpoints: [STATIONS_URL, ALERTS_URL, BOUNDS_URL, WMS_CONFIG_URL],
-    },
-    error: errors.length ? `Dados disponíveis sem ${errors.join(", ")}.` : null,
+    counts: countStations(stations),
+    systems: countSystems(stations),
+    source: source(fetchedAt),
+    error: missing.length ? `Dados disponíveis sem ${missing.join(", ")}.` : null,
   };
 }
