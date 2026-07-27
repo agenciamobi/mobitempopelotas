@@ -19,24 +19,29 @@ test("tomorrow route uses the shared shell with a dedicated retail hero", () => 
   assert.match(route, /TomorrowForecastPageV3/);
   assert.match(route, /pageClassName="internal-weather-shell--tomorrow"/);
   assert.match(route, /hero=\{\(\{ weather: productionWeather, advisoryLevel, officialAlertCount \}\)/);
+  assert.match(route, /Veja o tempo amanhã em Pelotas/);
   assert.doesNotMatch(route, /TomorrowForecastPageV2/);
   assert.doesNotMatch(route, /showOfficialAlerts=\{false\}/);
 });
 
-test("tomorrow hero derives all values from the second daily forecast", () => {
+test("tomorrow hero uses a useful search-oriented headline and concise metrics", () => {
   assert.match(hero, /weather\.daily\[1\]/);
   assert.match(hero, /weather\.daily\[0\]/);
   assert.match(hero, /getRetailWeatherPhoto/);
-  assert.match(hero, /Amanhã em Pelotas/);
-  assert.match(hero, /organizado para você planejar/);
-  assert.match(hero, /Máxima prevista/);
-  assert.match(hero, /Mínima/);
-  assert.match(hero, /Maior chance prevista/);
-  assert.match(hero, /Acumulado diário estimado/);
-  assert.match(hero, /Fonte principal da previsão/);
+  assert.match(hero, /Tempo amanhã em Pelotas/);
+  assert.match(hero, /temperatura, chuva e vento/);
+  assert.doesNotMatch(hero, /organizado para você planejar/);
+  assert.match(hero, /Mínima prevista/);
+  assert.match(hero, /Chance de chuva/);
+  assert.match(hero, /Rajada máxima/);
+  assert.match(hero, /metric\.detail \? <em>\{metric\.detail\}<\/em> : null/);
+  assert.match(hero, /Volume de chuva/);
+  assert.match(hero, /Fonte da previsão/);
   assert.match(hero, /today-retail-hero__current-photo/);
   assert.match(hero, /today-retail-hero__photo-credit/);
   assert.match(hero, /<h1/);
+  assert.doesNotMatch(hero, /menor temperatura/);
+  assert.doesNotMatch(hero, /maior chance prevista/);
   assert.doesNotMatch(hero, /weather\.current\.temperature/);
 });
 
@@ -48,18 +53,31 @@ test("retail photography is shared without breaking the today export", () => {
   assert.match(photoMap, /Heavy_Rain/);
 });
 
-test("tomorrow content is concise, comparative and source-aware", () => {
+test("tomorrow content answers planning questions in direct language", () => {
   assert.match(page, /weather\.daily\[1\]/);
   assert.match(page, /InternalPageChapters/);
-  assert.match(page, /O que muda de hoje para amanhã/);
-  assert.match(page, /Transforme a previsão em decisões simples/);
+  assert.match(page, /Previsão de amanhã/);
+  assert.match(page, /Compare com hoje/);
+  assert.match(page, /Como o tempo de amanhã deve mudar em relação a hoje/);
+  assert.match(page, /Como se preparar para o tempo de amanhã/);
+  assert.match(page, /Hoje à noite e amanhã cedo/);
+  assert.match(page, /O que INMET e CPPMet\/UFPel publicam para amanhã/);
+  assert.match(page, /Dúvidas sobre o tempo de amanhã em Pelotas/);
+  assert.match(page, /dayWeatherSummary/);
+  assert.match(page, /formatPercentDelta/);
+  assert.doesNotMatch(page, /p\.p\./);
+  assert.doesNotMatch(page, /Transforme a previsão em decisões simples/);
+  assert.doesNotMatch(page, /novas rodadas/);
+});
+
+test("tomorrow content remains comparative and source-aware", () => {
   assert.match(page, /buildPlanningCards/);
   assert.match(page, /forecastWeekdayKey/);
   assert.match(page, /period\.date\?\.slice\(0, 10\) === tomorrowDate/);
   assert.match(page, /CPPMet \/ UFPel/);
   assert.match(page, /INMET · \{period\.period\}/);
   assert.match(page, /FAQPage/);
-  assert.match(page, /Nenhum valor demonstrativo foi inserido/);
+  assert.match(page, /Nenhum valor foi estimado manualmente/);
   assert.doesNotMatch(page, /<h1/);
   assert.doesNotMatch(page, /daily-hero/);
   assert.doesNotMatch(page, /daily-condition-card/);
