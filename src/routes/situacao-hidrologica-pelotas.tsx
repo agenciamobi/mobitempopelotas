@@ -6,6 +6,7 @@ import "@/components/hydrology/HydrologyEditorialRefinements.css";
 import "@/components/hydrology/HydrologyEditorialRoute.css";
 import { HydrologyOverviewPage } from "@/components/hydrology/HydrologyPages";
 import { SaceGuaibaContext } from "@/components/hydrology/SaceGuaibaContext";
+import "@/components/hydrology/SaceGuaibaRefinement.css";
 import { HYDROLOGY_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
 import { getLagoonMonitoringNetwork } from "@/lib/hydrology/lagoon-network.functions";
@@ -88,7 +89,7 @@ export const Route = createFileRoute("/situacao-hidrologica-pelotas")({
     ]);
     return { weather, level, guaiba, lagoon, sace };
   },
-  staleTime: 5 * 60 * 1_000,
+  staleTime: 60 * 1_000,
   component: SituacaoHidrologicaPage,
 });
 
