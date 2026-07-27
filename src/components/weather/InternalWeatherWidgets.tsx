@@ -96,7 +96,9 @@ export function InternalForecastStory({
   }, [data, includeTrend]);
 
   return (
-    <div className={`internal-forecast-widget${includeTrend ? " includes-trend" : " is-today-only"}`}>
+    <div
+      className={`internal-forecast-widget${includeTrend ? " includes-trend" : " is-today-only"}`}
+    >
       <HomeForecastStory data={scopedData} />
     </div>
   );
@@ -105,7 +107,8 @@ export function InternalForecastStory({
 export function InternalObservationWidget({ data }: { data: WeatherIntelligenceData }) {
   const weather = data.weather;
   const current = weather.current;
-  const hasMeasurement = current?.temperature !== null && current?.temperature !== undefined;
+  const hasMeasurement =
+    current?.temperature !== null && current?.temperature !== undefined;
   const observed = hasMeasurement && weather.quality.currentSource === "embrapa";
   const forecastProvider = weather.quality.forecastProvider;
 
@@ -128,7 +131,8 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
         },
         {
           label: "Pôr do sol",
-          value: current.sunset ?? weather.inmetForecast[0]?.sunset ?? "Não informado",
+          value:
+            current.sunset ?? weather.inmetForecast[0]?.sunset ?? "Não informado",
           source: sourceName(weather.currentProvenance.sunset, forecastProvider),
         },
       ]
@@ -144,8 +148,8 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
         <span className="eyebrow">Medição local e procedência</span>
         <h2 id="internal-observation-title">O que está sendo observado agora</h2>
         <p>
-          A medição local e os campos complementados por modelo permanecem identificados sem repetir
-          a previsão principal.
+          A medição local e os campos complementados por modelo permanecem identificados sem
+          repetir a previsão principal.
         </p>
         <Link to="/estacao-embrapa-pelotas">
           Abrir estação Embrapa <span aria-hidden="true">→</span>
@@ -193,7 +197,9 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
         <div className="home-observation-story__unavailable internal-observation-unavailable">
           <RefreshCw aria-hidden="true" />
           <strong>Leitura local temporariamente indisponível</strong>
-          <span>A previsão por modelo continua ativa e permanece separada da observação.</span>
+          <span>
+            A previsão por modelo continua ativa e permanece separada da observação.
+          </span>
         </div>
       )}
     </section>
@@ -220,7 +226,9 @@ export function InternalPracticalSummary({
         <span className="eyebrow">Leitura prática</span>
         <h2 id="internal-practical-title">{title}</h2>
         <p>{data.brief.summary}</p>
-        <small>{summaryOrigin}. Os valores continuam vinculados às fontes estruturadas.</small>
+        <small>
+          {summaryOrigin}. Os valores continuam vinculados às fontes estruturadas.
+        </small>
       </div>
 
       <div className="internal-practical-widget__cards">
@@ -251,7 +259,9 @@ export function InternalPracticalSummary({
         </article>
       </div>
 
-      {footer ? <div className="internal-practical-widget__footer">{footer}</div> : null}
+      {footer ? (
+        <div className="internal-practical-widget__footer">{footer}</div>
+      ) : null}
     </section>
   );
 }
