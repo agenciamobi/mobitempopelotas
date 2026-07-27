@@ -42,26 +42,26 @@ const periodLabels = ["Próximas horas", "Na sequência", "Mais tarde"];
 const resourceLinks: ResourceLink[] = [
   {
     to: "/chuva-em-pelotas",
-    label: "Chuva detalhada",
-    detail: "Probabilidade, volume e evolução",
+    label: "Chuva por horário",
+    detail: "Chance e volume previsto",
     icon: CloudRain,
   },
   {
     to: "/vento-em-pelotas",
-    label: "Vento em Pelotas",
-    detail: "Velocidade, direção e rajadas",
+    label: "Vento e rajadas",
+    detail: "Velocidade, direção e picos",
     icon: Wind,
   },
   {
     to: "/radar-e-satelite-pelotas",
     label: "Radar e satélite",
-    detail: "Observe a aproximação das áreas de chuva",
+    detail: "Veja áreas de chuva se aproximando",
     icon: Radar,
   },
   {
     to: "/alertas",
-    label: "Alertas oficiais",
-    detail: "Avisos do INMET relevantes para Pelotas",
+    label: "Avisos do INMET",
+    detail: "Alertas oficiais para Pelotas",
     icon: TriangleAlert,
   },
 ];
@@ -116,20 +116,20 @@ function buildPeriods(hours: HourlyForecast[]) {
 }
 
 function statusLabel(status: PeriodStatus) {
-  if (status === "stable") return "Mais estável";
-  if (status === "moderate") return "Variação moderada";
-  if (status === "attention") return "Atenção";
-  return "Atenção alta";
+  if (status === "stable") return "Condições mais estáveis";
+  if (status === "moderate") return "Mudanças possíveis";
+  if (status === "attention") return "Acompanhe antes de sair";
+  return "Atenção reforçada";
 }
 
 function statusAdvice(status: PeriodStatus) {
   if (status === "stable")
-    return "Tende a ser a faixa mais favorável para deslocamentos e tarefas externas.";
+    return "É o período com menor combinação de chuva e rajadas na previsão atual.";
   if (status === "moderate")
-    return "Vale acompanhar mudanças de chuva e vento antes de sair.";
+    return "As condições podem mudar; confira chuva e vento perto do horário de saída.";
   if (status === "attention")
-    return "Planeje alternativas e confira o radar antes de atividades externas.";
-  return "Evite depender de condições estáveis e acompanhe alertas e radar.";
+    return "Consulte radar e avisos antes de depender de atividades ao ar livre.";
+  return "Evite depender de tempo estável e acompanhe radar e avisos oficiais.";
 }
 
 function hourRisk(hour: HourlyForecast) {
@@ -195,19 +195,19 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
     >
       <header className="today-resources__heading">
         <div>
-          <span className="eyebrow">Planejador do dia</span>
-          <h2 id="today-resources-title">Recursos para decidir as próximas horas</h2>
+          <span className="eyebrow">Planeje as próximas 12 horas</span>
+          <h2 id="today-resources-title">Qual é o melhor período para sair hoje?</h2>
         </div>
         <p>
-          A previsão foi organizada em janelas práticas. Os destaques abaixo são recalculados a
-          partir de chuva, rajadas e temperatura previstas para as próximas 12 horas.
+          Comparamos chance de chuva, rajadas e temperatura para destacar os períodos mais
+          favoráveis e aqueles que merecem nova consulta.
         </p>
       </header>
 
-      <div className="today-resources__signals" aria-label="Destaques automáticos para hoje">
+      <div className="today-resources__signals" aria-label="Principais períodos para planejar o dia">
         <article className="is-best">
           <span>
-            <CheckCircle2 aria-hidden="true" /> Melhor janela estimada
+            <CheckCircle2 aria-hidden="true" /> Período mais favorável
           </span>
           <strong>{bestPeriod.range}</strong>
           <small>{statusAdvice(bestPeriod.status)}</small>
@@ -215,7 +215,7 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
 
         <article className="is-attention">
           <span>
-            <TriangleAlert aria-hidden="true" /> Maior atenção
+            <TriangleAlert aria-hidden="true" /> Horário de maior atenção
           </span>
           <strong>{attentionHour?.time ?? "Em atualização"}</strong>
           <small>
@@ -227,12 +227,12 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
 
         <article>
           <span>
-            <Sunrise aria-hidden="true" /> Luz natural
+            <Sunrise aria-hidden="true" /> Luz do dia
           </span>
           <strong>{sunrise && sunset ? `${sunrise}–${sunset}` : "Em atualização"}</strong>
           <small>
             {daylight
-              ? `${daylight} entre nascer e pôr do sol.`
+              ? `${daylight} entre o nascer e o pôr do sol.`
               : "Horários solares não informados."}
           </small>
         </article>
@@ -251,22 +251,22 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
                 <span>
                   <Clock3 aria-hidden="true" /> {period.label}
                 </span>
-                <b>{isBest ? "Melhor janela" : statusLabel(period.status)}</b>
+                <b>{isBest ? "Melhor período" : statusLabel(period.status)}</b>
               </div>
               <strong>{period.range}</strong>
               <dl>
                 <div>
-                  <dt>Temperatura</dt>
+                  <dt>Faixa térmica</dt>
                   <dd>
                     {period.minTemperature}°–{period.maxTemperature}°
                   </dd>
                 </div>
                 <div>
-                  <dt>Chuva máxima</dt>
+                  <dt>Chance de chuva</dt>
                   <dd>{formatRain(period.peakRain)}</dd>
                 </div>
                 <div>
-                  <dt>Rajada</dt>
+                  <dt>Rajada máxima</dt>
                   <dd>{period.maxGust} km/h</dd>
                 </div>
               </dl>
@@ -278,8 +278,8 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
 
       <div className="today-resources__links">
         <div>
-          <span className="eyebrow">Aprofunde a leitura</span>
-          <strong>Abra somente o recurso que precisa agora</strong>
+          <span className="eyebrow">Consulte o detalhe que precisa</span>
+          <strong>Chuva, vento, radar e avisos oficiais</strong>
         </div>
         <nav aria-label="Recursos meteorológicos relacionados">
           {resourceLinks.map((resource) => {
@@ -302,8 +302,8 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
       <footer className="today-resources__solar-note">
         <Sunset aria-hidden="true" />
         <span>
-          As janelas são orientativas e não substituem avisos oficiais. Em caso de mudança rápida,
-          confira radar e alertas antes de sair.
+          Use os períodos como orientação. Se o tempo mudar rapidamente, confira radar e avisos
+          oficiais antes de sair.
         </span>
       </footer>
     </section>
