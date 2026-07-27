@@ -7,6 +7,7 @@ import { createMeteogramUrl, fetchPelotasMeteogram } from "../src/lib/weather/me
 const route = readFileSync("src/routes/meteograma-pelotas.tsx", "utf8");
 const page = readFileSync("src/components/weather/MeteogramPage.tsx", "utf8");
 const styles = readFileSync("src/components/weather/MeteogramPage.css", "utf8");
+const refinement = readFileSync("src/components/weather/MeteogramRefinement.css", "utf8");
 const functionSource = readFileSync("src/lib/weather/meteogram.functions.ts", "utf8");
 const publicRoutes = readFileSync("src/lib/public-routes.ts", "utf8");
 const todayAtmosphere = readFileSync("src/components/weather/TodayAtmosphericSignals.tsx", "utf8");
@@ -108,6 +109,7 @@ test("meteogram normalizer preserves hourly volume and atmospheric variables", a
 
 test("meteogram route exposes SEO, FAQ and separate forecast loading", () => {
   assert.match(route, /createFileRoute\("\/meteograma-pelotas"\)/);
+  assert.match(route, /MeteogramRefinement\.css/);
   assert.match(route, /getWeatherIntelligence\(\)/);
   assert.match(route, /getPelotasMeteogram\(\)/);
   assert.match(route, /Promise\.all/);
@@ -158,7 +160,10 @@ test("meteogram layout protects retail rail, scrolling charts and responsive sta
   assert.match(styles, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(styles, /@media \(forced-colors: active\)/);
   assert.match(styles, /:focus-visible/);
-  assert.doesNotMatch(styles, /font-size:\s*0\.[0-6][0-9]rem/);
+  assert.match(refinement, /font-size:\s*0\.75rem/);
+  assert.match(refinement, /grid-auto-flow:\s*column/);
+  assert.match(refinement, /grid-template-columns:\s*none/);
+  assert.match(refinement, /grid-auto-columns:\s*minmax\(32px, 1fr\)/);
 });
 
 test("meteogram is discoverable and cached as an operational page", () => {
