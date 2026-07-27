@@ -7,10 +7,15 @@ const containment = readFileSync(
   "src/components/weather/InternalWeatherWidgetsContainment.css",
   "utf8",
 );
+const refinement = readFileSync(
+  "src/components/weather/InternalWeatherWidgetsRefinement.css",
+  "utf8",
+);
 
-test("reusable weather widgets always load their containment layer", () => {
+test("reusable weather widgets always load containment and refinement layers", () => {
   assert.match(widgets, /InternalWeatherWidgets\.css/);
   assert.match(widgets, /InternalWeatherWidgetsContainment\.css/);
+  assert.match(widgets, /InternalWeatherWidgetsRefinement\.css/);
 });
 
 test("the reused homepage observation cannot escape the internal editorial rail", () => {
@@ -43,4 +48,15 @@ test("contained observation remains responsive without negative or full-bleed of
   assert.doesNotMatch(containment, /translateX\(-50%\)/);
   assert.doesNotMatch(containment, /margin-left:\s*50%/);
   assert.doesNotMatch(containment, /100vw/);
+});
+
+test("refinement neutralizes dark full-home observation styling inside the internal rail", () => {
+  assert.match(refinement, /Tempo Hoje v6/);
+  assert.match(refinement, /internal-observation-widget[\s\S]*background:[\s\S]*rgb\(255 255 255 \/ 96%\) !important/);
+  assert.match(refinement, /internal-observation-widget::after[\s\S]*display:\s*none !important/);
+  assert.match(refinement, /home-observation-story__reading[\s\S]*backdrop-filter:\s*none !important/);
+  assert.match(refinement, /home-observation-temperature[\s\S]*border-right:[\s\S]*rgb\(7 30 47 \/ 8%\) !important/);
+  assert.match(refinement, /@media \(max-width: 700px\)/);
+  assert.doesNotMatch(refinement, /100vw/);
+  assert.doesNotMatch(refinement, /translateX\(-50%\)/);
 });
