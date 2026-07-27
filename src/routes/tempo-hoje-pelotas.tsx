@@ -61,7 +61,9 @@ function TempoHojeHomeVisual({ data }: { data: WeatherIntelligenceData }) {
   const productionWeather = toProductionWeatherData(recoveredData.weather);
   const inmetAlerts = toProductionAlerts(recoveredData.weather);
   const advisory = getWeatherAdvisory(productionWeather);
-  const pelotasOfficialAlerts = inmetAlerts.alerts.filter((alert) => alert.relevance === "pelotas");
+  const pelotasOfficialAlerts = inmetAlerts.alerts.filter(
+    (alert) => alert.relevance === "pelotas",
+  );
   const verifiedPelotasAlerts = pelotasOfficialAlerts.filter(hasVerifiedInmetAlertSemantics);
   const officialLevel: AdvisoryLevel = verifiedPelotasAlerts.some(
     (alert) => alert.severity === "danger" || alert.severity === "great-danger",
@@ -71,7 +73,9 @@ function TempoHojeHomeVisual({ data }: { data: WeatherIntelligenceData }) {
       ? "attention"
       : "normal";
   const headerLevel =
-    advisoryRank[officialLevel] > advisoryRank[advisory.level] ? officialLevel : advisory.level;
+    advisoryRank[officialLevel] > advisoryRank[advisory.level]
+      ? officialLevel
+      : advisory.level;
   const mainClassName = pelotasOfficialAlerts.length
     ? "home-editorial-main today-v5-home-main has-official-alerts"
     : "home-editorial-main today-v5-home-main";
@@ -88,7 +92,10 @@ function TempoHojeHomeVisual({ data }: { data: WeatherIntelligenceData }) {
       <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
         <InmetAlertsPanel data={inmetAlerts} variant="home" advisoryLevel={headerLevel} />
         <TodayForecastPageV5 data={data} />
-        <EditorialContentSection id="como-interpretar-hoje" content={TODAY_EDITORIAL_CONTENT} />
+        <EditorialContentSection
+          id="como-interpretar-hoje"
+          content={TODAY_EDITORIAL_CONTENT}
+        />
       </main>
 
       <SiteFooter source={productionWeather.source} />
