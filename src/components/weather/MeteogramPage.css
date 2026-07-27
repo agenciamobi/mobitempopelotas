@@ -1,0 +1,998 @@
+.internal-weather-shell--meteogram .meteogram-hero {
+  width: 100%;
+  max-width: var(--internal-weather-frame-max, var(--portal-frame-max, 1760px));
+  margin-inline: auto;
+  padding: clamp(1rem, 2vw, 1.45rem) var(--internal-weather-frame-gutter, clamp(22px, 2.4vw, 42px)) 0;
+  box-sizing: border-box;
+}
+
+.meteogram-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(390px, 0.92fr);
+  align-items: stretch;
+  gap: clamp(1rem, 2.5vw, 2rem);
+}
+
+.meteogram-hero__content,
+.meteogram-hero__panel {
+  min-width: 0;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 1.55rem;
+  box-shadow: 0 24px 70px rgb(7 30 47 / 18%);
+}
+
+.meteogram-hero__content {
+  display: grid;
+  min-height: 500px;
+  align-content: end;
+  padding: clamp(2rem, 5vw, 4.8rem);
+  color: #fff;
+  background:
+    radial-gradient(circle at 91% 5%, rgb(24 189 205 / 29%), transparent 23rem),
+    radial-gradient(circle at 3% 100%, rgb(94 44 237 / 26%), transparent 28rem),
+    linear-gradient(145deg, #061f32, #0b3a50 58%, #124e61);
+}
+
+.meteogram-hero .eyebrow,
+.meteogram-page .eyebrow {
+  color: #087f8d;
+  font-size: 0.75rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.meteogram-hero__content .eyebrow {
+  color: #84e9f0;
+}
+
+.meteogram-hero__content h1 {
+  max-width: 14ch;
+  margin: 0.7rem 0 0;
+  font-size: clamp(3rem, 6.2vw, 6.5rem);
+  font-weight: 720;
+  letter-spacing: -0.08em;
+  line-height: 0.91;
+  text-wrap: balance;
+}
+
+.meteogram-hero__content > p {
+  max-width: 760px;
+  margin: 1.35rem 0 0;
+  color: rgb(255 255 255 / 72%);
+  font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+  line-height: 1.7;
+}
+
+.meteogram-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+.meteogram-hero__actions a {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.72rem 1rem;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 790;
+  text-decoration: none;
+  background: rgb(255 255 255 / 8%);
+}
+
+.meteogram-hero__actions a:first-child {
+  border-color: #18bdcd;
+  color: #062538;
+  background: #8debf1;
+}
+
+.meteogram-hero__actions svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.meteogram-hero__panel {
+  display: grid;
+  align-content: stretch;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  background:
+    radial-gradient(circle at 100% 0, rgb(94 44 237 / 10%), transparent 22rem),
+    #fff;
+}
+
+.meteogram-hero__panel > header {
+  display: grid;
+  align-content: start;
+  gap: 0.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgb(7 30 47 / 8%);
+}
+
+.meteogram-hero__panel > header span {
+  color: #087f8d;
+  font-size: 0.75rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.meteogram-hero__panel > header strong {
+  color: var(--portal-ink);
+  font-size: clamp(1.3rem, 2.3vw, 2rem);
+  letter-spacing: -0.045em;
+}
+
+.meteogram-hero__panel > header small {
+  color: var(--portal-ink-soft);
+  font-size: 0.78rem;
+}
+
+.meteogram-hero__panel > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding-top: 0.85rem;
+}
+
+.meteogram-hero__panel article {
+  display: grid;
+  min-width: 0;
+  min-height: 150px;
+  align-content: end;
+  gap: 0.45rem;
+  padding: 1rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-top: 4px solid #18bdcd;
+  border-radius: 1rem;
+  background: rgb(247 251 252 / 92%);
+}
+
+.meteogram-hero__panel article:nth-child(2) {
+  border-top-color: #5e2ced;
+}
+
+.meteogram-hero__panel article:nth-child(3) {
+  border-top-color: #f27035;
+}
+
+.meteogram-hero__panel article:nth-child(4) {
+  border-top-color: #e70b85;
+}
+
+.meteogram-hero__panel article span {
+  color: #607783;
+  font-size: 0.75rem;
+  font-weight: 820;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.meteogram-hero__panel article strong {
+  color: var(--portal-ink);
+  font-size: clamp(1.25rem, 2vw, 1.7rem);
+  letter-spacing: -0.04em;
+  line-height: 1.08;
+}
+
+.meteogram-hero__panel article small {
+  color: var(--portal-ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.meteogram-page {
+  display: grid;
+  min-width: 0;
+  gap: 1rem;
+}
+
+.internal-weather-shell--meteogram .internal-weather-main > .meteogram-page,
+.internal-weather-shell--meteogram .internal-weather-main > .editorial-answer-section {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+  justify-self: stretch;
+}
+
+.meteogram-chapters {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1.1rem;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 14px 34px rgb(7 30 47 / 4%);
+}
+
+.meteogram-chapters a {
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+  padding: 0.95rem;
+  border-right: 1px solid rgb(7 30 47 / 7%);
+  color: inherit;
+  text-decoration: none;
+}
+
+.meteogram-chapters a:last-child {
+  border-right: 0;
+}
+
+.meteogram-chapters span {
+  color: #087f8d;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.meteogram-chapters strong {
+  color: var(--portal-ink);
+  font-size: 0.86rem;
+}
+
+.meteogram-chapters small {
+  color: var(--portal-ink-soft);
+  font-size: 0.75rem;
+}
+
+.meteogram-overview,
+.meteogram-chart-card,
+.meteogram-volume,
+.meteogram-method,
+.meteogram-related,
+.meteogram-unavailable {
+  scroll-margin-top: 8rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1.35rem;
+  background: rgb(255 255 255 / 94%);
+  box-shadow: 0 16px 44px rgb(7 30 47 / 5%);
+}
+
+.meteogram-overview {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.15rem, 3vw, 2rem);
+  background:
+    radial-gradient(circle at 100% 0, rgb(24 189 205 / 9%), transparent 24rem),
+    rgb(255 255 255 / 96%);
+}
+
+.meteogram-overview > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.meteogram-overview h2,
+.meteogram-method h2,
+.meteogram-related h2 {
+  max-width: 20ch;
+  margin: 0.45rem 0 0;
+  color: var(--portal-ink);
+  font-size: clamp(2rem, 4vw, 3.75rem);
+  font-weight: 690;
+  letter-spacing: -0.065em;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+.meteogram-window-toggle {
+  display: inline-flex;
+  gap: 0.35rem;
+  padding: 0.3rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 999px;
+  background: #f2f7f8;
+}
+
+.meteogram-window-toggle button,
+.meteogram-quick-actions button {
+  border: 0;
+  color: #38525f;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 790;
+  background: transparent;
+  cursor: pointer;
+}
+
+.meteogram-window-toggle button {
+  min-height: 38px;
+  padding: 0.5rem 0.76rem;
+  border-radius: 999px;
+}
+
+.meteogram-window-toggle button.is-active {
+  color: #fff;
+  background: #087f8d;
+}
+
+.meteogram-window-toggle button:disabled {
+  cursor: not-allowed;
+  opacity: 0.42;
+}
+
+.meteogram-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.meteogram-quick-actions button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.72rem;
+  border: 1px solid rgb(7 30 47 / 9%);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.meteogram-quick-actions svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: #5e2ced;
+}
+
+.meteogram-timeline {
+  display: grid;
+  grid-auto-columns: minmax(130px, 1fr);
+  grid-auto-flow: column;
+  gap: 0.55rem;
+  overflow-x: auto;
+  padding: 0.15rem 0.1rem 0.55rem;
+  scrollbar-width: thin;
+}
+
+.meteogram-timeline button {
+  display: grid;
+  min-height: 116px;
+  align-content: end;
+  gap: 0.35rem;
+  padding: 0.8rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 0.9rem;
+  color: inherit;
+  text-align: left;
+  background: #fff;
+  cursor: pointer;
+}
+
+.meteogram-timeline button.is-selected {
+  border-color: #087f8d;
+  color: #fff;
+  background: linear-gradient(145deg, #087f8d, #0b6573);
+  box-shadow: 0 12px 28px rgb(8 127 141 / 20%);
+}
+
+.meteogram-timeline button > span,
+.meteogram-timeline button > small {
+  color: #6d828c;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.meteogram-timeline button > strong {
+  color: var(--portal-ink);
+  font-size: 1.3rem;
+  letter-spacing: -0.04em;
+}
+
+.meteogram-timeline button.is-selected > span,
+.meteogram-timeline button.is-selected > small {
+  color: rgb(255 255 255 / 72%);
+}
+
+.meteogram-timeline button.is-selected > strong {
+  color: #fff;
+}
+
+.meteogram-selected {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid rgb(94 44 237 / 12%);
+  border-radius: 1rem;
+  background: rgb(94 44 237 / 4%);
+}
+
+.meteogram-selected > header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.meteogram-selected > header span {
+  color: #5e2ced;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.meteogram-selected > header h3 {
+  margin: 0.25rem 0 0;
+  color: var(--portal-ink);
+  font-size: clamp(1.35rem, 2.5vw, 2rem);
+  letter-spacing: -0.045em;
+}
+
+.meteogram-selected > header > strong {
+  color: #5e2ced;
+  font-size: 0.88rem;
+}
+
+.meteogram-selected-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.meteogram-selected-grid article {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+  padding: 0.8rem;
+  border: 1px solid rgb(7 30 47 / 7%);
+  border-radius: 0.85rem;
+  background: rgb(255 255 255 / 88%);
+}
+
+.meteogram-selected-grid span {
+  color: #6c818b;
+  font-size: 0.7rem;
+  font-weight: 820;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.meteogram-selected-grid strong {
+  color: var(--portal-ink);
+  font-size: 1.1rem;
+  letter-spacing: -0.035em;
+}
+
+.meteogram-selected-grid small {
+  color: var(--portal-ink-soft);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.meteogram-insights {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.meteogram-insights article {
+  display: grid;
+  min-width: 0;
+  min-height: 205px;
+  align-content: start;
+  gap: 0.65rem;
+  padding: 1rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-top: 4px solid #18bdcd;
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.meteogram-insights article.is-attention {
+  border-top-color: #d49a29;
+}
+
+.meteogram-insights article.is-high {
+  border-top-color: #d5684c;
+}
+
+.meteogram-insights article.is-low {
+  border-top-color: #41a982;
+}
+
+.meteogram-insights svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: #087f8d;
+}
+
+.meteogram-insights span {
+  color: #607783;
+  font-size: 0.75rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.meteogram-insights strong {
+  color: var(--portal-ink);
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+.meteogram-insights p {
+  margin: 0;
+  color: var(--portal-ink-soft);
+  font-size: 0.8rem;
+  line-height: 1.55;
+}
+
+.meteogram-chart-card,
+.meteogram-volume {
+  display: grid;
+  gap: 0.9rem;
+  padding: clamp(1rem, 2.6vw, 1.6rem);
+}
+
+.meteogram-chart-card > header,
+.meteogram-volume > header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.meteogram-chart-card h3,
+.meteogram-volume h3 {
+  margin: 0;
+  color: var(--portal-ink);
+  font-size: clamp(1.35rem, 2.3vw, 2rem);
+  letter-spacing: -0.045em;
+}
+
+.meteogram-chart-card header p,
+.meteogram-volume header p {
+  max-width: 72ch;
+  margin: 0.35rem 0 0;
+  color: var(--portal-ink-soft);
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+.meteogram-chart-card.is-unavailable > strong {
+  color: #7c8e97;
+  font-size: 0.85rem;
+}
+
+.meteogram-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.45rem 0.7rem;
+}
+
+.meteogram-chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: #536c78;
+  font-size: 0.75rem;
+  font-weight: 760;
+}
+
+.meteogram-chart-legend i {
+  width: 1.3rem;
+  height: 3px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.meteogram-chart-scroll {
+  overflow-x: auto;
+  border: 1px solid rgb(7 30 47 / 7%);
+  border-radius: 0.95rem;
+  background:
+    linear-gradient(rgb(255 255 255 / 88%), rgb(255 255 255 / 88%)),
+    repeating-linear-gradient(90deg, transparent, transparent 58px, rgb(7 30 47 / 2.5%) 58px, rgb(7 30 47 / 2.5%) 59px);
+}
+
+.meteogram-chart-scroll svg {
+  display: block;
+  width: 100%;
+  min-width: 920px;
+  height: auto;
+}
+
+.meteogram-chart-grid {
+  stroke: rgb(7 30 47 / 8%);
+  stroke-width: 1;
+}
+
+.meteogram-chart-axis,
+.meteogram-chart-time {
+  fill: #738791;
+  font-family: inherit;
+  font-size: 11px;
+}
+
+.meteogram-chart-selected {
+  stroke: rgb(231 11 133 / 54%);
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+}
+
+.meteogram-chart-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.is-temperature { color: #e65f35; }
+.is-feels-like { color: #f1a33b; }
+.is-dew-point { color: #087f8d; }
+.is-rain { color: #5e2ced; }
+.is-humidity { color: #18a5b4; }
+.is-low-cloud { color: #18bdcd; }
+.is-mid-cloud { color: #5e2ced; }
+.is-high-cloud { color: #9d7bf4; }
+.is-visibility { color: #337f5e; }
+.is-wind { color: #087f8d; }
+.is-gust { color: #f27035; }
+.is-pressure { color: #e70b85; }
+
+.meteogram-volume > header > span {
+  color: #5e2ced;
+  font-size: 0.82rem;
+  font-weight: 820;
+}
+
+.meteogram-volume-grid {
+  display: grid;
+  min-height: 210px;
+  grid-template-columns: repeat(24, minmax(26px, 1fr));
+  align-items: end;
+  gap: 0.28rem;
+  overflow-x: auto;
+  padding: 1rem 0.6rem 0.65rem;
+  border: 1px solid rgb(7 30 47 / 7%);
+  border-radius: 0.95rem;
+  background: #f9fbfc;
+}
+
+.meteogram-volume-grid article {
+  display: grid;
+  min-width: 26px;
+  height: 175px;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  align-items: end;
+  justify-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 0.65rem;
+}
+
+.meteogram-volume-grid article.is-selected {
+  background: rgb(94 44 237 / 8%);
+}
+
+.meteogram-volume-grid article > span {
+  width: min(68%, 24px);
+  min-height: 3px;
+  align-self: end;
+  border-radius: 0.35rem 0.35rem 0.1rem 0.1rem;
+  background: linear-gradient(180deg, #5e2ced, #18bdcd);
+}
+
+.meteogram-volume-grid strong {
+  color: var(--portal-ink);
+  font-size: 0.7rem;
+}
+
+.meteogram-volume-grid small {
+  color: #748892;
+  font-size: 0.65rem;
+  white-space: nowrap;
+  transform: rotate(-45deg);
+  transform-origin: center;
+}
+
+.meteogram-method {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(210px, auto);
+  align-items: start;
+  gap: 1rem;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  background:
+    radial-gradient(circle at 100% 0, rgb(94 44 237 / 8%), transparent 20rem),
+    #fff;
+}
+
+.meteogram-method > svg {
+  width: 1.65rem;
+  height: 1.65rem;
+  color: #5e2ced;
+}
+
+.meteogram-method p {
+  max-width: 78ch;
+  margin: 1rem 0 0;
+  color: var(--portal-ink-soft);
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.meteogram-method > div:nth-child(2) > strong {
+  display: block;
+  margin-top: 0.8rem;
+  color: #a45022;
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.meteogram-method > div:last-child {
+  display: grid;
+  min-width: 210px;
+  gap: 0.4rem;
+  padding: 0.9rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 0.9rem;
+  background: rgb(247 250 251 / 88%);
+}
+
+.meteogram-method > div:last-child span {
+  color: #687e88;
+  font-size: 0.72rem;
+  font-weight: 820;
+  text-transform: uppercase;
+}
+
+.meteogram-method > div:last-child strong {
+  color: var(--portal-ink);
+  font-size: 0.9rem;
+}
+
+.meteogram-method > div:last-child a {
+  color: #5e2ced;
+  font-size: 0.78rem;
+  font-weight: 790;
+}
+
+.meteogram-related {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.2rem, 3vw, 2rem);
+}
+
+.meteogram-related > div {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.meteogram-related a {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 1rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1rem;
+  color: inherit;
+  text-decoration: none;
+  background: #fff;
+}
+
+.meteogram-related a > svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: 0 0 auto;
+  color: #087f8d;
+}
+
+.meteogram-related a span {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.meteogram-related a strong {
+  color: var(--portal-ink);
+  font-size: 0.9rem;
+}
+
+.meteogram-related a small {
+  color: var(--portal-ink-soft);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.meteogram-unavailable {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.meteogram-unavailable > svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #7c8e97;
+}
+
+.meteogram-unavailable h2 {
+  margin: 0;
+  color: var(--portal-ink);
+}
+
+.meteogram-unavailable p {
+  color: var(--portal-ink-soft);
+}
+
+.meteogram-unavailable a {
+  color: #5e2ced;
+  font-weight: 780;
+}
+
+.meteogram-page button:focus-visible,
+.meteogram-page a:focus-visible,
+.meteogram-hero a:focus-visible {
+  outline: 3px solid rgb(24 189 205 / 42%);
+  outline-offset: 3px;
+}
+
+@media (max-width: 1280px) {
+  .meteogram-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .meteogram-hero__content {
+    min-height: 450px;
+  }
+
+  .meteogram-hero__panel > div,
+  .meteogram-insights,
+  .meteogram-related > div {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .meteogram-selected-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 920px) {
+  .meteogram-chapters {
+    grid-auto-columns: minmax(160px, 1fr);
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    overflow-x: auto;
+  }
+
+  .meteogram-overview > header,
+  .meteogram-chart-card > header,
+  .meteogram-volume > header,
+  .meteogram-selected > header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .meteogram-chart-legend {
+    justify-content: flex-start;
+  }
+
+  .meteogram-method {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .meteogram-method > div:last-child {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 680px) {
+  .internal-weather-shell--meteogram .meteogram-hero {
+    padding-top: 0.65rem;
+  }
+
+  .meteogram-hero__content,
+  .meteogram-hero__panel,
+  .meteogram-overview,
+  .meteogram-chart-card,
+  .meteogram-volume,
+  .meteogram-method,
+  .meteogram-related,
+  .meteogram-unavailable {
+    border-radius: 1.05rem;
+  }
+
+  .meteogram-hero__content {
+    min-height: 440px;
+    padding: 1.45rem;
+  }
+
+  .meteogram-hero__content h1 {
+    font-size: clamp(2.7rem, 14vw, 4.5rem);
+  }
+
+  .meteogram-hero__panel {
+    padding: 1rem;
+  }
+
+  .meteogram-hero__panel > div,
+  .meteogram-insights,
+  .meteogram-related > div,
+  .meteogram-selected-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .meteogram-hero__panel article,
+  .meteogram-insights article {
+    min-height: 0;
+  }
+
+  .meteogram-overview > header,
+  .meteogram-chart-card > header,
+  .meteogram-volume > header,
+  .meteogram-selected > header {
+    display: flex;
+  }
+
+  .meteogram-window-toggle {
+    align-self: stretch;
+  }
+
+  .meteogram-window-toggle button {
+    flex: 1;
+  }
+
+  .meteogram-method {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .meteogram-method > svg {
+    display: none;
+  }
+
+  .meteogram-method > div:last-child {
+    grid-column: auto;
+    min-width: 0;
+  }
+
+  .meteogram-chart-scroll svg {
+    min-width: 820px;
+  }
+
+  .meteogram-volume-grid {
+    grid-template-columns: repeat(24, minmax(32px, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meteogram-page *,
+  .meteogram-hero * {
+    scroll-behavior: auto;
+    transition: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .meteogram-hero__content,
+  .meteogram-hero__panel,
+  .meteogram-chapters,
+  .meteogram-overview,
+  .meteogram-insights article,
+  .meteogram-chart-card,
+  .meteogram-volume,
+  .meteogram-method,
+  .meteogram-related,
+  .meteogram-unavailable {
+    border: 1px solid CanvasText;
+  }
+
+  .meteogram-chart-line,
+  .meteogram-chart-grid,
+  .meteogram-chart-selected {
+    stroke: CanvasText;
+  }
+}
