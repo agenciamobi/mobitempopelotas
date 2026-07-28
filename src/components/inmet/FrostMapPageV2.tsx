@@ -91,7 +91,7 @@ function createPopupContent(properties: PopupProperties) {
   temperature.textContent = `Mínima: ${formatTemperature(Number.isFinite(rawTemperature) ? rawTemperature : null)}`;
 
   const intensity = document.createElement("b");
-  intensity.textContent = String(properties.intensityLabel ?? "Intensidade indefinida");
+  intensity.textContent = String(properties.intensityLabel ?? "Classificação não informada");
 
   wrapper.append(title, code, date, temperature, intensity);
   return wrapper;
@@ -105,31 +105,31 @@ export function FrostMapHero({ initialData }: FrostMapPageProps) {
   return (
     <section className="frost-v2-hero" aria-labelledby="frost-v2-hero-title">
       <div className="frost-v2-hero__content">
-        <span className="frost-v2-eyebrow">Observação agrometeorológica · INMET</span>
+        <span className="frost-v2-eyebrow">Registros de geada do INMET</span>
         <h1 id="frost-v2-hero-title">Geadas observadas no Rio Grande do Sul.</h1>
         <p>
-          Consulte registros associados às estações do INMET. O mapa representa pontos de observação e
-          datas passadas; não é previsão de geada nem cobertura contínua de todo o território.
+          Veja registros encontrados nas estações do INMET. Cada ponto representa uma estação e uma data
+          passada; o mapa não prevê geada futura nem mostra toda a área que pode ter sido atingida.
         </p>
         <div className="frost-v2-hero__actions">
-          <a href="#mapa-de-ocorrencias">Explorar o mapa <ArrowRight aria-hidden="true" /></a>
+          <a href="#mapa-de-ocorrencias">Ver o mapa <ArrowRight aria-hidden="true" /></a>
           <Link to="/clima-em-pelotas">Entender o clima local</Link>
         </div>
       </div>
 
       <aside className={`frost-v2-hero__summary is-${initialData.status}`}>
         <header>
-          <span><Snowflake aria-hidden="true" />{initialData.status === "live" ? "Fonte respondendo" : "Fonte indisponível"}</span>
-          <small>Consulta em {formatDateTime(initialData.source.fetchedAt)}</small>
+          <span><Snowflake aria-hidden="true" />{initialData.status === "live" ? "Dados disponíveis" : "Dados indisponíveis"}</span>
+          <small>Atualizado em {formatDateTime(initialData.source.fetchedAt)}</small>
         </header>
         <div>
-          <span>Consulta inicial</span>
+          <span>Estações encontradas</span>
           <strong>{initialData.summary.stations}</strong>
-          <p>estações com registros no período selecionado pela rota</p>
+          <p>com registros nos filtros selecionados</p>
         </div>
         <dl>
           <div><dt>Registros</dt><dd>{initialData.summary.observations}</dd></div>
-          <div><dt>Menor mínima</dt><dd>{formatTemperature(initialData.summary.lowestTemperature)}</dd></div>
+          <div><dt>Menor temperatura</dt><dd>{formatTemperature(initialData.summary.lowestTemperature)}</dd></div>
         </dl>
         <footer>{formatDate(initialData.filters.startDate)} a {formatDate(initialData.filters.endDate)}</footer>
       </aside>
@@ -367,7 +367,7 @@ export function FrostMapPageV2({ initialData }: FrostMapPageProps) {
       .catch((error: unknown) => {
         if (error instanceof DOMException && error.name === "AbortError") return;
         console.error("Falha ao atualizar o mapa de geadas:", error);
-        setRefreshError("Os filtros não puderam ser atualizados. A última consulta válida permanece na tela.");
+        setRefreshError("Os filtros não puderam ser atualizados. Os últimos dados válidos continuam na tela.");
       })
       .finally(() => setIsRefreshing(false));
 
@@ -376,25 +376,25 @@ export function FrostMapPageV2({ initialData }: FrostMapPageProps) {
 
   return (
     <div className="frost-v2-page">
-      <nav className="frost-v2-chapters" aria-label="Capítulos do mapa de geadas">
-        <a href="#estado-da-consulta"><span>01</span><strong>Consulta</strong><small>Fonte, período e cobertura</small></a>
+      <nav className="frost-v2-chapters" aria-label="Seções do mapa de geadas">
+        <a href="#estado-da-consulta"><span>01</span><strong>Situação</strong><small>Período e atualização</small></a>
         <a href="#mapa-de-ocorrencias"><span>02</span><strong>Mapa</strong><small>Registros por estação</small></a>
-        <a href="#distribuicao-das-ocorrencias"><span>03</span><strong>Intensidade</strong><small>Classificação retornada</small></a>
-        <a href="#registros-de-geada"><span>04</span><strong>Tabela</strong><small>Lista acessível</small></a>
-        <a href="#limites-do-monitoramento"><span>05</span><strong>Limites</strong><small>O que o mapa não confirma</small></a>
+        <a href="#distribuicao-das-ocorrencias"><span>03</span><strong>Classificação</strong><small>Forte, moderada ou fraca</small></a>
+        <a href="#registros-de-geada"><span>04</span><strong>Lista</strong><small>Registros encontrados</small></a>
+        <a href="#limites-do-monitoramento"><span>05</span><strong>Como interpretar</strong><small>O que o mapa não mostra</small></a>
       </nav>
 
       <section className={`frost-v2-source is-${data.status}`} id="estado-da-consulta" aria-labelledby="frost-v2-source-title" role="status">
         <Database aria-hidden="true" />
         <div>
-          <span className="frost-v2-eyebrow">Estado da fonte</span>
-          <h2 id="frost-v2-source-title">{data.status === "live" ? "Consulta do INMET disponível" : "Consulta do INMET indisponível"}</h2>
-          <p>{data.message ?? "Os registros foram processados para os filtros atualmente selecionados."}</p>
+          <span className="frost-v2-eyebrow">Dados do INMET</span>
+          <h2 id="frost-v2-source-title">{data.status === "live" ? "Registros disponíveis" : "Registros temporariamente indisponíveis"}</h2>
+          <p>{data.message ?? "Os registros foram atualizados para os filtros escolhidos."}</p>
         </div>
         <dl>
           <div><dt>Período</dt><dd>{formatDate(data.filters.startDate)} a {formatDate(data.filters.endDate)}</dd></div>
-          <div><dt>Tipo</dt><dd>{stationTypeLabel(data.filters.stationType)}</dd></div>
-          <div><dt>Consulta</dt><dd>{formatDateTime(data.source.fetchedAt)}</dd></div>
+          <div><dt>Estações</dt><dd>{stationTypeLabel(data.filters.stationType)}</dd></div>
+          <div><dt>Última atualização</dt><dd>{formatDateTime(data.source.fetchedAt)}</dd></div>
         </dl>
       </section>
 
@@ -402,17 +402,17 @@ export function FrostMapPageV2({ initialData }: FrostMapPageProps) {
         <header className="frost-v2-section-heading">
           <div>
             <span className="frost-v2-eyebrow">Registros por estação</span>
-            <h2 id="frost-v2-map-title">Filtre o período e explore os pontos observados</h2>
+            <h2 id="frost-v2-map-title">Escolha o período e explore os pontos encontrados</h2>
           </div>
           <p>
-            Cada marcador representa uma estação com registro retornado. Agrupamentos indicam apenas a
-            quantidade de pontos próximos na visualização, não a extensão territorial da geada.
+            Cada marcador representa uma estação. Os círculos com números apenas juntam pontos próximos
+            no mapa e não mostram o tamanho da área que pode ter registrado geada.
           </p>
         </header>
 
         <div className="frost-v2-filters">
           <fieldset>
-            <legend><CalendarRange aria-hidden="true" />Período consultado</legend>
+            <legend><CalendarRange aria-hidden="true" />Período</legend>
             <div>
               {PERIOD_OPTIONS.map((option) => (
                 <button key={option} type="button" aria-pressed={days === option} className={days === option ? "is-active" : undefined} onClick={() => setDays(option)}>
@@ -433,7 +433,7 @@ export function FrostMapPageV2({ initialData }: FrostMapPageProps) {
           </fieldset>
           <div className="frost-v2-filter-state" aria-live="polite">
             <RefreshCw className={isRefreshing ? "is-spinning" : undefined} aria-hidden="true" />
-            <span>{isRefreshing ? "Atualizando filtros" : `${data.summary.stations} estações · ${data.summary.observations} registros`}</span>
+            <span>{isRefreshing ? "Atualizando mapa" : `${data.summary.stations} estações · ${data.summary.observations} registros`}</span>
           </div>
         </div>
 
@@ -441,18 +441,18 @@ export function FrostMapPageV2({ initialData }: FrostMapPageProps) {
 
         <div className="frost-v2-map-shell" aria-busy={isRefreshing}>
           <div ref={mapContainerRef} className="frost-v2-map" aria-label="Mapa de registros de geada por estação no Rio Grande do Sul" />
-          <div className="frost-v2-legend" aria-label="Legenda de intensidade da geada">
+          <div className="frost-v2-legend" aria-label="Legenda da classificação da geada">
             <strong>Classificação</strong>
             <span><i className="is-strong" />Forte</span>
             <span><i className="is-moderate" />Moderada</span>
             <span><i className="is-weak" />Fraca</span>
             <span><i className="is-possible" />Possível ocorrência</span>
-            <span><i className="is-undefined" />Indefinida</span>
+            <span><i className="is-undefined" />Não informada</span>
           </div>
           <div className={`frost-v2-loading${isMapLoaded && !isRefreshing ? " is-hidden" : ""}`} role="status">
             <span aria-hidden="true" />
             <strong>{mapError ? "Mapa temporariamente indisponível" : isRefreshing ? "Atualizando registros" : "Carregando mapa"}</strong>
-            <small>{mapError ? "A tabela continua disponível abaixo." : "Os pontos serão agrupados conforme o nível de zoom."}</small>
+            <small>{mapError ? "A lista continua disponível abaixo." : "Os pontos próximos são agrupados quando o mapa está mais afastado."}</small>
           </div>
         </div>
       </section>
@@ -460,41 +460,41 @@ export function FrostMapPageV2({ initialData }: FrostMapPageProps) {
       <section className="frost-v2-summary" id="distribuicao-das-ocorrencias" aria-labelledby="frost-v2-summary-title">
         <header className="frost-v2-section-heading">
           <div>
-            <span className="frost-v2-eyebrow">Distribuição retornada</span>
-            <h2 id="frost-v2-summary-title">Intensidade dos registros no filtro atual</h2>
+            <span className="frost-v2-eyebrow">Classificação dos registros</span>
+            <h2 id="frost-v2-summary-title">Como as ocorrências aparecem nos filtros atuais</h2>
           </div>
           <p>
-            A classificação depende do tipo de estação. Estações automáticas são apresentadas pelo produto
-            como possível ocorrência; não recebem a mesma gradação das convencionais.
+            As estações convencionais podem mostrar intensidade forte, moderada ou fraca. Nas automáticas,
+            a informação disponível pode aparecer apenas como possível ocorrência.
           </p>
         </header>
         <div className="frost-v2-summary-grid">
-          <article><Snowflake aria-hidden="true" /><span>Forte</span><strong>{data.summary.strong}</strong><small>Classificação convencional</small></article>
-          <article><ThermometerSnowflake aria-hidden="true" /><span>Moderada</span><strong>{data.summary.moderate}</strong><small>Classificação convencional</small></article>
-          <article><Snowflake aria-hidden="true" /><span>Fraca</span><strong>{data.summary.weak}</strong><small>Classificação convencional</small></article>
-          <article><MapPinned aria-hidden="true" /><span>Possível ocorrência</span><strong>{data.summary.possible}</strong><small>Produto de estação automática</small></article>
-          <article><Info aria-hidden="true" /><span>Indefinida</span><strong>{data.summary.undefined}</strong><small>Sem classificação reconhecida</small></article>
+          <article><Snowflake aria-hidden="true" /><span>Forte</span><strong>{data.summary.strong}</strong><small>Estações convencionais</small></article>
+          <article><ThermometerSnowflake aria-hidden="true" /><span>Moderada</span><strong>{data.summary.moderate}</strong><small>Estações convencionais</small></article>
+          <article><Snowflake aria-hidden="true" /><span>Fraca</span><strong>{data.summary.weak}</strong><small>Estações convencionais</small></article>
+          <article><MapPinned aria-hidden="true" /><span>Possível ocorrência</span><strong>{data.summary.possible}</strong><small>Estações automáticas</small></article>
+          <article><Info aria-hidden="true" /><span>Não informada</span><strong>{data.summary.undefined}</strong><small>Sem classificação disponível</small></article>
         </div>
       </section>
 
       <section className="frost-v2-table-section" id="registros-de-geada" aria-labelledby="frost-v2-table-title">
         <header className="frost-v2-section-heading">
           <div>
-            <span className="frost-v2-eyebrow">Consulta acessível</span>
-            <h2 id="frost-v2-table-title">Registros mais recentes do filtro</h2>
+            <span className="frost-v2-eyebrow">Lista de registros</span>
+            <h2 id="frost-v2-table-title">Ocorrências mais recentes nos filtros escolhidos</h2>
           </div>
           <p>
-            A tabela complementa o mapa e permite conferir estação, código, data, temperatura mínima e
-            classificação. São exibidas até 60 ocorrências recentes.
+            Consulte a estação, o código, a data, a temperatura mínima e a classificação. A lista mostra
+            até 60 registros recentes.
           </p>
         </header>
 
         {recentObservations.length ? (
           <>
-            <div className="frost-v2-table-intro"><Table2 aria-hidden="true" /><span><strong>{recentObservations.length} linhas exibidas</strong><small>{formatDate(data.filters.startDate)} a {formatDate(data.filters.endDate)}</small></span></div>
+            <div className="frost-v2-table-intro"><Table2 aria-hidden="true" /><span><strong>{recentObservations.length} registros exibidos</strong><small>{formatDate(data.filters.startDate)} a {formatDate(data.filters.endDate)}</small></span></div>
             <div className="frost-v2-table-wrap">
               <table>
-                <caption>Registros de geada retornados pelas estações do INMET no Rio Grande do Sul</caption>
+                <caption>Registros de geada encontrados nas estações do INMET no Rio Grande do Sul</caption>
                 <thead><tr><th scope="col">Estação</th><th scope="col">Data</th><th scope="col">Mínima</th><th scope="col">Classificação</th></tr></thead>
                 <tbody>
                   {recentObservations.map((observation) => (
@@ -512,7 +512,7 @@ export function FrostMapPageV2({ initialData }: FrostMapPageProps) {
         ) : (
           <div className="frost-v2-empty" role="status">
             <Snowflake aria-hidden="true" />
-            <div><strong>Nenhum registro foi retornado para estes filtros</strong><p>Isso não comprova ausência de geada em locais sem estação, fora do período ou sem dado reconhecido.</p></div>
+            <div><strong>Nenhum registro foi encontrado para estes filtros</strong><p>Isso não comprova ausência de geada em locais sem estação, fora do período ou sem dados disponíveis.</p></div>
           </div>
         )}
       </section>
@@ -520,24 +520,24 @@ export function FrostMapPageV2({ initialData }: FrostMapPageProps) {
       <section className="frost-v2-limits" id="limites-do-monitoramento" aria-labelledby="frost-v2-limits-title">
         <AlertTriangle aria-hidden="true" />
         <div>
-          <span className="frost-v2-eyebrow">Interpretação correta</span>
+          <span className="frost-v2-eyebrow">O que o mapa não mostra</span>
           <h2 id="frost-v2-limits-title">Ausência de ponto não significa ausência de geada</h2>
           <p>
-            O mapa é uma amostra espacial formada por estações. Baixadas, lavouras, áreas serranas e
-            microclimas rurais podem apresentar condições diferentes da estação mais próxima. Para decisão
-            agrícola, combine observação, previsão agrometeorológica e orientação técnica local.
+            O mapa é formado por estações específicas. Baixadas, lavouras, áreas serranas e outros
+            microclimas podem apresentar condições diferentes. Para decisões agrícolas, combine os
+            registros com a previsão do tempo e orientação técnica local.
           </p>
         </div>
         <ShieldCheck aria-hidden="true" />
       </section>
 
-      <section className="frost-v2-actions" aria-label="Ações relacionadas ao mapa de geadas">
-        <div><span className="frost-v2-eyebrow">Fonte e contexto</span><h2>Compare observação passada com previsão e clima</h2></div>
+      <section className="frost-v2-actions" aria-label="Outras páginas relacionadas ao mapa de geadas">
+        <div><span className="frost-v2-eyebrow">Veja junto com previsão e clima</span><h2>Compare os registros passados com a previsão dos próximos dias</h2></div>
         <div>
           <a href={data.source.portalUrl} target="_blank" rel="noopener noreferrer">Portal do INMET <ExternalLink aria-hidden="true" /></a>
           <Link to="/tempo-amanha-pelotas">Previsão de amanhã <ArrowRight aria-hidden="true" /></Link>
           <Link to="/clima-em-pelotas">Clima de Pelotas</Link>
-          <Link to="/metodologia">Metodologia e fontes</Link>
+          <Link to="/metodologia">Como os dados funcionam</Link>
         </div>
       </section>
     </div>
