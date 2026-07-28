@@ -24,33 +24,33 @@ test("hydrology route loads five independent sources in the shared shell", () =>
   assert.match(route, /staleTime: 60 \* 1_000/);
 });
 
-test("local telemetry distinguishes live, stale and unavailable readings", () => {
+test("local station distinguishes live, stale and unavailable readings", () => {
   assert.match(page, /level\.status === "live"/);
   assert.match(page, /level\.status === "stale"/);
   assert.match(page, /Última leitura conhecida/);
   assert.match(page, /não como nível atual/);
-  assert.match(page, /Telemetria indisponível/);
-  assert.match(page, /não preenche a ausência da fonte com nível estimado/);
+  assert.match(page, /Leitura indisponível/);
+  assert.match(page, /não substitui a ausência da estação por um nível estimado/);
   assert.match(page, /role="status"/);
   assert.doesNotMatch(page, /level\.status === "stale"[^\n]{0,220}label:\s*"Nível atual"/i);
 });
 
-test("measurement time, age and portal query remain separate", () => {
+test("measurement time, age and portal update remain separate", () => {
   assert.match(page, /Horário da medição/);
-  assert.match(page, /Idade da leitura/);
-  assert.match(page, /Consulta do portal/);
+  assert.match(page, /Tempo desde a leitura/);
+  assert.match(page, /Última atualização/);
   assert.match(page, /formatDateTime\(level\.updatedAt\)/);
   assert.match(page, /ageLabel\(level\.ageMinutes\)/);
   assert.match(page, /formatDateTime\(level\.source\.fetchedAt\)/);
 });
 
-test("Laranjal level preserves its technical reference and avoids cross-station conversion", () => {
-  assert.match(page, /referência técnica do equipamento/);
-  assert.match(page, /não deve ser comparado diretamente com cotas de outras estações/);
-  assert.match(page, /Não é classificação de risco/);
-  assert.match(page, /não utiliza as cotas oficiais de[\s\S]*outras estações/);
-  assert.match(route, /não possui conversão automática para cotas de outras estações/);
-  assert.match(route, /não são convertidas em classificação local para o Laranjal/);
+test("Laranjal level preserves its own reference and avoids cross-station conversion", () => {
+  assert.match(page, /referência própria do equipamento/);
+  assert.match(page, /não deve ser comparado diretamente com números absolutos de outras estações/);
+  assert.match(page, /Este valor não é uma classificação de risco/);
+  assert.match(page, /não usa as[\s\S]*cotas de Atenção, Alerta ou Inundação de outras estações/);
+  assert.match(route, /Os números não devem ser comparados por simples subtração/);
+  assert.match(route, /não são convertidas em classificação para o Laranjal/);
   assert.doesNotMatch(hydrologySource, /cota de inundação do Laranjal:\s*\d/i);
 });
 
@@ -63,33 +63,33 @@ test("local series exposes trend and changes without inventing missing data", ()
   assert.match(page, /level\.periodMinimum/);
   assert.match(page, /level\.periodAverage/);
   assert.match(page, /level\.periodMaximum/);
-  assert.match(page, /Não há pontos suficientes/);
-  assert.match(page, /A ausência do sensor não é substituída por estimativa/);
+  assert.match(page, /Não há medições suficientes/);
+  assert.match(page, /não é substituída por uma estimativa de nível/);
 });
 
-test("regional network and SACE remain contextual rather than local forecasts", () => {
+test("regional network and SACE remain context rather than local forecasts", () => {
   assert.match(page, /RegionalWaterNetwork/);
   assert.match(page, /SaceGuaibaContext/);
-  assert.match(page, /Cada rede responde a uma pergunta diferente/);
-  assert.match(page, /não converte automaticamente níveis e categorias/);
-  assert.match(route, /Nenhuma estação distante prevê sozinha o nível futuro em Pelotas/);
+  assert.match(page, /Cada estação deve ser lida na sua própria referência/);
+  assert.match(page, /não transforma automaticamente níveis e categorias/);
+  assert.match(route, /A situação dos rios ajuda a entender o cenário/);
   assert.match(route, /Uma estação elevada no SACE significa que o Laranjal vai subir\?/);
   assert.match(route, /sem transformá-la em risco para Pelotas/);
 });
 
-test("weather context is clearly forecast and limited to 24 hours", () => {
+test("weather information is clearly forecast and limited to 24 hours", () => {
   assert.match(page, /weather\.weather\.hourly\.slice\(0, 24\)/);
-  assert.match(page, /Contexto previsto · próximas 24 horas/);
-  assert.match(page, /Estes valores são previsão meteorológica, não medição hidrológica/);
+  assert.match(page, /Previsão para as próximas 24 horas/);
+  assert.match(page, /Estes valores são previsão do tempo, não medições do nível da água/);
   assert.match(page, /precipitationMm/);
   assert.match(page, /precipitationProbability/);
   assert.match(page, /windGust/);
-  assert.match(page, /não permitem calcular sozinhos o nível futuro/);
+  assert.match(page, /não calculam sozinhos quanto o nível do Laranjal vai subir ou baixar/);
 });
 
 test("absence of transmission is never interpreted as normal level", () => {
   assert.match(page, /Uma estação sem transmissão não deve ser interpretada como nível normal/);
-  assert.match(route, /Ausência de transmissão significa ausência de dado atual/);
+  assert.match(route, /Quando uma estação não transmite, não há dado atual/);
   assert.match(route, /Ausência de transmissão significa que o rio está normal\?/);
   assert.doesNotMatch(hydrologySource, /sem transmissão\s+(?:significa|confirma|indica)\s+(?:que\s+)?(?:o\s+)?nível normal/i);
 });
