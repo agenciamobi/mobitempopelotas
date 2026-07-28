@@ -300,7 +300,7 @@ function severityFromText(value: string): { severity: InmetAlertSeverity; label:
   }
   if (
     compact === "1" ||
-    /potencial|moderate|moderado|amarel|ffff00|ffcc00|facc15|rgb\(?255,?(?:204|255),?0/.test(
+    /potencial|moderate|moderado|amarel|fffe00|ffff00|ffcc00|facc15|rgb\(?255,?(?:204|254|255),?0/.test(
       normalized,
     )
   ) {
