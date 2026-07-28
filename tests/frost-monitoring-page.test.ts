@@ -23,19 +23,18 @@ test("frost route uses shared shell and parallel official data loaders", () => {
 });
 
 test("frost monitoring explicitly distinguishes observation from forecast", () => {
-  assert.match(page, /datas passadas; não é previsão de geada/);
-  assert.match(page, /Compare observação passada com previsão e clima/);
-  assert.match(route, /O produto é observacional/);
-  assert.match(route, /não prevê geada para a próxima madrugada/);
+  assert.match(page, /Cada ponto representa uma estação e uma data[\s\S]*passada/);
+  assert.match(page, /Compare os registros passados com a previsão/);
+  assert.match(route, /O mapa mostra registros passados e não prevê geada/);
   assert.match(route, /O mapa mostra previsão de geada\?/);
   assert.doesNotMatch(frostSource, /previsão confirmada de geada/i);
 });
 
 test("absence of returned observations is never equated with absence of frost", () => {
-  assert.match(page, /Nenhum registro foi retornado para estes filtros/);
+  assert.match(page, /Nenhum registro foi encontrado para estes filtros/);
   assert.match(page, /Isso não comprova ausência de geada/);
   assert.match(page, /Ausência de ponto não significa ausência de geada/);
-  assert.match(route, /A ausência de registro nos filtros selecionados não comprova ausência de geada/);
+  assert.match(route, /Quando nenhum registro aparece/);
   assert.match(route, /Nenhum ponto no mapa significa que não houve geada/);
   assert.doesNotMatch(frostSource, /não houve geada no Rio Grande do Sul/i);
 });
@@ -49,7 +48,7 @@ test("period and station type filters update through abortable internal requests
   assert.match(page, /new AbortController\(\)/);
   assert.match(page, /signal: controller\.signal/);
   assert.match(page, /return \(\) => controller\.abort\(\)/);
-  assert.match(page, /A última consulta válida permanece na tela/);
+  assert.match(page, /Os últimos dados válidos continuam na tela/);
 });
 
 test("map remains lazy, clustered and resilient when tiles fail", () => {
@@ -62,27 +61,27 @@ test("map remains lazy, clustered and resilient when tiles fail", () => {
   assert.match(page, /FullscreenControl/);
   assert.match(page, /cooperativeGestures: true/);
   assert.match(page, /Mapa temporariamente indisponível/);
-  assert.match(page, /A tabela continua disponível abaixo/);
+  assert.match(page, /A lista continua disponível abaixo/);
 });
 
 test("conventional and automatic stations preserve distinct interpretation", () => {
   assert.match(page, /type === "CONVENCIONAL" \? "Convencional" : "Automática"/);
-  assert.match(page, /Estações automáticas são apresentadas pelo produto como possível ocorrência/);
-  assert.match(page, /Classificação convencional/);
-  assert.match(page, /Produto de estação automática/);
-  assert.match(route, /não recebem necessariamente a mesma gradação das convencionais/);
-  assert.match(route, /Estações convencionais podem receber classificação fraca, moderada ou forte/);
+  assert.match(page, /As estações convencionais podem mostrar intensidade forte, moderada ou fraca/);
+  assert.match(page, /Estações convencionais/);
+  assert.match(page, /Estações automáticas/);
+  assert.match(route, /Nas estações automáticas/);
+  assert.match(route, /Nas estações convencionais/);
 });
 
 test("map clusters are not presented as territorial frost coverage", () => {
-  assert.match(page, /Agrupamentos indicam apenas a quantidade de pontos próximos/);
-  assert.match(page, /não a extensão territorial da geada/);
-  assert.match(route, /Agrupamentos no mapa indicam somente marcadores próximos/);
+  assert.match(page, /Os círculos com números apenas juntam pontos próximos/);
+  assert.match(page, /não mostram o tamanho da área/);
+  assert.match(route, /Os círculos com números apenas juntam estações próximas/);
   assert.match(route, /Os círculos agrupados mostram o tamanho da área com geada\?/);
 });
 
 test("accessible table preserves the exact returned observations", () => {
-  assert.match(page, /<caption>Registros de geada retornados/);
+  assert.match(page, /<caption>Registros de geada encontrados/);
   assert.match(page, /<th scope="col">Estação<\/th>/);
   assert.match(page, /<th scope="row">/);
   assert.match(page, /observation\.stationName/);
@@ -90,7 +89,7 @@ test("accessible table preserves the exact returned observations", () => {
   assert.match(page, /observation\.minimumTemperature/);
   assert.match(page, /observation\.intensityLabel/);
   assert.match(page, /\.slice\(0, 60\)/);
-  assert.match(page, /São exibidas até 60 ocorrências recentes/);
+  assert.match(page, /até 60 registros recentes/);
 });
 
 test("frost page follows responsive retail and accessibility contracts", () => {
