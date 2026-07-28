@@ -91,10 +91,10 @@ function buildRecentProfile(days: HistoricalWeatherDay[]): RecentProfile {
 
 function sourceCoverageLabel(history: WeatherHistoryData, profile: RecentProfile) {
   const total = history.days.length;
-  if (!total) return "Sem dias válidos";
+  if (!total) return "Sem dias disponíveis";
   const precipitationCoverage = Math.round((profile.precipitationDaysKnown / total) * 100);
   const windCoverage = Math.round((profile.windDaysKnown / total) * 100);
-  return `Chuva em ${precipitationCoverage}% dos dias · rajadas em ${windCoverage}%`;
+  return `Chuva informada em ${precipitationCoverage}% dos dias · rajadas em ${windCoverage}%`;
 }
 
 export function WeatherHistoryHero({ history }: WeatherHistoryPageProps) {
@@ -105,33 +105,33 @@ export function WeatherHistoryHero({ history }: WeatherHistoryPageProps) {
   return (
     <section className="history-hero history-hero--retail" aria-labelledby="history-hero-title">
       <div className="history-hero__content">
-        <p className="history-kicker">Histórico meteorológico recente</p>
+        <p className="history-kicker">Histórico de 30 dias</p>
         <h1 id="history-hero-title">Como o tempo variou nos últimos 30 dias em Pelotas.</h1>
         <p className="history-lead">
-          Compare máximas, mínimas, chuva e rajadas em dias completos. Este recorte mostra o que ocorreu
-          recentemente e não substitui uma normal climatológica de longo prazo.
+          Compare máximas, mínimas, chuva e rajadas em dias completos. Este período mostra o que ocorreu
+          recentemente e não representa o clima normal de muitos anos.
         </p>
         <div className="history-hero__actions">
-          <a href="#comparacao-diaria">Explorar o gráfico <ArrowRight aria-hidden="true" /></a>
+          <a href="#comparacao-diaria">Ver o gráfico <ArrowRight aria-hidden="true" /></a>
           <Link to="/clima-em-pelotas">Entender o clima de Pelotas</Link>
         </div>
       </div>
 
       <aside className={`history-period-card history-period-card-${history.status}`}>
         <header>
-          <span>Período consultado</span>
+          <span>Período exibido</span>
           <strong>{summary?.periodLabel ?? "Indisponível"}</strong>
           <small>
             {history.source.periodStart && history.source.periodEnd
               ? `${formatDate(history.source.periodStart)} a ${formatDate(history.source.periodEnd)}`
-              : "A fonte não devolveu uma série válida."}
+              : "Não foram encontrados dias válidos."}
           </small>
         </header>
 
         <div className="history-period-overview">
           <article>
             <CalendarDays aria-hidden="true" />
-            <span><strong>{history.days.length || "—"}</strong><small>dias válidos</small></span>
+            <span><strong>{history.days.length || "—"}</strong><small>dias com temperatura</small></span>
           </article>
           <article>
             <CloudRain aria-hidden="true" />
@@ -147,7 +147,7 @@ export function WeatherHistoryHero({ history }: WeatherHistoryPageProps) {
           </span>
         </div>
 
-        <footer>Consulta em {formatDateTime(history.source.fetchedAt)}</footer>
+        <footer>Atualizado em {formatDateTime(history.source.fetchedAt)}</footer>
       </aside>
     </section>
   );
@@ -191,19 +191,19 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
         />
       ) : null}
 
-      <nav className="history-chapters" aria-label="Capítulos do histórico meteorológico">
-        <a href="#resumo-do-periodo"><span>01</span><strong>Resumo</strong><small>Médias e acumulados</small></a>
+      <nav className="history-chapters" aria-label="Seções do histórico de 30 dias">
+        <a href="#resumo-do-periodo"><span>01</span><strong>Resumo</strong><small>Médias e chuva acumulada</small></a>
         <a href="#comparacao-diaria"><span>02</span><strong>Gráfico</strong><small>7, 14 ou 30 dias</small></a>
-        <a href="#perfil-do-periodo"><span>03</span><strong>Perfil</strong><small>Chuva e amplitude</small></a>
-        <a href="#destaques-do-periodo"><span>04</span><strong>Extremos</strong><small>Somente do recorte</small></a>
-        <a href="#valores-diarios"><span>05</span><strong>Tabela</strong><small>Dados usados nos cálculos</small></a>
+        <a href="#perfil-do-periodo"><span>03</span><strong>Dias com dados</strong><small>Chuva, rajadas e temperaturas</small></a>
+        <a href="#destaques-do-periodo"><span>04</span><strong>Destaques</strong><small>Somente deste período</small></a>
+        <a href="#valores-diarios"><span>05</span><strong>Valores diários</strong><small>Dados usados nos cálculos</small></a>
       </nav>
 
       {history.status === "partial" ? (
         <div className="history-status history-status-partial" role="status">
           <Info aria-hidden="true" />
           <div>
-            <strong>Série parcial</strong>
+            <strong>Alguns dias ou campos estão indisponíveis</strong>
             <span>{history.error}</span>
           </div>
         </div>
@@ -214,16 +214,16 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
           <section className="history-summary-section" id="resumo-do-periodo" aria-labelledby="history-summary-title">
             <header className="history-section-heading history-section-heading--compact">
               <div>
-                <p className="history-kicker">Visão geral do recorte</p>
-                <h2 id="history-summary-title">Médias e acumulados dos dias consultados</h2>
+                <p className="history-kicker">Resumo do período</p>
+                <h2 id="history-summary-title">Médias e acumulados dos dias disponíveis</h2>
               </div>
               <p>
-                Todos os indicadores pertencem apenas ao período informado. Campos ausentes não são
-                preenchidos com zero ou estimativas demonstrativas.
+                Todos os valores pertencem apenas ao período informado. Informações ausentes não são
+                substituídas por zero ou por números demonstrativos.
               </p>
             </header>
 
-            <div className="history-summary" aria-label="Resumo do período recente">
+            <div className="history-summary" aria-label="Resumo dos últimos 30 dias">
               <article>
                 <ThermometerSun aria-hidden="true" />
                 <span>Média das máximas</span>
@@ -240,7 +240,7 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
                 <CloudRain aria-hidden="true" />
                 <span>Chuva no período</span>
                 <strong>{valueOrDash(summary.totalPrecipitation, " mm")}</strong>
-                <small>Soma dos acumulados diários informados</small>
+                <small>Soma da chuva diária informada</small>
               </article>
               <article>
                 <Wind aria-hidden="true" />
@@ -258,12 +258,12 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
           <section className="history-profile history-section" id="perfil-do-periodo" aria-labelledby="history-profile-title">
             <div className="history-section-heading">
               <div>
-                <p className="history-kicker">Leitura complementar</p>
-                <h2 id="history-profile-title">Como o período se distribuiu</h2>
+                <p className="history-kicker">Detalhes do período</p>
+                <h2 id="history-profile-title">Quantos dias possuem cada informação</h2>
               </div>
               <p>
-                A contagem usa somente dias com o campo correspondente disponível. “Sem chuva” significa
-                acumulado diário abaixo de 0,1 mm na fonte consultada.
+                A contagem usa somente os dias que possuem o campo correspondente. “Sem chuva” significa
+                acumulado diário abaixo de 0,1 mm nos dados consultados.
               </p>
             </div>
 
@@ -282,26 +282,26 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
               </article>
               <article>
                 <Gauge aria-hidden="true" />
-                <span>Amplitude média diária</span>
+                <span>Variação média diária</span>
                 <strong>{valueOrDash(profile.averageAmplitude, " °C")}</strong>
                 <small>Diferença média entre máxima e mínima</small>
               </article>
               <article>
                 <TrendingUp aria-hidden="true" />
-                <span>Faixa térmica total</span>
+                <span>Faixa de temperaturas</span>
                 <strong>{valueOrDash(profile.temperatureSpan, " °C")}</strong>
-                <small>Da menor mínima à maior máxima do recorte</small>
+                <small>Da menor mínima à maior máxima do período</small>
               </article>
             </div>
 
-            <div className="history-coverage" aria-label="Completude das variáveis do histórico">
+            <div className="history-coverage" aria-label="Dias com cada informação disponível">
               <div>
                 <span>Temperatura</span>
                 <strong>{history.days.length}/{history.days.length} dias</strong>
                 <i><b style={{ width: "100%" }} /></i>
               </div>
               <div>
-                <span>Precipitação</span>
+                <span>Chuva</span>
                 <strong>{profile.precipitationDaysKnown}/{history.days.length} dias</strong>
                 <i><b style={{ width: `${history.days.length ? (profile.precipitationDaysKnown / history.days.length) * 100 : 0}%` }} /></i>
               </div>
@@ -317,11 +317,11 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
             <div className="history-section-heading">
               <div>
                 <p className="history-kicker">Destaques do período</p>
-                <h2 id="history-records-title">Dias que se destacaram na série</h2>
+                <h2 id="history-records-title">Dias que se destacaram nos dados</h2>
               </div>
               <p>
-                Estes são extremos apenas dos dias consultados e do ponto de grade utilizado. Não são
-                recordes históricos oficiais de Pelotas.
+                Estes são os maiores ou menores valores apenas entre os dias consultados. Não são recordes
+                históricos oficiais de Pelotas.
               </p>
             </div>
 
@@ -342,7 +342,7 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
                 <CloudRain aria-hidden="true" />
                 <span>Dia mais chuvoso</span>
                 <strong>{valueOrDash(summary.wettestDay?.precipitation ?? null, " mm")}</strong>
-                <p>{summary.wettestDay ? `${summary.wettestDay.weekday}, ${summary.wettestDay.label}` : "Precipitação não informada"}</p>
+                <p>{summary.wettestDay ? `${summary.wettestDay.weekday}, ${summary.wettestDay.label}` : "Chuva não informada"}</p>
               </article>
               <article>
                 <Wind aria-hidden="true" />
@@ -356,18 +356,18 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
           <section className="history-section" id="valores-diarios" aria-labelledby="history-table-title">
             <div className="history-section-heading">
               <div>
-                <p className="history-kicker">Série diária acessível</p>
-                <h2 id="history-table-title">Valores usados nos cálculos</h2>
+                <p className="history-kicker">Valores de cada dia</p>
+                <h2 id="history-table-title">Dados usados nos cálculos</h2>
               </div>
               <p>
-                A tabela permite conferir cada data e complementa o gráfico. Campos não publicados pela
-                fonte aparecem como “não informado”.
+                A tabela permite conferir cada data e complementa o gráfico. Campos que não foram publicados
+                aparecem como “não informado”.
               </p>
             </div>
 
             <div className="history-table-intro">
               <Table2 aria-hidden="true" />
-              <span><strong>{history.days.length} linhas de dados</strong><small>Ordem da data mais recente para a mais antiga.</small></span>
+              <span><strong>{history.days.length} dias exibidos</strong><small>Da data mais recente para a mais antiga.</small></span>
             </div>
 
             <div className="history-table-wrap">
@@ -378,7 +378,7 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
                     <th scope="col">Data</th>
                     <th scope="col">Máxima</th>
                     <th scope="col">Mínima</th>
-                    <th scope="col">Amplitude</th>
+                    <th scope="col">Variação</th>
                     <th scope="col">Chuva</th>
                     <th scope="col">Rajada</th>
                   </tr>
@@ -404,10 +404,10 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
           <AlertTriangle aria-hidden="true" />
           <div>
             <p className="history-kicker">Dados temporariamente indisponíveis</p>
-            <h2 id="history-unavailable-title">O histórico recente não pôde ser carregado</h2>
+            <h2 id="history-unavailable-title">O histórico de 30 dias não pôde ser carregado</h2>
             <p>
-              O portal não substitui a ausência da fonte por números simulados. O gráfico e os resumos
-              voltarão a aparecer quando uma série real estiver disponível.
+              A página não substitui a ausência dos dados por números simulados. O gráfico e os resumos
+              voltarão a aparecer quando informações reais estiverem disponíveis.
             </p>
             <small>{history.error}</small>
           </div>
@@ -417,31 +417,31 @@ export function WeatherHistoryPage({ history }: WeatherHistoryPageProps) {
       <section className="history-methodology" aria-labelledby="history-methodology-title">
         <TrendingUp aria-hidden="true" />
         <div>
-          <p className="history-kicker">Interpretação correta</p>
-          <h2 id="history-methodology-title">Histórico recente não é normal climatológica</h2>
+          <p className="history-kicker">Como interpretar</p>
+          <h2 id="history-methodology-title">Trinta dias não representam o clima normal</h2>
           <p>
-            Esta página descreve dias recentes. Climatologia exige séries longas, períodos padronizados e
-            controle de qualidade. O recorte não deve ser usado isoladamente para afirmar que um mês foi
-            normal, quente, frio, seco ou chuvoso em relação ao clima de Pelotas.
+            Esta página descreve dias recentes. O estudo do clima exige muitos anos de observações e critérios
+            próprios. O período não deve ser usado sozinho para afirmar que um mês foi normal, quente, frio,
+            seco ou chuvoso em relação ao clima de Pelotas.
           </p>
-          <Link to="/clima-em-pelotas">Entender clima e sazonalidade <ArrowRight aria-hidden="true" /></Link>
+          <Link to="/clima-em-pelotas">Entender o clima de Pelotas <ArrowRight aria-hidden="true" /></Link>
         </div>
       </section>
 
-      <section className="history-actions" aria-label="Ações relacionadas ao histórico meteorológico">
+      <section className="history-actions" aria-label="Ações relacionadas ao histórico de 30 dias">
         <div>
-          <p className="history-kicker">Fonte e contexto</p>
-          <h2>Compare a série recente com observação e previsão</h2>
+          <p className="history-kicker">Continue comparando</p>
+          <h2>Compare os últimos dias com medições e previsões</h2>
         </div>
         <div>
           <a className="history-primary-action" href={history.source.url} target="_blank" rel="noopener noreferrer">
-            Fonte histórica <ExternalLink aria-hidden="true" />
+            Abrir dados originais <ExternalLink aria-hidden="true" />
           </a>
           <Link className="history-secondary-action" to="/estacao-embrapa-pelotas">
             Estação Embrapa <ArrowRight aria-hidden="true" />
           </Link>
           <Link className="history-secondary-action" to="/previsao-7-dias-pelotas">Previsão de 7 dias</Link>
-          <Link className="history-secondary-action" to="/metodologia">Metodologia e fontes</Link>
+          <Link className="history-secondary-action" to="/metodologia">Como os dados funcionam</Link>
         </div>
       </section>
     </div>
