@@ -76,6 +76,15 @@ function prioritizeAlerts(alerts: InmetAlert[]) {
   });
 }
 
+function alertAreaLabel(alert: InmetAlert) {
+  const places = alert.municipalities.length > 0 ? alert.municipalities : alert.areas;
+  const visible = places.slice(0, 6);
+  const remaining = places.length - visible.length;
+
+  if (visible.length === 0) return null;
+  return remaining > 0 ? `${visible.join(", ")} e mais ${remaining}` : visible.join(", ");
+}
+
 function alertSchema(alert: InmetAlert) {
   return {
     "@context": "https://schema.org",
@@ -114,49 +123,93 @@ function AlertsHero({
   upcomingCount: number;
   source: WeatherIntelligenceData["weather"]["sources"]["inmet"];
 }) {
+  const sourceAvailable = source.usable;
   const severity = featured?.severity ?? "unknown";
-  const label = featured ? alertColorLabels[severity] : "Situação atual";
-  const target = featured ? "#aviso-prioritario" : "#resumo-alertas";
-  const targetLabel = featured ? "Ver aviso em destaque" : "Ver situação atual";
+  const label = featured
+    ? alertColorLabels[severity]
+    : sourceAvailable
+      ? "Sem alerta listado"
+      : "Consulta indisponível";
+  const target = featured ? "#aviso-prioritario" : "#situacao-alertas";
+  const targetLabel = featured
+    ? "Ler alerta prioritário"
+    : sourceAvailable
+      ? "Conferir situação atual"
+      : "Entender a indisponibilidade";
+  const panelStatus = featured
+    ? sourceAvailable
+      ? featured.period === "active"
+        ? "Em vigor agora"
+        : "Aviso programado"
+      : "Último aviso disponível"
+    : sourceAvailable
+      ? "Situação consultada"
+      : "Fonte temporariamente indisponível";
 
   return (
-    <header className={`alerts-editorial-hero alerts-editorial-hero-${severity}`}>
+    <header
+      className={`alerts-editorial-hero alerts-editorial-hero-${severity}`}
+      aria-labelledby="alerts-page-title"
+    >
       <div className="alerts-editorial-copy">
         <Link className="alerts-editorial-back" to="/" aria-label="Voltar ao tempo agora em Pelotas">
           <ArrowLeft aria-hidden="true" /> Visão geral
         </Link>
-        <span className="alerts-editorial-eyebrow">Avisos oficiais · Pelotas</span>
-        <h1>Alertas meteorológicos para Pelotas.</h1>
+        <span className="alerts-editorial-eyebrow">Avisos oficiais do INMET · Pelotas e região</span>
+        <h1 id="alerts-page-title">Alertas meteorológicos em Pelotas</h1>
         <p>
-          Veja os avisos emitidos pelo INMET, os horários de início e término, os municípios incluídos e
-          as orientações oficiais.
+          Consulte os avisos que incluem Pelotas ou áreas próximas, com nível de perigo, período de
+          validade, municípios afetados e recomendações oficiais.
         </p>
 
-        <div className="alerts-editorial-metrics" aria-label="Resumo dos alertas">
-          <div><span>Em vigor</span><strong>{activeCount}</strong></div>
-          <div><span>Programados</span><strong>{upcomingCount}</strong></div>
-          <div><span>Dados do INMET</span><strong>{source.usable ? "Disponíveis" : "Indisponíveis"}</strong></div>
+        <div className="alerts-editorial-metrics" aria-label="Resumo dos alertas meteorológicos">
+          <div>
+            <span>Em vigor</span>
+            <strong>{activeCount}</strong>
+          </div>
+          <div>
+            <span>Programados</span>
+            <strong>{upcomingCount}</strong>
+          </div>
+          <div>
+            <span>Última consulta</span>
+            <strong>{sourceAvailable ? formatDateTime(source.fetchedAt) : "Indisponível"}</strong>
+          </div>
         </div>
 
         <div className="alerts-editorial-actions">
-          <a href={target}>{targetLabel} <ArrowRight aria-hidden="true" /></a>
-          <Link to="/metodologia">Como funciona</Link>
+          <a href={target}>
+            {targetLabel} <ArrowRight aria-hidden="true" />
+          </a>
+          <a href="#como-interpretar-alertas">Entenda os níveis de alerta</a>
         </div>
       </div>
 
-      <aside className="alerts-editorial-panel" aria-label="Aviso meteorológico em destaque">
+      <aside className="alerts-editorial-panel" aria-label="Situação dos alertas meteorológicos">
         <div className="alerts-editorial-panel-line" aria-hidden="true" />
         <div className="alerts-editorial-panel-status">
-          {featured ? <ShieldAlert aria-hidden="true" /> : <CheckCircle2 aria-hidden="true" />}
+          {featured ? (
+            <ShieldAlert aria-hidden="true" />
+          ) : sourceAvailable ? (
+            <CheckCircle2 aria-hidden="true" />
+          ) : (
+            <AlertTriangle aria-hidden="true" />
+          )}
           <span>{label}</span>
         </div>
+        <p>{panelStatus}</p>
         {featured ? (
           <>
-            <p>{featured.period === "active" ? "Em vigor agora" : "Aviso programado"}</p>
             <h2>{featured.event}</h2>
             <dl>
-              <div><dt>Até quando</dt><dd>{formatDateTime(featured.expiresAt)}</dd></div>
-              <div><dt>Área</dt><dd>{featured.relevance === "pelotas" ? "Inclui Pelotas" : "Regional"}</dd></div>
+              <div>
+                <dt>Até quando</dt>
+                <dd>{formatDateTime(featured.expiresAt)}</dd>
+              </div>
+              <div>
+                <dt>Abrangência</dt>
+                <dd>{featured.relevance === "pelotas" ? "Inclui Pelotas" : "Regional ou estadual"}</dd>
+              </div>
             </dl>
             <a
               href={featured.officialUrl}
@@ -167,27 +220,36 @@ function AlertsHero({
               Abrir aviso oficial <ArrowUpRight aria-hidden="true" />
             </a>
           </>
+        ) : sourceAvailable ? (
+          <>
+            <h2>Nenhum aviso ativo ou programado listado agora</h2>
+            <span className="alerts-editorial-panel-note">
+              Isso não elimina mudanças rápidas no tempo. Confira novamente antes de atividades ao ar
+              livre.
+            </span>
+          </>
         ) : (
           <>
-            <p>Situação atual</p>
-            <h2>Nenhum alerta ativo ou programado.</h2>
+            <h2>Não foi possível confirmar os avisos do INMET</h2>
             <span className="alerts-editorial-panel-note">
-              Continue acompanhando: o INMET pode publicar novos avisos a qualquer momento.
+              Indisponibilidade de dados não significa ausência de risco. Consulte também os canais
+              oficiais.
             </span>
           </>
         )}
         <small>
-          {source.usable
-            ? `INMET atualizado em ${formatDateTime(source.fetchedAt)}`
-            : "Os dados do INMET estão indisponíveis nesta atualização. Uma nova consulta será feita automaticamente."}
+          {sourceAvailable
+            ? `Dados do INMET consultados em ${formatDateTime(source.fetchedAt)}.`
+            : "Uma nova consulta será feita automaticamente quando a fonte estiver disponível."}
         </small>
       </aside>
     </header>
   );
 }
 
-function FeaturedAlert({ alert }: { alert: InmetAlert }) {
+function FeaturedAlert({ alert, sourceAvailable }: { alert: InmetAlert; sourceAvailable: boolean }) {
   const label = alertColorLabels[alert.severity];
+
   return (
     <section
       id="aviso-prioritario"
@@ -198,16 +260,39 @@ function FeaturedAlert({ alert }: { alert: InmetAlert }) {
         <span className="alerts-featured-badge">
           <ShieldAlert aria-hidden="true" /> {label} · INMET
         </span>
-        <p className="alerts-kicker">{alert.period === "active" ? "Em vigor agora" : "Próximo aviso"}</p>
-        <h2 id="featured-alert-title">{label}: {alert.event}</h2>
+        <p className="alerts-kicker">
+          {sourceAvailable
+            ? alert.period === "active"
+              ? "Em vigor agora"
+              : "Aviso programado"
+            : "Último dado disponível"}
+        </p>
+        <h2 id="featured-alert-title">
+          {label}: {alert.event}
+        </h2>
         <p className="alerts-featured-description">
           {alert.description || "O INMET não forneceu uma descrição detalhada para este aviso."}
         </p>
 
+        {!sourceAvailable ? (
+          <p className="alerts-featured-source-warning">
+            A consulta mais recente ao INMET falhou. Confirme a validade diretamente no aviso oficial.
+          </p>
+        ) : null}
+
         <dl className="alerts-featured-period">
-          <div><dt>Começa</dt><dd>{formatDateTime(alert.startsAt)}</dd></div>
-          <div><dt>Termina</dt><dd>{formatDateTime(alert.expiresAt)}</dd></div>
-          <div><dt>Área</dt><dd>{alert.relevance === "pelotas" ? "Inclui Pelotas" : "Regional"}</dd></div>
+          <div>
+            <dt>Começa</dt>
+            <dd>{formatDateTime(alert.startsAt)}</dd>
+          </div>
+          <div>
+            <dt>Termina</dt>
+            <dd>{formatDateTime(alert.expiresAt)}</dd>
+          </div>
+          <div>
+            <dt>Abrangência</dt>
+            <dd>{alert.relevance === "pelotas" ? "Inclui Pelotas" : "Regional ou estadual"}</dd>
+          </div>
         </dl>
 
         {alert.instruction ? (
@@ -226,9 +311,9 @@ function FeaturedAlert({ alert }: { alert: InmetAlert }) {
           >
             Abrir aviso oficial <ArrowUpRight aria-hidden="true" />
           </a>
-          <Link to="/metodologia">
-            Como os alertas aparecem no portal <ArrowRight aria-hidden="true" />
-          </Link>
+          <a href="#como-interpretar-alertas">
+            Entenda os níveis de alerta <ArrowRight aria-hidden="true" />
+          </a>
         </div>
       </div>
       <AlertMunicipalityMap alert={alert} />
@@ -240,33 +325,41 @@ function AlertCard({ alert }: { alert: InmetAlert }) {
   const critical = alert.severity === "danger" || alert.severity === "great-danger";
   const Icon = critical ? ShieldAlert : AlertTriangle;
   const alertTitle = alert.headline || alert.event;
+  const areaLabel = alertAreaLabel(alert);
 
   return (
     <article className={`alerts-card alerts-card-${alert.severity}`}>
-      <div className="alerts-card-icon"><Icon aria-hidden="true" /></div>
+      <div className="alerts-card-icon">
+        <Icon aria-hidden="true" />
+      </div>
       <div className="alerts-card-content">
         <div className="alerts-card-meta">
           <span>{alert.period === "active" ? "Em vigor" : "Programado"}</span>
           <span>{severityLabels[alert.severity]}</span>
-          <span>{alert.relevance === "pelotas" ? "Inclui Pelotas" : "Área regional"}</span>
+          <span>{alert.relevance === "pelotas" ? "Inclui Pelotas" : "Área regional ou estadual"}</span>
         </div>
-        <h2>{alertTitle}</h2>
+        <h3>{alertTitle}</h3>
         <p>{alert.description || "O INMET não forneceu uma descrição detalhada para este aviso."}</p>
         {alert.instruction ? (
-          <div className="alerts-instruction"><strong>O que o INMET recomenda</strong><p>{alert.instruction}</p></div>
+          <div className="alerts-instruction">
+            <strong>O que o INMET recomenda</strong>
+            <p>{alert.instruction}</p>
+          </div>
         ) : null}
         <dl className="alerts-period">
-          <div><dt>Começa</dt><dd>{formatDateTime(alert.startsAt)}</dd></div>
-          <div><dt>Termina</dt><dd>{formatDateTime(alert.expiresAt)}</dd></div>
+          <div>
+            <dt>Começa</dt>
+            <dd>{formatDateTime(alert.startsAt)}</dd>
+          </div>
+          <div>
+            <dt>Termina</dt>
+            <dd>{formatDateTime(alert.expiresAt)}</dd>
+          </div>
         </dl>
-        {alert.areas.length > 0 || alert.municipalities.length > 0 ? (
+        {areaLabel ? (
           <div className="alerts-areas">
             <MapPin aria-hidden="true" />
-            <span>
-              {alert.municipalities.length > 0
-                ? alert.municipalities.slice(0, 8).join(", ")
-                : alert.areas.slice(0, 5).join(", ")}
-            </span>
+            <span>{areaLabel}</span>
           </div>
         ) : null}
       </div>
@@ -291,6 +384,8 @@ export function WeatherAlertsPage({ data }: { data: WeatherIntelligenceData }) {
   const remainingActive = featured ? active.filter((alert) => alert.id !== featured.id) : active;
   const remainingUpcoming = featured ? upcoming.filter((alert) => alert.id !== featured.id) : upcoming;
   const inmetSource = weather.sources.inmet;
+  const sourceAvailable = inmetSource.usable;
+  const hasAlerts = active.length > 0 || upcoming.length > 0;
 
   return (
     <div className="alerts-page">
@@ -300,6 +395,7 @@ export function WeatherAlertsPage({ data }: { data: WeatherIntelligenceData }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(alertSchema(featured)) }}
         />
       ) : null}
+
       <AlertsHero
         featured={featured}
         activeCount={active.length}
@@ -307,32 +403,58 @@ export function WeatherAlertsPage({ data }: { data: WeatherIntelligenceData }) {
         source={inmetSource}
       />
 
-      <section id="resumo-alertas" className="alerts-overview" aria-label="Resumo dos avisos meteorológicos">
+      <section
+        id="resumo-alertas"
+        className="alerts-overview"
+        aria-label="Resumo dos avisos meteorológicos"
+      >
         <article className={active.length > 0 ? "has-alert" : undefined}>
-          <span>Em vigor</span><strong>{active.length}</strong>
+          <span>Em vigor</span>
+          <strong>{active.length}</strong>
           <small>{active.length === 1 ? "aviso ativo" : "avisos ativos"}</small>
         </article>
         <article>
-          <span>Programados</span><strong>{upcoming.length}</strong>
+          <span>Programados</span>
+          <strong>{upcoming.length}</strong>
           <small>{upcoming.length === 1 ? "aviso futuro" : "avisos futuros"}</small>
         </article>
-        <article>
-          <span>Atualização</span><strong><Clock3 aria-hidden="true" /> Automática</strong>
-          <small>Atualizado junto com os dados meteorológicos</small>
+        <article className={!sourceAvailable ? "is-unavailable" : undefined}>
+          <span>Última consulta ao INMET</span>
+          <strong>
+            <Clock3 aria-hidden="true" />
+            {sourceAvailable ? formatDateTime(inmetSource.fetchedAt) : "Indisponível"}
+          </strong>
+          <small>
+            {sourceAvailable
+              ? "A página verifica novos avisos automaticamente"
+              : "Não interprete a falha como ausência de risco"}
+          </small>
         </article>
       </section>
 
-      {featured ? <FeaturedAlert alert={featured} /> : null}
+      {featured ? <FeaturedAlert alert={featured} sourceAvailable={sourceAvailable} /> : null}
 
-      {active.length === 0 && upcoming.length === 0 ? (
-        <section className="alerts-clear-state" aria-labelledby="alerts-clear-title">
-          <span><CheckCircle2 aria-hidden="true" /></span>
+      {!hasAlerts ? (
+        <section
+          id="situacao-alertas"
+          className={`alerts-clear-state${sourceAvailable ? "" : " is-unavailable"}`}
+          aria-labelledby="alerts-clear-title"
+          aria-live="polite"
+        >
+          <span>
+            {sourceAvailable ? <CheckCircle2 aria-hidden="true" /> : <AlertTriangle aria-hidden="true" />}
+          </span>
           <div>
-            <p className="alerts-kicker">Situação atual</p>
-            <h2 id="alerts-clear-title">Nenhum alerta oficial para Pelotas</h2>
+            <p className="alerts-kicker">{sourceAvailable ? "Situação consultada" : "Fonte indisponível"}</p>
+            <h2 id="alerts-clear-title">
+              {sourceAvailable
+                ? "Nenhum alerta oficial listado para Pelotas"
+                : "Não foi possível confirmar os alertas do INMET"}
+            </h2>
             <p>
-              Não há avisos ativos ou programados do INMET que incluam Pelotas nas informações
-              consultadas.
+              {sourceAvailable
+                ? "Não há avisos ativos ou programados identificados para Pelotas nos dados consultados. Continue acompanhando, porque novos alertas podem ser publicados a qualquer momento."
+                : "A consulta ao INMET falhou nesta atualização. Isso não significa ausência de risco; tente novamente e acompanhe também os canais oficiais e a Defesa Civil."}
             </p>
           </div>
         </section>
@@ -341,32 +463,49 @@ export function WeatherAlertsPage({ data }: { data: WeatherIntelligenceData }) {
       {remainingActive.length > 0 ? (
         <section className="alerts-section" aria-labelledby="active-alerts-title">
           <div className="alerts-section-heading">
-            <div><p className="alerts-kicker">Também em vigor</p><h2 id="active-alerts-title">Outros alertas ativos</h2></div>
+            <div>
+              <p className="alerts-kicker">Também em vigor</p>
+              <h2 id="active-alerts-title">Outros alertas ativos</h2>
+            </div>
             <span>{alertCountLabel(remainingActive.length)}</span>
           </div>
-          <div className="alerts-list">{remainingActive.map((alert) => <AlertCard key={alert.id} alert={alert} />)}</div>
+          <div className="alerts-list">
+            {remainingActive.map((alert) => (
+              <AlertCard key={alert.id} alert={alert} />
+            ))}
+          </div>
         </section>
       ) : null}
 
       {remainingUpcoming.length > 0 ? (
         <section className="alerts-section" aria-labelledby="upcoming-alerts-title">
           <div className="alerts-section-heading">
-            <div><p className="alerts-kicker">Próximas horas</p><h2 id="upcoming-alerts-title">Alertas programados</h2></div>
+            <div>
+              <p className="alerts-kicker">Próximas horas</p>
+              <h2 id="upcoming-alerts-title">Alertas programados</h2>
+            </div>
             <span>{alertCountLabel(remainingUpcoming.length)}</span>
           </div>
-          <div className="alerts-list">{remainingUpcoming.map((alert) => <AlertCard key={alert.id} alert={alert} />)}</div>
+          <div className="alerts-list">
+            {remainingUpcoming.map((alert) => (
+              <AlertCard key={alert.id} alert={alert} />
+            ))}
+          </div>
         </section>
       ) : null}
 
       <section className="alerts-method" aria-labelledby="alerts-method-title">
         <Info aria-hidden="true" />
         <div>
-          <h2 id="alerts-method-title">Como usar esta página</h2>
+          <h2 id="alerts-method-title">Informação oficial e tomada de decisão</h2>
           <p>
-            Os alertas são emitidos pelo INMET. O Tempo Pelotas organiza os avisos para facilitar a
-            consulta, mas as orientações da Defesa Civil, do INMET e das autoridades locais têm
-            prioridade em situações de risco.
+            O Tempo Pelotas não emite alertas. A página organiza dados publicados pelo INMET para
+            facilitar a consulta. Em situações de risco, as orientações do INMET, da Defesa Civil e das
+            autoridades locais têm prioridade.
           </p>
+          <Link to="/metodologia">
+            Ver como os dados são consultados <ArrowRight aria-hidden="true" />
+          </Link>
         </div>
       </section>
     </div>
