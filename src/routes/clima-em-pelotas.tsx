@@ -10,53 +10,53 @@ import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.funct
 
 const PAGE_TITLE = "Clima de Pelotas";
 const PAGE_DESCRIPTION =
-  "Entenda o clima de Pelotas, as estações do ano, influência da Lagoa dos Patos, frio, calor, chuva, vento e a diferença entre climatologia e tempo recente.";
+  "Entenda as estações do ano, a influência da Lagoa dos Patos e por que frio, calor, chuva e vento podem mudar rapidamente em Pelotas.";
 const PAGE_PATH = "/clima-em-pelotas";
 
 const CLIMATE_CONTENT = {
   eyebrow: "Entenda o clima local",
-  title: "Como interpretar clima, normais e histórico recente em Pelotas",
+  title: "Por que o tempo varia tanto em Pelotas",
   answer:
-    "Clima representa o comportamento de longo prazo da atmosfera e exige séries extensas, padronizadas e controladas. A previsão descreve os próximos horários ou dias; o histórico recente mostra apenas o período passado consultado. Por isso, os últimos 30 dias exibidos no portal não são apresentados como normal climatológica.",
+    "Clima descreve o comportamento do tempo ao longo de muitos anos. A previsão mostra o que pode acontecer nas próximas horas ou dias, enquanto o histórico de 30 dias mostra apenas o que ocorreu recentemente. Por isso, um mês isolado não representa o clima normal da cidade.",
   facts: [
-    "As Normais Climatológicas do INMET são referências oficiais calculadas para períodos padronizados de muitos anos.",
-    "Uma frente fria, uma onda de calor ou um mês chuvoso não definem isoladamente o clima de Pelotas.",
-    "A Lagoa dos Patos, a proximidade do Atlântico, a umidade, o vento e as passagens de frentes ajudam a explicar variações locais.",
-    "Verão, outono, inverno e primavera descrevem tendências sazonais, mas situações fora do padrão podem ocorrer em qualquer época.",
-    "O histórico de 30 dias serve para verificar o que ocorreu recentemente, sem classificar o período como normal, seco, chuvoso, quente ou frio em relação à climatologia.",
+    "As Normais Climatológicas do INMET são referências oficiais calculadas com muitos anos de observações.",
+    "Uma frente fria, uma onda de calor ou um mês chuvoso não definem sozinhos o clima de Pelotas.",
+    "A Lagoa dos Patos, o Atlântico, a umidade, o vento e as passagens de frentes ajudam a explicar as mudanças locais.",
+    "Verão, outono, inverno e primavera apresentam tendências diferentes, mas situações fora do padrão podem ocorrer em qualquer época.",
+    "O histórico de 30 dias ajuda a entender o período recente, sem afirmar sozinho se ele foi normal, seco, chuvoso, quente ou frio.",
   ],
   faqs: [
     {
       question: "Qual é a diferença entre tempo e clima?",
       answer:
-        "Tempo descreve a condição atual e a evolução prevista para horas ou dias. Clima resume padrões, médias e variações observados durante períodos longos e tecnicamente padronizados.",
+        "Tempo descreve a condição atual e a previsão para horas ou dias. Clima resume médias, padrões e variações observados durante muitos anos.",
     },
     {
       question: "Os últimos 30 dias mostram o clima normal de Pelotas?",
       answer:
-        "Não. Eles formam apenas um recorte recente. Uma normal climatológica exige décadas de observações, controle de qualidade e um período de referência definido.",
+        "Não. Eles mostram apenas um período recente. Uma normal climatológica exige décadas de observações, controle de qualidade e um período de referência definido.",
     },
     {
       question: "Por que o tempo muda rapidamente em Pelotas?",
       answer:
-        "A cidade está exposta a passagens de frentes e massas de ar, além da influência de umidade e vento associados à Lagoa dos Patos e ao Atlântico. A combinação desses fatores pode produzir mudanças relevantes em poucas horas.",
+        "A cidade recebe frentes e massas de ar e também sofre influência da umidade e do vento associados à Lagoa dos Patos e ao Atlântico. A combinação desses fatores pode mudar o tempo em poucas horas.",
     },
     {
       question: "Chove somente em uma estação do ano em Pelotas?",
       answer:
-        "Não. A chuva pode ocorrer ao longo do ano, associada a frentes, sistemas de baixa pressão e instabilidade atmosférica. A frequência e a intensidade variam de um período para outro.",
+        "Não. A chuva pode ocorrer ao longo do ano, ligada a frentes, áreas de baixa pressão e períodos de tempo instável. A frequência e a intensidade mudam de um período para outro.",
     },
     {
       question: "Onde consultar as Normais Climatológicas oficiais?",
       answer:
-        "O Instituto Nacional de Meteorologia disponibiliza as Normais Climatológicas do Brasil para períodos oficiais, incluindo 1991–2020. A página oferece acesso direto ao produto do INMET.",
+        "O Instituto Nacional de Meteorologia disponibiliza as Normais Climatológicas do Brasil para períodos oficiais, incluindo 1991–2020. A página oferece acesso direto às informações do INMET.",
     },
   ],
   relatedLinks: [
     {
-      label: "Histórico meteorológico recente",
+      label: "Histórico de 30 dias",
       href: "/historico-climatico-pelotas" as const,
-      description: "Compare máximas, mínimas, chuva e rajadas dos últimos 30 dias completos.",
+      description: "Compare máximas, mínimas, chuva e rajadas dos últimos dias.",
     },
     {
       label: "Tempo hoje em Pelotas",
@@ -64,14 +64,14 @@ const CLIMATE_CONTENT = {
       description: "Consulte a condição atual e a previsão das próximas horas.",
     },
     {
-      label: "Meteograma de Pelotas",
+      label: "Previsão hora a hora",
       href: "/meteograma-pelotas" as const,
-      description: "Acompanhe temperatura, chuva, nuvens, visibilidade, pressão e vento hora a hora.",
+      description: "Acompanhe temperatura, chuva, nuvens, visibilidade, pressão e vento.",
     },
     {
-      label: "Fontes e metodologia",
+      label: "Como os dados funcionam",
       href: "/metodologia" as const,
-      description: "Veja a função, atualização e os limites de cada fonte usada pelo portal.",
+      description: "Veja de onde vêm os dados, quando atualizam e quais são seus limites.",
     },
   ],
 };
