@@ -71,8 +71,8 @@ function buildFogSignal(hours: HourlyForecast[]): FogSignal {
     return {
       tone: "unknown",
       hour: null,
-      title: "Sinal ainda não calculável",
-      detail: "A previsão não informou ponto de orvalho suficiente para esta leitura.",
+      title: "Ainda sem dados suficientes",
+      detail: "A previsão ainda não informou o ponto de orvalho necessário para avaliar neblina.",
     };
   }
 
@@ -85,7 +85,7 @@ function buildFogSignal(hours: HourlyForecast[]): FogSignal {
     return {
       tone: "high",
       hour,
-      title: `Sinal elevado por volta de ${hour.time}`,
+      title: `Maior possibilidade por volta de ${hour.time}`,
       detail: `Temperatura e ponto de orvalho ficam separados por ${formatNumber(spread, " °C")}, com ${Math.round(lowCloud)}% de nuvens baixas e visibilidade prevista de ${formatNumber(visibility, " km")}.`,
     };
   }
@@ -95,15 +95,15 @@ function buildFogSignal(hours: HourlyForecast[]): FogSignal {
       tone: "attention",
       hour,
       title: `Vale acompanhar perto de ${hour.time}`,
-      detail: `A combinação de umidade, nuvens baixas e visibilidade sugere possibilidade de neblina ou teto baixo, sem confirmar ocorrência local.`,
+      detail: "Umidade, nuvens baixas e visibilidade indicam possibilidade de neblina, mas não confirmam que ela ocorrerá em todos os pontos da cidade.",
     };
   }
 
   return {
     tone: "low",
     hour,
-    title: "Sinal baixo nas próximas horas",
-    detail: "A previsão não combina, neste momento, proximidade forte do ponto de orvalho com baixa visibilidade ou muita nuvem baixa.",
+    title: "Baixa possibilidade nas próximas horas",
+    detail: "A previsão não reúne, neste momento, umidade alta, baixa visibilidade e muitas nuvens baixas ao mesmo tempo.",
   };
 }
 
@@ -132,10 +132,10 @@ function minimumHour(
 }
 
 function capeLabel(value: number | null | undefined) {
-  if (value === null || value === undefined) return "Não informado";
-  if (value >= 1_000) return "Energia convectiva elevada";
-  if (value >= 300) return "Energia convectiva moderada";
-  return "Energia convectiva baixa";
+  if (value === null || value === undefined) return "Ainda sem avaliação";
+  if (value >= 1_000) return "Maior possibilidade de tempestades";
+  if (value >= 300) return "Possibilidade moderada de tempestades";
+  return "Baixa possibilidade de tempestades";
 }
 
 function cloudValue(value: number | null | undefined) {
@@ -179,8 +179,10 @@ export function TodayAtmosphericSignals({ data }: { data: WeatherIntelligenceDat
   const sourceHealth = forecastSource ? data.weather.sources[forecastSource] : null;
   const modelLabel =
     forecastSource === "open-meteo"
-      ? "Open-Meteo Best Match"
-      : data.weather.quality.forecastProvider ?? "Modelo não informado";
+      ? "Previsão horária: Open-Meteo"
+      : data.weather.quality.forecastProvider
+        ? `Previsão horária: ${data.weather.quality.forecastProvider}`
+        : "Fonte da previsão não informada";
 
   return (
     <section
@@ -190,34 +192,34 @@ export function TodayAtmosphericSignals({ data }: { data: WeatherIntelligenceDat
     >
       <header className="today-atmosphere__heading">
         <div>
-          <span className="eyebrow">Umidade e estrutura da atmosfera</span>
-          <h2 id="today-atmosphere-title">Ponto de orvalho, nuvens e visibilidade</h2>
+          <span className="eyebrow">Umidade, nuvens e visibilidade</span>
+          <h2 id="today-atmosphere-title">Neblina, camadas de nuvens e possibilidade de tempestade</h2>
         </div>
         <div className="today-atmosphere__intro">
           <p>
-            Estes sinais ajudam a interpretar abafamento, possibilidade de neblina, teto baixo e
-            instabilidade. Eles complementam a previsão e não substituem observação local, radar ou
+            Estes dados ajudam a entender abafamento, neblina, nuvens baixas e instabilidade. A
+            ocorrência real pode variar entre bairros e deve ser confirmada por observação, radar e
             avisos oficiais.
           </p>
           <Link to="/meteograma-pelotas">
-            Abrir meteograma de 24 e 48 horas <ArrowRight aria-hidden="true" />
+            Ver previsão detalhada de 24 e 48 horas <ArrowRight aria-hidden="true" />
           </Link>
         </div>
       </header>
 
       <div className="today-atmosphere__signals">
         <article>
-          <span><Waves aria-hidden="true" /> Ponto de orvalho observado</span>
+          <span><Waves aria-hidden="true" /> Ponto de orvalho medido</span>
           <strong>{formatNumber(observedDewPoint, " °C")}</strong>
           <small>
             {currentSpread === null
-              ? "Leitura da Embrapa sem comparação térmica disponível."
-              : `${formatNumber(currentSpread, " °C")} abaixo da temperatura observada.`}
+              ? "Sem temperatura atual para comparar."
+              : `${formatNumber(currentSpread, " °C")} abaixo da temperatura atual.`}
           </small>
         </article>
 
         <article className={`is-${fogSignal.tone}`}>
-          <span><CloudFog aria-hidden="true" /> Neblina e nuvens baixas</span>
+          <span><CloudFog aria-hidden="true" /> Possibilidade de neblina</span>
           <strong>{fogSignal.title}</strong>
           <small>{fogSignal.detail}</small>
         </article>
@@ -227,30 +229,30 @@ export function TodayAtmosphericSignals({ data }: { data: WeatherIntelligenceDat
           <strong>{formatNumber(lowestVisibility?.visibilityKm, " km")}</strong>
           <small>
             {lowestVisibility
-              ? `Menor valor da janela por volta de ${lowestVisibility.time}.`
-              : "A fonte não informou visibilidade horária."}
+              ? `Menor valor previsto por volta de ${lowestVisibility.time}.`
+              : "A previsão ainda não informou a visibilidade por horário."}
           </small>
         </article>
 
         <article>
-          <span><Activity aria-hidden="true" /> Instabilidade convectiva</span>
+          <span><Activity aria-hidden="true" /> Possibilidade de tempestade</span>
           <strong>{capeLabel(peakCape?.cape)}</strong>
           <small>
             {peakCape?.cape === null || peakCape?.cape === undefined
-              ? "CAPE não informado nesta atualização."
-              : `Pico de ${Math.round(peakCape.cape)} J/kg por volta de ${peakCape.time}; CAPE isolado não confirma temporal.`}
+              ? "Ainda sem dados para avaliar a instabilidade."
+              : `O índice de instabilidade chega a ${Math.round(peakCape.cape)} J/kg por volta de ${peakCape.time}. Esse valor sozinho não confirma temporal.`}
           </small>
         </article>
       </div>
 
       {cloudHours.length ? (
-        <div className="today-atmosphere__clouds" aria-label="Perfil de nuvens das próximas horas">
+        <div className="today-atmosphere__clouds" aria-label="Camadas de nuvens das próximas horas">
           <header>
             <div>
               <Layers3 aria-hidden="true" />
               <span>
-                <strong>Perfil de nuvens por altitude</strong>
-                <small>Baixas, médias e altas nas próximas horas</small>
+                <strong>Camadas de nuvens nas próximas horas</strong>
+                <small>Nuvens baixas, médias e altas</small>
               </span>
             </div>
             <div className="today-atmosphere__legend" aria-label="Legenda das camadas">
@@ -273,7 +275,7 @@ export function TodayAtmosphericSignals({ data }: { data: WeatherIntelligenceDat
                 <div>
                   <span className="is-high" style={{ width: `${cloudValue(hour.cloudCoverHigh)}%` }} />
                 </div>
-                <small>{Math.round(hour.cloudCover ?? Math.max(cloudValue(hour.cloudCoverLow), cloudValue(hour.cloudCoverMid), cloudValue(hour.cloudCoverHigh)))}% total</small>
+                <small>{Math.round(hour.cloudCover ?? Math.max(cloudValue(hour.cloudCoverLow), cloudValue(hour.cloudCoverMid), cloudValue(hour.cloudCoverHigh)))}% de cobertura total</small>
               </article>
             ))}
           </div>
@@ -286,9 +288,9 @@ export function TodayAtmosphericSignals({ data }: { data: WeatherIntelligenceDat
           <strong>{modelLabel}</strong>
           <small>
             {pressureChange === null
-              ? "Tendência de pressão não calculável."
-              : `Pressão varia ${pressureChange > 0 ? "+" : ""}${pressureChange.toFixed(0)} hPa na janela.`}
-            {" · "}Dados consultados em {formatDateTime(sourceHealth?.fetchedAt)}.
+              ? "Variação da pressão ainda não disponível."
+              : `A pressão deve ${pressureChange >= 0 ? "subir" : "cair"} cerca de ${Math.abs(pressureChange).toFixed(0)} hPa nas próximas horas.`}
+            {" · "}Atualizado em {formatDateTime(sourceHealth?.fetchedAt)}.
           </small>
         </span>
       </footer>
