@@ -11,14 +11,25 @@ type SiteLayoutProps = {
   forceShell?: boolean;
 };
 
-const standaloneRoutes = new Set([
-  "/",
+const internalWeatherStandaloneRoutes = [
   "/tempo-hoje-pelotas",
   "/tempo-amanha-pelotas",
   "/previsao-7-dias-pelotas",
   "/chuva-em-pelotas",
   "/vento-em-pelotas",
   "/alertas",
+  "/clima-em-pelotas",
+  "/meteograma-pelotas",
+  "/cameras-ao-vivo-pelotas",
+  "/estacao-embrapa-pelotas",
+  "/historico-climatico-pelotas",
+  "/situacao-hidrologica-pelotas",
+  "/mapa-de-geadas-rio-grande-do-sul",
+] as const;
+
+const standaloneRoutes = new Set([
+  "/",
+  ...internalWeatherStandaloneRoutes,
   "/conta",
   "/entrar",
   "/minha-conta",
