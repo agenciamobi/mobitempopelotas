@@ -51,13 +51,13 @@ test("weekly page answers comparison and planning questions in direct language",
   assert.match(page, /weather\.daily\.slice\(0, 7\)/);
   assert.match(page, /InternalPageChapters/);
   assert.match(page, /Resumo da semana/);
-  assert.match(page, /Previsão diária/);
+  assert.match(page, /Dia a dia/);
   assert.match(page, /Temperatura, chuva e rajadas em cada dia/);
   assert.match(page, /Mínimas e máximas ao longo dos próximos 7 dias/);
   assert.match(page, /Dias com maior chance de chuva e rajadas mais fortes/);
   assert.match(page, /O que INMET e CPPMet\/UFPel publicam para os próximos dias/);
-  assert.match(page, /Dia mais favorável/);
-  assert.match(page, /Dia que exige mais atenção/);
+  assert.match(page, /Menor chance de chuva e rajadas/);
+  assert.match(page, /Mais chuva ou rajadas/);
   assert.match(page, /attentionDay/);
   assert.match(page, /rainSummary/);
   assert.match(page, /gustSummary/);
@@ -70,6 +70,11 @@ test("weekly page answers comparison and planning questions in direct language",
   assert.doesNotMatch(page, /Os períodos que merecem nova consulta/);
   assert.doesNotMatch(page, /próximas rodadas/);
   assert.doesNotMatch(page, /Nenhum valor demonstrativo foi inserido/);
+  assert.doesNotMatch(page, /Dia mais favorável/);
+  assert.doesNotMatch(page, /Condição do dia:/);
+  assert.doesNotMatch(page, /maior sinal de chuva/);
+  assert.doesNotMatch(page, /contexto complementar/);
+  assert.doesNotMatch(page, /não publicaram contexto/);
   assert.doesNotMatch(page, /<h1/);
   assert.doesNotMatch(page, /ForecastPageHeader/);
   assert.doesNotMatch(page, /forecast-seven-day-list/);
