@@ -1,0 +1,63 @@
+/* Scroll global — mantém a página rolável e alinha a barra à identidade do portal. */
+:root {
+  --document-scrollbar-track: #e8efef;
+  --document-scrollbar-border: #f4f7f5;
+  --document-scrollbar-start: #18bdcd;
+  --document-scrollbar-end: #5e2ced;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--document-scrollbar-end) var(--document-scrollbar-track);
+}
+
+html {
+  overflow-x: clip;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+body {
+  min-height: 100%;
+  overflow-x: clip;
+}
+
+html::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html::-webkit-scrollbar-track {
+  background: linear-gradient(180deg, #edf3f3, var(--document-scrollbar-track));
+  border-left: 1px solid rgb(7 30 47 / 5%);
+}
+
+html::-webkit-scrollbar-thumb {
+  min-height: 48px;
+  border: 3px solid var(--document-scrollbar-border);
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    var(--document-scrollbar-start),
+    var(--document-scrollbar-end)
+  );
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #16aebb, #5225cf 70%, #e70b85);
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-thumb:active {
+  background: #5e2ced;
+  background-clip: padding-box;
+}
+
+html::-webkit-scrollbar-corner {
+  background: var(--document-scrollbar-track);
+}
+
+@media (max-width: 900px) {
+  html {
+    scrollbar-gutter: auto;
+  }
+}
