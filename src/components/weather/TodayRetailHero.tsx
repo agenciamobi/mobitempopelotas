@@ -54,8 +54,11 @@ function extractClock(value: string | null | undefined) {
 
 function updateLabel(weather: WeatherData) {
   const current = weather.current;
-  if (current.updatedAt) return `Atualizado em ${current.updatedAt}`;
-  if (current.source.observedAt) return `Leitura das ${current.source.observedAt}`;
+  const updateValue = current.updatedAt ?? current.source.observedAt;
+  const clock = extractClock(updateValue);
+
+  if (clock) return `Atualizado às ${clock}`;
+  if (updateValue) return `Atualizado em ${updateValue}`;
   return current.available ? "Leitura recente" : "Dados em atualização";
 }
 
@@ -136,22 +139,23 @@ export function TodayRetailHero({
     <section
       className={`today-retail-hero today-retail-hero--${advisoryLevel}`}
       aria-labelledby="today-retail-hero-title"
+      aria-describedby="today-retail-hero-description"
       data-official-alerts={hasAlert ? "true" : "false"}
       data-weather-photo={iconName}
     >
       <div className="today-retail-hero__inner">
         <div className="today-retail-hero__copy">
           <span className="today-retail-hero__eyebrow">
-            <i aria-hidden="true" /> Tempo hoje · Pelotas
+            <i aria-hidden="true" /> Previsão local atualizada · Pelotas, RS
           </span>
 
           <h1 id="today-retail-hero-title">
-            Tempo hoje em Pelotas: <span>previsão por hora, chuva e vento.</span>
+            Tempo hoje <span>em Pelotas</span>
           </h1>
 
-          <p>
-            {condition} {conditionMoment}. Acompanhe como temperatura, chuva e vento mudam nas
-            próximas horas e escolha os melhores períodos para sair.
+          <p id="today-retail-hero-description">
+            {condition} {conditionMoment}. Acompanhe a previsão por hora, chuva e vento nas próximas
+            horas para organizar o seu dia.
           </p>
 
           <div className="today-retail-hero__badges" aria-label="Situação da previsão">
@@ -166,11 +170,11 @@ export function TodayRetailHero({
           </div>
 
           <div className="today-retail-hero__actions">
-            <a className="today-retail-hero__primary" href="#recursos-hoje">
-              Planejar próximas horas <ArrowRight aria-hidden="true" />
+            <a className="today-retail-hero__primary" href="#previsao-hoje">
+              Ver previsão por hora <ArrowRight aria-hidden="true" />
             </a>
-            <a className="today-retail-hero__secondary" href="#previsao-hoje">
-              Ver previsão por hora
+            <a className="today-retail-hero__secondary" href="#recursos-hoje">
+              Planejar próximas horas
             </a>
           </div>
         </div>
