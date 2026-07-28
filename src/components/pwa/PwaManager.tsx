@@ -65,6 +65,9 @@ export function PwaManager() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [waitingWorker, setWaitingWorker] = useState<ServiceWorker | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const hasUpdate = Boolean(waitingWorker);
+  const canInstall = Boolean(installPrompt) || isIos;
+  const shouldLockBodyScroll = isOpen && (hasUpdate || canInstall);
 
   useEffect(() => {
     const standaloneQuery = window.matchMedia("(display-mode: standalone)");
@@ -153,7 +156,7 @@ export function PwaManager() {
   }, []);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!shouldLockBodyScroll) return;
 
     const previousElement = document.activeElement as HTMLElement | null;
     const launcherElement = launcherRef.current;
@@ -197,7 +200,7 @@ export function PwaManager() {
       window.removeEventListener("keydown", handleKeyDown);
       window.requestAnimationFrame(() => (previousElement ?? launcherElement)?.focus());
     };
-  }, [isOpen]);
+  }, [shouldLockBodyScroll]);
 
   async function installApp() {
     setMessage(null);
@@ -221,6 +224,7 @@ export function PwaManager() {
         setIsOpen(false);
         setIsInstalled(true);
       } else {
+        setIsOpen(false);
         setMessage(
           "A instalação foi cancelada. Recarregue a página para receber uma nova opção de instalação.",
         );
@@ -228,6 +232,7 @@ export function PwaManager() {
     } catch (error) {
       console.error("Não foi possível abrir a instalação do Tempo Pelotas:", error);
       setInstallPrompt(null);
+      setIsOpen(false);
       setMessage(
         "Não foi possível abrir a instalação neste navegador. Recarregue a página e tente novamente.",
       );
@@ -243,9 +248,6 @@ export function PwaManager() {
     setMessage("Atualizando o portal com a versão mais recente...");
     waitingWorker.postMessage({ type: "SKIP_WAITING" });
   }
-
-  const hasUpdate = Boolean(waitingWorker);
-  const canInstall = Boolean(installPrompt) || isIos;
 
   if (!isReady || (isInstalled && !hasUpdate) || (!hasUpdate && !canInstall)) {
     return null;
