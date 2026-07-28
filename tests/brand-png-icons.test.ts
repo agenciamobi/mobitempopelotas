@@ -10,8 +10,8 @@ const iconRoute = readFileSync("src/routes/brand/tempo-pelotas-icon[.]png.ts", "
 const maskableRoute = readFileSync("src/routes/brand/tempo-pelotas-maskable[.]png.ts", "utf8");
 
 test("site head prioritizes the uploaded PNG for favicon and Apple touch icon", () => {
-  assert.match(root, /rel: "icon", href: "\/brand\/tempo-pelotas-icon\.png"/);
-  assert.match(root, /rel: "apple-touch-icon", href: "\/brand\/tempo-pelotas-icon\.png"/);
+  assert.match(root, /rel: "icon",[\s\S]*href: "\/brand\/tempo-pelotas-icon\.png"/);
+  assert.match(root, /rel: "apple-touch-icon",[\s\S]*href: "\/brand\/tempo-pelotas-icon\.png"/);
   assert.doesNotMatch(root, /rel: "apple-touch-icon", href: "\/brand\/tempo-pelotas-icon\.svg"/);
 });
 
@@ -48,7 +48,7 @@ test("PNG icon routes return immutable image responses", () => {
 });
 
 test("installed and offline experiences cache and display the PNG identity", () => {
-  assert.match(serviceWorker, /tempo-pelotas-v4/);
+  assert.match(serviceWorker, /tempo-pelotas-v5/);
   assert.match(serviceWorker, /\/brand\/tempo-pelotas-icon\.png/);
   assert.match(serviceWorker, /\/brand\/tempo-pelotas-maskable\.png/);
   assert.match(offline, /src="\/brand\/tempo-pelotas-icon\.png"/);
