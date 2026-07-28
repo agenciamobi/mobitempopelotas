@@ -46,6 +46,7 @@ type StationVisualState = {
 type ElementProps = Record<string, unknown> & {
   children?: ReactNode;
   className?: string;
+  id?: string;
   title?: string;
 };
 
@@ -58,6 +59,8 @@ const stationStateLabels: Record<string, string> = {
 const editorialCopyReplacements: Record<string, string> = {
   "Próximos dias": "Tendência do tempo",
   "Previsão para os próximos dias": "Como o tempo deve evoluir na semana",
+  "Veja como o tempo deve mudar ao longo do dia":
+    "Veja como o tempo deve mudar nas próximas horas",
 };
 
 function WaterTrendLegend() {
@@ -244,6 +247,7 @@ function transformDashboardNode(
   );
 
   let normalizedClassName = className;
+  let normalizedId = typeof props.id === "string" ? props.id : undefined;
 
   if (hasClass(className, "home-water-focus")) {
     normalizedClassName = appendClass(
@@ -259,6 +263,10 @@ function transformDashboardNode(
     );
   }
 
+  if (isDomElement && node.type === "section" && hasClass(className, "home-map-story")) {
+    normalizedId = "regiao";
+  }
+
   if (isDomElement && node.type === "article" && className.includes("risk-")) {
     const stationState = stationStates.find(
       (station) => normalizedText.includes(station.city) && normalizedText.includes(station.name),
@@ -272,8 +280,15 @@ function transformDashboardNode(
     }
   }
 
+  const classChanged = normalizedClassName !== className;
+  const idChanged = normalizedId !== props.id;
   const nextProps =
-    normalizedClassName !== className ? { className: normalizedClassName || undefined } : undefined;
+    classChanged || idChanged
+      ? {
+          ...(classChanged ? { className: normalizedClassName || undefined } : {}),
+          ...(idChanged ? { id: normalizedId } : {}),
+        }
+      : undefined;
 
   return cloneElement(node as ReactElement<ElementProps>, nextProps, transformedChildren);
 }
