@@ -1,14 +1,23 @@
 import { CANONICAL_SITE_URL } from "./site-config.ts";
 
 const CANONICAL_HOSTNAME = new URL(CANONICAL_SITE_URL).hostname;
-const LEGACY_HOSTNAME = ["mobitempopelotas", "lovable", "app"].join(".");
+const TECHNICAL_HOST_SUFFIXES = [
+  ["lovable", "app"].join("."),
+  ["vercel", "app"].join("."),
+];
+
+function isTechnicalHost(hostname: string) {
+  return TECHNICAL_HOST_SUFFIXES.some(
+    (suffix) => hostname === suffix || hostname.endsWith(`.${suffix}`),
+  );
+}
 
 export function getCanonicalRedirectUrl(requestUrl: string) {
   const url = new URL(requestUrl);
   const hostname = url.hostname.toLowerCase();
   const isCanonicalHost = hostname === CANONICAL_HOSTNAME;
   const shouldRedirect =
-    hostname === LEGACY_HOSTNAME ||
+    isTechnicalHost(hostname) ||
     hostname === `www.${CANONICAL_HOSTNAME}` ||
     (isCanonicalHost && url.protocol !== "https:");
 
