@@ -19,33 +19,33 @@ const TODAY_PAGE_CONTENT = {
   eyebrow: "Entenda os dados",
   title: "O que foi medido e o que é previsão nesta página",
   answer:
-    "A condição atual usa a observação local quando a estação está disponível. Os horários futuros, máxima, mínima, chuva, rajadas, visibilidade e camadas de nuvens são previsões do modelo identificado na página. O sinal de neblina combina variáveis previstas e não confirma ocorrência local.",
+    "A condição atual usa a medição local quando a estação está disponível. Os horários futuros, máxima, mínima, chuva, rajadas, visibilidade e camadas de nuvens são previsões. A avaliação de neblina combina vários dados previstos e não confirma que ela ocorrerá em todos os pontos da cidade.",
   facts: [
-    "Temperatura, sensação térmica, umidade, pressão, vento e ponto de orvalho atuais usam a observação local quando ela está disponível.",
-    "Máxima, mínima, chance de chuva, volume, rajadas, visibilidade, CAPE e nuvens por altitude são previsões meteorológicas.",
-    "Ponto de orvalho próximo da temperatura, umidade elevada, nuvens baixas e visibilidade reduzida podem indicar ambiente favorável à neblina, mas não garantem que ela ocorrerá em todo o município.",
-    "Antes de sair, atualize a consulta e confira radar e avisos oficiais quando houver mudança rápida ou instabilidade.",
+    "Temperatura, sensação térmica, umidade, pressão, vento e ponto de orvalho atuais usam a medição local quando ela está disponível.",
+    "Máxima, mínima, chance de chuva, volume, rajadas, visibilidade, instabilidade e camadas de nuvens são previsões meteorológicas.",
+    "Ponto de orvalho próximo da temperatura, umidade elevada, nuvens baixas e visibilidade reduzida aumentam a possibilidade de neblina, mas não garantem que ela ocorrerá em todo o município.",
+    "Antes de sair, atualize a página e confira radar e avisos oficiais quando houver mudança rápida no tempo.",
   ],
   faqs: [
     {
       question: "A temperatura mostrada agora foi medida?",
       answer:
-        "Quando há uma leitura local recente, sim. A página identifica a estação e o horário. Se a observação estiver indisponível, o portal mantém previsão e observação claramente separadas.",
+        "Quando há uma leitura local recente, sim. A página identifica a estação e o horário. Quando a medição está indisponível, a estimativa para agora aparece identificada separadamente.",
     },
     {
       question: "O que significa ponto de orvalho?",
       answer:
-        "É a temperatura em que o ar precisaria chegar para ficar saturado. Quando ponto de orvalho e temperatura ficam próximos, aumenta a possibilidade de condensação, neblina ou sensação de ar muito úmido, dependendo também de vento, nuvens e visibilidade.",
+        "É a temperatura em que o ar precisaria chegar para ficar saturado. Quando o ponto de orvalho e a temperatura ficam próximos, aumenta a possibilidade de condensação, neblina ou sensação de ar muito úmido. Vento, nuvens e visibilidade também influenciam.",
     },
     {
-      question: "O sinal de neblina confirma que haverá nevoeiro?",
+      question: "A avaliação confirma que haverá neblina?",
       answer:
-        "Não. Ele combina ponto de orvalho, umidade, nuvens baixas e visibilidade prevista para destacar horários que merecem acompanhamento. A ocorrência pode variar entre bairros, áreas rurais e a orla.",
+        "Não. Ela combina ponto de orvalho, umidade, nuvens baixas e visibilidade prevista para indicar os horários com maior possibilidade. A ocorrência pode variar entre bairros, áreas rurais e a orla.",
     },
     {
       question: "Chance de chuva e volume previsto são a mesma coisa?",
       answer:
-        "Não. A chance indica a probabilidade de chover no período. O volume em milímetros estima quanto pode acumular se a precipitação ocorrer.",
+        "Não. A chance indica a possibilidade de chover no período. O volume em milímetros estima quanto pode acumular.",
     },
     {
       question: "Quando devo conferir a previsão novamente?",
