@@ -5,6 +5,10 @@ import test from "node:test";
 const route = readFileSync("src/routes/estacao-embrapa-pelotas.tsx", "utf8");
 const page = readFileSync("src/components/embrapa/EmbrapaStationPageV2.tsx", "utf8");
 const styles = readFileSync("src/components/embrapa/EmbrapaStationPageV2.css", "utf8");
+const refinement = readFileSync(
+  "src/components/embrapa/EmbrapaStationPageV2Refinement.css",
+  "utf8",
+);
 
 const stationSource = `${route}\n${page}`;
 
@@ -14,6 +18,7 @@ test("Embrapa route uses the shared shell and source-aware page", () => {
   assert.match(route, /InternalWeatherPageShell/);
   assert.match(route, /EmbrapaStationHero/);
   assert.match(route, /EmbrapaStationPageV2/);
+  assert.match(route, /EmbrapaStationPageV2Refinement\.css/);
   assert.match(route, /pageClassName="internal-weather-shell--embrapa"/);
   assert.match(route, /showOfficialAlerts=\{false\}/);
   assert.match(route, /staleTime: 60 \* 1_000/);
@@ -28,6 +33,7 @@ test("station page distinguishes live, partial, stale and unavailable source sta
   assert.match(page, /Última temperatura reconhecida/);
   assert.match(page, /Nenhum valor é preenchido artificialmente/);
   assert.match(page, /health\.reason \?\? statusCopy\[status\]\.description/);
+  assert.match(page, /role="status"/);
   assert.doesNotMatch(page, /status === "stale"[^\n]{0,160}Temperatura atual/);
 });
 
@@ -82,14 +88,24 @@ test("field-level provenance explains how Embrapa enters the current condition",
 });
 
 test("station links and dataset metadata remain transparent and safe", () => {
+  assert.match(page, /const datasetSchema = available/);
   assert.match(page, /"@type": "Dataset"/);
   assert.match(page, /GeoCoordinates/);
   assert.match(page, /observation\.source\.latitude/);
   assert.match(page, /observation\.source\.longitude/);
   assert.match(page, /observation\.source\.altitude/);
   assert.match(page, /isBasedOn: observation\.source\.url/);
+  assert.doesNotMatch(page, /temporalCoverage:/);
   assert.match(page, /target="_blank" rel="noopener noreferrer"/);
   assert.match(page, /Monitor da Embrapa/);
+});
+
+test("unavailable state removes links to absent measurement sections", () => {
+  assert.match(page, /className=\{`embrapa-v2-chapters\$\{available \? "" : " is-compact"\}`\}/);
+  assert.match(page, /\{available \? \([\s\S]*href="#leitura-observada"/);
+  assert.match(page, /<span>\{available \? "05" : "02"\}<\/span>/);
+  assert.match(refinement, /embrapa-v2-chapters\.is-compact/);
+  assert.match(refinement, /repeat\(2, minmax\(0, 1fr\)\)/);
 });
 
 test("Embrapa page follows the current responsive retail system", () => {
