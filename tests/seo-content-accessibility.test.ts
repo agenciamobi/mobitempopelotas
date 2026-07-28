@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const editorialRouteFiles = [
+  "src/routes/alertas.tsx",
   "src/routes/previsao-7-dias-pelotas.tsx",
   "src/routes/chuva-em-pelotas.tsx",
   "src/routes/vento-em-pelotas.tsx",
@@ -43,6 +44,23 @@ test("monitoring content distinguishes observation, imagery, history and telemet
   assert.match(source, /não substituem alertas oficiais/i);
   assert.match(source, /normal climatológica/i);
   assert.match(source, /não deve ser interpretada isoladamente/i);
+});
+
+test("alert page distinguishes unavailable INMET data from an all-clear state", () => {
+  const route = read("src/routes/alertas.tsx");
+  const page = read("src/components/weather/WeatherAlertsPage.tsx");
+  const refinements = read("src/components/weather/WeatherAlertsRefinements.css");
+
+  assert.match(route, /Alertas meteorológicos em Pelotas e região/);
+  assert.match(route, /createFaqPageJsonLd/);
+  assert.match(route, /como-interpretar-alertas/);
+  assert.match(page, /Não foi possível confirmar os alertas do INMET/);
+  assert.match(page, /Não interprete a falha como ausência de risco/);
+  assert.match(page, /sourceAvailable/);
+  assert.match(page, /aria-live="polite"/);
+  assert.match(page, /Última consulta ao INMET/);
+  assert.match(refinements, /alerts-clear-state\.is-unavailable/);
+  assert.match(refinements, /@media \(max-width: 760px\)/);
 });
 
 test("editorial links preserve visible names and attach descriptions", () => {
