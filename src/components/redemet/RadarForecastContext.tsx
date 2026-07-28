@@ -93,24 +93,24 @@ export function RadarForecastContext({
     >
       <header>
         <div>
-          <span>Compare observação e previsão</span>
-          <h2 id="radar-forecast-context-title">O que a previsão indicava no horário do radar?</h2>
+          <span>Imagem e previsão no mesmo horário</span>
+          <h2 id="radar-forecast-context-title">O que a previsão mostrava quando esta imagem foi registrada?</h2>
         </div>
         <p>
-          O radar é uma imagem observada pela REDEMET. Os valores abaixo pertencem à grade de
-          previsão mais próxima daquele horário e não são medidos pelo radar.
+          O radar mostra uma imagem observada pela REDEMET. Os valores abaixo pertencem à previsão por
+          hora mais próxima e não são medidos pelo radar.
         </p>
       </header>
 
       <div className="radar-forecast-context__times">
         <article>
-          <small>Quadro observado</small>
+          <small>Horário da imagem</small>
           <strong>{formatDateTime(frame.observedAt)}</strong>
           <span>REDEMET/DECEA · {frame.label}</span>
         </article>
         <article>
-          <small>Hora válida da previsão</small>
-          <strong>{forecast?.time ?? "Sem correspondência próxima"}</strong>
+          <small>Horário da previsão</small>
+          <strong>{forecast?.time ?? "Sem horário próximo disponível"}</strong>
           <span>{modelLabel}</span>
         </article>
       </div>
@@ -140,14 +140,14 @@ export function RadarForecastContext({
         </div>
       ) : (
         <div className="radar-forecast-context__unavailable">
-          Não foi encontrada uma hora válida de previsão a até três horas deste quadro. Use o horário
-          exibido no radar e consulte a previsão por hora separadamente.
+          Não foi encontrado um horário de previsão a até três horas desta imagem. Confira o horário do
+          radar e consulte a previsão hora a hora separadamente.
         </div>
       )}
 
       <footer>
-        A comparação usa a grade {modelLabel}, consultada às {formatFetchedAt(sourceHealth?.fetchedAt)}.
-        Movimento entre quadros anteriores não representa previsão futura.
+        A comparação usa a previsão {modelLabel}, atualizada às {formatFetchedAt(sourceHealth?.fetchedAt)}.
+        O movimento entre imagens anteriores não representa o que acontecerá no futuro.
       </footer>
     </section>
   );
