@@ -8,6 +8,11 @@ const embedIsolation = readFileSync("src/components/embed/LaranjalEmbedIsolation
 const embedScript = readFileSync("src/routes/widgets/nivel-laranjal[.]js.ts", "utf8");
 const embedApi = readFileSync("src/routes/api/widgets/nivel-laranjal.ts", "utf8");
 const embedGuide = readFileSync("src/components/embed/LaranjalEmbedGuide.tsx", "utf8");
+const obsRoute = readFileSync("src/routes/embed/status-tempo-agora.tsx", "utf8");
+const obsComponent = readFileSync("src/components/embed/ObsWeatherStatusWidget.tsx", "utf8");
+const obsStyles = readFileSync("src/components/embed/ObsWeatherStatusWidget.module.css", "utf8");
+const obsFunctions = readFileSync("src/lib/weather/obs-weather-status.functions.ts", "utf8");
+const publicRoutes = readFileSync("src/lib/public-routes.ts", "utf8");
 const serverEntry = readFileSync("src/server.ts", "utf8");
 const siteLayout = readFileSync("src/components/layout/SiteLayout.tsx", "utf8");
 const alerts = readFileSync("src/components/weather/WeatherAlertsPage.tsx", "utf8");
@@ -66,31 +71,57 @@ test("Laranjal widget is standalone, responsive and publicly reusable", () => {
   assert.match(embedIsolation, /onesignal-bell-container/);
 });
 
-test("only the public embed document accepts third-party framing", () => {
-  assert.match(serverEntry, /pathname !== LARANJAL_EMBED_PATH/);
+test("OBS weather widget is private-by-discovery, noindex and Embrapa-led", () => {
+  assert.match(obsRoute, /createFileRoute\("\/embed\/status-tempo-agora"\)/);
+  assert.match(obsRoute, /noindex, nofollow, noarchive, nosnippet, noimageindex/);
+  assert.match(obsRoute, /getObsWeatherStatus/);
+  assert.match(siteLayout, /"\/embed\/status-tempo-agora"/);
+  assert.doesNotMatch(publicRoutes, /\/embed\/status-tempo-agora/);
+  assert.match(obsFunctions, /fetchAggregatedPelotasWeather/);
+  assert.match(obsFunctions, /observation\.temperature/);
+  assert.match(obsFunctions, /Embrapa Clima Temperado/);
+  assert.match(obsFunctions, /Trovoadas/);
+  assert.match(obsFunctions, /Chuva/);
+  assert.match(obsFunctions, /Nublado/);
+  assert.doesNotMatch(obsFunctions, /Trovoadas previstas|Nublado previsto/i);
+  assert.match(obsComponent, /REFRESH_INTERVAL_MS = 5 \* 60 \* 1_000/);
+  assert.match(obsComponent, /router\.invalidate\(\)/);
+  assert.match(obsComponent, /WeatherIcon/);
+  assert.match(obsStyles, /background:\s*transparent/);
+  assert.match(obsStyles, /@media \(max-width: 440px\)/);
+});
+
+test("only registered embed documents accept third-party framing", () => {
+  assert.match(serverEntry, /EMBED_PATHS = new Set/);
+  assert.match(serverEntry, /\/embed\/nivel-laranjal/);
+  assert.match(serverEntry, /\/embed\/status-tempo-agora/);
+  assert.match(serverEntry, /!EMBED_PATHS\.has\(pathname\)/);
   assert.match(serverEntry, /headers\.delete\("X-Frame-Options"\)/);
   assert.match(serverEntry, /frame-ancestors/);
   assert.match(serverEntry, /Cross-Origin-Resource-Policy", "cross-origin"/);
   assert.match(serverEntry, /camera=\(\), microphone=\(\), geolocation=\(\)/);
-  assert.match(serverEntry, /X-Robots-Tag", "noindex, nofollow"/);
+  assert.match(serverEntry, /X-Robots-Tag", EMBED_ROBOTS_POLICY/);
+  assert.match(serverEntry, /noarchive, nosnippet, noimageindex/);
   assert.match(serverEntry, /EMBED_CACHE_CONTROL/);
   assert.match(serverEntry, /response\.ok/);
   assert.match(serverEntry, /Cache-Control", "no-store"/);
 });
 
-test("alerts page uses the homepage editorial first-fold language", () => {
+test("alerts page uses a concise first fold and trustworthy source states", () => {
   assert.match(alerts, /AlertsHero/);
-  assert.match(alerts, /Alertas meteorológicos com contexto local/);
+  assert.match(alerts, /Alertas meteorológicos em Pelotas/);
   assert.match(alerts, /alerts-editorial-panel/);
   assert.match(alerts, /severityPriority/);
   assert.match(alerts, /prioritizeAlerts/);
+  assert.match(alerts, /sourceAvailable/);
+  assert.match(alerts, /Não foi possível confirmar os alertas do INMET/);
   assert.match(alerts, /id="resumo-alertas"/);
-  assert.match(alerts, /featured \? "#aviso-prioritario" : "#resumo-alertas"/);
+  assert.match(alerts, /featured \? "#aviso-prioritario" : "#situacao-alertas"/);
   assert.match(alertsStyles, /grid-template-columns:\s*minmax\(0, 1\.14fr\)/);
   assert.match(alertsStyles, /color:\s*#5e2ced/);
-  assert.match(alertsRefinements, /min-height:\s*clamp\(460px/);
-  assert.match(alertsRefinements, /#resumo-alertas/);
-  assert.match(alertsRefinements, /@media \(max-width:\s*620px\)/);
+  assert.match(alertsRefinements, /min-height:\s*clamp\(420px/);
+  assert.match(alertsRefinements, /#situacao-alertas/);
+  assert.match(alertsRefinements, /@media \(max-width: 760px\)/);
 });
 
 test("hydrology pages share a compact data-led editorial hero", () => {
