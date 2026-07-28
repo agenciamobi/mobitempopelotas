@@ -133,22 +133,23 @@ export function ProductionHome({
   const advisory = getWeatherAdvisory(weather);
   const pelotasOfficialAlerts = inmetAlerts.alerts.filter((alert) => alert.relevance === "pelotas");
   const verifiedPelotasAlerts = pelotasOfficialAlerts.filter(hasVerifiedInmetAlertSemantics);
+  const hasPelotasOfficialAlerts = pelotasOfficialAlerts.length > 0;
   const officialLevel: AdvisoryLevel = verifiedPelotasAlerts.some(
     (alert) => alert.severity === "danger" || alert.severity === "great-danger",
   )
     ? "warning"
-    : verifiedPelotasAlerts.some((alert) => alert.severity === "potential")
+    : verifiedPelotasAlerts.some((alert) => alert.severity === "potential") ||
+        hasPelotasOfficialAlerts
       ? "attention"
       : "normal";
   const headerLevel =
     advisoryRank[officialLevel] > advisoryRank[advisory.level] ? officialLevel : advisory.level;
-  const featuredSafetyBanner = getFeaturedSafetyBanner(pelotasOfficialAlerts.length > 0);
+  const featuredSafetyBanner = getFeaturedSafetyBanner(hasPelotasOfficialAlerts);
   const cppmetToday = recoveredData.weather.officialForecast[0] ?? null;
   const forecastWindSpeedKmh = strongestHourlyWindSpeed(weather);
-  const mainClassName =
-    pelotasOfficialAlerts.length > 0
-      ? "home-editorial-main has-official-alerts"
-      : "home-editorial-main";
+  const mainClassName = hasPelotasOfficialAlerts
+    ? "home-editorial-main has-official-alerts"
+    : "home-editorial-main";
 
   return (
     <div className="site-shell site-shell--home site-shell--home-editorial">
