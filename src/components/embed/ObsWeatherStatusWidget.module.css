@@ -32,6 +32,10 @@
   box-sizing: border-box;
 }
 
+.live {
+  --widget-accent: #6af2e6;
+}
+
 .widget::before {
   position: absolute;
   inset: 0 0 auto;
