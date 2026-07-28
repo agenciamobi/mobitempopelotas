@@ -9,9 +9,9 @@ import { getRedemetOverview } from "@/lib/redemet/redemet.functions";
 import { createEditorialPageJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
-const PAGE_TITLE = "Metodologia e fontes do Tempo Pelotas";
+const PAGE_TITLE = "Como os dados do Tempo Pelotas funcionam";
 const PAGE_DESCRIPTION =
-  "Origem dos dados meteorológicos e hidrológicos, estado das integrações, critérios de validação, contingências e limites do Tempo Pelotas.";
+  "Veja de onde vêm as informações de tempo e nível da água, quando foram atualizadas, o que acontece quando uma fonte falha e quais são os limites de cada dado.";
 const PAGE_PATH = "/metodologia";
 
 export const Route = createFileRoute("/metodologia")({
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/metodologia")({
         path: PAGE_PATH,
         breadcrumbs: [
           { name: "Início", path: "/" },
-          { name: "Metodologia e fontes", path: PAGE_PATH },
+          { name: "Como os dados funcionam", path: PAGE_PATH },
         ],
         about: [
           "Metodologia meteorológica",
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/metodologia")({
           "Régua do Cais Mauá",
           "MetSul e TideSat Global",
           "FURG e Portos RS",
-          "Monitoramento hidrológico da Lagoa dos Patos",
+          "Medições de nível na Lagoa dos Patos",
         ],
       }),
     ]),
