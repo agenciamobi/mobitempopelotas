@@ -7,11 +7,9 @@ import {
   Clock3,
   CloudRain,
   Compass,
-  Database,
   Droplets,
   ExternalLink,
   Gauge,
-  Info,
   MapPin,
   Radio,
   Scale,
@@ -22,11 +20,11 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import type { TimedObservation } from "@/lib/weather/official-sources.types";
 import type {
   AggregatedCurrentField,
   WeatherSourceHealthStatus,
 } from "@/lib/weather/aggregated-weather.types";
+import type { TimedObservation } from "@/lib/weather/official-sources.types";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 
 import "./EmbrapaStationPageV2.css";
@@ -238,49 +236,64 @@ export function EmbrapaStationPageV2({ data }: EmbrapaStationProps) {
   const usedFields = fieldsUsedByPortal(data);
   const StatusIcon = statusIcon(status);
 
-  const datasetSchema = {
-    "@context": "https://schema.org",
-    "@type": "Dataset",
-    name: "Observações meteorológicas da Embrapa Clima Temperado em Pelotas",
-    description:
-      "Temperatura, umidade, pressão, vento, extremos, chuva acumulada e evapotranspiração consultados no Posto Meteorológico da Sede da Embrapa Clima Temperado.",
-    spatialCoverage: {
-      "@type": "Place",
-      name: "Posto Meteorológico da Sede da Embrapa Clima Temperado, Pelotas",
-      geo: {
-        "@type": "GeoCoordinates",
-        latitude: observation.source.latitude,
-        longitude: observation.source.longitude,
-        elevation: observation.source.altitude,
-      },
-    },
-    temporalCoverage: observation.source.observationTime ?? "Última leitura publicada pela fonte",
-    dateModified: observation.source.fetchedAt,
-    isBasedOn: observation.source.url,
-    isAccessibleForFree: true,
-    creator: {
-      "@type": "Organization",
-      name: "Embrapa Clima Temperado",
-      url: "https://www.embrapa.br/clima-temperado",
-    },
-  };
+  const datasetSchema = available
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Dataset",
+        name: "Observações meteorológicas da Embrapa Clima Temperado em Pelotas",
+        description:
+          "Temperatura, umidade, pressão, vento, extremos, chuva acumulada e evapotranspiração consultados no Posto Meteorológico da Sede da Embrapa Clima Temperado.",
+        spatialCoverage: {
+          "@type": "Place",
+          name: "Posto Meteorológico da Sede da Embrapa Clima Temperado, Pelotas",
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: observation.source.latitude,
+            longitude: observation.source.longitude,
+            elevation: observation.source.altitude,
+          },
+        },
+        dateModified: observation.source.fetchedAt,
+        isBasedOn: observation.source.url,
+        isAccessibleForFree: true,
+        creator: {
+          "@type": "Organization",
+          name: "Embrapa Clima Temperado",
+          url: "https://www.embrapa.br/clima-temperado",
+        },
+      }
+    : null;
 
   return (
     <div className="embrapa-v2-page">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetSchema).replace(/</g, "\\u003c") }}
-      />
+      {datasetSchema ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(datasetSchema).replace(/</g, "\\u003c") }}
+        />
+      ) : null}
 
-      <nav className="embrapa-v2-chapters" aria-label="Capítulos da Estação Embrapa">
+      <nav
+        className={`embrapa-v2-chapters${available ? "" : " is-compact"}`}
+        aria-label="Capítulos da Estação Embrapa"
+      >
         <a href="#estado-da-fonte"><span>01</span><strong>Fonte</strong><small>Disponibilidade e atraso</small></a>
-        <a href="#leitura-observada"><span>02</span><strong>Medições</strong><small>Condição no ponto</small></a>
-        <a href="#chuva-e-evapotranspiracao"><span>03</span><strong>Água</strong><small>Chuva e evapotranspiração</small></a>
-        <a href="#extremos-do-dia"><span>04</span><strong>Extremos</strong><small>Mínimas e máximas</small></a>
-        <a href="#uso-no-portal"><span>05</span><strong>Procedência</strong><small>Como o dado é usado</small></a>
+        {available ? (
+          <>
+            <a href="#leitura-observada"><span>02</span><strong>Medições</strong><small>Condição no ponto</small></a>
+            <a href="#chuva-e-evapotranspiracao"><span>03</span><strong>Água</strong><small>Chuva e evapotranspiração</small></a>
+            <a href="#extremos-do-dia"><span>04</span><strong>Extremos</strong><small>Mínimas e máximas</small></a>
+          </>
+        ) : null}
+        <a href="#uso-no-portal"><span>{available ? "05" : "02"}</span><strong>Procedência</strong><small>Como o dado é usado</small></a>
       </nav>
 
-      <section className={`embrapa-v2-source is-${status}`} id="estado-da-fonte" aria-labelledby="embrapa-v2-source-title">
+      <section
+        className={`embrapa-v2-source is-${status}`}
+        id="estado-da-fonte"
+        aria-labelledby="embrapa-v2-source-title"
+        role="status"
+      >
         <StatusIcon aria-hidden="true" />
         <div>
           <span className="embrapa-v2-eyebrow">Estado da integração</span>
