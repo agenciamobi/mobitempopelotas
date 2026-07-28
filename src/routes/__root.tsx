@@ -73,6 +73,73 @@ window.OneSignalDeferred.push(async function(OneSignal) {
 })();
 `;
 
+const ACTIVE_MODAL_SELECTOR = [
+  ".pwa-dialog-backdrop",
+  '[role="dialog"][aria-modal="true"]',
+  '[data-radix-dialog-content][data-state="open"]',
+  '[data-vaul-drawer][data-state="open"]',
+].join(",");
+
+function removeStaleOverflowLock(element: HTMLElement) {
+  const overflow = element.style.getPropertyValue("overflow").trim();
+  const overflowY = element.style.getPropertyValue("overflow-y").trim();
+
+  if (overflow === "hidden" || overflow === "clip") {
+    element.style.removeProperty("overflow");
+  }
+
+  if (overflowY === "hidden" || overflowY === "clip") {
+    element.style.removeProperty("overflow-y");
+  }
+}
+
+function restoreDocumentScrollIfUnlocked() {
+  if (document.querySelector(ACTIVE_MODAL_SELECTOR)) return;
+
+  removeStaleOverflowLock(document.documentElement);
+  removeStaleOverflowLock(document.body);
+}
+
+function DocumentScrollGuard() {
+  useEffect(() => {
+    let frame = 0;
+
+    const scheduleRestore = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(restoreDocumentScrollIfUnlocked);
+    };
+
+    restoreDocumentScrollIfUnlocked();
+
+    const observer = new MutationObserver(scheduleRestore);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["style", "data-state", "aria-hidden"],
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["style"],
+    });
+
+    window.addEventListener("pageshow", scheduleRestore);
+    window.addEventListener("focus", scheduleRestore);
+    document.addEventListener("visibilitychange", scheduleRestore);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("pageshow", scheduleRestore);
+      window.removeEventListener("focus", scheduleRestore);
+      document.removeEventListener("visibilitychange", scheduleRestore);
+      restoreDocumentScrollIfUnlocked();
+    };
+  }, []);
+
+  return null;
+}
+
 function NotFoundComponent() {
   return (
     <SiteLayout forceShell>
@@ -194,6 +261,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <DocumentScrollGuard />
       <SiteLayout>
         <Outlet />
       </SiteLayout>
