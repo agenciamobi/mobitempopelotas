@@ -113,38 +113,38 @@ test("meteogram route exposes SEO, FAQ and separate forecast loading", () => {
   assert.match(route, /getWeatherIntelligence\(\)/);
   assert.match(route, /getPelotasMeteogram\(\)/);
   assert.match(route, /Promise\.all/);
-  assert.match(route, /Meteograma de Pelotas/);
-  assert.match(route, /temperatura, ponto de orvalho, chuva por hora, nuvens, visibilidade, pressão, vento, rajadas e CAPE/i);
+  assert.match(route, /Previsão hora a hora em Pelotas/);
+  assert.match(route, /temperatura, chuva, nuvens, visibilidade, pressão, vento, rajadas e possibilidade de tempestade/i);
   assert.match(route, /createFaqPageJsonLd\(PAGE_PATH, METEOGRAM_CONTENT\.faqs\)/);
   assert.match(route, /showOfficialAlerts=\{false\}/);
-  assert.match(route, /O meteograma mostra dados medidos ou previstos/);
-  assert.match(route, /CAPE é uma medida/);
+  assert.match(route, /Os gráficos mostram medições ou previsão/);
+  assert.match(route, /O que é o índice CAPE/);
 });
 
 test("meteogram page provides coordinated controls and practical readings", () => {
-  assert.match(page, /Meteograma de Pelotas: atmosfera, chuva e vento hora a hora/);
+  assert.match(page, /Como o tempo pode mudar nas próximas horas/);
   assert.match(page, /24 horas/);
   assert.match(page, /48 horas/);
   assert.match(page, /Maior chance de chuva/);
-  assert.match(page, /Rajada máxima/);
+  assert.match(page, /Maior rajada/);
   assert.match(page, /Menor visibilidade/);
-  assert.match(page, /Pico de CAPE/);
-  assert.match(page, /Horário selecionado/);
-  assert.match(page, /Temperatura, sensação e ponto de orvalho/);
-  assert.match(page, /Chance de chuva e umidade relativa/);
-  assert.match(page, /Volume previsto por hora/);
-  assert.match(page, /Camadas de nuvens/);
+  assert.match(page, /Maior possibilidade de tempestade/);
+  assert.match(page, /Horário escolhido/);
+  assert.match(page, /Temperatura, sensação e umidade do ar/);
+  assert.match(page, /Chance de chuva e umidade do ar/);
+  assert.match(page, /Chuva prevista por hora/);
+  assert.match(page, /Nuvens baixas, médias e altas/);
   assert.match(page, /Visibilidade prevista/);
   assert.match(page, /Vento e rajadas/);
   assert.match(page, /Pressão ao nível do mar/);
-  assert.match(page, /CAPE isolado não confirma temporal/);
-  assert.match(page, /O meteograma é uma previsão, não uma medição contínua/);
+  assert.match(page, /Esse valor, sozinho, não confirma temporal/);
+  assert.match(page, /Esta página mostra previsão, não medição/);
 });
 
 test("meteogram keeps atmospheric forecast separate from observation and hydrology", () => {
-  assert.match(page, /A observação da[\s\S]*Embrapa permanece separada/);
-  assert.match(page, /valores futuros não são chuva já medida/);
-  assert.match(page, /Modelos podem mudar entre atualizações/);
+  assert.match(page, /As medições da[\s\S]*Embrapa aparecem separadamente/);
+  assert.match(page, /Valores futuros não são chuva já medida/);
+  assert.match(page, /A previsão pode mudar entre atualizações/);
   assert.doesNotMatch(`${route}\n${page}`, /SACE|Guaíba|Lagoa dos Patos|nível da água/i);
 });
 
@@ -170,7 +170,7 @@ test("meteogram is discoverable and cached as an operational page", () => {
   assert.match(publicRoutes, /path: "\/meteograma-pelotas", changeFrequency: "hourly"/);
   assert.match(todayAtmosphere, /to="\/meteograma-pelotas"/);
   assert.match(todayAtmosphere, /Abrir meteograma de 24 e 48 horas/);
-  assert.match(header, /Meteograma 24–48h/);
+  assert.match(header, /Previsão hora a hora/);
   assert.match(header, /"\/meteograma-pelotas"/);
   assert.match(functionSource, /max-age=300/);
   assert.match(functionSource, /stale-while-revalidate=600/);
