@@ -36,11 +36,11 @@ const REDEMET_URL = "https://redemet.decea.mil.br/";
 const FRAME_INTERVAL_MS = 1_600;
 
 const chapters = [
-  { href: "#visao-geral-radar", label: "Visão geral", detail: "Atualização e fontes" },
-  { href: "#radar-regional", label: "Radar", detail: "Chuva na região" },
+  { href: "#visao-geral-radar", label: "Visão geral", detail: "Horários e imagens" },
+  { href: "#radar-regional", label: "Radar", detail: "Áreas de chuva" },
   { href: "#satelites-regionais", label: "Satélites", detail: "Cobertura de nuvens" },
   { href: "#trovoadas-regionais", label: "Trovoadas", detail: "Atividade elétrica" },
-  { href: "#como-ler-as-imagens", label: "Como interpretar", detail: "Limites e segurança" },
+  { href: "#como-ler-as-imagens", label: "Como usar", detail: "Limites e segurança" },
 ];
 
 type ObservedFrame = {
@@ -90,37 +90,37 @@ function getFreshness(value: string | null): {
   relative: string;
 } {
   if (!value) {
-    return { tone: "unknown", label: "Horário não informado", relative: "Sem referência temporal" };
+    return { tone: "unknown", label: "Horário não informado", relative: "Sem horário disponível" };
   }
 
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) {
-    return { tone: "unknown", label: "Horário não informado", relative: "Sem referência temporal" };
+    return { tone: "unknown", label: "Horário não informado", relative: "Sem horário disponível" };
   }
 
   const ageMinutes = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60_000));
   const relative =
     ageMinutes < 1
-      ? "Recebido agora"
+      ? "Atualizado agora"
       : ageMinutes < 60
-        ? `Recebido há ${ageMinutes} min`
+        ? `Atualizado há ${ageMinutes} min`
         : ageMinutes < 1_440
-          ? `Recebido há ${Math.floor(ageMinutes / 60)}h`
-          : "Recebido há mais de 1 dia";
+          ? `Atualizado há ${Math.floor(ageMinutes / 60)} h`
+          : "Atualizado há mais de 1 dia";
 
-  if (ageMinutes <= 30) return { tone: "recent", label: "Atualização recente", relative };
+  if (ageMinutes <= 30) return { tone: "recent", label: "Imagem recente", relative };
   if (ageMinutes <= 120) return { tone: "attention", label: "Confira o horário", relative };
-  return { tone: "stale", label: "Quadro com mais de 2h", relative };
+  return { tone: "stale", label: "Imagem com mais de 2 h", relative };
 }
 
 function sourceCountLabel(count: number) {
-  if (count === 1) return "1 fonte com dados disponíveis";
-  return `${count} fontes com dados disponíveis`;
+  if (count === 1) return "1 conjunto de dados disponível";
+  return `${count} conjuntos de dados disponíveis`;
 }
 
 function frameCountLabel(count: number) {
-  if (count === 1) return "1 quadro disponível";
-  return `${count} quadros disponíveis`;
+  if (count === 1) return "1 imagem disponível";
+  return `${count} imagens disponíveis`;
 }
 
 function FreshnessBadge({ value }: { value: string | null }) {
@@ -136,10 +136,10 @@ function FreshnessBadge({ value }: { value: string | null }) {
 
 function SourceState({ configured, available }: { configured: boolean; available: boolean }) {
   const label = !configured
-    ? "Integração pendente"
+    ? "Ainda não disponível"
     : available
-      ? "Dados disponíveis"
-      : "Indisponível nesta atualização";
+      ? "Imagens disponíveis"
+      : "Sem imagem nesta atualização";
   const className = !configured ? "is-pending" : available ? "is-live" : "is-unavailable";
 
   return (
@@ -176,11 +176,11 @@ function SourceSummaryCard({
       <SourceState configured={layer.configured} available={layer.available} />
       <dl>
         <div>
-          <dt>Último quadro</dt>
+          <dt>Imagem mais recente</dt>
           <dd>{formatDateTime(latest)}</dd>
         </div>
         <div>
-          <dt>Sequência</dt>
+          <dt>Imagens</dt>
           <dd>{frameCountLabel(layer.frames.length)}</dd>
         </div>
       </dl>
@@ -282,7 +282,7 @@ function ImageLayerPanel({
           <figure className="redemet-image-frame" data-freshness={freshness.tone}>
             <img
               src={selectedFrame.imageUrl}
-              alt={`${title}, imagem observada em ${formatDateTime(selectedFrame.observedAt)}`}
+              alt={`${title}, imagem registrada em ${formatDateTime(selectedFrame.observedAt)}`}
               loading={kind === "radar" ? "eager" : "lazy"}
               decoding="async"
               fetchPriority={kind === "radar" ? "high" : "auto"}
@@ -292,7 +292,7 @@ function ImageLayerPanel({
                 <span>{selectedFrame.label}</span>
                 <FreshnessBadge value={selectedFrame.observedAt} />
               </div>
-              <strong>Observado em {formatDateTime(selectedFrame.observedAt)}</strong>
+              <strong>Registrada em {formatDateTime(selectedFrame.observedAt)}</strong>
             </figcaption>
           </figure>
 
@@ -343,7 +343,7 @@ function ImageLayerPanel({
                 onClick={playback.showLatest}
                 disabled={playback.isLatest}
               >
-                <RotateCcw aria-hidden="true" /> Quadro mais recente
+                <RotateCcw aria-hidden="true" /> Imagem mais recente
               </button>
               <a href={selectedFrame.imageUrl} target="_blank" rel="noopener noreferrer">
                 <Maximize2 aria-hidden="true" /> Abrir imagem
@@ -356,8 +356,8 @@ function ImageLayerPanel({
           <ImageIcon aria-hidden="true" />
           <strong>
             {layer.configured
-              ? "A fonte não publicou uma imagem utilizável nesta atualização."
-              : "Esta fonte ainda depende da configuração da integração no servidor."}
+              ? "Não foi encontrada uma imagem utilizável nesta atualização."
+              : "Esta imagem ainda não está disponível no portal."}
           </strong>
           <p>As demais imagens, a previsão por horário e os avisos oficiais continuam disponíveis.</p>
         </div>
@@ -365,7 +365,7 @@ function ImageLayerPanel({
 
       <footer>
         <span>
-          {layer.sourceLabel} · Produto: {layer.product}
+          {layer.sourceLabel} · Tipo de imagem: {layer.product}
         </span>
         <a
           href={layer.officialUrl ?? REDEMET_URL}
@@ -373,7 +373,7 @@ function ImageLayerPanel({
           rel="noopener noreferrer"
           aria-label={`Consultar ${title} no site do ${sourceName}, em nova aba`}
         >
-          Abrir fonte oficial
+          Abrir página oficial
           <ExternalLink aria-hidden="true" />
         </a>
       </footer>
@@ -395,28 +395,27 @@ function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
       <div className="redemet-storm-heading">
         <div>
           <CloudLightning aria-hidden="true" />
-          <span>Atividade elétrica regional</span>
+          <span>Trovoadas na região</span>
         </div>
         <SourceState configured={layer.configured} available={layer.available} />
       </div>
 
       <div className="redemet-storm-content">
         <div>
-          <span>{layer.product}</span>
-          <h2 id="trovoadas-regionais-title">Trovoadas detectadas na sequência selecionada</h2>
+          <span>Descargas elétricas detectadas</span>
+          <h2 id="trovoadas-regionais-title">Trovoadas registradas no horário selecionado</h2>
           <p>
-            Os pontos representam descargas detectadas na região. Eles não confirmam, isoladamente,
-            tempestade ou risco no município; confira o horário, a evolução dos quadros e os avisos
-            oficiais.
+            Os pontos mostram descargas detectadas na região. Eles não confirmam, sozinhos, tempestade
+            ou risco em Pelotas; confira o horário, a mudança entre as imagens e os avisos oficiais.
           </p>
         </div>
 
         <div className="redemet-storm-reading">
           <strong>{layer.available && selectedFrame ? count : "—"}</strong>
-          <span>{count === 1 ? "ocorrência detectada" : "ocorrências detectadas"}</span>
+          <span>{count === 1 ? "registro encontrado" : "registros encontrados"}</span>
           <small>
             {selectedFrame
-              ? `Observado em ${formatDateTime(selectedFrame.observedAt)}`
+              ? `Registrado em ${formatDateTime(selectedFrame.observedAt)}`
               : "Dados em atualização"}
           </small>
           <FreshnessBadge value={selectedFrame?.observedAt ?? null} />
@@ -424,18 +423,18 @@ function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
       </div>
 
       {layer.available && layer.frames.length > 0 ? (
-        <div className="redemet-storm-controls" aria-label="Quadros de trovoadas disponíveis">
+        <div className="redemet-storm-controls" aria-label="Imagens de trovoadas disponíveis">
           <button
             type="button"
             onClick={() => playback.selectFrame(playback.selectedIndex - 1)}
             disabled={playback.selectedIndex === 0}
-            aria-label="Ver quadro anterior de trovoadas"
+            aria-label="Ver imagem anterior de trovoadas"
           >
             <ArrowLeft aria-hidden="true" />
           </button>
           <label className="redemet-storm-timeline">
             <span>
-              Quadro {playback.selectedIndex + 1} de {layer.frames.length}
+              Imagem {playback.selectedIndex + 1} de {layer.frames.length}
             </span>
             <input
               type="range"
@@ -449,7 +448,7 @@ function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
             type="button"
             onClick={() => playback.selectFrame(playback.selectedIndex + 1)}
             disabled={playback.selectedIndex >= layer.frames.length - 1}
-            aria-label="Ver próximo quadro de trovoadas"
+            aria-label="Ver próxima imagem de trovoadas"
           >
             <ArrowRight aria-hidden="true" />
           </button>
@@ -470,7 +469,7 @@ function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
               onClick={playback.showLatest}
               disabled={playback.isLatest}
             >
-              <RotateCcw aria-hidden="true" /> Quadro mais recente
+              <RotateCcw aria-hidden="true" /> Imagem mais recente
             </button>
           </div>
         </div>
@@ -479,7 +478,7 @@ function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
       <div className="redemet-storm-warning">
         <AlertTriangle aria-hidden="true" />
         <p>
-          Detecção de trovoada não é aviso meteorológico. Para decisões de segurança, consulte os{" "}
+          Uma trovoada detectada não é um aviso meteorológico. Para decisões de segurança, consulte os{" "}
           <Link to="/alertas">avisos oficiais para Pelotas</Link>.
         </p>
       </div>
@@ -502,18 +501,18 @@ export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
         aria-labelledby="redemet-page-title"
       >
         <div className="redemet-hero__copy">
-          <p>Imagens meteorológicas para a região de Pelotas</p>
+          <p>Imagens para acompanhar o tempo na região</p>
           <h1 id="redemet-page-title">
-            Radar meteorológico e satélite em Pelotas: <span>acompanhe chuva, nuvens e trovoadas.</span>
+            Radar e satélite em Pelotas: <span>veja áreas de chuva, nuvens e trovoadas.</span>
           </h1>
           <span>
-            Compare a sequência e o horário dos quadros da REDEMET/DECEA e do INMET. Radar indica
-            ecos associados à precipitação, satélite mostra nuvens e a camada STSC registra atividade
-            elétrica regional.
+            Confira a sequência e o horário das imagens da REDEMET/DECEA e do INMET. O radar ajuda a
+            localizar chuva, os satélites mostram nuvens e os registros de trovoadas indicam atividade
+            elétrica na região.
           </span>
           <div className="redemet-hero__actions">
             <a href="#radar-regional">
-              Abrir radar regional <ArrowRight aria-hidden="true" />
+              Ver radar regional <ArrowRight aria-hidden="true" />
             </a>
             <Link to="/alertas">
               Conferir avisos oficiais <ShieldAlert aria-hidden="true" />
@@ -523,7 +522,7 @@ export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
 
         <aside aria-label="Atualização das imagens meteorológicas" data-freshness={latestFreshness.tone}>
           <Clock3 aria-hidden="true" />
-          <span>Último quadro recebido</span>
+          <span>Imagem mais recente</span>
           <strong>{formatDateTime(latestFrame)}</strong>
           <FreshnessBadge value={latestFrame} />
           <small>
@@ -537,36 +536,36 @@ export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
       <section className="redemet-source-overview" aria-labelledby="redemet-source-overview-title">
         <header>
           <div>
-            <span>Disponibilidade nesta atualização</span>
-            <h2 id="redemet-source-overview-title">Horário e sequência de cada fonte</h2>
+            <span>Imagens disponíveis agora</span>
+            <h2 id="redemet-source-overview-title">Horário e quantidade de imagens</h2>
           </div>
           <p>
-            As fontes podem atualizar em momentos diferentes. Use o horário de cada produto, e não
-            apenas o horário mais recente exibido no topo.
+            Radar, satélites e trovoadas podem atualizar em momentos diferentes. Confira o horário em cada
+            bloco antes de comparar as imagens.
           </p>
         </header>
         <div className="redemet-source-overview__grid">
           <SourceSummaryCard
             icon={Radar}
             title="Radar regional"
-            description="Ecos associados à precipitação"
+            description="Áreas associadas à chuva"
             layer={data.radar}
           />
           <SourceSummaryCard
             icon={Satellite}
             title="Satélite REDEMET"
-            description="Nebulosidade disponibilizada pelo DECEA"
+            description="Nuvens vistas pelo DECEA"
             layer={data.satellite}
           />
           <SourceSummaryCard
             icon={Satellite}
             title="Satélite INMET"
-            description="Produto GOES para a Região Sul"
+            description="Imagem GOES da Região Sul"
             layer={data.inmetSatellite}
           />
           <SourceSummaryCard
             icon={CloudLightning}
-            title="Trovoadas STSC"
+            title="Trovoadas"
             description="Atividade elétrica detectada"
             layer={data.storms}
           />
@@ -577,22 +576,22 @@ export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
         <article>
           <Clock3 aria-hidden="true" />
           <strong>1. Confira o horário</strong>
-          <span>Um quadro antigo pode não representar a condição meteorológica deste momento.</span>
+          <span>Uma imagem antiga pode não representar o que está acontecendo agora.</span>
         </article>
         <article>
           <Play aria-hidden="true" />
           <strong>2. Reproduza a sequência</strong>
-          <span>Observe se os ecos, as nuvens ou as trovoadas avançam, recuam ou perdem intensidade.</span>
+          <span>Observe se as áreas de chuva, as nuvens ou as trovoadas avançam, recuam ou diminuem.</span>
         </article>
         <article>
           <Layers3 aria-hidden="true" />
-          <strong>3. Compare produtos diferentes</strong>
-          <span>Radar, satélite e trovoadas mostram fenômenos relacionados, mas não equivalentes.</span>
+          <strong>3. Compare as imagens</strong>
+          <span>Radar, satélite e trovoadas mostram informações relacionadas, mas diferentes.</span>
         </article>
         <article>
           <ShieldAlert aria-hidden="true" />
-          <strong>4. Confirme risco e orientação</strong>
-          <span>Para severidade e segurança, consulte os avisos oficiais e a previsão por horário.</span>
+          <strong>4. Confira os avisos</strong>
+          <span>Para risco e segurança, consulte os avisos oficiais e a previsão por horário.</span>
         </article>
       </section>
 
@@ -601,8 +600,8 @@ export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
         layer={data.radar}
         kind="radar"
         eyebrow="Radar meteorológico · REDEMET/DECEA"
-        title="Sinais de precipitação na região de Pelotas"
-        description="Reproduza os quadros para acompanhar a posição e o deslocamento recente dos ecos associados à chuva. A imagem é regional e não confirma precipitação em um endereço específico."
+        title="Áreas de chuva na região de Pelotas"
+        description="Reproduza as imagens para acompanhar a posição e o deslocamento recente das áreas associadas à chuva. O radar oferece uma visão regional e não confirma chuva em um endereço específico."
         featured
       />
 
@@ -614,11 +613,11 @@ export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
         <header className="redemet-section-heading">
           <div>
             <span>Imagens de satélite</span>
-            <h2 id="satelites-regionais-title">Cobertura e evolução das nuvens sobre a Região Sul</h2>
+            <h2 id="satelites-regionais-title">Nuvens sobre a Região Sul</h2>
           </div>
           <p>
-            REDEMET e INMET aparecem lado a lado, com produto, horário e origem separados. Nuvens no
-            satélite não significam necessariamente chuva no solo em Pelotas.
+            As imagens da REDEMET e do INMET aparecem lado a lado, com horário e origem identificados.
+            Nuvens no satélite não significam necessariamente chuva no solo em Pelotas.
           </p>
         </header>
 
@@ -628,8 +627,8 @@ export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
             layer={data.satellite}
             kind="satellite"
             eyebrow="Satélite regional · REDEMET/DECEA"
-            title="Evolução da nebulosidade pelo DECEA"
-            description="Compare os quadros para observar mudanças na cobertura e na organização das nuvens disponibilizadas pela REDEMET."
+            title="Mudança das nuvens vista pelo DECEA"
+            description="Compare as imagens para observar mudanças na cobertura, na organização e no deslocamento das nuvens."
           />
           <ImageLayerPanel
             id="satelite-inmet"
@@ -637,7 +636,7 @@ export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
             kind="satellite"
             eyebrow="Satélite GOES · INMET"
             title="Nuvens sobre a Região Sul pelo INMET"
-            description="Use este produto como leitura complementar para comparar cobertura, organização e deslocamento regional das nuvens."
+            description="Use esta imagem para comparar a cobertura, a organização e o deslocamento regional das nuvens."
           />
         </div>
       </section>
@@ -650,16 +649,16 @@ export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
         aria-labelledby="como-ler-as-imagens-title"
       >
         <div>
-          <span>Limites da observação</span>
-          <h2 id="como-ler-as-imagens-title">Imagem meteorológica ajuda a acompanhar, mas não define o risco sozinha</h2>
+          <span>Como interpretar</span>
+          <h2 id="como-ler-as-imagens-title">As imagens ajudam a acompanhar o tempo, mas não definem o risco sozinhas</h2>
         </div>
         <p>
-          O radar pode mostrar ecos sem confirmar chuva no seu bairro; o satélite mostra nuvens; e a
-          detecção de trovoada registra atividade elétrica regional. Para severidade, abrangência e
-          orientação de segurança, prevalecem os avisos oficiais.
+          O radar pode mostrar áreas associadas à chuva sem confirmar precipitação no seu bairro; o
+          satélite mostra nuvens; e os registros de trovoadas indicam atividade elétrica regional. Para
+          risco, abrangência e orientação de segurança, prevalecem os avisos oficiais.
         </p>
         <Link to="/metodologia">
-          Entender fontes e limitações
+          Ver como os dados funcionam
           <ArrowRight aria-hidden="true" />
         </Link>
       </section>
@@ -677,7 +676,7 @@ export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
         </Link>
         <Link to="/metodologia">
           <Layers3 aria-hidden="true" />
-          <span><small>Origem dos produtos</small><strong>Fontes e metodologia</strong></span>
+          <span><small>Origem das imagens</small><strong>Como os dados funcionam</strong></span>
           <ArrowRight aria-hidden="true" />
         </Link>
         <Link to="/tempo-hoje-pelotas">
