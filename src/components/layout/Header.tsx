@@ -32,28 +32,28 @@ const megaMenus = [
       "/metodologia",
     ],
     featured: {
-      eyebrow: "Observação regional",
+      eyebrow: "Veja agora",
       label: "Radar, satélites e estações",
       to: "/radar-e-satelite-pelotas",
-      description: "Acompanhe imagens meteorológicas, medições locais e a evolução recente do tempo.",
+      description: "Acompanhe imagens meteorológicas, medições locais e mudanças recentes no tempo.",
     },
     sections: [
       {
-        title: "Ao vivo e observado",
+        title: "Imagens e medições",
         links: [
-          { label: "Radar e satélite", to: "/radar-e-satelite-pelotas", description: "REDEMET, INMET e ocorrências regionais de trovoadas." },
-          { label: "Mapa de geadas", to: "/mapa-de-geadas-rio-grande-do-sul", description: "Ocorrências observadas pelas estações do INMET no Rio Grande do Sul." },
-          { label: "Estação Embrapa", to: "/estacao-embrapa-pelotas", description: "Dados medidos pela estação de Pelotas." },
-          { label: "Câmeras ao vivo", to: "/cameras-ao-vivo-pelotas", description: "Imagens locais e estado das transmissões." },
+          { label: "Radar e satélite", to: "/radar-e-satelite-pelotas", description: "Veja áreas de chuva, imagens de satélite e trovoadas na região." },
+          { label: "Mapa de geadas", to: "/mapa-de-geadas-rio-grande-do-sul", description: "Consulte registros de geada nas estações do INMET no Rio Grande do Sul." },
+          { label: "Estação Embrapa", to: "/estacao-embrapa-pelotas", description: "Veja temperatura, umidade, vento e chuva medidos em Pelotas." },
+          { label: "Câmeras ao vivo", to: "/cameras-ao-vivo-pelotas", description: "Veja imagens locais e saiba se a transmissão está ao vivo ou gravada." },
         ],
       },
       {
-        title: "Contexto e transparência",
+        title: "Entenda e compare",
         links: [
-          { label: "Clima de Pelotas", to: "/clima-em-pelotas", description: "Estações do ano, fatores locais, normais e diferença entre tempo e clima." },
-          { label: "Meteograma 24–48h", to: "/meteograma-pelotas", description: "Temperatura, chuva, nuvens, visibilidade, pressão e vento hora a hora." },
-          { label: "Histórico de 30 dias", to: "/historico-climatico-pelotas", description: "Compare máximas, mínimas, chuva e rajadas recentes." },
-          { label: "Fontes e metodologia", to: "/metodologia", description: "Origem, função, limites e atualização dos dados." },
+          { label: "Clima de Pelotas", to: "/clima-em-pelotas", description: "Entenda as estações do ano e por que o tempo varia na cidade." },
+          { label: "Previsão hora a hora", to: "/meteograma-pelotas", description: "Compare temperatura, chuva, nuvens, visibilidade, pressão e vento." },
+          { label: "Histórico de 30 dias", to: "/historico-climatico-pelotas", description: "Compare máximas, mínimas, chuva e rajadas dos últimos dias." },
+          { label: "Como os dados funcionam", to: "/metodologia", description: "Veja de onde vêm os dados, quando atualizam e quais são seus limites." },
         ],
       },
     ],
@@ -63,28 +63,28 @@ const megaMenus = [
     label: "Região",
     activePaths: ["/tempo-na-regiao-sul-rs", "/tempo-em"],
     featured: {
-      eyebrow: "Central local",
-      label: "Tempo por cidade na Zona Sul",
+      eyebrow: "Previsão por cidade",
+      label: "Tempo na Zona Sul",
       to: "/tempo-na-regiao-sul-rs",
-      description: "Previsão local e avisos municipais para Pelotas, Costa Doce, fronteira e Campanha.",
+      description: "Consulte a previsão para cidades da Zona Sul, Costa Doce, fronteira e Campanha.",
     },
     sections: [
       {
         title: "Pelotas e entorno",
         links: [
-          { label: "Pelotas", to: "/", description: "Central meteorológica completa de Pelotas." },
-          { label: "Capão do Leão", href: "/tempo-em/capao-do-leao-rs", description: "Tempo no município vizinho a Pelotas." },
-          { label: "Canguçu", href: "/tempo-em/cangucu-rs", description: "Condições na Serra do Sudeste." },
-          { label: "Morro Redondo", href: "/tempo-em/morro-redondo-rs", description: "Previsão para a área serrana próxima." },
+          { label: "Pelotas", to: "/", description: "Tempo agora, previsão, chuva, vento e alertas para Pelotas." },
+          { label: "Capão do Leão", href: "/tempo-em/capao-do-leao-rs", description: "Previsão do tempo para Capão do Leão." },
+          { label: "Canguçu", href: "/tempo-em/cangucu-rs", description: "Previsão do tempo para Canguçu." },
+          { label: "Morro Redondo", href: "/tempo-em/morro-redondo-rs", description: "Previsão do tempo para Morro Redondo." },
         ],
       },
       {
         title: "Costa e fronteira",
         links: [
-          { label: "Rio Grande", href: "/tempo-em/rio-grande-rs", description: "Porto, Lagoa dos Patos e litoral." },
-          { label: "São Lourenço do Sul", href: "/tempo-em/sao-lourenco-do-sul-rs", description: "Previsão na Costa Doce." },
-          { label: "Jaguarão", href: "/tempo-em/jaguarao-rs", description: "Tempo na fronteira com o Uruguai." },
-          { label: "Santa Vitória do Palmar", href: "/tempo-em/santa-vitoria-do-palmar-rs", description: "Condições no extremo sul." },
+          { label: "Rio Grande", href: "/tempo-em/rio-grande-rs", description: "Previsão para Rio Grande, porto e litoral." },
+          { label: "São Lourenço do Sul", href: "/tempo-em/sao-lourenco-do-sul-rs", description: "Previsão para São Lourenço do Sul e Costa Doce." },
+          { label: "Jaguarão", href: "/tempo-em/jaguarao-rs", description: "Previsão do tempo para Jaguarão." },
+          { label: "Santa Vitória do Palmar", href: "/tempo-em/santa-vitoria-do-palmar-rs", description: "Previsão do tempo para Santa Vitória do Palmar." },
         ],
       },
     ],
@@ -97,21 +97,21 @@ const megaMenus = [
       eyebrow: "Lagoa dos Patos",
       label: "Nível da água no Laranjal",
       to: "/nivel-da-lagoa-dos-patos-laranjal",
-      description: "Leitura local, tendência recente e contexto para a Praia do Laranjal.",
+      description: "Veja a última medição, a tendência recente e o horário da leitura no Laranjal.",
     },
     sections: [
       {
-        title: "Acompanhamento hídrico",
+        title: "Níveis e medições",
         links: [
-          { label: "Situação das águas", to: "/situacao-hidrologica-pelotas", description: "Laranjal e estações da Lagoa dos Patos." },
-          { label: "Nível no Laranjal", to: "/nivel-da-lagoa-dos-patos-laranjal", description: "Medição, tendência e última leitura conhecida." },
+          { label: "Situação das águas", to: "/situacao-hidrologica-pelotas", description: "Compare o Laranjal com estações da Lagoa dos Patos e rios que chegam ao Guaíba." },
+          { label: "Nível no Laranjal", to: "/nivel-da-lagoa-dos-patos-laranjal", description: "Veja a medição, a tendência e a última leitura conhecida." },
         ],
       },
       {
-        title: "Segurança e contexto",
+        title: "Alertas e explicações",
         links: [
-          { label: "Avisos oficiais", to: "/alertas", description: "Alertas meteorológicos vigentes para Pelotas." },
-          { label: "Como os dados são usados", to: "/metodologia", description: "Critérios, fontes e limitações das leituras." },
+          { label: "Avisos oficiais", to: "/alertas", description: "Consulte os avisos meteorológicos que incluem Pelotas." },
+          { label: "Entenda as medições", to: "/metodologia", description: "Saiba de onde vêm os dados e como interpretar cada leitura." },
         ],
       },
     ],
@@ -163,10 +163,10 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
             <div className="editorial-utility-context">
               <span className="editorial-location"><i aria-hidden="true" /> Pelotas, Rio Grande do Sul</span>
               <span className="editorial-utility-separator" aria-hidden="true" />
-              <span>Informação meteorológica local, oficial e regional</span>
+              <span>Tempo, previsão e monitoramento local</span>
             </div>
             <nav className="editorial-utility-navigation" aria-label="Links institucionais">
-              <Link to="/metodologia" aria-label="Conhecer as fontes e a metodologia do Tempo Pelotas">Fontes e metodologia</Link>
+              <Link to="/metodologia" aria-label="Conhecer as fontes e a metodologia do Tempo Pelotas">Como os dados funcionam</Link>
               <Link to="/cameras-ao-vivo-pelotas" aria-label="Ver câmeras ao vivo de Pelotas e região">Câmeras ao vivo</Link>
             </nav>
           </div>
@@ -178,7 +178,7 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
               <img className="production-brand-logo" src="/brand/tempo-pelotas-purple.svg" alt="" width={344} height={50} loading="eager" decoding="async" fetchPriority="high" draggable={false} />
             </Link>
           </div>
-          <div className="editorial-masthead-copy"><span>Portal meteorológico regional</span><strong>Previsão, observação e águas de Pelotas</strong></div>
+          <div className="editorial-masthead-copy"><span>Portal meteorológico regional</span><strong>Previsão, medições e nível da Lagoa</strong></div>
           <div className="production-header-actions">
             <AuthAccountAction />
             <Link className={`production-alert-link is-${advisoryLevel}${alertsActive ? " is-active" : ""}`} to="/alertas" aria-label="Consultar avisos meteorológicos oficiais para Pelotas" aria-current={alertsActive ? "page" : undefined}>
@@ -190,14 +190,14 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
 
         <div className="editorial-navigation-shell">
           <div className="editorial-navigation-inner">
-            <nav className="editorial-direct-navigation" aria-label="Editorias de previsão">
+            <nav className="editorial-direct-navigation" aria-label="Previsões principais">
               {editorialPrimaryLinks.map((item) => {
                 const active = isActivePath(pathname, item.to);
                 return <Link key={item.to} to={item.to} className={active ? "is-active" : undefined} aria-label={item.ariaLabel} aria-current={active ? "page" : undefined}>{item.label}</Link>;
               })}
             </nav>
             <span className="editorial-navigation-divider" aria-hidden="true" />
-            <nav className="mega-navigation" aria-label="Demais editorias">
+            <nav className="mega-navigation" aria-label="Outras páginas do portal">
               {megaMenus.map((menu) => {
                 const isOpen = openMenu === menu.id;
                 const isActive = menu.activePaths.some((path) => isActivePath(pathname, path));
@@ -209,7 +209,7 @@ export function Header({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryL
                     <div className="mega-navigation-panel" id={`mega-menu-${menu.id}`} aria-hidden={!isOpen}>
                       <div className="mega-navigation-surface">
                         <Link className={`mega-navigation-feature is-${menu.id}`} to={menu.featured.to} aria-label={`${menu.featured.label}. ${menu.featured.description}`} aria-current={isActivePath(pathname, menu.featured.to) ? "page" : undefined}>
-                          <small>{menu.featured.eyebrow}</small><strong>{menu.featured.label}</strong><span>{menu.featured.description}</span><b>Explorar <i aria-hidden="true">→</i></b>
+                          <small>{menu.featured.eyebrow}</small><strong>{menu.featured.label}</strong><span>{menu.featured.description}</span><b>Abrir <i aria-hidden="true">→</i></b>
                         </Link>
                         <div className="mega-navigation-columns">
                           {menu.sections.map((section) => (
