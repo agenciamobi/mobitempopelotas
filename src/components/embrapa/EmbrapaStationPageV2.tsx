@@ -50,7 +50,7 @@ const currentFieldLabels: Partial<Record<AggregatedCurrentField, string>> = {
   windDirection: "direção do vento",
   sunrise: "nascer do sol",
   sunset: "pôr do sol",
-  observedAt: "horário observado",
+  observedAt: "horário da medição",
 };
 
 const statusCopy: Record<
@@ -58,24 +58,24 @@ const statusCopy: Record<
   { label: string; title: string; description: string }
 > = {
   live: {
-    label: "Fonte respondendo",
-    title: "Leitura local disponível",
-    description: "A fonte respondeu e os principais campos da estação foram reconhecidos.",
+    label: "Leitura disponível",
+    title: "A estação está enviando dados",
+    description: "A fonte respondeu e as principais medições foram reconhecidas.",
   },
   partial: {
-    label: "Leitura parcial",
-    title: "Parte dos campos está disponível",
-    description: "A fonte respondeu, mas algumas variáveis não foram reconhecidas nesta consulta.",
+    label: "Alguns dados disponíveis",
+    title: "Parte das medições está disponível",
+    description: "A estação respondeu, mas algumas informações não vieram nesta atualização.",
   },
   stale: {
     label: "Leitura atrasada",
-    title: "A última medição conhecida não é recente",
-    description: "Os valores permanecem identificados como última leitura e não como condição atual.",
+    title: "A última medição não é recente",
+    description: "Os valores aparecem como última leitura conhecida e não como condição atual.",
   },
   unavailable: {
-    label: "Fonte indisponível",
+    label: "Estação indisponível",
     title: "A estação não pôde ser consultada",
-    description: "Nenhum valor é preenchido artificialmente enquanto a fonte estiver indisponível.",
+    description: "A página não mostra valores artificiais enquanto a fonte estiver indisponível.",
   },
 };
 
@@ -107,18 +107,18 @@ function formatDateTime(value: string | null | undefined) {
 }
 
 function ageLabel(ageMinutes: number | null) {
-  if (ageMinutes === null) return "Idade da leitura não determinada";
-  if (ageMinutes < 1) return "Leitura com menos de 1 minuto";
-  if (ageMinutes < 60) return `Leitura com ${Math.round(ageMinutes)} min`;
+  if (ageMinutes === null) return "Tempo desde a medição não informado";
+  if (ageMinutes < 1) return "Medida há menos de 1 minuto";
+  if (ageMinutes < 60) return `Medida há ${Math.round(ageMinutes)} min`;
   const hours = Math.floor(ageMinutes / 60);
   const minutes = Math.round(ageMinutes % 60);
-  return minutes ? `Leitura com ${hours} h ${minutes} min` : `Leitura com ${hours} h`;
+  return minutes ? `Medida há ${hours} h ${minutes} min` : `Medida há ${hours} h`;
 }
 
 function primaryReadingLabel(status: WeatherSourceHealthStatus) {
-  if (status === "live") return "Temperatura observada";
-  if (status === "partial") return "Temperatura reconhecida";
-  if (status === "stale") return "Última temperatura reconhecida";
+  if (status === "live") return "Temperatura agora";
+  if (status === "partial") return "Temperatura disponível";
+  if (status === "stale") return "Última temperatura informada";
   return "Temperatura indisponível";
 }
 
@@ -171,16 +171,16 @@ export function EmbrapaStationHero({ data }: EmbrapaStationProps) {
   const health = data.weather.sources.embrapa;
   const status = health.status;
   const StatusIcon = statusIcon(status);
-  const usedAsCurrentSource = data.weather.quality.currentSource === "embrapa";
+  const usedInCurrentSummary = fieldsUsedByPortal(data).length > 0;
 
   return (
     <section className="embrapa-v2-hero" aria-labelledby="embrapa-v2-hero-title">
       <div className="embrapa-v2-hero__content">
-        <span className="embrapa-v2-eyebrow">Observação meteorológica local</span>
-        <h1 id="embrapa-v2-hero-title">Estação Embrapa em Pelotas: medições e procedência.</h1>
+        <span className="embrapa-v2-eyebrow">Medições locais em Pelotas</span>
+        <h1 id="embrapa-v2-hero-title">Estação meteorológica da Embrapa.</h1>
         <p>
-          Consulte o que foi registrado no Posto Meteorológico da Sede. Medição, horário da estação,
-          momento da consulta e uso no portal aparecem separados para evitar confusão com previsão.
+          Veja o que foi medido no Posto Meteorológico da Sede, quando a leitura foi registrada e quais
+          informações foram usadas no resumo atual do Tempo Pelotas.
         </p>
         <div className="embrapa-v2-hero__actions">
           <a href="#leitura-observada">Ver todas as medições <ArrowRight aria-hidden="true" /></a>
@@ -193,7 +193,7 @@ export function EmbrapaStationHero({ data }: EmbrapaStationProps) {
           <span className="embrapa-v2-status-chip">
             <StatusIcon aria-hidden="true" /> {statusCopy[status].label}
           </span>
-          <small>{usedAsCurrentSource ? "Fonte principal da condição atual" : "Fonte local de comparação"}</small>
+          <small>{usedInCurrentSummary ? "Usada no resumo atual" : "Medição local para comparação"}</small>
         </header>
 
         <div className="embrapa-v2-reading__temperature">
@@ -219,8 +219,8 @@ export function EmbrapaStationHero({ data }: EmbrapaStationProps) {
           <span><Clock3 aria-hidden="true" />{ageLabel(data.weather.quality.observationAgeMinutes)}</span>
           <small>
             {observation.source.observationTime
-              ? `Horário publicado pela estação: ${observation.source.observationTime}`
-              : "A fonte não informou horário completo da medição."}
+              ? `Horário informado pela estação: ${observation.source.observationTime}`
+              : "A estação não informou o horário completo da medição."}
           </small>
         </footer>
       </aside>
@@ -275,17 +275,17 @@ export function EmbrapaStationPageV2({ data }: EmbrapaStationProps) {
 
       <nav
         className={`embrapa-v2-chapters${available ? "" : " is-compact"}`}
-        aria-label="Capítulos da Estação Embrapa"
+        aria-label="Seções da Estação Embrapa"
       >
-        <a href="#estado-da-fonte"><span>01</span><strong>Fonte</strong><small>Disponibilidade e atraso</small></a>
+        <a href="#estado-da-fonte"><span>01</span><strong>Situação</strong><small>Atualização da estação</small></a>
         {available ? (
           <>
-            <a href="#leitura-observada"><span>02</span><strong>Medições</strong><small>Condição no ponto</small></a>
-            <a href="#chuva-e-evapotranspiracao"><span>03</span><strong>Água</strong><small>Chuva e evapotranspiração</small></a>
-            <a href="#extremos-do-dia"><span>04</span><strong>Extremos</strong><small>Mínimas e máximas</small></a>
+            <a href="#leitura-observada"><span>02</span><strong>Medições</strong><small>Valores no local</small></a>
+            <a href="#chuva-e-evapotranspiracao"><span>03</span><strong>Chuva</strong><small>Acumulados e evapotranspiração</small></a>
+            <a href="#extremos-do-dia"><span>04</span><strong>Extremos</strong><small>Menores e maiores valores</small></a>
           </>
         ) : null}
-        <a href="#uso-no-portal"><span>{available ? "05" : "02"}</span><strong>Procedência</strong><small>Como o dado é usado</small></a>
+        <a href="#uso-no-portal"><span>{available ? "05" : "02"}</span><strong>Origem dos dados</strong><small>Uso no resumo atual</small></a>
       </nav>
 
       <section
@@ -296,14 +296,14 @@ export function EmbrapaStationPageV2({ data }: EmbrapaStationProps) {
       >
         <StatusIcon aria-hidden="true" />
         <div>
-          <span className="embrapa-v2-eyebrow">Estado da integração</span>
+          <span className="embrapa-v2-eyebrow">Situação da estação</span>
           <h2 id="embrapa-v2-source-title">{statusCopy[status].title}</h2>
           <p>{health.reason ?? statusCopy[status].description}</p>
         </div>
         <dl>
-          <div><dt>Consulta do portal</dt><dd>{formatDateTime(observation.source.fetchedAt)}</dd></div>
-          <div><dt>Idade calculada</dt><dd>{ageLabel(data.weather.quality.observationAgeMinutes)}</dd></div>
-          <div><dt>Uso como condição atual</dt><dd>{data.weather.quality.currentSource === "embrapa" ? "Sim" : "Não nesta atualização"}</dd></div>
+          <div><dt>Última atualização</dt><dd>{formatDateTime(observation.source.fetchedAt)}</dd></div>
+          <div><dt>Tempo desde a medição</dt><dd>{ageLabel(data.weather.quality.observationAgeMinutes)}</dd></div>
+          <div><dt>Usada no resumo atual</dt><dd>{usedFields.length > 0 ? "Sim" : "Não nesta atualização"}</dd></div>
         </dl>
       </section>
 
@@ -312,32 +312,32 @@ export function EmbrapaStationPageV2({ data }: EmbrapaStationProps) {
           <section className="embrapa-v2-section" id="leitura-observada" aria-labelledby="embrapa-v2-current-title">
             <header className="embrapa-v2-section-heading">
               <div>
-                <span className="embrapa-v2-eyebrow">Condição no ponto da estação</span>
-                <h2 id="embrapa-v2-current-title">Medições reconhecidas na última leitura</h2>
+                <span className="embrapa-v2-eyebrow">Medições no local da estação</span>
+                <h2 id="embrapa-v2-current-title">Valores informados na última leitura</h2>
               </div>
               <p>
-                Estes valores descrevem o local dos instrumentos. Centro, Laranjal, bairros e áreas
+                Estes valores representam o local dos instrumentos. Centro, Laranjal, bairros e áreas
                 rurais podem apresentar condições diferentes no mesmo horário.
               </p>
             </header>
 
             <div className="embrapa-v2-metric-grid">
-              <MetricCard icon={Thermometer} label="Temperatura" value={displayValue(observation.current.temperature, " °C")} detail="Valor observado pela estação" />
+              <MetricCard icon={Thermometer} label="Temperatura" value={displayValue(observation.current.temperature, " °C")} detail="Valor medido pela estação" />
               <MetricCard icon={Droplets} label="Umidade relativa" value={displayValue(observation.current.humidity, "%", 0)} detail="Quantidade relativa de vapor de água no ar" tone="purple" />
               <MetricCard icon={Gauge} label="Pressão atmosférica" value={displayValue(observation.current.pressure, " hPa")} detail={observation.current.pressureTrend ?? "Tendência não informada"} tone="orange" />
-              <MetricCard icon={Wind} label="Velocidade do vento" value={displayValue(observation.current.windSpeed, " km/h")} detail="Velocidade publicada pela estação" tone="magenta" />
-              <MetricCard icon={Compass} label="Direção do vento" value={observation.current.windDirection ?? "Não informada"} detail="Orientação publicada pela estação" />
+              <MetricCard icon={Wind} label="Velocidade do vento" value={displayValue(observation.current.windSpeed, " km/h")} detail="Velocidade informada pela estação" tone="magenta" />
+              <MetricCard icon={Compass} label="Direção do vento" value={observation.current.windDirection ?? "Não informada"} detail="Direção informada pela estação" />
               <MetricCard icon={Droplets} label="Ponto de orvalho" value={displayValue(observation.current.dewPoint, " °C")} detail="Temperatura em que o ar pode atingir saturação" tone="purple" />
-              <MetricCard icon={Sun} label="Nascer do sol" value={observation.current.sunrise ?? "Não informado"} detail="Horário exibido no monitor original" tone="orange" />
-              <MetricCard icon={Sun} label="Pôr do sol" value={observation.current.sunset ?? "Não informado"} detail="Horário exibido no monitor original" tone="magenta" />
+              <MetricCard icon={Sun} label="Nascer do sol" value={observation.current.sunrise ?? "Não informado"} detail="Horário mostrado pela estação" tone="orange" />
+              <MetricCard icon={Sun} label="Pôr do sol" value={observation.current.sunset ?? "Não informado"} detail="Horário mostrado pela estação" tone="magenta" />
             </div>
           </section>
 
           <section className="embrapa-v2-water" id="chuva-e-evapotranspiracao" aria-labelledby="embrapa-v2-water-title">
             <header className="embrapa-v2-section-heading">
               <div>
-                <span className="embrapa-v2-eyebrow">Balanço de água observado</span>
-                <h2 id="embrapa-v2-water-title">Chuva e evapotranspiração acumuladas</h2>
+                <span className="embrapa-v2-eyebrow">Chuva e perda de água</span>
+                <h2 id="embrapa-v2-water-title">Acumulados informados pela estação</h2>
               </div>
               <p>
                 A chuva representa o pluviômetro da Embrapa. Pancadas isoladas podem gerar acumulados
@@ -347,7 +347,7 @@ export function EmbrapaStationPageV2({ data }: EmbrapaStationProps) {
 
             <div className="embrapa-v2-water-columns">
               <article>
-                <header><CloudRain aria-hidden="true" /><span><strong>Precipitação</strong><small>Água registrada pelo pluviômetro</small></span></header>
+                <header><CloudRain aria-hidden="true" /><span><strong>Chuva</strong><small>Água registrada pelo pluviômetro</small></span></header>
                 <dl>
                   <div><dt>Hoje</dt><dd>{displayValue(observation.accumulated.rainDaily, " mm")}</dd></div>
                   <div><dt>No mês</dt><dd>{displayValue(observation.accumulated.rainMonthly, " mm")}</dd></div>
@@ -355,7 +355,7 @@ export function EmbrapaStationPageV2({ data }: EmbrapaStationProps) {
                 </dl>
               </article>
               <article>
-                <header><Waves aria-hidden="true" /><span><strong>Evapotranspiração</strong><small>Perda combinada de água para a atmosfera</small></span></header>
+                <header><Waves aria-hidden="true" /><span><strong>Evapotranspiração</strong><small>Água que retorna para a atmosfera</small></span></header>
                 <dl>
                   <div><dt>Hoje</dt><dd>{displayValue(observation.accumulated.evapotranspirationDaily, " mm", 2)}</dd></div>
                   <div><dt>No mês</dt><dd>{displayValue(observation.accumulated.evapotranspirationMonthly, " mm", 2)}</dd></div>
@@ -368,12 +368,12 @@ export function EmbrapaStationPageV2({ data }: EmbrapaStationProps) {
           <section className="embrapa-v2-section" id="extremos-do-dia" aria-labelledby="embrapa-v2-extremes-title">
             <header className="embrapa-v2-section-heading">
               <div>
-                <span className="embrapa-v2-eyebrow">Extremos publicados no dia</span>
-                <h2 id="embrapa-v2-extremes-title">Menores e maiores valores reconhecidos</h2>
+                <span className="embrapa-v2-eyebrow">Menores e maiores valores do dia</span>
+                <h2 id="embrapa-v2-extremes-title">Extremos informados pela estação</h2>
               </div>
               <p>
-                O horário é reproduzido da estação. Ausências permanecem explícitas e não são estimadas
-                pelo Tempo Pelotas.
+                Os horários são reproduzidos como informados pela estação. Valores ausentes não são
+                estimados pelo Tempo Pelotas.
               </p>
             </header>
 
@@ -396,7 +396,7 @@ export function EmbrapaStationPageV2({ data }: EmbrapaStationProps) {
               <article>
                 <header><Wind aria-hidden="true" /><h3>Vento</h3></header>
                 <ExtremeValue label="Maior velocidade" observation={observation.extremes.windSpeedMax} unit=" km/h" />
-                <div className="embrapa-v2-extreme-value"><span>Direção atual</span><strong>{observation.current.windDirection ?? "Não informada"}</strong><small>Não representa necessariamente a direção no momento da máxima.</small></div>
+                <div className="embrapa-v2-extreme-value"><span>Direção atual</span><strong>{observation.current.windDirection ?? "Não informada"}</strong><small>Não representa necessariamente a direção no momento da maior velocidade.</small></div>
               </article>
             </div>
           </section>
@@ -405,10 +405,10 @@ export function EmbrapaStationPageV2({ data }: EmbrapaStationProps) {
         <section className="embrapa-v2-unavailable" aria-labelledby="embrapa-v2-unavailable-title">
           <Radio aria-hidden="true" />
           <div>
-            <span className="embrapa-v2-eyebrow">Fonte externa indisponível</span>
+            <span className="embrapa-v2-eyebrow">Estação temporariamente indisponível</span>
             <h2 id="embrapa-v2-unavailable-title">As medições não puderam ser exibidas</h2>
-            <p>{observation.error ?? "A fonte não respondeu ou mudou de estrutura. O portal continuará tentando nas próximas atualizações."}</p>
-            <a href={observation.source.url} target="_blank" rel="noopener noreferrer">Abrir monitor original <ExternalLink aria-hidden="true" /></a>
+            <p>{observation.error ?? "A estação não respondeu. O portal tentará novamente nas próximas atualizações."}</p>
+            <a href={observation.source.url} target="_blank" rel="noopener noreferrer">Abrir página original <ExternalLink aria-hidden="true" /></a>
           </div>
         </section>
       )}
@@ -416,53 +416,53 @@ export function EmbrapaStationPageV2({ data }: EmbrapaStationProps) {
       <section className="embrapa-v2-provenance" id="uso-no-portal" aria-labelledby="embrapa-v2-provenance-title">
         <header className="embrapa-v2-section-heading">
           <div>
-            <span className="embrapa-v2-eyebrow">Rastreabilidade</span>
-            <h2 id="embrapa-v2-provenance-title">Como a Embrapa participa da condição atual</h2>
+            <span className="embrapa-v2-eyebrow">Origem dos dados</span>
+            <h2 id="embrapa-v2-provenance-title">Quais informações da Embrapa aparecem no resumo atual</h2>
           </div>
           <p>
-            O portal decide campo a campo. Uma fonte pode fornecer temperatura e umidade enquanto outra
-            completa previsão, visibilidade ou rajadas futuras.
+            O Tempo Pelotas verifica cada informação separadamente. A Embrapa pode fornecer temperatura
+            e umidade, enquanto a previsão das próximas horas vem de outro serviço identificado.
           </p>
         </header>
 
         <div className="embrapa-v2-provenance-grid">
           <article>
             <Activity aria-hidden="true" />
-            <span>Campos usados nesta atualização</span>
+            <span>Informações usadas agora</span>
             <strong>{usedFields.length}</strong>
-            <p>{usedFields.length ? usedFields.join(", ") : "Nenhum campo da condição consolidada veio da Embrapa nesta atualização."}</p>
+            <p>{usedFields.length ? usedFields.join(", ") : "Nenhuma informação do resumo atual veio da Embrapa nesta atualização."}</p>
           </article>
           <article>
             <CalendarClock aria-hidden="true" />
-            <span>Dois horários diferentes</span>
-            <strong>Medição ≠ consulta</strong>
-            <p>O horário publicado pela estação descreve a leitura; a consulta informa quando o portal acessou a fonte.</p>
+            <span>Dois horários importantes</span>
+            <strong>Medição e atualização</strong>
+            <p>O horário da medição informa quando o valor foi registrado; a atualização mostra quando o portal consultou a estação.</p>
           </article>
           <article>
             <Scale aria-hidden="true" />
-            <span>Comparação com modelos</span>
-            <strong>Diferenças são esperadas</strong>
+            <span>Por que os valores podem ser diferentes</span>
+            <strong>Estação e previsão não medem do mesmo jeito</strong>
             <p>Instrumentos e modelos usam métodos, horários e pontos geográficos diferentes.</p>
           </article>
           <article>
             <MapPin aria-hidden="true" />
-            <span>Representatividade espacial</span>
+            <span>Local da estação</span>
             <strong>{formatNumber(observation.source.altitude, 0)} m de altitude</strong>
-            <p>{formatNumber(observation.source.latitude, 3)}, {formatNumber(observation.source.longitude, 3)}. Uma estação não representa todos os microclimas de Pelotas.</p>
+            <p>{formatNumber(observation.source.latitude, 3)}, {formatNumber(observation.source.longitude, 3)}. Uma única estação não representa todos os bairros e microclimas de Pelotas.</p>
           </article>
         </div>
       </section>
 
-      <section className="embrapa-v2-actions" aria-label="Ações relacionadas à Estação Embrapa">
+      <section className="embrapa-v2-actions" aria-label="Outras páginas relacionadas à Estação Embrapa">
         <div>
-          <span className="embrapa-v2-eyebrow">Fonte e comparação</span>
-          <h2>Consulte o monitor original e compare com outros produtos</h2>
+          <span className="embrapa-v2-eyebrow">Fonte original e comparação</span>
+          <h2>Veja a página da Embrapa e compare com a previsão</h2>
         </div>
         <div>
-          <a href={observation.source.url} target="_blank" rel="noopener noreferrer">Monitor da Embrapa <ExternalLink aria-hidden="true" /></a>
+          <a href={observation.source.url} target="_blank" rel="noopener noreferrer">Página da Embrapa <ExternalLink aria-hidden="true" /></a>
           <Link to="/tempo-hoje-pelotas">Previsão de hoje <ArrowRight aria-hidden="true" /></Link>
           <Link to="/historico-climatico-pelotas">Histórico de 30 dias</Link>
-          <Link to="/metodologia">Metodologia e fontes</Link>
+          <Link to="/metodologia">Como os dados funcionam</Link>
         </div>
       </section>
     </div>
