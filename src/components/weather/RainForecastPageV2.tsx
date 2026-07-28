@@ -22,10 +22,10 @@ import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-br
 import "./RainForecastPageV2.css";
 
 const chapters = [
-  { href: "#panorama-da-chuva", label: "Resumo da chuva", detail: "Chance, horário e volume" },
+  { href: "#panorama-da-chuva", label: "Chuva em resumo", detail: "Chance, horário e volume" },
   { href: "#chuva-por-hora", label: "Próximas horas", detail: "Chance nas próximas 12 horas" },
   { href: "#chuva-na-semana", label: "Próximos 7 dias", detail: "Chance e volume diário" },
-  { href: "#planejamento-da-chuva", label: "Melhor horário", detail: "Menor e maior chance" },
+  { href: "#planejamento-da-chuva", label: "Melhores horários", detail: "Menor e maior chance" },
   { href: "#contexto-oficial-da-chuva", label: "Avisos do INMET", detail: "Alertas e previsão oficial" },
 ];
 
@@ -66,12 +66,12 @@ function timeReference(value: string | null | undefined) {
 }
 
 function activeAlertLabel(count: number) {
-  if (count === 0) return "Nenhum aviso de chuva listado";
+  if (count === 0) return "Nenhum aviso de chuva ativo";
   return count === 1 ? "1 aviso ativo" : `${count} avisos ativos`;
 }
 
 function officialPeriodLabel(count: number) {
-  if (count === 0) return "Nenhum período publicado com menção à chuva";
+  if (count === 0) return "A previsão oficial ainda não menciona chuva";
   return count === 1 ? "1 período menciona chuva" : `${count} períodos mencionam chuva`;
 }
 
@@ -183,15 +183,15 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
         aria-labelledby="rain-v2-overview-title"
       >
         <div className="rain-v2-overview__intro">
-          <span className="eyebrow">Resumo da chuva</span>
+          <span className="eyebrow">Chuva em resumo</span>
           <h2 id="rain-v2-overview-title">
             {nextWetHour
               ? `A chance de chuva chega a ${formatChance(nextWetHour.precipitationProbability)} ${timeReference(nextWetHour.time)}`
               : "Não há chance de chuva de 40% ou mais nas próximas 12 horas"}
           </h2>
           <p>
-            Chance de chuva indica a possibilidade de precipitação. O volume em milímetros estima
-            quanto pode acumular no período; os dois valores devem ser lidos separadamente.
+            A chance mostra a possibilidade de chover. O volume em milímetros indica quanto pode
+            acumular; os dois valores respondem a perguntas diferentes.
           </p>
         </div>
 
@@ -207,9 +207,9 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
           <article>
             <Droplets aria-hidden="true" />
             <div>
-              <span>Volume estimado para hoje</span>
+              <span>Volume previsto para hoje</span>
               <strong>{today ? formatMillimeters(today.precipitationMm) : "—"}</strong>
-              <small>Previsão total para o dia</small>
+              <small>Total previsto para o dia</small>
             </div>
           </article>
           <article className="is-best">
@@ -220,7 +220,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
               <small>
                 {bestWindow?.averageChance === null || !bestWindow
                   ? "Chance ainda não informada"
-                  : `Média prevista de ${bestWindow.averageChance}%`}
+                  : `Chance média de ${bestWindow.averageChance}%`}
               </small>
             </div>
           </article>
@@ -262,7 +262,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
                   <span>{hour.temperature}°</span>
                 </div>
                 <i aria-hidden="true"><b /></i>
-                <small>Rajada máxima de {hour.windGust ?? hour.windSpeed} km/h</small>
+                <small>Rajada de até {hour.windGust ?? hour.windSpeed} km/h</small>
               </article>
             );
           })}
@@ -279,7 +279,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
             <span className="eyebrow">Chuva nos próximos 7 dias</span>
             <h2 id="rain-v2-week-title">Chance e volume de chuva em cada dia</h2>
           </div>
-          <p>{rainyDays.length} de {days.length} dias têm chance de 30% ou mais ou volume a partir de 1 mm.</p>
+          <p>{rainyDays.length} de {days.length} dias têm pelo menos 30% de chance ou 1 mm previsto.</p>
         </header>
 
         <div className="rain-v2-week__grid">
@@ -294,7 +294,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
                 <div><dt>Chance de chuva</dt><dd>{formatChance(day.rainChance)}</dd></div>
                 <div><dt>Volume previsto</dt><dd>{formatMillimeters(day.precipitationMm)}</dd></div>
               </dl>
-              <small>Rajada máxima: {day.windGust === null ? "não informada" : `${day.windGust} km/h`}</small>
+              <small>Rajada: {day.windGust === null ? "não informada" : `até ${day.windGust} km/h`}</small>
             </article>
           ))}
         </div>
@@ -302,7 +302,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
         <div className="rain-v2-week__summary">
           <article><Droplets aria-hidden="true" /><span>Total previsto em 7 dias</span><strong>{formatMillimeters(totalRain)}</strong></article>
           <article><Umbrella aria-hidden="true" /><span>Dia com maior volume</span><strong>{highestVolumeDay?.weekday ?? "—"}</strong></article>
-          <article><CloudRain aria-hidden="true" /><span>Dias com chance ou volume</span><strong>{rainyDays.length} de {days.length}</strong></article>
+          <article><CloudRain aria-hidden="true" /><span>Dias com previsão de chuva</span><strong>{rainyDays.length} de {days.length}</strong></article>
         </div>
       </section>
 
@@ -324,7 +324,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
             <div>
               <span>Período com menor chance</span>
               <strong>{bestWindow ? `${bestWindow.start}–${bestWindow.end}` : "Em atualização"}</strong>
-              <p>É a janela com menor chance média de chuva; as rajadas são usadas como critério de desempate.</p>
+              <p>É o período com menor chance média de chuva. Em caso de empate, aparece o período com menor rajada.</p>
             </div>
           </article>
           <article className="is-attention">
@@ -334,7 +334,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
               <strong>{attentionWindow ? `${attentionWindow.start}–${attentionWindow.end}` : "Em atualização"}</strong>
               <p>
                 {attentionWindow?.maximumChance === null || !attentionWindow
-                  ? "A fonte ainda não informou a chance para esse período."
+                  ? "A previsão ainda não informou a chance para esse período."
                   : `A chance pode chegar a ${attentionWindow.maximumChance}%, com rajadas de até ${attentionWindow.maximumGust} km/h.`}
               </p>
             </div>
@@ -344,7 +344,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
             <div>
               <span>Horários com 30% ou mais</span>
               <strong>{wetHours.length} de {hours.length}</strong>
-              <p>A contagem considera a chance prevista de chuva nas próximas 12 horas.</p>
+              <p>Quantidade de horários com chance prevista de pelo menos 30% nas próximas 12 horas.</p>
             </div>
           </article>
         </div>
@@ -357,7 +357,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
       >
         <header>
           <div>
-            <span className="eyebrow">Avisos e previsão oficial</span>
+            <span className="eyebrow">Avisos e previsão do INMET</span>
             <h2 id="rain-v2-official-title">O que o INMET publica sobre chuva em Pelotas</h2>
           </div>
           <Link to="/alertas">Ver todos os avisos oficiais</Link>
@@ -369,15 +369,15 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
             <div>
               <span>Avisos de chuva e tempestade</span>
               <strong>{activeAlertLabel(activeRainAlerts.length)}</strong>
-              <p>{activeRainAlerts[0]?.headline || activeRainAlerts[0]?.event || "Nenhum aviso relacionado à chuva está listado nesta atualização."}</p>
+              <p>{activeRainAlerts[0]?.headline || activeRainAlerts[0]?.event || "Nenhum aviso ativo relacionado à chuva."}</p>
             </div>
           </article>
           <article>
             <Info aria-hidden="true" />
             <div>
-              <span>Previsão oficial do INMET</span>
+              <span>Previsão do INMET</span>
               <strong>{officialPeriodLabel(officialPeriods.length)}</strong>
-              <p>{officialPeriods[0]?.summary || "A previsão principal do portal continua disponível e identificada pela fonte utilizada."}</p>
+              <p>{officialPeriods[0]?.summary || "A previsão por horário e por dia continua disponível acima."}</p>
             </div>
           </article>
         </div>
@@ -392,8 +392,8 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
       <aside className="rain-v2-source-note" aria-label="Origem e atualização da previsão de chuva">
         <Info aria-hidden="true" />
         <p>
-          Previsão atualizada em {formatFetchedAt(weather.source.fetchedAt)}. Chance e volume são
-          estimativas para períodos futuros, não chuva já medida. A fonte principal é {weather.quality.forecastProvider ?? "o modelo meteorológico disponível"}.
+          Atualizado em {formatFetchedAt(weather.source.fetchedAt)}. Chance e volume são previsões, não
+          chuva já medida. Previsão principal: {weather.quality.forecastProvider ?? "modelo meteorológico disponível"}.
         </p>
       </aside>
     </div>
