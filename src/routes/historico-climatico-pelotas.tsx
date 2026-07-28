@@ -12,72 +12,72 @@ import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured
 import { getPelotasWeatherHistory } from "@/lib/weather/history.functions";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
-const PAGE_TITLE = "Histórico meteorológico recente de Pelotas";
+const PAGE_TITLE = "Histórico de 30 dias em Pelotas";
 const PAGE_DESCRIPTION =
-  "Compare temperaturas máximas e mínimas, chuva, rajadas, amplitude térmica e completude dos últimos 30 dias completos em Pelotas.";
+  "Compare temperaturas máximas e mínimas, chuva, rajadas e variações dos últimos 30 dias completos em Pelotas.";
 const PAGE_PATH = "/historico-climatico-pelotas";
 
 const HISTORY_PAGE_CONTENT = {
   ...HISTORY_EDITORIAL_CONTENT,
-  eyebrow: "Entenda o recorte recente",
-  title: "Como interpretar os últimos 30 dias em Pelotas",
+  eyebrow: "Como interpretar o período",
+  title: "O que os últimos 30 dias mostram sobre o tempo em Pelotas",
   answer:
-    "A página reúne dias completos recentes e permite comparar temperatura, chuva e rajadas. Os resultados valem somente para o período indicado e para o ponto de grade da fonte; não representam normais climatológicas nem recordes históricos oficiais do município.",
+    "A página reúne dias completos recentes para comparar temperatura, chuva e rajadas. Os resultados valem somente para o período indicado e para o local de referência usado pela fonte. Eles não representam o clima normal nem recordes históricos oficiais do município.",
   facts: [
-    "A média das máximas e a média das mínimas são calculadas apenas com os dias válidos da série.",
-    "Chuva no período é a soma dos acumulados diários informados pela fonte.",
-    "Dias com chuva consideram acumulado diário de pelo menos 1 mm; dias sem chuva informada usam acumulado abaixo de 0,1 mm.",
-    "Amplitude térmica diária é a diferença entre a máxima e a mínima do mesmo dia.",
-    "Campos ausentes permanecem indisponíveis e não são preenchidos com zero ou números demonstrativos.",
-    "O recorte de 30 dias não permite concluir sozinho que o período foi normal, quente, frio, seco ou chuvoso em relação ao clima de Pelotas.",
+    "A média das máximas e a média das mínimas usam apenas os dias que possuem esses valores.",
+    "A chuva no período é a soma dos acumulados diários informados.",
+    "Dias com chuva consideram pelo menos 1 mm; dias sem chuva informada usam acumulado abaixo de 0,1 mm.",
+    "A variação diária de temperatura é a diferença entre a máxima e a mínima do mesmo dia.",
+    "Informações ausentes continuam indisponíveis e não são substituídas por zero ou números demonstrativos.",
+    "Trinta dias não permitem concluir sozinhos se o período foi normal, quente, frio, seco ou chuvoso em relação ao clima de Pelotas.",
   ],
   faqs: [
     {
-      question: "Os dados representam observações da Estação Embrapa?",
+      question: "Os dados representam medições da Estação Embrapa?",
       answer:
-        "Não necessariamente. A página identifica a fonte histórica usada e trabalha com um ponto de grade para Pelotas. Medições da Estação Embrapa são apresentadas separadamente na página da estação.",
+        "Não necessariamente. A página identifica a origem dos dados históricos e usa um local de referência para Pelotas. As medições da Estação Embrapa aparecem separadamente na página da estação.",
     },
     {
       question: "O dia mais quente é um recorde histórico de Pelotas?",
       answer:
-        "Não. Ele é apenas o maior valor encontrado nos dias consultados e no conjunto de dados utilizado.",
+        "Não. Ele é apenas o maior valor encontrado entre os dias consultados e nas informações usadas por esta página.",
     },
     {
-      question: "Como é calculada a amplitude térmica?",
+      question: "Como é calculada a variação diária de temperatura?",
       answer:
-        "A amplitude diária é a diferença entre a temperatura máxima e a mínima do mesmo dia. A página também mostra a média dessas diferenças no período.",
+        "Ela é a diferença entre a temperatura máxima e a mínima do mesmo dia. A página também mostra a média dessas diferenças no período.",
     },
     {
       question: "Por que alguns dias não têm chuva ou rajada informada?",
       answer:
-        "A fonte pode não publicar determinada variável em todos os dias ou uma contingência pode fornecer apenas parte da série. O portal mantém esses campos como indisponíveis.",
+        "A origem dos dados pode não publicar determinada informação em todos os dias. Quando isso ocorre, a página mantém o campo como indisponível em vez de completar com um valor estimado.",
     },
     {
       question: "Trinta dias são suficientes para definir o clima de Pelotas?",
       answer:
-        "Não. Climatologia exige séries longas, períodos padronizados e controle de qualidade. Esta página serve para acompanhar o comportamento recente.",
+        "Não. O estudo do clima exige muitos anos de observações, períodos padronizados e controle de qualidade. Esta página mostra apenas o comportamento recente.",
     },
   ],
   relatedLinks: [
     {
       label: "Clima de Pelotas",
       href: "/clima-em-pelotas" as const,
-      description: "Entenda estações do ano, fatores locais e a diferença entre tempo e clima.",
+      description: "Entenda as estações do ano e por que o tempo varia na cidade.",
     },
     {
       label: "Estação Embrapa",
       href: "/estacao-embrapa-pelotas" as const,
-      description: "Consulte medições locais recentes e a procedência da observação.",
+      description: "Consulte temperatura, umidade, vento e chuva medidos em Pelotas.",
     },
     {
       label: "Previsão de 7 dias",
       href: "/previsao-7-dias-pelotas" as const,
-      description: "Compare o histórico recente com a tendência dos próximos dias.",
+      description: "Compare os últimos dias com a previsão para a próxima semana.",
     },
     {
-      label: "Fontes e metodologia",
+      label: "Como os dados funcionam",
       href: "/metodologia" as const,
-      description: "Veja como cada fonte é usada, atualizada e limitada no portal.",
+      description: "Veja de onde vêm os dados, quando atualizam e quais são seus limites.",
     },
   ],
 };
@@ -91,7 +91,7 @@ export const Route = createFileRoute("/historico-climatico-pelotas")({
         path: PAGE_PATH,
         breadcrumbs: [
           { name: "Início", path: "/" },
-          { name: "Histórico meteorológico recente", path: PAGE_PATH },
+          { name: "Histórico de 30 dias", path: PAGE_PATH },
         ],
         about: [
           "Histórico meteorológico de Pelotas",
@@ -99,7 +99,7 @@ export const Route = createFileRoute("/historico-climatico-pelotas")({
           "Chuva acumulada nos últimos 30 dias",
           "Rajadas de vento recentes",
           "Amplitude térmica diária",
-          "Completude dos dados meteorológicos",
+          "Disponibilidade dos dados meteorológicos",
           "Diferença entre histórico recente e climatologia",
         ],
       }),
