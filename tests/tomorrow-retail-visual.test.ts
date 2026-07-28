@@ -56,7 +56,7 @@ test("retail photography is shared without breaking the today export", () => {
 test("tomorrow content answers planning questions in direct language", () => {
   assert.match(page, /weather\.daily\[1\]/);
   assert.match(page, /InternalPageChapters/);
-  assert.match(page, /Previsão de amanhã/);
+  assert.match(page, /Amanhã em resumo/);
   assert.match(page, /Compare com hoje/);
   assert.match(page, /Como o tempo de amanhã deve mudar em relação a hoje/);
   assert.match(page, /Como se preparar para o tempo de amanhã/);
@@ -65,9 +65,13 @@ test("tomorrow content answers planning questions in direct language", () => {
   assert.match(page, /Dúvidas sobre o tempo de amanhã em Pelotas/);
   assert.match(page, /dayWeatherSummary/);
   assert.match(page, /formatPercentDelta/);
+  assert.match(page, /Confira antes de sair/);
+  assert.match(page, /Outras previsões disponíveis/);
   assert.doesNotMatch(page, /p\.p\./);
   assert.doesNotMatch(page, /Transforme a previsão em decisões simples/);
   assert.doesNotMatch(page, /novas rodadas/);
+  assert.doesNotMatch(page, /contexto complementar/);
+  assert.doesNotMatch(page, /não publicaram contexto/);
 });
 
 test("tomorrow content remains comparative and source-aware", () => {
