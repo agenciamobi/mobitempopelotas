@@ -9,9 +9,9 @@ import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
-const PAGE_TITLE = "Tempo hoje em Pelotas";
+const PAGE_TITLE = "Tempo hoje em Pelotas: previsão por hora";
 const PAGE_DESCRIPTION =
-  "Tempo hoje em Pelotas com condições atuais, previsão por hora, ponto de orvalho, nuvens, visibilidade, chuva, vento, radar e alertas oficiais.";
+  "Veja o tempo hoje em Pelotas com temperatura agora, sensação térmica, previsão por hora, chance de chuva, vento, radar e avisos oficiais do INMET.";
 const PAGE_PATH = "/tempo-hoje-pelotas";
 
 const TODAY_PAGE_CONTENT = {
