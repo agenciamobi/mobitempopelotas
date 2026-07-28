@@ -19,10 +19,10 @@ function formatDateTime(value: string | null) {
 }
 
 function trendLabel(value: number | null) {
-  if (value === null) return "Tendência indisponível";
+  if (value === null) return "Tendência não informada";
   if (value > 0.25) return `Subindo ${value.toFixed(1).replace(".", ",")} cm/h`;
   if (value < -0.25) return `Baixando ${Math.abs(value).toFixed(1).replace(".", ",")} cm/h`;
-  return "Nível estável";
+  return "Pouca mudança recente";
 }
 
 function changeLabel(value: number | null) {
@@ -41,10 +41,10 @@ export function HydrologyEditorialHero({
   const overview = variant === "overview";
   const statusLabel =
     level.status === "live"
-      ? "Telemetria atualizada"
+      ? "Leitura atualizada"
       : level.status === "stale"
         ? "Última leitura conhecida"
-        : "Telemetria indisponível";
+        : "Leitura indisponível";
 
   return (
     <header className={`hydrology-editorial-hero hydrology-editorial-hero-${variant}`}>
@@ -53,7 +53,7 @@ export function HydrologyEditorialHero({
           <ArrowLeft aria-hidden="true" /> {overview ? "Visão geral" : "Situação das águas"}
         </Link>
         <span className="hydrology-editorial-eyebrow">
-          {overview ? "Águas e segurança em Pelotas" : "Monitoramento local · Estação Laranjal"}
+          {overview ? "Águas e segurança em Pelotas" : "Medição local · Estação Laranjal"}
         </span>
         <h1>
           {overview
@@ -62,24 +62,24 @@ export function HydrologyEditorialHero({
         </h1>
         <p>
           {overview
-            ? "Comece pela leitura local da Estação Laranjal, observe a tendência recente e compare o contexto com as redes regionais e oficiais."
-            : "Leitura técnica da telemetria pública do LabHidroSens/UFPel, com evolução recente e contexto meteorológico para interpretar a variação local."}
+            ? "Comece pela leitura local da Estação Laranjal, observe a mudança recente e compare com outros pontos da Lagoa e do Guaíba."
+            : "Acompanhe a medição pública do LabHidroSens/UFPel, a evolução das últimas 24 horas e as informações de chuva e vento para Pelotas."}
         </p>
 
         <div className="hydrology-editorial-points" aria-label="Informações principais">
-          <span>Leitura local com horário e procedência</span>
-          <span>Tendência apresentada sem classificar risco</span>
+          <span>Leitura local com horário e origem</span>
+          <span>Mudança recente sem classificação automática de risco</span>
         </div>
 
         <div className="hydrology-editorial-actions">
           <a href="#hydrology-level-title">
-            Ver leitura e histórico <ArrowRight aria-hidden="true" />
+            Ver nível e histórico <ArrowRight aria-hidden="true" />
           </a>
           {overview ? (
             <Link to="/nivel-da-lagoa-dos-patos-laranjal">Abrir página da estação</Link>
           ) : (
             <a href={level.source.url} target="_blank" rel="noopener noreferrer">
-              Conferir fonte original <ExternalLink aria-hidden="true" />
+              Abrir página da estação <ExternalLink aria-hidden="true" />
             </a>
           )}
         </div>
@@ -109,7 +109,7 @@ export function HydrologyEditorialHero({
 
           <div className="hydrology-editorial-trend">
             <Activity aria-hidden="true" />
-            <div><span>Tendência</span><strong>{trendLabel(level.trendCmPerHour)}</strong></div>
+            <div><span>Mudança recente</span><strong>{trendLabel(level.trendCmPerHour)}</strong></div>
           </div>
 
           <dl>
@@ -126,7 +126,7 @@ export function HydrologyEditorialHero({
 
         <div className="hydrology-editorial-caption">
           <Gauge aria-hidden="true" />
-          <span>Referência técnica do sensor · não representa cota oficial de inundação</span>
+          <span>Referência própria da estação · não é cota oficial de inundação</span>
         </div>
       </div>
     </header>
