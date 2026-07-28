@@ -5,6 +5,7 @@ import {
   EmbrapaStationHero,
   EmbrapaStationPageV2,
 } from "@/components/embrapa/EmbrapaStationPageV2";
+import "@/components/embrapa/EmbrapaStationPageV2Refinement.css";
 import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
 import { EMBRAPA_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
