@@ -9,49 +9,49 @@ import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
-const PAGE_TITLE = "Meteograma de Pelotas";
+const PAGE_TITLE = "Previsão hora a hora em Pelotas";
 const PAGE_DESCRIPTION =
-  "Meteograma de Pelotas com temperatura, ponto de orvalho, chuva por hora, nuvens, visibilidade, pressão, vento, rajadas e CAPE nas próximas 24 ou 48 horas.";
+  "Acompanhe temperatura, chuva, nuvens, visibilidade, pressão, vento, rajadas e possibilidade de tempestade nas próximas 24 ou 48 horas em Pelotas.";
 const PAGE_PATH = "/meteograma-pelotas";
 
 const METEOGRAM_CONTENT = {
-  eyebrow: "Entenda o meteograma",
-  title: "Como interpretar a evolução da atmosfera hora a hora",
+  eyebrow: "Como ler a previsão hora a hora",
+  title: "Veja como o tempo pode mudar ao longo das próximas horas",
   answer:
-    "O meteograma reúne variáveis previstas para os mesmos horários, permitindo observar como temperatura, umidade, chuva, nuvens, visibilidade, pressão e vento evoluem em conjunto. Os gráficos representam uma previsão de modelo e não medições contínuas realizadas em todos os bairros de Pelotas.",
+    "A página coloca as principais informações previstas nos mesmos horários. Assim, você consegue comparar temperatura, chuva, nuvens, visibilidade, pressão e vento sem precisar abrir várias telas. Os valores vêm de modelos de previsão e não representam medições feitas continuamente em todos os bairros.",
   facts: [
-    "Temperatura e ponto de orvalho próximos indicam ar perto da saturação, mas neblina também depende de vento, nuvens baixas e visibilidade.",
-    "Chance de chuva informa possibilidade; volume em milímetros estima quanto pode precipitar no intervalo. Os dois valores não são equivalentes.",
-    "Nuvens baixas, médias e altas usam percentuais independentes e não devem ser somadas como se fossem partes de um único total.",
-    "Velocidade do vento é uma média prevista para o período; rajada representa um pico breve e normalmente mais forte.",
-    "CAPE indica energia disponível para convecção. Um valor elevado isoladamente não confirma temporal e deve ser comparado com radar, nuvens, chuva, vento e avisos oficiais.",
-    "Previsões de 48 horas podem mudar entre atualizações. Para decisões imediatas, confirme o horário mais próximo, a observação local e os avisos vigentes.",
+    "Quando temperatura e ponto de orvalho ficam próximos, o ar está mais úmido. Isso pode favorecer neblina, mas vento, nuvens baixas e visibilidade também precisam ser considerados.",
+    "A chance de chuva responde à possibilidade de chover; o volume em milímetros estima quanto pode cair durante aquele intervalo.",
+    "Nuvens baixas, médias e altas são mostradas separadamente. Os percentuais não devem ser somados.",
+    "A velocidade do vento representa o valor médio previsto; a rajada é um aumento breve e normalmente mais forte.",
+    "O índice CAPE ajuda a avaliar a possibilidade de desenvolvimento de nuvens de tempestade. Um valor alto, sozinho, não confirma temporal.",
+    "A previsão de 48 horas pode mudar conforme entram novas observações. Para decisões imediatas, confira os horários mais próximos e os avisos oficiais.",
   ],
   faqs: [
     {
-      question: "O meteograma mostra dados medidos ou previstos?",
+      question: "Os gráficos mostram medições ou previsão?",
       answer:
-        "Os gráficos horários são previsões do modelo identificado na página. A observação atual da Embrapa é mantida separada e descreve apenas o ponto e o horário medidos pela estação.",
+        "Eles mostram previsões para cada horário. As medições da Estação Embrapa aparecem em uma página separada e descrevem somente o local e o horário observados.",
     },
     {
       question: "Qual é a diferença entre chance e volume de chuva?",
       answer:
-        "A chance indica a probabilidade de ocorrer precipitação no intervalo. O volume em milímetros estima quanto pode acumular durante aquela hora. Chance alta pode ocorrer com pouco volume, e volume relevante pode aparecer em uma janela curta.",
+        "A chance mostra a possibilidade de chover. O volume em milímetros estima quanto pode cair naquele intervalo. Uma chance alta pode vir acompanhada de pouco volume.",
     },
     {
-      question: "Ponto de orvalho próximo da temperatura confirma neblina?",
+      question: "Temperatura próxima do ponto de orvalho confirma neblina?",
       answer:
-        "Não. A proximidade indica ar úmido perto da saturação. Neblina depende também de vento, resfriamento, nuvens baixas, visibilidade e condições locais que podem variar entre bairros, áreas rurais e a orla.",
+        "Não. Essa proximidade indica ar úmido, mas neblina também depende de vento, resfriamento, nuvens baixas, visibilidade e condições locais.",
     },
     {
-      question: "O que significa CAPE no meteograma?",
+      question: "O que é o índice CAPE?",
       answer:
-        "CAPE é uma medida da energia potencial disponível para movimentos convectivos. Valores maiores podem favorecer nuvens de grande desenvolvimento, mas não confirmam tempestade sem outros ingredientes atmosféricos.",
+        "É um indicador da energia disponível para o crescimento de nuvens. Valores maiores podem favorecer tempestades, mas precisam ser avaliados junto com chuva, nuvens, vento, radar e avisos oficiais.",
     },
     {
       question: "Por que a previsão de 48 horas pode mudar?",
       answer:
-        "Modelos são recalculados quando recebem novas observações. Chuva, neblina, rajadas e instabilidade podem apresentar mudanças relevantes conforme o horário se aproxima.",
+        "Os modelos são recalculados quando recebem novas observações. Chuva, neblina, rajadas e tempestades podem mudar de horário ou intensidade conforme o momento se aproxima.",
     },
   ],
   relatedLinks: [
@@ -63,17 +63,17 @@ const METEOGRAM_CONTENT = {
     {
       label: "Chuva em Pelotas",
       href: "/chuva-em-pelotas" as const,
-      description: "Compare chance e volume previstos em uma leitura dedicada.",
+      description: "Compare a chance de chuva e o volume previsto por horário.",
     },
     {
       label: "Radar e satélite",
       href: "/radar-e-satelite-pelotas" as const,
-      description: "Acompanhe imagens observadas, nuvens e atividade elétrica regional.",
+      description: "Acompanhe nuvens, chuva e atividade elétrica observadas na região.",
     },
     {
       label: "Avisos oficiais",
       href: "/alertas" as const,
-      description: "Consulte severidade, validade e orientações dos avisos do INMET.",
+      description: "Consulte a validade e as orientações dos avisos do INMET.",
     },
   ],
 };
@@ -87,7 +87,7 @@ export const Route = createFileRoute("/meteograma-pelotas")({
         path: PAGE_PATH,
         breadcrumbs: [
           { name: "Início", path: "/" },
-          { name: "Meteograma de Pelotas", path: PAGE_PATH },
+          { name: "Previsão hora a hora em Pelotas", path: PAGE_PATH },
         ],
         about: [
           "Meteograma de Pelotas",
@@ -97,7 +97,7 @@ export const Route = createFileRoute("/meteograma-pelotas")({
           "Visibilidade prevista em Pelotas",
           "Pressão atmosférica",
           "Vento e rajadas por hora",
-          "CAPE e instabilidade convectiva",
+          "CAPE e possibilidade de tempestade",
           "Open-Meteo Best Match",
         ],
       }),
