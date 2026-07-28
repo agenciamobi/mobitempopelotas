@@ -19,6 +19,7 @@ test("weather history route uses the shared shell and real history data", () => 
   assert.match(route, /WeatherHistoryPage/);
   assert.match(route, /showOfficialAlerts=\{false\}/);
   assert.match(route, /createFaqPageJsonLd\(PAGE_PATH, HISTORY_PAGE_CONTENT\.faqs\)/);
+  assert.match(route, /Histórico de 30 dias em Pelotas/);
 });
 
 test("recent profile distinguishes rain, dry days and missing fields", () => {
@@ -27,20 +28,22 @@ test("recent profile distinguishes rain, dry days and missing fields", () => {
   assert.match(page, /dryDays: precipitationDays\.filter\(\(day\) => \(day\.precipitation \?\? 0\) < 0\.1\)\.length/);
   assert.match(page, /windDaysKnown: windDays\.length/);
   assert.match(page, /precipitationDaysKnown: precipitationDays\.length/);
-  assert.match(page, /Campos ausentes não são[\s\S]*preenchidos com zero/);
+  assert.match(page, /Informações ausentes não são[\s\S]*substituídas por zero/);
   assert.doesNotMatch(page, /day\.precipitation === null[^\n]{0,80}dryDays/);
 });
 
-test("weather history exposes amplitude and data coverage", () => {
+test("weather history exposes temperature variation and days with information", () => {
   assert.match(page, /day\.temperatureMax - day\.temperatureMin/);
   assert.match(page, /averageAmplitude/);
   assert.match(page, /temperatureSpan/);
-  assert.match(page, /Amplitude média diária/);
-  assert.match(page, /Faixa térmica total/);
-  assert.match(page, /Completude das variáveis do histórico/);
-  assert.match(page, /Precipitação/);
+  assert.match(page, /Variação média diária/);
+  assert.match(page, /Faixa de temperaturas/);
+  assert.match(page, /Dias com cada informação disponível/);
+  assert.match(page, /Chuva/);
   assert.match(page, /Rajadas/);
-  assert.match(page, /Amplitude/);
+  assert.match(page, /Variação/);
+  assert.doesNotMatch(page, /Completude das variáveis/i);
+  assert.doesNotMatch(page, /Faixa térmica total/i);
 });
 
 test("chart defaults to the full 30-day period and preserves interactive filters", () => {
@@ -55,23 +58,28 @@ test("chart defaults to the full 30-day period and preserves interactive filters
   assert.match(chart, /Os pontos sem informação permanecem vazios/);
 });
 
-test("history copy limits all extremes to the consulted period", () => {
-  assert.match(page, /extremos apenas dos dias consultados/);
-  assert.match(page, /Não são[\s\S]*recordes históricos oficiais de Pelotas/);
-  assert.match(page, /Histórico recente não é normal climatológica/);
-  assert.match(page, /não deve ser usado isoladamente para afirmar/);
-  assert.match(route, /não representam normais climatológicas nem recordes históricos oficiais/);
+test("history copy limits all extremes to the displayed period", () => {
+  assert.match(page, /maiores ou menores valores apenas entre os dias consultados/);
+  assert.match(page, /Não são recordes[\s\S]*históricos oficiais de Pelotas/);
+  assert.match(page, /Trinta dias não representam o clima normal/);
+  assert.match(page, /não deve ser usado sozinho para afirmar/);
+  assert.match(route, /não representam o clima normal nem recordes históricos oficiais/);
   assert.match(route, /Trinta dias são suficientes para definir o clima de Pelotas/);
   assert.doesNotMatch(historySource, /recorde histórico de Pelotas é/i);
+  assert.doesNotMatch(historySource, /ponto de grade/i);
+  assert.doesNotMatch(historySource, /uma contingência pode fornecer/i);
 });
 
-test("history table remains an accessible audit trail", () => {
+test("history table remains an accessible daily reference", () => {
   assert.match(page, /<caption>Temperatura, chuva e rajadas/);
   assert.match(page, /<th scope="col">Data<\/th>/);
+  assert.match(page, /<th scope="col">Variação<\/th>/);
   assert.match(page, /<th scope="row">/);
-  assert.match(page, /Ordem da data mais recente para a mais antiga/);
+  assert.match(page, /Da data mais recente para a mais antiga/);
   assert.match(page, /\[\.\.\.history\.days\]\.reverse\(\)/);
   assert.match(page, /não informado/);
+  assert.match(page, /Abrir dados originais/);
+  assert.match(page, /Como os dados funcionam/);
 });
 
 test("history refinement follows the current retail layout and accessibility rules", () => {
