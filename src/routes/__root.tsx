@@ -25,215 +25,6 @@ import {
 import productionCss from "@/production/production-styles.css?url";
 import appCss from "../styles.css?url";
 
-const ONESIGNAL_SDK_URL = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
-const ONESIGNAL_BOOTSTRAP_SCRIPT = `
-window.OneSignalDeferred = window.OneSignalDeferred || [];
-window.OneSignalDeferred.push(async function(OneSignal) {
-  await OneSignal.init({
-    appId: "94e94002-7b9e-4b02-8661-62ad9080e3d3",
-    safari_web_id: "web.onesignal.auto.66c89079-ab76-4c24-84be-2fca07f56f6c",
-    serviceWorkerPath: "push/onesignal/OneSignalSDKWorker.js",
-    serviceWorkerParam: { scope: "/push/onesignal/" },
-    allowLocalhostAsSecureOrigin:
-      window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1",
-    notifyButton: {
-      enable: true,
-      position: "bottom-left",
-      size: "medium",
-      offset: { bottom: "18px", left: "18px" },
-    },
-  });
-});
-
-(function loadOneSignalOutsideCriticalRendering() {
-  var loaded = false;
-
-  function loadSdk() {
-    if (loaded || document.querySelector('script[data-tempo-pelotas-onesignal]')) return;
-    loaded = true;
-
-    var script = document.createElement("script");
-    script.src = ${JSON.stringify(ONESIGNAL_SDK_URL)};
-    script.async = true;
-    script.dataset.tempoPelotasOnesignal = "true";
-    document.head.appendChild(script);
-  }
-
-  function scheduleLoad() {
-    if ("requestIdleCallback" in window) {
-      window.requestIdleCallback(loadSdk, { timeout: 3500 });
-      return;
-    }
-
-    window.setTimeout(loadSdk, 1200);
-  }
-
-  if (document.readyState === "complete") scheduleLoad();
-  else window.addEventListener("load", scheduleLoad, { once: true });
-})();
-`;
-
-const ACTIVE_MODAL_SELECTOR = [
-  ".pwa-dialog-backdrop",
-  ".push-dialog-backdrop",
-  '[role="dialog"][aria-modal="true"]',
-  '[data-radix-dialog-content][data-state="open"]',
-  '[data-vaul-drawer][data-state="open"]',
-].join(",");
-
-const PAGE_WHEEL_EXCLUSION_SELECTOR = [
-  'input[type="range"]',
-  "textarea",
-  "select",
-  '[contenteditable="true"]',
-  ".pwa-dialog",
-  ".push-dialog",
-  '[data-radix-scroll-area-viewport]',
-].join(",");
-
-function isElementVisible(element: HTMLElement) {
-  if (element.hidden || element.getAttribute("aria-hidden") === "true") return false;
-
-  const style = window.getComputedStyle(element);
-  return (
-    style.display !== "none" &&
-    style.visibility !== "hidden" &&
-    style.pointerEvents !== "none" &&
-    element.getClientRects().length > 0
-  );
-}
-
-function hasActiveModal() {
-  return Array.from(document.querySelectorAll<HTMLElement>(ACTIVE_MODAL_SELECTOR)).some(
-    isElementVisible,
-  );
-}
-
-function removeStaleOverflowLock(element: HTMLElement) {
-  const overflow = element.style.getPropertyValue("overflow").trim();
-  const overflowY = element.style.getPropertyValue("overflow-y").trim();
-
-  if (overflow === "hidden" || overflow === "clip") {
-    element.style.removeProperty("overflow");
-  }
-
-  if (overflowY === "hidden" || overflowY === "clip") {
-    element.style.removeProperty("overflow-y");
-  }
-}
-
-function restoreDocumentScrollIfUnlocked() {
-  if (hasActiveModal()) return;
-
-  removeStaleOverflowLock(document.documentElement);
-  removeStaleOverflowLock(document.body);
-}
-
-function normalizedWheelDelta(event: WheelEvent) {
-  if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) return event.deltaY * 16;
-  if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) return event.deltaY * window.innerHeight * 0.9;
-  return event.deltaY;
-}
-
-function canDocumentScroll(deltaY: number) {
-  const scrollingElement = document.scrollingElement ?? document.documentElement;
-  const maximum = scrollingElement.scrollHeight - scrollingElement.clientHeight;
-
-  if (deltaY > 0) return scrollingElement.scrollTop < maximum - 1;
-  if (deltaY < 0) return scrollingElement.scrollTop > 1;
-  return false;
-}
-
-function hasScrollableAncestor(target: Element, deltaY: number) {
-  let element: HTMLElement | null = target instanceof HTMLElement ? target : target.parentElement;
-
-  while (element && element !== document.body && element !== document.documentElement) {
-    const style = window.getComputedStyle(element);
-    const scrollable = /auto|scroll|overlay/.test(style.overflowY);
-
-    if (scrollable && element.scrollHeight > element.clientHeight + 1) {
-      const maximum = element.scrollHeight - element.clientHeight;
-      if ((deltaY > 0 && element.scrollTop < maximum - 1) || (deltaY < 0 && element.scrollTop > 1)) {
-        return true;
-      }
-    }
-
-    element = element.parentElement;
-  }
-
-  return false;
-}
-
-function releaseBlockedDocumentWheel(event: WheelEvent) {
-  if (event.ctrlKey || event.metaKey || hasActiveModal()) return;
-
-  const target = event.target instanceof Element ? event.target : null;
-  if (!target || target.closest(PAGE_WHEEL_EXCLUSION_SELECTOR)) return;
-
-  const deltaY = normalizedWheelDelta(event);
-  if (!deltaY || Math.abs(deltaY) <= Math.abs(event.deltaX)) return;
-
-  const isInsideMap = Boolean(target.closest(".regional-map-engine, .maplibregl-map"));
-  if (isInsideMap) {
-    // O mapa possui listener próprio de wheel. Interromper somente a propagação
-    // mantém o comportamento padrão do navegador, que é rolar o documento.
-    event.stopImmediatePropagation();
-  }
-
-  if (hasScrollableAncestor(target, deltaY)) return;
-
-  const before = window.scrollY;
-  window.requestAnimationFrame(() => {
-    if (Math.abs(window.scrollY - before) > 1 || !canDocumentScroll(deltaY)) return;
-    window.scrollBy({ top: deltaY, left: 0, behavior: "auto" });
-  });
-}
-
-function DocumentScrollGuard() {
-  useEffect(() => {
-    let frame = 0;
-
-    const scheduleRestore = () => {
-      window.cancelAnimationFrame(frame);
-      frame = window.requestAnimationFrame(restoreDocumentScrollIfUnlocked);
-    };
-
-    restoreDocumentScrollIfUnlocked();
-
-    const observer = new MutationObserver(scheduleRestore);
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["style", "data-state", "aria-hidden"],
-    });
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["style"],
-    });
-
-    window.addEventListener("wheel", releaseBlockedDocumentWheel, {
-      capture: true,
-      passive: true,
-    });
-    window.addEventListener("pageshow", scheduleRestore);
-    window.addEventListener("focus", scheduleRestore);
-    document.addEventListener("visibilitychange", scheduleRestore);
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-      observer.disconnect();
-      window.removeEventListener("wheel", releaseBlockedDocumentWheel, true);
-      window.removeEventListener("pageshow", scheduleRestore);
-      window.removeEventListener("focus", scheduleRestore);
-      document.removeEventListener("visibilitychange", scheduleRestore);
-      restoreDocumentScrollIfUnlocked();
-    };
-  }, []);
-
-  return null;
-}
-
 function NotFoundComponent() {
   return (
     <SiteLayout forceShell>
@@ -312,9 +103,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: mapLibreCss },
       { rel: "stylesheet", href: productionCss },
       { rel: "manifest", href: "/manifest.webmanifest" },
-      { rel: "icon", href: "/brand/tempo-pelotas-icon.png", type: "image/png", sizes: "192x192" },
+      {
+        rel: "icon",
+        href: "/brand/tempo-pelotas-icon.png",
+        type: "image/png",
+        sizes: "192x192",
+      },
       { rel: "icon", href: "/brand/tempo-pelotas-icon.svg", type: "image/svg+xml" },
-      { rel: "apple-touch-icon", href: "/brand/tempo-pelotas-icon.png", sizes: "192x192" },
+      {
+        rel: "apple-touch-icon",
+        href: "/brand/tempo-pelotas-icon.png",
+        sizes: "192x192",
+      },
       {
         rel: "alternate",
         type: "application/feed+json",
@@ -340,7 +140,6 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="pt-BR">
       <head>
         <HeadContent />
-        <script dangerouslySetInnerHTML={{ __html: ONESIGNAL_BOOTSTRAP_SCRIPT }} />
       </head>
       <body>
         {children}
@@ -355,7 +154,6 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <DocumentScrollGuard />
       <SiteLayout>
         <Outlet />
       </SiteLayout>
