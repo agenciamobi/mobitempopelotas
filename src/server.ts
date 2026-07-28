@@ -8,9 +8,10 @@ type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
 
-const LARANJAL_EMBED_PATH = "/embed/nivel-laranjal";
+const EMBED_PATHS = new Set(["/embed/nivel-laranjal", "/embed/status-tempo-agora"]);
 const EMBED_CACHE_CONTROL = "public, max-age=60, s-maxage=60, stale-while-revalidate=300";
 const EMBED_CDN_CACHE_CONTROL = "max-age=60, stale-while-revalidate=300";
+const EMBED_ROBOTS_POLICY = "noindex, nofollow, noarchive, nosnippet, noimageindex";
 
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
@@ -61,7 +62,7 @@ function withFrameAncestors(policy: string | null, value: string) {
 
 function applyRouteResponseHeaders(request: Request, response: Response) {
   const pathname = new URL(request.url).pathname;
-  if (pathname !== LARANJAL_EMBED_PATH) return response;
+  if (!EMBED_PATHS.has(pathname)) return response;
 
   const headers = new Headers(response.headers);
   headers.delete("X-Frame-Options");
@@ -72,7 +73,7 @@ function applyRouteResponseHeaders(request: Request, response: Response) {
   headers.set("Cross-Origin-Resource-Policy", "cross-origin");
   headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  headers.set("X-Robots-Tag", "noindex, nofollow");
+  headers.set("X-Robots-Tag", EMBED_ROBOTS_POLICY);
   headers.set("Content-Language", "pt-BR");
 
   if (response.ok) {
