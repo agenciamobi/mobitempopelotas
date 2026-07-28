@@ -35,6 +35,7 @@ const standaloneRoutes = new Set([
   "/minha-conta",
   "/privacidade-e-dados",
   "/embed/nivel-laranjal",
+  "/embed/status-tempo-agora",
 ]);
 
 function pageAnnouncement() {
