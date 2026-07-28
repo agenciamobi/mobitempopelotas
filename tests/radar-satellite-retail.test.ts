@@ -12,45 +12,47 @@ const refinementStyles = readFileSync(
   "utf8",
 );
 const styles = `${baseStyles}\n${refinementStyles}\n${contextStyles}`;
+const visibleCopy = `${route}\n${page}\n${context}`;
 
 const remValues = [...styles.matchAll(/font-size:\s*(0\.\d+)rem/g)].map((match) =>
   Number(match[1]),
 );
 
 test("radar route uses direct SEO copy and page-specific editorial content", () => {
-  assert.match(route, /Radar meteorológico e satélite em Pelotas/);
-  assert.match(route, /sequência animada, horário de cada quadro, comparação com a previsão/);
+  assert.match(route, /Radar e satélite em Pelotas/);
+  assert.match(route, /horário, sequência de imagens e comparação com a previsão por hora/);
   assert.match(route, /RADAR_PAGE_CONTENT/);
-  assert.match(route, /Como usar radar, satélite e trovoadas para acompanhar o tempo em Pelotas/);
-  assert.match(route, /Como usar a reprodução automática dos quadros/);
-  assert.match(route, /movimento nas imagens é observação do passado recente, não previsão do futuro/);
-  assert.match(route, /Por que duas fontes podem mostrar horários diferentes/);
+  assert.match(route, /Acompanhe chuva, nuvens e trovoadas na região de Pelotas/);
+  assert.match(route, /Como usar a reprodução automática das imagens/);
+  assert.match(route, /imagens mostram o passado recente/);
+  assert.match(route, /Por que as imagens podem mostrar horários diferentes/);
   assert.match(route, /Os valores ao lado do radar foram medidos pela imagem/);
   assert.match(route, /createFaqPageJsonLd\(PAGE_PATH, RADAR_PAGE_CONTENT\.faqs\)/);
   assert.match(route, /className="radar-satellite-page"/);
   assert.match(route, /Sequência de imagens de radar/);
 });
 
-test("radar page provides source freshness and actionable observation guidance", () => {
+test("radar page provides image times and actionable guidance", () => {
   assert.match(page, /InternalPageChapters/);
-  assert.match(page, /Radar meteorológico e satélite em Pelotas/);
-  assert.match(page, /acompanhe chuva, nuvens e trovoadas/);
+  assert.match(page, /Radar e satélite em Pelotas/);
+  assert.match(page, /veja áreas de chuva, nuvens e trovoadas/);
   assert.match(page, /latestObservedAt/);
   assert.match(page, /getFreshness/);
   assert.match(page, /FreshnessBadge/);
   assert.match(page, /SourceSummaryCard/);
-  assert.match(page, /Horário e sequência de cada fonte/);
+  assert.match(page, /Horário e quantidade de imagens/);
   assert.match(page, /Radar regional/);
   assert.match(page, /Satélite REDEMET/);
   assert.match(page, /Satélite INMET/);
-  assert.match(page, /Trovoadas STSC/);
+  assert.match(page, /Trovoadas/);
   assert.match(page, /Confira o horário/);
   assert.match(page, /Reproduza a sequência/);
-  assert.match(page, /Compare produtos diferentes/);
-  assert.match(page, /Confirme risco e orientação/);
-  assert.doesNotMatch(page, /camadas respondendo/);
-  assert.doesNotMatch(page, /Transparência operacional/);
-  assert.doesNotMatch(page, /Fonte respondendo/);
+  assert.match(page, /Compare as imagens/);
+  assert.match(page, /Confira os avisos/);
+  assert.doesNotMatch(visibleCopy, /Integração pendente/i);
+  assert.doesNotMatch(visibleCopy, /Produto:/i);
+  assert.doesNotMatch(visibleCopy, /configuração da integração/i);
+  assert.doesNotMatch(visibleCopy, /grade de previsão/i);
 });
 
 test("image and storm timelines include playback and recovery controls", () => {
@@ -59,42 +61,44 @@ test("image and storm timelines include playback and recovery controls", () => {
   assert.match(page, /window\.setInterval/);
   assert.match(page, /Reproduzir sequência/);
   assert.match(page, /Pausar sequência/);
-  assert.match(page, /Quadro mais recente/);
+  assert.match(page, /Imagem mais recente/);
   assert.match(page, /Abrir imagem/);
   assert.match(page, /aria-pressed=\{playback\.isPlaying\}/);
   assert.match(page, /playback\.showLatest/);
   assert.match(page, /playback\.selectFrame/);
   assert.match(page, /redemet-storm-controls/);
-  assert.match(page, /Observado em \{formatDateTime\(selectedFrame\.observedAt\)\}/);
+  assert.match(page, /Registrada em \{formatDateTime\(selectedFrame\.observedAt\)\}/);
 });
 
 test("radar, satellite and storms remain explicitly distinct", () => {
   assert.match(page, /Radar meteorológico · REDEMET\/DECEA/);
-  assert.match(page, /Ecos associados à precipitação/);
-  assert.match(page, /Cobertura e evolução das nuvens sobre a Região Sul/);
+  assert.match(page, /Áreas de chuva na região de Pelotas/);
+  assert.match(page, /Nuvens sobre a Região Sul/);
   assert.match(page, /Nuvens no satélite não significam necessariamente chuva/);
-  assert.match(page, /Trovoadas detectadas na sequência selecionada/);
-  assert.match(page, /Detecção de trovoada não é aviso meteorológico/);
-  assert.match(page, /A imagem é regional e não confirma precipitação em um endereço específico/);
-  assert.match(page, /Imagem meteorológica ajuda a acompanhar, mas não define o risco sozinha/);
+  assert.match(page, /Trovoadas registradas no horário selecionado/);
+  assert.match(page, /Uma trovoada detectada não é um aviso meteorológico/);
+  assert.match(page, /não confirma chuva em um endereço específico/);
+  assert.match(page, /As imagens ajudam a acompanhar o tempo, mas não definem o risco sozinhas/);
 });
 
-test("latest radar frame is compared with the nearest valid forecast hour", () => {
+test("latest radar image is compared with the nearest forecast hour", () => {
   assert.match(route, /getWeatherIntelligence/);
   assert.match(route, /Promise\.all/);
   assert.match(route, /<RadarForecastContext radar=\{data\.redemet\.radar\} weather=\{data\.weather\}/);
   assert.match(context, /nearestForecastHour/);
   assert.match(context, /hour\.timestamp/);
   assert.match(context, /difference > 3 \* 60 \* 60 \* 1_000/);
-  assert.match(context, /O que a previsão indicava no horário do radar/);
-  assert.match(context, /O radar é uma imagem observada pela REDEMET/);
+  assert.match(context, /O que a previsão mostrava quando esta imagem foi registrada/);
+  assert.match(context, /O radar mostra uma imagem observada pela REDEMET/);
   assert.match(context, /não são medidos pelo radar/);
+  assert.match(context, /Horário da imagem/);
+  assert.match(context, /Horário da previsão/);
   assert.match(context, /Temperatura prevista/);
   assert.match(context, /Chance de chuva/);
   assert.match(context, /Rajada prevista/);
   assert.match(context, /Nuvens baixas/);
   assert.match(context, /Visibilidade prevista/);
-  assert.match(context, /Movimento entre quadros anteriores não representa previsão futura/);
+  assert.match(context, /O movimento entre imagens anteriores não representa o que acontecerá no futuro/);
 });
 
 test("radar retail layout follows the portal rail and keeps controls aligned", () => {
