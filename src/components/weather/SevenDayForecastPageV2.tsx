@@ -23,10 +23,10 @@ import "./SevenDayForecastPageV2.css";
 
 const chapters = [
   { href: "#panorama-da-semana", label: "Resumo da semana", detail: "Destaques dos próximos dias" },
-  { href: "#semana-dia-a-dia", label: "Previsão diária", detail: "Temperatura, chuva e rajadas" },
+  { href: "#semana-dia-a-dia", label: "Dia a dia", detail: "Temperatura, chuva e rajadas" },
   { href: "#tendencia-semanal", label: "Temperaturas", detail: "Mínimas e máximas" },
-  { href: "#riscos-da-semana", label: "Chuva e rajadas", detail: "Dias de maior atenção" },
-  { href: "#contexto-regional-semanal", label: "Fontes oficiais", detail: "INMET e UFPel" },
+  { href: "#riscos-da-semana", label: "Chuva e vento", detail: "Maiores valores previstos" },
+  { href: "#contexto-regional-semanal", label: "INMET e UFPel", detail: "Outras previsões disponíveis" },
 ];
 
 type DayTone = "stable" | "attention" | "high";
@@ -64,9 +64,9 @@ function dayTone(day: DailyForecast): DayTone {
 }
 
 function toneLabel(tone: DayTone) {
-  if (tone === "high") return "Maior atenção";
-  if (tone === "attention") return "Acompanhar";
-  return "Mais estável";
+  if (tone === "high") return "Mais chuva ou vento";
+  if (tone === "attention") return "Vale acompanhar";
+  return "Menores valores";
 }
 
 function formatRainChance(day: DailyForecast) {
@@ -95,13 +95,13 @@ function planningHeadline(days: DailyForecast[]) {
   const maximum = Math.max(...days.map((day) => day.max));
 
   if ((rainiest.rainChance ?? 0) >= 70 || rainiest.precipitationMm >= 15) {
-    return `${rainiest.weekday} tem o maior sinal de chuva da previsão`;
+    return `${rainiest.weekday} tem a maior combinação de chance e volume de chuva`;
   }
   if ((windiest.windGust ?? 0) >= 50) {
     return `${windiest.weekday} tem as rajadas mais fortes previstas`;
   }
   if (maximum - minimum >= 14) return "A temperatura deve variar bastante ao longo da semana";
-  return "A maior parte da semana apresenta condições mais estáveis";
+  return "A maior parte da semana tem menores valores de chuva e rajadas";
 }
 
 function ForecastUnavailable() {
@@ -165,8 +165,8 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
           <span className="eyebrow">Resumo dos próximos 7 dias</span>
           <h2 id="seven-day-v2-overview-title">{planningHeadline(days)}</h2>
           <p>
-            A previsão varia de {minimum}° a {maximum}°. Compare abaixo os dias com menor impacto e
-            aqueles com maior chance de chuva ou rajadas.
+            A temperatura deve variar de {minimum}° a {maximum}°. Compare os dias com menos chuva e
+            rajadas e aqueles que concentram os maiores valores.
           </p>
         </div>
 
@@ -174,7 +174,7 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
           <article className="is-best">
             <CheckCircle2 aria-hidden="true" />
             <div>
-              <span>Dia mais favorável</span>
+              <span>Menor chance de chuva e rajadas</span>
               <strong>{bestDay.weekday}</strong>
               <small>{rainSummary(bestDay)} · {gustSummary(bestDay)}</small>
             </div>
@@ -182,7 +182,7 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
           <article className="is-attention">
             <TriangleAlert aria-hidden="true" />
             <div>
-              <span>Dia que exige mais atenção</span>
+              <span>Mais chuva ou rajadas</span>
               <strong>{attentionDay.weekday}</strong>
               <small>{rainSummary(attentionDay)} · {gustSummary(attentionDay)}</small>
             </div>
@@ -190,9 +190,9 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
           <article>
             <CalendarDays aria-hidden="true" />
             <div>
-              <span>Dias com chance ou volume de chuva</span>
+              <span>Dias com previsão de chuva</span>
               <strong>{rainyDays.length} de {days.length}</strong>
-              <small>Conta chance de 30% ou mais ou volume diário a partir de 1 mm.</small>
+              <small>Inclui dias com pelo menos 30% de chance ou 1 mm previsto.</small>
             </div>
           </article>
         </div>
@@ -238,7 +238,7 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
                   <div>
                     <dt><Wind aria-hidden="true" /> Rajada máxima</dt>
                     <dd>{formatGust(day)}</dd>
-                    <small>Condição do dia: {toneLabel(tone).toLocaleLowerCase("pt-BR")}</small>
+                    <small>Maior valor previsto para o dia</small>
                   </div>
                 </dl>
               </article>
@@ -257,7 +257,7 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
             <span className="eyebrow">Temperaturas da semana</span>
             <h2 id="seven-day-v2-trend-title">Mínimas e máximas ao longo dos próximos 7 dias</h2>
           </div>
-          <p>As barras comparam a faixa prevista de cada dia dentro dos extremos da semana.</p>
+          <p>As barras mostram a faixa de temperatura prevista para cada dia.</p>
         </header>
 
         <div className="seven-day-v2-trend__list">
@@ -299,7 +299,7 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
             <span className="eyebrow">Chuva e rajadas</span>
             <h2 id="seven-day-v2-risks-title">Dias com maior chance de chuva e rajadas mais fortes</h2>
           </div>
-          <p>Os dias mais distantes podem mudar. Confirme a previsão conforme eles se aproximarem.</p>
+          <p>Os dias mais distantes podem mudar. Confira novamente conforme cada data se aproxima.</p>
         </header>
 
         <div className="seven-day-v2-risks__grid">
@@ -321,7 +321,7 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
                   <li key={`${day.weekday}-wind`}><span><strong>{day.weekday}</strong><small>Maior valor previsto para o dia</small></span><b>{formatGust(day)}</b></li>
                 ))}
               </ol>
-            ) : <p>As fontes ainda não publicaram rajadas para os próximos dias.</p>}
+            ) : <p>A previsão ainda não informou rajadas para os próximos dias.</p>}
             <Link to="/vento-em-pelotas">Ver velocidade e rajadas <ArrowRight aria-hidden="true" /></Link>
           </article>
         </div>
@@ -334,17 +334,17 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
       >
         <header>
           <div>
-            <span className="eyebrow">Previsão oficial e regional</span>
+            <span className="eyebrow">Outras previsões disponíveis</span>
             <h2 id="seven-day-v2-official-title">O que INMET e CPPMet/UFPel publicam para os próximos dias</h2>
           </div>
-          <Link to="/metodologia">Como usamos cada fonte</Link>
+          <Link to="/metodologia">Entenda as fontes</Link>
         </header>
 
         {hasOfficialContext ? (
           <div className="seven-day-v2-official__grid">
             <article>
               <span>INMET</span>
-              <strong>Previsão oficial publicada</strong>
+              <strong>Previsão publicada</strong>
               <ul>
                 {officialPeriods.map((period) => (
                   <li key={period.id}><span>{period.period}</span><p>{period.summary || "Resumo em atualização"}</p></li>
@@ -353,18 +353,18 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
             </article>
             <article className="is-regional">
               <span>CPPMet / UFPel</span>
-              <strong>Previsão regional publicada</strong>
+              <strong>Previsão para a região</strong>
               {regionalDays.length ? (
                 <ul>
                   {regionalDays.map((day) => (
-                    <li key={`${day.day}-${day.summary}`}><span>{day.day}</span><p>{day.summary || day.text || "Contexto em atualização"}</p></li>
+                    <li key={`${day.day}-${day.summary}`}><span>{day.day}</span><p>{day.summary || day.text || "Informações em atualização"}</p></li>
                   ))}
                 </ul>
-              ) : <p>O boletim regional ainda não publicou os próximos dias.</p>}
+              ) : <p>A UFPel ainda não publicou a previsão dos próximos dias.</p>}
             </article>
           </div>
         ) : (
-          <div className="seven-day-v2-official__unavailable"><Info aria-hidden="true" /><div><strong>INMET e CPPMet/UFPel ainda não publicaram contexto para o período</strong><span>A previsão principal continua disponível e identificada pela fonte utilizada.</span></div></div>
+          <div className="seven-day-v2-official__unavailable"><Info aria-hidden="true" /><div><strong>INMET e UFPel ainda não publicaram previsão para este período</strong><span>A previsão acima continua disponível.</span></div></div>
         )}
       </section>
 
@@ -378,7 +378,7 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
       <aside className="seven-day-v2-source-note" aria-label="Origem e atualização da previsão">
         <Info aria-hidden="true" />
         <p>
-          Previsão atualizada em {formatDateTime(weather.source.fetchedAt)}. A fonte principal é {weather.quality.forecastProvider ?? "o modelo meteorológico disponível"}. INMET e CPPMet/UFPel aparecem como contexto complementar quando publicam dados para o período.
+          Atualizado em {formatDateTime(weather.source.fetchedAt)}. Previsão principal: {weather.quality.forecastProvider ?? "modelo meteorológico disponível"}. INMET e UFPel aparecem quando há dados para o período.
         </p>
       </aside>
     </div>
