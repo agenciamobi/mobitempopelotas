@@ -10,9 +10,29 @@ const sevenDay = readFileSync("src/components/weather/SevenDayForecastPageV2.tsx
 const rain = readFileSync("src/components/weather/RainForecastPageV2.tsx", "utf8");
 const wind = readFileSync("src/components/weather/WindForecastPageV3.tsx", "utf8");
 const alerts = readFileSync("src/components/weather/WeatherAlertsPage.tsx", "utf8");
+const meteogram = readFileSync("src/components/weather/MeteogramPage.tsx", "utf8");
+const embrapa = readFileSync("src/components/embrapa/EmbrapaStationPageV2.tsx", "utf8");
+const cameras = readFileSync("src/components/cameras/CameraPageV2.tsx", "utf8");
+const frost = readFileSync("src/components/inmet/FrostMapPageV2.tsx", "utf8");
+const hydrology = readFileSync("src/components/hydrology/HydrologyOverviewV2.tsx", "utf8");
+const hydrologyHero = readFileSync("src/components/hydrology/HydrologyEditorialHero.tsx", "utf8");
+const hydrologyPages = readFileSync("src/components/hydrology/HydrologyPages.tsx", "utf8");
+const methodology = readFileSync("src/components/methodology/MethodologyPage.tsx", "utf8");
 
-const visitorSources = [header, widgets, atmosphere, tomorrow, sevenDay, rain, wind, alerts];
-const visibleCopy = visitorSources.join("\n");
+const primaryVisitorSources = [header, widgets, atmosphere, tomorrow, sevenDay, rain, wind, alerts];
+const auditedVisitorSources = [
+  ...primaryVisitorSources,
+  meteogram,
+  embrapa,
+  cameras,
+  frost,
+  hydrology,
+  hydrologyHero,
+  hydrologyPages,
+  methodology,
+];
+const visibleCopy = primaryVisitorSources.join("\n");
+const auditedCopy = auditedVisitorSources.join("\n");
 
 test("main menu uses language visitors can understand without portal jargon", () => {
   assert.match(header, /Imagens e medições/);
@@ -78,4 +98,48 @@ test("alerts page states availability and counts directly", () => {
   assert.doesNotMatch(alerts, /situação prioritária/i);
   assert.doesNotMatch(alerts, /resumo da consulta/i);
   assert.doesNotMatch(alerts, /encontrado\(s\)/i);
+});
+
+test("monitoring pages use direct labels while retaining necessary explanations", () => {
+  assert.match(meteogram, /Previsão hora a hora/);
+  assert.match(meteogram, /Possibilidade de tempestade/);
+  assert.match(embrapa, /Origem dos dados/);
+  assert.match(embrapa, /Situação da estação/);
+  assert.match(cameras, /Vídeo disponível/);
+  assert.match(cameras, /Origem do vídeo/);
+  assert.match(frost, /Dados do INMET/);
+  assert.match(frost, /Lista de registros/);
+});
+
+test("water and methodology pages use visitor-facing wording", () => {
+  assert.match(hydrology, /Leitura atualizada/);
+  assert.match(hydrology, /Vento agora/);
+  assert.match(hydrologyHero, /Medição local · Estação Laranjal/);
+  assert.match(hydrologyPages, /Medição da Estação Laranjal/);
+  assert.match(methodology, /Como os dados funcionam/);
+  assert.match(methodology, /Fontes disponíveis/);
+  assert.match(methodology, /Caminho dos dados/);
+});
+
+test("audited visitor interfaces do not expose internal operational phrases", () => {
+  for (const phrase of [
+    /faixa editorial/i,
+    /procedência/i,
+    /rastreabilidade/i,
+    /estado da integração/i,
+    /telemetria atualizada/i,
+    /telemetria indisponível/i,
+    /fonte de contingência/i,
+    /pico de CAPE/i,
+    /energia convectiva/i,
+    /produto de estação automática/i,
+    /consulta inicial/i,
+    /vento consolidado agora/i,
+    /estável no recorte/i,
+    /contexto previsto/i,
+    /consulta consolidada/i,
+    /transparência operacional/i,
+  ]) {
+    assert.doesNotMatch(auditedCopy, phrase);
+  }
 });
