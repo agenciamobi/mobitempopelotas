@@ -14,7 +14,7 @@ import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.funct
 
 const PAGE_TITLE = "Nível da Lagoa dos Patos no Laranjal";
 const PAGE_DESCRIPTION =
-  "Telemetria pública da Estação Laranjal, evolução do nível nas últimas 24 horas e contexto meteorológico para Pelotas.";
+  "Acompanhe a medição da Estação Laranjal, a evolução do nível nas últimas 24 horas e informações sobre chuva e vento em Pelotas.";
 const PAGE_PATH = "/nivel-da-lagoa-dos-patos-laranjal";
 
 export const Route = createFileRoute("/nivel-da-lagoa-dos-patos-laranjal")({
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/nivel-da-lagoa-dos-patos-laranjal")({
           "Nível da Lagoa dos Patos",
           "Estação Laranjal",
           "Praia do Laranjal",
-          "Telemetria hidrológica em Pelotas",
+          "Medição automática do nível em Pelotas",
           "Tendência do nível da água no Laranjal",
         ],
       }),
