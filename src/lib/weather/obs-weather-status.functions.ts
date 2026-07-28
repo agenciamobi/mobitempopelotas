@@ -44,10 +44,10 @@ export const getObsWeatherStatus = createServerFn({ method: "GET" }).handler(
         status: "unavailable",
         temperature: null,
         condition: "Indisponível",
-        icon,
+        icon: "cloud",
         updatedAt: weather.observation.source.fetchedAt,
         observationSource: "Embrapa Clima Temperado",
-        conditionSource: weather.quality.forecastProvider,
+        conditionSource: null,
       };
     }
 
