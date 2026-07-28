@@ -1,0 +1,9 @@
+.embrapa-v2-chapters.is-compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 680px) {
+  .embrapa-v2-chapters.is-compact {
+    display: flex;
+  }
+}
