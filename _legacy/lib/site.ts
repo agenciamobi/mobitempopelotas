@@ -1,12 +1,10 @@
-const fallbackUrl = "http://localhost:5175";
-const vercelUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : undefined;
+const canonicalUrl = "https://tempopelotas.com.br";
+const localUrl = "http://localhost:5175";
 
 export const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  vercelUrl ||
-  fallbackUrl
+  process.env.NODE_ENV === "development"
+    ? process.env.NEXT_PUBLIC_SITE_URL || localUrl
+    : canonicalUrl
 ).replace(/\/$/, "");
 
 export function absoluteUrl(path = "/") {
