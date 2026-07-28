@@ -126,6 +126,7 @@
   }
 
   .today-retail-hero__current {
+    min-height: 0;
     padding: 1rem;
   }
 
