@@ -26,12 +26,12 @@ test("camera states distinguish live, replay, configured and preparing", () => {
   assert.match(page, /type CameraPresentationState = "live" \| "replay" \| "configured" \| "preparing"/);
   assert.match(page, /Ao vivo agora/);
   assert.match(page, /Última transmissão/);
-  assert.match(page, /Player configurado/);
+  assert.match(page, /Vídeo disponível/);
   assert.match(page, /Em preparação/);
   assert.match(page, /camera\.status !== "online" \|\| !camera\.embedUrl/);
   assert.match(page, /camera\.broadcastStatus === "live"/);
   assert.match(page, /camera\.broadcastStatus === "replay"/);
-  assert.match(route, /Player configurado significa que existe uma incorporação/);
+  assert.match(route, /Vídeo disponível sem confirmação/);
 });
 
 test("external player loads only after explicit visitor interaction", () => {
@@ -43,7 +43,7 @@ test("external player loads only after explicit visitor interaction", () => {
   assert.match(page, /referrerPolicy="strict-origin-when-cross-origin"/);
   assert.match(page, /allowFullScreen/);
   assert.match(page, /setPlayerOpen\(false\)/);
-  assert.match(route, /O carregamento sob demanda reduz requisições externas/);
+  assert.match(route, /Isso melhora o carregamento da página/);
 });
 
 test("camera thumbnails and external links preserve privacy and accessibility", () => {
@@ -51,7 +51,7 @@ test("camera thumbnails and external links preserve privacy and accessibility", 
   assert.match(page, /referrerPolicy="no-referrer"/);
   assert.match(page, /alt=""/);
   assert.match(page, /target="_blank" rel="noopener noreferrer"/);
-  assert.match(page, /provedor externo, em nova aba/);
+  assert.match(page, /página original, em nova aba/);
   assert.match(page, /aria-live="polite"/);
   assert.match(page, /aria-pressed=\{active\}/);
 });
@@ -74,20 +74,20 @@ test("VideoObject is emitted only for verified live or replay players", () => {
 
 test("camera context separates visual observation, current fields and forecasts", () => {
   assert.match(page, /currentProvenance\.temperature/);
-  assert.match(page, /hourly\.slice\(0, 12\)/);
-  assert.match(page, /hourly\.slice\(0, 24\)/);
-  assert.match(page, /Previsão nas próximas 12 horas/);
-  assert.match(page, /Previsão nas próximas 24 horas/);
-  assert.match(page, /Não é uma leitura produzida pela câmera/);
+  assert.match(page, /hourly[\s\S]*\.slice\(0, 12\)/);
+  assert.match(page, /hourly[\s\S]*\.slice\(0, 24\)/);
+  assert.match(page, /Nas próximas 12 horas/);
+  assert.match(page, /Nas próximas 24 horas/);
+  assert.match(page, /Informação meteorológica, não produzida pela câmera/);
   assert.match(page, /Uma imagem não mede temperatura, vento, volume de chuva ou nível da água/);
-  assert.match(route, /A imagem complementa radar, estação e previsão, mas não mede variáveis meteorológicas/);
+  assert.match(route, /A câmera ajuda a observar o céu e o local, mas não mede/);
 });
 
 test("missing cameras and players never receive simulated imagery", () => {
-  assert.match(page, /O portal não cria imagens demonstrativas/);
-  assert.match(page, /O ponto permanece cadastrado sem simular imagem ou transmissão/);
-  assert.match(page, /Player ainda não disponível/);
-  assert.match(route, /Ponto em preparação permanece visível sem imagem simulada/);
+  assert.match(page, /O portal não usa imagens demonstrativas/);
+  assert.match(page, /sem usar vídeo ou imagem simulada/);
+  assert.match(page, /Imagem ainda não disponível/);
+  assert.match(route, /ponto em preparação permanece sem imagem/);
   assert.doesNotMatch(cameraSource, /placeholder\.com|picsum|unsplash/i);
 });
 
