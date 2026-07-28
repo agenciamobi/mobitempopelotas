@@ -53,13 +53,16 @@ test("today page exposes atmospheric interpretation without replacing observed v
   assert.doesNotMatch(today, /<TodayAtmosphericSignals data=\{recoveredData\}/);
   assert.match(atmosphere, /data\.weather\.observation\.current\.dewPoint/);
   assert.match(atmosphere, /buildFogSignal/);
-  assert.match(atmosphere, /Ponto de orvalho observado/);
-  assert.match(atmosphere, /Neblina e nuvens baixas/);
+  assert.match(atmosphere, /Ponto de orvalho medido/);
+  assert.match(atmosphere, /Possibilidade de neblina/);
   assert.match(atmosphere, /Menor visibilidade prevista/);
-  assert.match(atmosphere, /Instabilidade convectiva/);
-  assert.match(atmosphere, /CAPE isolado não confirma temporal/);
-  assert.match(atmosphere, /Perfil de nuvens por altitude/);
-  assert.match(atmosphere, /Open-Meteo Best Match/);
+  assert.match(atmosphere, /Possibilidade de tempestade/);
+  assert.match(atmosphere, /Esse valor sozinho não confirma temporal/);
+  assert.match(atmosphere, /Camadas de nuvens nas próximas horas/);
+  assert.match(atmosphere, /Previsão horária: Open-Meteo/);
+  assert.doesNotMatch(atmosphere, /Sinal ainda não calculável/);
+  assert.doesNotMatch(atmosphere, /Energia convectiva/);
+  assert.doesNotMatch(atmosphere, /Tendência de pressão não calculável/);
 });
 
 test("atmospheric section stays readable and responsive", () => {
