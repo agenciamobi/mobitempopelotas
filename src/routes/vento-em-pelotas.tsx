@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
-import { WindForecastPageV2 } from "@/components/weather/WindForecastPageV2";
+import { WindForecastPageV3 } from "@/components/weather/WindForecastPageV3";
 import { WIND_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
@@ -10,7 +10,7 @@ import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.funct
 
 const PAGE_TITLE = "Vento em Pelotas";
 const PAGE_DESCRIPTION =
-  "Veja o vento em Pelotas com velocidade e direção atuais, rajadas previstas por horário e para os próximos 7 dias, além de avisos oficiais.";
+  "Veja vento atual com procedência, direção, rajadas previstas por hora nas próximas 24 horas, maiores valores da janela, previsão para 7 dias e avisos oficiais em Pelotas.";
 const PAGE_PATH = "/vento-em-pelotas";
 
 const WIND_PAGE_CONTENT = {
@@ -18,32 +18,45 @@ const WIND_PAGE_CONTENT = {
   eyebrow: "Entenda os dados de vento",
   title: "Como ler velocidade, direção e rajadas em Pelotas",
   answer:
-    "A velocidade atual indica a intensidade do vento no momento da leitura e pode vir de uma estação ou de uma estimativa do modelo. A direção mostra de onde ele sopra. A rajada é um pico breve e mais forte; quando está em horário ou dia futuro, é uma previsão.",
+    "A velocidade atual, a direção e as rajadas futuras podem vir de fontes diferentes. O portal identifica a procedência de cada campo, trata rajada como um pico breve e não repete a direção atual como previsão para horários em que a fonte não publica direção.",
   facts: [
-    "Velocidade atual e rajada máxima não representam a mesma medida: a rajada é um pico de curta duração.",
-    "A direção informa de onde o vento vem. Vento sul, por exemplo, sopra do sul em direção ao norte.",
-    "Antes de atividades ao ar livre ou na Lagoa dos Patos, confira as rajadas por horário e os avisos oficiais.",
+    "Velocidade sustentada e rajada não representam a mesma medida: a rajada é um pico breve e normalmente mais forte.",
+    "A direção informa de onde o vento vem. Vento sul sopra do sul em direção ao norte.",
+    "A condição atual é consolidada campo a campo; velocidade e direção podem ter procedências distintas.",
+    "As próximas 24 horas exibem velocidade e rajada previstas por horário, sem inventar direção horária ausente.",
+    "As faixas visuais da página são editoriais e não substituem alertas oficiais do INMET ou de outros órgãos competentes.",
+    "Orla, áreas abertas, pontes e pontos com árvores ou objetos soltos podem ter exposição diferente do local representado pela estação ou pelo modelo.",
   ],
   faqs: [
     {
       question: "Qual é a diferença entre velocidade do vento e rajada?",
       answer:
-        "A velocidade representa o vento médio ou instantâneo informado pela fonte. A rajada é um aumento breve e mais intenso, por isso costuma apresentar valor superior.",
+        "A velocidade representa o vento sustentado ou instantâneo informado pela fonte. A rajada é um aumento breve e mais intenso, por isso costuma apresentar valor superior.",
     },
     {
       question: "O que significa a direção do vento?",
       answer:
-        "A direção indica de onde o vento sopra. Quando a página mostra sul, por exemplo, significa que o vento vem do sul e segue em direção ao norte.",
+        "A direção indica de onde o vento sopra. Quando a página mostra sul, significa que o vento vem do sul e segue em direção ao norte.",
     },
     {
       question: "O vento mostrado agora foi medido?",
       answer:
-        "A página identifica quando o valor atual foi observado pela estação da Embrapa. Se a medição local estiver indisponível, o portal informa que o valor atual foi estimado pelo modelo.",
+        "A página consulta a procedência específica da velocidade e da direção. Quando o campo vem da Estação Embrapa, ele é identificado como observação local; quando vem de um modelo, aparece como estimativa.",
+    },
+    {
+      question: "Por que a direção não aparece em cada horário futuro?",
+      answer:
+        "A série horária atualmente integrada fornece velocidade e rajada, mas não direção por hora. O portal não reutiliza a direção atual como se ela permanecesse igual durante toda a previsão.",
+    },
+    {
+      question: "As faixas de intensidade da página são alertas oficiais?",
+      answer:
+        "Não. Elas apenas ajudam a organizar visualmente os valores previstos. Avisos oficiais vigentes e orientações dos órgãos emissores têm prioridade.",
     },
     {
       question: "Quando as rajadas exigem mais atenção?",
       answer:
-        "Rajadas mais fortes podem afetar objetos soltos, árvores, estruturas leves, navegação e atividades ao ar livre. Em caso de aviso oficial, siga as orientações do órgão emissor.",
+        "Rajadas mais fortes podem afetar objetos soltos, árvores, estruturas leves, navegação e atividades ao ar livre. Considere o local de exposição e consulte os avisos oficiais.",
     },
   ],
   relatedLinks: [
@@ -58,7 +71,17 @@ const WIND_PAGE_CONTENT = {
       description: "Compare temperatura, chuva e rajadas previstas para cada dia.",
     },
     {
-      label: "Avisos oficiais do INMET",
+      label: "Radar e satélite",
+      href: "/radar-e-satelite-pelotas" as const,
+      description: "Observe sistemas meteorológicos associados a chuva, tempestade e mudanças de vento.",
+    },
+    {
+      label: "Situação das águas",
+      href: "/situacao-hidrologica-pelotas" as const,
+      description: "Entenda como vento e chuva podem influenciar a distribuição da água na Lagoa dos Patos.",
+    },
+    {
+      label: "Avisos oficiais",
       href: "/alertas" as const,
       description: "Consulte avisos relacionados a vento forte, tempestade e outros riscos meteorológicos.",
     },
@@ -77,10 +100,13 @@ export const Route = createFileRoute("/vento-em-pelotas")({
           { name: "Vento em Pelotas", path: PAGE_PATH },
         ],
         about: [
-          "Previsão de vento em Pelotas",
+          "Vento atual em Pelotas",
+          "Procedência da velocidade e direção do vento",
           "Rajadas de vento em Pelotas",
           "Direção do vento em Pelotas",
-          "Vento por hora em Pelotas",
+          "Previsão de vento por hora em Pelotas",
+          "Maiores rajadas nas próximas 24 horas",
+          "Previsão de rajadas para 7 dias",
           "Vento observado pela Embrapa em Pelotas",
           "Avisos oficiais de vento em Pelotas",
         ],
@@ -101,7 +127,7 @@ function VentoPage() {
       pageClassName="internal-weather-shell--wind"
       showOfficialAlerts={false}
     >
-      <WindForecastPageV2 data={weather} />
+      <WindForecastPageV3 data={weather} />
       <EditorialContentSection
         id="como-interpretar-a-previsao-de-vento"
         content={WIND_PAGE_CONTENT}
