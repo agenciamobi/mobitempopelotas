@@ -23,14 +23,16 @@ test("climate route is a real editorial page instead of the former redirect", ()
   assert.doesNotMatch(route, /statusCode:\s*301/);
 });
 
-test("climate page distinguishes weather, climate and recent history", () => {
-  assert.match(page, /Tempo descreve agora; clima exige muitos anos/);
-  assert.match(page, /Últimos 30 dias: contexto real, não média histórica/);
-  assert.match(page, /não determinam se a estação está acima, abaixo ou dentro da normal climatológica/);
-  assert.match(page, /Normais climatológicas usam períodos extensos e critérios técnicos/);
-  assert.match(page, /não uma medição contínua|não média histórica/i);
-  assert.match(route, /Os últimos 30 dias exibidos no portal não são apresentados como normal climatológica/i);
-  assert.match(route, /Uma frente fria, uma onda de calor ou um mês chuvoso não definem isoladamente o clima/);
+test("climate page distinguishes weather, climate and recent history in direct language", () => {
+  assert.match(page, /Tempo mostra o presente; clima descreve muitos anos/);
+  assert.match(page, /Últimos 30 dias: dados recentes, não média histórica/);
+  assert.match(page, /não mostram, sozinhos, se o período ficou acima ou abaixo do clima normal/);
+  assert.match(page, /As Normais Climatológicas usam muitos anos de dados/);
+  assert.match(route, /um mês isolado não representa o clima normal da cidade/i);
+  assert.match(route, /Uma frente fria, uma onda de calor ou um mês chuvoso não definem sozinhos o clima/);
+  assert.doesNotMatch(climateSource, /ponto de grade/i);
+  assert.doesNotMatch(climateSource, /tendências sazonais/i);
+  assert.doesNotMatch(climateSource, /acesso direto ao produto/i);
 });
 
 test("climate page describes all four seasons without fixed climatological numbers", () => {
@@ -65,7 +67,8 @@ test("recent climate context uses the existing real history dataset", () => {
   assert.match(page, /summary\.strongestWindGust/);
   assert.match(page, /summary\.warmestDay/);
   assert.match(page, /summary\.coldestDay/);
-  assert.match(page, /sem preencher a ausência da fonte com números simulados/);
+  assert.match(page, /sem preencher a ausência dos dados com números simulados/);
+  assert.match(page, /atualizado em \{formatDateTime\(history\.source\.fetchedAt\)\}/);
 });
 
 test("climate layout follows the shared retail rail and responsive contract", () => {
@@ -87,5 +90,5 @@ test("climate route is discoverable through sitemap and monitoring navigation", 
   assert.match(publicRoutes, /path: "\/clima-em-pelotas", changeFrequency: "daily"/);
   assert.match(header, /"\/clima-em-pelotas"/);
   assert.match(header, /label: "Clima de Pelotas"/);
-  assert.match(header, /Estações do ano, fatores locais, normais e diferença entre tempo e clima/);
+  assert.match(header, /Entenda as estações do ano e por que o tempo varia na cidade/);
 });
