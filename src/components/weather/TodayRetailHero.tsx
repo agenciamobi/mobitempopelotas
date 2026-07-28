@@ -23,6 +23,7 @@ import type { AdvisoryLevel } from "@/production/lib/weather-insights";
 import { getTodayRetailHeroPhoto } from "./today-retail-hero-backgrounds";
 import "./TodayRetailHero.css";
 import "./TodayRetailHeroPhoto.css";
+import "./TodayRetailHeroRefinement.css";
 
 type TodayRetailHeroProps = {
   weather: WeatherData;
