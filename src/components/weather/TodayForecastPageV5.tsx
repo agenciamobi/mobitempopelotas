@@ -16,12 +16,13 @@ import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-br
 import "./TodayAtmosphericSignalsLink.css";
 import "./TodayForecastPageV5.css";
 import "./TodayTypographyRefinement.css";
+import "./TodayForecastMobileRefinement.css";
 
 const chapters = [
   { href: "#previsao-hoje", label: "Próximas horas", detail: "Temperatura, chuva e vento" },
   { href: "#recursos-hoje", label: "Melhor período", detail: "Janelas para sair" },
   { href: "#medicao-atual", label: "Condição atual", detail: "Leitura da estação" },
-  { href: "#atmosfera-hoje", label: "Atmosfera", detail: "Orvalho, nuvens e visibilidade" },
+  { href: "#atmosfera-hoje", label: "Neblina e nuvens", detail: "Orvalho e visibilidade" },
   { href: "#leitura-do-dia", label: "Para sua rotina", detail: "O que merece atenção" },
   { href: "#como-interpretar-hoje", label: "Entenda os dados", detail: "Medição, previsão e FAQ" },
 ];
