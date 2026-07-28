@@ -17,6 +17,53 @@ const PAGE_DESCRIPTION =
   "Acompanhe a medição da Estação Laranjal, a evolução do nível nas últimas 24 horas e informações sobre chuva e vento em Pelotas.";
 const PAGE_PATH = "/nivel-da-lagoa-dos-patos-laranjal";
 
+const LARANJAL_PAGE_CONTENT = {
+  ...LARANJAL_LEVEL_EDITORIAL_CONTENT,
+  eyebrow: "Como interpretar o nível no Laranjal",
+  title: "Entenda o que a medição da Estação Laranjal representa",
+  answer:
+    "O número mostra o nível registrado no horário informado e na referência própria da Estação Laranjal. A evolução das últimas horas ajuda a acompanhar a mudança local, mas não confirma sozinha alagamento ou inundação.",
+  facts: [
+    "A estação pode ficar sem nova medição ou sofrer interrupções; sempre confira o horário e o aviso de atualização.",
+    "Uma mudança curta pode resultar de vento, oscilação local ou ruído. A sequência de medições é mais útil do que um único ponto.",
+    "Em condição de risco, siga a Defesa Civil, as autoridades municipais e os comunicados oficiais.",
+  ],
+  faqs: [
+    {
+      question: "O que representa o número exibido para o Laranjal?",
+      answer:
+        "Ele representa a medição da estação na referência usada pelo próprio equipamento. Não deve ser comparado diretamente com marcas físicas ou outras estações sem conhecer a referência de cada uma.",
+    },
+    {
+      question: "Com que frequência o nível é atualizado?",
+      answer:
+        "A frequência depende da estação e da disponibilidade da transmissão. A página mostra o horário da última medição válida e avisa quando o dado está atrasado ou indisponível.",
+    },
+    {
+      question: "Um valor alto confirma inundação no Laranjal?",
+      answer:
+        "Não por si só. O impacto depende da referência local, da evolução, do vento, da drenagem e das condições em cada trecho. Use os comunicados das autoridades para decisões de segurança.",
+    },
+  ],
+  relatedLinks: [
+    {
+      label: "Situação das águas em Pelotas",
+      href: "/situacao-hidrologica-pelotas" as const,
+      description: "Compare a medição local com outros pontos da Lagoa e do Guaíba.",
+    },
+    {
+      label: "Avisos meteorológicos oficiais",
+      href: "/alertas" as const,
+      description: "Confira alertas vigentes de chuva, vento e tempestade.",
+    },
+    {
+      label: "Câmeras do Laranjal",
+      href: "/cameras-ao-vivo-pelotas" as const,
+      description: "Use a imagem como complemento visual, sem substituir a medição da estação.",
+    },
+  ],
+};
+
 export const Route = createFileRoute("/nivel-da-lagoa-dos-patos-laranjal")({
   head: () =>
     createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
@@ -37,7 +84,7 @@ export const Route = createFileRoute("/nivel-da-lagoa-dos-patos-laranjal")({
           "Tendência do nível da água no Laranjal",
         ],
       }),
-      createFaqPageJsonLd(PAGE_PATH, LARANJAL_LEVEL_EDITORIAL_CONTENT.faqs),
+      createFaqPageJsonLd(PAGE_PATH, LARANJAL_PAGE_CONTENT.faqs),
     ]),
   loader: async () => {
     const [weather, level] = await Promise.all([getWeatherIntelligence(), getLaranjalLevelData()]);
@@ -55,7 +102,7 @@ function NivelLagoaPage() {
       <HydrologyEditorialHero level={data.level} variant="detail" />
       <LaranjalLevelPage weather={data.weather} level={data.level} />
       <LaranjalEmbedGuide />
-      <EditorialContentSection id="como-interpretar-nivel-laranjal" content={LARANJAL_LEVEL_EDITORIAL_CONTENT} />
+      <EditorialContentSection id="como-interpretar-nivel-laranjal" content={LARANJAL_PAGE_CONTENT} />
     </div>
   );
 }
