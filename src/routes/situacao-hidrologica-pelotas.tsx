@@ -17,57 +17,57 @@ import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.funct
 
 const PAGE_TITLE = "Situação das águas em Pelotas";
 const PAGE_DESCRIPTION =
-  "Acompanhe a Estação Laranjal, a Lagoa dos Patos, o Guaíba e o SACE, com nível observado, tendência, atualidade, referências locais e contexto meteorológico.";
+  "Acompanhe o nível no Laranjal, pontos da Lagoa dos Patos, o Guaíba e rios ligados ao SACE, com horário, tendência e informações sobre chuva e vento.";
 const PAGE_PATH = "/situacao-hidrologica-pelotas";
 
 const HYDROLOGY_PAGE_CONTENT = {
   ...HYDROLOGY_EDITORIAL_CONTENT,
-  eyebrow: "Entenda a rede hidrológica",
-  title: "Como relacionar Laranjal, Lagoa dos Patos, Guaíba e seus afluentes",
+  eyebrow: "Como acompanhar os níveis da água",
+  title: "Entenda o que cada estação mostra e por que os valores não são iguais",
   answer:
-    "A leitura do Laranjal descreve o ponto local da UFPel e utiliza a referência técnica daquele sensor. A rede da Lagoa dos Patos, o Guaíba e o SACE ampliam o contexto regional, mas conservam cotas, horários e classificações próprias. Nenhuma estação distante prevê sozinha o nível futuro em Pelotas.",
+    "A Estação Laranjal é a leitura local apresentada para Pelotas. Os demais pontos da Lagoa dos Patos, do Guaíba e dos rios acompanhados pelo SACE ajudam a entender a situação regional, mas cada estação usa seu próprio local, horário e referência de medição. Por isso, os números não devem ser comparados por simples subtração.",
   facts: [
-    "A Estação Laranjal é a referência local apresentada pelo portal e não possui conversão automática para cotas de outras estações.",
-    "Uma leitura atrasada continua identificada como último valor conhecido, nunca como nível atual sem ressalva.",
-    "A rede da Lagoa dos Patos compara Itapuã, Arambaré, São Lourenço do Sul e o estuário de Rio Grande, cada ponto com referência local própria.",
-    "O SACE Guaíba acrescenta contexto dos rios Jacuí, Taquari-Antas, Caí, Sinos, Gravataí, Delta e Guaíba.",
-    "Categorias de atenção, alerta e inundação pertencem à estação oficial que as publicou e não são convertidas em classificação local para o Laranjal.",
-    "Vento, chuva, armazenamento no Guaíba e na Lagoa, Canal São Gonçalo, drenagem local e saída oceânica influenciam a evolução observada em Pelotas.",
-    "Ausência de transmissão significa ausência de dado atual; não significa que o nível esteja normal.",
+    "A Estação Laranjal é a referência local do portal e não recebe automaticamente as cotas de outras estações.",
+    "Uma leitura atrasada aparece como último valor conhecido e não como nível atual.",
+    "Itapuã, Arambaré, São Lourenço do Sul e Rio Grande ajudam a acompanhar diferentes partes da Lagoa dos Patos.",
+    "O SACE mostra a situação de rios como Jacuí, Taquari-Antas, Caí, Sinos e Gravataí, além do Delta e do Guaíba.",
+    "As categorias Atenção, Alerta e Inundação pertencem à estação que as publicou e não são convertidas em classificação para o Laranjal.",
+    "Vento, chuva, armazenamento de água, Canal São Gonçalo, drenagem local e saída oceânica podem influenciar a evolução em Pelotas.",
+    "Quando uma estação não transmite, não há dado atual para interpretar; isso não significa que o nível esteja normal.",
   ],
   faqs: [
     ...HYDROLOGY_EDITORIAL_CONTENT.faqs,
     {
       question: "Uma estação elevada no SACE significa que o Laranjal vai subir?",
       answer:
-        "Não necessariamente. A situação a montante é um contexto importante, mas o comportamento no Laranjal também depende do tempo de propagação, do Guaíba, da Lagoa dos Patos, do vento, da chuva local e da saída oceânica em Rio Grande.",
+        "Não necessariamente. A situação dos rios ajuda a entender o cenário, mas o nível no Laranjal também depende do tempo de deslocamento da água, do Guaíba, da Lagoa dos Patos, do vento, da chuva local e da saída em Rio Grande.",
     },
     {
-      question: "O que significa acima de normal na seção do SACE?",
+      question: "O que significa acima de normal no SACE?",
       answer:
-        "Significa que a própria estação foi publicada pelo SACE em uma categoria diferente de Normal, como Cota de Atenção, Cota de Alerta ou Cota de Inundação. O portal reproduz essa classificação oficial sem transformá-la em risco para Pelotas.",
+        "Significa que aquela estação foi publicada em uma categoria diferente de Normal, como Atenção, Alerta ou Inundação. A página reproduz a classificação da própria estação sem transformá-la em risco para Pelotas.",
     },
     {
       question: "O nível do Laranjal pode ser comparado diretamente com o nível do Guaíba?",
       answer:
-        "Não. As estações usam referências, locais, instrumentos e métodos distintos. A comparação útil é observar tendência, horário e evolução dentro de cada série, não subtrair diretamente os valores absolutos.",
+        "Não. As estações ficam em locais diferentes e usam referências e instrumentos próprios. O mais útil é acompanhar a tendência e a evolução de cada ponto ao longo do tempo.",
     },
     {
       question: "Uma leitura antiga ainda aparece na página?",
       answer:
-        "Pode aparecer como última leitura conhecida, acompanhada do horário e da idade calculada. Ela não é apresentada como nível atual e não recebe tendência nova sem dados suficientes.",
+        "Pode aparecer como última leitura conhecida, sempre acompanhada do horário e da idade calculada. Ela não é apresentada como nível atual.",
     },
     {
       question: "Ausência de transmissão significa que o rio está normal?",
       answer:
-        "Não. Sem transmissão indica ausência de dado atual naquela estação. O estado do rio não deve ser inferido quando a fonte não publica uma leitura válida.",
+        "Não. Significa apenas que não há uma leitura atual disponível naquela estação. O estado do rio não deve ser concluído sem dados válidos.",
     },
   ],
   relatedLinks: [
     {
       label: "Nível da Lagoa no Laranjal",
       href: "/nivel-da-lagoa-dos-patos-laranjal" as const,
-      description: "Abra a página detalhada da Estação Laranjal e sua série recente.",
+      description: "Veja a página detalhada da Estação Laranjal e sua evolução recente.",
     },
     {
       label: "Tempo hoje em Pelotas",
@@ -80,9 +80,9 @@ const HYDROLOGY_PAGE_CONTENT = {
       description: "Acompanhe avisos meteorológicos vigentes e orientações oficiais.",
     },
     {
-      label: "Fontes e metodologia",
+      label: "Como os dados funcionam",
       href: "/metodologia" as const,
-      description: "Veja a função, a atualização e os limites de cada integração hidrológica.",
+      description: "Veja a origem, a atualização e os limites de cada fonte de nível.",
     },
   ],
 };
@@ -101,14 +101,14 @@ export const Route = createFileRoute("/situacao-hidrologica-pelotas")({
         about: [
           "Nível da Lagoa dos Patos",
           "Estação Laranjal",
-          "Monitoramento hidrológico regional",
+          "Medições de nível na região",
           "Situação das águas em Pelotas",
-          "Telemetria da Lagoa dos Patos",
+          "Medições automáticas da Lagoa dos Patos",
           "Guaíba e Delta do Jacuí",
           "SACE Guaíba do Serviço Geológico do Brasil",
           "Rios Jacuí, Taquari-Antas, Caí, Sinos e Gravataí",
-          "Atualidade e tendência de leituras hidrológicas",
-          "Referências locais de estações de nível",
+          "Horário e tendência das leituras de nível",
+          "Referências locais de estações",
           "Influência do vento e da chuva no nível da lagoa",
         ],
       }),
