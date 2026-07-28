@@ -12,6 +12,7 @@ const editorialRouteFiles = [
   "src/routes/estacao-embrapa-pelotas.tsx",
   "src/routes/historico-climatico-pelotas.tsx",
   "src/routes/cameras-ao-vivo-pelotas.tsx",
+  "src/routes/mapa-de-geadas-rio-grande-do-sul.tsx",
   "src/routes/situacao-hidrologica-pelotas.tsx",
   "src/routes/nivel-da-lagoa-dos-patos-laranjal.tsx",
 ] as const;
