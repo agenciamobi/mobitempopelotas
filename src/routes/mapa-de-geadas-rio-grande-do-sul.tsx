@@ -8,49 +8,49 @@ import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
-const PAGE_TITLE = "Mapa de geadas observadas no Rio Grande do Sul";
+const PAGE_TITLE = "Geadas observadas no Rio Grande do Sul";
 const PAGE_DESCRIPTION =
-  "Consulte registros de geada por estação do INMET no Rio Grande do Sul, com período, tipo de estação, temperatura mínima, classificação, mapa e tabela acessível.";
+  "Veja registros de geada nas estações do INMET no Rio Grande do Sul, com período, tipo de estação, temperatura mínima, classificação, mapa e tabela.";
 const PAGE_PATH = "/mapa-de-geadas-rio-grande-do-sul";
 
 const FROST_PAGE_CONTENT = {
-  eyebrow: "Entenda o monitoramento de geadas",
-  title: "Como interpretar os registros de geada das estações do INMET",
+  eyebrow: "Como ler o mapa de geadas",
+  title: "Entenda o que os pontos de geada representam",
   answer:
-    "O mapa reúne registros passados associados a estações meteorológicas do INMET. Cada ponto representa o local da estação e não uma área contínua atingida. A ausência de registro nos filtros selecionados não comprova ausência de geada em todo o município, região ou estado.",
+    "O mapa reúne registros passados das estações meteorológicas do INMET. Cada ponto mostra o local da estação e não toda a área que pode ter registrado geada. Quando nenhum registro aparece, isso significa apenas que a consulta não encontrou ocorrências nos filtros escolhidos.",
   facts: [
-    "O produto é observacional: mostra registros de datas passadas e não prevê geada para a próxima madrugada.",
-    "Estações convencionais podem receber classificação fraca, moderada ou forte conforme os critérios processados pelo produto.",
-    "Estações automáticas são apresentadas como possível ocorrência e não recebem necessariamente a mesma gradação das convencionais.",
-    "Agrupamentos no mapa indicam somente marcadores próximos no nível de zoom, não extensão territorial do fenômeno.",
-    "Baixadas, áreas rurais, lavouras e microclimas podem registrar geada mesmo quando a estação mais próxima não retornou ocorrência.",
-    "Decisões agrícolas devem combinar observação, previsão agrometeorológica e orientação técnica local.",
+    "O mapa mostra registros passados e não prevê geada para a próxima madrugada.",
+    "Nas estações convencionais, a ocorrência pode aparecer como fraca, moderada ou forte.",
+    "Nas estações automáticas, a página mostra possível ocorrência quando essa é a informação disponível.",
+    "Os círculos com números apenas juntam estações próximas naquele nível de zoom; eles não mostram o tamanho da área atingida.",
+    "Baixadas, áreas rurais, lavouras e outros microclimas podem registrar geada mesmo quando a estação mais próxima não apresenta ocorrência.",
+    "Para decisões agrícolas, combine o mapa com a previsão do tempo e orientação técnica local.",
   ],
   faqs: [
     {
       question: "O mapa mostra previsão de geada?",
       answer:
-        "Não. Ele mostra registros observados em datas passadas pelas estações retornadas pelo produto do INMET. Para risco futuro, consulte previsão meteorológica e orientação agrometeorológica.",
+        "Não. Ele mostra registros de datas passadas nas estações consultadas. Para avaliar risco futuro, use a previsão meteorológica e orientação agrometeorológica.",
     },
     {
-      question: "Nenhum ponto no mapa significa que não houve geada no Rio Grande do Sul?",
+      question: "Nenhum ponto no mapa significa que não houve geada no estado?",
       answer:
-        "Não. Significa apenas que nenhum registro foi retornado para o período, tipo de estação, estado e dados disponíveis naquela consulta. Locais sem estação ou com microclima diferente podem ter apresentado geada.",
+        "Não. Significa apenas que nenhum registro foi encontrado para o período, o tipo de estação e os dados disponíveis naquela consulta. Locais sem estação ou com microclima diferente podem ter registrado geada.",
     },
     {
       question: "Qual é a diferença entre estação convencional e automática?",
       answer:
-        "São redes e métodos observacionais diferentes. Nesta visualização, as convencionais podem receber gradação de intensidade, enquanto as automáticas aparecem como possível ocorrência conforme o produto consultado.",
+        "São formas diferentes de observação. Nesta página, as convencionais podem mostrar intensidade fraca, moderada ou forte, enquanto as automáticas aparecem como possível ocorrência quando essa é a classificação disponível.",
     },
     {
       question: "Os círculos agrupados mostram o tamanho da área com geada?",
       answer:
-        "Não. Eles apenas agrupam estações próximas para facilitar a navegação no mapa. Ao ampliar o zoom, os marcadores individuais são exibidos.",
+        "Não. Eles apenas juntam estações próximas para facilitar a navegação. Ao aproximar o mapa, os pontos individuais aparecem.",
     },
     {
-      question: "A menor temperatura é um recorde histórico do estado?",
+      question: "A menor temperatura exibida é um recorde histórico do estado?",
       answer:
-        "Não. É somente a menor temperatura mínima entre os registros retornados pelos filtros atuais. Não representa recorde histórico oficial do Rio Grande do Sul.",
+        "Não. É somente a menor temperatura entre os registros encontrados pelos filtros atuais.",
     },
   ],
   relatedLinks: [
@@ -62,17 +62,17 @@ const FROST_PAGE_CONTENT = {
     {
       label: "Clima de Pelotas",
       href: "/clima-em-pelotas" as const,
-      description: "Entenda sazonalidade, frio, massas de ar e diferença entre tempo e clima.",
+      description: "Entenda o frio, as estações do ano e a diferença entre tempo e clima.",
     },
     {
       label: "Estação Embrapa",
       href: "/estacao-embrapa-pelotas" as const,
-      description: "Veja medições locais, extremos e procedência da observação em Pelotas.",
+      description: "Veja medições locais e os extremos registrados em Pelotas.",
     },
     {
-      label: "Fontes e metodologia",
+      label: "Como os dados funcionam",
       href: "/metodologia" as const,
-      description: "Confira origem, atualização, função e limites das integrações meteorológicas.",
+      description: "Confira a origem, a atualização e os limites das fontes meteorológicas.",
     },
   ],
 };
@@ -87,17 +87,17 @@ export const Route = createFileRoute("/mapa-de-geadas-rio-grande-do-sul")({
         breadcrumbs: [
           { name: "Início", path: "/" },
           { name: "Monitoramento", path: "/radar-e-satelite-pelotas" },
-          { name: "Mapa de geadas observadas no RS", path: PAGE_PATH },
+          { name: "Geadas observadas no RS", path: PAGE_PATH },
         ],
         about: [
           "Geadas observadas no Rio Grande do Sul",
           "Estações meteorológicas do INMET",
           "Temperatura mínima por estação",
-          "Classificação de intensidade de geada",
+          "Intensidade de geada",
           "Estações convencionais e automáticas",
-          "Monitoramento agrometeorológico",
+          "Observação agrometeorológica",
           "Diferença entre observação e previsão de geada",
-          "Cobertura espacial de estações meteorológicas",
+          "Cobertura de estações meteorológicas",
         ],
       }),
       createFaqPageJsonLd(PAGE_PATH, FROST_PAGE_CONTENT.faqs),
