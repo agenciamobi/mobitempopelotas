@@ -26,25 +26,25 @@ test("Embrapa route uses the shared shell and source-aware page", () => {
 });
 
 test("station page distinguishes live, partial, stale and unavailable source states", () => {
-  assert.match(page, /live:[\s\S]*Fonte respondendo/);
-  assert.match(page, /partial:[\s\S]*Leitura parcial/);
+  assert.match(page, /live:[\s\S]*Leitura disponível/);
+  assert.match(page, /partial:[\s\S]*Alguns dados disponíveis/);
   assert.match(page, /stale:[\s\S]*Leitura atrasada/);
-  assert.match(page, /unavailable:[\s\S]*Fonte indisponível/);
-  assert.match(page, /Última temperatura reconhecida/);
-  assert.match(page, /Nenhum valor é preenchido artificialmente/);
+  assert.match(page, /unavailable:[\s\S]*Estação indisponível/);
+  assert.match(page, /Última temperatura informada/);
+  assert.match(page, /não mostra valores artificiais/);
   assert.match(page, /health\.reason \?\? statusCopy\[status\]\.description/);
   assert.match(page, /role="status"/);
-  assert.doesNotMatch(page, /status === "stale"[^\n]{0,160}Temperatura atual/);
+  assert.doesNotMatch(page, /status === "stale"[^\n]{0,160}Temperatura agora/);
 });
 
 test("measurement time, query time and observation age remain separate", () => {
   assert.match(page, /observation\.source\.observationTime/);
   assert.match(page, /observation\.source\.fetchedAt/);
   assert.match(page, /quality\.observationAgeMinutes/);
-  assert.match(page, /Horário publicado pela estação/);
-  assert.match(page, /Consulta do portal/);
-  assert.match(page, /Idade calculada/);
-  assert.match(page, /Medição ≠ consulta/);
+  assert.match(page, /Horário informado pela estação/);
+  assert.match(page, /Última atualização/);
+  assert.match(page, /Tempo desde a medição/);
+  assert.match(page, /Medição e atualização/);
   assert.match(route, /Uma consulta recente pode encontrar uma medição antiga/);
 });
 
@@ -77,14 +77,15 @@ test("rain, evapotranspiration and daily extremes preserve station scope", () =>
   assert.match(route, /O acumulado descreve o pluviômetro da estação/);
 });
 
-test("field-level provenance explains how Embrapa enters the current condition", () => {
+test("field-level origin explains how Embrapa enters the current summary", () => {
   assert.match(page, /currentProvenance/);
   assert.match(page, /source === "embrapa"/);
-  assert.match(page, /Campos usados nesta atualização/);
-  assert.match(page, /quality\.currentSource === "embrapa"/);
-  assert.match(page, /O portal decide campo a campo/);
-  assert.match(route, /A condição consolidada é montada campo a campo/);
-  assert.match(route, /Campos ausentes permanecem indisponíveis/);
+  assert.match(page, /Informações usadas agora/);
+  assert.match(page, /fieldsUsedByPortal\(data\)\.length > 0/);
+  assert.match(page, /verifica cada informação separadamente/);
+  assert.match(route, /A Embrapa pode fornecer parte das informações atuais/);
+  assert.match(route, /Quando um valor não é informado/);
+  assert.doesNotMatch(page, /quality\.currentSource === "embrapa"/);
 });
 
 test("station links and dataset metadata remain transparent and safe", () => {
@@ -97,7 +98,7 @@ test("station links and dataset metadata remain transparent and safe", () => {
   assert.match(page, /isBasedOn: observation\.source\.url/);
   assert.doesNotMatch(page, /temporalCoverage:/);
   assert.match(page, /target="_blank" rel="noopener noreferrer"/);
-  assert.match(page, /Monitor da Embrapa/);
+  assert.match(page, /Página da Embrapa/);
 });
 
 test("unavailable state removes links to absent measurement sections", () => {
