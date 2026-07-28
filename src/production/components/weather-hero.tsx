@@ -98,6 +98,13 @@ function getOfficialAlertReason(count: number) {
     : `Pelotas está incluída em ${count} avisos oficiais do INMET`;
 }
 
+function getCurrentConditionLabel(icon: keyof typeof weatherConditionLabels) {
+  if (icon === "rain") return "Chuva";
+  if (icon === "storm") return "Trovoadas";
+  if (icon === "wind") return "Tempo ventoso";
+  return weatherConditionLabels[icon];
+}
+
 function HeroMetricIcon({ name }: { name: HeroMetricIconName }) {
   const paths = {
     humidity: <path d="M12 3.2S6.8 9.3 6.8 13.7a5.2 5.2 0 0 0 10.4 0C17.2 9.3 12 3.2 12 3.2Z" />,
@@ -180,7 +187,7 @@ export function WeatherHero({
   const currentUpdateMeta = getCurrentUpdateMeta(current);
   const nextHourForecast = !current.available ? (weather.hourly[0] ?? null) : null;
   const heroIcon = resolveHeroWeatherIcon(weather, cppmetForecast?.item.summary);
-  const heroCondition = weatherConditionLabels[heroIcon];
+  const heroCondition = getCurrentConditionLabel(heroIcon);
 
   return (
     <section
@@ -366,14 +373,16 @@ export function WeatherHero({
         </div>
       </div>
 
-      <a
-        className="weather-hero-credit"
-        href={presentation.photoHref}
-        target="_blank"
-        rel="noreferrer"
-      >
-        {presentation.photoCredit}
-      </a>
+      {liveCameraBackground ? null : (
+        <a
+          className="weather-hero-credit"
+          href={presentation.photoHref}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {presentation.photoCredit}
+        </a>
+      )}
     </section>
   );
 }
