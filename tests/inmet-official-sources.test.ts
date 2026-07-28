@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { parseInmetForecastPayload } from "../src/lib/weather/inmet-forecast.server.ts";
 import { parseInmetStationPayload } from "../src/lib/weather/inmet-station.server.ts";
+
+const inmetAlertsSource = readFileSync("src/lib/weather/inmet.server.ts", "utf8");
 
 test("previsão municipal do INMET reconhece períodos aninhados e preserva valores ausentes", () => {
   const periods = parseInmetForecastPayload({
@@ -98,4 +101,11 @@ test("estação próxima do INMET é extraída sem transformar campos inválidos
 test("payloads sem estrutura meteorológica reconhecível permanecem vazios", () => {
   assert.deepEqual(parseInmetForecastPayload({ mensagem: "sem dados" }), []);
   assert.equal(parseInmetStationPayload({ mensagem: "sem dados" }), null);
+});
+
+test("avisos do INMET reconhecem as variações amarelas oficiais", () => {
+  assert.match(inmetAlertsSource, /amarel\|fffe00\|ffff00\|ffcc00\|facc15/);
+  assert.match(inmetAlertsSource, /rgb\\\(\?255,\?\(\?:204\|254\|255\),\?0/);
+  assert.match(inmetAlertsSource, /return \{ severity: "potential", label: "Perigo potencial" \}/);
+  assert.match(inmetAlertsSource, /"aviso_cor"/);
 });
