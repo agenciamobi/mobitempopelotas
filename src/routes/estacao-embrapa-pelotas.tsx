@@ -14,38 +14,38 @@ import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.funct
 
 const PAGE_TITLE = "Estação meteorológica da Embrapa em Pelotas";
 const PAGE_DESCRIPTION =
-  "Consulte temperatura, umidade, pressão, vento, chuva, evapotranspiração, extremos, horário e procedência da Estação Embrapa Clima Temperado em Pelotas.";
+  "Consulte temperatura, umidade, pressão, vento, chuva, evapotranspiração, extremos, horário e origem dos dados da Estação Embrapa em Pelotas.";
 const PAGE_PATH = "/estacao-embrapa-pelotas";
 
 const EMBRAPA_PAGE_CONTENT = {
   ...EMBRAPA_EDITORIAL_CONTENT,
-  eyebrow: "Entenda a observação local",
-  title: "Como interpretar as medições da Estação Embrapa em Pelotas",
+  eyebrow: "Como ler as medições da estação",
+  title: "Entenda o que a Estação Embrapa mede em Pelotas",
   answer:
-    "A estação registra condições em um ponto específico e em um horário próprio. O portal separa o momento da medição do momento da consulta, identifica leituras atrasadas ou parciais e informa quais campos da Embrapa entraram na condição atual consolidada.",
+    "A estação registra as condições em um ponto específico e em horários próprios. A página separa o horário da medição do momento em que o Tempo Pelotas consultou a fonte, avisa quando a leitura está atrasada e mostra quais informações da Embrapa foram usadas no resumo atual.",
   facts: [
-    "Temperatura, umidade, pressão, vento, chuva e evapotranspiração pertencem ao ponto dos instrumentos da Embrapa.",
-    "O horário da medição é publicado pela estação; o horário da consulta mostra quando o Tempo Pelotas acessou a fonte.",
-    "Uma leitura atrasada pode continuar visível como último valor conhecido, mas não deve ser tratada como condição atual.",
-    "A chuva acumulada representa o pluviômetro local e pode diferir bastante entre bairros, zona rural e orla do Laranjal.",
-    "A condição consolidada é montada campo a campo; a Embrapa pode fornecer parte das variáveis enquanto previsão e outros produtos vêm de fontes diferentes.",
-    "Campos ausentes permanecem indisponíveis e não são substituídos por estimativas sem identificação.",
+    "Temperatura, umidade, pressão, vento, chuva e evapotranspiração representam o local onde os instrumentos estão instalados.",
+    "O horário da medição informa quando o valor foi registrado; a última atualização informa quando o portal consultou a fonte.",
+    "Uma leitura atrasada pode continuar visível como último valor conhecido, mas não é apresentada como condição atual.",
+    "A chuva acumulada representa o pluviômetro da estação e pode ser diferente em outros bairros, na zona rural e no Laranjal.",
+    "A Embrapa pode fornecer parte das informações atuais, enquanto a previsão das próximas horas vem de modelos meteorológicos identificados separadamente.",
+    "Quando um valor não é informado, a página mantém o campo indisponível em vez de preencher com zero ou estimativa não identificada.",
   ],
   faqs: [
     {
       question: "A temperatura da Embrapa representa toda Pelotas?",
       answer:
-        "Não. Ela é uma medição válida para o local e horário da estação. Distância, urbanização, vegetação, proximidade da Lagoa e chuva localizada podem produzir diferenças em outros pontos do município.",
+        "Não. Ela representa o local e o horário da estação. Urbanização, vegetação, distância, proximidade da Lagoa e chuva localizada podem produzir diferenças em outros pontos do município.",
     },
     {
-      question: "Qual é a diferença entre horário da medição e horário da consulta?",
+      question: "Qual é a diferença entre horário da medição e última atualização?",
       answer:
-        "O horário da medição informa quando a estação registrou ou publicou o valor. O horário da consulta indica quando o portal acessou a fonte. Uma consulta recente pode encontrar uma medição antiga.",
+        "O horário da medição informa quando a estação registrou ou publicou o valor. A última atualização indica quando o Tempo Pelotas consultou a fonte. Uma consulta recente pode encontrar uma medição antiga.",
     },
     {
       question: "O que significa leitura atrasada?",
       answer:
-        "Significa que o último valor reconhecido ultrapassou o limite de atualidade usado pelo agregador. Ele pode ser mostrado como referência anterior, mas não é usado como observação atual sem essa ressalva.",
+        "Significa que o último valor conhecido ultrapassou o limite de atualidade usado pelo portal. Ele pode ser mostrado como referência anterior, mas não é tratado como observação atual.",
     },
     {
       question: "A chuva diária da Embrapa confirma quanto choveu em todos os bairros?",
@@ -55,14 +55,14 @@ const EMBRAPA_PAGE_CONTENT = {
     {
       question: "A Embrapa fornece a previsão das próximas horas?",
       answer:
-        "Nesta página, a Embrapa é usada como fonte observacional. A previsão horária e diária permanece identificada separadamente pelas fontes de modelo e pelos produtos oficiais do portal.",
+        "Nesta página, a Embrapa é usada para mostrar medições locais. A previsão horária e diária aparece separadamente e identifica o modelo responsável.",
     },
   ],
   relatedLinks: [
     {
       label: "Tempo hoje em Pelotas",
       href: "/tempo-hoje-pelotas" as const,
-      description: "Compare a observação local com a previsão das próximas horas.",
+      description: "Compare a medição local com a previsão das próximas horas.",
     },
     {
       label: "Histórico de 30 dias",
@@ -72,12 +72,12 @@ const EMBRAPA_PAGE_CONTENT = {
     {
       label: "Radar e satélite",
       href: "/radar-e-satelite-pelotas" as const,
-      description: "Compare a chuva no pluviômetro com a evolução regional das áreas de precipitação.",
+      description: "Compare a chuva no pluviômetro com as áreas de precipitação observadas na região.",
     },
     {
-      label: "Fontes e metodologia",
+      label: "Como os dados funcionam",
       href: "/metodologia" as const,
-      description: "Veja como a estação participa da consolidação e quais são seus limites.",
+      description: "Veja como as medições da estação são usadas e quais são seus limites.",
     },
   ],
 };
@@ -103,7 +103,7 @@ export const Route = createFileRoute("/estacao-embrapa-pelotas")({
           "Chuva acumulada na Estação Embrapa",
           "Evapotranspiração em Pelotas",
           "Horário e idade da observação",
-          "Procedência da condição atual",
+          "Origem dos dados da condição atual",
         ],
       }),
       createFaqPageJsonLd(PAGE_PATH, EMBRAPA_PAGE_CONTENT.faqs),
