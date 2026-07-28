@@ -21,10 +21,10 @@ import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-br
 import "./TomorrowForecastPageV3.css";
 
 const chapters = [
-  { href: "#resumo-amanha", label: "Previsão de amanhã", detail: "Temperatura, chuva e vento" },
+  { href: "#resumo-amanha", label: "Amanhã em resumo", detail: "Temperatura, chuva e vento" },
   { href: "#comparacao-amanha", label: "Compare com hoje", detail: "O que deve mudar" },
   { href: "#planejamento-amanha", label: "Para sua rotina", detail: "Como se preparar" },
-  { href: "#contexto-oficial-amanha", label: "Fontes oficiais", detail: "INMET e UFPel" },
+  { href: "#contexto-oficial-amanha", label: "INMET e UFPel", detail: "Outras previsões disponíveis" },
   { href: "#perguntas-amanha", label: "Perguntas", detail: "Respostas rápidas" },
 ];
 
@@ -112,7 +112,7 @@ function tomorrowTitle(day: DailyForecast) {
   if (day.max <= 18) return "O frio deve permanecer durante boa parte de amanhã";
   if (day.max >= 30) return "O calor deve ganhar força ao longo de amanhã";
   if (day.max - day.min >= 10) return "A variação de temperatura pede roupa em camadas";
-  return "Amanhã não apresenta um único fator de maior impacto";
+  return "A previsão de amanhã não mostra um único destaque principal";
 }
 
 function tomorrowSummary(day: DailyForecast) {
@@ -135,29 +135,29 @@ function buildPlanningCards(day: DailyForecast): PlanningCard[] {
         ? "O dia tende a permanecer frio; considere proteção térmica nos deslocamentos."
         : amplitude >= 10
           ? "A diferença entre mínima e máxima favorece o uso de roupa em camadas."
-          : "A faixa de temperatura não indica mudança brusca entre mínima e máxima.";
+          : "A temperatura deve variar menos entre a manhã e a tarde.";
 
   const rainDescription =
     day.rainChance === null
-      ? `O modelo estima ${day.precipitationMm} mm, mas não informou a chance percentual.`
+      ? `A previsão indica ${day.precipitationMm} mm, mas ainda não informa a chance percentual.`
       : day.rainChance >= 60 || day.precipitationMm >= 10
         ? `Com ${day.rainChance}% de chance e ${day.precipitationMm} mm previstos, leve proteção e confira a atualização antes de sair.`
         : day.rainChance >= 30
           ? `Há ${day.rainChance}% de chance. Mantenha uma alternativa coberta para compromissos sensíveis ao tempo.`
-          : `A chance máxima é de ${day.rainChance}%, com baixo impacto esperado neste momento.`;
+          : `A chance máxima é de ${day.rainChance}%, com pouca chuva prevista neste momento.`;
 
   const windDescription =
     day.windGust === null
-      ? "A fonte principal ainda não informou as rajadas previstas para amanhã."
+      ? "A previsão ainda não informou as rajadas para amanhã."
       : day.windGust >= 50
         ? `Rajadas de até ${day.windGust} km/h podem afetar estruturas leves e atividades ao ar livre.`
         : day.windGust >= 35
           ? `Rajadas de até ${day.windGust} km/h merecem atenção em áreas abertas e próximas à Lagoa.`
-          : `Rajadas de até ${day.windGust} km/h não indicam impacto elevado neste momento.`;
+          : `Rajadas de até ${day.windGust} km/h são previstas para o dia.`;
 
   return [
     {
-      label: "Temperatura",
+      label: "Temperatura amanhã",
       title: `${day.min}° a ${day.max}°`,
       description: temperatureDescription,
       icon: Thermometer,
@@ -178,9 +178,9 @@ function buildPlanningCards(day: DailyForecast): PlanningCard[] {
       tone: (day.windGust ?? 0) >= 35 ? "attention" : "normal",
     },
     {
-      label: "Atualize a previsão",
+      label: "Confira novamente",
       title: "Hoje à noite e amanhã cedo",
-      description: "Confira novamente antes de dormir e perto do horário em que pretende sair.",
+      description: "Veja a atualização antes de dormir e perto do horário em que pretende sair.",
       icon: RefreshCw,
       tone: "normal",
     },
@@ -238,14 +238,14 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
       question: "Vai chover amanhã em Pelotas?",
       answer:
         tomorrow.rainChance === null
-          ? `A fonte principal não informou a chance percentual, mas estima ${tomorrow.precipitationMm} mm para o dia.`
+          ? `A previsão não informou a chance percentual, mas indica ${tomorrow.precipitationMm} mm para o dia.`
           : `A maior chance prevista é de ${tomorrow.rainChance}%, com volume diário estimado de ${tomorrow.precipitationMm} mm.`,
     },
     {
       question: "Como estará o vento amanhã?",
       answer:
         tomorrow.windGust === null
-          ? "A fonte principal ainda não publicou a estimativa de rajadas para amanhã."
+          ? "A previsão ainda não publicou a estimativa de rajadas para amanhã."
           : `As rajadas podem chegar a ${tomorrow.windGust} km/h durante o dia.`,
     },
   ];
@@ -274,7 +274,7 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
         aria-labelledby="tomorrow-v3-overview-title"
       >
         <div className="tomorrow-v3-overview__intro">
-          <span className="eyebrow">Resumo da previsão</span>
+          <span className="eyebrow">Amanhã em resumo</span>
           <h2 id="tomorrow-v3-overview-title">{tomorrowTitle(tomorrow)}</h2>
           <p>{tomorrowSummary(tomorrow)}</p>
         </div>
@@ -283,11 +283,11 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
           <article>
             <CheckCircle2 aria-hidden="true" />
             <div>
-              <span>Faixa de temperatura</span>
+              <span>Temperatura amanhã</span>
               <strong>
                 {amplitude >= 10
-                  ? "Prepare-se para uma mudança perceptível"
-                  : "Temperatura com menor variação"}
+                  ? "A manhã e a tarde terão uma diferença maior"
+                  : "A temperatura deve variar menos"}
               </strong>
               <small>Mínima de {tomorrow.min}° e máxima de {tomorrow.max}°.</small>
             </div>
@@ -295,11 +295,11 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
           <article className="is-caution">
             <TriangleAlert aria-hidden="true" />
             <div>
-              <span>Atualize antes de sair</span>
+              <span>Confira antes de sair</span>
               <strong>
                 {(tomorrow.rainChance ?? 0) >= 60 || (tomorrow.windGust ?? 0) >= 50
                   ? "Chuva ou rajadas podem mudar seus planos"
-                  : "Confira a previsão novamente amanhã cedo"}
+                  : "Veja a previsão novamente amanhã cedo"}
               </strong>
               <small>Use também radar e avisos oficiais quando houver instabilidade.</small>
             </div>
@@ -383,10 +383,10 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
       >
         <header>
           <div>
-            <span className="eyebrow">Previsão oficial e regional</span>
+            <span className="eyebrow">Outras previsões disponíveis</span>
             <h2 id="tomorrow-v3-official-title">O que INMET e CPPMet/UFPel publicam para amanhã</h2>
           </div>
-          <Link to="/metodologia">Como usamos cada fonte</Link>
+          <Link to="/metodologia">Entenda as fontes</Link>
         </header>
 
         {hasOfficialContext ? (
@@ -407,7 +407,7 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
               <article className="is-regional">
                 <span>CPPMet / UFPel</span>
                 <strong>{cppmetContext.summary || "Previsão regional"}</strong>
-                <p>{cppmetContext.text || "Contexto regional sem detalhamento adicional."}</p>
+                <p>{cppmetContext.text || "Sem detalhes adicionais."}</p>
                 <small>{cppmetContext.minimum === null || cppmetContext.maximum === null ? "Temperaturas não publicadas" : `${cppmetContext.minimum}° / ${cppmetContext.maximum}°`}</small>
               </article>
             ) : null}
@@ -416,8 +416,8 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
           <div className="tomorrow-v3-official__unavailable">
             <Info aria-hidden="true" />
             <div>
-              <strong>INMET e CPPMet/UFPel ainda não publicaram contexto para amanhã</strong>
-              <span>A previsão principal continua disponível e identificada pela fonte utilizada.</span>
+              <strong>Ainda sem previsão específica do INMET ou da UFPel para amanhã</strong>
+              <span>A previsão acima continua disponível.</span>
             </div>
           </div>
         )}
@@ -433,7 +433,7 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
             <span className="eyebrow">Respostas rápidas</span>
             <h2 id="tomorrow-v3-faq-title">Dúvidas sobre o tempo de amanhã em Pelotas</h2>
           </div>
-          <p>As respostas usam os valores publicados pelas fontes disponíveis nesta atualização.</p>
+          <p>As respostas usam os dados disponíveis para amanhã.</p>
         </header>
         <div>
           {faqs.map((faq) => (
@@ -455,7 +455,7 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
       <aside className="tomorrow-v3-source-note" aria-label="Origem e atualização da previsão">
         <Gauge aria-hidden="true" />
         <p>
-          Previsão atualizada em {formatDateTime(weather.source.fetchedAt)}. A fonte principal é {weather.quality.forecastProvider ?? "o modelo meteorológico disponível"}. INMET e CPPMet/UFPel aparecem como contexto complementar quando publicam dados para amanhã.
+          Atualizado em {formatDateTime(weather.source.fetchedAt)}. Previsão principal: {weather.quality.forecastProvider ?? "modelo meteorológico disponível"}. INMET e UFPel aparecem quando há dados para amanhã.
         </p>
       </aside>
     </div>
