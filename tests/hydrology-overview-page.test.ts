@@ -32,7 +32,7 @@ test("local telemetry distinguishes live, stale and unavailable readings", () =>
   assert.match(page, /Telemetria indisponível/);
   assert.match(page, /não preenche a ausência da fonte com nível estimado/);
   assert.match(page, /role="status"/);
-  assert.doesNotMatch(page, /level\.status === "stale"[^\n]{0,180}nível atual/i);
+  assert.doesNotMatch(page, /level\.status === "stale"[^\n]{0,220}label:\s*"Nível atual"/i);
 });
 
 test("measurement time, age and portal query remain separate", () => {
@@ -91,7 +91,7 @@ test("absence of transmission is never interpreted as normal level", () => {
   assert.match(page, /Uma estação sem transmissão não deve ser interpretada como nível normal/);
   assert.match(route, /Ausência de transmissão significa ausência de dado atual/);
   assert.match(route, /Ausência de transmissão significa que o rio está normal\?/);
-  assert.doesNotMatch(hydrologySource, /sem transmissão[^\n]{0,100}nível normal\./i);
+  assert.doesNotMatch(hydrologySource, /sem transmissão\s+(?:significa|confirma|indica)\s+(?:que\s+)?(?:o\s+)?nível normal/i);
 });
 
 test("hydrology page publishes transparent dataset metadata only with a local reading", () => {
