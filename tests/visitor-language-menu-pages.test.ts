@@ -14,6 +14,10 @@ const meteogram = readFileSync("src/components/weather/MeteogramPage.tsx", "utf8
 const embrapa = readFileSync("src/components/embrapa/EmbrapaStationPageV2.tsx", "utf8");
 const cameras = readFileSync("src/components/cameras/CameraPageV2.tsx", "utf8");
 const frost = readFileSync("src/components/inmet/FrostMapPageV2.tsx", "utf8");
+const radar = readFileSync("src/components/redemet/RedemetOverview.tsx", "utf8");
+const radarContext = readFileSync("src/components/redemet/RadarForecastContext.tsx", "utf8");
+const climate = readFileSync("src/components/climate/ClimatePelotasPage.tsx", "utf8");
+const history = readFileSync("src/components/history/WeatherHistoryPage.tsx", "utf8");
 const hydrology = readFileSync("src/components/hydrology/HydrologyOverviewV2.tsx", "utf8");
 const hydrologyHero = readFileSync("src/components/hydrology/HydrologyEditorialHero.tsx", "utf8");
 const hydrologyPages = readFileSync("src/components/hydrology/HydrologyPages.tsx", "utf8");
@@ -26,6 +30,10 @@ const auditedVisitorSources = [
   embrapa,
   cameras,
   frost,
+  radar,
+  radarContext,
+  climate,
+  history,
   hydrology,
   hydrologyHero,
   hydrologyPages,
@@ -45,6 +53,17 @@ test("main menu uses language visitors can understand without portal jargon", ()
   assert.doesNotMatch(header, /Contexto e transparência/);
   assert.doesNotMatch(header, /Acompanhamento hídrico/);
   assert.doesNotMatch(header, />Explorar </);
+});
+
+test("monitoring menu descriptions match the purpose of all eight pages", () => {
+  assert.match(header, /Veja áreas de chuva, imagens de satélite e trovoadas na região\./);
+  assert.match(header, /Consulte registros de geada nas estações do INMET no Rio Grande do Sul\./);
+  assert.match(header, /Veja temperatura, umidade, vento e chuva medidos em Pelotas\./);
+  assert.match(header, /Veja imagens locais e saiba se a transmissão está ao vivo ou gravada\./);
+  assert.match(header, /Entenda as estações do ano e por que o tempo varia na cidade\./);
+  assert.match(header, /Compare temperatura, chuva, nuvens, visibilidade, pressão e vento\./);
+  assert.match(header, /Compare máximas, mínimas, chuva e rajadas dos últimos dias\./);
+  assert.match(header, /Veja de onde vêm os dados, quando atualizam e quais são seus limites\./);
 });
 
 test("current condition uses field-level origin and plain labels", () => {
@@ -101,24 +120,30 @@ test("alerts page states availability and counts directly", () => {
 });
 
 test("monitoring pages use direct labels while retaining necessary explanations", () => {
-  assert.match(meteogram, /Previsão hora a hora/);
-  assert.match(meteogram, /Possibilidade de tempestade/);
+  assert.match(radar, /Horário e quantidade de imagens/);
+  assert.match(radar, /Imagem mais recente/);
+  assert.match(frost, /Dados do INMET/);
+  assert.match(frost, /Lista de registros/);
   assert.match(embrapa, /Origem dos dados/);
   assert.match(embrapa, /Situação da estação/);
   assert.match(cameras, /Vídeo disponível/);
   assert.match(cameras, /Origem do vídeo/);
-  assert.match(frost, /Dados do INMET/);
-  assert.match(frost, /Lista de registros/);
+  assert.match(climate, /Tempo mostra o presente; clima descreve muitos anos/);
+  assert.match(climate, /Últimos 30 dias: dados recentes/);
+  assert.match(meteogram, /Previsão hora a hora/);
+  assert.match(meteogram, /Possibilidade de tempestade/);
+  assert.match(history, /Dias com dados/);
+  assert.match(history, /Valores diários/);
+  assert.match(methodology, /Como os dados funcionam/);
+  assert.match(methodology, /Fontes disponíveis/);
+  assert.match(methodology, /Caminho dos dados/);
 });
 
-test("water and methodology pages use visitor-facing wording", () => {
+test("water pages use visitor-facing wording", () => {
   assert.match(hydrology, /Leitura atualizada/);
   assert.match(hydrology, /Vento agora/);
   assert.match(hydrologyHero, /Medição local · Estação Laranjal/);
   assert.match(hydrologyPages, /Medição da Estação Laranjal/);
-  assert.match(methodology, /Como os dados funcionam/);
-  assert.match(methodology, /Fontes disponíveis/);
-  assert.match(methodology, /Caminho dos dados/);
 });
 
 test("audited visitor interfaces do not expose internal operational phrases", () => {
@@ -127,18 +152,29 @@ test("audited visitor interfaces do not expose internal operational phrases", ()
     /procedência/i,
     /rastreabilidade/i,
     /estado da integração/i,
+    /integração pendente/i,
+    /configuração da integração/i,
     /telemetria atualizada/i,
     /telemetria indisponível/i,
     /fonte de contingência/i,
+    /grade de previsão/i,
+    /ponto de grade/i,
     /pico de CAPE/i,
     /energia convectiva/i,
     /produto de estação automática/i,
+    /Produto:/i,
     /consulta inicial/i,
     /vento consolidado agora/i,
     /estável no recorte/i,
     /contexto previsto/i,
     /consulta consolidada/i,
     /transparência operacional/i,
+    /completude das variáveis/i,
+    /faixa térmica total/i,
+    /tendências sazonais/i,
+    /acesso direto ao produto/i,
+    /série diária acessível/i,
+    /visão geral do recorte/i,
   ]) {
     assert.doesNotMatch(auditedCopy, phrase);
   }
