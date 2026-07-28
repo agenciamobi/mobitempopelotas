@@ -75,10 +75,39 @@ window.OneSignalDeferred.push(async function(OneSignal) {
 
 const ACTIVE_MODAL_SELECTOR = [
   ".pwa-dialog-backdrop",
+  ".push-dialog-backdrop",
   '[role="dialog"][aria-modal="true"]',
   '[data-radix-dialog-content][data-state="open"]',
   '[data-vaul-drawer][data-state="open"]',
 ].join(",");
+
+const PAGE_WHEEL_EXCLUSION_SELECTOR = [
+  'input[type="range"]',
+  "textarea",
+  "select",
+  '[contenteditable="true"]',
+  ".pwa-dialog",
+  ".push-dialog",
+  '[data-radix-scroll-area-viewport]',
+].join(",");
+
+function isElementVisible(element: HTMLElement) {
+  if (element.hidden || element.getAttribute("aria-hidden") === "true") return false;
+
+  const style = window.getComputedStyle(element);
+  return (
+    style.display !== "none" &&
+    style.visibility !== "hidden" &&
+    style.pointerEvents !== "none" &&
+    element.getClientRects().length > 0
+  );
+}
+
+function hasActiveModal() {
+  return Array.from(document.querySelectorAll<HTMLElement>(ACTIVE_MODAL_SELECTOR)).some(
+    isElementVisible,
+  );
+}
 
 function removeStaleOverflowLock(element: HTMLElement) {
   const overflow = element.style.getPropertyValue("overflow").trim();
@@ -94,10 +123,70 @@ function removeStaleOverflowLock(element: HTMLElement) {
 }
 
 function restoreDocumentScrollIfUnlocked() {
-  if (document.querySelector(ACTIVE_MODAL_SELECTOR)) return;
+  if (hasActiveModal()) return;
 
   removeStaleOverflowLock(document.documentElement);
   removeStaleOverflowLock(document.body);
+}
+
+function normalizedWheelDelta(event: WheelEvent) {
+  if (event.deltaMode === WheelEvent.DOM_DELTA_LINE) return event.deltaY * 16;
+  if (event.deltaMode === WheelEvent.DOM_DELTA_PAGE) return event.deltaY * window.innerHeight * 0.9;
+  return event.deltaY;
+}
+
+function canDocumentScroll(deltaY: number) {
+  const scrollingElement = document.scrollingElement ?? document.documentElement;
+  const maximum = scrollingElement.scrollHeight - scrollingElement.clientHeight;
+
+  if (deltaY > 0) return scrollingElement.scrollTop < maximum - 1;
+  if (deltaY < 0) return scrollingElement.scrollTop > 1;
+  return false;
+}
+
+function hasScrollableAncestor(target: Element, deltaY: number) {
+  let element: HTMLElement | null = target instanceof HTMLElement ? target : target.parentElement;
+
+  while (element && element !== document.body && element !== document.documentElement) {
+    const style = window.getComputedStyle(element);
+    const scrollable = /auto|scroll|overlay/.test(style.overflowY);
+
+    if (scrollable && element.scrollHeight > element.clientHeight + 1) {
+      const maximum = element.scrollHeight - element.clientHeight;
+      if ((deltaY > 0 && element.scrollTop < maximum - 1) || (deltaY < 0 && element.scrollTop > 1)) {
+        return true;
+      }
+    }
+
+    element = element.parentElement;
+  }
+
+  return false;
+}
+
+function releaseBlockedDocumentWheel(event: WheelEvent) {
+  if (event.ctrlKey || event.metaKey || hasActiveModal()) return;
+
+  const target = event.target instanceof Element ? event.target : null;
+  if (!target || target.closest(PAGE_WHEEL_EXCLUSION_SELECTOR)) return;
+
+  const deltaY = normalizedWheelDelta(event);
+  if (!deltaY || Math.abs(deltaY) <= Math.abs(event.deltaX)) return;
+
+  const isInsideMap = Boolean(target.closest(".regional-map-engine, .maplibregl-map"));
+  if (isInsideMap) {
+    // O mapa possui listener próprio de wheel. Interromper somente a propagação
+    // mantém o comportamento padrão do navegador, que é rolar o documento.
+    event.stopImmediatePropagation();
+  }
+
+  if (hasScrollableAncestor(target, deltaY)) return;
+
+  const before = window.scrollY;
+  window.requestAnimationFrame(() => {
+    if (Math.abs(window.scrollY - before) > 1 || !canDocumentScroll(deltaY)) return;
+    window.scrollBy({ top: deltaY, left: 0, behavior: "auto" });
+  });
 }
 
 function DocumentScrollGuard() {
@@ -123,6 +212,10 @@ function DocumentScrollGuard() {
       attributeFilter: ["style"],
     });
 
+    window.addEventListener("wheel", releaseBlockedDocumentWheel, {
+      capture: true,
+      passive: true,
+    });
     window.addEventListener("pageshow", scheduleRestore);
     window.addEventListener("focus", scheduleRestore);
     document.addEventListener("visibilitychange", scheduleRestore);
@@ -130,6 +223,7 @@ function DocumentScrollGuard() {
     return () => {
       window.cancelAnimationFrame(frame);
       observer.disconnect();
+      window.removeEventListener("wheel", releaseBlockedDocumentWheel, true);
       window.removeEventListener("pageshow", scheduleRestore);
       window.removeEventListener("focus", scheduleRestore);
       document.removeEventListener("visibilitychange", scheduleRestore);
