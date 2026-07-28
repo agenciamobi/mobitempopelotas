@@ -126,7 +126,8 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
   const current = weather.current;
   const hasMeasurement =
     current?.temperature !== null && current?.temperature !== undefined;
-  const observed = hasMeasurement && weather.quality.currentSource === "embrapa";
+  const observed =
+    hasMeasurement && weather.currentProvenance.temperature === "embrapa";
   const forecastProvider = weather.quality.forecastProvider;
 
   const metrics = current
@@ -137,7 +138,7 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
           source: sourceName(weather.currentProvenance.humidity, forecastProvider),
         },
         {
-          label: "Vento observado",
+          label: "Vento agora",
           value: formatWind(current.windSpeed, current.windDirection),
           source: sourceName(weather.currentProvenance.windSpeed, forecastProvider),
         },
@@ -163,10 +164,10 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
     >
       <div className="home-observation-story__intro">
         <span className="eyebrow">Condição atual</span>
-        <h2 id="internal-observation-title">O que a estação observa agora em Pelotas</h2>
-        <p>Temperatura, umidade, vento e pressão com a origem identificada em cada valor.</p>
+        <h2 id="internal-observation-title">Temperatura e condições agora em Pelotas</h2>
+        <p>Cada valor mostra de onde veio e quando foi atualizado.</p>
         <Link to="/estacao-embrapa-pelotas">
-          Abrir dados completos da estação <span aria-hidden="true">→</span>
+          Ver todas as medições da estação <span aria-hidden="true">→</span>
         </Link>
       </div>
 
@@ -176,11 +177,11 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
             <small className="internal-observation-status">
               {observed ? (
                 <>
-                  <CheckCircle2 aria-hidden="true" /> Dados observados pela Embrapa
+                  <CheckCircle2 aria-hidden="true" /> Medição da Estação Embrapa
                 </>
               ) : (
                 <>
-                  <Info aria-hidden="true" /> Valor atual estimado pelo modelo
+                  <Info aria-hidden="true" /> Estimativa do modelo para agora
                 </>
               )}
             </small>
@@ -191,7 +192,7 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
                 : `Sensação térmica de ${formatNumber(current.feelsLike)}°`}
             </span>
             <small className="internal-observation-updated">
-              Leitura atualizada em {formatDateTime(current.observedAt ?? weather.source.fetchedAt)}
+              Atualizado em {formatDateTime(current.observedAt ?? weather.source.fetchedAt)}
             </small>
           </div>
 
@@ -210,8 +211,8 @@ export function InternalObservationWidget({ data }: { data: WeatherIntelligenceD
       ) : (
         <div className="home-observation-story__unavailable internal-observation-unavailable">
           <RefreshCw aria-hidden="true" />
-          <strong>Medição local indisponível agora</strong>
-          <span>A previsão continua disponível e identificada separadamente.</span>
+          <strong>A medição local está indisponível</strong>
+          <span>A previsão continua disponível e aparece separadamente.</span>
         </div>
       )}
     </section>
@@ -233,7 +234,7 @@ export function InternalPracticalSummary({
         <span className="eyebrow">Para organizar a rotina</span>
         <h2 id="internal-practical-title">{title}</h2>
         <p>{data.brief.summary}</p>
-        <small>Resumo do Tempo Pelotas com base nas fontes identificadas nesta página.</small>
+        <small>Resumo baseado nos dados desta atualização.</small>
       </div>
 
       <div className="internal-practical-widget__cards">
@@ -248,7 +249,7 @@ export function InternalPracticalSummary({
               ))}
             </ul>
           ) : (
-            <p>Nenhuma condição favorável adicional foi destacada.</p>
+            <p>Nenhum destaque favorável adicional.</p>
           )}
         </article>
 
@@ -263,7 +264,7 @@ export function InternalPracticalSummary({
               ))}
             </ul>
           ) : (
-            <p>Nenhum ponto adicional de atenção foi indicado.</p>
+            <p>Nenhum cuidado adicional indicado.</p>
           )}
         </article>
       </div>
