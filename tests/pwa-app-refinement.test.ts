@@ -10,13 +10,22 @@ const globalStyles = readFileSync("src/production/production-styles.css", "utf8"
 const serviceWorker = readFileSync("public/sw.js", "utf8");
 const offlinePage = readFileSync("public/offline.html", "utf8");
 
-test("root mounts the PWA experience and exposes full safe-area viewport", () => {
-  assert.match(rootRoute, /PwaAppExperience/);
-  assert.match(rootRoute, /<PwaAppExperience \/>/);
+test("temporarily disables PWA mounting and clears persistent browser state", () => {
+  assert.doesNotMatch(rootRoute, /import \{ PwaAppExperience \}/);
+  assert.doesNotMatch(rootRoute, /import \{ PwaManager \}/);
+  assert.doesNotMatch(rootRoute, /<PwaAppExperience \/>/);
+  assert.doesNotMatch(rootRoute, /<PwaManager \/>/);
+  assert.doesNotMatch(rootRoute, /rel: "manifest"/);
+  assert.match(rootRoute, /PWA_EMERGENCY_RESET_SCRIPT/);
+  assert.match(rootRoute, /navigator\.serviceWorker\.getRegistrations\(\)/);
+  assert.match(rootRoute, /registration\.unregister\(\)/);
+  assert.match(rootRoute, /caches\.keys\(\)/);
+  assert.match(rootRoute, /caches\.delete\(cacheName\)/);
+  assert.match(rootRoute, /element\.style\.removeProperty\("overflow"\)/);
   assert.match(rootRoute, /viewport-fit=cover/);
 });
 
-test("installed app tracks display mode, network and data-saving preferences", () => {
+test("installed app implementation remains available for later reactivation", () => {
   assert.match(experience, /data\.pwaMode/);
   assert.match(experience, /data\.saveData/);
   assert.match(experience, /data\.effectiveConnection/);
@@ -29,7 +38,7 @@ test("installed app tracks display mode, network and data-saving preferences", (
   assert.match(experience, /Conexão restabelecida/);
 });
 
-test("PWA visual layer handles standalone shell and safe areas", () => {
+test("PWA visual layer remains preserved but inactive", () => {
   assert.match(styles, /@media \(display-mode: standalone\), \(display-mode: fullscreen\)/);
   assert.match(styles, /--pwa-app-header-height/);
   assert.match(styles, /--pwa-app-nav-height/);
@@ -40,7 +49,7 @@ test("PWA visual layer handles standalone shell and safe areas", () => {
   assert.match(styles, /\.pwa-dialog::before/);
 });
 
-test("live camera falls back to its preview on slow, saved-data or offline connections", () => {
+test("live camera fallback styles remain available for future PWA reactivation", () => {
   assert.match(styles, /data-save-data="true"/);
   assert.match(styles, /data-effective-connection="slow-2g"/);
   assert.match(styles, /data-effective-connection="2g"/);
@@ -58,14 +67,14 @@ test("PWA refinement remains the final production style layer", () => {
   assert.ok(cssCamera >= 0 && cssPwa > cssCamera);
 });
 
-test("service worker uses a fresh cache and navigation preload", () => {
-  assert.match(serviceWorker, /tempo-pelotas-v3/);
+test("service worker source remains versioned for later reactivation", () => {
+  assert.match(serviceWorker, /tempo-pelotas-v5/);
   assert.match(serviceWorker, /navigationPreload\?\.enable\(\)/);
   assert.match(serviceWorker, /event\.preloadResponse/);
   assert.match(serviceWorker, /onlineOnlyNavigation\(event\)/);
 });
 
-test("offline page matches the installed app and reloads when connection returns", () => {
+test("offline page remains preserved for later reactivation", () => {
   assert.match(offlinePage, /viewport-fit=cover/);
   assert.match(offlinePage, /Aplicativo Tempo Pelotas/);
   assert.match(offlinePage, /Aguardando conexão/);
