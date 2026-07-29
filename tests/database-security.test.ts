@@ -7,6 +7,13 @@ const serverOnlyTables = new Set([
   "weather_daily_snapshots",
   "web_push_subscriptions",
   "web_push_dispatches",
+  "weather_station_current",
+  "weather_station_observations",
+  "weather_collector_settings",
+  "weather_data_alerts",
+  "weather_forecast_predictions",
+  "weather_forecast_verifications",
+  "weather_forecast_accuracy_settings",
 ]);
 const accountTables = new Map([
   ["profiles", "id"],
@@ -252,7 +259,37 @@ test("snapshots e web push permanecem exclusivos do servidor", async () => {
   assertNoClientGrantOnServerOnlyTables(`${snapshots} ${push}`);
 });
 
-test("a definição efetiva da RPC de conta exige sessão e search_path seguro", async () => {
+test("RPC pública usa RLS e consentimentos são gravados por trigger privado", async () => {
+  const migrations = await migrationsPromise;
+  const hardening = migration(migrations, "20260729065000_harden_account_permissions.sql");
+
+  assertIncludes(hardening, [
+    "create schema if not exists private",
+    "create or replace function private.record_account_consent_changes()",
+    "security definer set search_path = ''",
+    "current_user_id is null or current_user_id is distinct from new.user_id",
+    "create trigger user_preferences_record_consent_changes",
+    "execute function private.record_account_consent_changes()",
+    "revoke all on function private.record_account_consent_changes() from authenticated",
+    "revoke all on table public.profiles from authenticated",
+    "grant select, insert, update on table public.profiles to authenticated",
+    "revoke all on table public.user_preferences from authenticated",
+    "grant select, insert, update on table public.user_preferences to authenticated",
+    "revoke all on table public.account_consent_events from authenticated",
+    "grant select on table public.account_consent_events to authenticated",
+  ]);
+
+  assert.doesNotMatch(
+    hardening,
+    /grant\s+execute\s+on\s+function\s+private\.record_account_consent_changes\(\)\s+to\s+authenticated/,
+  );
+  assert.doesNotMatch(
+    hardening,
+    /grant\s+(?:all|truncate|delete)[^;]*on\s+table\s+public\.(?:profiles|user_preferences)\s+to\s+authenticated/,
+  );
+});
+
+test("a definição efetiva da RPC de conta exige sessão, claims canônicos e invoker", async () => {
   const migrations = await migrationsPromise;
   const allSql = [...migrations.values()].join(" ");
   const definitions = collectFunctionDefinitions(migrations, "update_account_preferences");
@@ -260,11 +297,15 @@ test("a definição efetiva da RPC de conta exige sessão e search_path seguro",
 
   assert.ok(latest, "A função update_account_preferences não foi versionada.");
   assertIncludes(latest.definition, [
-    "security definer",
+    "security invoker",
     "set search_path = ''",
     "current_user_id uuid := (select auth.uid())",
+    "claims jsonb := coalesce((select auth.jwt()), '{}'::jsonb)",
     "if current_user_id is null then raise exception 'authentication required'",
+    "canonical_email",
+    "canonical_avatar_url",
   ]);
+  assert.doesNotMatch(latest.definition, /account_consent_events/);
   assert.match(
     allSql,
     /grant\s+execute\s+on\s+function\s+public\.update_account_preferences\s*\([^;]*\)\s+to\s+authenticated;/,
