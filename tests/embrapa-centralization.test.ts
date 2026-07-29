@@ -17,6 +17,10 @@ const healthLogicMigration = readFileSync(
   "supabase/migrations/20260729031500_weather_data_health_logic.sql",
   "utf8",
 );
+const healthDurationFixMigration = readFileSync(
+  "supabase/migrations/20260729033000_fix_weather_failure_duration.sql",
+  "utf8",
+);
 const centralStore = readFileSync("src/lib/weather/embrapa-central.server.ts", "utf8");
 const healthServer = readFileSync("src/lib/weather/embrapa-health.server.ts", "utf8");
 const healthFunction = readFileSync("src/lib/weather/embrapa-health.functions.ts", "utf8");
@@ -141,6 +145,14 @@ test("coletor abre e resolve alertas por falha, atraso, lentidão e leitura inco
   assert.match(healthLogicMigration, /'slow-response'/);
   assert.match(healthLogicMigration, /new\.last_duration_ms > 15000/);
   assert.match(healthLogicMigration, /'incomplete-reading'/);
+});
+
+test("duração usa o fim da tentativa correspondente em sucesso e falha", () => {
+  assert.match(healthDurationFixMigration, /succeeded := new\.last_success_at is distinct from old\.last_success_at/);
+  assert.match(healthDurationFixMigration, /failed := new\.error is not null/);
+  assert.match(healthDurationFixMigration, /finished_at := coalesce\(new\.last_success_at, now\(\)\)/);
+  assert.match(healthDurationFixMigration, /finished_at := coalesce\(new\.last_attempt_at, now\(\)\)/);
+  assert.match(healthDurationFixMigration, /new\.last_duration_ms := duration_ms/);
 });
 
 test("snapshot de saúde é sanitizado e acessível apenas pelo backend", () => {
