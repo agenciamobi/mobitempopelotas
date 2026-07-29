@@ -1,6 +1,6 @@
 import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 
-import { RegionalCityWeatherPage } from "@/components/regional/RegionalCityWeatherPage";
+import { RegionalCityWeatherPageClient } from "@/components/regional/RegionalCityWeatherPageClient";
 import { createPageHead } from "@/lib/page-meta";
 import { REGIONAL_HOME_CITY_SLUG, regionalCityPath } from "@/lib/regional-cities";
 import { getRegionalCityWeather } from "@/lib/weather/regional-city-weather.functions";
@@ -32,5 +32,5 @@ export const Route = createFileRoute("/tempo-em/$citySlug")({
 });
 
 function RegionalCityRoute() {
-  return <RegionalCityWeatherPage data={Route.useLoaderData()} />;
+  return <RegionalCityWeatherPageClient data={Route.useLoaderData()} />;
 }
