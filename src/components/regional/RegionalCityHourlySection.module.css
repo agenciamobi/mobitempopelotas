@@ -65,7 +65,7 @@
 
 .grid {
   display: grid;
-  grid-auto-columns: minmax(170px, 1fr);
+  grid-auto-columns: minmax(184px, 1fr);
   grid-auto-flow: column;
   overflow-x: auto;
   border: 1px solid rgb(7 30 47 / 9%);
@@ -75,10 +75,30 @@
 }
 
 .grid article {
+  position: relative;
   min-width: 0;
-  padding: 20px 18px;
+  padding: 20px 18px 22px;
+  overflow: hidden;
   border-right: 1px solid rgb(7 30 47 / 9%);
   scroll-snap-align: start;
+}
+
+.grid article::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: #18bdcd;
+  content: "";
+}
+
+.grid article:nth-child(3n + 2)::before {
+  background: #5e2ced;
+}
+
+.grid article:nth-child(3n)::before {
+  background: #e70b85;
 }
 
 .grid article:last-child {
@@ -97,12 +117,38 @@
 
 .grid header small {
   color: #708791;
-  font-size: 0.61rem;
+  font-size: 0.58rem;
+}
+
+.condition {
+  display: grid;
+  min-height: 92px;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 13px 0;
+  border-top: 1px solid rgb(7 30 47 / 7%);
+  border-bottom: 1px solid rgb(7 30 47 / 7%);
+}
+
+.condition svg {
+  width: 52px;
+  height: 52px;
+  color: #0b8f9d;
+}
+
+.condition span {
+  color: #506d7b;
+  font-size: 0.68rem;
+  font-weight: 780;
+  line-height: 1.35;
 }
 
 .temperature {
-  margin: 24px 0 18px;
-  font-size: 2.45rem;
+  margin: 22px 0 18px;
+  color: #071e2f;
+  font-size: 2.65rem;
   font-weight: 900;
   line-height: 0.9;
   letter-spacing: -0.07em;
@@ -129,6 +175,7 @@
 
 .grid dd {
   margin: 0;
+  color: #173848;
   font-size: 0.62rem;
   font-weight: 850;
   text-align: right;
