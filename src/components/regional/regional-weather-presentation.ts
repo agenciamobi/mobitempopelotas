@@ -1,4 +1,4 @@
-import type { WeatherIconName } from "@/production/lib/weather-data";
+import type { WeatherIconName } from "../../production/lib/weather-data";
 
 function normalizeCondition(condition: string | null | undefined) {
   return (condition ?? "")
