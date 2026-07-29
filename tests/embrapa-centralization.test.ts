@@ -24,7 +24,10 @@ const healthDurationFixMigration = readFileSync(
 const centralStore = readFileSync("src/lib/weather/embrapa-central.server.ts", "utf8");
 const healthServer = readFileSync("src/lib/weather/embrapa-health.server.ts", "utf8");
 const healthFunction = readFileSync("src/lib/weather/embrapa-health.functions.ts", "utf8");
+const historyServer = readFileSync("src/lib/weather/embrapa-history.server.ts", "utf8");
+const historyFunction = readFileSync("src/lib/weather/embrapa-history.functions.ts", "utf8");
 const healthPanel = readFileSync("src/components/embrapa/EmbrapaDataHealthPanel.tsx", "utf8");
+const historyCharts = readFileSync("src/components/embrapa/EmbrapaHistoryCharts.tsx", "utf8");
 const stationRoute = readFileSync("src/routes/estacao-embrapa-pelotas.tsx", "utf8");
 const officialSources = readFileSync("src/lib/weather/official-sources.server.ts", "utf8");
 const sourceCollector = readFileSync("src/lib/weather/embrapa.server.ts", "utf8");
@@ -165,11 +168,38 @@ test("snapshot de saúde é sanitizado e acessível apenas pelo backend", () => 
   assert.match(healthFunction, /max-age=15, stale-while-revalidate=45/);
 });
 
-test("página da estação carrega o painel junto do mesmo ciclo de atualização", () => {
+test("histórico de 24 horas usa apenas observações centrais e limita o volume enviado", () => {
+  assert.match(historyServer, /HISTORY_WINDOW_HOURS = 24/);
+  assert.match(historyServer, /BUCKET_MINUTES = 10/);
+  assert.match(historyServer, /MAX_QUERY_ROWS = 2_000/);
+  assert.match(historyServer, /from\("weather_station_observations"\)/);
+  assert.match(historyServer, /\.eq\("station_id", EMBRAPA_STATION_ID\)/);
+  assert.match(historyServer, /\.gte\("fetched_at", from\)/);
+  assert.match(historyServer, /Math\.floor\(timestamp \/ BUCKET_MS\) \* BUCKET_MS/);
+  assert.doesNotMatch(historyServer, /fetchEmbrapaObservation/);
+  assert.match(historyFunction, /max-age=45, stale-while-revalidate=15/);
+});
+
+test("chuva histórica é derivada por incremento e trata reinício do acumulado diário", () => {
+  assert.match(historyServer, /rainDaily >= previousRainDaily \? rainDaily - previousRainDaily : rainDaily/);
+  assert.match(historyServer, /bucket\.rainIncrement \+= Math\.max\(0, increment\)/);
+  assert.match(historyServer, /rainTotal: rainValues\.length/);
+});
+
+test("página da estação carrega medições, gráficos e saúde no mesmo ciclo", () => {
   assert.match(stationRoute, /Promise\.all/);
   assert.match(stationRoute, /getWeatherIntelligence\(\)/);
   assert.match(stationRoute, /getEmbrapaHealthSnapshot\(\)/);
+  assert.match(stationRoute, /getEmbrapaHistory24h\(\)/);
+  assert.match(stationRoute, /<EmbrapaHistoryCharts snapshot=\{history\} \/>/);
   assert.match(stationRoute, /<EmbrapaDataHealthPanel snapshot=\{health\} \/>/);
+  assert.match(historyCharts, /id="historico-24-horas"/);
+  assert.match(historyCharts, /Temperatura e sensação térmica/);
+  assert.match(historyCharts, /Umidade relativa/);
+  assert.match(historyCharts, /Pressão atmosférica/);
+  assert.match(historyCharts, /Velocidade do vento/);
+  assert.match(historyCharts, /Chuva por intervalo/);
+  assert.match(historyCharts, /ResponsiveContainer/);
   assert.match(healthPanel, /id="saude-dos-dados"/);
   assert.match(healthPanel, /Incidentes automáticos/);
 });
