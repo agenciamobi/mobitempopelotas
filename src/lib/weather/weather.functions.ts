@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { setResponseHeaders } from "@tanstack/react-start/server";
 
-import { fetchPelotasWeather } from "./open-meteo.server";
+import { fetchPelotasWeather } from "./open-meteo-resilient.server";
 
 export const getPelotasWeather = createServerFn({ method: "GET" }).handler(async () => {
   setResponseHeaders(
