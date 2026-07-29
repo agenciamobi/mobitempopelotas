@@ -1,5 +1,5 @@
 import { fetchCppmetForecast } from "./cppmet.server";
-import { fetchEmbrapaObservation } from "./embrapa.server";
+import { getCentralEmbrapaObservation } from "./embrapa-central.server";
 import { fetchInmetForecast } from "./inmet-forecast.server";
 import { fetchInmetStationReference } from "./inmet-station.server";
 import { fetchInmetAlerts } from "./inmet.server";
@@ -139,7 +139,7 @@ async function settleWithin<T>(
 export async function fetchOfficialWeatherSources(): Promise<OfficialWeatherSources> {
   const [embrapa, inmet, inmetForecast, inmetStation, cppmet] = await Promise.all([
     settleWithin(
-      fetchEmbrapaObservation(),
+      getCentralEmbrapaObservation(),
       "Embrapa",
       OFFICIAL_SOURCE_DEADLINE_MS.embrapa,
       unavailableEmbrapa,
