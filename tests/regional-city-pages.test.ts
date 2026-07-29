@@ -14,10 +14,12 @@ const route = readFileSync("src/routes/tempo-em/$citySlug.tsx", "utf8");
 const directoryRoute = readFileSync("src/routes/tempo-na-regiao-sul-rs.tsx", "utf8");
 const page = readFileSync("src/components/regional/RegionalCityWeatherPage.tsx", "utf8");
 const hero = readFileSync("src/components/regional/RegionalCityHero.tsx", "utf8");
+const heroStyles = readFileSync("src/components/regional/RegionalCityHero.css", "utf8");
 const adapter = readFileSync("src/components/regional/regional-city-forecast-story.ts", "utf8");
 const identityStyles = readFileSync("src/components/regional/RegionalCityIdentity.css", "utf8");
 const performanceStyles = readFileSync("src/components/regional/RegionalCityPerformance.css", "utf8");
-const sharedHero = readFileSync("src/components/weather/TodayRetailHero.tsx", "utf8");
+const sharedHero = readFileSync("src/components/weather/WeatherSplitHero.tsx", "utf8");
+const sharedHeroStyles = readFileSync("src/components/weather/WeatherSplitHero.css", "utf8");
 const sharedForecast = readFileSync("src/components/weather/HomeForecastStory.tsx", "utf8");
 const header = readFileSync("src/components/layout/Header.tsx", "utf8");
 
@@ -67,20 +69,19 @@ test("city pages query real coordinate forecasts and municipal INMET alerts", ()
   assert.match(page, /hasVerifiedRegionalAlertSemantics/);
 });
 
-test("regional first fold reuses the approved retail hero", () => {
+test("regional first fold follows the wind page split composition", () => {
   assert.match(page, /<RegionalCityHero data=\{data\}/);
-  assert.match(hero, /<TodayRetailHero/);
-  assert.match(hero, /locationName=\{city\.name\}/);
-  assert.match(hero, /primaryHref="#previsao-hoje"/);
-  assert.match(hero, /secondaryHref="#tendencia"/);
-  assert.match(hero, /alertHref="#avisos-municipais"/);
-  assert.match(hero, /currentIsObserved=\{false\}/);
-  assert.match(adapter, /toRegionalRetailWeather/);
-  assert.match(adapter, /regionalAdvisoryLevel/);
-  assert.match(sharedHero, /locationName\?: string/);
-  assert.match(sharedHero, /currentIsObserved\?: boolean/);
-  assert.match(identityStyles, /> section\.today-retail-hero/);
-  assert.match(identityStyles, /\.today-retail-hero__inner/);
+  assert.match(hero, /<WeatherSplitHero/);
+  assert.match(hero, /title={`Como o tempo deve mudar em \$\{city\.name\}\.\`}/);
+  assert.match(hero, /currentLabel="Temperatura agora"/);
+  assert.match(hero, /highlightLabel="Maior chance de chuva nas próximas 24h"/);
+  assert.match(hero, /href="#previsao-hoje"/);
+  assert.match(hero, /href="#avisos-municipais"/);
+  assert.match(sharedHero, /weather-split-hero__copy/);
+  assert.match(sharedHero, /weather-split-hero__card/);
+  assert.match(sharedHeroStyles, /grid-template-columns: minmax\(0, 1\.08fr\) minmax\(390px, 0\.92fr\)/);
+  assert.match(sharedHeroStyles, /linear-gradient\(145deg, #102437, #18334f 58%, #25375c\)/);
+  assert.match(heroStyles, /\.regional-city-split-hero/);
 });
 
 test("regional pages reuse approved alert, chapter and forecast structures", () => {
