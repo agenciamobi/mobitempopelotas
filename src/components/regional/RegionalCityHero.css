@@ -1,0 +1,13 @@
+.regional-city-split-hero {
+  width: min(calc(100% - var(--regional-frame-gap)), var(--regional-frame-max));
+  max-width: var(--regional-frame-max);
+  margin-right: auto;
+  margin-left: auto;
+  box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+  .regional-city-split-hero {
+    width: calc(100% - 20px);
+  }
+}
