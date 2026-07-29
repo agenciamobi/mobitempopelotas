@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { AlertTriangle, ArrowRight, CloudRain, Compass, Wind } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
+import { InternalPageChapters } from "@/components/weather/InternalWeatherWidgets";
+import { HomeForecastStory } from "@/components/weather/HomeForecastStory";
 import {
   REGIONAL_CITIES,
   isRegionalHomeCity,
@@ -12,98 +14,45 @@ import {
   regionalAlertPeriod,
   selectPriorityRegionalAlert,
 } from "@/lib/weather/regional-alert-priority";
-import type {
-  RegionalCityAlert,
-  RegionalCityWeatherData,
-} from "@/lib/weather/regional-city-weather.types";
-import { WeatherIcon } from "@/production/components/weather-icon";
+import type { RegionalCityWeatherData } from "@/lib/weather/regional-city-weather.types";
 import { RegionalCityHero } from "./RegionalCityHero";
-import { RegionalCityHourlySection } from "./RegionalCityHourlySection";
+import { toRegionalForecastStory } from "./regional-city-forecast-story";
 import { formatRegionalDateTime } from "./regional-time-format";
-import { regionalWeatherIcon } from "./regional-weather-presentation";
 
 import "./RegionalCityPerformance.css";
 import "./RegionalCityRefinements.css";
 import styles from "./RegionalCityWeatherPage.module.css";
 import "./RegionalCityEditorial.css";
 import "./RegionalCityCascadeFix.css";
-
-const regionalNumberFormat = new Intl.NumberFormat("pt-BR", {
-  maximumFractionDigits: 1,
-});
+import "./RegionalCityIdentity.css";
 
 const regionalSections = [
   {
     href: "#avisos-municipais",
     label: "Avisos",
-    description: "INMET e orientações oficiais",
+    detail: "INMET e orientações oficiais",
   },
   {
-    href: "#previsao-horaria-regional",
+    href: "#previsao-hoje",
     label: "Próximas horas",
-    description: "Temperatura, chuva e vento",
+    detail: "Temperatura, chuva e vento",
   },
   {
-    href: "#previsao-7-dias-regional",
-    label: "Próximos 7 dias",
-    description: "Tendência diária do município",
+    href: "#tendencia",
+    label: "Próximos dias",
+    detail: "Tendência diária do município",
   },
   {
     href: "#como-interpretar-previsao-regional",
-    label: "Como interpretar",
-    description: "Limites e origem dos dados",
+    label: "Entenda os dados",
+    detail: "Limites e origem da previsão",
   },
   {
     href: "#cidades-proximas",
     label: "Cidades próximas",
-    description: "Previsão para a região",
+    detail: "Previsão para a região",
   },
-] as const;
-
-function metric(value: number | null, suffix: string) {
-  return value === null || !Number.isFinite(value)
-    ? "—"
-    : `${regionalNumberFormat.format(value)}${suffix}`;
-}
-
-function maximum(values: Array<number | null>) {
-  const usable = values.filter((value): value is number => value !== null && Number.isFinite(value));
-  return usable.length > 0 ? Math.max(...usable) : null;
-}
-
-function severityColor(alert: RegionalCityAlert) {
-  if (!hasVerifiedRegionalAlertSemantics(alert)) return "neutral";
-  if (alert.severity === "great-danger") return "red";
-  if (alert.severity === "danger") return "orange";
-  if (alert.severity === "potential") return "yellow";
-  return "neutral";
-}
-
-function alertTimingLabel(alert: RegionalCityAlert) {
-  const period = regionalAlertPeriod(alert);
-  if (period === "active") return "Em vigor agora";
-  if (period === "upcoming") return "Aviso programado";
-  return "Período em validação";
-}
-
-function RegionalSectionNavigation({ cityName }: { cityName: string }) {
-  return (
-    <nav className="regional-city-section-nav" aria-label={`Seções da previsão para ${cityName}`}>
-      <span className="regional-city-section-nav__label">Nesta página</span>
-      <div className="regional-city-section-nav__links">
-        {regionalSections.map((section, index) => (
-          <a href={section.href} key={section.href}>
-            <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-            <span>
-              <strong>{section.label}</strong>
-              <small>{section.description}</small>
-            </span>
-          </a>
-        ))}
-      </div>
-    </nav>
-  );
-}
+];
 
 function CityLink({ city }: { city: RegionalCity }) {
   if (isRegionalHomeCity(city)) {
@@ -125,20 +74,86 @@ function CityLink({ city }: { city: RegionalCity }) {
   );
 }
 
+function RegionalOfficialAlertPanel({ data }: { data: RegionalCityWeatherData }) {
+  const alert = selectPriorityRegionalAlert(data.alerts.items);
+  const verified = alert ? hasVerifiedRegionalAlertSemantics(alert) : false;
+  const period = alert ? regionalAlertPeriod(alert) : null;
+  const severityClass = alert && verified ? `severity-${alert.severity}` : "advisory-normal";
+  const statusLabel = alert
+    ? verified
+      ? alert.severityLabel
+      : "Classificação em validação"
+    : data.alerts.status === "unavailable"
+      ? "Consulta indisponível"
+      : "Atualizado";
+  const title = alert
+    ? `Aviso meteorológico: ${alert.event}`
+    : data.alerts.status === "unavailable"
+      ? "Não foi possível consultar os avisos municipais agora"
+      : `Nenhum aviso municipal ativo encontrado para ${data.city.name}`;
+  const validity = alert
+    ? verified
+      ? `${formatRegionalDateTime(alert.startsAt)} até ${formatRegionalDateTime(alert.expiresAt)}`
+      : "Período completo ainda não reconhecido; confirme no aviso original"
+    : data.alerts.status === "unavailable"
+      ? "A situação deve ser confirmada nos canais oficiais"
+      : `Consulta atualizada em ${formatRegionalDateTime(data.source.fetchedAt)}`;
+  const officialUrl = alert?.officialUrl ?? data.alerts.sourceUrl;
+
+  return (
+    <section
+      id="avisos-municipais"
+      className={`home-inmet-alerts ${severityClass}${verified ? " is-officially-classified" : " is-unverified"} regional-city-official-alert`}
+      data-alert-period={period ?? "none"}
+      data-alert-severity={alert?.severity ?? "unknown"}
+      data-alert-official-semantics={verified ? "verified" : "unverified"}
+      aria-labelledby="regional-inmet-title"
+    >
+      <div className="home-inmet-alerts__main">
+        <div className="home-inmet-alerts__mark" aria-hidden="true">
+          <small>INMET</small>
+          <strong>{alert ? "!" : "✓"}</strong>
+        </div>
+        <div className="home-inmet-alerts__copy">
+          <div className="home-inmet-alerts__topline">
+            <span>Aviso oficial do INMET</span>
+            <b>{statusLabel}</b>
+          </div>
+          <h2 id="regional-inmet-title">{title}</h2>
+          <div className="home-inmet-alerts__meta">
+            <span>
+              <small>Abrangência</small>
+              <strong>Município de {data.city.name}</strong>
+            </span>
+            <span>
+              <small>Validade</small>
+              <strong>{validity}</strong>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className="home-inmet-alerts__aside">
+        <strong>Áreas e orientações oficiais</strong>
+        <small>
+          {alert
+            ? `Aviso com abrangência informada para ${data.city.name}`
+            : "A consulta automática é atualizada periodicamente"}
+        </small>
+        <a href={officialUrl} target="_blank" rel="noreferrer">
+          Consultar avisos <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+  );
+}
+
 export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherData }) {
   const city = data.city;
-  const current = data.current;
-  const priorityAlert = selectPriorityRegionalAlert(data.alerts.items);
-  const alertsUnavailable = data.alerts.status === "unavailable";
   const related = REGIONAL_CITIES.filter(
     (item) => item.slug !== city.slug && item.group === city.group,
   ).slice(0, 5);
   const title = `Tempo em ${city.name}, RS`;
-  const highestRainChance = maximum(data.daily.map((day) => day.rainChance));
-  const strongestGust = maximum(data.daily.map((day) => day.windGust));
-  const alertToneClass = priorityAlert
-    ? (styles[`alert${severityColor(priorityAlert)}`] ?? "")
-    : "";
+  const forecastStory = toRegionalForecastStory(data);
   const schema = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -159,154 +174,20 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
 
       <RegionalCityHero data={data} />
-      <RegionalSectionNavigation cityName={city.name} />
+      <RegionalOfficialAlertPanel data={data} />
+      <InternalPageChapters
+        items={regionalSections}
+        label={`Navegação da previsão para ${city.name}`}
+      />
 
-      {priorityAlert ? (
-        <section
-          id="avisos-municipais"
-          className={`${styles.alert} ${alertToneClass} regional-city-alert`}
-        >
-          <AlertTriangle aria-hidden="true" />
-          <div>
-            <span>
-              {hasVerifiedRegionalAlertSemantics(priorityAlert)
-                ? `${priorityAlert.severityLabel} · INMET · ${alertTimingLabel(priorityAlert)}`
-                : "Aviso oficial do INMET · classificação em validação"}
-            </span>
-            <h2>{priorityAlert.event}</h2>
-            <p>
-              {priorityAlert.description ||
-                `Aviso meteorológico com abrangência informada para ${city.name}.`}
-            </p>
-            {priorityAlert.instruction ? (
-              <p>
-                <strong>Orientações:</strong> {priorityAlert.instruction}
-              </p>
-            ) : null}
-            <small>
-              {hasVerifiedRegionalAlertSemantics(priorityAlert)
-                ? `${formatRegionalDateTime(priorityAlert.startsAt)} até ${formatRegionalDateTime(priorityAlert.expiresAt)}`
-                : "Período completo ainda não reconhecido pelo portal; confirme no aviso original."}
-            </small>
-          </div>
-          <a
-            href={priorityAlert.officialUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Consultar o aviso oficial “${priorityAlert.event}” no site do INMET, em nova aba`}
-          >
-            Consultar aviso oficial <ArrowRight aria-hidden="true" />
-          </a>
-        </section>
-      ) : alertsUnavailable ? (
-        <section
-          id="avisos-municipais"
-          className={`${styles.noAlert} regional-city-alert regional-city-alert--unavailable`}
-        >
-          <AlertTriangle aria-hidden="true" />
-          <div>
-            <strong>Consulta municipal ao INMET temporariamente indisponível</strong>
-            <p>
-              Não é possível afirmar que {city.name} está sem avisos neste momento. Consulte o portal
-              oficial do INMET e os canais da Defesa Civil até a próxima atualização automática.
-            </p>
-          </div>
-        </section>
-      ) : (
-        <section
-          id="avisos-municipais"
-          className={`${styles.noAlert} regional-city-alert regional-city-alert--clear`}
-        >
-          <span aria-hidden="true" />
-          <div>
-            <strong>Nenhum aviso municipal ativo encontrado</strong>
-            <p>
-              A consulta automática ao INMET não retornou alerta vigente para {city.name} nesta
-              atualização. A ausência de resultado não substitui os canais oficiais de emergência.
-            </p>
-          </div>
-        </section>
-      )}
-
-      <section
-        className={`${styles.summary} regional-city-summary`}
-        aria-label="Resumo da previsão local"
-      >
-        <article>
-          <CloudRain aria-hidden="true" />
-          <span>Maior chance de chuva</span>
-          <strong>{metric(highestRainChance, "%")}</strong>
-        </article>
-        <article>
-          <Wind aria-hidden="true" />
-          <span>Rajada mais forte</span>
-          <strong>{metric(strongestGust, " km/h")}</strong>
-        </article>
-        <article>
-          <Compass aria-hidden="true" />
-          <span>Vento agora</span>
-          <strong>
-            {current?.windDirection ?? "—"} · {metric(current?.windSpeed ?? null, " km/h")}
-          </strong>
-        </article>
-      </section>
-
-      <RegionalCityHourlySection data={data} />
-
-      <section
-        id="previsao-7-dias-regional"
-        className={`${styles.forecast} regional-city-forecast`}
-        aria-labelledby="regional-forecast-title"
-      >
-        <header>
-          <div>
-            <span className={styles.eyebrow}>Próximos dias</span>
-            <h2 id="regional-forecast-title">Previsão para {city.name}</h2>
-          </div>
-          <small>Modelo Open-Meteo · atualização automática</small>
-        </header>
-        {data.daily.length > 0 ? (
-          <div className={styles.forecastGrid}>
-            {data.daily.map((day) => (
-              <article key={day.date}>
-                <header>
-                  <strong>{day.weekday}</strong>
-                  <small>{day.date.split("-").reverse().slice(0, 2).join("/")}</small>
-                </header>
-                <div className="regional-city-daily-condition">
-                  <WeatherIcon
-                    name={regionalWeatherIcon(day.condition)}
-                    title={`Condição prevista: ${day.condition}`}
-                  />
-                  <h3>{day.condition}</h3>
-                </div>
-                <div className={styles.range}>
-                  <strong>{metric(day.maximum, "°")}</strong>
-                  <span>{metric(day.minimum, "°")}</span>
-                </div>
-                <dl>
-                  <div>
-                    <dt>Chuva</dt>
-                    <dd>{metric(day.rainChance, "%")}</dd>
-                  </div>
-                  <div>
-                    <dt>Volume</dt>
-                    <dd>{metric(day.precipitationMm, " mm")}</dd>
-                  </div>
-                  <div>
-                    <dt>Rajada</dt>
-                    <dd>{metric(day.windGust, " km/h")}</dd>
-                  </div>
-                </dl>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <p className={styles.forecastUnavailable}>
-            A previsão dos próximos dias está temporariamente indisponível.
-          </p>
-        )}
-      </section>
+      <div className="internal-forecast-widget regional-city-shared-forecast">
+        <HomeForecastStory
+          data={forecastStory}
+          context="regional-page"
+          locationName={city.name}
+          showLinks={false}
+        />
+      </div>
 
       <section
         id="como-interpretar-previsao-regional"
