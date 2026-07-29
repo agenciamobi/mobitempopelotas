@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   CloudRain,
@@ -29,6 +28,14 @@ type TodayRetailHeroProps = {
   weather: WeatherData;
   advisoryLevel: AdvisoryLevel;
   officialAlertCount?: number;
+  locationName?: string;
+  locationState?: string;
+  primaryHref?: string;
+  secondaryHref?: string;
+  secondaryLabel?: string;
+  alertHref?: string;
+  description?: string;
+  currentIsObserved?: boolean;
 };
 
 type RetailMetric = {
@@ -63,9 +70,9 @@ function updateLabel(weather: WeatherData) {
   return current.available ? "Leitura recente" : "Dados em atualização";
 }
 
-function alertLabel(count: number) {
-  if (count === 1) return "1 aviso oficial para Pelotas";
-  return `${count} avisos oficiais para Pelotas`;
+function alertLabel(count: number, locationName: string) {
+  if (count === 1) return `1 aviso oficial para ${locationName}`;
+  return `${count} avisos oficiais para ${locationName}`;
 }
 
 function buildCurrentMetrics(weather: WeatherData): RetailMetric[] {
@@ -118,6 +125,14 @@ export function TodayRetailHero({
   weather,
   advisoryLevel,
   officialAlertCount = 0,
+  locationName = "Pelotas",
+  locationState = "RS",
+  primaryHref = "#previsao-hoje",
+  secondaryHref = "#recursos-hoje",
+  secondaryLabel = "Planejar próximas horas",
+  alertHref = "/alertas",
+  description,
+  currentIsObserved,
 }: TodayRetailHeroProps) {
   const { current } = weather;
   const today = weather.daily[0] ?? null;
@@ -129,7 +144,13 @@ export function TodayRetailHero({
   const sunrise = extractClock(current.sunrise ?? weather.astronomy?.sunrise);
   const sunset = extractClock(current.sunset ?? weather.astronomy?.sunset);
   const hasAlert = officialAlertCount > 0;
+  const isObserved = currentIsObserved ?? current.available;
   const conditionMoment = current.available ? "agora" : "na próxima hora";
+  const statusDetail = isObserved
+    ? "Observado agora"
+    : current.available
+      ? "Estimativa para agora"
+      : "Próxima hora";
   const photo = getTodayRetailHeroPhoto(iconName, advisoryLevel);
   const photoStyle = {
     "--today-retail-hero-photo": `url("${photo.src}")`,
@@ -147,35 +168,35 @@ export function TodayRetailHero({
       <div className="today-retail-hero__inner">
         <div className="today-retail-hero__copy">
           <span className="today-retail-hero__eyebrow">
-            <i aria-hidden="true" /> Previsão local atualizada · Pelotas, RS
+            <i aria-hidden="true" /> Previsão local atualizada · {locationName}, {locationState}
           </span>
 
           <h1 id="today-retail-hero-title">
-            Tempo hoje <span>em Pelotas</span>
+            Tempo hoje <span>em {locationName}</span>
           </h1>
 
           <p id="today-retail-hero-description">
-            {condition} {conditionMoment}. Acompanhe a previsão por hora, chuva e vento nas próximas
-            horas para organizar o seu dia.
+            {description ??
+              `${condition} ${conditionMoment}. Acompanhe a previsão por hora, chuva e vento nas próximas horas para organizar o seu dia.`}
           </p>
 
           <div className="today-retail-hero__badges" aria-label="Situação da previsão">
             <span>{updateLabel(weather)}</span>
             {hasAlert ? (
-              <Link className="is-alert" to="/alertas">
-                <ShieldAlert aria-hidden="true" /> {alertLabel(officialAlertCount)}
-              </Link>
+              <a className="is-alert" href={alertHref}>
+                <ShieldAlert aria-hidden="true" /> {alertLabel(officialAlertCount, locationName)}
+              </a>
             ) : (
-              <span className="is-stable">Sem aviso oficial listado para Pelotas</span>
+              <span className="is-stable">Sem aviso oficial listado para {locationName}</span>
             )}
           </div>
 
           <div className="today-retail-hero__actions">
-            <a className="today-retail-hero__primary" href="#previsao-hoje">
+            <a className="today-retail-hero__primary" href={primaryHref}>
               Ver previsão por hora <ArrowRight aria-hidden="true" />
             </a>
-            <a className="today-retail-hero__secondary" href="#recursos-hoje">
-              Planejar próximas horas
+            <a className="today-retail-hero__secondary" href={secondaryHref}>
+              {secondaryLabel}
             </a>
           </div>
         </div>
@@ -185,9 +206,11 @@ export function TodayRetailHero({
             className="today-retail-hero__current"
             style={photoStyle}
             aria-label={
-              current.available
-                ? "Condição observada agora em Pelotas"
-                : "Condição prevista para a próxima hora em Pelotas"
+              isObserved
+                ? `Condição observada agora em ${locationName}`
+                : current.available
+                  ? `Condição estimada agora em ${locationName}`
+                  : `Condição prevista para a próxima hora em ${locationName}`
             }
           >
             <div
@@ -199,17 +222,20 @@ export function TodayRetailHero({
             <div className="today-retail-hero__current-content">
               <header>
                 <div>
-                  <span>Pelotas, RS</span>
-                  <small>{current.available ? "Observado agora" : "Próxima hora"}</small>
+                  <span>{locationName}, {locationState}</span>
+                  <small>{statusDetail}</small>
                 </div>
                 <b>
-                  <i aria-hidden="true" /> {current.available ? "Agora" : "Previsão"}
+                  <i aria-hidden="true" /> {isObserved ? "Agora" : "Previsão"}
                 </b>
               </header>
 
               <div className="today-retail-hero__current-main">
                 <div className="today-retail-hero__weather-icon">
-                  <WeatherIcon name={iconName} title={`Condição em Pelotas: ${condition}`} />
+                  <WeatherIcon
+                    name={iconName}
+                    title={`Condição em ${locationName}: ${condition}`}
+                  />
                 </div>
                 <div>
                   <strong>{formatValue(currentTemperature, "°")}</strong>
@@ -244,7 +270,7 @@ export function TodayRetailHero({
             </div>
           </article>
 
-          <div className="today-retail-hero__tiles" aria-label="Resumo do dia">
+          <div className="today-retail-hero__tiles" aria-label={`Resumo do dia em ${locationName}`}>
             <article>
               <span>
                 <Thermometer aria-hidden="true" /> Faixa do dia
