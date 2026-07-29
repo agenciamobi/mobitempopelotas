@@ -14,10 +14,11 @@ const route = readFileSync("src/routes/tempo-em/$citySlug.tsx", "utf8");
 const directoryRoute = readFileSync("src/routes/tempo-na-regiao-sul-rs.tsx", "utf8");
 const page = readFileSync("src/components/regional/RegionalCityWeatherPage.tsx", "utf8");
 const hero = readFileSync("src/components/regional/RegionalCityHero.tsx", "utf8");
-const heroStyles = readFileSync("src/components/regional/RegionalCityHero.module.css", "utf8");
+const adapter = readFileSync("src/components/regional/regional-city-forecast-story.ts", "utf8");
+const identityStyles = readFileSync("src/components/regional/RegionalCityIdentity.css", "utf8");
 const performanceStyles = readFileSync("src/components/regional/RegionalCityPerformance.css", "utf8");
-const hourly = readFileSync("src/components/regional/RegionalCityHourlySection.tsx", "utf8");
-const hourlyStyles = readFileSync("src/components/regional/RegionalCityHourlySection.module.css", "utf8");
+const sharedHero = readFileSync("src/components/weather/TodayRetailHero.tsx", "utf8");
+const sharedForecast = readFileSync("src/components/weather/HomeForecastStory.tsx", "utf8");
 const header = readFileSync("src/components/layout/Header.tsx", "utf8");
 
 test("regional registry has unique slugs, IBGE codes and valid coordinates", () => {
@@ -62,30 +63,36 @@ test("city pages query real coordinate forecasts and municipal INMET alerts", ()
   assert.match(server, /precipitation_probability/);
   assert.match(server, /sunrise,sunset/);
   assert.match(server, /hourlyStart \+ 12/);
-  assert.match(page, /RegionalCityHourlySection/);
-  assert.match(page, /consulta municipal ao INMET/i);
-  assert.match(page, /hasVerifiedAlertSemantics/);
+  assert.match(page, /RegionalOfficialAlertPanel/);
+  assert.match(page, /hasVerifiedRegionalAlertSemantics/);
 });
 
-test("regional first fold follows the homepage composition with an honest visual fallback", () => {
+test("regional first fold reuses the approved retail hero", () => {
   assert.match(page, /<RegionalCityHero data=\{data\}/);
-  assert.match(hero, /Boletim meteorológico · \{city\.name\}/);
-  assert.match(hero, /\$\{condition\} agora em \$\{city\.name\}/);
-  assert.match(hero, /Imagem ilustrativa/);
-  assert.match(hero, /Representação visual da condição atual/);
-  assert.match(hero, /Estimativa por modelo para as coordenadas centrais/);
-  assert.match(hero, /current\?\.temperature/);
-  assert.match(hero, /current\?\.humidity/);
-  assert.match(hero, /current\?\.windSpeed/);
-  assert.match(hero, /current\?\.pressure/);
-  assert.match(hero, /conditionPresentation/);
-  assert.match(hero, /w=1400&q=72/);
-  assert.doesNotMatch(hero, /w=1800&q=82/);
-  assert.match(heroStyles, /grid-template-columns:\s*minmax\(0, 1\.08fr\)/);
-  assert.match(heroStyles, /background-image:\s*var\(--regional-hero-image\)/);
-  assert.match(heroStyles, /@media \(max-width:\s*900px\)/);
-  assert.match(heroStyles, /@media \(max-width:\s*620px\)/);
-  assert.match(heroStyles, /width:\s*calc\(100% - 24px\)/);
+  assert.match(hero, /<TodayRetailHero/);
+  assert.match(hero, /locationName=\{city\.name\}/);
+  assert.match(hero, /primaryHref="#previsao-hoje"/);
+  assert.match(hero, /secondaryHref="#tendencia"/);
+  assert.match(hero, /alertHref="#avisos-municipais"/);
+  assert.match(hero, /currentIsObserved=\{false\}/);
+  assert.match(adapter, /toRegionalRetailWeather/);
+  assert.match(adapter, /regionalAdvisoryLevel/);
+  assert.match(sharedHero, /locationName\?: string/);
+  assert.match(sharedHero, /currentIsObserved\?: boolean/);
+  assert.match(identityStyles, /> section\.today-retail-hero/);
+  assert.match(identityStyles, /\.today-retail-hero__inner/);
+});
+
+test("regional pages reuse approved alert, chapter and forecast structures", () => {
+  assert.match(page, /home-inmet-alerts/);
+  assert.match(page, /<InternalPageChapters/);
+  assert.match(page, /<HomeForecastStory/);
+  assert.match(page, /internal-forecast-widget regional-city-shared-forecast/);
+  assert.match(sharedForecast, /context\?: "home" \| "today-page" \| "regional-page"/);
+  assert.match(sharedForecast, /locationName\?: string/);
+  assert.match(adapter, /precipitationMm: hour\.precipitationMm/);
+  assert.match(adapter, /rainChance: day\.rainChance/);
+  assert.doesNotMatch(page, /RegionalCityHourlySection/);
 });
 
 test("regional pages defer lower sections and keep anchor navigation aligned", () => {
@@ -95,20 +102,9 @@ test("regional pages defer lower sections and keep anchor navigation aligned", (
   assert.match(performanceStyles, /contain-intrinsic-size:\s*auto 760px/);
   assert.match(performanceStyles, /scroll-margin-top:\s*7\.5rem/);
   assert.match(performanceStyles, /@media \(max-width:\s*700px\)/);
-});
-
-test("hourly regional section shows probability, millimeters, wind and sun times", () => {
-  assert.match(hourly, /id="previsao-horaria-regional"/);
-  assert.match(hourly, /Próximas horas/);
-  assert.match(hourly, /data\.astronomy\.sunrise/);
-  assert.match(hourly, /data\.astronomy\.sunset/);
-  assert.match(hourly, /hour\.rainChance/);
-  assert.match(hourly, /hour\.precipitationMm/);
-  assert.match(hourly, /hour\.windSpeed/);
-  assert.match(hourly, /hour\.windGust/);
-  assert.match(hourlyStyles, /grid-auto-flow:\s*column/);
-  assert.match(hourlyStyles, /overflow-x:\s*auto/);
-  assert.match(hourlyStyles, /@media \(max-width:\s*620px\)/);
+  assert.match(identityStyles, /#previsao-hoje/);
+  assert.match(identityStyles, /#tendencia/);
+  assert.match(identityStyles, /#cidades-proximas/);
 });
 
 test("regional navigation points Pelotas directly to the homepage", () => {
