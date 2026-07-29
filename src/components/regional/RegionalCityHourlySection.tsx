@@ -1,9 +1,11 @@
 import { Sunrise, Sunset } from "lucide-react";
 
 import type { RegionalCityWeatherData } from "@/lib/weather/regional-city-weather.types";
+import { WeatherIcon } from "@/production/components/weather-icon";
 
 import styles from "./RegionalCityHourlySection.module.css";
 import { formatRegionalHour } from "./regional-time-format";
+import { regionalWeatherIcon } from "./regional-weather-presentation";
 
 function metric(value: number | null, suffix: string) {
   return value === null || !Number.isFinite(value)
@@ -41,14 +43,33 @@ export function RegionalCityHourlySection({ data }: { data: RegionalCityWeatherD
             <article key={hour.time}>
               <header>
                 <strong>{index === 0 ? "Agora" : formatRegionalHour(hour.time)}</strong>
-                <small>{hour.condition}</small>
+                <small>Previsão horária</small>
               </header>
+              <div className={styles.condition}>
+                <WeatherIcon
+                  name={regionalWeatherIcon(hour.condition, hour.time)}
+                  title={`Condição prevista: ${hour.condition}`}
+                />
+                <span>{hour.condition}</span>
+              </div>
               <div className={styles.temperature}>{metric(hour.temperature, "°")}</div>
               <dl>
-                <div><dt>Chance</dt><dd>{metric(hour.rainChance, "%")}</dd></div>
-                <div><dt>Volume</dt><dd>{metric(hour.precipitationMm, " mm")}</dd></div>
-                <div><dt>Vento</dt><dd>{metric(hour.windSpeed, " km/h")}</dd></div>
-                <div><dt>Rajada</dt><dd>{metric(hour.windGust, " km/h")}</dd></div>
+                <div>
+                  <dt>Chance</dt>
+                  <dd>{metric(hour.rainChance, "%")}</dd>
+                </div>
+                <div>
+                  <dt>Volume</dt>
+                  <dd>{metric(hour.precipitationMm, " mm")}</dd>
+                </div>
+                <div>
+                  <dt>Vento</dt>
+                  <dd>{metric(hour.windSpeed, " km/h")}</dd>
+                </div>
+                <div>
+                  <dt>Rajada</dt>
+                  <dd>{metric(hour.windGust, " km/h")}</dd>
+                </div>
               </dl>
             </article>
           ))}
