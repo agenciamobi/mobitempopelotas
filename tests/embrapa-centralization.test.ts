@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { getObservationAgeMinutes } from "../src/lib/weather/current-observation.ts";
+import type { EmbrapaObservation } from "../src/lib/weather/official-sources.types.ts";
+
 const migration = readFileSync(
   "supabase/migrations/20260729013000_centralize_embrapa_observations.sql",
   "utf8",
@@ -13,6 +16,43 @@ const cronRoute = readFileSync("src/routes/api/cron/embrapa.ts", "utf8");
 const publicRoute = readFileSync("src/routes/api/weather/embrapa.ts", "utf8");
 const minuteRefresh = readFileSync("src/components/weather/WeatherMinuteRefresh.tsx", "utf8");
 const weatherFunction = readFileSync("src/lib/weather/weather-intelligence.functions.ts", "utf8");
+
+function observationWithoutPublishedTime(fetchedAt: string): EmbrapaObservation {
+  return {
+    status: "live",
+    current: {
+      temperature: 18,
+      humidity: 80,
+      feelsLike: 18,
+      dewPoint: 14,
+      pressure: 1015,
+      pressureTrend: "estável",
+      windDirection: "SE",
+      windSpeed: 8,
+      sunrise: "07:10",
+      sunset: "17:50",
+    },
+    extremes: {
+      temperatureMin: { value: 12, time: "06:00" },
+      temperatureMax: { value: 19, time: "14:00" },
+      humidityMin: { value: 70, time: "14:00" },
+      humidityMax: { value: 95, time: "06:00" },
+      windSpeedMax: { value: 20, time: "13:00" },
+    },
+    accumulated: { rainDaily: 0, rainMonthly: 40, rainAnnual: 500 },
+    source: {
+      name: "Embrapa Clima Temperado",
+      station: "Posto Meteorológico da Sede",
+      url: "https://agromet.cpact.embrapa.br/online/Current_Monitor.htm",
+      latitude: -31.7,
+      longitude: -52.4,
+      altitude: 57,
+      fetchedAt,
+      observationTime: null,
+    },
+    error: null,
+  };
+}
 
 test("centralizador persiste leitura atual, histórico deduplicado e agenda coleta por minuto", () => {
   assert.match(migration, /create table if not exists public\.weather_station_current/);
@@ -43,6 +83,12 @@ test("centralizador controla concorrência, preserva última leitura e deduplica
   assert.match(centralStore, /onConflict: "station_id,source_hash"/);
   assert.match(centralStore, /fallback: "last-known"/);
   assert.match(centralStore, /CENTRAL_READING_MAX_AGE_MS = 75_000/);
+});
+
+test("última leitura sem horário publicado envelhece pelo fetchedAt", () => {
+  const now = new Date("2026-07-29T03:00:00.000Z");
+  const observation = observationWithoutPublishedTime("2026-07-29T02:20:00.000Z");
+  assert.equal(getObservationAgeMinutes(observation, now), 40);
 });
 
 test("rotas pública e de coleta leem a mesma fonte central", () => {
