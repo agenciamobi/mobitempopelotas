@@ -9,7 +9,19 @@ const migration = readFileSync(
   "supabase/migrations/20260729013000_centralize_embrapa_observations.sql",
   "utf8",
 );
+const healthSchemaMigration = readFileSync(
+  "supabase/migrations/20260729030000_weather_data_health.sql",
+  "utf8",
+);
+const healthLogicMigration = readFileSync(
+  "supabase/migrations/20260729031500_weather_data_health_logic.sql",
+  "utf8",
+);
 const centralStore = readFileSync("src/lib/weather/embrapa-central.server.ts", "utf8");
+const healthServer = readFileSync("src/lib/weather/embrapa-health.server.ts", "utf8");
+const healthFunction = readFileSync("src/lib/weather/embrapa-health.functions.ts", "utf8");
+const healthPanel = readFileSync("src/components/embrapa/EmbrapaDataHealthPanel.tsx", "utf8");
+const stationRoute = readFileSync("src/routes/estacao-embrapa-pelotas.tsx", "utf8");
 const officialSources = readFileSync("src/lib/weather/official-sources.server.ts", "utf8");
 const sourceCollector = readFileSync("src/lib/weather/embrapa.server.ts", "utf8");
 const cronRoute = readFileSync("src/routes/api/cron/embrapa.ts", "utf8");
@@ -106,4 +118,46 @@ test("páginas meteorológicas revalidam o snapshot coerente a cada minuto", () 
   assert.match(minuteRefresh, /document\.visibilityState !== "visible"/);
   assert.match(weatherFunction, /max-age=45, stale-while-revalidate=15/);
   assert.doesNotMatch(weatherFunction, /max-age=300/);
+});
+
+test("saúde operacional registra métricas e mantém incidentes privados", () => {
+  assert.match(healthSchemaMigration, /add column if not exists consecutive_failures/);
+  assert.match(healthSchemaMigration, /add column if not exists last_duration_ms/);
+  assert.match(healthSchemaMigration, /add column if not exists successful_collects/);
+  assert.match(healthSchemaMigration, /create table if not exists public\.weather_data_alerts/);
+  assert.match(healthSchemaMigration, /alter table public\.weather_data_alerts enable row level security/);
+  assert.match(healthSchemaMigration, /revoke all on table public\.weather_data_alerts from anon, authenticated/);
+  assert.match(healthSchemaMigration, /create policy "weather alerts private"/);
+});
+
+test("coletor abre e resolve alertas por falha, atraso, lentidão e leitura incompleta", () => {
+  assert.match(healthLogicMigration, /create or replace function public\.track_weather_station_health/);
+  assert.match(healthLogicMigration, /new\.consecutive_failures := old\.consecutive_failures \+ 1/);
+  assert.match(healthLogicMigration, /new\.last_duration_ms := duration_ms/);
+  assert.match(healthLogicMigration, /'consecutive-failures'/);
+  assert.match(healthLogicMigration, /new\.consecutive_failures >= 3/);
+  assert.match(healthLogicMigration, /'stale-reading'/);
+  assert.match(healthLogicMigration, /success_age_minutes > 5/);
+  assert.match(healthLogicMigration, /'slow-response'/);
+  assert.match(healthLogicMigration, /new\.last_duration_ms > 15000/);
+  assert.match(healthLogicMigration, /'incomplete-reading'/);
+});
+
+test("snapshot de saúde é sanitizado e acessível apenas pelo backend", () => {
+  assert.match(healthLogicMigration, /create or replace function public\.get_embrapa_health_snapshot/);
+  assert.match(healthLogicMigration, /revoke execute on function public\.get_embrapa_health_snapshot\(\) from public, anon, authenticated/);
+  assert.match(healthLogicMigration, /grant execute on function public\.get_embrapa_health_snapshot\(\) to service_role/);
+  assert.match(healthServer, /get_embrapa_health_snapshot/);
+  assert.match(healthServer, /isAdminConfigured/);
+  assert.doesNotMatch(healthPanel, /collector_token|refresh_lease_token|error:/);
+  assert.match(healthFunction, /max-age=15, stale-while-revalidate=45/);
+});
+
+test("página da estação carrega o painel junto do mesmo ciclo de atualização", () => {
+  assert.match(stationRoute, /Promise\.all/);
+  assert.match(stationRoute, /getWeatherIntelligence\(\)/);
+  assert.match(stationRoute, /getEmbrapaHealthSnapshot\(\)/);
+  assert.match(stationRoute, /<EmbrapaDataHealthPanel snapshot=\{health\} \/>/);
+  assert.match(healthPanel, /id="saude-dos-dados"/);
+  assert.match(healthPanel, /Incidentes automáticos/);
 });
