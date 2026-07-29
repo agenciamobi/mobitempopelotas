@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 
 import { HourlyRainVolume } from "@/components/weather/HourlyRainVolume";
-import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import type { WeatherIconName } from "@/lib/weather/types";
 
 import "./HomeForecastStory.css";
@@ -31,9 +30,41 @@ const iconMap: Record<WeatherIconName, LucideIcon> = {
 
 type RainLevel = "none" | "low" | "moderate" | "high" | "very-high";
 
+export type ForecastStoryData = {
+  weather: {
+    current: {
+      windSpeed: number | null;
+      windGust: number | null;
+    } | null;
+    hourly: Array<{
+      time: string;
+      timestamp?: string;
+      temperature: number | null;
+      precipitationProbability: number | null;
+      precipitationMm?: number | null;
+      windSpeed: number | null;
+      windGust: number | null;
+      icon: WeatherIconName;
+    }>;
+    daily: Array<{
+      weekday: string;
+      date: string;
+      dateIso?: string;
+      min: number | null;
+      max: number | null;
+      rainChance: number | null;
+      precipitationMm: number | null;
+      windGust: number | null;
+      icon: WeatherIconName;
+    }>;
+  };
+};
+
 type HomeForecastStoryProps = {
-  data: WeatherIntelligenceData;
-  context?: "home" | "today-page";
+  data: ForecastStoryData;
+  context?: "home" | "today-page" | "regional-page";
+  locationName?: string;
+  showLinks?: boolean;
 };
 
 function ForecastIcon({ name, size = 25 }: { name: WeatherIconName; size?: number }) {
@@ -55,6 +86,21 @@ function formatNumber(value: number, maximumFractionDigits = 1) {
   return new Intl.NumberFormat("pt-BR", { maximumFractionDigits }).format(value);
 }
 
+function formatMetric(value: number | null, suffix = "") {
+  return value === null || !Number.isFinite(value) ? "—" : `${formatNumber(value)}${suffix}`;
+}
+
+function hourlyVolumeLabel(value: number | null | undefined, index: number) {
+  if (value === undefined) return <HourlyRainVolume index={index} />;
+  if (value === null) return <small>Volume indisponível</small>;
+  if (value <= 0) return <small>Sem volume relevante</small>;
+  return <small>{formatNumber(value)} mm previstos</small>;
+}
+
+function windValue(windGust: number | null, windSpeed: number | null) {
+  return windGust ?? windSpeed ?? 0;
+}
+
 function timeReference(value: string | null | undefined) {
   if (!value) return "horário não informado";
   const normalized = value.trim().toLocaleLowerCase("pt-BR");
@@ -73,21 +119,30 @@ function tomorrowHeadline(chance: number | null) {
 
 function tomorrowDescription(
   chance: number | null,
-  precipitation: number,
+  precipitation: number | null,
   windGust: number | null,
 ) {
   const rainText =
-    chance === null
-      ? `${formatNumber(precipitation)} mm previstos pelo modelo`
-      : `${chance}% de chance de chuva e ${formatNumber(precipitation)} mm previstos`;
+    precipitation === null
+      ? chance === null
+        ? "chuva em atualização"
+        : `${chance}% de chance de chuva`
+      : chance === null
+        ? `${formatNumber(precipitation)} mm previstos pelo modelo`
+        : `${chance}% de chance de chuva e ${formatNumber(precipitation)} mm previstos`;
   const windText = windGust === null ? "rajadas em atualização" : `rajadas de até ${windGust} km/h`;
 
   return `${rainText}, com ${windText}.`;
 }
 
-export function HomeForecastStory({ data, context = "home" }: HomeForecastStoryProps) {
+export function HomeForecastStory({
+  data,
+  context = "home",
+  locationName = "Pelotas",
+  showLinks = true,
+}: HomeForecastStoryProps) {
   const { hourly, daily, current } = data.weather;
-  const isTodayPage = context === "today-page";
+  const isDetailedPage = context !== "home";
   const visibleHours = hourly.slice(0, 7);
   const today = daily[0];
   const tomorrow = daily[1];
@@ -98,8 +153,8 @@ export function HomeForecastStory({ data, context = "home" }: HomeForecastStoryP
     return !highest || currentChance > highestChance ? hour : highest;
   }, null);
   const strongestHourlyGust = visibleHours.reduce(
-    (highest, hour) => Math.max(highest, hour.windGust ?? hour.windSpeed),
-    current?.windGust ?? current?.windSpeed ?? 0,
+    (highest, hour) => Math.max(highest, windValue(hour.windGust, hour.windSpeed)),
+    windValue(current?.windGust ?? null, current?.windSpeed ?? null),
   );
   const forecastWindow =
     visibleHours.length > 1
@@ -117,31 +172,31 @@ export function HomeForecastStory({ data, context = "home" }: HomeForecastStoryP
       <header className="home-forecast-heading">
         <div>
           <span className="home-forecast-eyebrow">
-            {isTodayPage ? "Previsão por hora em Pelotas" : "Previsão hora a hora"}
+            {isDetailedPage ? `Previsão por hora em ${locationName}` : "Previsão hora a hora"}
           </span>
           <h2 id="home-forecast-title">
-            {isTodayPage
+            {isDetailedPage
               ? "Temperatura, chuva e vento nas próximas horas"
               : "Veja como o tempo deve mudar ao longo do dia"}
           </h2>
         </div>
 
-        <dl className="home-forecast-facts" aria-label="Resumo da previsão de hoje">
+        <dl className="home-forecast-facts" aria-label={`Resumo da previsão de hoje em ${locationName}`}>
           <div>
-            <dt>{isTodayPage ? "Máxima prevista" : "Temperatura máxima"}</dt>
-            <dd>{today.max}°</dd>
+            <dt>{isDetailedPage ? "Máxima prevista" : "Temperatura máxima"}</dt>
+            <dd>{formatMetric(today.max, "°")}</dd>
           </div>
           <div>
-            <dt>{isTodayPage ? "Mínima prevista" : "Temperatura mínima"}</dt>
-            <dd>{today.min}°</dd>
+            <dt>{isDetailedPage ? "Mínima prevista" : "Temperatura mínima"}</dt>
+            <dd>{formatMetric(today.min, "°")}</dd>
           </div>
           <div>
-            <dt>{isTodayPage ? "Maior chance de chuva" : "Chance de chuva"}</dt>
-            <dd>{today.rainChance === null ? "—" : `${today.rainChance}%`}</dd>
+            <dt>{isDetailedPage ? "Maior chance de chuva" : "Chance de chuva"}</dt>
+            <dd>{formatMetric(today.rainChance, "%")}</dd>
           </div>
           <div>
-            <dt>{isTodayPage ? "Rajada máxima" : "Vento mais forte"}</dt>
-            <dd>{today.windGust === null ? "—" : `${today.windGust} km/h`}</dd>
+            <dt>{isDetailedPage ? "Rajada máxima" : "Vento mais forte"}</dt>
+            <dd>{formatMetric(today.windGust, " km/h")}</dd>
           </div>
         </dl>
       </header>
@@ -150,7 +205,7 @@ export function HomeForecastStory({ data, context = "home" }: HomeForecastStoryP
         <>
           <div className="home-forecast-window" aria-label="Resumo das próximas horas">
             <div>
-              <small>{isTodayPage ? "Período mostrado" : "Janela exibida"}</small>
+              <small>{isDetailedPage ? "Período mostrado" : "Janela exibida"}</small>
               <strong>{visibleHours.length} horários</strong>
               <span>{forecastWindow}</span>
             </div>
@@ -162,48 +217,47 @@ export function HomeForecastStory({ data, context = "home" }: HomeForecastStoryP
               <span>{timeReference(peakHour?.time)}</span>
             </div>
             <div>
-              <small>{isTodayPage ? "Rajada máxima" : "Rajada mais forte"}</small>
+              <small>{isDetailedPage ? "Rajada máxima" : "Rajada mais forte"}</small>
               <strong>{strongestHourlyGust} km/h</strong>
               <span>nas próximas horas</span>
             </div>
           </div>
 
-          <div className="home-hourly-cards" aria-label="Tempo nas próximas horas">
+          <div className="home-hourly-cards" aria-label={`Tempo nas próximas horas em ${locationName}`}>
             {visibleHours.map((hour, index) => {
               const rain = rainReading(hour.precipitationProbability);
               const isPeak = peakHour === hour && rain.chance > 0;
+              const gust = windValue(hour.windGust, hour.windSpeed);
 
               return (
                 <article
                   className={`rain-${rain.level}${index === 0 ? " is-current" : ""}${isPeak ? " is-rain-peak" : ""}`}
-                  key={`${hour.time}-${index}`}
-                  aria-label={`${hour.time}: ${hour.temperature} graus, ${rain.chance}% de chance de chuva e rajadas de até ${hour.windGust ?? hour.windSpeed} quilômetros por hora`}
+                  key={`${hour.timestamp ?? hour.time}-${index}`}
+                  aria-label={`${hour.time}: ${formatMetric(hour.temperature, " graus")}, ${rain.chance}% de chance de chuva e rajadas de até ${gust} quilômetros por hora`}
                 >
                   <div className="home-hourly-topline">
                     <span>{hour.time}</span>
                     {index === 0 ? (
-                      <b>{isTodayPage ? "Próxima hora" : "Agora"}</b>
+                      <b>{isDetailedPage ? "Próxima hora" : "Agora"}</b>
                     ) : isPeak ? (
                       <b>Maior chance</b>
                     ) : null}
                   </div>
                   <div className="home-hourly-weather">
                     <ForecastIcon name={hour.icon} />
-                    <strong>{hour.temperature}°</strong>
+                    <strong>{formatMetric(hour.temperature, "°")}</strong>
                   </div>
                   <div className="home-hourly-rain">
                     <div>
-                      <span>{isTodayPage ? "Chance de chuva" : "Chuva"}</span>
+                      <span>{isDetailedPage ? "Chance de chuva" : "Chuva"}</span>
                       <strong>{rain.chance}%</strong>
                     </div>
                     <i aria-hidden="true">
                       <b style={{ width: `${rain.chance}%` }} />
                     </i>
-                    <HourlyRainVolume index={index} />
+                    {hourlyVolumeLabel(hour.precipitationMm, index)}
                   </div>
-                  <span className="home-hourly-wind">
-                    Rajada de até {hour.windGust ?? hour.windSpeed} km/h
-                  </span>
+                  <span className="home-hourly-wind">Rajada de até {gust} km/h</span>
                 </article>
               );
             })}
@@ -215,7 +269,7 @@ export function HomeForecastStory({ data, context = "home" }: HomeForecastStoryP
         <div className="home-next-days" id="tendencia">
           <div className="home-next-days-heading">
             <span className="home-forecast-eyebrow">Tendência do tempo</span>
-            <strong>Como o tempo deve evoluir</strong>
+            <strong>Como o tempo deve evoluir em {locationName}</strong>
           </div>
 
           <div className="home-next-day-cards">
@@ -225,8 +279,8 @@ export function HomeForecastStory({ data, context = "home" }: HomeForecastStoryP
               return (
                 <article
                   className={`rain-${rain.level}${index === 0 ? " is-tomorrow" : ""}`}
-                  key={`${day.weekday}-${day.date}`}
-                  aria-label={`${day.weekday}, ${day.date}: máxima de ${day.max} graus, mínima de ${day.min} graus e ${rain.chance}% de chance de chuva`}
+                  key={`${day.weekday}-${day.dateIso ?? day.date}`}
+                  aria-label={`${day.weekday}, ${day.date}: máxima de ${formatMetric(day.max, " graus")}, mínima de ${formatMetric(day.min, " graus")} e ${rain.chance}% de chance de chuva`}
                 >
                   <div className="home-next-day-topline">
                     <div>
@@ -248,19 +302,21 @@ export function HomeForecastStory({ data, context = "home" }: HomeForecastStoryP
                       <b style={{ width: `${rain.chance}%` }} />
                     </i>
                     <small>
-                      {day.precipitationMm > 0
-                        ? `${formatNumber(day.precipitationMm)} mm previstos`
-                        : "Sem volume relevante"}
+                      {day.precipitationMm === null
+                        ? "Volume indisponível"
+                        : day.precipitationMm > 0
+                          ? `${formatNumber(day.precipitationMm)} mm previstos`
+                          : "Sem volume relevante"}
                     </small>
                   </div>
                   <div className="home-next-day-temperatures">
                     <span>
                       <small>Máx.</small>
-                      <strong>{day.max}°</strong>
+                      <strong>{formatMetric(day.max, "°")}</strong>
                     </span>
                     <span>
                       <small>Mín.</small>
-                      <strong>{day.min}°</strong>
+                      <strong>{formatMetric(day.min, "°")}</strong>
                     </span>
                   </div>
                 </article>
@@ -268,7 +324,7 @@ export function HomeForecastStory({ data, context = "home" }: HomeForecastStoryP
             })}
           </div>
 
-          {tomorrow ? (
+          {showLinks && tomorrow ? (
             <article className="home-tomorrow-spotlight">
               <div>
                 <span className="home-forecast-eyebrow">Destaque da previsão</span>
@@ -291,12 +347,14 @@ export function HomeForecastStory({ data, context = "home" }: HomeForecastStoryP
             </article>
           ) : null}
 
-          <div className="home-forecast-links">
-            <Link to="/tempo-hoje-pelotas">
-              Ver previsão completa de hoje <ArrowRight aria-hidden="true" />
-            </Link>
-            <Link to="/previsao-7-dias-pelotas">Ver previsão para 7 dias</Link>
-          </div>
+          {showLinks ? (
+            <div className="home-forecast-links">
+              <Link to="/tempo-hoje-pelotas">
+                Ver previsão completa de hoje <ArrowRight aria-hidden="true" />
+              </Link>
+              <Link to="/previsao-7-dias-pelotas">Ver previsão para 7 dias</Link>
+            </div>
+          ) : null}
         </div>
       ) : null}
     </section>
