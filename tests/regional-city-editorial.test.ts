@@ -8,8 +8,16 @@ const pageSource = readFileSync(
   new URL("../src/components/regional/RegionalCityWeatherPage.tsx", import.meta.url),
   "utf8",
 );
+const heroSource = readFileSync(
+  new URL("../src/components/regional/RegionalCityHero.tsx", import.meta.url),
+  "utf8",
+);
 const adapterSource = readFileSync(
   new URL("../src/components/regional/regional-city-forecast-story.ts", import.meta.url),
+  "utf8",
+);
+const retailHeroSource = readFileSync(
+  new URL("../src/components/weather/TodayRetailHero.tsx", import.meta.url),
   "utf8",
 );
 const forecastStorySource = readFileSync(
@@ -18,10 +26,6 @@ const forecastStorySource = readFileSync(
 );
 const editorialCss = readFileSync(
   new URL("../src/components/regional/RegionalCityEditorial.css", import.meta.url),
-  "utf8",
-);
-const cascadeCss = readFileSync(
-  new URL("../src/components/regional/RegionalCityCascadeFix.css", import.meta.url),
   "utf8",
 );
 const identityCss = readFileSync(
@@ -35,12 +39,26 @@ test("páginas regionais usam o main semântico fornecido pelo layout global", (
 });
 
 test("páginas regionais reutilizam os componentes aprovados das páginas internas", () => {
+  assert.match(heroSource, /<TodayRetailHero/);
   assert.match(pageSource, /<InternalPageChapters/);
   assert.match(pageSource, /<HomeForecastStory/);
   assert.match(pageSource, /internal-forecast-widget regional-city-shared-forecast/);
   assert.doesNotMatch(pageSource, /<RegionalCityHourlySection/);
   assert.doesNotMatch(pageSource, /regional-city-summary/);
   assert.doesNotMatch(pageSource, /regional-city-forecast/);
+});
+
+test("hero regional é o hero retail parametrizado, sem nova composição paralela", () => {
+  assert.match(heroSource, /locationName=\{city\.name\}/);
+  assert.match(heroSource, /primaryHref="#previsao-hoje"/);
+  assert.match(heroSource, /secondaryHref="#tendencia"/);
+  assert.match(heroSource, /alertHref="#avisos-municipais"/);
+  assert.match(heroSource, /currentIsObserved=\{false\}/);
+  assert.match(retailHeroSource, /locationName\?: string/);
+  assert.match(retailHeroSource, /locationState\?: string/);
+  assert.match(retailHeroSource, /currentIsObserved\?: boolean/);
+  assert.match(adapterSource, /toRegionalRetailWeather/);
+  assert.match(adapterSource, /regionalAdvisoryLevel/);
 });
 
 test("navegação regional usa os mesmos capítulos da previsão de hoje", () => {
@@ -73,11 +91,11 @@ test("previsão regional é adaptada sem duplicar a grade meteorológica", () =>
   assert.match(forecastStorySource, /hour\.precipitationMm/);
 });
 
-test("tema regional preserva frame e aplica o sistema interno compartilhado", () => {
+test("tema regional preserva o frame e encaixa os componentes compartilhados", () => {
   assert.match(editorialCss, /--regional-frame-max:\s*var\(--portal-frame-max, 1760px\)/);
   assert.match(editorialCss, /--regional-gutter:\s*var\(--portal-content-gutter/);
-  assert.match(editorialCss, /\.regional-city-page \.regional-city-hero/);
-  assert.match(cascadeCss, /section\.regional-city-hero/);
+  assert.match(identityCss, /> section\.today-retail-hero/);
+  assert.match(identityCss, /\.today-retail-hero__inner/);
   assert.match(identityCss, /\.regional-city-page > \.internal-page-chapters/);
   assert.match(identityCss, /\.regional-city-page > \.regional-city-shared-forecast/);
   assert.match(identityCss, /grid-template-columns: repeat\(5, minmax\(0, 1fr\)\)/);
