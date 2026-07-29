@@ -35,6 +35,56 @@
   padding: clamp(42px, 5vw, 82px) var(--regional-gutter);
 }
 
+.regional-city-page .regional-city-forecast > div article {
+  position: relative;
+  overflow: hidden;
+}
+
+.regional-city-page .regional-city-forecast > div article::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: #18bdcd;
+  content: "";
+}
+
+.regional-city-page .regional-city-forecast > div article:nth-child(3n + 2)::before {
+  background: #5e2ced;
+}
+
+.regional-city-page .regional-city-forecast > div article:nth-child(3n)::before {
+  background: #e70b85;
+}
+
+.regional-city-daily-condition {
+  display: grid;
+  min-height: 94px;
+  grid-template-columns: 58px minmax(0, 1fr);
+  align-items: center;
+  gap: 13px;
+  margin: 18px 0 16px;
+  padding: 14px 0;
+  border-top: 1px solid var(--regional-line-soft);
+  border-bottom: 1px solid var(--regional-line-soft);
+}
+
+.regional-city-daily-condition svg {
+  width: 56px;
+  height: 56px;
+  color: #0b8f9d;
+}
+
+.regional-city-daily-condition h3 {
+  min-height: 0;
+  margin: 0;
+  color: #506d7b;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
 @media (max-width: 700px) {
   .site-shell--topic[data-topic="tempo-em"] .site-container--topic > .regional-city-page > section.regional-city-alert {
     margin-top: 14px;
