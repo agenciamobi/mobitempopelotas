@@ -65,7 +65,7 @@ export type HourlyForecast = {
 export type DailyForecast = {
   weekday: string;
   date: string;
-  dateIso: string;
+  dateIso?: string;
   min: number;
   max: number;
   rainChance: number | null;
