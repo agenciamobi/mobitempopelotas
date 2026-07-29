@@ -24,8 +24,8 @@ const forecastStorySource = readFileSync(
   new URL("../src/components/weather/HomeForecastStory.tsx", import.meta.url),
   "utf8",
 );
-const editorialCss = readFileSync(
-  new URL("../src/components/regional/RegionalCityEditorial.css", import.meta.url),
+const pageCss = readFileSync(
+  new URL("../src/components/regional/RegionalCityWeatherPage.module.css", import.meta.url),
   "utf8",
 );
 const identityCss = readFileSync(
@@ -91,13 +91,18 @@ test("previsão regional é adaptada sem duplicar a grade meteorológica", () =>
   assert.match(forecastStorySource, /hour\.precipitationMm/);
 });
 
-test("tema regional preserva o frame e encaixa os componentes compartilhados", () => {
-  assert.match(editorialCss, /--regional-frame-max:\s*var\(--portal-frame-max, 1760px\)/);
-  assert.match(editorialCss, /--regional-gutter:\s*var\(--portal-content-gutter/);
+test("tema regional preserva o frame e contém apenas os estilos ativos", () => {
+  assert.match(pageCss, /\.page \{[\s\S]*width: 100%/);
+  assert.match(pageCss, /\.context/);
+  assert.match(pageCss, /\.related/);
+  assert.match(pageCss, /\.sources/);
+  assert.doesNotMatch(pageCss, /\.forecastGrid/);
+  assert.doesNotMatch(pageCss, /\.nowCard/);
   assert.match(identityCss, /> section\.today-retail-hero/);
   assert.match(identityCss, /\.today-retail-hero__inner/);
   assert.match(identityCss, /\.regional-city-page > \.internal-page-chapters/);
   assert.match(identityCss, /\.regional-city-page > \.regional-city-shared-forecast/);
+  assert.match(identityCss, /section\.regional-city-official-alert/);
   assert.match(identityCss, /grid-template-columns: repeat\(5, minmax\(0, 1fr\)\)/);
 });
 
