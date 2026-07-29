@@ -7,6 +7,7 @@ const migration = readFileSync(
   "utf8",
 );
 const server = readFileSync("src/lib/weather/forecast-accuracy.server.ts", "utf8");
+const openMeteoDaily = readFileSync("src/lib/weather/open-meteo-daily.server.ts", "utf8");
 const functions = readFileSync("src/lib/weather/forecast-accuracy.functions.ts", "utf8");
 const cronRoute = readFileSync("src/routes/api/cron/forecast-accuracy.ts", "utf8");
 const panel = readFileSync("src/components/methodology/ForecastAccuracyPanel.tsx", "utf8");
@@ -17,12 +18,28 @@ test("arquiva previsões por provedor, ciclo, data alvo e antecedência", () => 
   assert.match(migration, /create table if not exists public\.weather_forecast_predictions/);
   assert.match(migration, /provider_key in \('open-meteo', 'met-norway'\)/);
   assert.match(migration, /cycle_hour in \(0, 6, 12, 18\)/);
-  assert.match(migration, /unique \(location_slug, provider_key, issued_local_date, cycle_hour, target_date\)/);
-  assert.match(server, /fetchOpenMeteoWeather\(\)/);
+  assert.match(
+    migration,
+    /unique \(location_slug, provider_key, issued_local_date, cycle_hour, target_date\)/,
+  );
+  assert.match(server, /fetchOpenMeteoDailyForecast\(\)/);
   assert.match(server, /fetchMetNorwayWeather\(\)/);
   assert.match(server, /FORECAST_CYCLE_HOURS = 6/);
-  assert.match(server, /onConflict: "location_slug,provider_key,issued_local_date,cycle_hour,target_date"/);
+  assert.match(
+    server,
+    /onConflict: "location_slug,provider_key,issued_local_date,cycle_hour,target_date"/,
+  );
   assert.match(weatherTypes, /dateIso\?: string/);
+});
+
+test("Open-Meteo usa consulta diária leve, datas ISO e nova tentativa", () => {
+  assert.match(openMeteoDaily, /forecast_days: "7"/);
+  assert.match(openMeteoDaily, /daily: \[/);
+  assert.doesNotMatch(openMeteoDaily, /hourly:/);
+  assert.doesNotMatch(openMeteoDaily, /current:/);
+  assert.match(openMeteoDaily, /dateIso: date/);
+  assert.match(openMeteoDaily, /MAX_ATTEMPTS = 2/);
+  assert.match(openMeteoDaily, /AbortSignal\.timeout\(REQUEST_TIMEOUT_MS\)/);
 });
 
 test("verificação usa somente dia completo observado pela Embrapa", () => {
@@ -39,8 +56,14 @@ test("verificação usa somente dia completo observado pela Embrapa", () => {
 
 test("captura e verificação são privadas e executadas por cron", () => {
   assert.match(migration, /create table if not exists public\.weather_forecast_accuracy_settings/);
-  assert.match(migration, /revoke all on table public\.weather_forecast_predictions from anon, authenticated/);
-  assert.match(migration, /revoke execute on function public\.score_weather_forecasts\(date\) from public, anon, authenticated/);
+  assert.match(
+    migration,
+    /revoke all on table public\.weather_forecast_predictions from anon, authenticated/,
+  );
+  assert.match(
+    migration,
+    /revoke execute on function public\.score_weather_forecasts\(date\) from public, anon, authenticated/,
+  );
   assert.match(migration, /tempo-pelotas-forecast-capture/);
   assert.match(migration, /'5 3,9,15,21 \* \* \*'/);
   assert.match(migration, /tempo-pelotas-forecast-verification/);
