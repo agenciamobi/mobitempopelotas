@@ -74,7 +74,7 @@ export function SaceGuaibaMap({
           minZoom: 5,
           maxZoom: 13,
           cooperativeGestures: true,
-          attributionControl: true,
+          attributionControl: {},
         });
         mapRef.current = map;
         map.dragRotate.disable();

@@ -33,7 +33,7 @@ export function AlertMunicipalityMap({ alert }: { alert: InmetAlert }) {
           minZoom: 5,
           maxZoom: 12,
           cooperativeGestures: true,
-          attributionControl: true,
+          attributionControl: {},
         });
         mapRef.current = map;
         map.dragRotate.disable();

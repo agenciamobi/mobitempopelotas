@@ -201,7 +201,8 @@ function normalizeData(
 export async function fetchInmetFrostMap(request: FrostRequest = {}): Promise<FrostMapData> {
   const endDate = normalizedDate(request.endDate);
   const days = Math.min(30, Math.max(1, Math.round(request.days ?? 30)));
-  const stationType = request.stationType === "AUTOMATICA" ? "AUTOMATICA" : "CONVENCIONAL";
+  const stationType: FrostStationType =
+    request.stationType === "AUTOMATICA" ? "AUTOMATICA" : "CONVENCIONAL";
   const state = (request.state ?? DEFAULT_STATE).trim().toUpperCase().slice(0, 2) || DEFAULT_STATE;
   const startDate = subtractDays(endDate, days);
   const filters = { startDate, endDate, days, stationType, state };
