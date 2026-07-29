@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 
 import { SiteLayout } from "@/components/layout/SiteLayout";
 import { ViewportScrollRoot } from "@/components/layout/ViewportScrollRoot";
+import { WeatherMinuteRefresh } from "@/components/weather/WeatherMinuteRefresh";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 import {
   SITE_DESCRIPTION,
@@ -187,6 +188,7 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <WeatherMinuteRefresh />
       <ViewportScrollRoot>
         <SiteLayout>
           <Outlet />
