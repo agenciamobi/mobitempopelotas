@@ -20,7 +20,6 @@ import { toRegionalForecastStory } from "./regional-city-forecast-story";
 import { formatRegionalDateTime } from "./regional-time-format";
 
 import "./RegionalCityPerformance.css";
-import "./RegionalCityRefinements.css";
 import styles from "./RegionalCityWeatherPage.module.css";
 import "./RegionalCityEditorial.css";
 import "./RegionalCityCascadeFix.css";
