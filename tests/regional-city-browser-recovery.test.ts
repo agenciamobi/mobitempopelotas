@@ -40,7 +40,15 @@ function forecastPayload() {
     { length: 24 },
     (_, index) => `2026-07-29T${String(index).padStart(2, "0")}:00`,
   );
-  const dailyDates = Array.from({ length: 7 }, (_, index) => `2026-0${index < 3 ? "7" : "8"}-${String(index < 3 ? 29 + index : index - 2).padStart(2, "0")}`);
+  const dailyDates = [
+    "2026-07-29",
+    "2026-07-30",
+    "2026-07-31",
+    "2026-08-01",
+    "2026-08-02",
+    "2026-08-03",
+    "2026-08-04",
+  ];
 
   return {
     current: {
