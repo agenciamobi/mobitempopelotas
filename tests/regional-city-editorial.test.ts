@@ -21,7 +21,7 @@ const cascadeCss = readFileSync(
   "utf8",
 );
 
- test("páginas regionais usam o main semântico fornecido pelo layout global", () => {
+test("páginas regionais usam o main semântico fornecido pelo layout global", () => {
   assert.doesNotMatch(pageSource, /<main\b/);
   assert.match(pageSource, /<div className=\{`\$\{styles\.page\} regional-city-page`\}>/);
 });
