@@ -101,7 +101,8 @@ function ProviderCard({
           <span>Erro médio de temperatura</span>
           <strong>{formatNumber(provider.meanTemperatureError, 2)} °C</strong>
           <small>
-            mínima {formatNumber(provider.minimumError, 2)} °C · máxima {formatNumber(provider.maximumError, 2)} °C
+            mínima {formatNumber(provider.minimumError, 2)} °C · máxima{" "}
+            {formatNumber(provider.maximumError, 2)} °C
           </small>
         </div>
         <div>
@@ -164,7 +165,11 @@ export function ForecastAccuracyPanel({ summary }: { summary: ForecastAccuracySu
           <p>{copy.description}</p>
         </div>
         <span className="forecast-accuracy__status">
-          {summary.status === "ready" ? <CheckCircle2 aria-hidden="true" /> : <Clock3 aria-hidden="true" />}
+          {summary.status === "ready" ? (
+            <CheckCircle2 aria-hidden="true" />
+          ) : (
+            <Clock3 aria-hidden="true" />
+          )}
           {copy.label}
         </span>
       </header>
@@ -174,8 +179,8 @@ export function ForecastAccuracyPanel({ summary }: { summary: ForecastAccuracySu
         <div>
           <h3>{copy.title}</h3>
           <p>
-            O erro é calculado comparando máximas, mínimas e chuva previstas com um dia completo medido no
-            Posto Meteorológico da Sede da Embrapa. Dias incompletos são descartados.
+            O erro é calculado comparando máximas, mínimas e chuva previstas com um dia completo
+            medido no Posto Meteorológico da Sede da Embrapa. Dias incompletos são descartados.
           </p>
         </div>
       </div>
@@ -224,19 +229,35 @@ export function ForecastAccuracyPanel({ summary }: { summary: ForecastAccuracySu
           <div>
             <strong>Primeiras previsões sendo arquivadas</strong>
             <p>
-              Não é possível reconstruir com fidelidade uma previsão antiga. Por isso, o histórico começa
-              agora e somente publicará métricas depois que as previsões arquivadas puderem ser comparadas
-              com observações completas.
+              Não é possível reconstruir com fidelidade uma previsão antiga. Por isso, o histórico
+              começa agora e somente publicará métricas depois que as previsões arquivadas puderem
+              ser comparadas com observações completas.
             </p>
           </div>
         </div>
       )}
 
       <ol className="forecast-accuracy__method">
-        <li><span>01</span><strong>Arquivar</strong><p>Os dois provedores são registrados quatro vezes ao dia.</p></li>
-        <li><span>02</span><strong>Observar</strong><p>A Embrapa alimenta o histórico central durante todo o dia.</p></li>
-        <li><span>03</span><strong>Validar</strong><p>Somente dias com cobertura suficiente entram na amostra.</p></li>
-        <li><span>04</span><strong>Comparar</strong><p>Os erros são separados por provedor e antecedência.</p></li>
+        <li>
+          <span>01</span>
+          <strong>Arquivar</strong>
+          <p>Os dois provedores são registrados quatro vezes ao dia.</p>
+        </li>
+        <li>
+          <span>02</span>
+          <strong>Observar</strong>
+          <p>A Embrapa alimenta o histórico central durante todo o dia.</p>
+        </li>
+        <li>
+          <span>03</span>
+          <strong>Validar</strong>
+          <p>Somente dias com cobertura suficiente entram na amostra.</p>
+        </li>
+        <li>
+          <span>04</span>
+          <strong>Comparar</strong>
+          <p>Os erros são separados por provedor e antecedência.</p>
+        </li>
       </ol>
     </section>
   );
