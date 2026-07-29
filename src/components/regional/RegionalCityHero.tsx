@@ -9,6 +9,7 @@ import type { WeatherIconName } from "@/production/lib/weather-data";
 
 import styles from "./RegionalCityHero.module.css";
 import { formatRegionalDateTime } from "./regional-time-format";
+import { isRegionalNight, regionalWeatherIcon } from "./regional-weather-presentation";
 
 type HeroPresentation = {
   icon: WeatherIconName;
@@ -46,42 +47,35 @@ function maximum(values: Array<number | null>) {
   return usable.length > 0 ? Math.max(...usable) : null;
 }
 
-function isNight(value: string | null) {
-  if (!value) return false;
-  const match = value.match(/T(\d{2}):/);
-  if (!match) return false;
-  const hour = Number(match[1]);
-  return hour < 6 || hour >= 19;
-}
-
 function conditionPresentation(condition: string | null, observedAt: string | null): HeroPresentation {
   const normalized = (condition ?? "").toLocaleLowerCase("pt-BR");
-  const night = isNight(observedAt);
+  const night = isRegionalNight(observedAt);
+  const icon = regionalWeatherIcon(condition, observedAt);
 
   if (/temporal|trovoada/.test(normalized)) {
-    return { icon: "storm", image: PHOTOS.storm, position: "center 52%" };
+    return { icon, image: PHOTOS.storm, position: "center 52%" };
   }
   if (/chuva|garoa/.test(normalized)) {
-    return { icon: "rain", image: PHOTOS.rain, position: "center 50%" };
+    return { icon, image: PHOTOS.rain, position: "center 50%" };
   }
   if (/neblina|nevoeiro/.test(normalized)) {
-    return { icon: "cloud", image: PHOTOS.fog, position: "center 48%" };
+    return { icon, image: PHOTOS.fog, position: "center 48%" };
   }
   if (/limpo/.test(normalized)) {
     return {
-      icon: night ? "moon" : "sun",
+      icon,
       image: night ? PHOTOS.night : PHOTOS.clear,
       position: night ? "center 44%" : "center 50%",
     };
   }
   if (/parcialmente/.test(normalized)) {
     return {
-      icon: night ? "partly-cloudy-night" : "partly-cloudy",
+      icon,
       image: night ? PHOTOS.night : PHOTOS.clouds,
       position: "center 48%",
     };
   }
-  return { icon: "cloud", image: PHOTOS.clouds, position: "center 48%" };
+  return { icon, image: PHOTOS.clouds, position: "center 48%" };
 }
 
 export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
@@ -187,9 +181,18 @@ export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
           </div>
 
           <dl>
-            <div><dt>Umidade</dt><dd>{metric(current?.humidity ?? null, "%")}</dd></div>
-            <div><dt>Vento</dt><dd>{metric(current?.windSpeed ?? null, " km/h")}</dd></div>
-            <div><dt>Pressão</dt><dd>{metric(current?.pressure ?? null, " hPa")}</dd></div>
+            <div>
+              <dt>Umidade</dt>
+              <dd>{metric(current?.humidity ?? null, "%")}</dd>
+            </div>
+            <div>
+              <dt>Vento</dt>
+              <dd>{metric(current?.windSpeed ?? null, " km/h")}</dd>
+            </div>
+            <div>
+              <dt>Pressão</dt>
+              <dd>{metric(current?.pressure ?? null, " hPa")}</dd>
+            </div>
           </dl>
 
           <footer>
@@ -203,7 +206,9 @@ export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
         </article>
 
         <div className={styles.photoLabel}>
-          <span><i aria-hidden="true" /> Imagem ilustrativa</span>
+          <span>
+            <i aria-hidden="true" /> Imagem ilustrativa
+          </span>
           <small>Representação visual da condição atual</small>
         </div>
       </div>
