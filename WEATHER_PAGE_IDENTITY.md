@@ -7,23 +7,27 @@ Este documento define o contrato visual das páginas do Tempo Pelotas. O objetiv
 As páginas de previsão devem reutilizar os componentes abaixo antes de criar qualquer alternativa:
 
 1. `TodayRetailHero`
-   - primeira dobra meteorológica;
-   - aceita cidade, estado, links de ação, aviso e origem da condição atual;
-   - usado em `/tempo-hoje-pelotas` e nas rotas `/tempo-em/...`.
+   - primeira dobra da página `/tempo-hoje-pelotas`;
+   - concentra condição atual, fotografia contextual e métricas rápidas do dia.
 
-2. `home-inmet-alerts`
+2. `WeatherSplitHero`
+   - primeira dobra editorial dividida em bloco escuro e painel operacional claro;
+   - deriva da composição aprovada em `/vento-em-pelotas`;
+   - usado nas rotas `/tempo-em/...`, com cidade, temperatura, chuva, faixa diária e rajadas parametrizadas.
+
+3. `home-inmet-alerts`
    - contrato visual do aviso oficial do INMET;
    - mantém marca lateral, classificação, abrangência, validade e ação oficial na mesma posição.
 
-3. `InternalPageChapters`
+4. `InternalPageChapters`
    - navegação numerada entre os capítulos da página;
    - textos e destinos podem variar, mas estrutura, tipografia e comportamento responsivo permanecem iguais.
 
-4. `HomeForecastStory`
+5. `HomeForecastStory`
    - cabeçalho editorial, métricas do dia, resumo das próximas horas, cards horários e tendência diária;
    - recebe `locationName` e dados adaptados, sem manter grades alternativas por cidade.
 
-5. `InternalObservationWidget` e `InternalPracticalSummary`
+6. `InternalObservationWidget` e `InternalPracticalSummary`
    - devem ser usados quando a página tiver medição observada ou orientação prática equivalente.
 
 ## Regra de arquitetura
@@ -31,8 +35,9 @@ As páginas de previsão devem reutilizar os componentes abaixo antes de criar q
 Diferenças entre cidades e fontes pertencem a adaptadores de dados, não a novos componentes visuais.
 
 - Pelotas usa os dados meteorológicos agregados do portal.
-- As páginas municipais usam `regional-city-forecast-story.ts` para converter os dados regionais ao contrato compartilhado.
-- Valores indisponíveis permanecem indisponíveis; o adaptador não deve inventar números para satisfazer o componente.
+- As páginas municipais usam `regional-city-forecast-story.ts` para converter os dados regionais ao contrato compartilhado da previsão.
+- A primeira dobra municipal usa `RegionalCityHero` apenas como adaptador de conteúdo para `WeatherSplitHero`.
+- Valores indisponíveis permanecem indisponíveis; os adaptadores não devem inventar números para satisfazer o componente.
 
 ## Regra de evolução
 
