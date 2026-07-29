@@ -6,6 +6,7 @@ import { selectPriorityRegionalAlert } from "@/lib/weather/regional-alert-priori
 import type { RegionalCityWeatherData } from "@/lib/weather/regional-city-weather.types";
 import { WeatherIcon } from "@/production/components/weather-icon";
 
+import "./RegionalCityHero.css";
 import { formatRegionalDateTime, formatRegionalHour } from "./regional-time-format";
 import { regionalWeatherIcon } from "./regional-weather-presentation";
 
@@ -72,7 +73,7 @@ export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
       }
       eyebrow={`Previsão local · ${city.group}`}
       title={`Como o tempo deve mudar em ${city.name}.`}
-      description={`Compare a condição estimada agora com temperatura, chuva e vento previstos para as próximas horas e veja a tendência dos próximos dias no município.`}
+      description="Compare a condição estimada agora com temperatura, chuva e vento previstos para as próximas horas e veja a tendência dos próximos dias no município."
       actions={
         <>
           <a href="#previsao-hoje">
@@ -95,7 +96,9 @@ export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
       facts={[
         {
           label: "Faixa prevista hoje",
-          value: today ? `${metric(today.minimum, "°")} / ${metric(today.maximum, "°")}` : "Não informada",
+          value: today
+            ? `${metric(today.minimum, "°")} / ${metric(today.maximum, "°")}`
+            : "Não informada",
         },
         {
           label: "Rajada mais forte",
