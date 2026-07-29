@@ -3,26 +3,48 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const rootRoute = readFileSync("src/routes/__root.tsx", "utf8");
+const scrollRoot = readFileSync("src/components/layout/ViewportScrollRoot.tsx", "utf8");
 const scrollStyles = readFileSync("src/production/styles/document-scroll.css", "utf8");
 const productionCss = readFileSync("src/production/production-styles.css", "utf8");
 const productionManifest = readFileSync("src/production/production-styles.ts", "utf8");
 
-test("não intercepta globalmente wheel ou teclas de navegação", () => {
-  assert.doesNotMatch(rootRoute, /addEventListener\("wheel"/);
-  assert.doesNotMatch(rootRoute, /releaseBlockedDocumentWheel/);
-  assert.doesNotMatch(rootRoute, /stopImmediatePropagation/);
-  assert.doesNotMatch(rootRoute, /window\.scrollBy/);
-  assert.doesNotMatch(rootRoute, /DocumentScrollGuard/);
+test("monta um viewport próprio para toda a aplicação", () => {
+  assert.match(rootRoute, /import \{ ViewportScrollRoot \}/);
+  assert.match(rootRoute, /<ViewportScrollRoot>[\s\S]*<SiteLayout>/);
+  assert.match(scrollRoot, /id="page-scroll-root"/);
+  assert.match(scrollRoot, /data-scroll-viewport="true"/);
 });
 
-test("mantém a página rolável e aplica scrollbar editorial", () => {
-  assert.match(scrollStyles, /html \{[\s\S]*overflow-y: auto;/);
+test("garante wheel e teclas de navegação no viewport dedicado", () => {
+  assert.match(scrollRoot, /window\.addEventListener\("wheel", handleWheel/);
+  assert.match(scrollRoot, /passive: false/);
+  assert.match(scrollRoot, /event\.preventDefault\(\)/);
+  assert.match(scrollRoot, /root\.scrollTop \+= deltaY/);
+  assert.match(scrollRoot, /case "ArrowDown"/);
+  assert.match(scrollRoot, /case "PageDown"/);
+  assert.match(scrollRoot, /case "PageUp"/);
+  assert.match(scrollRoot, /case "Home"/);
+  assert.match(scrollRoot, /case "End"/);
+  assert.match(scrollRoot, /root\.scrollTo\(\{ top: destination, behavior: "auto" \}\)/);
+});
+
+test("preserva campos editáveis, modais e scroll interno", () => {
+  assert.match(scrollRoot, /EDITABLE_SELECTOR/);
+  assert.match(scrollRoot, /MODAL_SELECTOR/);
+  assert.match(scrollRoot, /hasScrollableAncestor/);
+  assert.match(scrollRoot, /isModalOpen\(\)/);
+  assert.match(scrollRoot, /shouldPreserveKeyboardBehavior/);
+});
+
+test("desativa scroll concorrente em html e body e aplica scrollbar editorial", () => {
+  assert.match(scrollStyles, /html,[\s\S]*body \{[\s\S]*overflow: hidden !important;/);
+  assert.match(scrollStyles, /\.page-scroll-root \{[\s\S]*overflow-y: scroll;/);
   assert.match(scrollStyles, /scrollbar-color: var\(--document-scrollbar-end\)/);
-  assert.match(scrollStyles, /html::\-webkit-scrollbar-thumb/);
+  assert.match(scrollStyles, /\.page-scroll-root::\-webkit-scrollbar-thumb/);
   assert.match(scrollStyles, /linear-gradient\([\s\S]*--document-scrollbar-start/);
 });
 
-test("carrega a scrollbar na entrada CSS e no manifesto", () => {
+test("carrega a camada de scrollbar na entrada CSS e no manifesto", () => {
   assert.match(productionCss, /@import "\.\/styles\/document-scroll\.css";/);
   assert.match(productionManifest, /import "\.\/styles\/document-scroll\.css";/);
 });
