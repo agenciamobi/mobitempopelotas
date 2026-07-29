@@ -384,7 +384,7 @@ function parseCapAlert(xml: string, fallbackUrl: string): InmetAlert | null {
   };
 }
 
-function toTextArray(value: unknown) {
+function toTextArray(value: unknown): string[] {
   if (Array.isArray(value)) return unique(value.flatMap((item) => toTextArray(item)));
   const text = nestedText(value);
   return text ? unique(text.split(/[,;|\n]+/)) : [];
