@@ -1,7 +1,25 @@
 /*
- * Identidade compartilhada — as páginas /tempo-em/... passam a usar os mesmos
- * blocos aprovados em /tempo-hoje-pelotas: aviso INMET, capítulos e história da previsão.
+ * Identidade compartilhada — as páginas /tempo-em/... usam os mesmos blocos
+ * aprovados em /tempo-hoje-pelotas: hero retail, aviso INMET, capítulos e previsão.
  */
+.site-shell--topic[data-topic="tempo-em"]
+  .site-container--topic
+  > .regional-city-page
+  > section.today-retail-hero {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: clamp(2.1rem, 4.8vw, 4.8rem) 0 clamp(1.7rem, 3.8vw, 3.5rem);
+}
+
+.site-shell--topic[data-topic="tempo-em"] .today-retail-hero__inner {
+  width: 100%;
+  max-width: var(--regional-frame-max);
+  padding-right: var(--regional-gutter);
+  padding-left: var(--regional-gutter);
+  box-sizing: border-box;
+}
+
 .regional-city-page > :is(
     .home-inmet-alerts,
     .internal-page-chapters,
@@ -99,6 +117,12 @@
   }
 }
 
+@media (max-width: 920px) {
+  .site-shell--topic[data-topic="tempo-em"] .today-retail-hero__inner {
+    max-width: 780px;
+  }
+}
+
 @media (max-width: 760px) {
   .regional-city-page > .internal-page-chapters {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -116,6 +140,18 @@
 }
 
 @media (max-width: 700px) {
+  .site-shell--topic[data-topic="tempo-em"]
+    .site-container--topic
+    > .regional-city-page
+    > section.today-retail-hero {
+    padding: 1.5rem 0 1.35rem;
+  }
+
+  .site-shell--topic[data-topic="tempo-em"] .today-retail-hero__inner {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
   .regional-city-page > .regional-city-official-alert {
     margin-top: 14px;
   }
