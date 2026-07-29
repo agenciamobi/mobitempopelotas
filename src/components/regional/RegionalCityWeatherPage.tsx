@@ -24,6 +24,7 @@ import "./RegionalCityPerformance.css";
 import "./RegionalCityRefinements.css";
 import styles from "./RegionalCityWeatherPage.module.css";
 import "./RegionalCityEditorial.css";
+import "./RegionalCityCascadeFix.css";
 
 const regionalNumberFormat = new Intl.NumberFormat("pt-BR", {
   maximumFractionDigits: 1,
