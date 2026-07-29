@@ -8,14 +8,26 @@ import type { RegionalCityWeatherData } from "@/lib/weather/regional-city-weathe
 import { RegionalCityWeatherPage } from "./RegionalCityWeatherPage";
 
 export function RegionalCityWeatherPageClient({
-  data: initialData,
+  data,
 }: {
   data: RegionalCityWeatherData;
+}) {
+  return (
+    <RegionalCityWeatherRecovery
+      initialData={data}
+      key={`${data.city.slug}:${data.source.fetchedAt}`}
+    />
+  );
+}
+
+function RegionalCityWeatherRecovery({
+  initialData,
+}: {
+  initialData: RegionalCityWeatherData;
 }) {
   const [data, setData] = useState(initialData);
 
   useEffect(() => {
-    setData(initialData);
     if (!regionalCityNeedsBrowserRecovery(initialData)) return;
 
     const controller = new AbortController();
