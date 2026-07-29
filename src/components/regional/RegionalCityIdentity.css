@@ -23,7 +23,10 @@
 .regional-city-page > :is(
     .home-inmet-alerts,
     .internal-page-chapters,
-    .regional-city-shared-forecast
+    .regional-city-shared-forecast,
+    .regional-city-context,
+    .regional-city-related,
+    .regional-city-sources
   ) {
   width: min(calc(100% - var(--regional-frame-gap)), var(--regional-frame-max));
   max-width: var(--regional-frame-max);
@@ -32,8 +35,14 @@
   box-sizing: border-box;
 }
 
-.regional-city-page > .regional-city-official-alert {
-  margin-top: clamp(24px, 3vw, 42px);
+.site-shell--topic[data-topic="tempo-em"]
+  .site-container--topic
+  > .regional-city-page
+  > section.regional-city-official-alert {
+  width: min(calc(100% - var(--regional-frame-gap)), var(--regional-frame-max));
+  max-width: var(--regional-frame-max);
+  margin: clamp(24px, 3vw, 42px) auto 0;
+  padding: 0;
   scroll-margin-top: 7.75rem;
 }
 
@@ -69,6 +78,36 @@
 
 .regional-city-shared-forecast :is(.home-hourly-cards, .home-next-day-cards) article {
   scroll-snap-align: start;
+}
+
+.site-shell--topic[data-topic="tempo-em"]
+  .site-container--topic
+  > .regional-city-page
+  > section.regional-city-context {
+  width: min(calc(100% - var(--regional-frame-gap)), var(--regional-frame-max));
+  max-width: var(--regional-frame-max);
+  margin: clamp(22px, 2.6vw, 38px) auto 0;
+  padding: clamp(42px, 5vw, 82px) var(--regional-gutter);
+}
+
+.site-shell--topic[data-topic="tempo-em"]
+  .site-container--topic
+  > .regional-city-page
+  > section.regional-city-related {
+  width: min(calc(100% - var(--regional-frame-gap)), var(--regional-frame-max));
+  max-width: var(--regional-frame-max);
+  margin: clamp(22px, 2.6vw, 38px) auto 0;
+  padding: clamp(36px, 4.7vw, 72px) var(--regional-gutter);
+}
+
+.site-shell--topic[data-topic="tempo-em"]
+  .site-container--topic
+  > .regional-city-page
+  > footer.regional-city-sources {
+  width: min(calc(100% - var(--regional-frame-gap)), var(--regional-frame-max));
+  max-width: var(--regional-frame-max);
+  margin: clamp(22px, 2.6vw, 38px) auto 0;
+  padding: 22px var(--regional-gutter);
 }
 
 .regional-city-official-alert.home-inmet-alerts.is-unverified[data-alert-period="none"] {
@@ -152,7 +191,10 @@
     padding-left: 14px;
   }
 
-  .regional-city-page > .regional-city-official-alert {
+  .site-shell--topic[data-topic="tempo-em"]
+    .site-container--topic
+    > .regional-city-page
+    > section.regional-city-official-alert {
     margin-top: 14px;
   }
 
@@ -160,6 +202,26 @@
     margin-top: 16px;
     padding: 1rem;
     border-radius: 1rem;
+  }
+
+  .site-shell--topic[data-topic="tempo-em"]
+    .site-container--topic
+    > .regional-city-page
+    > section.regional-city-context,
+  .site-shell--topic[data-topic="tempo-em"]
+    .site-container--topic
+    > .regional-city-page
+    > section.regional-city-related {
+    margin-top: 16px;
+    padding: 28px 16px;
+  }
+
+  .site-shell--topic[data-topic="tempo-em"]
+    .site-container--topic
+    > .regional-city-page
+    > footer.regional-city-sources {
+    margin-top: 16px;
+    padding: 20px 16px;
   }
 
   #avisos-municipais,
