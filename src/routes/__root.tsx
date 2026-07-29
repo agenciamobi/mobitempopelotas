@@ -11,6 +11,7 @@ import mapLibreCss from "maplibre-gl/dist/maplibre-gl.css?url";
 import { useEffect, type ReactNode } from "react";
 
 import { SiteLayout } from "@/components/layout/SiteLayout";
+import { ViewportScrollRoot } from "@/components/layout/ViewportScrollRoot";
 import { reportLovableError } from "@/lib/lovable-error-reporting";
 import {
   SITE_DESCRIPTION,
@@ -186,9 +187,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <SiteLayout>
-        <Outlet />
-      </SiteLayout>
+      <ViewportScrollRoot>
+        <SiteLayout>
+          <Outlet />
+        </SiteLayout>
+      </ViewportScrollRoot>
     </QueryClientProvider>
   );
 }
