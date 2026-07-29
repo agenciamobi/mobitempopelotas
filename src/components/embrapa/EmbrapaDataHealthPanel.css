@@ -1,0 +1,291 @@
+.embrapa-health {
+  display: grid;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  padding: clamp(1.15rem, 2.8vw, 2rem);
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(circle at 100% 0, rgb(24 189 205 / 9%), transparent 24rem),
+    radial-gradient(circle at 0 100%, rgb(94 44 237 / 8%), transparent 22rem),
+    #fff;
+  box-shadow: 0 22px 60px rgb(7 30 47 / 9%);
+}
+
+.embrapa-health__header,
+.embrapa-health__alerts-heading,
+.embrapa-health > footer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.embrapa-health__header h2,
+.embrapa-health__alerts-heading h3 {
+  margin: 0.35rem 0 0;
+  color: var(--portal-ink);
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.embrapa-health__header h2 {
+  font-size: clamp(1.7rem, 3vw, 2.6rem);
+}
+
+.embrapa-health__header p,
+.embrapa-health__alerts-heading p,
+.embrapa-health__clear p,
+.embrapa-health__alert-list p {
+  margin: 0.55rem 0 0;
+  color: var(--portal-ink-soft);
+  line-height: 1.65;
+}
+
+.embrapa-health__header p {
+  max-width: 760px;
+}
+
+.embrapa-health__eyebrow {
+  color: #087f8d;
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.embrapa-health__status {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 999px;
+  color: #166534;
+  font-size: 0.78rem;
+  font-weight: 820;
+  background: #edf9f0;
+}
+
+.embrapa-health__status svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.embrapa-health.is-degraded .embrapa-health__status {
+  color: #815500;
+  background: #fff7df;
+}
+
+.embrapa-health.is-critical .embrapa-health__status,
+.embrapa-health.is-unavailable .embrapa-health__status {
+  color: #9d3022;
+  background: #fff0ed;
+}
+
+.embrapa-health__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.embrapa-health__metrics article {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.25rem 0.65rem;
+  padding: 1rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1rem;
+  background: rgb(248 251 252 / 88%);
+}
+
+.embrapa-health__metrics svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  grid-row: span 3;
+  color: #5e2ced;
+}
+
+.embrapa-health__metrics span,
+.embrapa-health__pipeline span {
+  color: #087f8d;
+  font-size: 0.72rem;
+  font-weight: 820;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.embrapa-health__metrics strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--portal-ink);
+  font-size: clamp(1.05rem, 1.8vw, 1.4rem);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.embrapa-health__metrics small,
+.embrapa-health__pipeline small,
+.embrapa-health > footer {
+  color: var(--portal-ink-soft);
+  font-size: 0.74rem;
+  line-height: 1.45;
+}
+
+.embrapa-health__pipeline {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.embrapa-health__pipeline article {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1rem;
+  background: #fff;
+}
+
+.embrapa-health__pipeline article > svg {
+  width: 1.3rem;
+  height: 1.3rem;
+  margin-top: 0.05rem;
+  color: #14804a;
+}
+
+.embrapa-health__pipeline article.is-warning > svg {
+  color: #d97706;
+}
+
+.embrapa-health__pipeline article > div {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.embrapa-health__pipeline strong {
+  color: var(--portal-ink);
+  font-size: 0.92rem;
+}
+
+.embrapa-health__alerts {
+  display: grid;
+  gap: 0.9rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(7 30 47 / 8%);
+}
+
+.embrapa-health__alerts-heading h3 {
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+}
+
+.embrapa-health__alerts-heading > span {
+  padding: 0.4rem 0.6rem;
+  border-radius: 999px;
+  color: var(--portal-ink-soft);
+  font-size: 0.72rem;
+  font-weight: 780;
+  background: #f1f5f6;
+}
+
+.embrapa-health__clear,
+.embrapa-health__alert-list article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 1rem;
+}
+
+.embrapa-health__clear {
+  border: 1px solid #cfead8;
+  background: #f3fbf6;
+}
+
+.embrapa-health__clear > svg {
+  width: 1.3rem;
+  height: 1.3rem;
+  color: #168149;
+}
+
+.embrapa-health__clear strong,
+.embrapa-health__alert-list strong {
+  color: var(--portal-ink);
+  font-size: 0.9rem;
+}
+
+.embrapa-health__clear p,
+.embrapa-health__alert-list p {
+  font-size: 0.82rem;
+}
+
+.embrapa-health__alert-list {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.embrapa-health__alert-list article {
+  border: 1px solid #f2d5aa;
+  background: #fff9ed;
+}
+
+.embrapa-health__alert-list article.is-critical {
+  border-color: #f1c8c0;
+  background: #fff3f0;
+}
+
+.embrapa-health__alert-list article > svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #c66a08;
+}
+
+.embrapa-health__alert-list article.is-critical > svg {
+  color: #b63e2f;
+}
+
+.embrapa-health__alert-list small {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--portal-ink-soft);
+  font-size: 0.72rem;
+}
+
+.embrapa-health > footer {
+  align-items: center;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgb(7 30 47 / 8%);
+}
+
+@media (max-width: 1050px) {
+  .embrapa-health__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .embrapa-health__header,
+  .embrapa-health__alerts-heading,
+  .embrapa-health > footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .embrapa-health__status,
+  .embrapa-health__alerts-heading > span {
+    align-self: flex-start;
+  }
+
+  .embrapa-health__metrics,
+  .embrapa-health__pipeline {
+    grid-template-columns: 1fr;
+  }
+
+  .embrapa-health__metrics strong {
+    white-space: normal;
+  }
+}
