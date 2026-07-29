@@ -1,5 +1,8 @@
 import { timingSafeEqual } from "node:crypto";
 
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+import type { Json } from "@/lib/supabase/database.types";
 import {
   createSupabaseAdminClient,
   getSupabaseServerConfig,
@@ -31,6 +34,59 @@ type ForecastPredictionInsert = {
   precipitation_mm: number;
   rain_chance: number | null;
   wind_gust: number | null;
+};
+
+type ForecastPredictionRow = ForecastPredictionInsert & {
+  id: number;
+  created_at: string;
+};
+
+type ForecastAccuracySettingsRow = {
+  location_slug: string;
+  endpoint: string;
+  collector_token: string;
+  enabled: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+type ForecastAccuracyDatabase = {
+  public: {
+    Tables: {
+      weather_forecast_predictions: {
+        Row: ForecastPredictionRow;
+        Insert: ForecastPredictionInsert;
+        Update: Partial<ForecastPredictionInsert>;
+        Relationships: [];
+      };
+      weather_forecast_accuracy_settings: {
+        Row: ForecastAccuracySettingsRow;
+        Insert: {
+          location_slug: string;
+          endpoint: string;
+          collector_token?: string;
+          enabled?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<ForecastAccuracySettingsRow>;
+        Relationships: [];
+      };
+    };
+    Views: { [_ in never]: never };
+    Functions: {
+      score_weather_forecasts: {
+        Args: { p_target_date?: string };
+        Returns: Json;
+      };
+      get_forecast_accuracy_summary: {
+        Args: { p_days?: number };
+        Returns: Json;
+      };
+    };
+    Enums: { [_ in never]: never };
+    CompositeTypes: { [_ in never]: never };
+  };
 };
 
 export type ForecastAccuracyLead = {
@@ -83,6 +139,10 @@ export type ForecastCaptureResult = {
 
 function storageConfigured() {
   return getSupabaseServerConfig().isAdminConfigured;
+}
+
+function forecastAccuracyClient() {
+  return createSupabaseAdminClient() as unknown as SupabaseClient<ForecastAccuracyDatabase>;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -189,7 +249,7 @@ export async function captureForecastPredictions(): Promise<ForecastCaptureResul
   const local = localDateTimeParts(issuedAt);
   const cycleHour = Math.floor(local.hour / FORECAST_CYCLE_HOURS) * FORECAST_CYCLE_HOURS;
   const forecasts = await Promise.all([fetchOpenMeteoWeather(), fetchMetNorwayWeather()]);
-  const client = createSupabaseAdminClient() as any;
+  const client = forecastAccuracyClient();
   const providers: ForecastCaptureResult["providers"] = [];
   let storedCount = 0;
 
@@ -233,9 +293,9 @@ export async function verifyRecentForecasts() {
     throw new Error("O armazenamento de precisão das previsões não está configurado.");
   }
 
-  const client = createSupabaseAdminClient() as any;
+  const client = forecastAccuracyClient();
   const today = localDateTimeParts().date;
-  const results: unknown[] = [];
+  const results: Json[] = [];
 
   for (let offset = 1; offset <= RECENT_VERIFICATION_DAYS; offset += 1) {
     const targetDate = shiftDate(today, -offset);
@@ -331,7 +391,7 @@ export async function getForecastAccuracySummaryServer(): Promise<ForecastAccura
   if (!storageConfigured()) return unavailableSummary();
 
   try {
-    const client = createSupabaseAdminClient() as any;
+    const client = forecastAccuracyClient();
     const { data, error } = await client.rpc("get_forecast_accuracy_summary", { p_days: 30 });
     if (error) throw new Error(error.message);
     return parseSummary(data);
@@ -360,13 +420,13 @@ export async function authorizeForecastAccuracyRequest(request: Request) {
   const receivedToken = request.headers.get("x-collector-token")?.trim();
   if (!receivedToken || !storageConfigured()) return false;
 
-  const client = createSupabaseAdminClient() as any;
+  const client = forecastAccuracyClient();
   const { data, error } = await client
     .from("weather_forecast_accuracy_settings")
     .select("collector_token,enabled")
     .eq("location_slug", LOCATION_SLUG)
     .maybeSingle();
 
-  if (error || !data?.enabled || typeof data.collector_token !== "string") return false;
+  if (error || !data?.enabled) return false;
   return safeTokenEqual(receivedToken, data.collector_token);
 }
