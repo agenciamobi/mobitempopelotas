@@ -16,9 +16,11 @@ import type {
   RegionalCityAlert,
   RegionalCityWeatherData,
 } from "@/lib/weather/regional-city-weather.types";
+import { WeatherIcon } from "@/production/components/weather-icon";
 import { RegionalCityHero } from "./RegionalCityHero";
 import { RegionalCityHourlySection } from "./RegionalCityHourlySection";
 import { formatRegionalDateTime } from "./regional-time-format";
+import { regionalWeatherIcon } from "./regional-weather-presentation";
 
 import "./RegionalCityPerformance.css";
 import "./RegionalCityRefinements.css";
@@ -271,7 +273,13 @@ export function RegionalCityWeatherPage({ data }: { data: RegionalCityWeatherDat
                   <strong>{day.weekday}</strong>
                   <small>{day.date.split("-").reverse().slice(0, 2).join("/")}</small>
                 </header>
-                <h3>{day.condition}</h3>
+                <div className="regional-city-daily-condition">
+                  <WeatherIcon
+                    name={regionalWeatherIcon(day.condition)}
+                    title={`Condição prevista: ${day.condition}`}
+                  />
+                  <h3>{day.condition}</h3>
+                </div>
                 <div className={styles.range}>
                   <strong>{metric(day.maximum, "°")}</strong>
                   <span>{metric(day.minimum, "°")}</span>
