@@ -1,70 +1,66 @@
-# Diagnóstico — rolagem "só arrastando a barra"
+# Plano — diagnóstico do bloqueio de rolagem
 
-## Resultado da reprodução
+O travamento não reproduziu em Chromium headless em nenhuma das três URLs (apex, www, lovable.app). As três servem o mesmo bundle `index-CHv0PIEg.js`, sem `preventDefault`, sem overlay fixed, sem overflow restritivo. O único componente com estado persistente entre sessões é o **Service Worker ativo** (escopo `https://tempopelotas.com.br/`).
 
-Testei o sintoma descrito em **duas superfícies**, com Playwright/Chromium headless, viewport 1280×900, sobre a Home `/`:
+Sem uma reprodução real, qualquer edição seria especulativa. Antes de tocar em código, coletar dados do ambiente do usuário.
 
-1. Preview local (`http://localhost:8080/`, HEAD atual).
-2. Domínio publicado (`https://mobitempopelotas.lovable.app/`).
+## Passo 1 — Reprodução no navegador real (usuário executa)
 
-Em ambos, wheel do mouse e teclas de navegação movimentaram o documento normalmente:
-
-| Ação | Preview `scrollY` | Público `scrollY` |
-|---|---|---|
-| inicial | 0 | 0 |
-| `mouse.wheel(0, 600)` | 600 | 600 |
-| `PageDown` | 1387 | 1387 |
-| `End` | 7933 | 8067 |
-
-Nenhum listener `wheel`/`keydown`/`touchmove` marcou `defaultPrevented=true`. Nenhum overlay `fixed`/`sticky` cobrindo ≥90% do viewport com `pointer-events` ativo. `document.scrollingElement === <html>`, `document.activeElement === <body>`, sem iframe fullscreen sobre o conteúdo.
-
-Estado computado relevante (público):
-
-```text
-html  overflow-y:auto  overflow-x:hidden  position:static  height:9507.78px
-body  overflow-y:auto  overflow-x:hidden  position:static  height:9507.78px
-scrollingElement = HTML   scrollHeight = 9508   clientHeight = 900
-```
-
-Isso é consistente com um documento normalmente rolável — não há trava global de wheel/teclado no código atual (o teste `tests/document-scroll.test.ts` já veda `wheel`/`stopImmediatePropagation`/`DocumentScrollGuard` em `__root.tsx`, e o guard antigo foi removido).
-
-## Por que não vou nomear uma causa agora
-
-A instrução explícita foi "não proponha hipóteses sem reproduzir". Não reproduzi o sintoma nas condições testadas, então qualquer culpado que eu apontasse (ex.: `PwaManager` bloqueando scroll do body quando o diálogo abre, foco preso num `contenteditable`, `overflow: hidden` aplicado ao `<html>` por um estado transiente, extensão do navegador, camada MapLibre capturando wheel) seria especulação.
-
-## O que preciso de você para fechar o diagnóstico
-
-Uma destas informações, na ordem de utilidade:
-
-1. **URL exata e rota** onde o travamento aparece (Home, `/radar-e-satelite-pelotas`, `/situacao-hidrologica-pelotas`, embed, etc.) e se é preview (`id-preview--…lovable.app`) ou domínio público.
-2. **Reprodutibilidade**: acontece sempre, ou só depois de alguma ação (abrir menu, clicar em card de radar, PWA instalado, abrir/fechar diálogo, foco num input)?
-3. **Ambiente**: navegador + versão, desktop/mobile, se está com o app instalado como PWA (modo standalone), extensões ativas.
-4. **Snapshot no momento do travamento** — cole no console e me mande o retorno:
+Com a página travada, abrir DevTools > Console e colar:
 
 ```js
 (() => {
-  const de = document.documentElement, b = document.body, se = document.scrollingElement;
-  const cs = getComputedStyle(de), bs = getComputedStyle(b);
+  const se = document.scrollingElement;
+  const hs = getComputedStyle(document.documentElement);
+  const bs = getComputedStyle(document.body);
+  const active = document.activeElement;
+  const overlays = [...document.querySelectorAll('*')].filter(e=>{
+    const s=getComputedStyle(e); if(!['fixed','sticky'].includes(s.position)) return false;
+    const r=e.getBoundingClientRect();
+    return r.width>=innerWidth*0.8 && r.height>=innerHeight*0.6 && s.pointerEvents!=='none';
+  }).map(e=>({tag:e.tagName,cls:e.className,z:getComputedStyle(e).zIndex,pe:getComputedStyle(e).pointerEvents}));
+  const prevented = [];
+  ['wheel','keydown','touchmove'].forEach(t=>addEventListener(t,e=>{if(e.defaultPrevented)prevented.push(t)},{capture:true,passive:true}));
   return {
-    scrollingElement: se && se.tagName,
-    html: { overflowY: cs.overflowY, overflowX: cs.overflowX, position: cs.position, height: cs.height },
-    body: { overflowY: bs.overflowY, overflowX: bs.overflowX, position: bs.position, height: bs.height },
-    activeElement: document.activeElement && (document.activeElement.tagName + '#' + document.activeElement.id + '.' + document.activeElement.className),
-    pwaDataset: document.documentElement.dataset,
-    fixedOverlays: Array.from(document.querySelectorAll('*')).filter(e => {
-      const s = getComputedStyle(e); if (!['fixed','sticky'].includes(s.position)) return false;
-      const r = e.getBoundingClientRect();
-      return r.width >= innerWidth*0.9 && r.height >= innerHeight*0.9 && s.pointerEvents !== 'none';
-    }).map(e => e.tagName + '#' + e.id + '.' + (e.className||'').toString().slice(0,120)),
-    scrollY: scrollY, docHeight: de.scrollHeight
+    ua: navigator.userAgent,
+    standalone: matchMedia('(display-mode: standalone)').matches,
+    url: location.href,
+    scrollingEl: se?.tagName, scrollY: scrollY, scrollH: se?.scrollHeight, clientH: se?.clientHeight,
+    htmlOverflow:[hs.overflow,hs.overflowY,hs.position,hs.height,hs.overscrollBehavior],
+    bodyOverflow:[bs.overflow,bs.overflowY,bs.position,bs.height,bs.touchAction,bs.overscrollBehavior],
+    activeElement: active && {tag:active.tagName, cls:active.className, tabindex:active.tabIndex},
+    overlays,
+    swRegs: await navigator.serviceWorker.getRegistrations().then(rs=>rs.map(r=>r.scope)),
   };
 })()
 ```
 
-5. Opcional: no DevTools → Elements → Event Listeners no `document`, `window`, `html` e `body`, um print da lista dos listeners `wheel`, `keydown`, `touchmove`, `scroll` (com "Ancestors" desmarcado).
+E, após tentar rolar por 2 segundos, colar `prevented` (variável global acima) para saber se algum handler está engolindo o evento.
 
-Com esses dados eu volto direto ao arquivo/listener culpado — sem chutar entre `PwaManager`, `SiteLayout`, `PwaAppExperience`, MapLibre ou o CSS `document-scroll.css`.
+## Passo 2 — Teste de isolamento do Service Worker
 
-## Próximo passo
+Ainda no console da página travada:
 
-Aguardo os dados acima. Não mexo em nenhum arquivo até a causa estar reproduzida.
+```js
+navigator.serviceWorker.getRegistrations().then(rs=>Promise.all(rs.map(r=>r.unregister()))).then(()=>location.reload())
+```
+
+Se após unregister + reload o scroll voltar, o SW (ou algo que ele injeta/cacheia) é a causa. Se continuar travado, é código de aplicação.
+
+## Passo 3 — Diagnóstico dirigido pelos dados coletados
+
+Com o retorno do passo 1 e o resultado do passo 2, cruzar com:
+- `src/routes/__root.tsx` e overlays globais (modals, sheets, toasts, dialogs de menu mobile).
+- Registros de SW em `public/` e qualquer hook de instalação de PWA.
+- Handlers globais de wheel/keydown em componentes de mapa (MapLibre) que podem ter capturado o documento indevidamente após unmount.
+- `activeElement` reportado — se for iframe do YouTube ou canvas do mapa, isso explica setas/PageDown sem efeito no documento; wheel também não subiria se ponteiro estivesse dentro do iframe.
+
+## Passo 4 — Correção
+
+Somente após o passo 3 identificar o responsável, propor edição mínima e localizada. Não editar antes.
+
+## Restrições
+
+- Nenhuma edição de código ou publicação até o passo 3 concluir.
+- Nenhum comando com efeito colateral no repositório.
+- Domínio público de referência apenas `https://tempopelotas.com.br`.
