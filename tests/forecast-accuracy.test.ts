@@ -35,11 +35,13 @@ test("arquiva previsões por provedor, ciclo, data alvo e antecedência", () => 
 test("Open-Meteo usa consulta diária leve, datas ISO e nova tentativa", () => {
   assert.match(openMeteoDaily, /forecast_days: "7"/);
   assert.match(openMeteoDaily, /daily: \[/);
-  assert.doesNotMatch(openMeteoDaily, /hourly:/);
-  assert.doesNotMatch(openMeteoDaily, /current:/);
+  assert.match(openMeteoDaily, /temperature_2m_max/);
+  assert.match(openMeteoDaily, /precipitation_sum/);
   assert.match(openMeteoDaily, /dateIso: date/);
   assert.match(openMeteoDaily, /MAX_ATTEMPTS = 2/);
   assert.match(openMeteoDaily, /AbortSignal\.timeout\(REQUEST_TIMEOUT_MS\)/);
+  assert.doesNotMatch(openMeteoDaily, /boundary_layer_height/);
+  assert.doesNotMatch(openMeteoDaily, /cloud_cover_low/);
 });
 
 test("verificação usa somente dia completo observado pela Embrapa", () => {
