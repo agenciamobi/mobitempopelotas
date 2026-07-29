@@ -10,7 +10,7 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 ## Legenda
 
 - **Migrado:** existe implementação nativa funcional no destino.
-- **Parcial:** existe base funcional, mas falta configuração externa, persistência ou validação final.
+- **Parcial:** existe base funcional e operação real, mas falta uma validação final ou ativação controlada.
 - **Não migrado:** existe somente no snapshot legado ou ainda não possui implementação funcional.
 - **Revisar:** deve ser reavaliado antes de portar ou manter.
 - **Descartar:** configuração específica do Next.js/Vercel que não deve ser portada.
@@ -19,27 +19,26 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 
 | Domínio | Estimativa atual | Situação |
 | --- | ---: | --- |
-| Fundação, rotas e layout | 95% | Arquitetura TanStack, identidade, header, megamenu, footer, acessibilidade básica e estados globais implementados |
-| Previsão meteorológica | 95% | Open-Meteo, Embrapa, INMET, CPPMet, insights e síntese Gemini com fallback determinístico integrados |
-| Home editorial | 95% | Hero, alertas, blocos editoriais, contingência e navegação orientada ao visitante implementados |
-| Hidrologia | 90% | Laranjal, Lagoa dos Patos, rede regional, Guaíba, tendências e metodologia integrados; validação contínua das fontes permanece necessária |
-| Radar, satélite, trovoadas e mapas | 90% | REDEMET e MapLibre implementados com configuração server-side e estados explícitos de indisponibilidade |
-| Câmeras | 90% | YouTube, descoberta de live, replay, ID manual e contingências implementados |
-| Supabase, histórico e autenticação | 80% | Clientes, migrations, snapshots, Google OAuth, PKCE, cookies SSR, conta e direitos do titular implementados; aplicação e validação no projeto externo permanecem pendentes |
-| PWA, push e cron | 85% | PWA, offline, snapshots e Web Push nativo concluídos; schedulers e testes externos por navegador permanecem pendentes |
+| Fundação, rotas e layout | 96% | Arquitetura TanStack, identidade, header, megamenu, footer, acessibilidade básica e estados globais implementados |
+| Previsão meteorológica | 98% | Open-Meteo, MET Norway, Embrapa, INMET, CPPMet, síntese Gemini e avaliação automática de precisão integrados |
+| Home editorial | 96% | Hero, alertas, blocos editoriais, contingência e navegação orientada ao visitante implementados |
+| Hidrologia | 92% | Laranjal, Lagoa dos Patos, rede regional, Guaíba, tendências e metodologia integrados; validação contínua das fontes permanece necessária |
+| Radar, satélite, trovoadas e mapas | 92% | REDEMET e MapLibre implementados com configuração server-side, proxy controlado e estados explícitos de indisponibilidade |
+| Câmeras | 92% | YouTube, descoberta de live, replay, ID manual e contingências implementados |
+| Supabase, histórico e autenticação | 92% | Projeto oficial ativo, migrations aplicadas, RLS endurecida, Google OAuth habilitado, callback de produção aceito e direitos do titular protegidos; ciclo autenticado com contas descartáveis ainda precisa de validação interativa |
+| PWA, push e cron | 78% | Cron meteorológico está ativo; PWA e Web Push permanecem temporariamente desativados até a conclusão da investigação de rolagem e dos testes reais de navegador |
 | SEO técnico e transparência | 98% | Canonicals, Open Graph, Twitter Cards, sitemap, robots, Schema editorial, feed e endpoint público implementados |
-| Qualidade, observabilidade e LGPD | 85% | CI, auditoria visual, exportação, exclusão, consentimentos e política pública implementados; faltam testes automatizados e auditorias finais |
+| Qualidade, observabilidade e LGPD | 92% | Saúde da Embrapa, arquivo de precisão, advisors do banco, exportação, exclusão, consentimentos e contratos de segurança implementados; faltam auditoria WCAG/Core Web Vitals e ciclo autenticado completo |
 
-**Percentual global aproximado de paridade funcional: 90% a 93%.**
+**Percentual global aproximado de paridade funcional: 93% a 95%.**
 
-## Bloqueadores principais
+## Pendências principais
 
-1. Confirmar o projeto Supabase externo oficial, o histórico de migrations e as variáveis de ambiente antes de habilitar o modo externo.
-2. Aplicar e testar RLS para perfis, preferências, consentimentos, snapshots e inscrições push com usuários anônimos e autenticados.
-3. Validar Google OAuth, callback PKCE, cookies SSR, exportação e exclusão em preview e produção.
-4. Definir e configurar os schedulers definitivos para snapshots e resumo Web Push.
-5. Concluir testes automatizados, WCAG 2.2 AA, Core Web Vitals, configuração de produção e plano de rollback.
-6. Manter todas as secrets exclusivamente em módulos `*.server.ts`, server functions, rotas de servidor ou Edge Functions.
+1. Concluir um ciclo real de login Google com duas contas descartáveis: criação de perfil, isolamento RLS, consentimentos, exportação, logout e exclusão em cascata.
+2. Reativar PWA e Web Push somente por implantação controlada, sem bloqueio global de rolagem e com testes em navegador real.
+3. Executar a suíte completa em ambiente limpo e concluir WCAG 2.2 AA, Core Web Vitals e auditoria responsiva.
+4. Formalizar o plano de rollback de aplicação, banco, domínio e caches antes do encerramento do corte.
+5. Manter todas as secrets exclusivamente em módulos `*.server.ts`, server functions, rotas de servidor ou Edge Functions.
 
 ## Matriz operacional
 
@@ -77,13 +76,13 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 | 30 | Página de situação hidrológica | Migrado | `_legacy/app/situacao-hidrologica-pelotas/page.tsx` | `src/routes/situacao-hidrologica-pelotas.tsx` | Serviços hidrológicos | Composição tolerante a falhas parciais | Médio | Laranjal, Lagoa e Guaíba com metodologia e fontes claras | 4 |
 | 31 | Histórico climático | Migrado | `weather-history*.ts`, API, gráficos e página | `src/lib/weather/history.server.ts`, `src/lib/weather/history-with-snapshots.server.ts`, rota e gráficos | Open-Meteo histórico e Supabase externo | Consulta externa combinada com arquivo próprio; sem dados simulados | Alto | Séries reais, timezone consistente, estados vazios, fallback e fonte documentada | 6 |
 | 32 | Snapshots meteorológicos | Migrado | `weather-snapshot-store.ts`, cron e migration | `src/lib/weather/weather-snapshot-store.server.ts`, `src/routes/api/cron/weather-snapshot.ts`, migration Supabase | `CRON_SECRET`, secret administrativa e scheduler | Upsert server-only, chave composta e rota assinada | Alto | Snapshot periódico sem duplicação, resposta sanitizada e recuperação por arquivo próprio | 6 |
-| 33 | Supabase — clientes browser/server | Parcial | libs Supabase do legado | `src/lib/supabase/client.ts`, `src/lib/supabase/server-client.server.ts`, `src/lib/supabase/request-client.server.ts` | URL, publishable key e secret server-only | SDK, PKCE, cookies SSR e clientes separados implementados; modo mock preservado | Alto | Configuração real validada em preview e sessão SSR testada | 6–7 |
-| 34 | Banco, migrations e RLS | Parcial | `_legacy/supabase/migrations/*` | `supabase/migrations/` e projeto externo oficial | Acesso ao projeto Supabase | Perfis, preferências, consentimentos, snapshots e push versionados; aplicação e testes pendentes | Crítico | Histórico conferido, RLS testada e rollback documentado | 6–8 |
-| 35 | Login Google e conta | Parcial | `/auth/*`, `/entrar`, `/minha-conta`, componentes | `src/routes/auth/`, `src/routes/entrar.tsx`, `src/routes/minha-conta.tsx`, `src/lib/auth/` | Supabase Auth Google e chaves publicáveis | Callback PKCE, cookies SSR, logout, preferências, exportação e exclusão adaptados ao TanStack | Alto | Fluxos testados no Supabase externo, sem cache compartilhado ou redirect aberto | 7 |
-| 36 | APIs internas e diagnóstico | Parcial | `_legacy/app/api/**`, diagnóstico de integrações | server functions e rotas públicas em `src/routes/` | Variáveis de cada integração | Endpoints públicos, conta e RPCs classificados; validação externa continua necessária | Médio | Status distingue configurado/operacional sem vazar secrets | 2–8 |
-| 37 | Cron | Parcial | rotas Vercel Cron | rotas em `src/routes/api/cron/` e scheduler externo planejado | `CRON_SECRET`, `PUSH_ADMIN_SECRET` | Rotas assinadas e idempotentes implementadas; agendamento definitivo pendente | Alto | Autenticação, idempotência, logs e execução observável | 8 |
-| 38 | Web push | Migrado | serviço, store e APIs do legado | `src/lib/push/`, `src/routes/api/push/`, `public/sw.js` e migrations | VAPID public/private, subject, Supabase e secrets | Criptografia nativa, paginação, leases, limpeza de endpoints e interface opcional por aparelho | Crítico | Subscribe, unsubscribe, envio, expiração, vínculo opcional e separação editorial validados pelo CI | 8 |
-| 39 | PWA e offline | Migrado | manifesto, service worker, manager e offline | `public/manifest.webmanifest`, `public/sw.js`, `public/offline.html`, `src/components/pwa/` | VAPID apenas para notificações | Integração Vite/TanStack reescrita | Médio | Instalável, offline seguro, atualização controlada e cache resiliente | 8 |
+| 33 | Supabase — clientes browser/server | Parcial | libs Supabase do legado | `src/lib/supabase/client.ts`, `src/lib/supabase/server-client.server.ts`, `src/lib/supabase/request-client.server.ts` | URL, publishable key e secret server-only | Projeto externo oficial ativo; SDK, cookies SSR e clientes separados validados sem expor a chave administrativa | Alto | Falta somente validar persistência e renovação da sessão em navegador autenticado real | 6–7 |
+| 34 | Banco, migrations e RLS | Parcial | `_legacy/supabase/migrations/*` | `supabase/migrations/` e projeto externo oficial | Projeto Supabase `tempopelotas` | Migrations aplicadas; RLS, privilégios mínimos, advisors, trigger privado de consentimento e tabelas server-only auditados | Crítico | Confirmar isolamento com duas contas e registrar rollback do banco | 6–8 |
+| 35 | Login Google e conta | Parcial | `/auth/*`, `/entrar`, `/minha-conta`, componentes | `src/routes/auth/`, `src/routes/conta.tsx`, `src/lib/auth/`, rotas de exportação/exclusão | Supabase Auth Google e chaves publicáveis | Google habilitado, callback de produção aceito, PKCE, redirects internos, cache privado, exclusão e logout sem sessão validados | Alto | Concluir login, exportação, consentimentos e exclusão com contas descartáveis | 7 |
+| 36 | APIs internas e diagnóstico | Parcial | `_legacy/app/api/**`, diagnóstico de integrações | server functions e rotas públicas em `src/routes/` | Variáveis de cada integração | Endpoints meteorológicos, conta e RPCs classificados; respostas críticas testadas no domínio oficial | Médio | Completar inventário de status e correlation IDs sem vazar secrets | 2–8 |
+| 37 | Cron | Parcial | rotas Vercel Cron | rotas em `src/routes/api/cron/` e pg_cron/pg_net no Supabase | `CRON_SECRET`, tokens privados dos coletores | Coleta central da Embrapa e arquivo de precisão ativos e observáveis; rotina de Web Push segue suspensa | Alto | Reativar somente o agendamento de push após testes de navegador | 8 |
+| 38 | Web push | Parcial | serviço, store e APIs do legado | `src/lib/push/`, `src/routes/api/push/`, `public/sw.js` e migrations | VAPID public/private, subject, Supabase e secrets | Criptografia nativa, paginação, leases e limpeza de endpoints implementados, porém ativação suspensa | Crítico | Subscribe, unsubscribe, envio, expiração e vínculo validados em navegador sem afetar a rolagem | 8 |
+| 39 | PWA e offline | Parcial | manifesto, service worker, manager e offline | arquivos preservados em `public/` e `src/components/pwa/`; montagem removida temporariamente do root | Nenhuma para instalação; VAPID apenas para push | Implementação preservada, mas service worker, manifesto e interface de instalação foram desativados durante o diagnóstico de rolagem | Médio | Reativação isolada, sem mutação global de `body`, com wheel, teclado, touch e atualização controlada testados | 8 |
 | 40 | Sitemap | Migrado | `_legacy/app/sitemap.ts` | `src/routes/sitemap[.]xml.ts`, `src/lib/public-routes.ts` | `VITE_SITE_URL` | Server route com XML e cache | Baixo | URLs canônicas sem rotas privadas ou duplicadas | 9 |
 | 41 | Robots | Migrado | `_legacy/app/robots.ts` | `src/routes/robots[.]txt.ts` | `VITE_SITE_URL` | Server route com content-type correto | Baixo | Sitemap referenciado e regras por ambiente | 9 |
 | 42 | Canonicals | Migrado | metadata das páginas Next | `src/lib/site-config.ts`, `src/lib/page-meta.ts`, heads das rotas | `VITE_SITE_URL` | URL absoluta centralizada | Baixo | Canonical único em cada rota indexável | 9 |
@@ -91,13 +90,13 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 | 44 | Schema.org | Migrado | JSON-LD espalhado no legado | `src/lib/structured-data.ts`, `src/lib/site-config.ts` e heads das rotas | Dados editoriais e meteorológicos | WebSite global por `@id`, WebPage e BreadcrumbList centralizados | Médio | JSON-LD válido, sem entidades duplicadas ou alegações indevidas | 9 |
 | 45 | `pelotas.json`, feed e transparência | Migrado | endpoints e metodologia | `src/routes/pelotas[.]json.ts`, `src/routes/feed.ts`, metodologia e privacidade | Contratos atuais | Schema, JSON Feed, CORS, cache e política pública explícitos | Baixo | JSON estável, feed válido e fontes e dados documentados | 9 |
 | 46 | PageSpeed API | Revisar | Variável sem consumo funcional | Ferramenta administrativa futura | `GOOGLE_PAGESPEED_API_KEY` | Não incluir sem caso de uso | Baixo | Chave removida ou diagnóstico restrito | 10 |
-| 47 | Acessibilidade | Parcial | Semântica e CSS legados | layout, headers, PWA, conta e componentes | Nenhuma | Foco, skip link, teclado, ARIA e movimento reduzido implementados parcialmente | Médio | WCAG 2.2 AA nos fluxos principais | Contínuo |
-| 48 | Responsividade | Parcial | CSS mobile cumulativo | CSS/componentes reconstruídos mobile-first | Nenhuma | Sem copiar cascata legada | Médio | 320 px a desktop sem overflow ou cortes | Contínuo |
-| 49 | Observabilidade | Parcial | Logs pontuais | tratamento de erro, logs sanitizados e auditorias | Provedor futuro | Erros externos diferenciados e secrets omitidas | Médio | Correlation IDs, saúde e métricas básicas | 10 |
-| 50 | Segurança e LGPD | Parcial | Práticas parciais do legado | RLS, configuração server-only, `/privacidade-e-dados` e direitos na conta | Supabase/Auth/push | Minimização, consentimentos versionados, exportação, exclusão e cascata implementados | Crítico | Aplicar migrations e testar isolamento, exportação, exclusão e retenção no ambiente oficial | 7–10 |
-| 51 | Testes | Parcial | Validações manuais | CI, smoke tests e auditoria visual | Vitest/Playwright | Cobertura visual existe; unitários, contratos e RLS pendentes | Alto | Parsers, normalizadores, RLS e rotas críticas cobertos | 10 |
+| 47 | Acessibilidade | Parcial | Semântica e CSS legados | layout, headers, conta e componentes | Nenhuma | Foco, skip link, teclado, ARIA e movimento reduzido implementados parcialmente | Médio | WCAG 2.2 AA nos fluxos principais | Contínuo |
+| 48 | Responsividade | Parcial | CSS mobile cumulativo | CSS/componentes reconstruídos mobile-first | Nenhuma | Sem copiar cascata legada | Médio | 320 px a desktop sem overflow, cortes ou bloqueio de rolagem | Contínuo |
+| 49 | Observabilidade | Parcial | Logs pontuais | saúde da Embrapa, incidentes automáticos, arquivo de precisão, tratamento de erro e logs sanitizados | Supabase e logs do hosting | Métricas básicas e estados das fontes implementados; correlation IDs globais ainda ausentes | Médio | Rastrear uma requisição entre portal, Edge Function e banco sem expor secrets | 10 |
+| 50 | Segurança e LGPD | Parcial | Práticas parciais do legado | RLS, schema privado, `/privacidade-e-dados`, exportação, exclusão e direitos na conta | Supabase/Auth/push | Privilégios destrutivos removidos do cliente, RPC pública como invoker, consentimento por trigger privado e endpoints testados sem sessão | Crítico | Validar duas contas, exportação autenticada, cascata e retenção em ciclo real | 7–10 |
+| 51 | Testes | Parcial | Validações manuais | CI, contratos Node, smoke tests e auditoria visual | Node test, TypeScript e navegador | Parsers, normalizadores, banco, autenticação, precisão, rotas e regressões visuais possuem contratos; suíte integral ainda não foi executada após o lote atual | Alto | Build, typecheck, lint e todos os contratos verdes em ambiente limpo | 10 |
 | 52 | Build, lint e typecheck | Migrado | Workflows do legado | `.github/workflows/quality.yml` | Node 24 e lockfile | Ordem build → typecheck → lint padronizada | Baixo | Três comandos verdes em ambiente limpo | 10 |
-| 53 | Deploy e domínio | Parcial | Vercel/Next | Hosting TanStack/Lovable | Secrets e domínio | Configuração Vercel descartada; preview e auditoria ativos | Crítico | Produção validada, DNS com rollback e zero perda SEO | 10 |
+| 53 | Deploy e domínio | Parcial | Vercel/Next | Hosting TanStack/Lovable e domínio oficial | Secrets, DNS e Cloudflare | Produção e domínio oficial operacionais; publicação e rotas críticas verificadas | Crítico | Formalizar rollback de aplicação, banco, DNS e caches com zero perda SEO | 10 |
 
 ## Recursos desenvolvidos após o snapshot e confirmados no destino
 
@@ -112,20 +111,22 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 - página, resumo e destaque visual de amanhã;
 - sínteses meteorológicas com Gemini e fallback determinístico;
 - mapa regional MapLibre e páginas temáticas;
-- PWA instalável, offline seguro e atualização controlada;
 - SDK Supabase, clientes separados, PKCE e cookies SSR;
+- centralizador da Embrapa, histórico de 24 horas, saúde operacional e incidentes automáticos;
 - histórico climático combinado com arquivo próprio e fallback editorial;
 - snapshots meteorológicos idempotentes com rota de captura protegida por segredo;
-- Web Push nativo com VAPID, paginação, leases e avisos oficiais separados da previsão;
+- arquivo de previsões, verificação contra a Embrapa e painel público de precisão;
+- coleta Open-Meteo isolada em Edge Function para contornar limitação de rede do hosting;
+- Web Push nativo com VAPID, paginação, leases e avisos oficiais separados da previsão, atualmente suspenso;
 - dados estruturados editoriais com WebSite, WebPage e BreadcrumbList conectados por `@id`;
-- conta com preferências, consentimentos versionados, exportação, exclusão e política pública de retenção.
+- conta com Google OAuth, privilégios mínimos, consentimentos versionados, exportação, exclusão e política pública de retenção.
 
 ## Sequência de execução atualizada
 
-1. **Operacionalizar Supabase e Lote 7:** conferir histórico, aplicar migrations, testar RLS, Google OAuth, cookies SSR e direitos do titular.
-2. **Operacionalizar Lote 8:** configurar VAPID definitivo, schedulers, logs e testes reais de navegador.
-3. **Executar Lote 10 — corte:** testes unitários e de contratos, acessibilidade, performance, segurança, deploy, DNS e rollback.
+1. **Encerrar Lote 7 interativo:** executar login Google com duas contas descartáveis, validar isolamento, exportação, consentimentos, logout e exclusão.
+2. **Reativar Lote 8 de forma controlada:** PWA e Web Push sem bloqueio global de rolagem, com validação em Chrome normal, anônimo, mobile e perfil com extensões.
+3. **Executar Lote 10 — corte:** suíte integral, WCAG 2.2 AA, Core Web Vitals, responsividade, segurança, rollback e encerramento do domínio.
 
 ## Regra de atualização
 
-Ao concluir cada lote, atualizar o status e o critério de aceite desta matriz com evidência nos arquivos de `src/`. A presença de um arquivo em `_legacy/` nunca deve ser considerada implementação concluída.
+Ao concluir cada lote, atualizar o status e o critério de aceite desta matriz com evidência nos arquivos de `src/` ou em documentos operacionais versionados. A presença de um arquivo em `_legacy/` nunca deve ser considerada implementação concluída.
