@@ -1,5 +1,5 @@
 import { fetchMetNorwayWeather } from "./met-norway.server";
-import { fetchPelotasWeather as fetchOpenMeteoWeather } from "./open-meteo.server";
+import { fetchPelotasWeather as fetchOpenMeteoWeather } from "./open-meteo-resilient.server";
 import { selectBaseline, type WeatherBaselineData } from "./weather-baseline-select";
 
 export type { WeatherBaselineData } from "./weather-baseline-select";
