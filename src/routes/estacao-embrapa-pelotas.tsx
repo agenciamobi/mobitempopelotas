@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
+import { EmbrapaDataHealthPanel } from "@/components/embrapa/EmbrapaDataHealthPanel";
 import {
   EmbrapaStationHero,
   EmbrapaStationPageV2,
@@ -10,11 +11,12 @@ import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPag
 import { EMBRAPA_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
+import { getEmbrapaHealthSnapshot } from "@/lib/weather/embrapa-health.functions";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 const PAGE_TITLE = "Estação meteorológica da Embrapa em Pelotas";
 const PAGE_DESCRIPTION =
-  "Consulte temperatura, umidade, pressão, vento, chuva, evapotranspiração, extremos, horário e origem dos dados da Estação Embrapa em Pelotas.";
+  "Consulte temperatura, umidade, pressão, vento, chuva, evapotranspiração, extremos, horário, origem e saúde operacional dos dados da Estação Embrapa em Pelotas.";
 const PAGE_PATH = "/estacao-embrapa-pelotas";
 
 const EMBRAPA_PAGE_CONTENT = {
@@ -30,6 +32,7 @@ const EMBRAPA_PAGE_CONTENT = {
     "A chuva acumulada representa o pluviômetro da estação e pode ser diferente em outros bairros, na zona rural e no Laranjal.",
     "A Embrapa pode fornecer parte das informações atuais, enquanto a previsão das próximas horas vem de modelos meteorológicos identificados separadamente.",
     "Quando um valor não é informado, a página mantém o campo indisponível em vez de preencher com zero ou estimativa não identificada.",
+    "O painel de saúde informa quando o centralizador coletou, validou e armazenou os dados, sem expor credenciais ou detalhes internos sensíveis.",
   ],
   faqs: [
     {
@@ -104,17 +107,24 @@ export const Route = createFileRoute("/estacao-embrapa-pelotas")({
           "Evapotranspiração em Pelotas",
           "Horário e idade da observação",
           "Origem dos dados da condição atual",
+          "Saúde operacional do coletor meteorológico",
         ],
       }),
       createFaqPageJsonLd(PAGE_PATH, EMBRAPA_PAGE_CONTENT.faqs),
     ]),
-  loader: () => getWeatherIntelligence(),
+  loader: async () => {
+    const [data, health] = await Promise.all([
+      getWeatherIntelligence(),
+      getEmbrapaHealthSnapshot(),
+    ]);
+    return { data, health };
+  },
   staleTime: 60 * 1_000,
   component: EstacaoEmbrapaPage,
 });
 
 function EstacaoEmbrapaPage() {
-  const data = Route.useLoaderData();
+  const { data, health } = Route.useLoaderData();
 
   return (
     <InternalWeatherPageShell
@@ -124,6 +134,7 @@ function EstacaoEmbrapaPage() {
       hero={() => <EmbrapaStationHero data={data} />}
     >
       <EmbrapaStationPageV2 data={data} />
+      <EmbrapaDataHealthPanel snapshot={health} />
       <EditorialContentSection
         id="como-interpretar-estacao-embrapa"
         content={EMBRAPA_PAGE_CONTENT}
