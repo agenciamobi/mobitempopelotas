@@ -1,0 +1,159 @@
+/*
+ * Identidade compartilhada — as páginas /tempo-em/... passam a usar os mesmos
+ * blocos aprovados em /tempo-hoje-pelotas: aviso INMET, capítulos e história da previsão.
+ */
+.regional-city-page > :is(
+    .home-inmet-alerts,
+    .internal-page-chapters,
+    .regional-city-shared-forecast
+  ) {
+  width: min(calc(100% - var(--regional-frame-gap)), var(--regional-frame-max));
+  max-width: var(--regional-frame-max);
+  margin-right: auto;
+  margin-left: auto;
+  box-sizing: border-box;
+}
+
+.regional-city-page > .regional-city-official-alert {
+  margin-top: clamp(24px, 3vw, 42px);
+  scroll-margin-top: 7.75rem;
+}
+
+.regional-city-page > .internal-page-chapters {
+  margin-top: 0;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-top: 0;
+  border-radius: 0 0 0.95rem 0.95rem;
+  box-shadow: 0 12px 36px rgb(7 30 47 / 5%);
+}
+
+.regional-city-page > .regional-city-shared-forecast {
+  margin-top: clamp(22px, 2.6vw, 38px);
+  scroll-margin-top: 7.75rem;
+}
+
+.regional-city-shared-forecast .home-forecast-story {
+  margin: 0;
+  padding: 0;
+}
+
+.regional-city-shared-forecast .home-forecast-heading h2 {
+  max-width: 760px;
+}
+
+.regional-city-shared-forecast .home-hourly-cards,
+.regional-city-shared-forecast .home-next-day-cards {
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  scrollbar-width: thin;
+  scroll-snap-type: x proximity;
+}
+
+.regional-city-shared-forecast :is(.home-hourly-cards, .home-next-day-cards) article {
+  scroll-snap-align: start;
+}
+
+.regional-city-official-alert.home-inmet-alerts.is-unverified[data-alert-period="none"] {
+  border-color: rgb(24 189 205 / 20%);
+  background:
+    linear-gradient(90deg, rgb(24 189 205 / 5%), transparent 30%),
+    rgb(255 255 255 / 96%);
+}
+
+.regional-city-official-alert.home-inmet-alerts.is-unverified[data-alert-period="none"]
+  .home-inmet-alerts__mark {
+  background: #078997;
+}
+
+.regional-city-official-alert .home-inmet-alerts__aside > a {
+  display: inline-flex;
+  min-height: 39px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0 0.9rem;
+  border-radius: 999px;
+  background: #071e2f;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 780;
+  white-space: nowrap;
+}
+
+.regional-city-official-alert .home-inmet-alerts__aside > a:hover,
+.regional-city-official-alert .home-inmet-alerts__aside > a:focus-visible {
+  background: #12364c;
+  outline: none;
+}
+
+#previsao-hoje,
+#tendencia,
+#como-interpretar-previsao-regional,
+#cidades-proximas {
+  scroll-margin-top: 7.75rem;
+}
+
+@media (max-width: 1180px) {
+  .regional-city-page > .internal-page-chapters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .regional-city-page > .internal-page-chapters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .regional-city-shared-forecast .home-forecast-heading {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .regional-city-shared-forecast .home-forecast-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 0.85rem;
+  }
+}
+
+@media (max-width: 700px) {
+  .regional-city-page > .regional-city-official-alert {
+    margin-top: 14px;
+  }
+
+  .regional-city-page > .regional-city-shared-forecast {
+    margin-top: 16px;
+    padding: 1rem;
+    border-radius: 1rem;
+  }
+
+  #avisos-municipais,
+  #previsao-hoje,
+  #tendencia,
+  #como-interpretar-previsao-regional,
+  #cidades-proximas {
+    scroll-margin-top: 5.75rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .regional-city-page > .internal-page-chapters {
+    display: flex;
+    overflow-x: auto;
+    grid-template-columns: none;
+    scroll-snap-type: x proximity;
+  }
+
+  .regional-city-page > .internal-page-chapters a {
+    min-width: 9.5rem;
+    flex: 0 0 9.5rem;
+    scroll-snap-align: start;
+  }
+}
+
+@media (forced-colors: active) {
+  .regional-city-official-alert.home-inmet-alerts.is-unverified[data-alert-period="none"] {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+}
