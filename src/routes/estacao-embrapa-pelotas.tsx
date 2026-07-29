@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { EmbrapaDataHealthPanel } from "@/components/embrapa/EmbrapaDataHealthPanel";
+import { EmbrapaHistoryCharts } from "@/components/embrapa/EmbrapaHistoryCharts";
 import {
   EmbrapaStationHero,
   EmbrapaStationPageV2,
@@ -12,11 +13,12 @@ import { EMBRAPA_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 import { getEmbrapaHealthSnapshot } from "@/lib/weather/embrapa-health.functions";
+import { getEmbrapaHistory24h } from "@/lib/weather/embrapa-history.functions";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 const PAGE_TITLE = "Estação meteorológica da Embrapa em Pelotas";
 const PAGE_DESCRIPTION =
-  "Consulte temperatura, umidade, pressão, vento, chuva, evapotranspiração, extremos, horário, origem e saúde operacional dos dados da Estação Embrapa em Pelotas.";
+  "Consulte temperatura, umidade, pressão, vento, chuva, extremos, histórico de 24 horas, origem e saúde operacional dos dados da Estação Embrapa em Pelotas.";
 const PAGE_PATH = "/estacao-embrapa-pelotas";
 
 const EMBRAPA_PAGE_CONTENT = {
@@ -33,6 +35,7 @@ const EMBRAPA_PAGE_CONTENT = {
     "A Embrapa pode fornecer parte das informações atuais, enquanto a previsão das próximas horas vem de modelos meteorológicos identificados separadamente.",
     "Quando um valor não é informado, a página mantém o campo indisponível em vez de preencher com zero ou estimativa não identificada.",
     "O painel de saúde informa quando o centralizador coletou, validou e armazenou os dados, sem expor credenciais ou detalhes internos sensíveis.",
+    "Os gráficos de 24 horas utilizam somente o histórico centralizado e agrupam as observações em intervalos de dez minutos.",
   ],
   faqs: [
     {
@@ -59,6 +62,11 @@ const EMBRAPA_PAGE_CONTENT = {
       question: "A Embrapa fornece a previsão das próximas horas?",
       answer:
         "Nesta página, a Embrapa é usada para mostrar medições locais. A previsão horária e diária aparece separadamente e identifica o modelo responsável.",
+    },
+    {
+      question: "Como os gráficos das últimas 24 horas são calculados?",
+      answer:
+        "O Tempo Pelotas reúne as observações armazenadas pelo centralizador e calcula médias em intervalos de dez minutos. Para chuva, o gráfico apresenta os incrementos identificados entre leituras consecutivas do acumulado diário.",
     },
   ],
   relatedLinks: [
@@ -104,7 +112,7 @@ export const Route = createFileRoute("/estacao-embrapa-pelotas")({
           "Temperatura e umidade observadas",
           "Pressão e vento medidos em Pelotas",
           "Chuva acumulada na Estação Embrapa",
-          "Evapotranspiração em Pelotas",
+          "Histórico meteorológico de 24 horas",
           "Horário e idade da observação",
           "Origem dos dados da condição atual",
           "Saúde operacional do coletor meteorológico",
@@ -113,18 +121,19 @@ export const Route = createFileRoute("/estacao-embrapa-pelotas")({
       createFaqPageJsonLd(PAGE_PATH, EMBRAPA_PAGE_CONTENT.faqs),
     ]),
   loader: async () => {
-    const [data, health] = await Promise.all([
+    const [data, health, history] = await Promise.all([
       getWeatherIntelligence(),
       getEmbrapaHealthSnapshot(),
+      getEmbrapaHistory24h(),
     ]);
-    return { data, health };
+    return { data, health, history };
   },
   staleTime: 60 * 1_000,
   component: EstacaoEmbrapaPage,
 });
 
 function EstacaoEmbrapaPage() {
-  const { data, health } = Route.useLoaderData();
+  const { data, health, history } = Route.useLoaderData();
 
   return (
     <InternalWeatherPageShell
@@ -134,6 +143,7 @@ function EstacaoEmbrapaPage() {
       hero={() => <EmbrapaStationHero data={data} />}
     >
       <EmbrapaStationPageV2 data={data} />
+      <EmbrapaHistoryCharts snapshot={history} />
       <EmbrapaDataHealthPanel snapshot={health} />
       <EditorialContentSection
         id="como-interpretar-estacao-embrapa"
