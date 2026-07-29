@@ -1,0 +1,353 @@
+.weather-split-hero {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1.08fr) minmax(390px, 0.92fr);
+  gap: clamp(1rem, 2.5vw, 2rem);
+}
+
+.weather-split-hero__copy,
+.weather-split-hero__card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 1.55rem;
+  box-shadow: 0 24px 70px rgb(7 30 47 / 16%);
+}
+
+.weather-split-hero__copy {
+  display: grid;
+  min-height: 500px;
+  align-content: end;
+  padding: clamp(2rem, 5vw, 4.8rem);
+  color: #fff;
+  background:
+    radial-gradient(circle at 95% 4%, rgb(94 44 237 / 28%), transparent 24rem),
+    radial-gradient(circle at 3% 100%, rgb(24 189 205 / 24%), transparent 28rem),
+    linear-gradient(145deg, #102437, #18334f 58%, #25375c);
+}
+
+.weather-split-hero__back {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.6rem;
+  color: rgb(255 255 255 / 72%);
+  font-size: 0.76rem;
+  font-weight: 780;
+  text-decoration: none;
+}
+
+.weather-split-hero__back svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.weather-split-hero__eyebrow {
+  color: #9cecf0;
+  font-size: 0.75rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.weather-split-hero__copy h1 {
+  max-width: 14ch;
+  margin: 0.72rem 0 0;
+  font-size: clamp(3rem, 6vw, 6.1rem);
+  font-weight: 720;
+  letter-spacing: -0.08em;
+  line-height: 0.92;
+  text-wrap: balance;
+}
+
+.weather-split-hero__copy > p {
+  max-width: 760px;
+  margin: 1.35rem 0 0;
+  color: rgb(255 255 255 / 74%);
+  font-size: clamp(0.96rem, 1.2vw, 1.08rem);
+  line-height: 1.7;
+}
+
+.weather-split-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 1.5rem;
+}
+
+.weather-split-hero__actions a {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.72rem 1rem;
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 790;
+  text-decoration: none;
+  background: rgb(255 255 255 / 8%);
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease;
+}
+
+.weather-split-hero__actions a:first-child {
+  border-color: #18bdcd;
+  color: #062538;
+  background: #9cecf0;
+}
+
+.weather-split-hero__actions a:hover {
+  transform: translateY(-2px);
+}
+
+.weather-split-hero__actions svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.weather-split-hero__card {
+  display: grid;
+  grid-template-rows: auto 1fr auto auto auto;
+  gap: 1rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-color: rgb(7 30 47 / 8%);
+  background:
+    radial-gradient(circle at 100% 0, rgb(94 44 237 / 10%), transparent 22rem),
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 10%), transparent 20rem),
+    #fff;
+}
+
+.weather-split-hero__card.is-elevated {
+  background:
+    radial-gradient(circle at 100% 0, rgb(242 112 53 / 12%), transparent 22rem),
+    #fff;
+}
+
+.weather-split-hero__card.is-strong {
+  background:
+    radial-gradient(circle at 100% 0, rgb(231 11 133 / 12%), transparent 22rem),
+    #fff;
+}
+
+.weather-split-hero__card.is-unknown {
+  background:
+    radial-gradient(circle at 100% 0, rgb(113 135 146 / 10%), transparent 22rem),
+    #fff;
+}
+
+.weather-split-hero__card > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgb(7 30 47 / 8%);
+}
+
+.weather-split-hero__card > header > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  padding: 0.42rem 0.62rem;
+  border-radius: 999px;
+  color: #166534;
+  font-size: 0.75rem;
+  font-weight: 820;
+  background: #eef9f1;
+}
+
+.weather-split-hero__card.is-elevated > header > span {
+  color: #815500;
+  background: #fff8e6;
+}
+
+.weather-split-hero__card.is-strong > header > span {
+  color: #9d3022;
+  background: #fff2ef;
+}
+
+.weather-split-hero__card.is-unknown > header > span {
+  color: #526d79;
+  background: #f1f6f7;
+}
+
+.weather-split-hero__card > header svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.weather-split-hero__card > header small,
+.weather-split-hero__card > footer {
+  color: var(--portal-ink-soft);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.weather-split-hero__current {
+  display: grid;
+  align-content: center;
+  gap: 0.35rem;
+}
+
+.weather-split-hero__current > span {
+  color: #087f8d;
+  font-size: 0.75rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.weather-split-hero__current > strong {
+  color: var(--portal-ink);
+  font-size: clamp(4rem, 8vw, 7rem);
+  font-weight: 720;
+  letter-spacing: -0.09em;
+  line-height: 0.9;
+}
+
+.weather-split-hero__current > small {
+  color: var(--portal-ink-soft);
+  font-size: 0.82rem;
+}
+
+.weather-split-hero__highlight {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 1rem;
+  background: rgb(247 251 252 / 92%);
+}
+
+.weather-split-hero__highlight > svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  color: #5e2ced;
+}
+
+.weather-split-hero__highlight > span {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.weather-split-hero__highlight small,
+.weather-split-hero__highlight b {
+  color: var(--portal-ink-soft);
+  font-size: 0.75rem;
+}
+
+.weather-split-hero__highlight strong {
+  color: var(--portal-ink);
+  font-size: 1.4rem;
+  letter-spacing: -0.04em;
+}
+
+.weather-split-hero__highlight b {
+  font-weight: 700;
+}
+
+.weather-split-hero__card dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin: 0;
+}
+
+.weather-split-hero__card dl > div {
+  display: grid;
+  gap: 0.18rem;
+  min-width: 0;
+  padding: 0.75rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 0.9rem;
+  background: rgb(247 251 252 / 88%);
+}
+
+.weather-split-hero__card dt {
+  color: #607783;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.weather-split-hero__card dd {
+  margin: 0;
+  color: var(--portal-ink);
+  font-size: 0.76rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.weather-split-hero a:focus-visible {
+  outline: 3px solid rgb(24 189 205 / 44%);
+  outline-offset: 3px;
+}
+
+@media (max-width: 980px) {
+  .weather-split-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .weather-split-hero__copy {
+    min-height: 430px;
+  }
+}
+
+@media (max-width: 720px) {
+  .weather-split-hero__copy,
+  .weather-split-hero__card {
+    border-radius: 1.15rem;
+  }
+
+  .weather-split-hero__copy {
+    min-height: 390px;
+    padding: 1.45rem;
+  }
+
+  .weather-split-hero__copy h1 {
+    font-size: clamp(2.5rem, 13vw, 4.15rem);
+  }
+
+  .weather-split-hero__card {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .weather-split-hero__actions,
+  .weather-split-hero__actions a {
+    width: 100%;
+  }
+
+  .weather-split-hero__card > header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .weather-split-hero__card dl {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-split-hero__actions a {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .weather-split-hero__copy,
+  .weather-split-hero__card,
+  .weather-split-hero__highlight,
+  .weather-split-hero__card dl > div {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+}
