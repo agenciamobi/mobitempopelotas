@@ -9,7 +9,7 @@ import {
 } from "@/lib/supabase/server-client.server";
 
 import { fetchMetNorwayWeather } from "./met-norway.server";
-import { fetchPelotasWeather as fetchOpenMeteoWeather } from "./open-meteo.server";
+import { fetchOpenMeteoDailyForecast } from "./open-meteo-daily.server";
 import type { DailyForecast, WeatherHomeData } from "./types";
 
 const LOCATION_SLUG = "pelotas-rs";
@@ -248,7 +248,10 @@ export async function captureForecastPredictions(): Promise<ForecastCaptureResul
   const issuedAt = new Date();
   const local = localDateTimeParts(issuedAt);
   const cycleHour = Math.floor(local.hour / FORECAST_CYCLE_HOURS) * FORECAST_CYCLE_HOURS;
-  const forecasts = await Promise.all([fetchOpenMeteoWeather(), fetchMetNorwayWeather()]);
+  const forecasts = await Promise.all([
+    fetchOpenMeteoDailyForecast(),
+    fetchMetNorwayWeather(),
+  ]);
   const client = forecastAccuracyClient();
   const providers: ForecastCaptureResult["providers"] = [];
   let storedCount = 0;
