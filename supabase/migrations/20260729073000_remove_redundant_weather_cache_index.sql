@@ -1,0 +1,1 @@
+drop index if exists public.weather_provider_payload_cache_success_idx;
