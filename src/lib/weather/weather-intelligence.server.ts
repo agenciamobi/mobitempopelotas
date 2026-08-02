@@ -1,7 +1,7 @@
 import { fetchAggregatedPelotasWeather } from "./aggregated-weather.server";
 import type { AggregatedWeatherData, WeatherSourceKey } from "./aggregated-weather.types";
 import { reconcileDailyTemperatures } from "./daily-temperature-reconciliation";
-import { generateGeminiWeatherBrief } from "./gemini-weather.server";
+import { fetchLatestWeatherAiSnapshot } from "./weather-ai-snapshot.server";
 import type { WeatherBrief, WeatherIntelligenceData } from "./weather-intelligence.types";
 
 const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
@@ -155,7 +155,10 @@ export function createDeterministicWeatherBrief(weather: AggregatedWeatherData):
 }
 
 export async function fetchWeatherIntelligence(): Promise<WeatherIntelligenceData> {
-  const aggregatedWeather = await fetchAggregatedPelotasWeather();
+  const [aggregatedWeather, aiSnapshot] = await Promise.all([
+    fetchAggregatedPelotasWeather(),
+    fetchLatestWeatherAiSnapshot(),
+  ]);
   const weather: AggregatedWeatherData = {
     ...aggregatedWeather,
     daily: reconcileDailyTemperatures(
@@ -164,19 +167,17 @@ export async function fetchWeatherIntelligence(): Promise<WeatherIntelligenceDat
     ),
   };
   const deterministicBrief = createDeterministicWeatherBrief(weather);
-  const gemini = await generateGeminiWeatherBrief(weather);
-  const generatedBrief = gemini.status === "generated" ? gemini.brief : null;
-  const useGemini = generatedBrief !== null;
+  const useGemini = aiSnapshot !== null;
 
   return {
     weather,
-    brief: generatedBrief ?? deterministicBrief,
+    brief: aiSnapshot?.brief ?? deterministicBrief,
     intelligence: {
       origin: useGemini ? "gemini" : "deterministic",
-      geminiStatus: gemini.status,
-      model: gemini.model,
-      generatedAt: new Date().toISOString(),
-      error: gemini.error,
+      geminiStatus: useGemini ? "generated" : "unavailable",
+      model: aiSnapshot?.model ?? null,
+      generatedAt: aiSnapshot?.generatedAt ?? new Date().toISOString(),
+      error: null,
     },
   };
 }
