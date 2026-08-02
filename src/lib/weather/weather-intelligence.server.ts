@@ -161,10 +161,7 @@ export async function fetchWeatherIntelligence(): Promise<WeatherIntelligenceDat
   ]);
   const weather: AggregatedWeatherData = {
     ...aggregatedWeather,
-    daily: reconcileDailyTemperatures(
-      aggregatedWeather.daily,
-      aggregatedWeather.inmetForecast,
-    ),
+    daily: reconcileDailyTemperatures(aggregatedWeather.daily, aggregatedWeather.inmetForecast),
   };
   const deterministicBrief = createDeterministicWeatherBrief(weather);
   const useGemini = aiSnapshot !== null;
