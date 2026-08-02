@@ -26,7 +26,7 @@ test("workflow agenda quatro janelas diárias em Brasília", () => {
   const workflow = read(".github/workflows/weather-ai-snapshots.yml");
   assert.match(workflow, /15 3,9,15,21 \* \* \*/);
   assert.match(workflow, /TEMPO_PELOTAS_CRON_SECRET/);
-  assert.match(workflow, /\/api\/cron\/weather-ai/);
+  assert.match(workflow, /\/api\/cron\/push-daily\?task=weather-ai/);
   assert.doesNotMatch(workflow, /--retry\s+[1-9]/);
 });
 
@@ -40,9 +40,11 @@ test("banco impede mais de uma tentativa por período", () => {
   assert.match(migration, /revoke all.*authenticated/s);
 });
 
-test("endpoint de geração exige CRON_SECRET", () => {
-  const route = read("src/routes/api/cron/weather-ai.ts");
+test("endpoint compartilhado separa IA e push e exige CRON_SECRET", () => {
+  const route = read("src/routes/api/cron/push-daily.ts");
   assert.match(route, /process\.env\.CRON_SECRET/);
   assert.match(route, /hasBearerSecret/);
   assert.match(route, /generateScheduledWeatherAiSnapshot/);
+  assert.match(route, /searchParams\.get\("task"\) === "weather-ai"/);
+  assert.match(route, /sendDailySummary/);
 });
