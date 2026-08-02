@@ -40,13 +40,15 @@ Consequências:
 
 ## Fluxo de geração
 
-1. O GitHub Actions chama `POST /api/cron/weather-ai`.
+1. O GitHub Actions chama `GET /api/cron/push-daily?task=weather-ai`.
 2. A rota valida `Authorization: Bearer $CRON_SECRET`.
 3. A rotina reserva a chave do período no Supabase.
 4. As fontes meteorológicas são agregadas e reconciliadas.
 5. O Gemini gera um único `WeatherBrief`.
 6. O resultado é salvo em `weather_ai_snapshots`.
 7. As páginas passam a reutilizar o snapshot salvo.
+
+A mesma rota sem `task=weather-ai` mantém exclusivamente o comportamento existente de envio do resumo push diário.
 
 ## Fluxo público
 
