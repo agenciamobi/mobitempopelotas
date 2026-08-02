@@ -24,7 +24,6 @@ jobs:
           curl \
             --fail-with-body \
             --max-time 90 \
-            --request POST \
             --header "Authorization: Bearer $CRON_SECRET" \
             --header "Accept: application/json" \
-            https://tempopelotas.com.br/api/cron/weather-ai
+            "https://tempopelotas.com.br/api/cron/push-daily?task=weather-ai"
