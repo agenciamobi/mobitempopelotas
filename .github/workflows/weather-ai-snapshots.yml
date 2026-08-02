@@ -1,0 +1,29 @@
+name: Weather AI snapshots
+
+on:
+  schedule:
+    # 00:15, 06:15, 12:15 e 18:15 em America/Sao_Paulo (UTC-3).
+    - cron: "15 3,9,15,21 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: weather-ai-snapshots
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    name: Generate persisted snapshot
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call protected weather AI cron
+        env:
+          CRON_SECRET: ${{ secrets.TEMPO_PELOTAS_CRON_SECRET }}
+        run: |
+          test -n "$CRON_SECRET"
+          curl \
+            --fail-with-body \
+            --max-time 90 \
+            --header "Authorization: Bearer $CRON_SECRET" \
+            --header "Accept: application/json" \
+            "https://tempopelotas.com.br/api/cron/push-daily?task=weather-ai"

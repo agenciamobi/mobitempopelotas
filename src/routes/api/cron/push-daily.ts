@@ -12,6 +12,7 @@ import {
 import type { PushDeliveryResult } from "@/lib/push/push.types";
 import { broadcastPushNotification, getPushConfigurationStatus } from "@/lib/push/web-push.server";
 import type { InmetAlert } from "@/lib/weather/official-sources.types";
+import { generateScheduledWeatherAiSnapshot } from "@/lib/weather/weather-ai-snapshot.server";
 import { fetchWeatherIntelligence } from "@/lib/weather/weather-intelligence.server";
 
 const TIMEZONE = "America/Sao_Paulo";
@@ -113,6 +114,45 @@ function sortPelotasAlertsBySeverity(alerts: InmetAlert[]) {
     const leftSentAt = left.sentAt ? Date.parse(left.sentAt) : 0;
     return rightSentAt - leftSentAt;
   });
+}
+
+async function generateWeatherAiSnapshot(request: Request) {
+  const cronSecret = process.env.CRON_SECRET?.trim();
+  if (!cronSecret) {
+    return pushJsonResponse(
+      {
+        success: false,
+        configured: false,
+        error: "A rotina de IA meteorológica ainda não foi configurada.",
+      },
+      503,
+    );
+  }
+
+  if (!hasBearerSecret(request, cronSecret)) {
+    return pushJsonResponse({ success: false, error: "Não autorizado." }, 401);
+  }
+
+  const result = await generateScheduledWeatherAiSnapshot();
+
+  if (result.status === "generated") {
+    return pushJsonResponse({ success: true, ...result });
+  }
+
+  if (result.status === "already-claimed") {
+    return pushJsonResponse({
+      success: true,
+      skipped: true,
+      reason: "slot-already-claimed",
+      ...result,
+    });
+  }
+
+  if (result.status === "not-configured") {
+    return pushJsonResponse({ success: false, configured: false, ...result }, 503);
+  }
+
+  return pushJsonResponse({ success: false, ...result }, 500);
 }
 
 async function sendDailySummary(request: Request) {
@@ -257,7 +297,10 @@ async function sendDailySummary(request: Request) {
 export const Route = createFileRoute("/api/cron/push-daily")({
   server: {
     handlers: {
-      GET: ({ request }) => sendDailySummary(request),
+      GET: ({ request }) =>
+        new URL(request.url).searchParams.get("task") === "weather-ai"
+          ? generateWeatherAiSnapshot(request)
+          : sendDailySummary(request),
     },
   },
 });
