@@ -4,12 +4,15 @@ on:
   push:
     branches:
       - agent/limitar-gemini-4x-dia
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: read
 
 concurrency:
-  group: weather-ai-validation-${{ github.ref }}
+  group: weather-ai-validation-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
