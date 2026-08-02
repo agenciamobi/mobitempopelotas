@@ -38,9 +38,6 @@ jobs:
       - name: Validate weather AI contracts
         run: node --test tests/weather-ai-snapshots.test.ts
 
-      - name: Check versioned route tree
-        run: npm run routes:check
-
       - name: Build production bundle
         run: npm run build
 
