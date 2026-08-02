@@ -11,6 +11,9 @@ import type { WeatherBrief } from "./weather-intelligence.types";
 
 const TIMEZONE = "America/Sao_Paulo";
 const SNAPSHOT_MAX_AGE_MS = 8 * 60 * 60 * 1_000;
+const SNAPSHOT_CACHE_MS = 5 * 60 * 1_000;
+const SNAPSHOT_FAILURE_CACHE_MS = 30 * 1_000;
+const SNAPSHOT_READ_TIMEOUT_MS = 1_200;
 const TABLE_NAME = "weather_ai_snapshots";
 
 type WeatherAiPeriod = "overnight" | "morning" | "afternoon" | "evening";
@@ -51,6 +54,14 @@ export type WeatherAiGenerationResult = {
   model: string | null;
   error: string | null;
 };
+
+type SnapshotCache = {
+  value: WeatherAiSnapshot | null;
+  expiresAt: number;
+};
+
+let snapshotCache: SnapshotCache | null = null;
+let snapshotReadPromise: Promise<WeatherAiSnapshot | null> | null = null;
 
 function getRestConfig(): RestConfig | null {
   const config = getSupabaseServerConfig();
@@ -109,12 +120,13 @@ async function restRequest(
   query: string,
   init: RequestInit = {},
   prefer?: string,
+  timeoutMs = 5_000,
 ) {
   const response = await fetch(`${config.url}/rest/v1/${TABLE_NAME}${query}`, {
     ...init,
     headers: restHeaders(config, prefer),
     cache: "no-store",
-    signal: AbortSignal.timeout(5_000),
+    signal: AbortSignal.timeout(timeoutMs),
   });
 
   if (!response.ok) {
@@ -190,9 +202,14 @@ function reconciledWeather(weather: AggregatedWeatherData): AggregatedWeatherDat
   };
 }
 
-export async function fetchLatestWeatherAiSnapshot(): Promise<WeatherAiSnapshot | null> {
+function cacheSnapshot(value: WeatherAiSnapshot | null, ttlMs: number) {
+  snapshotCache = { value, expiresAt: Date.now() + ttlMs };
+  return value;
+}
+
+async function readLatestWeatherAiSnapshot(): Promise<WeatherAiSnapshot | null> {
   const config = getRestConfig();
-  if (!config) return null;
+  if (!config) return cacheSnapshot(null, SNAPSHOT_FAILURE_CACHE_MS);
 
   try {
     const params = new URLSearchParams({
@@ -201,29 +218,48 @@ export async function fetchLatestWeatherAiSnapshot(): Promise<WeatherAiSnapshot 
       order: "generated_at.desc",
       limit: "1",
     });
-    const response = await restRequest(config, `?${params.toString()}`);
+    const response = await restRequest(
+      config,
+      `?${params.toString()}`,
+      {},
+      undefined,
+      SNAPSHOT_READ_TIMEOUT_MS,
+    );
     const rows = z.array(storedSnapshotSchema).parse(await response.json());
     const snapshot = rows[0];
-    if (!snapshot) return null;
+    if (!snapshot) return cacheSnapshot(null, SNAPSHOT_FAILURE_CACHE_MS);
 
     const generatedAt = new Date(snapshot.generated_at).getTime();
     if (!Number.isFinite(generatedAt) || Date.now() - generatedAt > SNAPSHOT_MAX_AGE_MS) {
-      return null;
+      return cacheSnapshot(null, SNAPSHOT_FAILURE_CACHE_MS);
     }
 
-    return {
-      slotKey: snapshot.slot_key,
-      period: snapshot.period,
-      brief: snapshot.brief,
-      model: snapshot.model,
-      generatedAt: snapshot.generated_at,
-    };
+    return cacheSnapshot(
+      {
+        slotKey: snapshot.slot_key,
+        period: snapshot.period,
+        brief: snapshot.brief,
+        model: snapshot.model,
+        generatedAt: snapshot.generated_at,
+      },
+      SNAPSHOT_CACHE_MS,
+    );
   } catch (error) {
     console.warn("[weather-ai] Snapshot persistido indisponível", {
       message: error instanceof Error ? error.message : String(error),
     });
-    return null;
+    return cacheSnapshot(null, SNAPSHOT_FAILURE_CACHE_MS);
   }
+}
+
+export async function fetchLatestWeatherAiSnapshot(): Promise<WeatherAiSnapshot | null> {
+  if (snapshotCache && snapshotCache.expiresAt > Date.now()) return snapshotCache.value;
+  if (snapshotReadPromise) return snapshotReadPromise;
+
+  snapshotReadPromise = readLatestWeatherAiSnapshot().finally(() => {
+    snapshotReadPromise = null;
+  });
+  return snapshotReadPromise;
 }
 
 export async function generateScheduledWeatherAiSnapshot(
@@ -289,6 +325,16 @@ export async function generateScheduledWeatherAiSnapshot(
       model: gemini.model,
       sourceFetchedAt: weather.source.fetchedAt,
     });
+    cacheSnapshot(
+      {
+        slotKey,
+        period,
+        brief: gemini.brief,
+        model: gemini.model,
+        generatedAt,
+      },
+      SNAPSHOT_CACHE_MS,
+    );
 
     return {
       status: "generated",
