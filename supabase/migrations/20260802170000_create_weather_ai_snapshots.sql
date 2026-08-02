@@ -13,7 +13,7 @@ create table if not exists public.weather_ai_snapshots (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint weather_ai_slot_key_format check (
-    slot_key ~ '^\d{4}-\d{2}-\d{2}-(overnight|morning|afternoon|evening)$'
+    slot_key ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}-(overnight|morning|afternoon|evening)$'
   ),
   constraint weather_ai_period_allowed check (
     period in ('overnight', 'morning', 'afternoon', 'evening')
