@@ -1,0 +1,51 @@
+name: Weather AI validation
+
+on:
+  push:
+    branches:
+      - agent/limitar-gemini-4x-dia
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weather-ai-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate weather AI snapshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies without changing lockfile
+        run: npm install --no-audit --no-fund --package-lock=false
+
+      - name: Validate environment template
+        run: npm run runtime:check:example
+
+      - name: Validate weather AI contracts
+        run: node --test tests/weather-ai-snapshots.test.ts
+
+      - name: Check versioned route tree
+        run: npm run routes:check
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Validate public routes
+        run: npm run test:routes
+
+      - name: TypeScript
+        run: npm run typecheck
+
+      - name: ESLint
+        run: npm run lint
