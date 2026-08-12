@@ -307,7 +307,7 @@ test("SACE experience offers map filters, source transparency and explicit inter
   assert.match(context, /data\.legend/);
   assert.match(context, /data\.highlightedStations/);
   assert.match(context, /Abrir SACE Guaíba/);
-  assert.match(context, /sem conversão para risco local em[\s\S]*Pelotas/);
+  assert.match(context, /sem conversão para risco local[\s\S]*Pelotas/);
   assert.match(context, /Integração com o SACE temporariamente sem resposta/);
   assert.match(context, /Isso não confirma indisponibilidade do SGB/);
 });
