@@ -54,10 +54,11 @@ function jsonResponse(payload: unknown, status = 200) {
 }
 
 test("SACE integration only consumes the public structured resources identified in the HAR", () => {
-  assert.match(server, /\/guaiba\/api\/geojson\/point/);
-  assert.match(server, /\/guaiba\/rest\/alertas/);
-  assert.match(server, /\/guaiba\/api\/geojson\/bounds/);
-  assert.match(server, /\/guaiba\/wms-config/);
+  assert.match(server, /https:\/\/sace\.sgb\.gov\.br\/guaiba/);
+  assert.match(server, /api\/geojson\/point/);
+  assert.match(server, /rest\/alertas/);
+  assert.match(server, /api\/geojson\/bounds/);
+  assert.match(server, /wms-config/);
   assert.match(server, /stationsSchema/);
   assert.match(server, /alertLegendSchema/);
   assert.match(server, /boundsSchema/);
@@ -84,7 +85,7 @@ test("SACE server preserves official station categories without predicting Pelot
   assert.match(server, /SEM_INFORMACAO/);
   assert.match(server, /Cota de Atenção/);
   assert.match(server, /Cota de Alerta/);
-  assert.match(server, /Cota de Inundação/);
+  assert.match(route, /Atenção, Alerta e Inundação/);
   assert.match(server, /stationIsAboveNormal/);
   assert.match(server, /withoutTransmission/);
   assert.match(server, /Guaíba e Delta/);
@@ -287,7 +288,7 @@ test("SACE retries one transient failure on the station endpoint before declarin
 
 test("hydrology page identifies SACE as upstream context and keeps local refresh cadence", () => {
   assert.match(route, /getSaceGuaibaData/);
-  assert.match(route, /<SaceGuaibaContext data=\{data\.sace\}/);
+  assert.match(route, /sace=\{data\.sace\}/);
   assert.match(route, /staleTime: 60 \* 1_000/);
   assert.match(route, /SACE Guaíba do Serviço Geológico do Brasil/);
   assert.match(route, /Uma estação elevada no SACE significa que o Laranjal vai subir/);
