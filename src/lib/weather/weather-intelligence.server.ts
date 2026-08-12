@@ -1,7 +1,10 @@
 import { fetchAggregatedPelotasWeather } from "./aggregated-weather.server";
 import type { AggregatedWeatherData, WeatherSourceKey } from "./aggregated-weather.types";
 import { reconcileDailyTemperatures } from "./daily-temperature-reconciliation";
-import { fetchLatestWeatherAiSnapshot } from "./weather-ai-snapshot.server";
+import {
+  computeWeatherAiFingerprint,
+  fetchLatestWeatherAiSnapshot,
+} from "./weather-ai-snapshot.server";
 import type { WeatherBrief, WeatherIntelligenceData } from "./weather-intelligence.types";
 
 const SOURCE_LABELS: Record<WeatherSourceKey, string> = {
@@ -164,16 +167,19 @@ export async function fetchWeatherIntelligence(): Promise<WeatherIntelligenceDat
     daily: reconcileDailyTemperatures(aggregatedWeather.daily, aggregatedWeather.inmetForecast),
   };
   const deterministicBrief = createDeterministicWeatherBrief(weather);
-  const useGemini = aiSnapshot !== null;
+  const currentFingerprint = computeWeatherAiFingerprint(weather);
+  const compatibleSnapshot =
+    aiSnapshot?.sourceFingerprint === currentFingerprint ? aiSnapshot : null;
+  const useGemini = compatibleSnapshot !== null;
 
   return {
     weather,
-    brief: aiSnapshot?.brief ?? deterministicBrief,
+    brief: compatibleSnapshot?.brief ?? deterministicBrief,
     intelligence: {
       origin: useGemini ? "gemini" : "deterministic",
       geminiStatus: useGemini ? "generated" : "unavailable",
-      model: aiSnapshot?.model ?? null,
-      generatedAt: aiSnapshot?.generatedAt ?? new Date().toISOString(),
+      model: compatibleSnapshot?.model ?? null,
+      generatedAt: compatibleSnapshot?.generatedAt ?? new Date().toISOString(),
       error: null,
     },
   };
