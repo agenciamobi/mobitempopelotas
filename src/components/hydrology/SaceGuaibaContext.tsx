@@ -60,7 +60,8 @@ function stationDescription(station: SaceGuaibaStation) {
 }
 
 function SourceState({ data }: { data: SaceGuaibaData }) {
-  const Icon = data.status === "live" ? CheckCircle2 : data.status === "partial" ? AlertTriangle : WifiOff;
+  const Icon =
+    data.status === "live" ? CheckCircle2 : data.status === "partial" ? AlertTriangle : WifiOff;
   return (
     <div className={`sace-source-state is-${data.status}`}>
       <Icon aria-hidden="true" />
@@ -70,7 +71,7 @@ function SourceState({ data }: { data: SaceGuaibaData }) {
             ? "Rede pública disponível"
             : data.status === "partial"
               ? "Rede disponível parcialmente"
-              : "Rede temporariamente indisponível"}
+              : "Integração com o SACE temporariamente sem resposta"}
         </strong>
         <small>
           {data.error ?? `Consulta realizada em ${formatDateTime(data.source.fetchedAt)}.`}
@@ -97,8 +98,9 @@ export function SaceGuaibaContext({ data }: { data: SaceGuaibaData }) {
         </div>
         <div>
           <p>
-            O SACE acompanha estações nos rios Jacuí, Taquari-Antas, Caí, Sinos, Gravataí, no Delta e
-            no Guaíba. Essa rede amplia o contexto regional antes da água chegar à Lagoa dos Patos.
+            O SACE acompanha estações nos rios Jacuí, Taquari-Antas, Caí, Sinos, Gravataí, no Delta
+            e no Guaíba. Essa rede amplia o contexto regional antes da água chegar à Lagoa dos
+            Patos.
           </p>
           <SourceState data={data} />
         </div>
@@ -107,9 +109,10 @@ export function SaceGuaibaContext({ data }: { data: SaceGuaibaData }) {
       <div className="sace-boundary-note">
         <Route aria-hidden="true" />
         <p>
-          <strong>Leitura regional, não previsão para o Laranjal.</strong> Uma categoria elevada em um
-          afluente indica a situação oficial daquela estação. Vento, chuva, armazenamento no Guaíba e
-          na Lagoa, saída oceânica e drenagem local interferem no que será observado em Pelotas.
+          <strong>Leitura regional, não previsão para o Laranjal.</strong> Uma categoria elevada em
+          um afluente indica a situação oficial daquela estação. Vento, chuva, armazenamento no
+          Guaíba e na Lagoa, saída oceânica e drenagem local interferem no que será observado em
+          Pelotas.
         </p>
       </div>
 
@@ -199,11 +202,7 @@ export function SaceGuaibaContext({ data }: { data: SaceGuaibaData }) {
               </div>
             </div>
 
-            <SaceGuaibaMap
-              stations={filteredStations}
-              layers={data.layers}
-              bounds={data.bounds}
-            />
+            <SaceGuaibaMap stations={filteredStations} layers={data.layers} bounds={data.bounds} />
 
             {data.legend.length ? (
               <div className="sace-legend" aria-label="Legenda oficial do SACE Guaíba">
@@ -221,10 +220,14 @@ export function SaceGuaibaContext({ data }: { data: SaceGuaibaData }) {
             <div>
               <Waves aria-hidden="true" />
               <span>
-                <strong>{filter === "all" ? "Estações estratégicas e destaques oficiais" : "Estações do filtro"}</strong>
+                <strong>
+                  {filter === "all"
+                    ? "Estações estratégicas e destaques oficiais"
+                    : "Estações do filtro"}
+                </strong>
                 <small>
-                  As categorias abaixo são reproduzidas da rede SACE, sem conversão para risco local em
-                  Pelotas.
+                  As categorias abaixo são reproduzidas da rede SACE, sem conversão para risco local
+                  em Pelotas.
                 </small>
               </span>
             </div>
@@ -250,7 +253,10 @@ export function SaceGuaibaContext({ data }: { data: SaceGuaibaData }) {
               <Activity aria-hidden="true" />
               <div>
                 <strong>Nenhuma estação corresponde a este filtro</strong>
-                <p>O quadro atual não possui estação nesta seleção. Escolha outro sistema ou retorne a Todas.</p>
+                <p>
+                  O quadro atual não possui estação nesta seleção. Escolha outro sistema ou retorne
+                  a Todas.
+                </p>
               </div>
             </div>
           )}
@@ -259,10 +265,10 @@ export function SaceGuaibaContext({ data }: { data: SaceGuaibaData }) {
         <div className="sace-unavailable">
           <WifiOff aria-hidden="true" />
           <div>
-            <strong>As estações do SACE não estão disponíveis nesta atualização</strong>
+            <strong>A integração não recebeu as estações do SACE nesta atualização</strong>
             <p>
-              A leitura local do Laranjal e a rede da Lagoa dos Patos continuam independentes desta
-              integração.
+              Isso não confirma indisponibilidade do SGB. A leitura local do Laranjal e a rede da
+              Lagoa dos Patos continuam independentes desta integração.
             </p>
           </div>
         </div>
@@ -272,7 +278,8 @@ export function SaceGuaibaContext({ data }: { data: SaceGuaibaData }) {
         <span>
           <Database aria-hidden="true" />
           <small>
-            Fonte: {data.source.name}. Consulta do portal em {formatDateTime(data.source.fetchedAt)}.
+            Fonte: {data.source.name}. Consulta do portal em {formatDateTime(data.source.fetchedAt)}
+            .
           </small>
         </span>
         <a href={data.source.url} target="_blank" rel="noopener noreferrer">
