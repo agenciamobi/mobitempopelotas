@@ -154,7 +154,13 @@ async function generateWeatherAiSnapshot(request: Request) {
   }
 
   if (result.status === "not-configured") {
-    return pushJsonResponse({ success: false, configured: false, ...result }, 503);
+    return pushJsonResponse({
+      success: true,
+      skipped: true,
+      configured: false,
+      reason: "ai-editorial-not-configured",
+      ...result,
+    });
   }
 
   return pushJsonResponse({ success: false, ...result }, 500);
