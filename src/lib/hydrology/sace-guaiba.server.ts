@@ -7,6 +7,7 @@ const ALERTS_URL = `${SACE_BASE_URL}/rest/alertas`;
 const BOUNDS_URL = `${SACE_BASE_URL}/api/geojson/bounds`;
 const WMS_CONFIG_URL = `${SACE_BASE_URL}/wms-config`;
 const REQUEST_TIMEOUT_MS = 8_000;
+const STATION_RETRY_DELAY_MS = 250;
 
 const finiteNumber = z.number().finite();
 const nullableNumber = finiteNumber.nullable().optional();
@@ -147,6 +148,16 @@ export type SaceGuaibaData = {
   error: string | null;
 };
 
+class SaceHttpError extends Error {
+  retryable: boolean;
+
+  constructor(message: string, retryable: boolean) {
+    super(message);
+    this.name = "SaceHttpError";
+    this.retryable = retryable;
+  }
+}
+
 function normalizeHexColor(value: string | null | undefined, fallback: string) {
   return typeof value === "string" && /^#[0-9a-f]{6}$/i.test(value.trim())
     ? value.trim()
@@ -210,12 +221,14 @@ function normalizeStations(
 
   return payload.features.map<SaceGuaibaStation>((feature) => {
     const properties = feature.properties;
-    const alertType = (properties.tipoAlerta.trim() || "SEM_INFORMACAO").toUpperCase();
+    const rawAlertType = (properties.tipoAlerta.trim() || "SEM_INFORMACAO").toUpperCase();
     const explicitLabel = properties.nomeFiltroAlerta?.trim() || "";
-    const alertLabel = explicitLabel || fallbackAlertLabel(alertType);
-    const matchedLegend =
-      legendByLabel.get(normalizeText(alertLabel)) ?? legendByType.get(alertType)?.at(-1);
-    const transmitting = alertType !== "SEM_INFORMACAO" && !/sem transmiss/i.test(alertLabel);
+    const alertLabel = explicitLabel || fallbackAlertLabel(rawAlertType);
+    const legendFromLabel = legendByLabel.get(normalizeText(alertLabel));
+    const matchedLegend = legendFromLabel ?? legendByType.get(rawAlertType)?.at(-1);
+    const effectiveAlertType = explicitLabel && legendFromLabel ? legendFromLabel.alertType : rawAlertType;
+    const transmitting =
+      effectiveAlertType !== "SEM_INFORMACAO" && !/sem transmiss/i.test(alertLabel);
 
     return {
       id: properties.id,
@@ -226,7 +239,7 @@ function normalizeStations(
       longitude: feature.geometry.coordinates[0],
       latitude: feature.geometry.coordinates[1],
       drainageAreaKm2: properties.areaDrenagem ?? null,
-      alertType,
+      alertType: effectiveAlertType,
       alertLabel,
       alertColor: normalizeHexColor(properties.corAlerta, matchedLegend?.color ?? "#78909c"),
       legendOrder: properties.ordemLegenda ?? matchedLegend?.order ?? null,
@@ -317,22 +330,53 @@ function unavailableData(error: string, fetchedAt = new Date()): SaceGuaibaData 
   };
 }
 
-async function fetchJson(url: string) {
-  const response = await fetch(url, {
-    headers: {
-      Accept: "application/json",
-      "User-Agent": "MOBI-Tempo-Pelotas/2.0 (+https://tempopelotas.com.br)",
-    },
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-  });
-  if (!response.ok) throw new Error(`SACE respondeu HTTP ${response.status} em ${new URL(url).pathname}.`);
-  return response.json() as Promise<unknown>;
+function isTransientHttpStatus(status: number) {
+  return status === 408 || status === 425 || status === 429 || status >= 500;
+}
+
+function wait(ms: number) {
+  return new Promise<void>((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchJson(url: string, options: { retryTransient?: boolean } = {}) {
+  const maxAttempts = options.retryTransient ? 2 : 1;
+  let lastError: unknown = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        headers: {
+          Accept: "application/json, text/javascript, */*; q=0.01",
+          Referer: SACE_PUBLIC_URL,
+          "X-Requested-With": "XMLHttpRequest",
+          "User-Agent": "MOBI-Tempo-Pelotas/2.0 (+https://tempopelotas.com.br)",
+        },
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      });
+
+      if (!response.ok) {
+        throw new SaceHttpError(
+          `SACE respondeu HTTP ${response.status} em ${new URL(url).pathname}.`,
+          isTransientHttpStatus(response.status),
+        );
+      }
+
+      return response.json() as Promise<unknown>;
+    } catch (error) {
+      lastError = error;
+      const retryable = !(error instanceof SaceHttpError) || error.retryable;
+      if (attempt >= maxAttempts || !retryable) throw error;
+      await wait(STATION_RETRY_DELAY_MS);
+    }
+  }
+
+  throw lastError instanceof Error ? lastError : new Error("Falha desconhecida ao consultar o SACE.");
 }
 
 export async function fetchSaceGuaibaData(): Promise<SaceGuaibaData> {
   const fetchedAt = new Date();
   const [stationsResult, legendResult, boundsResult, wmsResult] = await Promise.allSettled([
-    fetchJson(STATIONS_URL),
+    fetchJson(STATIONS_URL, { retryTransient: true }),
     fetchJson(ALERTS_URL),
     fetchJson(BOUNDS_URL),
     fetchJson(WMS_CONFIG_URL),
@@ -340,7 +384,7 @@ export async function fetchSaceGuaibaData(): Promise<SaceGuaibaData> {
 
   if (stationsResult.status === "rejected") {
     return unavailableData(
-      `A rede pública de estações do SACE Guaíba não respondeu. ${String(stationsResult.reason)}`,
+      `A integração do Tempo Pelotas não conseguiu obter as estações do SACE Guaíba. ${String(stationsResult.reason)}`,
       fetchedAt,
     );
   }
