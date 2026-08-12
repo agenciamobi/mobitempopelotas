@@ -260,8 +260,7 @@ async function completeSnapshot(
         generated_at: options.status === "generated" ? completedAt : null,
         source_fetched_at: options.sourceFetchedAt ?? null,
         source_fingerprint: options.status === "generated" ? options.sourceFingerprint : null,
-        reused_from_slot:
-          options.status === "generated" ? (options.reusedFromSlot ?? null) : null,
+        reused_from_slot: options.status === "generated" ? (options.reusedFromSlot ?? null) : null,
         brief: options.status === "generated" ? options.brief : null,
         model: options.model ?? null,
         error: options.error?.slice(0, 800) ?? null,
