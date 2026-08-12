@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 
 import { z } from "zod";
 
@@ -36,6 +36,8 @@ const storedSnapshotSchema = z.object({
   brief: weatherBriefSchema,
   model: z.string().nullable(),
   generated_at: z.string(),
+  source_fingerprint: z.string().regex(/^[a-f0-9]{64}$/),
+  reused_from_slot: z.string().nullable().optional(),
 });
 
 export type WeatherAiSnapshot = {
@@ -44,14 +46,18 @@ export type WeatherAiSnapshot = {
   brief: WeatherBrief;
   model: string | null;
   generatedAt: string;
+  sourceFingerprint: string;
+  reusedFromSlot: string | null;
 };
 
 export type WeatherAiGenerationResult = {
-  status: "generated" | "already-claimed" | "not-configured" | "failed";
+  status: "generated" | "reused" | "already-claimed" | "not-configured" | "failed";
   slotKey: string;
   period: WeatherAiPeriod;
   generatedAt: string | null;
   model: string | null;
+  sourceFingerprint: string | null;
+  reusedFromSlot: string | null;
   error: string | null;
 };
 
@@ -92,16 +98,83 @@ function localDateAndHour(date = new Date()) {
 }
 
 function resolvePeriod(hour: number): WeatherAiPeriod {
-  if (hour < 6) return "overnight";
-  if (hour < 12) return "morning";
-  if (hour < 18) return "afternoon";
-  return "evening";
+  if (hour < 5) return "overnight";
+  if (hour < 11) return "morning";
+  if (hour < 17) return "afternoon";
+  if (hour < 23) return "evening";
+  return "overnight";
 }
 
 export function resolveWeatherAiSlot(date = new Date()) {
   const { dateKey, hour } = localDateAndHour(date);
   const period = resolvePeriod(hour);
   return { slotKey: `${dateKey}-${period}`, period } as const;
+}
+
+function bucket(value: number | null | undefined, size: number) {
+  if (value === null || value === undefined || !Number.isFinite(value)) return null;
+  return Math.round(value / size) * size;
+}
+
+function normalizedText(value: string | null | undefined) {
+  return value?.trim().toLowerCase().replace(/\s+/g, " ") || null;
+}
+
+export function computeWeatherAiFingerprint(weather: AggregatedWeatherData) {
+  const current = weather.current;
+  const materialState = {
+    status: weather.status,
+    current: current
+      ? {
+          temperature: bucket(current.temperature, 2),
+          feelsLike: bucket(current.feelsLike, 2),
+          condition: normalizedText(current.condition),
+          humidity: bucket(current.humidity, 10),
+          windSpeed: bucket(current.windSpeed, 5),
+          windGust: bucket(current.windGust, 5),
+          windDirection: normalizedText(current.windDirection),
+        }
+      : null,
+    daily: weather.daily.slice(0, 2).map((day) => ({
+      date: day.dateIso ?? day.date,
+      min: bucket(day.min, 1),
+      max: bucket(day.max, 1),
+      rainChance: bucket(day.rainChance, 10),
+      precipitationMm: bucket(day.precipitationMm, 1),
+      windGust: bucket(day.windGust, 5),
+      icon: day.icon,
+    })),
+    alerts: weather.alerts
+      .filter((alert) => alert.period === "active" || alert.period === "upcoming")
+      .map((alert) => ({
+        id: alert.id,
+        event: normalizedText(alert.event),
+        severity: alert.severity,
+        relevance: alert.relevance,
+        period: alert.period,
+        startsAt: alert.startsAt,
+        expiresAt: alert.expiresAt,
+      }))
+      .sort((left, right) => left.id.localeCompare(right.id)),
+    quality: {
+      confidence: weather.quality.confidence,
+      currentSource: weather.quality.currentSource,
+      forecastSource: weather.quality.forecastSource,
+      degradedSources: [...weather.quality.degradedSources].sort(),
+      significantDiscrepancies: weather.quality.discrepancies
+        .filter((item) => item.severity === "significant")
+        .map((item) => ({
+          scope: item.scope,
+          field: item.field,
+          referenceSource: item.referenceSource,
+          comparisonSource: item.comparisonSource,
+          day: item.day,
+        }))
+        .sort((left, right) => JSON.stringify(left).localeCompare(JSON.stringify(right))),
+    },
+  };
+
+  return createHash("sha256").update(JSON.stringify(materialState)).digest("hex");
 }
 
 function restHeaders(config: RestConfig, prefer?: string) {
@@ -166,6 +239,8 @@ async function completeSnapshot(
     model?: string | null;
     error?: string | null;
     sourceFetchedAt?: string | null;
+    sourceFingerprint?: string | null;
+    reusedFromSlot?: string | null;
   },
 ) {
   const completedAt = new Date().toISOString();
@@ -184,6 +259,8 @@ async function completeSnapshot(
         completed_at: completedAt,
         generated_at: options.status === "generated" ? completedAt : null,
         source_fetched_at: options.sourceFetchedAt ?? null,
+        source_fingerprint: options.status === "generated" ? options.sourceFingerprint : null,
+        reused_from_slot: options.status === "generated" ? options.reusedFromSlot ?? null : null,
         brief: options.status === "generated" ? options.brief : null,
         model: options.model ?? null,
         error: options.error?.slice(0, 800) ?? null,
@@ -207,43 +284,55 @@ function cacheSnapshot(value: WeatherAiSnapshot | null, ttlMs: number) {
   return value;
 }
 
+function mapStoredSnapshot(snapshot: z.infer<typeof storedSnapshotSchema>): WeatherAiSnapshot {
+  return {
+    slotKey: snapshot.slot_key,
+    period: snapshot.period,
+    brief: snapshot.brief,
+    model: snapshot.model,
+    generatedAt: snapshot.generated_at,
+    sourceFingerprint: snapshot.source_fingerprint,
+    reusedFromSlot: snapshot.reused_from_slot ?? null,
+  };
+}
+
+async function readGeneratedSnapshot(
+  config: RestConfig,
+  sourceFingerprint?: string,
+): Promise<WeatherAiSnapshot | null> {
+  const params = new URLSearchParams({
+    select: "slot_key,period,brief,model,generated_at,source_fingerprint,reused_from_slot",
+    status: "eq.generated",
+    order: "generated_at.desc",
+    limit: "1",
+  });
+  if (sourceFingerprint) params.set("source_fingerprint", `eq.${sourceFingerprint}`);
+
+  const response = await restRequest(
+    config,
+    `?${params.toString()}`,
+    {},
+    undefined,
+    SNAPSHOT_READ_TIMEOUT_MS,
+  );
+  const rows = z.array(storedSnapshotSchema).parse(await response.json());
+  return rows[0] ? mapStoredSnapshot(rows[0]) : null;
+}
+
 async function readLatestWeatherAiSnapshot(): Promise<WeatherAiSnapshot | null> {
   const config = getRestConfig();
   if (!config) return cacheSnapshot(null, SNAPSHOT_FAILURE_CACHE_MS);
 
   try {
-    const params = new URLSearchParams({
-      select: "slot_key,period,brief,model,generated_at",
-      status: "eq.generated",
-      order: "generated_at.desc",
-      limit: "1",
-    });
-    const response = await restRequest(
-      config,
-      `?${params.toString()}`,
-      {},
-      undefined,
-      SNAPSHOT_READ_TIMEOUT_MS,
-    );
-    const rows = z.array(storedSnapshotSchema).parse(await response.json());
-    const snapshot = rows[0];
+    const snapshot = await readGeneratedSnapshot(config);
     if (!snapshot) return cacheSnapshot(null, SNAPSHOT_FAILURE_CACHE_MS);
 
-    const generatedAt = new Date(snapshot.generated_at).getTime();
+    const generatedAt = new Date(snapshot.generatedAt).getTime();
     if (!Number.isFinite(generatedAt) || Date.now() - generatedAt > SNAPSHOT_MAX_AGE_MS) {
       return cacheSnapshot(null, SNAPSHOT_FAILURE_CACHE_MS);
     }
 
-    return cacheSnapshot(
-      {
-        slotKey: snapshot.slot_key,
-        period: snapshot.period,
-        brief: snapshot.brief,
-        model: snapshot.model,
-        generatedAt: snapshot.generated_at,
-      },
-      SNAPSHOT_CACHE_MS,
-    );
+    return cacheSnapshot(snapshot, SNAPSHOT_CACHE_MS);
   } catch (error) {
     console.warn("[weather-ai] Snapshot persistido indisponível", {
       message: error instanceof Error ? error.message : String(error),
@@ -262,6 +351,24 @@ export async function fetchLatestWeatherAiSnapshot(): Promise<WeatherAiSnapshot 
   return snapshotReadPromise;
 }
 
+function emptyGenerationResult(
+  status: WeatherAiGenerationResult["status"],
+  slotKey: string,
+  period: WeatherAiPeriod,
+  error: string | null,
+): WeatherAiGenerationResult {
+  return {
+    status,
+    slotKey,
+    period,
+    generatedAt: null,
+    model: null,
+    sourceFingerprint: null,
+    reusedFromSlot: null,
+    error,
+  };
+}
+
 export async function generateScheduledWeatherAiSnapshot(
   date = new Date(),
 ): Promise<WeatherAiGenerationResult> {
@@ -269,32 +376,58 @@ export async function generateScheduledWeatherAiSnapshot(
   const config = getRestConfig();
 
   if (!config || !isGeminiConfigured()) {
-    return {
-      status: "not-configured",
+    return emptyGenerationResult(
+      "not-configured",
       slotKey,
       period,
-      generatedAt: null,
-      model: null,
-      error: "Supabase administrativo ou Gemini não configurado.",
-    };
+      "Supabase administrativo ou Gemini não configurado.",
+    );
   }
 
   let leaseToken: string | null = null;
+  let sourceFingerprint: string | null = null;
 
   try {
     leaseToken = await claimSnapshot(config, slotKey, period);
-    if (!leaseToken) {
-      return {
-        status: "already-claimed",
+    if (!leaseToken) return emptyGenerationResult("already-claimed", slotKey, period, null);
+
+    const weather = reconciledWeather(await fetchAggregatedPelotasWeather());
+    sourceFingerprint = computeWeatherAiFingerprint(weather);
+    const reusableSnapshot = await readGeneratedSnapshot(config, sourceFingerprint);
+
+    if (reusableSnapshot) {
+      const generatedAt = await completeSnapshot(config, {
+        slotKey,
+        leaseToken,
+        status: "generated",
+        brief: reusableSnapshot.brief,
+        model: reusableSnapshot.model,
+        sourceFetchedAt: weather.source.fetchedAt,
+        sourceFingerprint,
+        reusedFromSlot: reusableSnapshot.slotKey,
+      });
+      const snapshot: WeatherAiSnapshot = {
         slotKey,
         period,
-        generatedAt: null,
-        model: null,
+        brief: reusableSnapshot.brief,
+        model: reusableSnapshot.model,
+        generatedAt,
+        sourceFingerprint,
+        reusedFromSlot: reusableSnapshot.slotKey,
+      };
+      cacheSnapshot(snapshot, SNAPSHOT_CACHE_MS);
+      return {
+        status: "reused",
+        slotKey,
+        period,
+        generatedAt,
+        model: reusableSnapshot.model,
+        sourceFingerprint,
+        reusedFromSlot: reusableSnapshot.slotKey,
         error: null,
       };
     }
 
-    const weather = reconciledWeather(await fetchAggregatedPelotasWeather());
     const gemini = await generateGeminiWeatherBrief(weather);
 
     if (gemini.status !== "generated" || !gemini.brief) {
@@ -313,6 +446,8 @@ export async function generateScheduledWeatherAiSnapshot(
         period,
         generatedAt: null,
         model: gemini.model,
+        sourceFingerprint,
+        reusedFromSlot: null,
         error,
       };
     }
@@ -324,17 +459,18 @@ export async function generateScheduledWeatherAiSnapshot(
       brief: gemini.brief,
       model: gemini.model,
       sourceFetchedAt: weather.source.fetchedAt,
+      sourceFingerprint,
     });
-    cacheSnapshot(
-      {
-        slotKey,
-        period,
-        brief: gemini.brief,
-        model: gemini.model,
-        generatedAt,
-      },
-      SNAPSHOT_CACHE_MS,
-    );
+    const snapshot: WeatherAiSnapshot = {
+      slotKey,
+      period,
+      brief: gemini.brief,
+      model: gemini.model,
+      generatedAt,
+      sourceFingerprint,
+      reusedFromSlot: null,
+    };
+    cacheSnapshot(snapshot, SNAPSHOT_CACHE_MS);
 
     return {
       status: "generated",
@@ -342,6 +478,8 @@ export async function generateScheduledWeatherAiSnapshot(
       period,
       generatedAt,
       model: gemini.model,
+      sourceFingerprint,
+      reusedFromSlot: null,
       error: null,
     };
   } catch (error) {
@@ -352,6 +490,7 @@ export async function generateScheduledWeatherAiSnapshot(
         leaseToken,
         status: "failed",
         error: message,
+        sourceFingerprint,
       }).catch(() => undefined);
     }
     return {
@@ -360,6 +499,8 @@ export async function generateScheduledWeatherAiSnapshot(
       period,
       generatedAt: null,
       model: null,
+      sourceFingerprint,
+      reusedFromSlot: null,
       error: message,
     };
   }
