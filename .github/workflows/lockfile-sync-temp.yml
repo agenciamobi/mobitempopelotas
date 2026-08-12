@@ -11,20 +11,29 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - name: Regenerar package-lock.json
+      - name: Confirmar lockfile reproduzível
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
-      - name: Persistir lockfile quando necessário
-        run: |
-          if ! git diff --quiet -- package-lock.json; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add package-lock.json
-            git commit -m "chore(deps): sincronizar package-lock com package.json"
-            git push origin HEAD:agent/ci-lockfile-sync-20260812
-          fi
+      - name: Exigir lockfile sem diferenças
+        run: git diff --exit-code -- package-lock.json
+      - name: Instalação limpa
+        run: npm ci --no-audit --no-fund
+      - name: Validar template de ambiente
+        run: npm run runtime:check:example
+      - name: Contratos rápidos
+        run: npm run test:contracts
+      - name: Verificar árvore de rotas versionada
+        run: npm run routes:check
+      - name: Build de produção
+        run: npm run build
+      - name: Contrato das rotas públicas
+        run: npm run test:routes
+      - name: TypeScript
+        run: npm run typecheck
+      - name: ESLint
+        run: npm run lint
