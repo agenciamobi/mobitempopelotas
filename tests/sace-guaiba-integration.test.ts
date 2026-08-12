@@ -15,6 +15,44 @@ const route = readFileSync("src/routes/situacao-hidrologica-pelotas.tsx", "utf8"
 
 const integrationSource = `${server}\n${serverFunction}\n${context}\n${map}\n${route}`;
 
+const legend = [
+  { prioridade: 7, tipoAlerta: "MEDIO", ordemLegenda: 4, nome: "Cota de Alerta", cor: "#ff9933" },
+  { prioridade: 6, tipoAlerta: "BAIXO", ordemLegenda: 5, nome: "Cota de Atenção", cor: "#ffff33" },
+  { prioridade: 1, tipoAlerta: "NORMAL", ordemLegenda: 6, nome: "Normal", cor: "#00FF33" },
+  {
+    prioridade: null,
+    tipoAlerta: "SEM_INFORMACAO",
+    ordemLegenda: 20,
+    nome: "Sem transmissão",
+    cor: "#c4c4c4",
+  },
+];
+
+const bounds = { minx: -54.8525, miny: -31.5, maxx: -49, maxy: -27.759 };
+const wms = {
+  camadas: [
+    {
+      title: "Bacia",
+      url: "https://opendata.sgb.gov.br/geoserver/ows",
+      layerName: "geonode:sace_bacia_hidrografica_guaiba",
+      options: { version: "1.1.0", format: "image/png", transparent: true },
+    },
+    {
+      title: "Hidrografia",
+      url: "https://opendata.sgb.gov.br/geoserver/ows",
+      layerName: "geonode:sace_hidrografia_guaiba",
+      options: { version: "1.1.0", format: "image/png", transparent: true },
+    },
+  ],
+};
+
+function jsonResponse(payload: unknown, status = 200) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
 test("SACE integration only consumes the public structured resources identified in the HAR", () => {
   assert.match(server, /\/guaiba\/api\/geojson\/point/);
   assert.match(server, /\/guaiba\/rest\/alertas/);
@@ -33,6 +71,15 @@ test("SACE integration only consumes the public structured resources identified 
   assert.doesNotMatch(integrationSource, /senha|passwordHint|credencial/i);
 });
 
+test("SACE server uses browser-compatible public headers and retries only the critical station request", () => {
+  assert.match(server, /application\/json, text\/javascript, \*\/\*; q=0\.01/);
+  assert.match(server, /Referer: SACE_PUBLIC_URL/);
+  assert.match(server, /"X-Requested-With": "XMLHttpRequest"/);
+  assert.match(server, /fetchJson\(STATIONS_URL, \{ retryTransient: true \}\)/);
+  assert.match(server, /const maxAttempts = options\.retryTransient \? 2 : 1/);
+  assert.match(server, /status === 408 \|\| status === 425 \|\| status === 429 \|\| status >= 500/);
+});
+
 test("SACE server preserves official station categories without predicting Pelotas", () => {
   assert.match(server, /SEM_INFORMACAO/);
   assert.match(server, /Cota de Atenção/);
@@ -49,7 +96,7 @@ test("SACE server preserves official station categories without predicting Pelot
   assert.doesNotMatch(server, /previs[aã]o.*Laranjal/i);
 });
 
-test("SACE normalizer accepts the public HAR shape and preserves official colors", async () => {
+test("SACE normalizer follows the label displayed by the official portal when fields disagree", async () => {
   const originalFetch = globalThis.fetch;
   const stations = {
     type: "FeatureCollection",
@@ -108,33 +155,41 @@ test("SACE normalizer accepts the public HAR shape and preserves official colors
           ordemLegenda: 2147483647,
         },
       },
-    ],
-  };
-  const legend = [
-    { prioridade: 7, tipoAlerta: "MEDIO", ordemLegenda: 4, nome: "Cota de Alerta", cor: "#ff9933" },
-    { prioridade: 1, tipoAlerta: "NORMAL", ordemLegenda: 6, nome: "Normal", cor: "#00FF33" },
-    {
-      prioridade: null,
-      tipoAlerta: "SEM_INFORMACAO",
-      ordemLegenda: 20,
-      nome: "Sem transmissão",
-      cor: "#c4c4c4",
-    },
-  ];
-  const bounds = { minx: -54.8525, miny: -31.5, maxx: -49, maxy: -27.759 };
-  const wms = {
-    camadas: [
       {
-        title: "Bacia",
-        url: "https://opendata.sgb.gov.br/geoserver/ows",
-        layerName: "geonode:sace_bacia_hidrografica_guaiba",
-        options: { version: "1.1.0", format: "image/png", transparent: true },
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [-51.63, -28.38] },
+        properties: {
+          id: 4,
+          nome: "Ibiraiaras",
+          sigla: "02851072",
+          rio: "Ibiraiaras",
+          localizacao: "",
+          latitude: -28.38,
+          longitude: -51.63,
+          areaDrenagem: null,
+          tipoAlerta: "SEM_INFORMACAO",
+          corAlerta: "#00FF33",
+          nomeFiltroAlerta: "Normal",
+          ordemLegenda: 6,
+        },
       },
       {
-        title: "Hidrografia",
-        url: "https://opendata.sgb.gov.br/geoserver/ows",
-        layerName: "geonode:sace_hidrografia_guaiba",
-        options: { version: "1.1.0", format: "image/png", transparent: true },
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [-51.23, -30.13] },
+        properties: {
+          id: 5,
+          nome: "Ipanema",
+          sigla: "87460120",
+          rio: "Guaíba / Porto Alegre",
+          localizacao: "",
+          latitude: -30.13,
+          longitude: -51.23,
+          areaDrenagem: 82900,
+          tipoAlerta: "NORMAL",
+          corAlerta: "#c4c4c4",
+          nomeFiltroAlerta: "Sem transmissão",
+          ordemLegenda: 20,
+        },
       },
     ],
   };
@@ -148,21 +203,18 @@ test("SACE normalizer accepts the public HAR shape and preserves official colors
         : url.includes("/api/geojson/bounds")
           ? bounds
           : wms;
-    return new Response(JSON.stringify(payload), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return jsonResponse(payload);
   }) as typeof fetch;
 
   try {
     const data = await fetchSaceGuaibaData();
     assert.equal(data.status, "live");
     assert.deepEqual(data.counts, {
-      total: 3,
-      transmitting: 2,
-      normal: 1,
+      total: 5,
+      transmitting: 3,
+      normal: 2,
       aboveNormal: 1,
-      withoutTransmission: 1,
+      withoutTransmission: 2,
     });
     assert.equal(data.stations[0]?.alertLabel, "Normal");
     assert.equal(data.stations[0]?.alertColor, "#00FF33");
@@ -170,9 +222,64 @@ test("SACE normalizer accepts the public HAR shape and preserves official colors
     assert.equal(data.stations[1]?.alertColor, "#ff9933");
     assert.equal(data.stations[2]?.alertLabel, "Sem transmissão");
     assert.equal(data.stations[2]?.alertColor, "#c4c4c4");
+    assert.equal(data.stations[3]?.alertType, "NORMAL");
+    assert.equal(data.stations[3]?.transmitting, true);
+    assert.equal(data.stations[3]?.alertColor, "#00FF33");
+    assert.equal(data.stations[4]?.alertType, "SEM_INFORMACAO");
+    assert.equal(data.stations[4]?.transmitting, false);
+    assert.equal(data.stations[4]?.alertColor, "#c4c4c4");
     assert.equal(data.layers.length, 2);
     assert.deepEqual(data.bounds, [-54.8525, -31.5, -49, -27.759]);
     assert.ok(data.highlightedStations.some((station) => station.id === 2));
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("SACE retries one transient failure on the station endpoint before declaring integration unavailable", async () => {
+  const originalFetch = globalThis.fetch;
+  let stationAttempts = 0;
+  const stations = {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        geometry: { type: "Point", coordinates: [-51.31, -30.1] },
+        properties: {
+          id: 14,
+          nome: "Terminal CATSUL Guaíba",
+          sigla: "87242000",
+          rio: "Guaíba / Guaíba",
+          localizacao: "",
+          latitude: -30.1,
+          longitude: -51.31,
+          areaDrenagem: 82850,
+          tipoAlerta: "NORMAL",
+          corAlerta: "#00FF33",
+          nomeFiltroAlerta: "Normal",
+          ordemLegenda: 6,
+        },
+      },
+    ],
+  };
+
+  globalThis.fetch = (async (input) => {
+    const url = String(input);
+    if (url.includes("/api/geojson/point")) {
+      stationAttempts += 1;
+      if (stationAttempts === 1) return jsonResponse({ error: "temporary" }, 503);
+      return jsonResponse(stations);
+    }
+    if (url.includes("/rest/alertas")) return jsonResponse(legend);
+    if (url.includes("/api/geojson/bounds")) return jsonResponse(bounds);
+    return jsonResponse(wms);
+  }) as typeof fetch;
+
+  try {
+    const data = await fetchSaceGuaibaData();
+    assert.equal(stationAttempts, 2);
+    assert.equal(data.status, "live");
+    assert.equal(data.counts.total, 1);
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -200,6 +307,8 @@ test("SACE experience offers map filters, source transparency and explicit inter
   assert.match(context, /data\.highlightedStations/);
   assert.match(context, /Abrir SACE Guaíba/);
   assert.match(context, /sem conversão para risco local em[\s\S]*Pelotas/);
+  assert.match(context, /Integração com o SACE temporariamente sem resposta/);
+  assert.match(context, /Isso não confirma indisponibilidade do SGB/);
 });
 
 test("SACE map uses official WMS, safe popup text and stable filtering", () => {
@@ -232,8 +341,11 @@ test("SACE layout remains readable and responsive", () => {
   assert.match(mapStyles, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("SACE response is cached separately from the local hydrology page", () => {
-  assert.match(serverFunction, /max-age=300/);
-  assert.match(serverFunction, /stale-while-revalidate=600/);
+test("SACE response keeps long cache only for healthy/partial data and uses short negative cache", () => {
+  assert.match(serverFunction, /HEALTHY_CACHE_HEADERS/);
+  assert.match(serverFunction, /max-age=300, stale-while-revalidate=600/);
   assert.match(serverFunction, /CDN-Cache-Control/);
+  assert.match(serverFunction, /UNAVAILABLE_CACHE_HEADERS/);
+  assert.match(serverFunction, /max-age=20, must-revalidate/);
+  assert.match(serverFunction, /data\.status === "unavailable"/);
 });
