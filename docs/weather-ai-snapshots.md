@@ -109,7 +109,7 @@ O valor deve ser idêntico ao `CRON_SECRET` do ambiente publicado.
 
 ## Implantação
 
-1. Aplicar `supabase/migrations/20260802170000_create_weather_ai_snapshots.sql` no Supabase externo oficial.
+1. Aplicar as migrations do repositório no Supabase externo oficial. A base nova cria `weather_ai_snapshots` em `20260802170000_create_weather_ai_snapshots.sql`; `20260812201000_add_weather_ai_snapshot_fingerprint.sql` atualiza com segurança uma tabela que eventualmente já tenha sido criada pela versão anterior da PR.
 2. Confirmar `MOBI_SUPABASE_SECRET_KEY` no runtime do servidor.
 3. Confirmar `GEMINI_API_KEY`, `GEMINI_MODEL` e `GEMINI_WEATHER_ENABLED`.
 4. Criar ou conferir o secret `TEMPO_PELOTAS_CRON_SECRET` no GitHub.
