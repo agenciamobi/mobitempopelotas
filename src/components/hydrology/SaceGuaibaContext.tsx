@@ -70,7 +70,7 @@ function SourceState({ data }: { data: SaceGuaibaData }) {
             ? "Rede pública disponível"
             : data.status === "partial"
               ? "Rede disponível parcialmente"
-              : "Rede temporariamente indisponível"}
+              : "Integração com o SACE temporariamente sem resposta"}
         </strong>
         <small>
           {data.error ?? `Consulta realizada em ${formatDateTime(data.source.fetchedAt)}.`}
@@ -259,10 +259,10 @@ export function SaceGuaibaContext({ data }: { data: SaceGuaibaData }) {
         <div className="sace-unavailable">
           <WifiOff aria-hidden="true" />
           <div>
-            <strong>As estações do SACE não estão disponíveis nesta atualização</strong>
+            <strong>A integração não recebeu as estações do SACE nesta atualização</strong>
             <p>
-              A leitura local do Laranjal e a rede da Lagoa dos Patos continuam independentes desta
-              integração.
+              Isso não confirma indisponibilidade do SGB. A leitura local do Laranjal e a rede da Lagoa
+              dos Patos continuam independentes desta integração.
             </p>
           </div>
         </div>
