@@ -82,13 +82,7 @@ const wmsConfigSchema = z.object({
 });
 
 export type SaceRiverSystem =
-  | "Guaíba e Delta"
-  | "Jacuí"
-  | "Taquari-Antas"
-  | "Caí"
-  | "Sinos"
-  | "Gravataí"
-  | "Outros afluentes";
+  "Guaíba e Delta" | "Jacuí" | "Taquari-Antas" | "Caí" | "Sinos" | "Gravataí" | "Outros afluentes";
 
 export type SaceGuaibaStation = {
   id: number;
@@ -165,7 +159,10 @@ function normalizeHexColor(value: string | null | undefined, fallback: string) {
 }
 
 function normalizeText(value: string) {
-  return value.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+  return value
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
 }
 
 function resolveRiverSystem(value: string): SaceRiverSystem {
@@ -226,7 +223,8 @@ function normalizeStations(
     const alertLabel = explicitLabel || fallbackAlertLabel(rawAlertType);
     const legendFromLabel = legendByLabel.get(normalizeText(alertLabel));
     const matchedLegend = legendFromLabel ?? legendByType.get(rawAlertType)?.at(-1);
-    const effectiveAlertType = explicitLabel && legendFromLabel ? legendFromLabel.alertType : rawAlertType;
+    const effectiveAlertType =
+      explicitLabel && legendFromLabel ? legendFromLabel.alertType : rawAlertType;
     const transmitting =
       effectiveAlertType !== "SEM_INFORMACAO" && !/sem transmiss/i.test(alertLabel);
 
@@ -267,10 +265,9 @@ function selectHighlightedStations(stations: SaceGuaibaStation[]) {
     .map((pattern) => stations.find((station) => pattern.test(station.name)))
     .filter((station): station is SaceGuaibaStation => Boolean(station));
 
-  return [...new Map([...elevated, ...strategic].map((station) => [station.id, station])).values()].slice(
-    0,
-    12,
-  );
+  return [
+    ...new Map([...elevated, ...strategic].map((station) => [station.id, station])).values(),
+  ].slice(0, 12);
 }
 
 function countStations(stations: SaceGuaibaStation[]) {
@@ -301,7 +298,11 @@ function countSystems(stations: SaceGuaibaStation[]) {
   return names
     .map((name) => {
       const matching = stations.filter((station) => station.riverSystem === name);
-      return { name, total: matching.length, aboveNormal: matching.filter(stationIsAboveNormal).length };
+      return {
+        name,
+        total: matching.length,
+        aboveNormal: matching.filter(stationIsAboveNormal).length,
+      };
     })
     .filter((item) => item.total > 0);
 }
@@ -370,7 +371,9 @@ async function fetchJson(url: string, options: { retryTransient?: boolean } = {}
     }
   }
 
-  throw lastError instanceof Error ? lastError : new Error("Falha desconhecida ao consultar o SACE.");
+  throw lastError instanceof Error
+    ? lastError
+    : new Error("Falha desconhecida ao consultar o SACE.");
 }
 
 export async function fetchSaceGuaibaData(): Promise<SaceGuaibaData> {
@@ -391,7 +394,10 @@ export async function fetchSaceGuaibaData(): Promise<SaceGuaibaData> {
 
   const parsedStations = stationsSchema.safeParse(stationsResult.value);
   if (!parsedStations.success) {
-    return unavailableData("O SACE Guaíba respondeu com uma estrutura de estações inesperada.", fetchedAt);
+    return unavailableData(
+      "O SACE Guaíba respondeu com uma estrutura de estações inesperada.",
+      fetchedAt,
+    );
   }
 
   const legend = normalizeLegend(legendResult.status === "fulfilled" ? legendResult.value : null);
@@ -399,9 +405,15 @@ export async function fetchSaceGuaibaData(): Promise<SaceGuaibaData> {
   const parsedBounds =
     boundsResult.status === "fulfilled" ? boundsSchema.safeParse(boundsResult.value) : null;
   const bounds: SaceGuaibaData["bounds"] = parsedBounds?.success
-    ? [parsedBounds.data.minx, parsedBounds.data.miny, parsedBounds.data.maxx, parsedBounds.data.maxy]
+    ? [
+        parsedBounds.data.minx,
+        parsedBounds.data.miny,
+        parsedBounds.data.maxx,
+        parsedBounds.data.maxy,
+      ]
     : null;
-  const parsedWms = wmsResult.status === "fulfilled" ? wmsConfigSchema.safeParse(wmsResult.value) : null;
+  const parsedWms =
+    wmsResult.status === "fulfilled" ? wmsConfigSchema.safeParse(wmsResult.value) : null;
   const layers: SaceGuaibaLayer[] = parsedWms?.success
     ? parsedWms.data.camadas
         .filter((layer) => new URL(layer.url).hostname.endsWith("sgb.gov.br"))
