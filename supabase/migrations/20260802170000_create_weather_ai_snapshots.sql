@@ -7,6 +7,8 @@ create table if not exists public.weather_ai_snapshots (
   completed_at timestamptz,
   generated_at timestamptz,
   source_fetched_at timestamptz,
+  source_fingerprint text,
+  reused_from_slot text,
   brief jsonb,
   model text,
   error text,
@@ -21,6 +23,9 @@ create table if not exists public.weather_ai_snapshots (
   constraint weather_ai_status_allowed check (
     status in ('claimed', 'generated', 'failed')
   ),
+  constraint weather_ai_source_fingerprint_format check (
+    source_fingerprint is null or source_fingerprint ~ '^[a-f0-9]{64}$'
+  ),
   constraint weather_ai_model_length check (
     model is null or char_length(model) <= 120
   ),
@@ -28,17 +33,21 @@ create table if not exists public.weather_ai_snapshots (
     error is null or char_length(error) <= 800
   ),
   constraint weather_ai_completion_consistent check (
-    (status = 'claimed' and completed_at is null and generated_at is null and brief is null)
+    (status = 'claimed' and completed_at is null and generated_at is null and brief is null and source_fingerprint is null)
     or
-    (status = 'generated' and completed_at is not null and generated_at is not null and brief is not null)
+    (status = 'generated' and completed_at is not null and generated_at is not null and brief is not null and source_fingerprint is not null)
     or
-    (status = 'failed' and completed_at is not null and brief is null)
+    (status = 'failed' and completed_at is not null and brief is null and source_fingerprint is null)
   )
 );
 
 create index if not exists weather_ai_snapshots_generated_at_idx
   on public.weather_ai_snapshots (generated_at desc)
   where status = 'generated';
+
+create index if not exists weather_ai_snapshots_fingerprint_idx
+  on public.weather_ai_snapshots (source_fingerprint, generated_at desc)
+  where status = 'generated' and source_fingerprint is not null;
 
 create index if not exists weather_ai_snapshots_status_claimed_at_idx
   on public.weather_ai_snapshots (status, claimed_at desc);
