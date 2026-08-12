@@ -135,8 +135,13 @@ async function generateWeatherAiSnapshot(request: Request) {
 
   const result = await generateScheduledWeatherAiSnapshot();
 
-  if (result.status === "generated") {
-    return pushJsonResponse({ success: true, ...result });
+  if (result.status === "generated" || result.status === "reused") {
+    return pushJsonResponse({
+      success: true,
+      aiCalled: result.status === "generated",
+      reused: result.status === "reused",
+      ...result,
+    });
   }
 
   if (result.status === "already-claimed") {
