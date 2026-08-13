@@ -1,101 +1,112 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-import { SiteFooter } from "@/components/SiteFooter";
-import { SiteHeader } from "@/components/SiteHeader";
-import { absoluteUrl, SITE_NAME } from "@/lib/site-config";
+import { createPageHead } from "@/lib/page-meta";
+import { createEditorialPageJsonLd } from "@/lib/structured-data";
+import { SiteFooter } from "@/production/components/site-footer";
+import { SiteHeader } from "@/production/components/site-header";
+import type { WeatherData } from "@/production/lib/weather-data";
 
-import "./privacidade-e-dados.css";
-
-export const Route = createFileRoute("/privacidade-e-dados")({
-  head: () => ({
-    meta: [
-      { title: `Privacidade e dados | ${SITE_NAME}` },
-      {
-        name: "description",
-        content:
-          "Entenda como o Tempo Pelotas trata dados pessoais, preferências, notificações e informações de conta.",
-      },
-    ],
-    links: [{ rel: "canonical", href: absoluteUrl("/privacidade-e-dados") }],
-  }),
-  component: PrivacyPage,
-});
+const PAGE_TITLE = "Privacidade, dados e retenção no Tempo Pelotas";
+const PAGE_DESCRIPTION =
+  "Entenda quais dados a conta utiliza, por quanto tempo são mantidos e como baixar ou excluir suas informações no Tempo Pelotas.";
+const PAGE_PATH = "/privacidade-e-dados";
 
 const privacyFooterSource = {
   name: "Tempo Pelotas",
-  url: "/privacidade-e-dados",
+  url: "/metodologia",
   isFallback: false,
-  observationName: null,
-  observationUrl: null,
-  forecastName: null,
-  forecastUrl: null,
-};
+  observationName: "Política de privacidade",
+  observationUrl: PAGE_PATH,
+  forecastName: "Metodologia e fontes",
+  forecastUrl: "/metodologia",
+} satisfies WeatherData["source"];
 
-function PrivacyPage() {
+export const Route = createFileRoute("/privacidade-e-dados")({
+  head: () =>
+    createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
+      createEditorialPageJsonLd({
+        name: PAGE_TITLE,
+        description: PAGE_DESCRIPTION,
+        path: PAGE_PATH,
+        breadcrumbs: [
+          { name: "Início", path: "/" },
+          { name: "Privacidade e dados", path: PAGE_PATH },
+        ],
+        about: ["Privacidade no Tempo Pelotas", "Retenção de dados", "Direitos da conta"],
+      }),
+    ]),
+  component: PrivacyDataPage,
+});
+
+function PrivacyDataPage() {
   return (
-    <div className="privacy-page">
-      <SiteHeader />
+    <div className="site-shell">
+      <SiteHeader advisoryLevel="normal" />
 
-      <main className="privacy-main" id="conteudo-principal">
+      <main className="privacy-page" id="conteudo-principal" tabIndex={-1}>
         <header className="privacy-hero">
-          <span className="eyebrow">Privacidade e dados</span>
-          <h1>Seus dados são usados apenas para os recursos que você escolhe ativar</h1>
-          <p>
-            O Tempo Pelotas mantém a previsão e os alertas públicos sem exigir conta. Login,
-            preferências e notificações são recursos opcionais e usam somente os dados necessários
-            para funcionar.
-          </p>
+          <div>
+            <span className="eyebrow">Privacidade e controle</span>
+            <h1>Seus dados devem ser compreensíveis e estar sob seu controle</h1>
+            <p>
+              O Tempo Pelotas mantém previsão, avisos oficiais, radar, satélite, câmeras e situação
+              das águas acessíveis sem login. A conta existe somente para identificação básica e
+              preferências opcionais.
+            </p>
+          </div>
+
+          <aside className="privacy-summary" aria-label="Resumo da política">
+            <strong>Conta opcional</strong>
+            <span>
+              Você pode consultar o portal sem cadastro, alterar preferências a qualquer momento,
+              baixar uma cópia dos seus dados ou excluir definitivamente a conta.
+            </span>
+          </aside>
         </header>
 
         <div className="privacy-grid">
           <section className="privacy-card">
-            <span className="eyebrow">Sem conta</span>
-            <h2>Previsão e alertas continuam públicos</h2>
-            <p>
-              Você pode consultar o portal sem criar perfil e sem compartilhar nome ou e-mail. Dados
-              técnicos de acesso podem ser processados pela infraestrutura de hospedagem para
-              segurança, entrega e diagnóstico operacional.
-            </p>
-          </section>
-
-          <section className="privacy-card">
-            <span className="eyebrow">Conta opcional</span>
-            <h2>O login usa sua conta Google</h2>
-            <p>
-              Quando você escolhe entrar, o Supabase Auth recebe a identidade necessária para criar
-              sua sessão. O portal pode guardar nome de exibição, e-mail e foto do perfil quando
-              fornecidos pelo provedor de autenticação.
-            </p>
-          </section>
-
-          <section className="privacy-card">
-            <span className="eyebrow">Preferências</span>
-            <h2>Autorizações ficam vinculadas à sua conta</h2>
-            <p>
-              Preferências de resumo diário, alertas meteorológicos, situação das águas e novidades
-              da comunidade são armazenadas para que o portal respeite suas escolhas nos próximos
-              acessos.
-            </p>
-          </section>
-
-          <section className="privacy-card">
-            <span className="eyebrow">Notificações</span>
-            <h2>Web Push depende de autorização do navegador</h2>
-            <p>
-              O portal só registra uma inscrição Push depois da sua autorização. O endpoint e as
-              chaves técnicas da inscrição são usados exclusivamente para entregar os avisos que
-              você habilitou.
-            </p>
-          </section>
-
-          <section className="privacy-card privacy-card--wide">
-            <span className="eyebrow">Como usamos os dados</span>
-            <h2>Finalidades limitadas ao serviço</h2>
+            <span className="eyebrow">O que é utilizado</span>
+            <h2>Dados básicos e escolhas do visitante</h2>
             <ul>
-              <li>autenticar a conta e manter a sessão;</li>
-              <li>salvar preferências e consentimentos escolhidos pelo usuário;</li>
-              <li>entregar notificações autorizadas;</li>
-              <li>permitir exportação e exclusão dos próprios dados;</li>
+              <li>nome, e-mail e imagem fornecidos pelo Google;</li>
+              <li>preferências de alertas, águas, resumo diário e novidades;</li>
+              <li>histórico de alterações dessas preferências, com data e versão da política;</li>
+              <li>dados técnicos do aparelho quando notificações são ativadas.</li>
+            </ul>
+          </section>
+
+          <section className="privacy-card">
+            <span className="eyebrow">O que não depende da conta</span>
+            <h2>Informação meteorológica continua pública</h2>
+            <p>
+              Previsão do tempo, chuva, vento, imagens de radar e satélite, avisos oficiais, câmeras
+              e níveis das águas não são bloqueados para visitantes sem conta.
+            </p>
+            <p>
+              O portal não comercializa dados pessoais e não usa a conta para alterar ou esconder
+              informações públicas.
+            </p>
+          </section>
+
+          <section className="privacy-card">
+            <span className="eyebrow">Retenção</span>
+            <h2>Por quanto tempo os dados permanecem</h2>
+            <ul>
+              <li>
+                perfil, preferências e histórico de consentimentos permanecem enquanto a conta
+                estiver ativa;
+              </li>
+              <li>ao excluir a conta, esses registros são removidos em cascata;</li>
+              <li>inscrições push vinculadas à conta também são removidas com a exclusão;</li>
+              <li>
+                inscrições push anônimas ficam registradas no servidor com endpoint, chaves de
+                entrega, tópicos escolhidos e identificação técnica do navegador;
+              </li>
+              <li>
+                esse registro anônimo não possui prazo fixo: ele é removido quando o visitante
+                desativa os avisos com sucesso ou quando o provedor informa que a inscrição expirou;
+              </li>
               <li>métricas agregadas de disparo não guardam identificação do visitante.</li>
             </ul>
           </section>
