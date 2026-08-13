@@ -11,7 +11,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,11 +24,27 @@ jobs:
         run: npm run runtime:check:example
       - name: Testar contratos do snapshot e teto mensal
         run: node --test tests/weather-ai-snapshots.test.ts
-      - name: TypeScript
-        run: npm run typecheck
-      - name: ESLint dos arquivos alterados
-        run: npx eslint src/lib/weather/weather-ai-budget.server.ts src/lib/weather/weather-ai-snapshot.server.ts src/routes/api/cron/push-daily.ts tests/weather-ai-snapshots.test.ts
-      - name: Prettier dos arquivos alterados
-        run: npx prettier --check src/lib/weather/weather-ai-budget.server.ts src/lib/weather/weather-ai-snapshot.server.ts src/routes/api/cron/push-daily.ts tests/weather-ai-snapshots.test.ts docs/weather-ai-snapshots.md
-      - name: Build de produção
-        run: npm run build
+      - name: Capturar validações restantes
+        shell: bash
+        run: |
+          set +e
+          npm run typecheck > typecheck.log 2>&1
+          echo $? > typecheck-exit.txt
+          npx eslint src/lib/weather/weather-ai-budget.server.ts src/lib/weather/weather-ai-snapshot.server.ts src/routes/api/cron/push-daily.ts tests/weather-ai-snapshots.test.ts > eslint.log 2>&1
+          echo $? > eslint-exit.txt
+          npx prettier --check src/lib/weather/weather-ai-budget.server.ts src/lib/weather/weather-ai-snapshot.server.ts src/routes/api/cron/push-daily.ts tests/weather-ai-snapshots.test.ts docs/weather-ai-snapshots.md > prettier.log 2>&1
+          echo $? > prettier-exit.txt
+          npm run build > build.log 2>&1
+          echo $? > build-exit.txt
+          exit 0
+      - name: Publicar diagnóstico
+        uses: actions/upload-artifact@v4
+        with:
+          name: weather-ai-budget-validation
+          path: |
+            *-exit.txt
+            typecheck.log
+            eslint.log
+            prettier.log
+            build.log
+          retention-days: 1
