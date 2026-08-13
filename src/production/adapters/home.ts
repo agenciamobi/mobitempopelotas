@@ -38,7 +38,7 @@ function forecastTimeLabel(value: string) {
 
 function resolveAstronomy(data: AggregatedWeatherData): AstronomyData {
   const inmetPeriod =
-    data.inmetForecast.find((period) => period.sunrise || period.sunset || period.season) ?? null;
+    (data.inmetForecast ?? []).find((period) => period.sunrise || period.sunset || period.season) ?? null;
   const date = inmetPeriod?.date ?? localDateKey();
   const sunrise =
     inmetPeriod?.sunrise ?? data.current?.sunrise ?? data.observation.current.sunrise ?? null;
@@ -120,7 +120,7 @@ function observedCurrent(data: AggregatedWeatherData): CurrentWeather {
 }
 
 export function toProductionWeatherData(data: AggregatedWeatherData): WeatherData {
-  const daily = reconcileDailyTemperatures(data.daily, data.inmetForecast);
+  const daily = reconcileDailyTemperatures(data.daily, data.inmetForecast ?? []);
 
   return {
     current: observedCurrent(data),
