@@ -7,6 +7,10 @@ import { fetchAggregatedPelotasWeather } from "./aggregated-weather.server";
 import type { AggregatedWeatherData } from "./aggregated-weather.types";
 import { reconcileDailyTemperatures } from "./daily-temperature-reconciliation";
 import { generateGeminiWeatherBrief } from "./gemini-weather.server";
+import {
+  claimWeatherAiMonthlyBudget,
+  completeWeatherAiCall,
+} from "./weather-ai-budget.server";
 import type { WeatherBrief } from "./weather-intelligence.types";
 
 const TIMEZONE = "America/Sao_Paulo";
@@ -51,7 +55,13 @@ export type WeatherAiSnapshot = {
 };
 
 export type WeatherAiGenerationResult = {
-  status: "generated" | "reused" | "already-claimed" | "not-configured" | "failed";
+  status:
+    | "generated"
+    | "reused"
+    | "already-claimed"
+    | "not-configured"
+    | "budget-blocked"
+    | "failed";
   slotKey: string;
   period: WeatherAiPeriod;
   generatedAt: string | null;
@@ -59,6 +69,9 @@ export type WeatherAiGenerationResult = {
   sourceFingerprint: string | null;
   reusedFromSlot: string | null;
   error: string | null;
+  budgetMonth?: string;
+  monthlyCalls?: number;
+  monthlyCallLimit?: number;
 };
 
 type SnapshotCache = {
@@ -386,6 +399,7 @@ export async function generateScheduledWeatherAiSnapshot(
 
   let leaseToken: string | null = null;
   let sourceFingerprint: string | null = null;
+  let budgetCallId: string | null = null;
 
   try {
     leaseToken = await claimSnapshot(config, slotKey, period);
@@ -428,7 +442,90 @@ export async function generateScheduledWeatherAiSnapshot(
       };
     }
 
+    if (weather.status === "unavailable" || (!weather.current && weather.daily.length === 0)) {
+      const error = "Não há dados meteorológicos suficientes para sintetizar.";
+      await completeSnapshot(config, {
+        slotKey,
+        leaseToken,
+        status: "failed",
+        error,
+        sourceFetchedAt: weather.source.fetchedAt,
+      });
+      return {
+        status: "failed",
+        slotKey,
+        period,
+        generatedAt: null,
+        model: null,
+        sourceFingerprint,
+        reusedFromSlot: null,
+        error,
+      };
+    }
+
+    let budget;
+    try {
+      budget = await claimWeatherAiMonthlyBudget(slotKey, date);
+    } catch (error) {
+      const message = `Proteção financeira da IA indisponível; chamada bloqueada. ${
+        error instanceof Error ? error.message : String(error)
+      }`;
+      await completeSnapshot(config, {
+        slotKey,
+        leaseToken,
+        status: "failed",
+        error: message,
+        sourceFetchedAt: weather.source.fetchedAt,
+      });
+      return {
+        status: "budget-blocked",
+        slotKey,
+        period,
+        generatedAt: null,
+        model: null,
+        sourceFingerprint,
+        reusedFromSlot: null,
+        error: message,
+      };
+    }
+
+    if (!budget.allowed || !budget.callId) {
+      const error = `Teto mensal de ${budget.callLimit} chamadas ao Gemini atingido; geração bloqueada.`;
+      await completeSnapshot(config, {
+        slotKey,
+        leaseToken,
+        status: "failed",
+        error,
+        sourceFetchedAt: weather.source.fetchedAt,
+      });
+      return {
+        status: "budget-blocked",
+        slotKey,
+        period,
+        generatedAt: null,
+        model: null,
+        sourceFingerprint,
+        reusedFromSlot: null,
+        error,
+        budgetMonth: budget.monthKey,
+        monthlyCalls: budget.calls,
+        monthlyCallLimit: budget.callLimit,
+      };
+    }
+
+    budgetCallId = budget.callId;
     const gemini = await generateGeminiWeatherBrief(weather);
+    await completeWeatherAiCall(budgetCallId, {
+      status: gemini.status === "generated" && gemini.brief ? "generated" : "failed",
+      model: gemini.model,
+      error: gemini.error,
+    }).catch((error) => {
+      console.error("[weather-ai] Não foi possível fechar o log individual da chamada", {
+        callId: budgetCallId,
+        message: error instanceof Error ? error.message : String(error),
+      });
+    });
+    budgetCallId = null;
 
     if (gemini.status !== "generated" || !gemini.brief) {
       const error = gemini.error ?? `Gemini não gerou o snapshot: ${gemini.status}.`;
@@ -449,6 +546,9 @@ export async function generateScheduledWeatherAiSnapshot(
         sourceFingerprint,
         reusedFromSlot: null,
         error,
+        budgetMonth: budget.monthKey,
+        monthlyCalls: budget.calls,
+        monthlyCallLimit: budget.callLimit,
       };
     }
 
@@ -481,9 +581,19 @@ export async function generateScheduledWeatherAiSnapshot(
       sourceFingerprint,
       reusedFromSlot: null,
       error: null,
+      budgetMonth: budget.monthKey,
+      monthlyCalls: budget.calls,
+      monthlyCallLimit: budget.callLimit,
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Falha desconhecida.";
+    if (budgetCallId) {
+      await completeWeatherAiCall(budgetCallId, {
+        status: "failed",
+        model: null,
+        error: message,
+      }).catch(() => undefined);
+    }
     if (leaseToken) {
       await completeSnapshot(config, {
         slotKey,
