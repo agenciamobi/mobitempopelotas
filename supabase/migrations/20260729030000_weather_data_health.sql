@@ -75,30 +75,5 @@ revoke all on table public.weather_data_alerts from anon, authenticated;
 grant select, insert, update, delete on table public.weather_data_alerts to service_role;
 grant usage, select on sequence public.weather_data_alerts_id_seq to service_role;
 
-create policy "weather current private"
-on public.weather_station_current
-for all
-to anon, authenticated
-using (false)
-with check (false);
-
-create policy "weather observations private"
-on public.weather_station_observations
-for all
-to anon, authenticated
-using (false)
-with check (false);
-
-create policy "weather collector settings private"
-on public.weather_collector_settings
-for all
-to anon, authenticated
-using (false)
-with check (false);
-
-create policy "weather alerts private"
-on public.weather_data_alerts
-for all
-to anon, authenticated
-using (false)
-with check (false);
+-- As tabelas meteorológicas server-only usam RLS com default deny e privilégios revogados
+-- para anon/authenticated. Não são necessárias policies de cliente com USING (false).
