@@ -11,7 +11,7 @@ permissions:
 jobs:
   diagnostic:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -19,7 +19,9 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - name: Capturar TypeScript sem gerador customizado
+      - name: Gerar árvore oficial no build
+        run: npm run build
+      - name: Capturar TypeScript sobre a árvore oficial
         shell: bash
         run: |
           set +e
