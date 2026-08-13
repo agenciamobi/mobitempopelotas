@@ -4,17 +4,7 @@
 //     nitro (build-only using cloudflare as a default target), VITE_* env injection, @ path alias,
 //     React/TanStack dedupe, error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
-import { execFileSync } from "node:child_process";
-
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
-
-// Some deployment platforms invoke Vite directly instead of the package.json build script.
-// Generate the typed route tree while Vite loads its config, before TanStack starts crawling
-// the file routes. This prevents stale route types and "Crawling result not available" errors.
-execFileSync(process.execPath, ["scripts/generate-route-tree.mjs"], {
-  cwd: process.cwd(),
-  stdio: "inherit",
-});
 
 export default defineConfig({
   tanstackStart: {
