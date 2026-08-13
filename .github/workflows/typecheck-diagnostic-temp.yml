@@ -28,11 +28,12 @@ jobs:
           npx tsc --noEmit > typecheck.log 2>&1
           echo $? > typecheck-exit-code.txt
           exit 0
-      - name: Publicar diagnóstico
+      - name: Publicar diagnóstico e árvore oficial
         uses: actions/upload-artifact@v4
         with:
           name: typecheck-current-diagnostic
           path: |
             typecheck.log
             typecheck-exit-code.txt
+            src/routeTree.gen.ts
           retention-days: 1
