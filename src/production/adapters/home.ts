@@ -2,11 +2,11 @@ import type { GuaibaObservationData } from "@/lib/hydrology/guaiba.server";
 import type { LagoonMonitoringNetworkData } from "@/lib/hydrology/lagoon-network.server";
 import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
 import type { AggregatedWeatherData } from "@/lib/weather/aggregated-weather.types";
-import { reconcileDailyTemperatures } from "@/lib/weather/daily-temperature-reconciliation";
+import { reconcileDailyTemperatures } from "../../lib/weather/daily-temperature-reconciliation.ts";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import type { EmbrapaObservationData } from "@/production/lib/embrapa-observation";
 import type { InmetAlertsData } from "@/production/lib/inmet-alerts";
-import { resolveMoonPhase } from "@/production/lib/astronomy";
+import { resolveMoonPhase } from "../lib/astronomy.ts";
 import type { WeatherAiSummaries } from "@/production/lib/weather-ai-summary";
 import type { AstronomyData, CurrentWeather, WeatherData } from "@/production/lib/weather-data";
 
@@ -38,11 +38,12 @@ function forecastTimeLabel(value: string) {
 
 function resolveAstronomy(data: AggregatedWeatherData): AstronomyData {
   const inmetPeriod =
-    data.inmetForecast.find((period) => period.sunrise || period.sunset || period.season) ?? null;
+    (data.inmetForecast ?? []).find((period) => period.sunrise || period.sunset || period.season) ?? null;
   const date = inmetPeriod?.date ?? localDateKey();
   const sunrise =
     inmetPeriod?.sunrise ?? data.current?.sunrise ?? data.observation.current.sunrise ?? null;
-  const sunset = inmetPeriod?.sunset ?? data.current?.sunset ?? data.observation.current.sunset ?? null;
+  const sunset =
+    inmetPeriod?.sunset ?? data.current?.sunset ?? data.observation.current.sunset ?? null;
   const hasInmetSunTimes = Boolean(inmetPeriod?.sunrise || inmetPeriod?.sunset);
   const lunar = resolveMoonPhase(date);
 
@@ -52,11 +53,7 @@ function resolveAstronomy(data: AggregatedWeatherData): AstronomyData {
     sunset,
     moonPhase: lunar.name,
     season: inmetPeriod?.season ?? null,
-    solarSource: hasInmetSunTimes
-      ? "INMET"
-      : sunrise || sunset
-        ? "Embrapa Clima Temperado"
-        : null,
+    solarSource: hasInmetSunTimes ? "INMET" : sunrise || sunset ? "Embrapa Clima Temperado" : null,
     seasonSource: inmetPeriod?.season ? "INMET" : null,
     lunarSource: lunar.source,
   };
@@ -120,7 +117,7 @@ function observedCurrent(data: AggregatedWeatherData): CurrentWeather {
 }
 
 export function toProductionWeatherData(data: AggregatedWeatherData): WeatherData {
-  const daily = reconcileDailyTemperatures(data.daily, data.inmetForecast);
+  const daily = reconcileDailyTemperatures(data.daily, data.inmetForecast ?? []);
 
   return {
     current: observedCurrent(data),
