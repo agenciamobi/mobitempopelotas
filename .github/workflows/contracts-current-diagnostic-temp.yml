@@ -1,0 +1,35 @@
+name: Contracts current diagnostic temp
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Capturar contratos
+        shell: bash
+        run: |
+          set +e
+          npm run test:contracts > contracts.log 2>&1
+          echo $? > contracts-exit-code.txt
+          exit 0
+      - uses: actions/upload-artifact@v4
+        with:
+          name: contracts-current-diagnostic
+          path: |
+            contracts.log
+            contracts-exit-code.txt
+          retention-days: 1
