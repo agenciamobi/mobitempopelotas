@@ -69,6 +69,41 @@ test("banco impede duplicidade por período e indexa fingerprint material", () =
   assert.match(migration, /revoke all.*authenticated/s);
 });
 
+test("teto mensal é atômico, auditável e falha fechado", () => {
+  const migration = read("supabase/migrations/20260813023000_add_weather_ai_monthly_budget.sql");
+  const budget = read("src/lib/weather/weather-ai-budget.server.ts");
+  const snapshot = read("src/lib/weather/weather-ai-snapshot.server.ts");
+  const route = read("src/routes/api/cron/push-daily.ts");
+  const env = read(".env.example");
+
+  assert.match(migration, /create table if not exists public\.weather_ai_monthly_usage/);
+  assert.match(migration, /create table if not exists public\.weather_ai_calls/);
+  assert.match(migration, /claim_weather_ai_monthly_call/);
+  assert.match(migration, /weather_ai_monthly_usage\.calls \+ 1/);
+  assert.match(migration, /weather_ai_monthly_usage\.calls < p_call_limit/);
+  assert.match(migration, /insert into public\.weather_ai_calls/);
+  assert.match(migration, /security definer/);
+  assert.match(migration, /revoke all on function.*anon/s);
+  assert.match(migration, /grant execute on function.*service_role/s);
+
+  assert.match(budget, /DEFAULT_MONTHLY_CALL_LIMIT = 150/);
+  assert.match(budget, /GEMINI_WEATHER_MONTHLY_CALL_LIMIT/);
+  assert.match(budget, /rest\/v1\/rpc\/\$\{BUDGET_RPC\}/);
+  assert.match(budget, /throw new Error\(`Contador mensal da IA respondeu com HTTP/);
+  assert.match(budget, /completeWeatherAiCall/);
+
+  const reuseIndex = snapshot.indexOf("if (reusableSnapshot)");
+  const budgetIndex = snapshot.indexOf("budget = await claimWeatherAiMonthlyBudget");
+  const geminiIndex = snapshot.indexOf("const gemini = await generateGeminiWeatherBrief");
+  assert.ok(reuseIndex >= 0 && budgetIndex > reuseIndex);
+  assert.ok(geminiIndex > budgetIndex);
+  assert.match(snapshot, /status: "budget-blocked"/);
+  assert.match(snapshot, /Proteção financeira da IA indisponível; chamada bloqueada/);
+  assert.match(route, /reason: "monthly-ai-budget"/);
+  assert.match(route, /aiCalled: false/);
+  assert.match(env, /GEMINI_WEATHER_MONTHLY_CALL_LIMIT=150/);
+});
+
 test("endpoint compartilhado separa IA e push e informa quando não houve chamada", () => {
   const route = read("src/routes/api/cron/push-daily.ts");
   assert.match(route, /process\.env\.CRON_SECRET/);

@@ -10,12 +10,12 @@ O resultado editorial é persistido no Supabase externo. Quando não existe um t
 
 O workflow `.github/workflows/weather-ai-snapshots.yml` executa quatro vezes por dia no fuso `America/Sao_Paulo`:
 
-| Ciclo | Horário |
-| --- | --- |
-| Manhã | 05:00 |
-| Meio do dia | 11:00 |
-| Fim da tarde | 17:00 |
-| Noite | 23:00 |
+| Ciclo        | Horário |
+| ------------ | ------- |
+| Manhã        | 05:00   |
+| Meio do dia  | 11:00   |
+| Fim da tarde | 17:00   |
+| Noite        | 23:00   |
 
 No GitHub Actions os horários são configurados em UTC como `0 2,8,14,20 * * *`.
 
@@ -36,6 +36,27 @@ Isso impede chamadas duplicadas por concorrência, reexecução do workflow ou a
 
 O teto operacional continua sendo quatro oportunidades por dia, mas o número real de chamadas ao Gemini pode ser menor.
 
+## Teto financeiro mensal
+
+Além do limite por janela, existe uma segunda trava independente e atômica no Supabase. O padrão é de **150 tentativas reais de API por mês**, configurável por `GEMINI_WEATHER_MONTHLY_CALL_LIMIT`.
+
+O contador é reservado imediatamente antes de `generateGeminiWeatherBrief()`. Portanto:
+
+- abrir ou atualizar páginas não consome cota;
+- feed, JSON e push diário não consomem cota;
+- uma janela duplicada não consome cota;
+- reutilizar um fingerprint existente não consome cota;
+- ausência de dados meteorológicos suficientes não consome cota;
+- somente uma tentativa que chegou ao ponto de chamar o Gemini ocupa uma unidade do orçamento.
+
+A função SQL `claim_weather_ai_monthly_call` incrementa `weather_ai_monthly_usage` somente quando `calls < call_limit`, na mesma operação que cria um registro individual em `weather_ai_calls`. Isso evita ultrapassagem do limite mesmo com concorrência.
+
+Cada tentativa autorizada recebe um `call_id`. Depois da resposta do Gemini o registro individual é fechado como `generated` ou `failed`, com modelo e erro quando aplicável. Assim o total mensal pode ser auditado sem depender apenas dos logs do provedor.
+
+A proteção é **fail closed**: se o Supabase não conseguir confirmar o orçamento ou se a migration da trava não estiver aplicada, a rotina não chama o Gemini. O site segue usando o resumo determinístico.
+
+Quando o teto é alcançado, o cron responde com `success: true`, `skipped: true`, `reason: "monthly-ai-budget"` e `aiCalled: false`; portanto a proteção financeira não transforma o portal em indisponível.
+
 ## Fingerprint material
 
 Depois de reservar a janela, o sistema agrega e reconcilia as fontes meteorológicas e calcula `source_fingerprint`.
@@ -49,7 +70,7 @@ O fingerprint não usa valores crus minuto a minuto. Ele normaliza apenas mudan�
 - alertas oficiais ativos ou próximos;
 - confiança, fontes degradadas e divergências significativas.
 
-Se já existir um snapshot gerado com o mesmo fingerprint, o novo ciclo copia o texto persistido e registra `reused_from_slot`. Nesse caso nenhuma chamada ao Gemini é realizada.
+Se já existir um snapshot gerado com o mesmo fingerprint, o novo ciclo copia o texto persistido e registra `reused_from_slot`. Nesse caso nenhuma chamada ao Gemini é realizada e o orçamento mensal não é consumido.
 
 ## Fluxo de geração
 
@@ -58,9 +79,11 @@ Se já existir um snapshot gerado com o mesmo fingerprint, o novo ciclo copia o 
 3. A rotina reserva `slot_key` no Supabase.
 4. As fontes meteorológicas são agregadas e reconciliadas.
 5. O sistema calcula o fingerprint material.
-6. Se existir texto compatível, ele é reutilizado sem IA.
-7. Se não existir, o Gemini pode gerar um único `WeatherBrief`.
-8. O resultado é persistido em `weather_ai_snapshots`.
+6. Se existir texto compatível, ele é reutilizado sem IA e sem consumir orçamento.
+7. Se não houver dados suficientes, a janela termina sem consumir orçamento.
+8. O sistema tenta reservar uma unidade do teto mensal no Supabase.
+9. Se o teto estiver disponível, registra a tentativa em `weather_ai_calls` e só então o Gemini pode gerar um `WeatherBrief`.
+10. O resultado da chamada e o snapshot são persistidos.
 
 A rota `/api/cron/push-daily` sem `task=weather-ai` mantém exclusivamente o comportamento de notificações e não chama Gemini.
 
@@ -83,9 +106,9 @@ Alertas do INMET são sempre consumidos diretamente dos dados oficiais. Exibiç�
 
 ## Segurança
 
-A tabela possui RLS habilitada e não concede acesso a `anon` ou `authenticated`. Somente `service_role` pode ler e gravar os snapshots. A chave administrativa permanece no runtime do servidor.
+As tabelas `weather_ai_snapshots`, `weather_ai_monthly_usage` e `weather_ai_calls` possuem RLS habilitada e não concedem acesso a `anon` ou `authenticated`. Somente `service_role` pode ler ou gravar os dados de controle. A função atômica de reserva mensal também concede execução somente ao `service_role`.
 
-O diretório `_legacy` não participa do runtime nem dos jobs editoriais.
+A chave administrativa permanece no runtime do servidor. O diretório `_legacy` não participa do runtime nem dos jobs editoriais.
 
 ## Configuração
 
@@ -96,8 +119,11 @@ CRON_SECRET=
 GEMINI_API_KEY=
 GEMINI_MODEL=gemini-3.5-flash-lite
 GEMINI_WEATHER_ENABLED=true
+GEMINI_WEATHER_MONTHLY_CALL_LIMIT=150
 MOBI_SUPABASE_SECRET_KEY=
 ```
+
+`GEMINI_WEATHER_MONTHLY_CALL_LIMIT` é opcional. Quando ausente ou inválido, o código usa o limite seguro padrão de 150. Valores aceitos ficam entre 1 e 10000.
 
 Nos secrets do repositório GitHub:
 
@@ -109,19 +135,23 @@ O valor deve ser idêntico ao `CRON_SECRET` do ambiente publicado.
 
 ## Implantação
 
-1. Aplicar as migrations do repositório no Supabase externo oficial. A base nova cria `weather_ai_snapshots` em `20260802170000_create_weather_ai_snapshots.sql`; `20260812201000_add_weather_ai_snapshot_fingerprint.sql` atualiza com segurança uma tabela que eventualmente já tenha sido criada pela versão anterior da PR.
+1. Aplicar as migrations do repositório no Supabase externo oficial. A base cria `weather_ai_snapshots` em `20260802170000_create_weather_ai_snapshots.sql`; `20260812201000_add_weather_ai_snapshot_fingerprint.sql` atualiza instalações anteriores; `20260813023000_add_weather_ai_monthly_budget.sql` cria o teto mensal, o log individual e a função atômica.
 2. Confirmar `MOBI_SUPABASE_SECRET_KEY` no runtime do servidor.
-3. Confirmar `GEMINI_API_KEY`, `GEMINI_MODEL` e `GEMINI_WEATHER_ENABLED`.
+3. Confirmar `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_WEATHER_ENABLED` e, se desejado, `GEMINI_WEATHER_MONTHLY_CALL_LIMIT`.
 4. Criar ou conferir o secret `TEMPO_PELOTAS_CRON_SECRET` no GitHub.
 5. Publicar a aplicação.
 6. Executar manualmente `Weather AI snapshots` uma vez.
-7. Reexecutar na mesma janela e confirmar `slot-already-claimed`.
-8. Em uma janela futura com fingerprint idêntico, confirmar `status: reused` e `aiCalled: false`.
+7. Conferir que `weather_ai_monthly_usage.calls` aumentou somente se houve tentativa real de Gemini.
+8. Conferir o registro correspondente em `weather_ai_calls`.
+9. Reexecutar na mesma janela e confirmar `slot-already-claimed`, sem novo incremento mensal.
+10. Em uma janela futura com fingerprint idêntico, confirmar `status: reused` e `aiCalled: false`, novamente sem incremento mensal.
 
 ## Comportamento em falhas
 
 - Supabase administrativo ou Gemini não configurado: o job editorial não chama IA; o portal segue determinístico.
-- Gemini falha após a reserva: a janela é registrada como `failed` e não é repetida automaticamente.
+- Contador mensal indisponível: chamada ao Gemini bloqueada; o portal segue determinístico.
+- Teto mensal atingido: chamada bloqueada com `monthly-ai-budget`; o portal segue determinístico.
+- Gemini falha depois que a tentativa foi autorizada: a unidade mensal permanece contabilizada, pois houve tentativa real de API, e o log individual fica como `failed`.
 - Snapshot com mais de oito horas: resumo determinístico.
 - Fingerprint incompatível: resumo determinístico.
 - Banco temporariamente indisponível: resumo determinístico.
