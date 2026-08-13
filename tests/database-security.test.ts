@@ -80,10 +80,30 @@ function assertPoliciesRemainAccountScoped(sql: string) {
     assert.ok(tableMatch, `Policy sem tabela pública reconhecida: ${statement}`);
 
     const table = tableMatch[1] ?? "";
-    assert.ok(
-      !serverOnlyTables.has(table),
-      `Tabela server-only não pode ter policy de cliente: ${table}`,
-    );
+    if (serverOnlyTables.has(table)) {
+      const roleMatch = statement.match(/\bto\s+(.+?)(?=\s+using|\s+with\s+check|$)/);
+      const roles = roleMatch?.[1] ?? "public";
+
+      assert.doesNotMatch(
+        roles,
+        /\bpublic\b/,
+        `Tabela server-only não pode expor policy ao role public: ${table}`,
+      );
+
+      if (/\b(?:anon|authenticated)\b/.test(roles)) {
+        assert.match(
+          statement,
+          /\busing\s*\(\s*false\s*\)/,
+          `Policy de cliente em ${table} deve negar leitura explicitamente: ${statement}`,
+        );
+        assert.match(
+          statement,
+          /\bwith\s+check\s*\(\s*false\s*\)/,
+          `Policy de cliente em ${table} deve negar escrita explicitamente: ${statement}`,
+        );
+      }
+      continue;
+    }
 
     const ownerColumn = accountTables.get(table);
     if (!ownerColumn) continue;
