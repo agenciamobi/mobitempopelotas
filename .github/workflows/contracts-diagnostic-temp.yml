@@ -1,4 +1,4 @@
-name: Weather AI budget formatter temp
+name: Weather AI budget validation temp
 
 on:
   pull_request:
@@ -6,32 +6,27 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  format:
-    if: github.event.pull_request.head.repo.full_name == github.repository
+  validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
-      - run: npm ci --no-audit --no-fund
-      - name: Aplicar Prettier
-        run: npx prettier --write src/lib/weather/weather-ai-budget.server.ts src/lib/weather/weather-ai-snapshot.server.ts src/routes/api/cron/push-daily.ts tests/weather-ai-snapshots.test.ts docs/weather-ai-snapshots.md
-      - name: Persistir somente formatação
-        shell: bash
-        run: |
-          if git diff --quiet; then
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/lib/weather/weather-ai-budget.server.ts src/lib/weather/weather-ai-snapshot.server.ts src/routes/api/cron/push-daily.ts tests/weather-ai-snapshots.test.ts docs/weather-ai-snapshots.md
-          git commit -m "style(ai): formatar guardrail financeiro"
-          git push origin HEAD:${{ github.head_ref }}
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+      - name: Validar template de ambiente
+        run: npm run runtime:check:example
+      - name: Testar snapshots e teto mensal
+        run: node --test tests/weather-ai-snapshots.test.ts
+      - name: ESLint dos arquivos alterados
+        run: npx eslint src/lib/weather/weather-ai-budget.server.ts src/lib/weather/weather-ai-snapshot.server.ts src/routes/api/cron/push-daily.ts tests/weather-ai-snapshots.test.ts
+      - name: Prettier dos arquivos alterados
+        run: npx prettier --check src/lib/weather/weather-ai-budget.server.ts src/lib/weather/weather-ai-snapshot.server.ts src/routes/api/cron/push-daily.ts tests/weather-ai-snapshots.test.ts docs/weather-ai-snapshots.md
+      - name: Build de produção
+        run: npm run build
