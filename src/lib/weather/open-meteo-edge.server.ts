@@ -1,13 +1,11 @@
 import { z } from "zod";
 
-import {
-  createSupabaseAdminClient,
-  getSupabaseServerConfig,
-} from "@/lib/supabase/server-client.server";
+import { getSupabaseServerConfig } from "@/lib/supabase/server-client.server";
 
 const LOCATION_SLUG = "pelotas-rs";
 const EDGE_FUNCTION_NAME = "open-meteo-forecast";
 const REQUEST_TIMEOUT_MS = 35_000;
+const SETTINGS_TIMEOUT_MS = 5_000;
 
 const edgeResponseSchema = z.object({
   success: z.literal(true),
@@ -18,6 +16,11 @@ const edgeResponseSchema = z.object({
   payload: z.unknown(),
 });
 
+const collectorSettingsSchema = z.object({
+  collector_token: z.string().min(1),
+  enabled: z.boolean(),
+});
+
 export type OpenMeteoEdgePayload = {
   payload: unknown;
   fetchedAt: string | null;
@@ -25,21 +28,42 @@ export type OpenMeteoEdgePayload = {
   warning: string | null;
 };
 
+async function fetchCollectorSettings(config: { url: string; secretKey: string }) {
+  const params = new URLSearchParams({
+    select: "collector_token,enabled",
+    location_slug: `eq.${LOCATION_SLUG}`,
+    limit: "1",
+  });
+  const response = await fetch(
+    `${config.url.replace(/\/$/, "")}/rest/v1/weather_forecast_accuracy_settings?${params.toString()}`,
+    {
+      headers: {
+        Accept: "application/json",
+        apikey: config.secretKey,
+        Authorization: `Bearer ${config.secretKey}`,
+      },
+      cache: "no-store",
+      signal: AbortSignal.timeout(SETTINGS_TIMEOUT_MS),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Supabase respondeu com HTTP ${response.status} ao consultar o coletor.`);
+  }
+
+  const rows = z.array(collectorSettingsSchema).parse(await response.json());
+  return rows[0] ?? null;
+}
+
 export async function fetchOpenMeteoPayloadViaEdge(): Promise<OpenMeteoEdgePayload> {
   const config = getSupabaseServerConfig();
-  if (!config.isAdminConfigured || !config.url) {
+  if (!config.isAdminConfigured || !config.url || !config.secretKey) {
     throw new Error("Supabase administrativo não configurado para a previsão Open-Meteo.");
   }
 
-  const admin = createSupabaseAdminClient();
-  const { data: settings, error: settingsError } = await admin
-    .from("weather_forecast_accuracy_settings")
-    .select("collector_token,enabled")
-    .eq("location_slug", LOCATION_SLUG)
-    .maybeSingle();
-
-  if (settingsError || !settings?.enabled) {
-    throw new Error(settingsError?.message ?? "Coletor meteorológico desativado.");
+  const settings = await fetchCollectorSettings({ url: config.url, secretKey: config.secretKey });
+  if (!settings?.enabled) {
+    throw new Error("Coletor meteorológico desativado.");
   }
 
   const response = await fetch(`${config.url}/functions/v1/${EDGE_FUNCTION_NAME}`, {
