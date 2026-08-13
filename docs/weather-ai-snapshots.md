@@ -10,12 +10,12 @@ O resultado editorial é persistido no Supabase externo. Quando não existe um t
 
 O workflow `.github/workflows/weather-ai-snapshots.yml` executa quatro vezes por dia no fuso `America/Sao_Paulo`:
 
-| Ciclo | Horário |
-| --- | --- |
-| Manhã | 05:00 |
-| Meio do dia | 11:00 |
-| Fim da tarde | 17:00 |
-| Noite | 23:00 |
+| Ciclo        | Horário |
+| ------------ | ------- |
+| Manhã        | 05:00   |
+| Meio do dia  | 11:00   |
+| Fim da tarde | 17:00   |
+| Noite        | 23:00   |
 
 No GitHub Actions os horários são configurados em UTC como `0 2,8,14,20 * * *`.
 

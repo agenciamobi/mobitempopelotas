@@ -7,10 +7,7 @@ import { fetchAggregatedPelotasWeather } from "./aggregated-weather.server";
 import type { AggregatedWeatherData } from "./aggregated-weather.types";
 import { reconcileDailyTemperatures } from "./daily-temperature-reconciliation";
 import { generateGeminiWeatherBrief } from "./gemini-weather.server";
-import {
-  claimWeatherAiMonthlyBudget,
-  completeWeatherAiCall,
-} from "./weather-ai-budget.server";
+import { claimWeatherAiMonthlyBudget, completeWeatherAiCall } from "./weather-ai-budget.server";
 import type { WeatherBrief } from "./weather-intelligence.types";
 
 const TIMEZONE = "America/Sao_Paulo";
@@ -56,12 +53,7 @@ export type WeatherAiSnapshot = {
 
 export type WeatherAiGenerationResult = {
   status:
-    | "generated"
-    | "reused"
-    | "already-claimed"
-    | "not-configured"
-    | "budget-blocked"
-    | "failed";
+    "generated" | "reused" | "already-claimed" | "not-configured" | "budget-blocked" | "failed";
   slotKey: string;
   period: WeatherAiPeriod;
   generatedAt: string | null;
