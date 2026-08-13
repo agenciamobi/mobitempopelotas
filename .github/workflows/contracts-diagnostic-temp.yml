@@ -24,6 +24,7 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          import re
 
           def replace(path, old, new):
               file = Path(path)
@@ -40,12 +41,9 @@ jobs:
           replace("tests/camera-monitoring-page.test.ts", '  assert.match(page, /target="_blank" rel="noopener noreferrer"/);', '  assert.match(page, /target="_blank"[\\s\\S]*rel="noopener noreferrer"/);')
           replace("tests/camera-monitoring-page.test.ts", '  assert.match(page, /camera\\.embedUrl && camera\\.publicUrl/);', '  assert.match(page, /camera\\.embedUrl\\s*&&\\s*camera\\.publicUrl/);')
 
-          database_old = '''    assert.ok(
-              !serverOnlyTables.has(table),
-              `Tabela server-only não pode ter policy de cliente: ${table}`,
-            );
-
-            const ownerColumn = accountTables.get(table);'''
+          database_path = Path("tests/database-security.test.ts")
+          database_text = database_path.read_text(encoding="utf-8")
+          database_pattern = re.compile(r'''    assert\.ok\(\n\s*!serverOnlyTables\.has\(table\),\n\s*`Tabela server-only não pode ter policy de cliente: \$\{table\}`,\n\s*\);\n\n\s*const ownerColumn = accountTables\.get\(table\);''')
           database_new = '''    if (serverOnlyTables.has(table)) {
               const roleMatch = statement.match(/\\bto\\s+(.+?)(?=\\s+using|\\s+with\\s+check|$)/);
               const roles = roleMatch?.[1] ?? "public";
@@ -58,7 +56,10 @@ jobs:
             }
 
             const ownerColumn = accountTables.get(table);'''
-          replace("tests/database-security.test.ts", database_old, database_new)
+          database_text, database_count = database_pattern.subn(database_new, database_text, count=1)
+          if database_count != 1:
+              raise SystemExit(f"Contrato server-only esperado não encontrado: {database_count}")
+          database_path.write_text(database_text, encoding="utf-8")
 
           replace("tests/embed-alerts-hydrology-regional.test.ts", 'const regionalRefinements = readFileSync("src/components/regional/RegionalCityRefinements.css", "utf8");', 'const regionalStyles = readFileSync(\n  "src/components/regional/RegionalCityWeatherPage.module.css",\n  "utf8",\n);')
           replace("tests/embed-alerts-hydrology-regional.test.ts", '  assert.match(regionalRefinements, /min-height:\\s*clamp\\(470px/);\n  assert.match(regionalRefinements, /#previsao-horaria-regional/);\n  assert.match(regionalRefinements, /@media \\(max-width:\\s*620px\\)/);', '  assert.match(regionalStyles, /\\.page/);\n  assert.match(regionalStyles, /\\.context/);\n  assert.match(regionalStyles, /\\.related/);\n  assert.match(regionalStyles, /@media \\(max-width: 760px\\)/);')
