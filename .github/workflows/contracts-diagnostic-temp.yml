@@ -56,7 +56,7 @@ jobs:
             }
 
             const ownerColumn = accountTables.get(table);'''
-          database_text, database_count = database_pattern.subn(database_new, database_text, count=1)
+          database_text, database_count = database_pattern.subn(lambda _: database_new, database_text, count=1)
           if database_count != 1:
               raise SystemExit(f"Contrato server-only esperado não encontrado: {database_count}")
           database_path.write_text(database_text, encoding="utf-8")
