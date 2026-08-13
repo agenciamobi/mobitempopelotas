@@ -1,0 +1,9 @@
+#previsao-horaria-regional {
+  min-height: clamp(470px, 55vh, 680px);
+}
+
+@media (max-width: 620px) {
+  #previsao-horaria-regional {
+    min-height: auto;
+  }
+}
