@@ -39,8 +39,20 @@ jobs:
       - name: Validar template de ambiente
         run: npm run runtime:check:example
 
-      - name: Contratos rápidos
-        run: npm run test:contracts
+      - name: Diagnosticar contratos rápidos
+        shell: bash
+        run: |
+          failed=0
+          while IFS= read -r test_file; do
+            [ -z "$test_file" ] && continue
+            echo "::group::$test_file"
+            if ! node --test "$test_file"; then
+              echo "::error file=$test_file::Contrato falhou: $test_file"
+              failed=1
+            fi
+            echo "::endgroup::"
+          done < <(node -e 'const p=require("./package.json"); const s=p.scripts["test:contracts"]; console.log([...s.matchAll(/tests\/[A-Za-z0-9._/-]+\.test\.ts/g)].map(m=>m[0]).join("\n"))')
+          exit "$failed"
 
       - name: Verificar árvore de rotas versionada
         run: npm run routes:check
