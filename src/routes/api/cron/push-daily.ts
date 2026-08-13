@@ -153,6 +153,16 @@ async function generateWeatherAiSnapshot(request: Request) {
     });
   }
 
+  if (result.status === "budget-blocked") {
+    return pushJsonResponse({
+      success: true,
+      aiCalled: false,
+      skipped: true,
+      reason: "monthly-ai-budget",
+      ...result,
+    });
+  }
+
   if (result.status === "not-configured") {
     return pushJsonResponse({
       success: true,
