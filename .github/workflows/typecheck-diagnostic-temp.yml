@@ -19,11 +19,11 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - name: Capturar TypeScript
+      - name: Capturar TypeScript sem gerador customizado
         shell: bash
         run: |
           set +e
-          npm run typecheck > typecheck.log 2>&1
+          npx tsc --noEmit > typecheck.log 2>&1
           echo $? > typecheck-exit-code.txt
           exit 0
       - name: Publicar diagnóstico
