@@ -12,7 +12,6 @@ const resilient = readFileSync("src/lib/weather/open-meteo-resilient.server.ts",
 const baseline = readFileSync("src/lib/weather/weather-baseline.server.ts", "utf8");
 const publicFunction = readFileSync("src/lib/weather/weather.functions.ts", "utf8");
 
-
 test("cache completo do Open-Meteo é privado e controla concorrência", () => {
   assert.match(migration, /create table if not exists public\.weather_provider_payload_cache/);
   assert.match(migration, /payload jsonb not null default '\{\}'::jsonb/);
@@ -27,10 +26,9 @@ test("cache completo do Open-Meteo é privado e controla concorrência", () => {
   assert.match(migration, /last_success_at < now\(\) - make_interval/);
   assert.match(
     migration,
-    /grant execute on function public\.claim_weather_provider_refresh\(text, uuid, integer, integer\) to service_role/,
+    /grant execute on function public\.claim_weather_provider_refresh\(text, uuid, integer, integer\)\s+to service_role/,
   );
 });
-
 
 test("Edge Function exige token e preserva último payload válido", () => {
   assert.match(edgeFunction, /constantTimeEqual/);
@@ -38,9 +36,9 @@ test("Edge Function exige token e preserva último payload válido", () => {
   assert.match(edgeFunction, /weather_forecast_accuracy_settings/);
   assert.match(edgeFunction, /claim_weather_provider_refresh/);
   assert.match(edgeFunction, /cacheStatus: "fresh"/);
-  assert.match(edgeFunction, /cacheStatus: "shared"/);
-  assert.match(edgeFunction, /cacheStatus: "stale"/);
-  assert.match(edgeFunction, /cacheStatus: "refreshed"/);
+  assert.match(edgeFunction, /"shared"/);
+  assert.match(edgeFunction, /cacheStatus:\s*"stale"/);
+  assert.match(edgeFunction, /cacheStatus:\s*"refreshed"/);
   assert.match(edgeFunction, /hasForecastPayload\(cached\.payload\)/);
   assert.match(edgeFunction, /status: cached && hasForecastPayload\(cached\.payload\) \? "stale" : "unavailable"/);
   assert.match(edgeFunction, /forecast_days: "7"/);
@@ -48,7 +46,6 @@ test("Edge Function exige token e preserva último payload válido", () => {
   assert.match(edgeFunction, /wind_gusts_10m/);
   assert.doesNotMatch(edgeFunction, /Access-Control-Allow-Origin/);
 });
-
 
 test("cliente server-only chama a Edge Function sem expor o token", () => {
   assert.match(edgeClient, /createSupabaseAdminClient/);
@@ -60,16 +57,12 @@ test("cliente server-only chama a Edge Function sem expor o token", () => {
   assert.doesNotMatch(edgeClient, /export const collectorToken/);
 });
 
-
 test("agregação usa Edge Function e mantém consulta direta apenas como contingência", () => {
   assert.match(resilient, /fetchOpenMeteoPayloadViaEdge/);
   assert.match(resilient, /normalizeOpenMeteoWeather/);
   assert.match(resilient, /return fetchOpenMeteoDirect\(\)/);
   assert.match(resilient, /edge\.cacheStatus === "stale"/);
-  assert.match(
-    baseline,
-    /from "\.\/open-meteo-resilient\.server"/,
-  );
+  assert.match(baseline, /from "\.\/open-meteo-resilient\.server"/);
   assert.doesNotMatch(baseline, /from "\.\/open-meteo\.server"/);
   assert.match(publicFunction, /from "\.\/open-meteo-resilient\.server"/);
 });

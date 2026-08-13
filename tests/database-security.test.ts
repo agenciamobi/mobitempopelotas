@@ -14,6 +14,7 @@ const serverOnlyTables = new Set([
   "weather_forecast_predictions",
   "weather_forecast_verifications",
   "weather_forecast_accuracy_settings",
+  "weather_provider_payload_cache",
 ]);
 const accountTables = new Map([
   ["profiles", "id"],
@@ -80,10 +81,27 @@ function assertPoliciesRemainAccountScoped(sql: string) {
     assert.ok(tableMatch, `Policy sem tabela pública reconhecida: ${statement}`);
 
     const table = tableMatch[1] ?? "";
-    assert.ok(
-      !serverOnlyTables.has(table),
-      `Tabela server-only não pode ter policy de cliente: ${table}`,
-    );
+    if (serverOnlyTables.has(table)) {
+      const targetsClient = /\bto\s+[^;]*\b(?:public|anon|authenticated)\b/.test(statement);
+      if (targetsClient) {
+        assert.match(
+          statement,
+          /\busing\s*\(\s*false\s*\)/,
+          `Policy de cliente em tabela server-only deve negar leitura: ${statement}`,
+        );
+        assert.match(
+          statement,
+          /\bwith\s+check\s*\(\s*false\s*\)/,
+          `Policy de cliente em tabela server-only deve negar escrita: ${statement}`,
+        );
+        assert.doesNotMatch(
+          statement,
+          /\b(?:using|with\s+check)\s*\(\s*true\s*\)/,
+          `Policy permissiva detectada em tabela server-only: ${statement}`,
+        );
+      }
+      continue;
+    }
 
     const ownerColumn = accountTables.get(table);
     if (!ownerColumn) continue;

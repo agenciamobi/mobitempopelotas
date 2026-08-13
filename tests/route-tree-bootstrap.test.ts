@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
@@ -17,11 +16,9 @@ const packageLock = JSON.parse(readFileSync("package-lock.json", "utf8")) as {
     }
   >;
 };
-const generator = readFileSync("scripts/generate-route-tree.mjs", "utf8");
 const viteConfig = readFileSync("vite.config.ts", "utf8");
+const routeTree = readFileSync("src/routeTree.gen.ts", "utf8");
 const qualityWorkflow = readFileSync(".github/workflows/quality.yml", "utf8");
-
-const GENERATOR_COMMAND = "node scripts/generate-route-tree.mjs";
 
 function workflowStepPosition(command: string) {
   const position = qualityWorkflow.indexOf(command);
@@ -29,68 +26,35 @@ function workflowStepPosition(command: string) {
   return position;
 }
 
-test("route tree is generated before development, build, tests and typecheck", () => {
-  assert.equal(packageJson.scripts?.["routes:generate"], GENERATOR_COMMAND);
-  assert.equal(packageJson.scripts?.["routes:check"], `${GENERATOR_COMMAND} --check`);
-  assert.match(packageJson.scripts?.dev ?? "", /^node scripts\/generate-route-tree\.mjs && vite dev$/);
-  assert.match(packageJson.scripts?.build ?? "", /^node scripts\/generate-route-tree\.mjs && vite build$/);
-  assert.match(
-    packageJson.scripts?.["build:dev"] ?? "",
-    /^node scripts\/generate-route-tree\.mjs && vite build --mode development$/,
-  );
-  assert.match(
-    packageJson.scripts?.test ?? "",
-    /^node scripts\/generate-route-tree\.mjs && node --test tests\/\*\*\/\*\.test\.ts$/,
-  );
-  assert.match(
-    packageJson.scripts?.["test:routes"] ?? "",
-    /^node scripts\/generate-route-tree\.mjs && node --test tests\/public-routes\.test\.ts$/,
-  );
-  assert.match(
-    packageJson.scripts?.typecheck ?? "",
-    /^node scripts\/generate-route-tree\.mjs && tsc --noEmit$/,
-  );
-});
-
-test("direct Vite invocations generate routes before TanStack plugins are created", () => {
-  const bootstrapIndex = viteConfig.indexOf("execFileSync(process.execPath");
-  const configIndex = viteConfig.indexOf("export default defineConfig");
-
-  assert.ok(bootstrapIndex >= 0, "vite.config.ts deve executar o gerador de rotas");
-  assert.ok(configIndex > bootstrapIndex, "o bootstrap deve ocorrer antes da criação dos plugins");
-  assert.match(viteConfig, /scripts\/generate-route-tree\.mjs/);
-  assert.match(viteConfig, /stdio:\s*"inherit"/);
-});
-
-test("route generator discovers all exported file routes recursively", () => {
-  assert.match(generator, /readdir\(directory, \{ withFileTypes: true \}\)/);
-  assert.match(generator, /CREATE_FILE_ROUTE_CALL_PATTERN/);
-  assert.match(generator, /ROUTE_PATTERN/);
-  assert.match(generator, /expectedRoutePath/);
-  assert.match(generator, /deve declarar createFileRoute com um caminho literal/);
-  assert.match(generator, /Caminho incompatível/);
-  assert.match(generator, /Rota duplicada detectada/);
-  assert.match(generator, /Identificador de rota duplicado/);
-  assert.match(generator, /routeTree\.gen\.ts regenerado/);
-  assert.match(generator, /GeneratedFileRoute/);
-  assert.match(generator, /_addFileChildren\(rootRouteChildren\)/);
-  assert.match(generator, /_addFileTypes<FileRouteTypes>\(\)/);
-});
-
-test("committed route tree matches every discovered route module", () => {
-  const result = spawnSync(process.execPath, ["scripts/generate-route-tree.mjs", "--check"], {
-    encoding: "utf8",
-  });
-
+test("TanStack/Lovable owns route generation for development, build and checks", () => {
+  assert.equal(packageJson.scripts?.["routes:generate"], "vite build");
   assert.equal(
-    result.status,
-    0,
-    [result.stdout, result.stderr].filter(Boolean).join("\n") || "route tree check failed",
+    packageJson.scripts?.["routes:check"],
+    "vite build && git diff --exit-code -- src/routeTree.gen.ts",
   );
+  assert.equal(packageJson.scripts?.dev, "vite dev");
+  assert.equal(packageJson.scripts?.build, "vite build");
+  assert.equal(packageJson.scripts?.["build:dev"], "vite build --mode development");
+  assert.equal(packageJson.scripts?.test, "vite build && node --test tests/**/*.test.ts");
+  assert.equal(packageJson.scripts?.["test:routes"], "vite build && node --test tests/public-routes.test.ts");
+  assert.equal(packageJson.scripts?.typecheck, "vite build && tsc --noEmit");
+});
+
+test("Vite uses the Lovable TanStack config without a duplicate custom route generator", () => {
+  assert.match(viteConfig, /from "@lovable\.dev\/vite-tanstack-config"/);
+  assert.match(viteConfig, /export default defineConfig/);
+  assert.match(viteConfig, /tanstackStart:/);
+  assert.match(viteConfig, /server:\s*\{\s*entry:\s*"server"\s*\}/);
+  assert.doesNotMatch(viteConfig, /execFileSync|generate-route-tree\.mjs/);
+});
+
+test("committed TanStack route tree contains generated route metadata", () => {
+  assert.match(routeTree, /routeTree/);
+  assert.match(routeTree, /FileRoutesByPath|FileRoutesByTo|FileRoutesById/);
+  assert.match(routeTree, /createFileRoute|_addFileChildren|rootRouteChildren/);
 });
 
 test("quality workflow checks the committed tree before production build", () => {
-  assert.doesNotMatch(qualityWorkflow, /routes:generate\s*&&\s*npm run routes:check/);
   assert.ok(
     workflowStepPosition("npm run routes:check") < workflowStepPosition("npm run build"),
     "routes:check deve executar antes do build",

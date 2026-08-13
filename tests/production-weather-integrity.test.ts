@@ -1,9 +1,26 @@
 import assert from "node:assert/strict";
+import { registerHooks } from "node:module";
+import { resolve as resolvePath } from "node:path";
 import test from "node:test";
+import { pathToFileURL } from "node:url";
 
 import type { AggregatedWeatherData } from "../src/lib/weather/aggregated-weather.types.ts";
-import { toProductionWeatherData } from "../src/production/adapters/home.ts";
 import { fallbackWeatherData } from "../src/production/lib/weather-data.ts";
+
+registerHooks({
+  resolve(specifier, context, nextResolve) {
+    if (!specifier.startsWith("@/")) return nextResolve(specifier, context);
+
+    const relativePath = specifier.slice(2);
+    const withExtension = /\.[cm]?[jt]sx?$/.test(relativePath) ? relativePath : `${relativePath}.ts`;
+    return {
+      shortCircuit: true,
+      url: pathToFileURL(resolvePath("src", withExtension)).href,
+    };
+  },
+});
+
+const { toProductionWeatherData } = await import("../src/production/adapters/home.ts");
 
 function makeAggregatedWeather(overrides: Record<string, unknown> = {}) {
   const base = {
@@ -34,6 +51,7 @@ function makeAggregatedWeather(overrides: Record<string, unknown> = {}) {
     ],
     alerts: [],
     officialForecast: [],
+    inmetForecast: [],
     observation: {
       status: "live",
       current: {
@@ -76,7 +94,7 @@ function makeAggregatedWeather(overrides: Record<string, unknown> = {}) {
       forecastSource: "met-norway",
       forecastProvider: "MET Norway",
     },
-    sources: {},
+    sources: { inmet: { usable: false, fetchedAt: null, reason: null } },
     source: { fetchedAt: "2026-07-24T06:14:00.000Z" },
     message: "Dados degradados",
     ...overrides,
