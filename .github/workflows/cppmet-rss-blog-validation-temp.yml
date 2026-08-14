@@ -66,3 +66,64 @@ jobs:
         run: npm run routes:generate
       - name: Build de produção
         run: npm run build
+
+  compare-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: base
+      - name: Checkout feature CPPMet
+        uses: actions/checkout@v4
+        with:
+          ref: feat/cppmet-rss-blog-20260814
+          path: feature
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Instalar dependências do main
+        run: cd base && npm ci --no-audit --no-fund
+      - name: Instalar dependências da feature
+        run: cd feature && npm ci --no-audit --no-fund
+      - name: Comparar falhas dos contratos
+        run: |
+          set +e
+          (cd base && npm run test:contracts) > base-contracts.log 2>&1
+          BASE_EXIT=$?
+          (cd feature && npm run test:contracts) > feature-contracts.log 2>&1
+          FEATURE_EXIT=$?
+          set -e
+
+          export BASE_EXIT FEATURE_EXIT
+          node <<'NODE'
+          const fs = require('node:fs');
+
+          function failureNames(path) {
+            const text = fs.readFileSync(path, 'utf8');
+            const names = [];
+            for (const line of text.split(/\r?\n/)) {
+              const match = line.match(/^\s*not ok \d+ - (.+)$/);
+              if (match) names.push(match[1].trim());
+            }
+            return [...new Set(names)].sort();
+          }
+
+          const base = failureNames('base-contracts.log');
+          const feature = failureNames('feature-contracts.log');
+          const added = feature.filter((name) => !base.includes(name));
+          const removed = base.filter((name) => !feature.includes(name));
+
+          console.log(JSON.stringify({
+            baseExit: Number(process.env.BASE_EXIT),
+            featureExit: Number(process.env.FEATURE_EXIT),
+            baseFailures: base,
+            featureFailures: feature,
+            addedFailures: added,
+            removedFailures: removed,
+          }, null, 2));
+
+          if (added.length > 0) process.exit(1);
+          NODE
