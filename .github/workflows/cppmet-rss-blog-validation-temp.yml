@@ -105,20 +105,36 @@ jobs:
             const text = fs.readFileSync(path, 'utf8');
             const names = [];
             for (const line of text.split(/\r?\n/)) {
-              const match = line.match(/^\s*not ok \d+ - (.+)$/);
-              if (match) names.push(match[1].trim());
+              const tap = line.match(/^\s*not ok \d+ - (.+)$/);
+              const spec = line.match(/^\s*[✖✗×]\s+(.+?)(?:\s+\([\d.]+ms\))?\s*$/u);
+              const name = tap?.[1] ?? spec?.[1];
+              if (name) names.push(name.trim());
             }
             return [...new Set(names)].sort();
           }
 
+          function tail(path) {
+            return fs.readFileSync(path, 'utf8').split(/\r?\n/).slice(-80).join('\n');
+          }
+
+          const baseExit = Number(process.env.BASE_EXIT);
+          const featureExit = Number(process.env.FEATURE_EXIT);
           const base = failureNames('base-contracts.log');
           const feature = failureNames('feature-contracts.log');
+
+          if ((baseExit !== 0 && base.length === 0) || (featureExit !== 0 && feature.length === 0)) {
+            console.error('Não foi possível extrair as falhas; recusando falso positivo.');
+            console.error('--- main tail ---\n' + tail('base-contracts.log'));
+            console.error('--- feature tail ---\n' + tail('feature-contracts.log'));
+            process.exit(2);
+          }
+
           const added = feature.filter((name) => !base.includes(name));
           const removed = base.filter((name) => !feature.includes(name));
 
           console.log(JSON.stringify({
-            baseExit: Number(process.env.BASE_EXIT),
-            featureExit: Number(process.env.FEATURE_EXIT),
+            baseExit,
+            featureExit,
             baseFailures: base,
             featureFailures: feature,
             addedFailures: added,
