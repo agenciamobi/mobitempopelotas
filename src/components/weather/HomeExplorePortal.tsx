@@ -58,6 +58,7 @@ const exploreGroups: ReadonlyArray<ExploreGroup> = [
       { label: "Radar e satélite", to: "/radar-e-satelite-pelotas" },
       { label: "Câmeras ao vivo", to: "/cameras-ao-vivo-pelotas" },
       { label: "Histórico climático", to: "/historico-climatico-pelotas" },
+      { label: "Notícias CPPMet/UFPel", to: "/blog" },
     ],
   },
   {
