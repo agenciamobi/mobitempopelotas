@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   validate:
@@ -21,10 +21,43 @@ jobs:
           cache: npm
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
-      - name: Aplicar Prettier no workspace efêmero
-        run: npx prettier --write src/lib/content/cppmet-news.server.ts src/lib/content/cppmet-news.functions.ts src/components/blog/CppmetNewsPage.tsx src/components/blog/CppmetNewsPage.css src/routes/blog.tsx src/lib/public-routes.ts src/components/weather/HomeExplorePortal.tsx tests/cppmet-rss-blog.test.ts
       - name: Testar parser RSS
         run: node --test tests/cppmet-rss-blog.test.ts
+      - name: Smoke do RSS real CPPMet/UFPel
+        run: |
+          node --input-type=module <<'NODE'
+          const { parseCppmetRss } = await import('./src/lib/content/cppmet-news.server.ts');
+          const candidates = [
+            'https://wp.ufpel.edu.br/cppmet/feed/',
+            'https://wp.ufpel.edu.br/cppmet/feed',
+          ];
+          const headers = {
+            Accept: 'application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.5',
+            'Accept-Language': 'pt-BR,pt;q=0.9',
+            'User-Agent': 'TEMPO-Pelotas/2.0 (+https://tempopelotas.com.br)',
+          };
+          const results = [];
+          for (const url of candidates) {
+            try {
+              const response = await fetch(url, {
+                headers,
+                redirect: 'follow',
+                signal: AbortSignal.timeout(8000),
+              });
+              const xml = await response.text();
+              const items = response.ok ? parseCppmetRss(xml) : [];
+              results.push({ url, status: response.status, finalUrl: response.url, items: items.length });
+              if (response.ok && items.length > 0) {
+                console.log(JSON.stringify({ ok: true, url, status: response.status, finalUrl: response.url, items: items.length, firstTitle: items[0].title }, null, 2));
+                process.exit(0);
+              }
+            } catch (error) {
+              results.push({ url, error: error instanceof Error ? error.message : String(error) });
+            }
+          }
+          console.error(JSON.stringify({ ok: false, results }, null, 2));
+          process.exit(1);
+          NODE
       - name: Validar formatação
         run: npx prettier --check src/lib/content/cppmet-news.server.ts src/lib/content/cppmet-news.functions.ts src/components/blog/CppmetNewsPage.tsx src/components/blog/CppmetNewsPage.css src/routes/blog.tsx src/lib/public-routes.ts src/components/weather/HomeExplorePortal.tsx tests/cppmet-rss-blog.test.ts
       - name: Validar ESLint
@@ -33,12 +66,3 @@ jobs:
         run: npm run routes:generate
       - name: Build de produção
         run: npm run build
-      - name: Persistir arquivos validados no branch técnico
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/lib/content/cppmet-news.server.ts src/components/blog/CppmetNewsPage.tsx src/components/blog/CppmetNewsPage.css src/routeTree.gen.ts
-          if ! git diff --cached --quiet; then
-            git commit -m "chore(blog): aplicar formatação e árvore de rotas validadas"
-            git push
-          fi
