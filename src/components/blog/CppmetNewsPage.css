@@ -150,9 +150,7 @@
 .cppmet-blog__card--featured {
   grid-column: 1 / -1;
   min-height: 300px;
-  background:
-    radial-gradient(circle at 95% 15%, rgba(54, 137, 177, 0.1), transparent 30%),
-    #fff;
+  background: radial-gradient(circle at 95% 15%, rgba(54, 137, 177, 0.1), transparent 30%), #fff;
 }
 
 .cppmet-blog__card-meta {

@@ -68,7 +68,9 @@ function stripHtml(value: string) {
 
 function readTag(block: string, tag: string) {
   const escaped = tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  return block.match(new RegExp(`<${escaped}\\b[^>]*>([\\s\\S]*?)<\\/${escaped}>`, "i"))?.[1] ?? null;
+  return (
+    block.match(new RegExp(`<${escaped}\\b[^>]*>([\\s\\S]*?)<\\/${escaped}>`, "i"))?.[1] ?? null
+  );
 }
 
 function readTags(block: string, tag: string) {
@@ -183,7 +185,9 @@ export async function fetchCppmetNews(): Promise<CppmetNewsFeed> {
         error: null,
       };
     } catch (error) {
-      errors.push(error instanceof Error ? error.message : "Falha desconhecida ao consultar o RSS do CPPMet.");
+      errors.push(
+        error instanceof Error ? error.message : "Falha desconhecida ao consultar o RSS do CPPMet.",
+      );
     }
   }
 
