@@ -41,9 +41,9 @@ export function CppmetNewsPage({ feed }: CppmetNewsPageProps) {
           </p>
           <h1 id="cppmet-blog-title">Publicações do CPPMet / UFPel</h1>
           <p className="cppmet-blog__lead editorial-answer-summary">
-            Acompanhe notícias, análises e comunicados publicados pelo Centro de Pesquisas e Previsões
-            Meteorológicas da UFPel. O Tempo Pelotas lê o feed RSS oficial e mantém o conteúdo original
-            na fonte.
+            Acompanhe notícias, análises e comunicados publicados pelo Centro de Pesquisas e
+            Previsões Meteorológicas da UFPel. O Tempo Pelotas lê o feed RSS oficial e mantém o
+            conteúdo original na fonte.
           </p>
         </div>
 
@@ -70,8 +70,8 @@ export function CppmetNewsPage({ feed }: CppmetNewsPageProps) {
           </span>
         </div>
         <p>
-          Fonte: <strong>{feed.source.name}</strong>. O Tempo Pelotas não altera títulos nem publica o
-          artigo completo; cada item leva à publicação original.
+          Fonte: <strong>{feed.source.name}</strong>. O Tempo Pelotas não altera títulos nem publica
+          o artigo completo; cada item leva à publicação original.
         </p>
       </section>
 
@@ -83,7 +83,9 @@ export function CppmetNewsPage({ feed }: CppmetNewsPageProps) {
               key={item.url}
             >
               <div className="cppmet-blog__card-meta">
-                <time dateTime={item.publishedAt ?? undefined}>{formatPublishedAt(item.publishedAt)}</time>
+                <time dateTime={item.publishedAt ?? undefined}>
+                  {formatPublishedAt(item.publishedAt)}
+                </time>
                 {item.categories.length > 0 ? <span>{item.categories[0]}</span> : null}
               </div>
               <h2>{item.title}</h2>
@@ -99,8 +101,8 @@ export function CppmetNewsPage({ feed }: CppmetNewsPageProps) {
         <section className="cppmet-blog__empty" aria-live="polite">
           <h2>As publicações não puderam ser carregadas agora</h2>
           <p>
-            A página continua disponível sem inventar ou reutilizar conteúdo antigo como se fosse atual.
-            Você pode consultar diretamente o site do CPPMet enquanto o feed não responde.
+            A página continua disponível sem inventar ou reutilizar conteúdo antigo como se fosse
+            atual. Você pode consultar diretamente o site do CPPMet enquanto o feed não responde.
           </p>
           <a href={feed.source.siteUrl} target="_blank" rel="noopener noreferrer">
             Consultar CPPMet / UFPel
