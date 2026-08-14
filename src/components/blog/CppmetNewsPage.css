@@ -1,0 +1,246 @@
+.cppmet-blog {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: clamp(28px, 5vw, 64px) 0 72px;
+}
+
+.cppmet-blog__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 32px;
+  align-items: end;
+  padding: clamp(28px, 5vw, 56px);
+  border: 1px solid rgba(20, 74, 103, 0.13);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(55, 142, 181, 0.14), transparent 34%),
+    linear-gradient(145deg, #f8fbfd 0%, #edf5f8 100%);
+  box-shadow: 0 20px 60px rgba(9, 42, 60, 0.08);
+}
+
+.cppmet-blog__hero-copy {
+  max-width: 780px;
+}
+
+.cppmet-blog__eyebrow {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0 0 14px;
+  color: #176486;
+  font-size: 0.86rem;
+  font-weight: 750;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.cppmet-blog__hero h1 {
+  margin: 0;
+  color: #092f45;
+  font-size: clamp(2rem, 5vw, 4.1rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+.cppmet-blog__lead {
+  max-width: 720px;
+  margin: 22px 0 0;
+  color: #456472;
+  font-size: clamp(1rem, 1.5vw, 1.16rem);
+  line-height: 1.65;
+}
+
+.cppmet-blog__source-link,
+.cppmet-blog__card a,
+.cppmet-blog__empty a {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  color: #0c5d80;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cppmet-blog__source-link {
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 18px;
+  border: 1px solid rgba(12, 93, 128, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  white-space: nowrap;
+}
+
+.cppmet-blog__source-link:hover,
+.cppmet-blog__card a:hover,
+.cppmet-blog__empty a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cppmet-blog__source-bar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 22px 34px;
+  align-items: center;
+  margin: 22px 0 34px;
+  padding: 18px 20px;
+  border: 1px solid rgba(20, 74, 103, 0.1);
+  border-radius: 18px;
+  background: #fff;
+}
+
+.cppmet-blog__source-bar > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cppmet-blog__source-bar p {
+  margin: 0;
+  color: #58717c;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.cppmet-blog__status,
+.cppmet-blog__updated {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.cppmet-blog__status--live {
+  color: #17633b;
+  background: #eaf7ef;
+}
+
+.cppmet-blog__status--unavailable {
+  color: #8a4b17;
+  background: #fff3e4;
+}
+
+.cppmet-blog__updated {
+  color: #4e6672;
+  background: #f1f5f7;
+}
+
+.cppmet-blog__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.cppmet-blog__card {
+  display: flex;
+  flex-direction: column;
+  min-height: 260px;
+  padding: clamp(22px, 3vw, 32px);
+  border: 1px solid rgba(20, 74, 103, 0.12);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 12px 36px rgba(9, 42, 60, 0.055);
+}
+
+.cppmet-blog__card--featured {
+  grid-column: 1 / -1;
+  min-height: 300px;
+  background:
+    radial-gradient(circle at 95% 15%, rgba(54, 137, 177, 0.1), transparent 30%),
+    #fff;
+}
+
+.cppmet-blog__card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+  color: #69808a;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.cppmet-blog__card-meta span {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #eef5f8;
+  color: #366375;
+}
+
+.cppmet-blog__card h2 {
+  margin: 14px 0 12px;
+  color: #0d3447;
+  font-size: clamp(1.28rem, 2vw, 1.75rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.cppmet-blog__card--featured h2 {
+  max-width: 880px;
+  font-size: clamp(1.65rem, 3vw, 2.55rem);
+}
+
+.cppmet-blog__card p {
+  max-width: 860px;
+  margin: 0 0 24px;
+  color: #58717c;
+  line-height: 1.62;
+}
+
+.cppmet-blog__card a {
+  margin-top: auto;
+}
+
+.cppmet-blog__empty {
+  padding: clamp(28px, 5vw, 48px);
+  border: 1px dashed rgba(20, 74, 103, 0.24);
+  border-radius: 22px;
+  background: #f8fbfc;
+}
+
+.cppmet-blog__empty h2 {
+  margin: 0 0 10px;
+  color: #163f52;
+}
+
+.cppmet-blog__empty p {
+  max-width: 720px;
+  margin: 0 0 18px;
+  color: #607984;
+  line-height: 1.6;
+}
+
+@media (max-width: 760px) {
+  .cppmet-blog {
+    width: min(100% - 20px, 1180px);
+    padding-top: 18px;
+  }
+
+  .cppmet-blog__hero {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    border-radius: 22px;
+  }
+
+  .cppmet-blog__source-link {
+    justify-self: start;
+    white-space: normal;
+  }
+
+  .cppmet-blog__source-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .cppmet-blog__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cppmet-blog__card--featured {
+    grid-column: auto;
+  }
+}
