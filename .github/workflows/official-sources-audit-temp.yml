@@ -18,7 +18,7 @@ jobs:
         run: |
           node <<'NODE'
           const headers = {
-            'User-Agent': 'TEMPO-Pelotas-Audit/1.0 (+https://tempopelotas.com.br)',
+            'User-Agent': 'TEMPO-Pelotas-Audit/1.1 (+https://tempopelotas.com.br)',
             'Accept-Language': 'pt-BR,pt;q=0.9',
           };
 
@@ -70,6 +70,18 @@ jobs:
           const homeResult = await request('https://tempopelotas.com.br/', 'text/html');
           if (!homeResult.response.ok) throw new Error(`home HTTP ${homeResult.response.status}`);
           const home = homeResult.text;
+          const heroMatch = home.match(/<section[^>]*class="[^"]*weather-hero[^"]*"[\s\S]*?<\/section>/i);
+          const heroHtml = heroMatch?.[0] ?? '';
+          const heroText = heroHtml
+            .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
+            .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' ')
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+          const provenanceValues = currentProvenance && typeof currentProvenance === 'object'
+            ? [...new Set(Object.values(currentProvenance).filter(Boolean))]
+            : [];
 
           const audit = {
             checkedAt: new Date().toISOString(),
@@ -79,29 +91,31 @@ jobs:
               status: snapshot?.status ?? null,
               current,
               currentProvenance,
+              currentProvenanceSources: provenanceValues,
               embrapa: sources?.embrapa ?? null,
               inmet: sources?.inmet ?? null,
               forecastSource: snapshot?.weather?.quality?.forecastSource ?? null,
               forecastProvider: snapshot?.weather?.quality?.forecastProvider ?? null,
               summaryGeneration,
             },
-            homepage: {
-              bytes: Buffer.byteLength(home),
-              hasCurrentStationLabel: /Embrapa Clima Temperado|Medição da estação|Leitura das/.test(home),
-              hasInmetLabel: /INMET/.test(home),
-              hasGeminiMarker: /Gemini|gemini/i.test(home),
+            hero: {
+              found: Boolean(heroHtml),
+              text: heroText.slice(0, 2500),
+              hasCurrentStationLabel: /Embrapa Clima Temperado|Leitura das|Atualizada em/.test(heroText),
+              hasInmetLabel: /INMET/.test(heroText),
+              hasGeminiMarker: /Gemini|gemini/i.test(heroText),
             },
           };
 
           console.log(JSON.stringify(audit, null, 2));
 
           if (!results.inmetForecast?.ok) throw new Error('INMET previsão não respondeu ao vivo.');
+          if (!results.inmetAlerts?.ok) throw new Error('INMET avisos não respondeu ao vivo.');
           if (!results.inmetStation?.ok) throw new Error('INMET estação não respondeu ao vivo.');
           if (!results.embrapa?.ok) throw new Error('Embrapa não respondeu ao vivo.');
-          if (current && currentProvenance?.source !== 'embrapa') {
-            throw new Error(`Condição atual publicada veio de ${currentProvenance?.source || 'fonte desconhecida'}, não Embrapa.`);
+          if (current && (provenanceValues.length !== 1 || provenanceValues[0] !== 'embrapa')) {
+            throw new Error(`Proveniência da condição atual não é exclusivamente Embrapa: ${provenanceValues.join(', ') || 'ausente'}.`);
           }
-          if (home.includes('Gemini') || home.includes('gemini')) {
-            throw new Error('Homepage expôs marcador Gemini no HTML do hero/home.');
-          }
+          if (!heroHtml) throw new Error('Hero não foi encontrado no HTML publicado.');
+          if (/Gemini|gemini/i.test(heroText)) throw new Error('Hero publicado contém referência a Gemini.');
           NODE
