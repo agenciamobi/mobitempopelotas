@@ -66,7 +66,7 @@ test("publication age uses the camera query timestamp instead of Date.now", () =
 test("VideoObject is emitted only for verified live or replay players", () => {
   assert.match(page, /const verifiedVideo = cameraData\.cameras\.find/);
   assert.match(page, /camera\.broadcastStatus === "live" \|\| camera\.broadcastStatus === "replay"/);
-  assert.match(page, /camera\.embedUrl && camera\.publicUrl/);
+  assert.match(page, /camera\.embedUrl\s*&&\s*camera\.publicUrl/);
   assert.match(page, /const videoSchema = verifiedVideo \?/);
   assert.match(page, /isLiveBroadcast: verifiedVideo\.broadcastStatus === "live"/);
   assert.doesNotMatch(page, /broadcastStatus === null[^\n]{0,120}VideoObject/);
