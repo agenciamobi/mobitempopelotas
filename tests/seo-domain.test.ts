@@ -26,6 +26,10 @@ const ignoredDirectories = new Set([
   "dist",
   "node_modules",
 ]);
+const sitemapRoute = readFileSync("src/routes/sitemap[.]xml.ts", "utf8");
+const feedRoute = readFileSync("src/routes/feed.ts", "utf8");
+const brandAliasRoute = readFileSync("src/routes/brand/tempo-pelotas-header.ts", "utf8");
+const accountRoute = readFileSync("src/routes/conta.tsx", "utf8");
 
 function listProjectFiles(directory = "."): string[] {
   const files: string[] = [];
@@ -85,6 +89,15 @@ test("o sitemap contém somente URLs canônicas e todas as rotas públicas", () 
   for (const route of PUBLIC_ROUTES) {
     assert.equal(sitemap.includes(`<loc>${absoluteUrl(route.path)}</loc>`), true);
   }
+});
+
+test("recursos técnicos permanecem acessíveis sem virar páginas de busca", () => {
+  assert.match(feedRoute, /"X-Robots-Tag": "noindex, nofollow"/);
+  assert.match(brandAliasRoute, /"X-Robots-Tag": "noindex, nofollow"/);
+  assert.match(brandAliasRoute, /Location: "\/brand\/tempo-pelotas-header\.svg"/);
+  assert.match(accountRoute, /src="\/brand\/tempo-pelotas-header\.svg"/);
+  assert.doesNotMatch(accountRoute, /src="\/brand\/tempo-pelotas-header"(?!\.svg)/);
+  assert.doesNotMatch(sitemapRoute, /"X-Robots-Tag": "index, follow"/);
 });
 
 test("nenhum arquivo do projeto publica domínios obsoletos", () => {
