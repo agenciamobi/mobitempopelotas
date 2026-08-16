@@ -9,6 +9,24 @@ const LOCATION_SLUG = "pelotas-rs";
 const EDGE_FUNCTION_NAME = "open-meteo-forecast";
 const REQUEST_TIMEOUT_MS = 35_000;
 
+type ForecastAccuracySettings = {
+  collector_token: string;
+  enabled: boolean;
+};
+
+type ForecastAccuracySettingsClient = {
+  from(table: "weather_forecast_accuracy_settings"): {
+    select(columns: "collector_token,enabled"): {
+      eq(column: "location_slug", value: string): {
+        maybeSingle(): Promise<{
+          data: ForecastAccuracySettings | null;
+          error: { message: string } | null;
+        }>;
+      };
+    };
+  };
+};
+
 const edgeResponseSchema = z.object({
   success: z.literal(true),
   provider: z.literal("open-meteo"),
@@ -31,7 +49,10 @@ export async function fetchOpenMeteoPayloadViaEdge(): Promise<OpenMeteoEdgePaylo
     throw new Error("Supabase administrativo não configurado para a previsão Open-Meteo.");
   }
 
-  const admin = createSupabaseAdminClient();
+  // A migration de precisão meteorológica já está versionada, mas database.types.ts só deve ser
+  // regenerado depois de confirmar sua aplicação no Supabase oficial. Mantemos o cast restrito a
+  // esta tabela até essa reconciliação, sem afrouxar a tipagem do restante do cliente administrativo.
+  const admin = createSupabaseAdminClient() as unknown as ForecastAccuracySettingsClient;
   const { data: settings, error: settingsError } = await admin
     .from("weather_forecast_accuracy_settings")
     .select("collector_token,enabled")
