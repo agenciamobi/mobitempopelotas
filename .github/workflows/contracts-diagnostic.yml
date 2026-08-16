@@ -12,7 +12,7 @@ permissions:
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,9 +26,165 @@ jobs:
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
 
+      - name: water-level-state
+        continue-on-error: true
+        run: node --test tests/water-level-state.test.ts
+
+      - name: push-http
+        continue-on-error: true
+        run: node --test tests/push-http.test.ts
+
+      - name: database-security
+        continue-on-error: true
+        run: node --test tests/database-security.test.ts
+
+      - name: auth-account-security
+        continue-on-error: true
+        run: node --test tests/auth-account-security.test.ts
+
+      - name: embrapa-centralization
+        continue-on-error: true
+        run: node --test tests/embrapa-centralization.test.ts
+
+      - name: forecast-accuracy
+        continue-on-error: true
+        run: node --test tests/forecast-accuracy.test.ts
+
+      - name: open-meteo-edge
+        continue-on-error: true
+        run: node --test tests/open-meteo-edge.test.ts
+
+      - name: runtime-readiness
+        continue-on-error: true
+        run: node --test tests/runtime-readiness.test.ts
+
+      - name: lovable-runtime-readiness
+        continue-on-error: true
+        run: node --test tests/lovable-runtime-readiness.test.ts
+
+      - name: pwa-scroll-lock
+        continue-on-error: true
+        run: node --test tests/pwa-scroll-lock.test.ts
+
+      - name: document-scroll
+        continue-on-error: true
+        run: node --test tests/document-scroll.test.ts
+
+      - name: production-css-entry
+        continue-on-error: true
+        run: node --test tests/production-css-entry.test.ts
+
+      - name: weather-traceability
+        continue-on-error: true
+        run: node --test tests/weather-traceability.test.ts
+
+      - name: current-observation
+        continue-on-error: true
+        run: node --test tests/current-observation.test.ts
+
+      - name: production-weather-integrity
+        continue-on-error: true
+        run: node --test tests/production-weather-integrity.test.ts
+
+      - name: inmet-official-sources
+        continue-on-error: true
+        run: node --test tests/inmet-official-sources.test.ts
+
+      - name: daily-temperature-reconciliation
+        continue-on-error: true
+        run: node --test tests/daily-temperature-reconciliation.test.ts
+
+      - name: onesignal-integration
+        continue-on-error: true
+        run: node --test tests/onesignal-integration.test.ts
+
+      - name: redemet-performance
+        continue-on-error: true
+        run: node --test tests/redemet-performance.test.ts
+
+      - name: internal-editorial-cohesion
+        continue-on-error: true
+        run: node --test tests/internal-editorial-cohesion.test.ts
+
       - name: homepage-coherence
         continue-on-error: true
         run: node --test tests/homepage-coherence.test.ts
+
+      - name: today-home-visual
+        continue-on-error: true
+        run: node --test tests/today-home-visual.test.ts
+
+      - name: today-typography
+        continue-on-error: true
+        run: node --test tests/today-typography.test.ts
+
+      - name: tomorrow-retail-visual
+        continue-on-error: true
+        run: node --test tests/tomorrow-retail-visual.test.ts
+
+      - name: seven-day-retail-visual
+        continue-on-error: true
+        run: node --test tests/seven-day-retail-visual.test.ts
+
+      - name: rain-retail-visual
+        continue-on-error: true
+        run: node --test tests/rain-retail-visual.test.ts
+
+      - name: wind-copy
+        continue-on-error: true
+        run: node --test tests/wind-copy.test.ts
+
+      - name: visitor-language-menu-pages
+        continue-on-error: true
+        run: node --test tests/visitor-language-menu-pages.test.ts
+
+      - name: radar-satellite-retail
+        continue-on-error: true
+        run: node --test tests/radar-satellite-retail.test.ts
+
+      - name: atmospheric-intelligence
+        continue-on-error: true
+        run: node --test tests/atmospheric-intelligence.test.ts
+
+      - name: meteogram-page
+        continue-on-error: true
+        run: node --test tests/meteogram-page.test.ts
+
+      - name: climate-page
+        continue-on-error: true
+        run: node --test tests/climate-page.test.ts
+
+      - name: weather-history-page
+        continue-on-error: true
+        run: node --test tests/weather-history-page.test.ts
+
+      - name: embrapa-station-page
+        continue-on-error: true
+        run: node --test tests/embrapa-station-page.test.ts
+
+      - name: camera-monitoring-page
+        continue-on-error: true
+        run: node --test tests/camera-monitoring-page.test.ts
+
+      - name: frost-monitoring-page
+        continue-on-error: true
+        run: node --test tests/frost-monitoring-page.test.ts
+
+      - name: hydrology-overview-page
+        continue-on-error: true
+        run: node --test tests/hydrology-overview-page.test.ts
+
+      - name: internal-weather-widgets
+        continue-on-error: true
+        run: node --test tests/internal-weather-widgets.test.ts
+
+      - name: regional-city-browser-recovery
+        continue-on-error: true
+        run: node --test tests/regional-city-browser-recovery.test.ts
+
+      - name: regional-city-editorial
+        continue-on-error: true
+        run: node --test tests/regional-city-editorial.test.ts
 
       - name: seo-domain
         continue-on-error: true
@@ -38,14 +194,14 @@ jobs:
         continue-on-error: true
         run: node --test tests/seo-content-accessibility.test.ts
 
-      - name: frost-monitoring-page
+      - name: embed-alerts-hydrology-regional
         continue-on-error: true
-        run: node --test tests/frost-monitoring-page.test.ts
+        run: node --test tests/embed-alerts-hydrology-regional.test.ts
 
-      - name: regional-city-editorial
+      - name: sace-guaiba-integration
         continue-on-error: true
-        run: node --test tests/regional-city-editorial.test.ts
+        run: node --test tests/sace-guaiba-integration.test.ts
 
-      - name: internal-editorial-cohesion
+      - name: route-tree-bootstrap
         continue-on-error: true
-        run: node --test tests/internal-editorial-cohesion.test.ts
+        run: node --test tests/route-tree-bootstrap.test.ts
