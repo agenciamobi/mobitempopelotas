@@ -12,7 +12,7 @@ permissions:
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,38 +21,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: npm
 
-      - name: Instalar dependências
-        run: npm ci --no-audit --no-fund
-
-      - name: Expor falhas compactas dos contratos herdados
+      - name: Gerar e expor diferença da árvore de rotas
         shell: bash
         run: |
-          set +e
-          status=0
-          cat > /tmp/failing-contracts.txt <<'EOF'
-          tests/database-security.test.ts
-          tests/open-meteo-edge.test.ts
-          tests/production-weather-integrity.test.ts
-          tests/today-home-visual.test.ts
-          tests/visitor-language-menu-pages.test.ts
-          tests/atmospheric-intelligence.test.ts
-          tests/meteogram-page.test.ts
-          tests/camera-monitoring-page.test.ts
-          tests/hydrology-overview-page.test.ts
-          tests/regional-city-editorial.test.ts
-          EOF
-
-          while read -r test_file; do
-            output="/tmp/$(basename "${test_file}").log"
-            node --test "${test_file}" >"${output}" 2>&1
-            code=$?
-            if [ "${code}" -ne 0 ]; then
-              status=1
-              detail="$(grep -E '^(✖|  (TypeError|Error|AssertionError)|    (expected|actual|operator):)' "${output}" | tail -n 18 | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g')"
-              echo "::error file=${test_file}::${detail}"
-            fi
-          done < /tmp/failing-contracts.txt
-
-          exit "${status}"
+          node scripts/generate-route-tree.mjs
+          echo '--- ROUTE TREE DIFF START ---'
+          git diff --unified=2 -- src/routeTree.gen.ts
+          echo '--- ROUTE TREE DIFF END ---'
