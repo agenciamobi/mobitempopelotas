@@ -38,7 +38,7 @@ test("Edge Function exige token e preserva último payload válido", () => {
   assert.match(edgeFunction, /weather_forecast_accuracy_settings/);
   assert.match(edgeFunction, /claim_weather_provider_refresh/);
   assert.match(edgeFunction, /cacheStatus: "fresh"/);
-  assert.match(edgeFunction, /cacheStatus: "shared"/);
+  assert.match(edgeFunction, /cacheStatus:[\s\S]*\? "shared"[\s\S]*: "stale"/);
   assert.match(edgeFunction, /cacheStatus: "stale"/);
   assert.match(edgeFunction, /cacheStatus: "refreshed"/);
   assert.match(edgeFunction, /hasForecastPayload\(cached\.payload\)/);
