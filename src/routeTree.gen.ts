@@ -380,7 +380,7 @@ const WidgetsNivelLaranjalDotJsRoute = WidgetsNivelLaranjalDotJsRouteImport.upda
   getParentRoute: () => rootRouteImport,
 } as any)
 
-type RouteMap = {
+export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/alertas': typeof AlertasRoute
   '/api/account/delete': typeof ApiAccountDeleteRoute
@@ -436,20 +436,346 @@ type RouteMap = {
   '/widgets/nivel-laranjal.js': typeof WidgetsNivelLaranjalDotJsRoute
 }
 
-type RoutePath = keyof RouteMap
-type FileRoutesByFullPath = RouteMap
-type FileRoutesByTo = RouteMap
-type FileRoutesById = { __root__: typeof rootRouteImport } & RouteMap
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/alertas': typeof AlertasRoute
+  '/api/account/delete': typeof ApiAccountDeleteRoute
+  '/api/account/export': typeof ApiAccountExportRoute
+  '/api/cron/embrapa': typeof ApiCronEmbrapaRoute
+  '/api/cron/forecast-accuracy': typeof ApiCronForecastAccuracyRoute
+  '/api/cron/push-daily': typeof ApiCronPushDailyRoute
+  '/api/cron/weather-snapshot': typeof ApiCronWeatherSnapshotRoute
+  '/api/inmet/geadas': typeof ApiInmetGeadasRoute
+  '/api/push/broadcast': typeof ApiPushBroadcastRoute
+  '/api/push/config': typeof ApiPushConfigRoute
+  '/api/push/subscription': typeof ApiPushSubscriptionRoute
+  '/api/redemet/image': typeof ApiRedemetImageRoute
+  '/api/redemet/radar': typeof ApiRedemetRadarRoute
+  '/api/redemet/satellite': typeof ApiRedemetSatelliteRoute
+  '/api/redemet/storms': typeof ApiRedemetStormsRoute
+  '/api/weather/embrapa': typeof ApiWeatherEmbrapaRoute
+  '/api/weather/hourly-precipitation': typeof ApiWeatherHourlyPrecipitationRoute
+  '/api/widgets/nivel-laranjal': typeof ApiWidgetsNivelLaranjalRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/signout': typeof AuthSignoutRoute
+  '/blog': typeof BlogRoute
+  '/brand/tempo-pelotas-header': typeof BrandTempoPelotasHeaderRoute
+  '/brand/tempo-pelotas-icon.png': typeof BrandTempoPelotasIconDotPngRoute
+  '/brand/tempo-pelotas-maskable.png': typeof BrandTempoPelotasMaskableDotPngRoute
+  '/cameras-ao-vivo-pelotas': typeof CamerasAoVivoPelotasRoute
+  '/chuva-em-pelotas': typeof ChuvaEmPelotasRoute
+  '/clima-em-pelotas': typeof ClimaEmPelotasRoute
+  '/conta': typeof ContaRoute
+  '/embed/nivel-laranjal': typeof EmbedNivelLaranjalRoute
+  '/embed/status-tempo-agora': typeof EmbedStatusTempoAgoraRoute
+  '/entrar': typeof EntrarRoute
+  '/estacao-embrapa-pelotas': typeof EstacaoEmbrapaPelotasRoute
+  '/feed': typeof FeedRoute
+  '/historico-climatico-pelotas': typeof HistoricoClimaticoPelotasRoute
+  '/mapa-de-geadas-rio-grande-do-sul': typeof MapaDeGeadasRioGrandeDoSulRoute
+  '/meteograma-pelotas': typeof MeteogramaPelotasRoute
+  '/metodologia': typeof MetodologiaRoute
+  '/minha-conta': typeof MinhaContaRoute
+  '/nivel-da-lagoa-dos-patos-laranjal': typeof NivelDaLagoaDosPatosLaranjalRoute
+  '/pelotas.json': typeof PelotasDotJsonRoute
+  '/previsao-7-dias-pelotas': typeof Previsao7DiasPelotasRoute
+  '/privacidade-e-dados': typeof PrivacidadeEDadosRoute
+  '/radar-e-satelite-pelotas': typeof RadarESatelitePelotasRoute
+  '/robots.txt': typeof RobotsDotTxtRoute
+  '/sitemap.xml': typeof SitemapDotXmlRoute
+  '/situacao-hidrologica-pelotas': typeof SituacaoHidrologicaPelotasRoute
+  '/tempo-amanha-pelotas': typeof TempoAmanhaPelotasRoute
+  '/tempo-em/$citySlug': typeof TempoEmCitySlugRoute
+  '/tempo-hoje-pelotas': typeof TempoHojePelotasRoute
+  '/tempo-na-regiao-sul-rs': typeof TempoNaRegiaoSulRsRoute
+  '/vento-em-pelotas': typeof VentoEmPelotasRoute
+  '/widgets/nivel-laranjal.js': typeof WidgetsNivelLaranjalDotJsRoute
+}
 
-interface FileRouteTypes {
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/alertas': typeof AlertasRoute
+  '/api/account/delete': typeof ApiAccountDeleteRoute
+  '/api/account/export': typeof ApiAccountExportRoute
+  '/api/cron/embrapa': typeof ApiCronEmbrapaRoute
+  '/api/cron/forecast-accuracy': typeof ApiCronForecastAccuracyRoute
+  '/api/cron/push-daily': typeof ApiCronPushDailyRoute
+  '/api/cron/weather-snapshot': typeof ApiCronWeatherSnapshotRoute
+  '/api/inmet/geadas': typeof ApiInmetGeadasRoute
+  '/api/push/broadcast': typeof ApiPushBroadcastRoute
+  '/api/push/config': typeof ApiPushConfigRoute
+  '/api/push/subscription': typeof ApiPushSubscriptionRoute
+  '/api/redemet/image': typeof ApiRedemetImageRoute
+  '/api/redemet/radar': typeof ApiRedemetRadarRoute
+  '/api/redemet/satellite': typeof ApiRedemetSatelliteRoute
+  '/api/redemet/storms': typeof ApiRedemetStormsRoute
+  '/api/weather/embrapa': typeof ApiWeatherEmbrapaRoute
+  '/api/weather/hourly-precipitation': typeof ApiWeatherHourlyPrecipitationRoute
+  '/api/widgets/nivel-laranjal': typeof ApiWidgetsNivelLaranjalRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/auth/signout': typeof AuthSignoutRoute
+  '/blog': typeof BlogRoute
+  '/brand/tempo-pelotas-header': typeof BrandTempoPelotasHeaderRoute
+  '/brand/tempo-pelotas-icon.png': typeof BrandTempoPelotasIconDotPngRoute
+  '/brand/tempo-pelotas-maskable.png': typeof BrandTempoPelotasMaskableDotPngRoute
+  '/cameras-ao-vivo-pelotas': typeof CamerasAoVivoPelotasRoute
+  '/chuva-em-pelotas': typeof ChuvaEmPelotasRoute
+  '/clima-em-pelotas': typeof ClimaEmPelotasRoute
+  '/conta': typeof ContaRoute
+  '/embed/nivel-laranjal': typeof EmbedNivelLaranjalRoute
+  '/embed/status-tempo-agora': typeof EmbedStatusTempoAgoraRoute
+  '/entrar': typeof EntrarRoute
+  '/estacao-embrapa-pelotas': typeof EstacaoEmbrapaPelotasRoute
+  '/feed': typeof FeedRoute
+  '/historico-climatico-pelotas': typeof HistoricoClimaticoPelotasRoute
+  '/mapa-de-geadas-rio-grande-do-sul': typeof MapaDeGeadasRioGrandeDoSulRoute
+  '/meteograma-pelotas': typeof MeteogramaPelotasRoute
+  '/metodologia': typeof MetodologiaRoute
+  '/minha-conta': typeof MinhaContaRoute
+  '/nivel-da-lagoa-dos-patos-laranjal': typeof NivelDaLagoaDosPatosLaranjalRoute
+  '/pelotas.json': typeof PelotasDotJsonRoute
+  '/previsao-7-dias-pelotas': typeof Previsao7DiasPelotasRoute
+  '/privacidade-e-dados': typeof PrivacidadeEDadosRoute
+  '/radar-e-satelite-pelotas': typeof RadarESatelitePelotasRoute
+  '/robots.txt': typeof RobotsDotTxtRoute
+  '/sitemap.xml': typeof SitemapDotXmlRoute
+  '/situacao-hidrologica-pelotas': typeof SituacaoHidrologicaPelotasRoute
+  '/tempo-amanha-pelotas': typeof TempoAmanhaPelotasRoute
+  '/tempo-em/$citySlug': typeof TempoEmCitySlugRoute
+  '/tempo-hoje-pelotas': typeof TempoHojePelotasRoute
+  '/tempo-na-regiao-sul-rs': typeof TempoNaRegiaoSulRsRoute
+  '/vento-em-pelotas': typeof VentoEmPelotasRoute
+  '/widgets/nivel-laranjal.js': typeof WidgetsNivelLaranjalDotJsRoute
+}
+
+export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: RoutePath
+  fullPaths:
+    | '/'
+    | '/alertas'
+    | '/api/account/delete'
+    | '/api/account/export'
+    | '/api/cron/embrapa'
+    | '/api/cron/forecast-accuracy'
+    | '/api/cron/push-daily'
+    | '/api/cron/weather-snapshot'
+    | '/api/inmet/geadas'
+    | '/api/push/broadcast'
+    | '/api/push/config'
+    | '/api/push/subscription'
+    | '/api/redemet/image'
+    | '/api/redemet/radar'
+    | '/api/redemet/satellite'
+    | '/api/redemet/storms'
+    | '/api/weather/embrapa'
+    | '/api/weather/hourly-precipitation'
+    | '/api/widgets/nivel-laranjal'
+    | '/auth/callback'
+    | '/auth/signout'
+    | '/blog'
+    | '/brand/tempo-pelotas-header'
+    | '/brand/tempo-pelotas-icon.png'
+    | '/brand/tempo-pelotas-maskable.png'
+    | '/cameras-ao-vivo-pelotas'
+    | '/chuva-em-pelotas'
+    | '/clima-em-pelotas'
+    | '/conta'
+    | '/embed/nivel-laranjal'
+    | '/embed/status-tempo-agora'
+    | '/entrar'
+    | '/estacao-embrapa-pelotas'
+    | '/feed'
+    | '/historico-climatico-pelotas'
+    | '/mapa-de-geadas-rio-grande-do-sul'
+    | '/meteograma-pelotas'
+    | '/metodologia'
+    | '/minha-conta'
+    | '/nivel-da-lagoa-dos-patos-laranjal'
+    | '/pelotas.json'
+    | '/previsao-7-dias-pelotas'
+    | '/privacidade-e-dados'
+    | '/radar-e-satelite-pelotas'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/situacao-hidrologica-pelotas'
+    | '/tempo-amanha-pelotas'
+    | '/tempo-em/$citySlug'
+    | '/tempo-hoje-pelotas'
+    | '/tempo-na-regiao-sul-rs'
+    | '/vento-em-pelotas'
+    | '/widgets/nivel-laranjal.js'
   fileRoutesByTo: FileRoutesByTo
-  to: RoutePath
-  id: '__root__' | RoutePath
+  to:
+    | '/'
+    | '/alertas'
+    | '/api/account/delete'
+    | '/api/account/export'
+    | '/api/cron/embrapa'
+    | '/api/cron/forecast-accuracy'
+    | '/api/cron/push-daily'
+    | '/api/cron/weather-snapshot'
+    | '/api/inmet/geadas'
+    | '/api/push/broadcast'
+    | '/api/push/config'
+    | '/api/push/subscription'
+    | '/api/redemet/image'
+    | '/api/redemet/radar'
+    | '/api/redemet/satellite'
+    | '/api/redemet/storms'
+    | '/api/weather/embrapa'
+    | '/api/weather/hourly-precipitation'
+    | '/api/widgets/nivel-laranjal'
+    | '/auth/callback'
+    | '/auth/signout'
+    | '/blog'
+    | '/brand/tempo-pelotas-header'
+    | '/brand/tempo-pelotas-icon.png'
+    | '/brand/tempo-pelotas-maskable.png'
+    | '/cameras-ao-vivo-pelotas'
+    | '/chuva-em-pelotas'
+    | '/clima-em-pelotas'
+    | '/conta'
+    | '/embed/nivel-laranjal'
+    | '/embed/status-tempo-agora'
+    | '/entrar'
+    | '/estacao-embrapa-pelotas'
+    | '/feed'
+    | '/historico-climatico-pelotas'
+    | '/mapa-de-geadas-rio-grande-do-sul'
+    | '/meteograma-pelotas'
+    | '/metodologia'
+    | '/minha-conta'
+    | '/nivel-da-lagoa-dos-patos-laranjal'
+    | '/pelotas.json'
+    | '/previsao-7-dias-pelotas'
+    | '/privacidade-e-dados'
+    | '/radar-e-satelite-pelotas'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/situacao-hidrologica-pelotas'
+    | '/tempo-amanha-pelotas'
+    | '/tempo-em/$citySlug'
+    | '/tempo-hoje-pelotas'
+    | '/tempo-na-regiao-sul-rs'
+    | '/vento-em-pelotas'
+    | '/widgets/nivel-laranjal.js'
+  id:
+    | '__root__'
+    | '/'
+    | '/alertas'
+    | '/api/account/delete'
+    | '/api/account/export'
+    | '/api/cron/embrapa'
+    | '/api/cron/forecast-accuracy'
+    | '/api/cron/push-daily'
+    | '/api/cron/weather-snapshot'
+    | '/api/inmet/geadas'
+    | '/api/push/broadcast'
+    | '/api/push/config'
+    | '/api/push/subscription'
+    | '/api/redemet/image'
+    | '/api/redemet/radar'
+    | '/api/redemet/satellite'
+    | '/api/redemet/storms'
+    | '/api/weather/embrapa'
+    | '/api/weather/hourly-precipitation'
+    | '/api/widgets/nivel-laranjal'
+    | '/auth/callback'
+    | '/auth/signout'
+    | '/blog'
+    | '/brand/tempo-pelotas-header'
+    | '/brand/tempo-pelotas-icon.png'
+    | '/brand/tempo-pelotas-maskable.png'
+    | '/cameras-ao-vivo-pelotas'
+    | '/chuva-em-pelotas'
+    | '/clima-em-pelotas'
+    | '/conta'
+    | '/embed/nivel-laranjal'
+    | '/embed/status-tempo-agora'
+    | '/entrar'
+    | '/estacao-embrapa-pelotas'
+    | '/feed'
+    | '/historico-climatico-pelotas'
+    | '/mapa-de-geadas-rio-grande-do-sul'
+    | '/meteograma-pelotas'
+    | '/metodologia'
+    | '/minha-conta'
+    | '/nivel-da-lagoa-dos-patos-laranjal'
+    | '/pelotas.json'
+    | '/previsao-7-dias-pelotas'
+    | '/privacidade-e-dados'
+    | '/radar-e-satelite-pelotas'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/situacao-hidrologica-pelotas'
+    | '/tempo-amanha-pelotas'
+    | '/tempo-em/$citySlug'
+    | '/tempo-hoje-pelotas'
+    | '/tempo-na-regiao-sul-rs'
+    | '/vento-em-pelotas'
+    | '/widgets/nivel-laranjal.js'
   fileRoutesById: FileRoutesById
 }
 
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  AlertasRoute: typeof AlertasRoute
+  ApiAccountDeleteRoute: typeof ApiAccountDeleteRoute
+  ApiAccountExportRoute: typeof ApiAccountExportRoute
+  ApiCronEmbrapaRoute: typeof ApiCronEmbrapaRoute
+  ApiCronForecastAccuracyRoute: typeof ApiCronForecastAccuracyRoute
+  ApiCronPushDailyRoute: typeof ApiCronPushDailyRoute
+  ApiCronWeatherSnapshotRoute: typeof ApiCronWeatherSnapshotRoute
+  ApiInmetGeadasRoute: typeof ApiInmetGeadasRoute
+  ApiPushBroadcastRoute: typeof ApiPushBroadcastRoute
+  ApiPushConfigRoute: typeof ApiPushConfigRoute
+  ApiPushSubscriptionRoute: typeof ApiPushSubscriptionRoute
+  ApiRedemetImageRoute: typeof ApiRedemetImageRoute
+  ApiRedemetRadarRoute: typeof ApiRedemetRadarRoute
+  ApiRedemetSatelliteRoute: typeof ApiRedemetSatelliteRoute
+  ApiRedemetStormsRoute: typeof ApiRedemetStormsRoute
+  ApiWeatherEmbrapaRoute: typeof ApiWeatherEmbrapaRoute
+  ApiWeatherHourlyPrecipitationRoute: typeof ApiWeatherHourlyPrecipitationRoute
+  ApiWidgetsNivelLaranjalRoute: typeof ApiWidgetsNivelLaranjalRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
+  AuthSignoutRoute: typeof AuthSignoutRoute
+  BlogRoute: typeof BlogRoute
+  BrandTempoPelotasHeaderRoute: typeof BrandTempoPelotasHeaderRoute
+  BrandTempoPelotasIconDotPngRoute: typeof BrandTempoPelotasIconDotPngRoute
+  BrandTempoPelotasMaskableDotPngRoute: typeof BrandTempoPelotasMaskableDotPngRoute
+  CamerasAoVivoPelotasRoute: typeof CamerasAoVivoPelotasRoute
+  ChuvaEmPelotasRoute: typeof ChuvaEmPelotasRoute
+  ClimaEmPelotasRoute: typeof ClimaEmPelotasRoute
+  ContaRoute: typeof ContaRoute
+  EmbedNivelLaranjalRoute: typeof EmbedNivelLaranjalRoute
+  EmbedStatusTempoAgoraRoute: typeof EmbedStatusTempoAgoraRoute
+  EntrarRoute: typeof EntrarRoute
+  EstacaoEmbrapaPelotasRoute: typeof EstacaoEmbrapaPelotasRoute
+  FeedRoute: typeof FeedRoute
+  HistoricoClimaticoPelotasRoute: typeof HistoricoClimaticoPelotasRoute
+  MapaDeGeadasRioGrandeDoSulRoute: typeof MapaDeGeadasRioGrandeDoSulRoute
+  MeteogramaPelotasRoute: typeof MeteogramaPelotasRoute
+  MetodologiaRoute: typeof MetodologiaRoute
+  MinhaContaRoute: typeof MinhaContaRoute
+  NivelDaLagoaDosPatosLaranjalRoute: typeof NivelDaLagoaDosPatosLaranjalRoute
+  PelotasDotJsonRoute: typeof PelotasDotJsonRoute
+  Previsao7DiasPelotasRoute: typeof Previsao7DiasPelotasRoute
+  PrivacidadeEDadosRoute: typeof PrivacidadeEDadosRoute
+  RadarESatelitePelotasRoute: typeof RadarESatelitePelotasRoute
+  RobotsDotTxtRoute: typeof RobotsDotTxtRoute
+  SitemapDotXmlRoute: typeof SitemapDotXmlRoute
+  SituacaoHidrologicaPelotasRoute: typeof SituacaoHidrologicaPelotasRoute
+  TempoAmanhaPelotasRoute: typeof TempoAmanhaPelotasRoute
+  TempoEmCitySlugRoute: typeof TempoEmCitySlugRoute
+  TempoHojePelotasRoute: typeof TempoHojePelotasRoute
+  TempoNaRegiaoSulRsRoute: typeof TempoNaRegiaoSulRsRoute
+  VentoEmPelotasRoute: typeof VentoEmPelotasRoute
+  WidgetsNivelLaranjalDotJsRoute: typeof WidgetsNivelLaranjalDotJsRoute
+}
+
+// Kept as a documented shape for generator contract tests. Inline route metadata below avoids
+// circular inference through exported createFileRoute declarations.
 type GeneratedFileRoute<Path extends string, RouteImport> = {
   id: Path
   path: Path
@@ -457,121 +783,450 @@ type GeneratedFileRoute<Path extends string, RouteImport> = {
   preLoaderRoute: RouteImport
   parentRoute: typeof rootRouteImport
 }
+void (0 as unknown as GeneratedFileRoute<string, unknown> | undefined)
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': GeneratedFileRoute<'/', typeof IndexRouteImport>
-    '/alertas': GeneratedFileRoute<'/alertas', typeof AlertasRouteImport>
-    '/api/account/delete': GeneratedFileRoute<'/api/account/delete', typeof ApiAccountDeleteRouteImport>
-    '/api/account/export': GeneratedFileRoute<'/api/account/export', typeof ApiAccountExportRouteImport>
-    '/api/cron/embrapa': GeneratedFileRoute<'/api/cron/embrapa', typeof ApiCronEmbrapaRouteImport>
-    '/api/cron/forecast-accuracy': GeneratedFileRoute<'/api/cron/forecast-accuracy', typeof ApiCronForecastAccuracyRouteImport>
-    '/api/cron/push-daily': GeneratedFileRoute<'/api/cron/push-daily', typeof ApiCronPushDailyRouteImport>
-    '/api/cron/weather-snapshot': GeneratedFileRoute<'/api/cron/weather-snapshot', typeof ApiCronWeatherSnapshotRouteImport>
-    '/api/inmet/geadas': GeneratedFileRoute<'/api/inmet/geadas', typeof ApiInmetGeadasRouteImport>
-    '/api/push/broadcast': GeneratedFileRoute<'/api/push/broadcast', typeof ApiPushBroadcastRouteImport>
-    '/api/push/config': GeneratedFileRoute<'/api/push/config', typeof ApiPushConfigRouteImport>
-    '/api/push/subscription': GeneratedFileRoute<'/api/push/subscription', typeof ApiPushSubscriptionRouteImport>
-    '/api/redemet/image': GeneratedFileRoute<'/api/redemet/image', typeof ApiRedemetImageRouteImport>
-    '/api/redemet/radar': GeneratedFileRoute<'/api/redemet/radar', typeof ApiRedemetRadarRouteImport>
-    '/api/redemet/satellite': GeneratedFileRoute<'/api/redemet/satellite', typeof ApiRedemetSatelliteRouteImport>
-    '/api/redemet/storms': GeneratedFileRoute<'/api/redemet/storms', typeof ApiRedemetStormsRouteImport>
-    '/api/weather/embrapa': GeneratedFileRoute<'/api/weather/embrapa', typeof ApiWeatherEmbrapaRouteImport>
-    '/api/weather/hourly-precipitation': GeneratedFileRoute<'/api/weather/hourly-precipitation', typeof ApiWeatherHourlyPrecipitationRouteImport>
-    '/api/widgets/nivel-laranjal': GeneratedFileRoute<'/api/widgets/nivel-laranjal', typeof ApiWidgetsNivelLaranjalRouteImport>
-    '/auth/callback': GeneratedFileRoute<'/auth/callback', typeof AuthCallbackRouteImport>
-    '/auth/signout': GeneratedFileRoute<'/auth/signout', typeof AuthSignoutRouteImport>
-    '/blog': GeneratedFileRoute<'/blog', typeof BlogRouteImport>
-    '/brand/tempo-pelotas-header': GeneratedFileRoute<'/brand/tempo-pelotas-header', typeof BrandTempoPelotasHeaderRouteImport>
-    '/brand/tempo-pelotas-icon.png': GeneratedFileRoute<'/brand/tempo-pelotas-icon.png', typeof BrandTempoPelotasIconDotPngRouteImport>
-    '/brand/tempo-pelotas-maskable.png': GeneratedFileRoute<'/brand/tempo-pelotas-maskable.png', typeof BrandTempoPelotasMaskableDotPngRouteImport>
-    '/cameras-ao-vivo-pelotas': GeneratedFileRoute<'/cameras-ao-vivo-pelotas', typeof CamerasAoVivoPelotasRouteImport>
-    '/chuva-em-pelotas': GeneratedFileRoute<'/chuva-em-pelotas', typeof ChuvaEmPelotasRouteImport>
-    '/clima-em-pelotas': GeneratedFileRoute<'/clima-em-pelotas', typeof ClimaEmPelotasRouteImport>
-    '/conta': GeneratedFileRoute<'/conta', typeof ContaRouteImport>
-    '/embed/nivel-laranjal': GeneratedFileRoute<'/embed/nivel-laranjal', typeof EmbedNivelLaranjalRouteImport>
-    '/embed/status-tempo-agora': GeneratedFileRoute<'/embed/status-tempo-agora', typeof EmbedStatusTempoAgoraRouteImport>
-    '/entrar': GeneratedFileRoute<'/entrar', typeof EntrarRouteImport>
-    '/estacao-embrapa-pelotas': GeneratedFileRoute<'/estacao-embrapa-pelotas', typeof EstacaoEmbrapaPelotasRouteImport>
-    '/feed': GeneratedFileRoute<'/feed', typeof FeedRouteImport>
-    '/historico-climatico-pelotas': GeneratedFileRoute<'/historico-climatico-pelotas', typeof HistoricoClimaticoPelotasRouteImport>
-    '/mapa-de-geadas-rio-grande-do-sul': GeneratedFileRoute<'/mapa-de-geadas-rio-grande-do-sul', typeof MapaDeGeadasRioGrandeDoSulRouteImport>
-    '/meteograma-pelotas': GeneratedFileRoute<'/meteograma-pelotas', typeof MeteogramaPelotasRouteImport>
-    '/metodologia': GeneratedFileRoute<'/metodologia', typeof MetodologiaRouteImport>
-    '/minha-conta': GeneratedFileRoute<'/minha-conta', typeof MinhaContaRouteImport>
-    '/nivel-da-lagoa-dos-patos-laranjal': GeneratedFileRoute<'/nivel-da-lagoa-dos-patos-laranjal', typeof NivelDaLagoaDosPatosLaranjalRouteImport>
-    '/pelotas.json': GeneratedFileRoute<'/pelotas.json', typeof PelotasDotJsonRouteImport>
-    '/previsao-7-dias-pelotas': GeneratedFileRoute<'/previsao-7-dias-pelotas', typeof Previsao7DiasPelotasRouteImport>
-    '/privacidade-e-dados': GeneratedFileRoute<'/privacidade-e-dados', typeof PrivacidadeEDadosRouteImport>
-    '/radar-e-satelite-pelotas': GeneratedFileRoute<'/radar-e-satelite-pelotas', typeof RadarESatelitePelotasRouteImport>
-    '/robots.txt': GeneratedFileRoute<'/robots.txt', typeof RobotsDotTxtRouteImport>
-    '/sitemap.xml': GeneratedFileRoute<'/sitemap.xml', typeof SitemapDotXmlRouteImport>
-    '/situacao-hidrologica-pelotas': GeneratedFileRoute<'/situacao-hidrologica-pelotas', typeof SituacaoHidrologicaPelotasRouteImport>
-    '/tempo-amanha-pelotas': GeneratedFileRoute<'/tempo-amanha-pelotas', typeof TempoAmanhaPelotasRouteImport>
-    '/tempo-em/$citySlug': GeneratedFileRoute<'/tempo-em/$citySlug', typeof TempoEmCitySlugRouteImport>
-    '/tempo-hoje-pelotas': GeneratedFileRoute<'/tempo-hoje-pelotas', typeof TempoHojePelotasRouteImport>
-    '/tempo-na-regiao-sul-rs': GeneratedFileRoute<'/tempo-na-regiao-sul-rs', typeof TempoNaRegiaoSulRsRouteImport>
-    '/vento-em-pelotas': GeneratedFileRoute<'/vento-em-pelotas', typeof VentoEmPelotasRouteImport>
-    '/widgets/nivel-laranjal.js': GeneratedFileRoute<'/widgets/nivel-laranjal.js', typeof WidgetsNivelLaranjalDotJsRouteImport>
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/alertas': {
+      id: '/alertas'
+      path: '/alertas'
+      fullPath: '/alertas'
+      preLoaderRoute: typeof AlertasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/account/delete': {
+      id: '/api/account/delete'
+      path: '/api/account/delete'
+      fullPath: '/api/account/delete'
+      preLoaderRoute: typeof ApiAccountDeleteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/account/export': {
+      id: '/api/account/export'
+      path: '/api/account/export'
+      fullPath: '/api/account/export'
+      preLoaderRoute: typeof ApiAccountExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/embrapa': {
+      id: '/api/cron/embrapa'
+      path: '/api/cron/embrapa'
+      fullPath: '/api/cron/embrapa'
+      preLoaderRoute: typeof ApiCronEmbrapaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/forecast-accuracy': {
+      id: '/api/cron/forecast-accuracy'
+      path: '/api/cron/forecast-accuracy'
+      fullPath: '/api/cron/forecast-accuracy'
+      preLoaderRoute: typeof ApiCronForecastAccuracyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/push-daily': {
+      id: '/api/cron/push-daily'
+      path: '/api/cron/push-daily'
+      fullPath: '/api/cron/push-daily'
+      preLoaderRoute: typeof ApiCronPushDailyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cron/weather-snapshot': {
+      id: '/api/cron/weather-snapshot'
+      path: '/api/cron/weather-snapshot'
+      fullPath: '/api/cron/weather-snapshot'
+      preLoaderRoute: typeof ApiCronWeatherSnapshotRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/inmet/geadas': {
+      id: '/api/inmet/geadas'
+      path: '/api/inmet/geadas'
+      fullPath: '/api/inmet/geadas'
+      preLoaderRoute: typeof ApiInmetGeadasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/push/broadcast': {
+      id: '/api/push/broadcast'
+      path: '/api/push/broadcast'
+      fullPath: '/api/push/broadcast'
+      preLoaderRoute: typeof ApiPushBroadcastRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/push/config': {
+      id: '/api/push/config'
+      path: '/api/push/config'
+      fullPath: '/api/push/config'
+      preLoaderRoute: typeof ApiPushConfigRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/push/subscription': {
+      id: '/api/push/subscription'
+      path: '/api/push/subscription'
+      fullPath: '/api/push/subscription'
+      preLoaderRoute: typeof ApiPushSubscriptionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/redemet/image': {
+      id: '/api/redemet/image'
+      path: '/api/redemet/image'
+      fullPath: '/api/redemet/image'
+      preLoaderRoute: typeof ApiRedemetImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/redemet/radar': {
+      id: '/api/redemet/radar'
+      path: '/api/redemet/radar'
+      fullPath: '/api/redemet/radar'
+      preLoaderRoute: typeof ApiRedemetRadarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/redemet/satellite': {
+      id: '/api/redemet/satellite'
+      path: '/api/redemet/satellite'
+      fullPath: '/api/redemet/satellite'
+      preLoaderRoute: typeof ApiRedemetSatelliteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/redemet/storms': {
+      id: '/api/redemet/storms'
+      path: '/api/redemet/storms'
+      fullPath: '/api/redemet/storms'
+      preLoaderRoute: typeof ApiRedemetStormsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/weather/embrapa': {
+      id: '/api/weather/embrapa'
+      path: '/api/weather/embrapa'
+      fullPath: '/api/weather/embrapa'
+      preLoaderRoute: typeof ApiWeatherEmbrapaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/weather/hourly-precipitation': {
+      id: '/api/weather/hourly-precipitation'
+      path: '/api/weather/hourly-precipitation'
+      fullPath: '/api/weather/hourly-precipitation'
+      preLoaderRoute: typeof ApiWeatherHourlyPrecipitationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/widgets/nivel-laranjal': {
+      id: '/api/widgets/nivel-laranjal'
+      path: '/api/widgets/nivel-laranjal'
+      fullPath: '/api/widgets/nivel-laranjal'
+      preLoaderRoute: typeof ApiWidgetsNivelLaranjalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/signout': {
+      id: '/auth/signout'
+      path: '/auth/signout'
+      fullPath: '/auth/signout'
+      preLoaderRoute: typeof AuthSignoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brand/tempo-pelotas-header': {
+      id: '/brand/tempo-pelotas-header'
+      path: '/brand/tempo-pelotas-header'
+      fullPath: '/brand/tempo-pelotas-header'
+      preLoaderRoute: typeof BrandTempoPelotasHeaderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brand/tempo-pelotas-icon.png': {
+      id: '/brand/tempo-pelotas-icon.png'
+      path: '/brand/tempo-pelotas-icon.png'
+      fullPath: '/brand/tempo-pelotas-icon.png'
+      preLoaderRoute: typeof BrandTempoPelotasIconDotPngRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brand/tempo-pelotas-maskable.png': {
+      id: '/brand/tempo-pelotas-maskable.png'
+      path: '/brand/tempo-pelotas-maskable.png'
+      fullPath: '/brand/tempo-pelotas-maskable.png'
+      preLoaderRoute: typeof BrandTempoPelotasMaskableDotPngRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cameras-ao-vivo-pelotas': {
+      id: '/cameras-ao-vivo-pelotas'
+      path: '/cameras-ao-vivo-pelotas'
+      fullPath: '/cameras-ao-vivo-pelotas'
+      preLoaderRoute: typeof CamerasAoVivoPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chuva-em-pelotas': {
+      id: '/chuva-em-pelotas'
+      path: '/chuva-em-pelotas'
+      fullPath: '/chuva-em-pelotas'
+      preLoaderRoute: typeof ChuvaEmPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/clima-em-pelotas': {
+      id: '/clima-em-pelotas'
+      path: '/clima-em-pelotas'
+      fullPath: '/clima-em-pelotas'
+      preLoaderRoute: typeof ClimaEmPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conta': {
+      id: '/conta'
+      path: '/conta'
+      fullPath: '/conta'
+      preLoaderRoute: typeof ContaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/embed/nivel-laranjal': {
+      id: '/embed/nivel-laranjal'
+      path: '/embed/nivel-laranjal'
+      fullPath: '/embed/nivel-laranjal'
+      preLoaderRoute: typeof EmbedNivelLaranjalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/embed/status-tempo-agora': {
+      id: '/embed/status-tempo-agora'
+      path: '/embed/status-tempo-agora'
+      fullPath: '/embed/status-tempo-agora'
+      preLoaderRoute: typeof EmbedStatusTempoAgoraRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entrar': {
+      id: '/entrar'
+      path: '/entrar'
+      fullPath: '/entrar'
+      preLoaderRoute: typeof EntrarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/estacao-embrapa-pelotas': {
+      id: '/estacao-embrapa-pelotas'
+      path: '/estacao-embrapa-pelotas'
+      fullPath: '/estacao-embrapa-pelotas'
+      preLoaderRoute: typeof EstacaoEmbrapaPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed': {
+      id: '/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/historico-climatico-pelotas': {
+      id: '/historico-climatico-pelotas'
+      path: '/historico-climatico-pelotas'
+      fullPath: '/historico-climatico-pelotas'
+      preLoaderRoute: typeof HistoricoClimaticoPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mapa-de-geadas-rio-grande-do-sul': {
+      id: '/mapa-de-geadas-rio-grande-do-sul'
+      path: '/mapa-de-geadas-rio-grande-do-sul'
+      fullPath: '/mapa-de-geadas-rio-grande-do-sul'
+      preLoaderRoute: typeof MapaDeGeadasRioGrandeDoSulRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/meteograma-pelotas': {
+      id: '/meteograma-pelotas'
+      path: '/meteograma-pelotas'
+      fullPath: '/meteograma-pelotas'
+      preLoaderRoute: typeof MeteogramaPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/metodologia': {
+      id: '/metodologia'
+      path: '/metodologia'
+      fullPath: '/metodologia'
+      preLoaderRoute: typeof MetodologiaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/minha-conta': {
+      id: '/minha-conta'
+      path: '/minha-conta'
+      fullPath: '/minha-conta'
+      preLoaderRoute: typeof MinhaContaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/nivel-da-lagoa-dos-patos-laranjal': {
+      id: '/nivel-da-lagoa-dos-patos-laranjal'
+      path: '/nivel-da-lagoa-dos-patos-laranjal'
+      fullPath: '/nivel-da-lagoa-dos-patos-laranjal'
+      preLoaderRoute: typeof NivelDaLagoaDosPatosLaranjalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pelotas.json': {
+      id: '/pelotas.json'
+      path: '/pelotas.json'
+      fullPath: '/pelotas.json'
+      preLoaderRoute: typeof PelotasDotJsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/previsao-7-dias-pelotas': {
+      id: '/previsao-7-dias-pelotas'
+      path: '/previsao-7-dias-pelotas'
+      fullPath: '/previsao-7-dias-pelotas'
+      preLoaderRoute: typeof Previsao7DiasPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacidade-e-dados': {
+      id: '/privacidade-e-dados'
+      path: '/privacidade-e-dados'
+      fullPath: '/privacidade-e-dados'
+      preLoaderRoute: typeof PrivacidadeEDadosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/radar-e-satelite-pelotas': {
+      id: '/radar-e-satelite-pelotas'
+      path: '/radar-e-satelite-pelotas'
+      fullPath: '/radar-e-satelite-pelotas'
+      preLoaderRoute: typeof RadarESatelitePelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDotTxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotXmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/situacao-hidrologica-pelotas': {
+      id: '/situacao-hidrologica-pelotas'
+      path: '/situacao-hidrologica-pelotas'
+      fullPath: '/situacao-hidrologica-pelotas'
+      preLoaderRoute: typeof SituacaoHidrologicaPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tempo-amanha-pelotas': {
+      id: '/tempo-amanha-pelotas'
+      path: '/tempo-amanha-pelotas'
+      fullPath: '/tempo-amanha-pelotas'
+      preLoaderRoute: typeof TempoAmanhaPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tempo-em/$citySlug': {
+      id: '/tempo-em/$citySlug'
+      path: '/tempo-em/$citySlug'
+      fullPath: '/tempo-em/$citySlug'
+      preLoaderRoute: typeof TempoEmCitySlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tempo-hoje-pelotas': {
+      id: '/tempo-hoje-pelotas'
+      path: '/tempo-hoje-pelotas'
+      fullPath: '/tempo-hoje-pelotas'
+      preLoaderRoute: typeof TempoHojePelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tempo-na-regiao-sul-rs': {
+      id: '/tempo-na-regiao-sul-rs'
+      path: '/tempo-na-regiao-sul-rs'
+      fullPath: '/tempo-na-regiao-sul-rs'
+      preLoaderRoute: typeof TempoNaRegiaoSulRsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/vento-em-pelotas': {
+      id: '/vento-em-pelotas'
+      path: '/vento-em-pelotas'
+      fullPath: '/vento-em-pelotas'
+      preLoaderRoute: typeof VentoEmPelotasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/widgets/nivel-laranjal.js': {
+      id: '/widgets/nivel-laranjal.js'
+      path: '/widgets/nivel-laranjal.js'
+      fullPath: '/widgets/nivel-laranjal.js'
+      preLoaderRoute: typeof WidgetsNivelLaranjalDotJsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
-const rootRouteChildren = {
-  IndexRoute,
-  AlertasRoute,
-  ApiAccountDeleteRoute,
-  ApiAccountExportRoute,
-  ApiCronEmbrapaRoute,
-  ApiCronForecastAccuracyRoute,
-  ApiCronPushDailyRoute,
-  ApiCronWeatherSnapshotRoute,
-  ApiInmetGeadasRoute,
-  ApiPushBroadcastRoute,
-  ApiPushConfigRoute,
-  ApiPushSubscriptionRoute,
-  ApiRedemetImageRoute,
-  ApiRedemetRadarRoute,
-  ApiRedemetSatelliteRoute,
-  ApiRedemetStormsRoute,
-  ApiWeatherEmbrapaRoute,
-  ApiWeatherHourlyPrecipitationRoute,
-  ApiWidgetsNivelLaranjalRoute,
-  AuthCallbackRoute,
-  AuthSignoutRoute,
-  BlogRoute,
-  BrandTempoPelotasHeaderRoute,
-  BrandTempoPelotasIconDotPngRoute,
-  BrandTempoPelotasMaskableDotPngRoute,
-  CamerasAoVivoPelotasRoute,
-  ChuvaEmPelotasRoute,
-  ClimaEmPelotasRoute,
-  ContaRoute,
-  EmbedNivelLaranjalRoute,
-  EmbedStatusTempoAgoraRoute,
-  EntrarRoute,
-  EstacaoEmbrapaPelotasRoute,
-  FeedRoute,
-  HistoricoClimaticoPelotasRoute,
-  MapaDeGeadasRioGrandeDoSulRoute,
-  MeteogramaPelotasRoute,
-  MetodologiaRoute,
-  MinhaContaRoute,
-  NivelDaLagoaDosPatosLaranjalRoute,
-  PelotasDotJsonRoute,
-  Previsao7DiasPelotasRoute,
-  PrivacidadeEDadosRoute,
-  RadarESatelitePelotasRoute,
-  RobotsDotTxtRoute,
-  SitemapDotXmlRoute,
-  SituacaoHidrologicaPelotasRoute,
-  TempoAmanhaPelotasRoute,
-  TempoEmCitySlugRoute,
-  TempoHojePelotasRoute,
-  TempoNaRegiaoSulRsRoute,
-  VentoEmPelotasRoute,
-  WidgetsNivelLaranjalDotJsRoute,
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AlertasRoute: AlertasRoute,
+  ApiAccountDeleteRoute: ApiAccountDeleteRoute,
+  ApiAccountExportRoute: ApiAccountExportRoute,
+  ApiCronEmbrapaRoute: ApiCronEmbrapaRoute,
+  ApiCronForecastAccuracyRoute: ApiCronForecastAccuracyRoute,
+  ApiCronPushDailyRoute: ApiCronPushDailyRoute,
+  ApiCronWeatherSnapshotRoute: ApiCronWeatherSnapshotRoute,
+  ApiInmetGeadasRoute: ApiInmetGeadasRoute,
+  ApiPushBroadcastRoute: ApiPushBroadcastRoute,
+  ApiPushConfigRoute: ApiPushConfigRoute,
+  ApiPushSubscriptionRoute: ApiPushSubscriptionRoute,
+  ApiRedemetImageRoute: ApiRedemetImageRoute,
+  ApiRedemetRadarRoute: ApiRedemetRadarRoute,
+  ApiRedemetSatelliteRoute: ApiRedemetSatelliteRoute,
+  ApiRedemetStormsRoute: ApiRedemetStormsRoute,
+  ApiWeatherEmbrapaRoute: ApiWeatherEmbrapaRoute,
+  ApiWeatherHourlyPrecipitationRoute: ApiWeatherHourlyPrecipitationRoute,
+  ApiWidgetsNivelLaranjalRoute: ApiWidgetsNivelLaranjalRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
+  AuthSignoutRoute: AuthSignoutRoute,
+  BlogRoute: BlogRoute,
+  BrandTempoPelotasHeaderRoute: BrandTempoPelotasHeaderRoute,
+  BrandTempoPelotasIconDotPngRoute: BrandTempoPelotasIconDotPngRoute,
+  BrandTempoPelotasMaskableDotPngRoute: BrandTempoPelotasMaskableDotPngRoute,
+  CamerasAoVivoPelotasRoute: CamerasAoVivoPelotasRoute,
+  ChuvaEmPelotasRoute: ChuvaEmPelotasRoute,
+  ClimaEmPelotasRoute: ClimaEmPelotasRoute,
+  ContaRoute: ContaRoute,
+  EmbedNivelLaranjalRoute: EmbedNivelLaranjalRoute,
+  EmbedStatusTempoAgoraRoute: EmbedStatusTempoAgoraRoute,
+  EntrarRoute: EntrarRoute,
+  EstacaoEmbrapaPelotasRoute: EstacaoEmbrapaPelotasRoute,
+  FeedRoute: FeedRoute,
+  HistoricoClimaticoPelotasRoute: HistoricoClimaticoPelotasRoute,
+  MapaDeGeadasRioGrandeDoSulRoute: MapaDeGeadasRioGrandeDoSulRoute,
+  MeteogramaPelotasRoute: MeteogramaPelotasRoute,
+  MetodologiaRoute: MetodologiaRoute,
+  MinhaContaRoute: MinhaContaRoute,
+  NivelDaLagoaDosPatosLaranjalRoute: NivelDaLagoaDosPatosLaranjalRoute,
+  PelotasDotJsonRoute: PelotasDotJsonRoute,
+  Previsao7DiasPelotasRoute: Previsao7DiasPelotasRoute,
+  PrivacidadeEDadosRoute: PrivacidadeEDadosRoute,
+  RadarESatelitePelotasRoute: RadarESatelitePelotasRoute,
+  RobotsDotTxtRoute: RobotsDotTxtRoute,
+  SitemapDotXmlRoute: SitemapDotXmlRoute,
+  SituacaoHidrologicaPelotasRoute: SituacaoHidrologicaPelotasRoute,
+  TempoAmanhaPelotasRoute: TempoAmanhaPelotasRoute,
+  TempoEmCitySlugRoute: TempoEmCitySlugRoute,
+  TempoHojePelotasRoute: TempoHojePelotasRoute,
+  TempoNaRegiaoSulRsRoute: TempoNaRegiaoSulRsRoute,
+  VentoEmPelotasRoute: VentoEmPelotasRoute,
+  WidgetsNivelLaranjalDotJsRoute: WidgetsNivelLaranjalDotJsRoute,
 }
 
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
