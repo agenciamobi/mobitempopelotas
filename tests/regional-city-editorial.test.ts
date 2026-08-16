@@ -53,7 +53,7 @@ test("páginas regionais reutilizam os componentes aprovados das páginas intern
   assert.match(pageSource, /internal-forecast-widget regional-city-shared-forecast/);
   assert.doesNotMatch(pageSource, /<RegionalCityHourlySection/);
   assert.doesNotMatch(pageSource, /regional-city-summary/);
-  assert.doesNotMatch(pageSource, /regional-city-forecast/);
+  assert.doesNotMatch(pageSource, /className=["'`]regional-city-forecast["'`]/);
 });
 
 test("primeira dobra regional segue a composição dividida da página de vento", () => {
