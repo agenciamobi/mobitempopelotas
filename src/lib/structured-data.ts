@@ -17,6 +17,7 @@ export type EditorialPageJsonLdOptions = {
   path: string;
   breadcrumbs: readonly BreadcrumbJsonLdItem[];
   about?: string | readonly string[];
+  location?: Record<string, unknown>;
 };
 
 export type FaqJsonLdItem = {
@@ -75,7 +76,7 @@ export function createEditorialPageJsonLd(options: EditorialPageJsonLdOptions) {
     "@type": "Thing",
     name,
   }));
-  const pelotas = createPelotasPlaceJsonLd();
+  const location = options.location ?? createPelotasPlaceJsonLd();
 
   return {
     "@context": "https://schema.org",
@@ -92,19 +93,15 @@ export function createEditorialPageJsonLd(options: EditorialPageJsonLdOptions) {
         inLanguage: "pt-BR",
         isAccessibleForFree: true,
         breadcrumb: { "@id": breadcrumbId },
-        contentLocation: pelotas,
-        spatialCoverage: pelotas,
+        contentLocation: location,
+        spatialCoverage: location,
         audience: {
           "@type": "PeopleAudience",
-          geographicArea: pelotas,
+          geographicArea: location,
         },
         primaryImageOfPage: {
           "@type": "ImageObject",
           url: SOCIAL_IMAGE_URL,
-        },
-        speakable: {
-          "@type": "SpeakableSpecification",
-          cssSelector: ["h1", ".editorial-answer-summary"],
         },
         potentialAction: {
           "@type": "ReadAction",
