@@ -95,13 +95,15 @@ test("radar and camera images avoid unnecessary synchronous decoding", () => {
   assert.match(cameras, /loading="lazy"[\s\S]*decoding="async"/);
 });
 
-test("editorial WebPage schema remains answer-engine friendly", () => {
+test("editorial WebPage schema remains aligned with visible page semantics", () => {
   const source = read("src/lib/structured-data.ts");
 
   assert.match(source, /isAccessibleForFree:\s*true/);
   assert.match(source, /"@type": "ReadAction"/);
   assert.match(source, /keywords:\s*about\.join/);
-  assert.match(source, /SpeakableSpecification/);
+  assert.match(source, /contentLocation:\s*pelotas/);
+  assert.match(source, /"@type": "BreadcrumbList"/);
+  assert.doesNotMatch(source, /SpeakableSpecification/);
 });
 
 test("below-fold editorial content uses delayed rendering", () => {
