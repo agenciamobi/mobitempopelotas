@@ -27,7 +27,7 @@ test("cache completo do Open-Meteo é privado e controla concorrência", () => {
   assert.match(migration, /last_success_at < now\(\) - make_interval/);
   assert.match(
     migration,
-    /grant execute on function public\.claim_weather_provider_refresh\(text, uuid, integer, integer\) to service_role/,
+    /grant execute on function public\.claim_weather_provider_refresh\(text, uuid, integer, integer\)\s+to service_role/,
   );
 });
 
