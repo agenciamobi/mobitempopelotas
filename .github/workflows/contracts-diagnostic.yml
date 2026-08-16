@@ -26,7 +26,7 @@ jobs:
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
 
-      - name: Expor causas dos contratos herdados
+      - name: Expor falhas compactas dos contratos herdados
         shell: bash
         run: |
           set +e
@@ -50,7 +50,7 @@ jobs:
             code=$?
             if [ "${code}" -ne 0 ]; then
               status=1
-              detail="$(tail -c 2600 "${output}" | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g')"
+              detail="$(grep -E '^(✖|  (TypeError|Error|AssertionError)|    (expected|actual|operator):)' "${output}" | tail -n 18 | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g')"
               echo "::error file=${test_file}::${detail}"
             fi
           done < /tmp/failing-contracts.txt
