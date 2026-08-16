@@ -140,7 +140,10 @@ test("hydrology pages share a compact data-led editorial hero", () => {
   assert.match(hydrologyRefinements, /min-height:\s*clamp\(470px/);
   assert.match(hydrologyRefinements, /#hydrology-level-title/);
   assert.match(levelRoute, /HydrologyEditorialHero level=\{data\.level\} variant="detail"/);
-  assert.match(overviewRoute, /HydrologyEditorialHero level=\{data\.level\} variant="overview"/);
+  assert.match(
+    overviewRoute,
+    /HydrologyOverviewHero[\s\S]*level=\{data\.level\}[\s\S]*lagoon=\{data\.lagoon\}[\s\S]*sace=\{data\.sace\}/,
+  );
   assert.match(levelRoute, /LaranjalEmbedGuide/);
 });
 
@@ -171,7 +174,8 @@ test("regional city pages share alert priority, pt-BR metrics and current respon
   assert.match(regionalHero, /regional-city-hero/);
   assert.match(regionalPage, /selectPriorityRegionalAlert/);
   assert.match(regionalPage, /to="\/tempo-em\/\$citySlug"/);
-  assert.match(regionalPage, /aria-label=\{`Consultar o aviso oficial/);
+  assert.match(regionalPage, /href=\{officialUrl\} target="_blank" rel="noreferrer"/);
+  assert.match(regionalPage, /Consultar avisos/);
   assert.match(regionalPage, /RegionalCityPerformance\.css/);
   assert.match(regionalPage, /RegionalCityWeatherPage\.module\.css/);
   assert.match(regionalPage, /RegionalCityIdentity\.css/);
