@@ -40,7 +40,7 @@ jobs:
         run: npm run runtime:check:example
 
       - name: Contratos rápidos
-        run: npm run test:contracts
+        run: node scripts/run-contract-tests.mjs
 
       - name: Verificar árvore de rotas versionada
         run: npm run routes:check
