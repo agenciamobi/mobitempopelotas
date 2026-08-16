@@ -1,122 +1,98 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-import { createPageHead } from "@/lib/page-meta";
-import { createEditorialPageJsonLd } from "@/lib/structured-data";
-import { SiteFooter } from "@/production/components/site-footer";
-import { SiteHeader } from "@/production/components/site-header";
-import type { WeatherData } from "@/production/lib/weather-data";
+import { SiteFooter } from "@/components/layout/Footer";
+import { SiteHeader } from "@/components/layout/Header";
+import { absoluteUrl, SITE_NAME } from "@/lib/site-config";
 
-const PAGE_TITLE = "Privacidade, dados e retenção no Tempo Pelotas";
-const PAGE_DESCRIPTION =
-  "Entenda quais dados a conta utiliza, por quanto tempo são mantidos e como baixar ou excluir suas informações no Tempo Pelotas.";
-const PAGE_PATH = "/privacidade-e-dados";
+import "@/production/styles/home-editorial-shell.css";
+import "@/production/styles/home-clone.css";
+import "@/production/styles/header-hero-fullwidth-v32.css";
+import "./privacidade-e-dados.css";
 
 const privacyFooterSource = {
   name: "Tempo Pelotas",
-  url: "/metodologia",
+  url: "/privacidade-e-dados",
   isFallback: false,
-  observationName: "Política de privacidade",
-  observationUrl: PAGE_PATH,
-  forecastName: "Metodologia e fontes",
-  forecastUrl: "/metodologia",
-} satisfies WeatherData["source"];
+  observationName: "Dados da conta e preferências",
+  forecastName: "Privacidade e LGPD",
+};
 
 export const Route = createFileRoute("/privacidade-e-dados")({
-  head: () =>
-    createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
-      createEditorialPageJsonLd({
-        name: PAGE_TITLE,
-        description: PAGE_DESCRIPTION,
-        path: PAGE_PATH,
-        breadcrumbs: [
-          { name: "Início", path: "/" },
-          { name: "Privacidade e dados", path: PAGE_PATH },
-        ],
-        about: ["Privacidade no Tempo Pelotas", "Retenção de dados", "Direitos da conta"],
-      }),
-    ]),
-  component: PrivacyDataPage,
+  head: () => ({
+    meta: [
+      { title: `Privacidade e dados pessoais | ${SITE_NAME}` },
+      {
+        name: "description",
+        content:
+          "Entenda quais dados o Tempo Pelotas usa, por que usa, como protegemos sua conta e como exercer seus direitos de privacidade.",
+      },
+      { name: "robots", content: "index, follow" },
+    ],
+    links: [{ rel: "canonical", href: absoluteUrl("/privacidade-e-dados") }],
+  }),
+  component: PrivacyPage,
 });
 
-function PrivacyDataPage() {
+function PrivacyPage() {
   return (
-    <div className="site-shell">
-      <SiteHeader advisoryLevel="normal" />
+    <div className="site-shell site-shell--home-editorial privacy-page">
+      <SiteHeader />
 
-      <main className="privacy-page" id="conteudo-principal" tabIndex={-1}>
+      <main id="conteudo-principal" className="privacy-main">
         <header className="privacy-hero">
-          <div>
-            <span className="eyebrow">Privacidade e controle</span>
-            <h1>Seus dados devem ser compreensíveis e estar sob seu controle</h1>
-            <p>
-              O Tempo Pelotas mantém previsão, avisos oficiais, radar, satélite, câmeras e situação
-              das águas acessíveis sem login. A conta existe somente para identificação básica e
-              preferências opcionais.
-            </p>
-          </div>
-
-          <aside className="privacy-summary" aria-label="Resumo da política">
-            <strong>Conta opcional</strong>
-            <span>
-              Você pode consultar o portal sem cadastro, alterar preferências a qualquer momento,
-              baixar uma cópia dos seus dados ou excluir definitivamente a conta.
-            </span>
-          </aside>
+          <span className="eyebrow">Privacidade e dados</span>
+          <h1>Como o Tempo Pelotas trata seus dados pessoais</h1>
+          <p>
+            O portal pode ser usado sem conta. Login, preferências e notificações são recursos
+            opcionais e só usam os dados necessários para funcionar.
+          </p>
         </header>
 
         <div className="privacy-grid">
           <section className="privacy-card">
-            <span className="eyebrow">O que é utilizado</span>
-            <h2>Dados básicos e escolhas do visitante</h2>
-            <ul>
-              <li>nome, e-mail e imagem fornecidos pelo Google;</li>
-              <li>preferências de alertas, águas, resumo diário e novidades;</li>
-              <li>histórico de alterações dessas preferências, com data e versão da política;</li>
-              <li>dados técnicos do aparelho quando notificações são ativadas.</li>
-            </ul>
-          </section>
-
-          <section className="privacy-card">
-            <span className="eyebrow">O que não depende da conta</span>
-            <h2>Informação meteorológica continua pública</h2>
+            <span className="eyebrow">Uso público</span>
+            <h2>Previsão sem cadastro</h2>
             <p>
-              Previsão do tempo, chuva, vento, imagens de radar e satélite, avisos oficiais, câmeras
-              e níveis das águas não são bloqueados para visitantes sem conta.
-            </p>
-            <p>
-              O portal não comercializa dados pessoais e não usa a conta para alterar ou esconder
-              informações públicas.
+              As páginas públicas de previsão do tempo, alertas, imagens, situação hidrológica e
+              metodologia não exigem que você crie uma conta.
             </p>
           </section>
 
           <section className="privacy-card">
-            <span className="eyebrow">Retenção</span>
-            <h2>Por quanto tempo os dados permanecem</h2>
-            <ul>
-              <li>
-                perfil, preferências e histórico de consentimentos permanecem enquanto a conta
-                estiver ativa;
-              </li>
-              <li>ao excluir a conta, esses registros são removidos em cascata;</li>
-              <li>inscrições push vinculadas à conta também são removidas com a exclusão;</li>
-              <li>
-                inscrições push anônimas ficam registradas no servidor com endpoint, chaves de
-                entrega, tópicos escolhidos e identificação técnica do navegador;
-              </li>
-              <li>
-                esse registro anônimo não possui prazo fixo: ele é removido quando o visitante
-                desativa os avisos com sucesso ou quando o provedor informa que a inscrição expirou;
-              </li>
-              <li>métricas agregadas de disparo não guardam identificação do visitante.</li>
-            </ul>
+            <span className="eyebrow">Conta opcional</span>
+            <h2>Login e perfil</h2>
+            <p>
+              Se você escolher entrar com Google, usamos a identidade fornecida pelo provedor para
+              criar ou acessar sua conta. Nome de exibição e imagem de perfil podem ser atualizados
+              pelo próprio usuário.
+            </p>
           </section>
 
           <section className="privacy-card">
-            <span className="eyebrow">Segurança</span>
-            <h2>Credenciais não entram na exportação</h2>
+            <span className="eyebrow">Preferências</span>
+            <h2>Alertas e comunicações</h2>
             <p>
-              Tokens de sessão, chaves administrativas e material criptográfico de entrega não são
-              enviados para a interface nem incluídos no arquivo de exportação.
+              As preferências registram quais assuntos você quer receber, como alertas
+              meteorológicos, situação das águas, resumo diário e novidades da comunidade.
+            </p>
+          </section>
+
+          <section className="privacy-card">
+            <span className="eyebrow">Notificações</span>
+            <h2>Web Push</h2>
+            <p>
+              Quando você autoriza notificações no navegador, armazenamos os identificadores
+              técnicos necessários para entregar as mensagens. Esses dados não são usados para
+              publicidade comportamental.
+            </p>
+          </section>
+
+          <section className="privacy-card privacy-card--wide">
+            <span className="eyebrow">Proteção</span>
+            <h2>Segurança e isolamento</h2>
+            <p>
+              As credenciais administrativas do Supabase ficam somente no servidor. O navegador
+              recebe apenas a chave pública quando a integração está habilitada.
             </p>
             <p>
               As tabelas da conta usam políticas que limitam a leitura ao próprio usuário. A
@@ -133,7 +109,7 @@ function PrivacyDataPage() {
               o acesso às páginas públicas do portal.
             </p>
             <div className="privacy-actions">
-              <Link to="/conta">Abrir minha conta</Link>
+              <Link to="/conta" search={{}}>Abrir minha conta</Link>
               <Link to="/metodologia">Consultar metodologia e fontes</Link>
             </div>
           </section>
