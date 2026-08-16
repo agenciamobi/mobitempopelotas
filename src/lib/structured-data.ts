@@ -102,10 +102,6 @@ export function createEditorialPageJsonLd(options: EditorialPageJsonLdOptions) {
           "@type": "ImageObject",
           url: SOCIAL_IMAGE_URL,
         },
-        speakable: {
-          "@type": "SpeakableSpecification",
-          cssSelector: ["h1", ".editorial-answer-summary"],
-        },
         potentialAction: {
           "@type": "ReadAction",
           target: pageUrl,
