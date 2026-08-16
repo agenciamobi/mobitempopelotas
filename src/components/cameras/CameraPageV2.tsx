@@ -34,7 +34,10 @@ type CameraPageProps = {
 
 type CameraPresentationState = "live" | "replay" | "configured" | "preparing";
 
-const stateCopy: Record<CameraPresentationState, { label: string; title: string; description: string }> = {
+const stateCopy: Record<
+  CameraPresentationState,
+  { label: string; title: string; description: string }
+> = {
   live: {
     label: "Ao vivo agora",
     title: "Transmissão ao vivo",
@@ -48,7 +51,8 @@ const stateCopy: Record<CameraPresentationState, { label: string; title: string;
   configured: {
     label: "Vídeo disponível",
     title: "Horário da imagem não confirmado",
-    description: "O vídeo pode ser aberto, mas não foi possível confirmar se a imagem é ao vivo ou gravada.",
+    description:
+      "O vídeo pode ser aberto, mas não foi possível confirmar se a imagem é ao vivo ou gravada.",
   },
   preparing: {
     label: "Em preparação",
@@ -166,27 +170,40 @@ export function CameraPageHero({ cameraData }: Pick<CameraPageProps, "cameraData
         <span className="camera-v2-eyebrow">Imagens do Laranjal e de Pelotas</span>
         <h1 id="camera-v2-hero-title">Câmeras do Laranjal e de Pelotas.</h1>
         <p>
-          Veja o céu, a visibilidade e a superfície da Lagoa em pontos específicos. Cada câmera informa
-          se a imagem está ao vivo, é uma gravação anterior ou ainda não tem horário confirmado.
+          Veja o céu, a visibilidade e a superfície da Lagoa em pontos específicos. Cada câmera
+          informa se a imagem está ao vivo, é uma gravação anterior ou ainda não tem horário confirmado.
         </p>
         <div className="camera-v2-hero__actions">
-          <a href="#explorador-de-cameras">Escolher uma câmera <ArrowRight aria-hidden="true" /></a>
+          <a href="#explorador-de-cameras">
+            Escolher uma câmera <ArrowRight aria-hidden="true" />
+          </a>
           <Link to="/radar-e-satelite-pelotas">Comparar com radar</Link>
         </div>
       </div>
       <aside className={`camera-v2-featured is-${featuredState}`} aria-label="Câmera em destaque">
         <header>
-          <span><FeaturedIcon aria-hidden="true" />{stateCopy[featuredState].label}</span>
+          <span>
+            <FeaturedIcon aria-hidden="true" />
+            {stateCopy[featuredState].label}
+          </span>
           <small>Atualizado em {formatDateTime(cameraData.source.fetchedAt)}</small>
         </header>
         <div>
           <span>Câmera em destaque</span>
           <strong>{featured?.shortName ?? "Nenhum ponto"}</strong>
-          <p>{featured ? stateCopy[featuredState].description : "Nenhuma câmera foi cadastrada."}</p>
+          <p>
+            {featured ? stateCopy[featuredState].description : "Nenhuma câmera foi cadastrada."}
+          </p>
         </div>
         <dl>
-          <div><dt>Ao vivo</dt><dd>{counts.live}</dd></div>
-          <div><dt>Gravações</dt><dd>{counts.replay}</dd></div>
+          <div>
+            <dt>Ao vivo</dt>
+            <dd>{counts.live}</dd>
+          </div>
+          <div>
+            <dt>Gravações</dt>
+            <dd>{counts.replay}</dd>
+          </div>
           <div><dt>Sem horário confirmado</dt><dd>{counts.configured}</dd></div>
         </dl>
         <footer>{featured?.provider ?? cameraData.source.name}</footer>
