@@ -293,16 +293,24 @@ test("RPC pública usa RLS e consentimentos são gravados por trigger privado", 
 
 test("a definição efetiva da RPC de conta exige sessão, claims canônicos e invoker", async () => {
   const migrations = await migrationsPromise;
+  const allSql = [...migrations.values()].join(" ");
   const definitions = collectFunctionDefinitions(migrations, "update_account_preferences");
-  assert.ok(definitions.length >= 1, "A RPC update_account_preferences não foi encontrada.");
-
   const latest = definitions.at(-1);
-  assert.ok(latest);
-  assert.match(latest.definition, /security invoker/);
-  assert.doesNotMatch(latest.definition, /security definer/);
-  assert.match(latest.definition, /auth\.uid\(\)/);
-  assert.match(latest.definition, /auth\.jwt\(\)/);
-  assert.match(latest.definition, /email_verified/);
-  assert.match(latest.definition, /phone_verified/);
-  assert.match(latest.definition, /raise exception/);
+
+  assert.ok(latest, "A função update_account_preferences não foi versionada.");
+  assertIncludes(latest.definition, [
+    "security invoker",
+    "set search_path = ''",
+    "current_user_id uuid := (select auth.uid())",
+    "claims jsonb := coalesce((select auth.jwt()), '{}'::jsonb)",
+    "if current_user_id is null then raise exception 'authentication required'",
+    "canonical_email",
+    "canonical_avatar_url",
+  ]);
+  assert.doesNotMatch(latest.definition, /account_consent_events/);
+  assert.match(
+    allSql,
+    /grant\s+execute\s+on\s+function\s+public\.update_account_preferences\s*\([^;]*\)\s+to\s+authenticated;/,
+  );
+  assertFunctionIsNotPublic(allSql, "update_account_preferences");
 });
