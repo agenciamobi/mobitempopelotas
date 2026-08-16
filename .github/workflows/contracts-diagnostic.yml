@@ -12,12 +12,10 @@ permissions:
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
@@ -25,34 +23,36 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Comparar contratos do PR com a base
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: Expor causas dos contratos herdados
         shell: bash
         run: |
           set +e
-          grep -o '"tests/[^"]*\.test\.ts"' scripts/run-contract-tests.mjs | tr -d '"' > /tmp/contracts.txt
+          status=0
+          cat > /tmp/failing-contracts.txt <<'EOF'
+          tests/database-security.test.ts
+          tests/open-meteo-edge.test.ts
+          tests/production-weather-integrity.test.ts
+          tests/today-home-visual.test.ts
+          tests/visitor-language-menu-pages.test.ts
+          tests/atmospheric-intelligence.test.ts
+          tests/meteogram-page.test.ts
+          tests/camera-monitoring-page.test.ts
+          tests/hydrology-overview-page.test.ts
+          tests/regional-city-editorial.test.ts
+          EOF
 
-          npm ci --no-audit --no-fund
-          npm run runtime:check:example
-
-          head_status=0
           while read -r test_file; do
-            if ! node --test "${test_file}"; then
-              echo "::error file=${test_file}::HEAD falha: ${test_file}"
-              head_status=1
+            output="/tmp/$(basename "${test_file}").log"
+            node --test "${test_file}" >"${output}" 2>&1
+            code=$?
+            if [ "${code}" -ne 0 ]; then
+              status=1
+              detail="$(tail -c 2600 "${output}" | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g')"
+              echo "::error file=${test_file}::${detail}"
             fi
-          done < /tmp/contracts.txt
+          done < /tmp/failing-contracts.txt
 
-          git checkout --detach 421655bceecdcfb2f49a07d0c5af972366fa2c43
-          npm ci --no-audit --no-fund
-          npm run runtime:check:example
-
-          base_status=0
-          while read -r test_file; do
-            if ! node --test "${test_file}"; then
-              echo "::warning file=${test_file}::BASE também falha: ${test_file}"
-              base_status=1
-            fi
-          done < /tmp/contracts.txt
-
-          echo "HEAD_STATUS=${head_status} BASE_STATUS=${base_status}"
-          exit "${head_status}"
+          exit "${status}"
