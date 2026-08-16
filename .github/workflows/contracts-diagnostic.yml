@@ -12,10 +12,12 @@ permissions:
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
@@ -23,21 +25,34 @@ jobs:
           node-version: 24
           cache: npm
 
-      - name: Instalar dependências
-        run: npm ci --no-audit --no-fund
-
-      - name: Validar template de ambiente
-        run: npm run runtime:check:example
-
-      - name: Identificar contratos que falham
+      - name: Comparar contratos do PR com a base
         shell: bash
         run: |
-          status=0
+          set +e
+          grep -o '"tests/[^"]*\.test\.ts"' scripts/run-contract-tests.mjs | tr -d '"' > /tmp/contracts.txt
+
+          npm ci --no-audit --no-fund
+          npm run runtime:check:example
+
+          head_status=0
           while read -r test_file; do
-            echo "=== ${test_file} ==="
             if ! node --test "${test_file}"; then
-              echo "::error file=${test_file}::Contrato falhou isoladamente no CI"
-              status=1
+              echo "::error file=${test_file}::HEAD falha: ${test_file}"
+              head_status=1
             fi
-          done < <(grep -o '"tests/[^"]*\.test\.ts"' scripts/run-contract-tests.mjs | tr -d '"')
-          exit "${status}"
+          done < /tmp/contracts.txt
+
+          git checkout --detach 421655bceecdcfb2f49a07d0c5af972366fa2c43
+          npm ci --no-audit --no-fund
+          npm run runtime:check:example
+
+          base_status=0
+          while read -r test_file; do
+            if ! node --test "${test_file}"; then
+              echo "::warning file=${test_file}::BASE também falha: ${test_file}"
+              base_status=1
+            fi
+          done < /tmp/contracts.txt
+
+          echo "HEAD_STATUS=${head_status} BASE_STATUS=${base_status}"
+          exit "${head_status}"
