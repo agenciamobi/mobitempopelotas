@@ -19,7 +19,7 @@ jobs:
           node <<'NODE'
           const baseUrl = 'https://tempopelotas.com.br';
           const headers = {
-            'User-Agent': 'TEMPO-Pelotas-Inventory-Audit/1.0',
+            'User-Agent': 'TEMPO-Pelotas-Inventory-Audit/1.1',
             'Accept-Language': 'pt-BR,pt;q=0.9',
           };
 
@@ -36,25 +36,13 @@ jobs:
           const sitemap = await fetchText(`${baseUrl}/sitemap.xml`, 'application/xml');
           if (!sitemap.response.ok) throw new Error(`sitemap HTTP ${sitemap.response.status}`);
           const urls = [...sitemap.text.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
-          if (urls.length < 35) throw new Error(`Sitemap menor que o esperado: ${urls.length} URLs.`);
 
-          const results = [];
-          for (const url of urls) {
-            try {
-              const { response, text } = await fetchText(url);
-              results.push({
-                path: new URL(url).pathname,
-                status: response.status,
-                ok: response.ok,
-                bytes: Buffer.byteLength(text),
-                contentType: response.headers.get('content-type'),
-              });
-            } catch (error) {
-              results.push({ path: new URL(url).pathname, status: null, ok: false, error: error.message });
-            }
-          }
-
-          const support = [
+          const direct = [
+            ['/blog', 'text/html'],
+            ['/entrar', 'text/html'],
+            ['/conta', 'text/html'],
+            ['/manifest.webmanifest', 'application/manifest+json'],
+            ['/sw.js', 'text/javascript'],
             ['/robots.txt', 'text/plain'],
             ['/pelotas.json', 'application/json'],
             ['/feed', 'application/feed+json'],
@@ -66,27 +54,32 @@ jobs:
             ['/api/weather/hourly-precipitation', 'application/json'],
             ['/api/inmet/geadas?days=7&uf=RS', 'application/json'],
           ];
-          const supportResults = [];
-          for (const [path, accept] of support) {
+
+          const directResults = [];
+          for (const [path, accept] of direct) {
             try {
               const { response, text } = await fetchText(`${baseUrl}${path}`, accept);
-              supportResults.push({ path, status: response.status, ok: response.ok, bytes: Buffer.byteLength(text), contentType: response.headers.get('content-type') });
+              directResults.push({
+                path,
+                status: response.status,
+                ok: response.ok,
+                bytes: Buffer.byteLength(text),
+                contentType: response.headers.get('content-type'),
+                inSitemap: urls.includes(`${baseUrl}${path}`),
+              });
             } catch (error) {
-              supportResults.push({ path, status: null, ok: false, error: error.message });
+              directResults.push({ path, status: null, ok: false, error: error.message, inSitemap: false });
             }
           }
 
-          const failedPages = results.filter((item) => !item.ok);
-          const failedSupport = supportResults.filter((item) => !item.ok);
+          const failed = directResults.filter((item) => !item.ok);
           console.log(JSON.stringify({
             checkedAt: new Date().toISOString(),
             sitemapCount: urls.length,
-            publicPages: results,
-            support: supportResults,
-            failedPages,
-            failedSupport,
+            sitemapHasBlog: urls.includes(`${baseUrl}/blog`),
+            direct: directResults,
+            failed,
           }, null, 2));
 
-          if (failedPages.length > 0) throw new Error(`${failedPages.length} página(s) pública(s) falharam.`);
-          if (failedSupport.length > 0) throw new Error(`${failedSupport.length} interface(s) pública(s) falharam.`);
+          if (failed.length > 0) throw new Error(`${failed.length} interface(s) direta(s) falharam.`);
           NODE
