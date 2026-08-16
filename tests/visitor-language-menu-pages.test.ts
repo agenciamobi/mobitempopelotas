@@ -110,8 +110,8 @@ test("alerts page states availability and counts directly", () => {
   assert.match(alerts, /Dados do INMET/);
   assert.match(alerts, /Situação consultada/);
   assert.match(alerts, /Fonte temporariamente indisponível/);
-  assert.match(alerts, /Ver aviso em destaque/);
-  assert.match(alerts, /Nenhum alerta oficial para Pelotas/);
+  assert.match(alerts, /Ler alerta prioritário/);
+  assert.match(alerts, /Nenhum aviso ativo ou programado listado agora/);
   assert.match(alerts, /alertCountLabel/);
   assert.doesNotMatch(alerts, /Fonte<\/span><strong>\{source\.usable \? "Disponível" : "Restrita"\}/);
   assert.doesNotMatch(alerts, /situação prioritária/i);
