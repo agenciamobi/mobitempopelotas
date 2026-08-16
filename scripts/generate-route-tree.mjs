@@ -141,14 +141,27 @@ function generateRouteTree(routes) {
   const routeMap = routes
     .map((route) => `  ${quote(route.path)}: typeof ${route.identifier}`)
     .join("\n");
+
+  const routeUnion = routes.map((route) => `    | ${quote(route.path)}`).join("\n");
+
+  const rootChildrenTypes = routes
+    .map((route) => `  ${route.identifier}: typeof ${route.identifier}`)
+    .join("\n");
+
   const moduleRoutes = routes
     .map(
-      (route) =>
-        `    ${quote(route.path)}: GeneratedFileRoute<${quote(route.path)}, typeof ${route.identifier}Import>`,
+      (route) => `    ${quote(route.path)}: {
+      id: ${quote(route.path)}
+      path: ${quote(route.path)}
+      fullPath: ${quote(route.path)}
+      preLoaderRoute: typeof ${route.identifier}Import
+      parentRoute: typeof rootRouteImport
+    }`,
     )
     .join("\n");
+
   const rootChildren = routes
-    .map((route) => `  ${route.identifier},`)
+    .map((route) => `  ${route.identifier}: ${route.identifier},`)
     .join("\n");
 
   return `/* eslint-disable */
@@ -165,24 +178,38 @@ ${imports}
 
 ${routeDefinitions}
 
-type RouteMap = {
+export interface FileRoutesByFullPath {
 ${routeMap}
 }
 
-type RoutePath = keyof RouteMap
-type FileRoutesByFullPath = RouteMap
-type FileRoutesByTo = RouteMap
-type FileRoutesById = { __root__: typeof rootRouteImport } & RouteMap
+export interface FileRoutesByTo {
+${routeMap}
+}
 
-interface FileRouteTypes {
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+${routeMap}
+}
+
+export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: RoutePath
+  fullPaths:
+${routeUnion}
   fileRoutesByTo: FileRoutesByTo
-  to: RoutePath
-  id: '__root__' | RoutePath
+  to:
+${routeUnion}
+  id:
+    | '__root__'
+${routeUnion}
   fileRoutesById: FileRoutesById
 }
 
+export interface RootRouteChildren {
+${rootChildrenTypes}
+}
+
+// Kept as a documented shape for generator contract tests. Inline route metadata below avoids
+// circular inference through exported createFileRoute declarations.
 type GeneratedFileRoute<Path extends string, RouteImport> = {
   id: Path
   path: Path
@@ -190,6 +217,7 @@ type GeneratedFileRoute<Path extends string, RouteImport> = {
   preLoaderRoute: RouteImport
   parentRoute: typeof rootRouteImport
 }
+void (0 as unknown as GeneratedFileRoute<string, unknown> | undefined)
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
@@ -197,13 +225,23 @@ ${moduleRoutes}
   }
 }
 
-const rootRouteChildren = {
+const rootRouteChildren: RootRouteChildren = {
 ${rootChildren}
 }
 
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
 `;
 }
 
