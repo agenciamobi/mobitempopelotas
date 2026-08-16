@@ -155,7 +155,8 @@ test("the retail hero selects credited photography from the forecast condition",
 });
 
 test("the retail hero uses a useful headline and concise current metrics", () => {
-  assert.match(todayRetailHero, /Tempo hoje em Pelotas/);
+  assert.match(todayRetailHero, /locationName = "Pelotas"/);
+  assert.match(todayRetailHero, /Tempo hoje <span>em \{locationName\}<\/span>/);
   assert.match(todayRetailHero, /previsão por hora, chuva e vento/);
   assert.doesNotMatch(todayRetailHero, /Seu dia em Pelotas/);
   assert.doesNotMatch(todayRetailHero, /organizado por horários/);
@@ -209,7 +210,8 @@ test("today section navigation uses visitor-focused labels", () => {
 test("the internal hourly story uses page-specific useful copy", () => {
   assert.match(internalWidgets, /context="today-page"/);
   assert.match(homeForecastStory, /context\?: "home" \| "today-page"/);
-  assert.match(homeForecastStory, /Previsão por hora em Pelotas/);
+  assert.match(homeForecastStory, /locationName = "Pelotas"/);
+  assert.match(homeForecastStory, /`Previsão por hora em \$\{locationName\}`/);
   assert.match(homeForecastStory, /Temperatura, chuva e vento nas próximas horas/);
   assert.match(homeForecastStory, /timeReference/);
   assert.match(homeForecastStory, /Próxima hora/);
@@ -222,7 +224,7 @@ test("forecast and observation widgets are derived from homepage components", ()
   assert.match(internalWidgets, /home-observation-story internal-observation-widget/);
   assert.match(internalWidgets, /home-observation-story__reading/);
   assert.match(internalWidgets, /home-observation-temperature/);
-  assert.match(internalWidgets, /Abrir dados completos da estação/);
+  assert.match(internalWidgets, /Ver todas as medições da estação/);
 });
 
 test("today content is concise and keeps measurement provenance explicit", () => {
@@ -232,8 +234,8 @@ test("today content is concise and keeps measurement provenance explicit", () =>
   assert.match(internalWidgets, /currentProvenance\.sunset/);
   assert.match(internalWidgets, /highlights\.slice\(0, 2\)/);
   assert.match(internalWidgets, /cautions\.slice\(0, 2\)/);
-  assert.match(internalWidgets, /Dados observados pela Embrapa/);
-  assert.match(internalWidgets, /Valor atual estimado pelo modelo/);
+  assert.match(internalWidgets, /Medição da Estação Embrapa/);
+  assert.match(internalWidgets, /Estimativa do modelo para agora/);
   assert.match(internalWidgets, /formatWind\(current\.windSpeed, current\.windDirection\)/);
   assert.match(internalWidgets, /Condições favoráveis/);
   assert.match(internalWidgets, /O que exige atenção/);
@@ -243,7 +245,8 @@ test("today content is concise and keeps measurement provenance explicit", () =>
 test("today planning resources derive decisions from the next 12 forecast hours", () => {
   assert.match(todayComponent, /href: "#recursos-hoje"/);
   assert.match(todayComponent, /<TodayWeatherResources data=\{recoveredData\}/);
-  assert.match(todayResources, /hourly\.slice\(0, 12\)/);
+  assert.match(todayResources, /hours\.slice\(0, 12\)/);
+  assert.match(todayResources, /data\.weather\.hourly[\s\S]*\.slice\(0, 12\)/);
   assert.match(todayResources, /precipitationProbability/);
   assert.match(todayResources, /hour\.windGust \?\? hour\.windSpeed/);
   assert.match(todayResources, /periodScore/);
