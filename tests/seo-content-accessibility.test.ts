@@ -97,13 +97,20 @@ test("radar and camera images avoid unnecessary synchronous decoding", () => {
 
 test("editorial WebPage schema remains aligned with visible page semantics", () => {
   const source = read("src/lib/structured-data.ts");
+  const frost = read("src/routes/mapa-de-geadas-rio-grande-do-sul.tsx");
+  const regionalDirectory = read("src/routes/tempo-na-regiao-sul-rs.tsx");
 
   assert.match(source, /isAccessibleForFree:\s*true/);
   assert.match(source, /"@type": "ReadAction"/);
   assert.match(source, /keywords:\s*about\.join/);
-  assert.match(source, /contentLocation:\s*pelotas/);
+  assert.match(source, /const location = options\.location \?\? createPelotasPlaceJsonLd\(\)/);
+  assert.match(source, /contentLocation:\s*location/);
   assert.match(source, /"@type": "BreadcrumbList"/);
   assert.doesNotMatch(source, /SpeakableSpecification/);
+  assert.match(frost, /location:\s*RIO_GRANDE_DO_SUL_LOCATION/);
+  assert.match(frost, /\{ geo: null \}/);
+  assert.match(regionalDirectory, /location:\s*SOUTHERN_RS_LOCATION/);
+  assert.match(regionalDirectory, /\{ geo: null \}/);
 });
 
 test("below-fold editorial content uses delayed rendering", () => {
