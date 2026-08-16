@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import assert from "node:assert/strict";
 import test from "node:test";
@@ -26,6 +26,7 @@ const ignoredDirectories = new Set([
   "dist",
   "node_modules",
 ]);
+const publicationRoots = ["src", "public"];
 const sitemapRoute = readFileSync("src/routes/sitemap[.]xml.ts", "utf8");
 const feedRoute = readFileSync("src/routes/feed.ts", "utf8");
 const brandAliasRoute = readFileSync("src/routes/brand/tempo-pelotas-header.ts", "utf8");
@@ -100,15 +101,19 @@ test("recursos técnicos permanecem acessíveis sem virar páginas de busca", ()
   assert.doesNotMatch(sitemapRoute, /"X-Robots-Tag": "index, follow"/);
 });
 
-test("nenhum arquivo do projeto publica domínios obsoletos", () => {
+test("nenhum arquivo publicável contém domínios obsoletos", () => {
   const offenders: string[] = [];
 
-  for (const file of listProjectFiles()) {
-    try {
-      const content = readFileSync(file, "utf8");
-      if (forbiddenHostFragments.some((host) => content.includes(host))) offenders.push(file);
-    } catch {
-      // Arquivos binários não participam da verificação textual.
+  for (const root of publicationRoots) {
+    if (!existsSync(root)) continue;
+
+    for (const file of listProjectFiles(root)) {
+      try {
+        const content = readFileSync(file, "utf8");
+        if (forbiddenHostFragments.some((host) => content.includes(host))) offenders.push(file);
+      } catch {
+        // Arquivos binários não participam da verificação textual.
+      }
     }
   }
 
