@@ -12,6 +12,14 @@ const PAGE_TITLE = "Geadas observadas no Rio Grande do Sul";
 const PAGE_DESCRIPTION =
   "Veja registros de geada nas estações do INMET no Rio Grande do Sul, com período, tipo de estação, temperatura mínima, classificação, mapa e tabela.";
 const PAGE_PATH = "/mapa-de-geadas-rio-grande-do-sul";
+const RIO_GRANDE_DO_SUL_LOCATION = {
+  "@type": "AdministrativeArea",
+  name: "Rio Grande do Sul, Brasil",
+  containedInPlace: {
+    "@type": "Country",
+    name: "Brasil",
+  },
+};
 
 const FROST_PAGE_CONTENT = {
   eyebrow: "Como ler o mapa de geadas",
@@ -79,29 +87,36 @@ const FROST_PAGE_CONTENT = {
 
 export const Route = createFileRoute("/mapa-de-geadas-rio-grande-do-sul")({
   head: () =>
-    createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH, [
-      createEditorialPageJsonLd({
-        name: PAGE_TITLE,
-        description: PAGE_DESCRIPTION,
-        path: PAGE_PATH,
-        breadcrumbs: [
-          { name: "Início", path: "/" },
-          { name: "Monitoramento", path: "/radar-e-satelite-pelotas" },
-          { name: "Geadas observadas no RS", path: PAGE_PATH },
-        ],
-        about: [
-          "Geadas observadas no Rio Grande do Sul",
-          "Estações meteorológicas do INMET",
-          "Temperatura mínima por estação",
-          "Intensidade de geada",
-          "Estações convencionais e automáticas",
-          "Observação agrometeorológica",
-          "Diferença entre observação e previsão de geada",
-          "Cobertura de estações meteorológicas",
-        ],
-      }),
-      createFaqPageJsonLd(PAGE_PATH, FROST_PAGE_CONTENT.faqs),
-    ]),
+    createPageHead(
+      PAGE_TITLE,
+      PAGE_DESCRIPTION,
+      PAGE_PATH,
+      [
+        createEditorialPageJsonLd({
+          name: PAGE_TITLE,
+          description: PAGE_DESCRIPTION,
+          path: PAGE_PATH,
+          breadcrumbs: [
+            { name: "Início", path: "/" },
+            { name: "Monitoramento", path: "/radar-e-satelite-pelotas" },
+            { name: "Geadas observadas no RS", path: PAGE_PATH },
+          ],
+          about: [
+            "Geadas observadas no Rio Grande do Sul",
+            "Estações meteorológicas do INMET",
+            "Temperatura mínima por estação",
+            "Intensidade de geada",
+            "Estações convencionais e automáticas",
+            "Observação agrometeorológica",
+            "Diferença entre observação e previsão de geada",
+            "Cobertura de estações meteorológicas",
+          ],
+          location: RIO_GRANDE_DO_SUL_LOCATION,
+        }),
+        createFaqPageJsonLd(PAGE_PATH, FROST_PAGE_CONTENT.faqs),
+      ],
+      { geo: null },
+    ),
   loader: async () => {
     const [frost, weather] = await Promise.all([
       getInmetFrostOverview(),
