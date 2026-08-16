@@ -15,7 +15,7 @@ export type PageHeadGeo = {
 };
 
 export type PageHeadOptions = {
-  geo?: PageHeadGeo;
+  geo?: PageHeadGeo | null;
 };
 
 const PELOTAS_GEO: PageHeadGeo = {
@@ -36,7 +36,7 @@ export function createPageHead(
   const canonicalUrl = absoluteUrl(canonicalPath);
   const robots =
     "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
-  const geo = options.geo ?? PELOTAS_GEO;
+  const geo = options.geo === null ? null : (options.geo ?? PELOTAS_GEO);
 
   return {
     meta: [
@@ -45,16 +45,20 @@ export function createPageHead(
       { name: "author", content: SITE_NAME },
       { name: "robots", content: robots },
       { name: "googlebot", content: robots },
-      { name: "geo.region", content: geo.region ?? "BR-RS" },
-      { name: "geo.placename", content: geo.placename },
-      {
-        name: "geo.position",
-        content: `${geo.latitude};${geo.longitude}`,
-      },
-      {
-        name: "ICBM",
-        content: `${geo.latitude}, ${geo.longitude}`,
-      },
+      ...(geo
+        ? [
+            { name: "geo.region", content: geo.region ?? "BR-RS" },
+            { name: "geo.placename", content: geo.placename },
+            {
+              name: "geo.position",
+              content: `${geo.latitude};${geo.longitude}`,
+            },
+            {
+              name: "ICBM",
+              content: `${geo.latitude}, ${geo.longitude}`,
+            },
+          ]
+        : []),
       { property: "og:title", content: fullTitle },
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },
