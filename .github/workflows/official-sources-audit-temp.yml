@@ -1,0 +1,107 @@
+name: Official sources audit temp
+
+on:
+  push:
+    branches:
+      - agent/runtime-official-sources-audit-20260816
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Validar fontes oficiais e snapshot público
+        run: |
+          node <<'NODE'
+          const headers = {
+            'User-Agent': 'TEMPO-Pelotas-Audit/1.0 (+https://tempopelotas.com.br)',
+            'Accept-Language': 'pt-BR,pt;q=0.9',
+          };
+
+          async function request(url, accept = 'application/json') {
+            const response = await fetch(url, {
+              headers: { ...headers, Accept: accept },
+              redirect: 'follow',
+              signal: AbortSignal.timeout(15000),
+            });
+            const text = await response.text();
+            return { response, text };
+          }
+
+          const endpoints = [
+            ['inmetForecast', 'https://apiprevmet3.inmet.gov.br/previsao/4314407', 'application/json'],
+            ['inmetAlerts', 'https://apiprevmet3.inmet.gov.br/avisos/getByGeocode/4314407', 'application/json'],
+            ['inmetStation', 'https://apiprevmet3.inmet.gov.br/estacao/proxima/4314407', 'application/json'],
+            ['embrapa', 'https://agromet.cpact.embrapa.br/online/Current_Monitor.htm', 'text/html'],
+          ];
+
+          const results = {};
+          for (const [name, url, accept] of endpoints) {
+            try {
+              const { response, text } = await request(url, accept);
+              results[name] = {
+                status: response.status,
+                ok: response.ok,
+                finalUrl: response.url,
+                contentType: response.headers.get('content-type'),
+                bytes: Buffer.byteLength(text),
+              };
+              if (!response.ok || text.length < 20) {
+                throw new Error(`${name} inválido: HTTP ${response.status}, bytes=${text.length}`);
+              }
+              if (accept === 'application/json') JSON.parse(text);
+            } catch (error) {
+              results[name] = { ...(results[name] || {}), error: error instanceof Error ? error.message : String(error) };
+            }
+          }
+
+          const snapshotResult = await request('https://tempopelotas.com.br/pelotas.json', 'application/json');
+          if (!snapshotResult.response.ok) throw new Error(`pelotas.json HTTP ${snapshotResult.response.status}`);
+          const snapshot = JSON.parse(snapshotResult.text);
+          const current = snapshot?.weather?.current ?? null;
+          const currentProvenance = snapshot?.weather?.current_provenance ?? null;
+          const sources = snapshot?.weather?.sources ?? {};
+          const summaryGeneration = snapshot?.weather?.summary_generation ?? null;
+
+          const homeResult = await request('https://tempopelotas.com.br/', 'text/html');
+          if (!homeResult.response.ok) throw new Error(`home HTTP ${homeResult.response.status}`);
+          const home = homeResult.text;
+
+          const audit = {
+            checkedAt: new Date().toISOString(),
+            endpoints: results,
+            publicSnapshot: {
+              generatedAt: snapshot?.generated_at ?? null,
+              status: snapshot?.status ?? null,
+              current,
+              currentProvenance,
+              embrapa: sources?.embrapa ?? null,
+              inmet: sources?.inmet ?? null,
+              forecastSource: snapshot?.weather?.quality?.forecastSource ?? null,
+              forecastProvider: snapshot?.weather?.quality?.forecastProvider ?? null,
+              summaryGeneration,
+            },
+            homepage: {
+              bytes: Buffer.byteLength(home),
+              hasCurrentStationLabel: /Embrapa Clima Temperado|Medição da estação|Leitura das/.test(home),
+              hasInmetLabel: /INMET/.test(home),
+              hasGeminiMarker: /Gemini|gemini/i.test(home),
+            },
+          };
+
+          console.log(JSON.stringify(audit, null, 2));
+
+          if (!results.inmetForecast?.ok) throw new Error('INMET previsão não respondeu ao vivo.');
+          if (!results.inmetStation?.ok) throw new Error('INMET estação não respondeu ao vivo.');
+          if (!results.embrapa?.ok) throw new Error('Embrapa não respondeu ao vivo.');
+          if (current && currentProvenance?.source !== 'embrapa') {
+            throw new Error(`Condição atual publicada veio de ${currentProvenance?.source || 'fonte desconhecida'}, não Embrapa.`);
+          }
+          if (home.includes('Gemini') || home.includes('gemini')) {
+            throw new Error('Homepage expôs marcador Gemini no HTML do hero/home.');
+          }
+          NODE
