@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { createPageHead } from "../src/lib/page-meta.ts";
 import {
   REGIONAL_CITIES,
   REGIONAL_HOME_CITY_SLUG,
@@ -53,6 +54,42 @@ test("Pelotas consolidates authority on the homepage while other cities remain i
   assert.match(route, /to:\s*"\/"/);
   assert.match(route, /getRegionalCityWeather/);
   assert.match(directoryRoute, /createFileRoute\("\/tempo-na-regiao-sul-rs"\)/);
+});
+
+test("regional page metadata uses the requested city's coordinates", () => {
+  const bage = REGIONAL_CITIES.find((city) => city.slug === "bage-rs");
+  assert.ok(bage);
+
+  const head = createPageHead("Tempo em Bagé, RS", "Previsão local.", regionalCityPath(bage), [], {
+    geo: {
+      region: "BR-RS",
+      placename: bage.name,
+      latitude: bage.latitude,
+      longitude: bage.longitude,
+    },
+  });
+
+  assert.ok(
+    head.meta.some(
+      (entry) =>
+        "name" in entry &&
+        entry.name === "geo.placename" &&
+        "content" in entry &&
+        entry.content === "Bagé",
+    ),
+  );
+  assert.ok(
+    head.meta.some(
+      (entry) =>
+        "name" in entry &&
+        entry.name === "geo.position" &&
+        "content" in entry &&
+        entry.content === `${bage.latitude};${bage.longitude}`,
+    ),
+  );
+  assert.match(route, /placename:\s*city\.name/);
+  assert.match(route, /latitude:\s*city\.latitude/);
+  assert.match(route, /longitude:\s*city\.longitude/);
 });
 
 test("city pages query real coordinate forecasts and municipal INMET alerts", () => {
