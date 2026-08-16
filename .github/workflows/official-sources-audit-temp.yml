@@ -10,112 +10,83 @@ permissions:
   contents: read
 
 jobs:
-  audit:
+  public-surface:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - name: Validar fontes oficiais e snapshot público
+      - name: Auditar sitemap, páginas e interfaces públicas
         run: |
           node <<'NODE'
+          const baseUrl = 'https://tempopelotas.com.br';
           const headers = {
-            'User-Agent': 'TEMPO-Pelotas-Audit/1.1 (+https://tempopelotas.com.br)',
+            'User-Agent': 'TEMPO-Pelotas-Inventory-Audit/1.0',
             'Accept-Language': 'pt-BR,pt;q=0.9',
           };
 
-          async function request(url, accept = 'application/json') {
+          async function fetchText(url, accept = 'text/html') {
             const response = await fetch(url, {
               headers: { ...headers, Accept: accept },
               redirect: 'follow',
-              signal: AbortSignal.timeout(15000),
+              signal: AbortSignal.timeout(20000),
             });
             const text = await response.text();
             return { response, text };
           }
 
-          const endpoints = [
-            ['inmetForecast', 'https://apiprevmet3.inmet.gov.br/previsao/4314407', 'application/json'],
-            ['inmetAlerts', 'https://apiprevmet3.inmet.gov.br/avisos/getByGeocode/4314407', 'application/json'],
-            ['inmetStation', 'https://apiprevmet3.inmet.gov.br/estacao/proxima/4314407', 'application/json'],
-            ['embrapa', 'https://agromet.cpact.embrapa.br/online/Current_Monitor.htm', 'text/html'],
-          ];
+          const sitemap = await fetchText(`${baseUrl}/sitemap.xml`, 'application/xml');
+          if (!sitemap.response.ok) throw new Error(`sitemap HTTP ${sitemap.response.status}`);
+          const urls = [...sitemap.text.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1]);
+          if (urls.length < 35) throw new Error(`Sitemap menor que o esperado: ${urls.length} URLs.`);
 
-          const results = {};
-          for (const [name, url, accept] of endpoints) {
+          const results = [];
+          for (const url of urls) {
             try {
-              const { response, text } = await request(url, accept);
-              results[name] = {
+              const { response, text } = await fetchText(url);
+              results.push({
+                path: new URL(url).pathname,
                 status: response.status,
                 ok: response.ok,
-                finalUrl: response.url,
-                contentType: response.headers.get('content-type'),
                 bytes: Buffer.byteLength(text),
-              };
-              if (!response.ok || text.length < 20) {
-                throw new Error(`${name} inválido: HTTP ${response.status}, bytes=${text.length}`);
-              }
-              if (accept === 'application/json') JSON.parse(text);
+                contentType: response.headers.get('content-type'),
+              });
             } catch (error) {
-              results[name] = { ...(results[name] || {}), error: error instanceof Error ? error.message : String(error) };
+              results.push({ path: new URL(url).pathname, status: null, ok: false, error: error.message });
             }
           }
 
-          const snapshotResult = await request('https://tempopelotas.com.br/pelotas.json', 'application/json');
-          if (!snapshotResult.response.ok) throw new Error(`pelotas.json HTTP ${snapshotResult.response.status}`);
-          const snapshot = JSON.parse(snapshotResult.text);
-          const current = snapshot?.weather?.current ?? null;
-          const currentProvenance = snapshot?.weather?.current_provenance ?? null;
-          const sources = snapshot?.weather?.sources ?? {};
-          const summaryGeneration = snapshot?.weather?.summary_generation ?? null;
-
-          const homeResult = await request('https://tempopelotas.com.br/', 'text/html');
-          if (!homeResult.response.ok) throw new Error(`home HTTP ${homeResult.response.status}`);
-          const home = homeResult.text;
-          const heroMatch = home.match(/<section[^>]*class="[^"]*weather-hero[^"]*"[\s\S]*?<\/section>/i);
-          const heroHtml = heroMatch?.[0] ?? '';
-          const heroText = heroHtml
-            .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
-            .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' ')
-            .replace(/<[^>]+>/g, ' ')
-            .replace(/\s+/g, ' ')
-            .trim();
-
-          const provenanceValues = currentProvenance && typeof currentProvenance === 'object'
-            ? [...new Set(Object.values(currentProvenance).filter(Boolean))]
-            : [];
-
-          const audit = {
-            checkedAt: new Date().toISOString(),
-            endpoints: results,
-            publicSnapshot: {
-              generatedAt: snapshot?.generated_at ?? null,
-              status: snapshot?.status ?? null,
-              current,
-              currentProvenance,
-              currentProvenanceSources: provenanceValues,
-              embrapa: sources?.embrapa ?? null,
-              inmet: sources?.inmet ?? null,
-              forecastSource: snapshot?.weather?.quality?.forecastSource ?? null,
-              forecastProvider: snapshot?.weather?.quality?.forecastProvider ?? null,
-              summaryGeneration,
-            },
-            hero: {
-              found: Boolean(heroHtml),
-              text: heroText.slice(0, 2500),
-              hasCurrentStationLabel: /Embrapa Clima Temperado|Leitura das|Atualizada em/.test(heroText),
-              hasInmetLabel: /INMET/.test(heroText),
-              hasGeminiMarker: /Gemini|gemini/i.test(heroText),
-            },
-          };
-
-          console.log(JSON.stringify(audit, null, 2));
-
-          if (!results.inmetForecast?.ok) throw new Error('INMET previsão não respondeu ao vivo.');
-          if (!results.inmetAlerts?.ok) throw new Error('INMET avisos não respondeu ao vivo.');
-          if (!results.inmetStation?.ok) throw new Error('INMET estação não respondeu ao vivo.');
-          if (!results.embrapa?.ok) throw new Error('Embrapa não respondeu ao vivo.');
-          if (current && (provenanceValues.length !== 1 || provenanceValues[0] !== 'embrapa')) {
-            throw new Error(`Proveniência da condição atual não é exclusivamente Embrapa: ${provenanceValues.join(', ') || 'ausente'}.`);
+          const support = [
+            ['/robots.txt', 'text/plain'],
+            ['/pelotas.json', 'application/json'],
+            ['/feed', 'application/feed+json'],
+            ['/embed/nivel-laranjal', 'text/html'],
+            ['/embed/status-tempo-agora', 'text/html'],
+            ['/widgets/nivel-laranjal.js', 'text/javascript'],
+            ['/api/widgets/nivel-laranjal', 'application/json'],
+            ['/api/weather/embrapa', 'application/json'],
+            ['/api/weather/hourly-precipitation', 'application/json'],
+            ['/api/inmet/geadas?days=7&uf=RS', 'application/json'],
+          ];
+          const supportResults = [];
+          for (const [path, accept] of support) {
+            try {
+              const { response, text } = await fetchText(`${baseUrl}${path}`, accept);
+              supportResults.push({ path, status: response.status, ok: response.ok, bytes: Buffer.byteLength(text), contentType: response.headers.get('content-type') });
+            } catch (error) {
+              supportResults.push({ path, status: null, ok: false, error: error.message });
+            }
           }
-          if (!heroHtml) throw new Error('Hero não foi encontrado no HTML publicado.');
-          if (/Gemini|gemini/i.test(heroText)) throw new Error('Hero publicado contém referência a Gemini.');
+
+          const failedPages = results.filter((item) => !item.ok);
+          const failedSupport = supportResults.filter((item) => !item.ok);
+          console.log(JSON.stringify({
+            checkedAt: new Date().toISOString(),
+            sitemapCount: urls.length,
+            publicPages: results,
+            support: supportResults,
+            failedPages,
+            failedSupport,
+          }, null, 2));
+
+          if (failedPages.length > 0) throw new Error(`${failedPages.length} página(s) pública(s) falharam.`);
+          if (failedSupport.length > 0) throw new Error(`${failedSupport.length} interface(s) pública(s) falharam.`);
           NODE
