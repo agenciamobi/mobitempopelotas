@@ -1,0 +1,51 @@
+name: Diagnóstico temporário de contratos
+
+on:
+  push:
+    branches:
+      - agent/seo-gsc-round-20260816
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci --no-audit --no-fund
+
+      - name: homepage-coherence
+        continue-on-error: true
+        run: node --test tests/homepage-coherence.test.ts
+
+      - name: seo-domain
+        continue-on-error: true
+        run: node --test tests/seo-domain.test.ts
+
+      - name: seo-content-accessibility
+        continue-on-error: true
+        run: node --test tests/seo-content-accessibility.test.ts
+
+      - name: frost-monitoring-page
+        continue-on-error: true
+        run: node --test tests/frost-monitoring-page.test.ts
+
+      - name: regional-city-editorial
+        continue-on-error: true
+        run: node --test tests/regional-city-editorial.test.ts
+
+      - name: internal-editorial-cohesion
+        continue-on-error: true
+        run: node --test tests/internal-editorial-cohesion.test.ts
