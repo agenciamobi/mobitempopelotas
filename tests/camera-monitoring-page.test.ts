@@ -50,7 +50,8 @@ test("camera thumbnails and external links preserve privacy and accessibility", 
   assert.match(page, /decoding="async"/);
   assert.match(page, /referrerPolicy="no-referrer"/);
   assert.match(page, /alt=""/);
-  assert.match(page, /target="_blank" rel="noopener noreferrer"/);
+  assert.match(page, /target="_blank"/);
+  assert.match(page, /rel="noopener noreferrer"/);
   assert.match(page, /página original, em nova aba/);
   assert.match(page, /aria-live="polite"/);
   assert.match(page, /aria-pressed=\{active\}/);
