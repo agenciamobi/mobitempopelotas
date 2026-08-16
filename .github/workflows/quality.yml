@@ -54,5 +54,11 @@ jobs:
       - name: TypeScript
         run: npm run typecheck
 
+      - name: Debug temporário do Prettier da página de câmeras
+        run: |
+          echo "PRETTIER_CAMERA_BEGIN"
+          npx prettier src/components/cameras/CameraPageV2.tsx
+          echo "PRETTIER_CAMERA_END"
+
       - name: ESLint
         run: npm run lint
