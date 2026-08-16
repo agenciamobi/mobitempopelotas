@@ -133,7 +133,7 @@ function PrivacyDataPage() {
               o acesso às páginas públicas do portal.
             </p>
             <div className="privacy-actions">
-              <Link to="/conta" search={{}}>Abrir minha conta</Link>
+              <Link to="/conta" search={{ erro: undefined }}>Abrir minha conta</Link>
               <Link to="/metodologia">Consultar metodologia e fontes</Link>
             </div>
           </section>
