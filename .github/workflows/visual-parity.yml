@@ -74,9 +74,12 @@ jobs:
           const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
           let lastError = "servidor ainda não respondeu";
 
-          for (let attempt = 1; attempt <= 36; attempt += 1) {
+          // A Home pode precisar concluir a contingência do Open-Meteo (15 s)
+          // quando o CI não possui credenciais/saída de rede. O probe precisa
+          // esperar mais do que a própria fonte antes de cancelar o SSR.
+          for (let attempt = 1; attempt <= 12; attempt += 1) {
             try {
-              const response = await fetch(url, { signal: AbortSignal.timeout(10_000) });
+              const response = await fetch(url, { signal: AbortSignal.timeout(25_000) });
               const html = await response.text();
 
               if (response.ok && html.includes("site-shell--home-editorial")) {
@@ -89,8 +92,8 @@ jobs:
               lastError = error instanceof Error ? error.message : String(error);
             }
 
-            console.log(`Aguardando revisão local (${attempt}/36): ${lastError}`);
-            await wait(5_000);
+            console.log(`Aguardando revisão local (${attempt}/12): ${lastError}`);
+            if (attempt < 12) await wait(5_000);
           }
 
           throw new Error(`A revisão local não ficou disponível: ${lastError}`);
