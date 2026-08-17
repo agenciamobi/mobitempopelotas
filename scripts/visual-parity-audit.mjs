@@ -117,20 +117,67 @@ async function auditPage(page, target, viewport) {
 
   const audit = await page.evaluate(
     ({ mobile, strictLayout, httpStatus }) => {
+      function cssColor(value) {
+        const match = value.match(
+          /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:\s*[,/]\s*([\d.]+))?\s*\)/u,
+        );
+        if (!match) return null;
+
+        return {
+          red: Number(match[1]),
+          green: Number(match[2]),
+          blue: Number(match[3]),
+          alpha: match[4] === undefined ? 1 : Number(match[4]),
+        };
+      }
+
+      function relativeLuminance({ red, green, blue }) {
+        const channel = (value) => {
+          const normalized = value / 255;
+          return normalized <= 0.04045
+            ? normalized / 12.92
+            : ((normalized + 0.055) / 1.055) ** 2.4;
+        };
+
+        return 0.2126 * channel(red) + 0.7152 * channel(green) + 0.0722 * channel(blue);
+      }
+
+      function hasLightFooterSurface(style) {
+        if (!style) return false;
+
+        const values = `${style.backgroundColor} ${style.backgroundImage}`;
+        const colors = values.match(/rgba?\([^)]*\)/gu) ?? [];
+        const opaqueColors = colors
+          .map(cssColor)
+          .filter((color) => color && color.alpha >= 0.5);
+
+        return (
+          opaqueColors.length > 0 &&
+          opaqueColors.every((color) => relativeLuminance(color) >= 0.72)
+        );
+      }
+
       const root = document.documentElement;
       const active = document.activeElement;
       const skipLink = document.querySelector(".skip-link");
       const skipRect = skipLink?.getBoundingClientRect() ?? null;
-      const mobileNavigation = document.querySelector(".mobile-tab-bar");
-      const footer = document.querySelector(".site-footer-v3");
+      const siteShell = document.querySelector(".site-shell--home-editorial");
+      const mobileNavigation = document.querySelector(
+        ".production-mobile-navigation, .mobile-tab-bar",
+      );
+      const footer = document.querySelector(".editorial-footer-shell, .site-footer-v3");
       const footerPanel = document.querySelector(".editorial-footer");
-      const brand = document.querySelector("img.brand-logo, .editorial-footer__brand img");
+      const brand = document.querySelector(
+        ".production-brand-logo, .editorial-footer-brand-logo, img.brand-logo, .editorial-footer__brand img",
+      );
       const mobileNavigationStyle = mobileNavigation
         ? window.getComputedStyle(mobileNavigation)
         : null;
+      const siteShellStyle = siteShell ? window.getComputedStyle(siteShell) : null;
       const footerStyle = footer ? window.getComputedStyle(footer) : null;
       const footerPanelStyle = footerPanel ? window.getComputedStyle(footerPanel) : null;
       const footerBackground = footerPanelStyle?.backgroundColor ?? null;
+      const footerBackgroundImage = footerPanelStyle?.backgroundImage ?? null;
       const navigationRect = mobileNavigation?.getBoundingClientRect() ?? null;
       const navigationVisible = Boolean(
         mobileNavigationStyle &&
@@ -142,12 +189,16 @@ async function auditPage(page, target, viewport) {
       const footerPaddingBottom = footerStyle
         ? Number.parseFloat(footerStyle.paddingBottom) || 0
         : 0;
+      const shellPaddingBottom = siteShellStyle
+        ? Number.parseFloat(siteShellStyle.paddingBottom) || 0
+        : 0;
+      const protectedBottomSpace = Math.max(footerPaddingBottom, shellPaddingBottom);
       const weatherUnavailable = Boolean(document.querySelector(".production-weather-unavailable"));
       const hasWeatherState = Boolean(
         document.querySelector(".weather-hero, .production-weather-unavailable"),
       );
       const hasCoreStructure = Boolean(
-        document.querySelector(".site-shell--home-editorial") &&
+        siteShell &&
         document.querySelector("#conteudo-principal") &&
         hasWeatherState &&
         footer &&
@@ -165,9 +216,10 @@ async function auditPage(page, target, viewport) {
         hasExplore: Boolean(document.querySelector("#explorar-portal")),
         exploreHeading:
           document.querySelector("#home-explore-portal-title")?.textContent?.trim() ?? null,
-        hasFooter: Boolean(footer),
+        hasFooter: Boolean(footer && footerPanel),
         footerBackground,
-        footerLight: strictLayout ? footerBackground === "rgb(248, 250, 248)" : null,
+        footerBackgroundImage,
+        footerLight: strictLayout ? hasLightFooterSurface(footerPanelStyle) : null,
         brandLoaded: Boolean(brandImage?.complete && brandImage.naturalWidth > 0),
         skipLinkFocused: active === skipLink,
         skipLinkVisible: Boolean(
@@ -180,9 +232,11 @@ async function auditPage(page, target, viewport) {
         navigationVisible,
         navigationHeight,
         footerPaddingBottom,
+        shellPaddingBottom,
+        protectedBottomSpace,
         footerProtected:
           mobile && strictLayout && navigationVisible
-            ? footerPaddingBottom >= navigationHeight
+            ? protectedBottomSpace + 1 >= navigationHeight
             : null,
       };
     },
@@ -209,14 +263,16 @@ async function auditPage(page, target, viewport) {
     failures.push("rodapé editorial ausente");
   }
   if (target.strictLayout && audit.footerLight !== true) {
-    failures.push(`rodapé publicado não está claro: ${audit.footerBackground ?? "cor ausente"}`);
+    failures.push(
+      `rodapé publicado não está claro: ${audit.footerBackgroundImage ?? audit.footerBackground ?? "superfície ausente"}`,
+    );
   }
   if (target.strictLayout && (!audit.skipLinkFocused || !audit.skipLinkVisible)) {
     failures.push("skip link não recebeu foco visível");
   }
   if (audit.footerProtected === false) {
     failures.push(
-      `rodapé sem proteção suficiente: ${audit.footerPaddingBottom}px para navegação de ${audit.navigationHeight}px`,
+      `rodapé sem proteção suficiente: ${audit.protectedBottomSpace}px para navegação de ${audit.navigationHeight}px`,
     );
   }
 
