@@ -44,6 +44,9 @@ jobs:
       - name: Contratos rápidos
         run: npm run test:contracts
 
+      - name: Contrato Weather AI
+        run: node --test tests/weather-ai-snapshots.test.ts
+
       - name: Verificar árvore de rotas versionada
         run: npm run routes:check
 
