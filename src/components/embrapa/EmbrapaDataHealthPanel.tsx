@@ -17,35 +17,33 @@ import type {
 
 import "./EmbrapaDataHealthPanel.css";
 
-const levelCopy: Record<
-  EmbrapaHealthLevel,
-  { label: string; title: string; description: string }
-> = {
-  normal: {
-    label: "Operação normal",
-    title: "Centralizador funcionando normalmente",
-    description:
-      "O coletor está ativo, a leitura central é recente e não existem incidentes operacionais abertos.",
-  },
-  degraded: {
-    label: "Atenção",
-    title: "Dados disponíveis com degradação",
-    description:
-      "O portal ainda possui dados, mas detectou atraso, falhas repetidas, resposta lenta ou leitura incompleta.",
-  },
-  critical: {
-    label: "Incidente crítico",
-    title: "A centralização precisa de atenção",
-    description:
-      "A última coleta está muito atrasada ou o coletor acumulou falhas que comprometem a atualização em tempo real.",
-  },
-  unavailable: {
-    label: "Sem diagnóstico",
-    title: "Saúde operacional indisponível",
-    description:
-      "O ambiente ainda não conseguiu consultar o registro central de monitoramento da estação.",
-  },
-};
+const levelCopy: Record<EmbrapaHealthLevel, { label: string; title: string; description: string }> =
+  {
+    normal: {
+      label: "Operação normal",
+      title: "Centralizador funcionando normalmente",
+      description:
+        "O coletor está ativo, a leitura central é recente e não existem incidentes operacionais abertos.",
+    },
+    degraded: {
+      label: "Atenção",
+      title: "Dados disponíveis com degradação",
+      description:
+        "O portal ainda possui dados, mas detectou atraso, falhas repetidas, resposta lenta ou leitura incompleta.",
+    },
+    critical: {
+      label: "Incidente crítico",
+      title: "A centralização precisa de atenção",
+      description:
+        "A última coleta está muito atrasada ou o coletor acumulou falhas que comprometem a atualização em tempo real.",
+    },
+    unavailable: {
+      label: "Sem diagnóstico",
+      title: "Saúde operacional indisponível",
+      description:
+        "O ambiente ainda não conseguiu consultar o registro central de monitoramento da estação.",
+    },
+  };
 
 function formatDateTime(value: string | null) {
   if (!value) return "Não registrado";
@@ -146,7 +144,8 @@ export function EmbrapaDataHealthPanel({ snapshot }: { snapshot: EmbrapaHealthSn
           <span>Falhas consecutivas</span>
           <strong>{formatInteger(snapshot.collector.consecutiveFailures)}</strong>
           <small>
-            {formatInteger(snapshot.collector.successfulCollects)} sucessos · {formatInteger(snapshot.collector.failedCollects)} falhas
+            {formatInteger(snapshot.collector.successfulCollects)} sucessos ·{" "}
+            {formatInteger(snapshot.collector.failedCollects)} falhas
           </small>
         </article>
       </div>
@@ -156,7 +155,9 @@ export function EmbrapaDataHealthPanel({ snapshot }: { snapshot: EmbrapaHealthSn
           <RadioTower aria-hidden="true" />
           <div>
             <span>Agendador</span>
-            <strong>{collectorCurrent ? "Executando a cada minuto" : "Sem execução recente"}</strong>
+            <strong>
+              {collectorCurrent ? "Executando a cada minuto" : "Sem execução recente"}
+            </strong>
             <small>Última tentativa: {formatDateTime(snapshot.collector.lastAttemptAt)}</small>
           </div>
         </article>
@@ -184,7 +185,11 @@ export function EmbrapaDataHealthPanel({ snapshot }: { snapshot: EmbrapaHealthSn
           <History aria-hidden="true" />
           <div>
             <span>Persistência</span>
-            <strong>{snapshot.history.total > 0 ? "Histórico sendo preservado" : "Sem histórico disponível"}</strong>
+            <strong>
+              {snapshot.history.total > 0
+                ? "Histórico sendo preservado"
+                : "Sem histórico disponível"}
+            </strong>
             <small>Gravação deduplicada por mudança dos dados</small>
           </div>
         </article>
@@ -194,9 +199,15 @@ export function EmbrapaDataHealthPanel({ snapshot }: { snapshot: EmbrapaHealthSn
         <div className="embrapa-health__alerts-heading">
           <div>
             <span className="embrapa-health__eyebrow">Incidentes automáticos</span>
-            <h3>{snapshot.alerts.openCount ? "Ocorrências que exigem atenção" : "Nenhum incidente aberto"}</h3>
+            <h3>
+              {snapshot.alerts.openCount
+                ? "Ocorrências que exigem atenção"
+                : "Nenhum incidente aberto"}
+            </h3>
           </div>
-          <span>{snapshot.alerts.openCount} aberto{snapshot.alerts.openCount === 1 ? "" : "s"}</span>
+          <span>
+            {snapshot.alerts.openCount} aberto{snapshot.alerts.openCount === 1 ? "" : "s"}
+          </span>
         </div>
 
         {snapshot.alerts.items.length ? (
@@ -217,7 +228,10 @@ export function EmbrapaDataHealthPanel({ snapshot }: { snapshot: EmbrapaHealthSn
             <CheckCircle2 aria-hidden="true" />
             <div>
               <strong>Coleta dentro dos parâmetros esperados</strong>
-              <p>Falhas, atrasos, lentidão e campos ausentes são verificados automaticamente a cada execução.</p>
+              <p>
+                Falhas, atrasos, lentidão e campos ausentes são verificados automaticamente a cada
+                execução.
+              </p>
             </div>
           </div>
         )}

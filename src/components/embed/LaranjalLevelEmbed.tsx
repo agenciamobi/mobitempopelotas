@@ -81,12 +81,7 @@ function MiniChart({ data }: { data: LaranjalLevelData }) {
         </defs>
         <line x1={paddingX} y1={paddingY} x2={width - paddingX} y2={paddingY} />
         <line x1={paddingX} y1={height / 2} x2={width - paddingX} y2={height / 2} />
-        <line
-          x1={paddingX}
-          y1={height - paddingY}
-          x2={width - paddingX}
-          y2={height - paddingY}
-        />
+        <line x1={paddingX} y1={height - paddingY} x2={width - paddingX} y2={height - paddingY} />
         <path d={area} fill="url(#embed-laranjal-area)" />
         <polyline
           points={line}
@@ -96,12 +91,7 @@ function MiniChart({ data }: { data: LaranjalLevelData }) {
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <circle
-          cx={coordinates.at(-1)?.x}
-          cy={coordinates.at(-1)?.y}
-          r="6"
-          fill="currentColor"
-        />
+        <circle cx={coordinates.at(-1)?.x} cy={coordinates.at(-1)?.y} r="6" fill="currentColor" />
       </svg>
       <div className={styles.chartLabels}>
         <span>24 horas</span>
@@ -169,7 +159,8 @@ export function LaranjalLevelEmbed({ data }: { data: LaranjalLevelData }) {
             </div>
           </div>
           <span className={`${styles.status} ${live ? styles.live : styles.stale}`}>
-            <i aria-hidden="true" /> {live ? "Tempo real" : data.status === "stale" ? "Última leitura" : "Indisponível"}
+            <i aria-hidden="true" />{" "}
+            {live ? "Tempo real" : data.status === "stale" ? "Última leitura" : "Indisponível"}
           </span>
         </header>
 
@@ -202,9 +193,7 @@ export function LaranjalLevelEmbed({ data }: { data: LaranjalLevelData }) {
           </a>
         </footer>
 
-        <p className={styles.source}>
-          Fonte: LabHidroSens / UFPel · Apresentação: Tempo Pelotas
-        </p>
+        <p className={styles.source}>Fonte: LabHidroSens / UFPel · Apresentação: Tempo Pelotas</p>
       </article>
     </main>
   );
