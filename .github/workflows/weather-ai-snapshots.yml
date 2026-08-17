@@ -60,8 +60,8 @@ jobs:
 
           echo "::add-mask::$oidc_token"
 
-          OIDC_TOKEN="$oidc_token" node <<'NODE'
-          const { createPublicKey, verify } = require("node:crypto");
+          OIDC_TOKEN="$oidc_token" node --input-type=module <<'NODE'
+          import { createPublicKey, verify } from "node:crypto";
 
           const token = process.env.OIDC_TOKEN;
           const [encodedHeader, encodedPayload, encodedSignature] = token.split(".");
