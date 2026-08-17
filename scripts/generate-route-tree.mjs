@@ -143,8 +143,13 @@ function generateRouteTree(routes) {
     .join("\n");
   const moduleRoutes = routes
     .map(
-      (route) =>
-        `    ${quote(route.path)}: GeneratedFileRoute<${quote(route.path)}, typeof ${route.identifier}Import>`,
+      (route) => `    ${quote(route.path)}: {
+      id: ${quote(route.path)}
+      path: ${quote(route.path)}
+      fullPath: ${quote(route.path)}
+      preLoaderRoute: typeof ${route.identifier}Import
+      parentRoute: typeof rootRouteImport
+    }`,
     )
     .join("\n");
   const rootChildren = routes
@@ -181,14 +186,6 @@ interface FileRouteTypes {
   to: RoutePath
   id: '__root__' | RoutePath
   fileRoutesById: FileRoutesById
-}
-
-type GeneratedFileRoute<Path extends string, RouteImport> = {
-  id: Path
-  path: Path
-  fullPath: Path
-  preLoaderRoute: RouteImport
-  parentRoute: typeof rootRouteImport
 }
 
 declare module '@tanstack/react-router' {
