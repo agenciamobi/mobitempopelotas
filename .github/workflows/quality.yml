@@ -37,9 +37,12 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Sincronizar formatação e árvore uma única vez
-        if: ${{ github.event_name == 'push' && !contains(github.event.head_commit.message, 'chore: sync generated route tree and formatting') }}
+        if: github.event_name == 'push'
         shell: bash
         run: |
+          if git log -1 --pretty=%B | grep -Fq "chore: sync generated route tree and formatting"; then
+            exit 0
+          fi
           npx prettier --write src/components/cameras/CameraPageV2.tsx scripts/generate-route-tree.mjs
           node scripts/generate-route-tree.mjs
           git add src/components/cameras/CameraPageV2.tsx scripts/generate-route-tree.mjs src/routeTree.gen.ts
