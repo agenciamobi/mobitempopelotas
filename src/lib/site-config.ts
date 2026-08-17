@@ -16,7 +16,8 @@ export function absoluteUrl(path = "/") {
 
 export const ORGANIZATION_JSON_LD_ID = absoluteUrl("/#organization");
 export const WEBSITE_JSON_LD_ID = absoluteUrl("/#website");
-export const SOCIAL_IMAGE_URL = absoluteUrl("/brand/tempo-pelotas-primary.svg");
+export const BRAND_LOGO_URL = absoluteUrl("/brand/tempo-pelotas-primary.svg");
+export const SOCIAL_IMAGE_URL = absoluteUrl("/brand/tempo-pelotas-social.png");
 
 export function createPelotasPlaceJsonLd() {
   return {
@@ -49,7 +50,7 @@ export function createWebsiteJsonLd() {
         url: SITE_URL,
         logo: {
           "@type": "ImageObject",
-          url: SOCIAL_IMAGE_URL,
+          url: BRAND_LOGO_URL,
         },
         areaServed: pelotas,
         knowsAbout: [
