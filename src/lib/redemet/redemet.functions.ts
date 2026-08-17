@@ -3,7 +3,8 @@ import { setResponseHeaders } from "@tanstack/react-start/server";
 
 import { fetchInmetSatellite } from "@/lib/weather/inmet-satellite.server";
 import { withRedemetLastGood } from "./redemet-last-good.server";
-import { fetchRedemetRadar, fetchRedemetSatellite, fetchRedemetStorms } from "./redemet.server";
+import { fetchRedemetRadarResilient } from "./redemet-radar.server";
+import { fetchRedemetSatellite, fetchRedemetStorms } from "./redemet.server";
 import type { RedemetOverview } from "./redemet.types";
 
 export const getRedemetOverview = createServerFn({ method: "GET" }).handler(
@@ -16,7 +17,7 @@ export const getRedemetOverview = createServerFn({ method: "GET" }).handler(
     );
 
     const [radar, satellite, inmetSatellite, storms] = await Promise.all([
-      withRedemetLastGood("radar:10", () => fetchRedemetRadar(10)),
+      withRedemetLastGood("radar:10", () => fetchRedemetRadarResilient(10)),
       withRedemetLastGood("satellite:realcada:10", () => fetchRedemetSatellite("realcada", 10)),
       withRedemetLastGood("satellite:inmet:goes:s:iv:10", () => fetchInmetSatellite(10)),
       withRedemetLastGood("storms:20", () => fetchRedemetStorms(20)),
