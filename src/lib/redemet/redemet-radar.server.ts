@@ -31,6 +31,12 @@ type RuntimeWithProcess = typeof globalThis & {
   };
 };
 
+type RawRadarFrame = {
+  path: string;
+  data: string | null;
+  bounds: RedemetBounds;
+};
+
 type ParsedRadarPayload = {
   frames: RedemetImageFrame[];
   matchingRecords: number;
@@ -141,7 +147,9 @@ function parseDate(value: string | null) {
   }
 
   const normalized = trimmed.includes("T") ? trimmed : trimmed.replace(" ", "T");
-  const withZone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(normalized) ? normalized : `${normalized}Z`;
+  const withZone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(normalized)
+    ? normalized
+    : `${normalized}Z`;
   const parsed = new Date(withZone);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
@@ -183,8 +191,10 @@ export function parseRadarPayloadForArea(
   const normalizedArea = area.trim().toLowerCase();
   const requestedFrames = clampFrameCount(frameCount);
   const records = collectRadarRecords(payload, normalizedArea);
-  const rawFrames = records.flatMap((record) => {
-    const rawPath = asString(record.path ?? record.url ?? record.imagem ?? record.image ?? record.arquivo);
+  const rawFrames: RawRadarFrame[] = records.flatMap((record) => {
+    const rawPath = asString(
+      record.path ?? record.url ?? record.imagem ?? record.image ?? record.arquivo,
+    );
     const path = rawPath ? normalizeOfficialImageUrl(rawPath) : null;
     const bounds = readBounds(record);
     if (!path || !bounds) return [];
@@ -199,7 +209,9 @@ export function parseRadarPayloadForArea(
       },
     ];
   });
-  const unique = new Map(rawFrames.map((frame) => [frame.path, frame]));
+  const unique = new Map<string, RawRadarFrame>();
+  for (const frame of rawFrames) unique.set(frame.path, frame);
+
   const frames = [...unique.values()]
     .sort((first, second) => {
       const firstTime = parseDate(first.data)?.getTime() ?? 0;
