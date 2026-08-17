@@ -126,8 +126,7 @@ async function computedAccessibleNames(page, session, candidates) {
     });
     const target =
       nodes.find(
-        (axNode) =>
-          !axNode.ignored && axNode.backendDOMNodeId === node.backendNodeId,
+        (axNode) => !axNode.ignored && axNode.backendDOMNodeId === node.backendNodeId,
       ) ??
       nodes.find((axNode) => !axNode.ignored) ??
       null;
