@@ -122,10 +122,7 @@ async function discoverRoutes() {
 
 function generateRouteTree(routes) {
   const imports = routes
-    .map(
-      (route) =>
-        `import { Route as ${route.identifier}Import } from ${quote(route.importPath)}`,
-    )
+    .map((route) => `import { Route as ${route.identifier}Import } from ${quote(route.importPath)}`)
     .join("\n");
 
   const routeDefinitions = routes
@@ -152,9 +149,7 @@ function generateRouteTree(routes) {
     }`,
     )
     .join("\n");
-  const rootChildren = routes
-    .map((route) => `  ${route.identifier},`)
-    .join("\n");
+  const rootChildren = routes.map((route) => `  ${route.identifier},`).join("\n");
 
   return `/* eslint-disable */
 

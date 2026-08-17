@@ -34,7 +34,10 @@ type CameraPageProps = {
 
 type CameraPresentationState = "live" | "replay" | "configured" | "preparing";
 
-const stateCopy: Record<CameraPresentationState, { label: string; title: string; description: string }> = {
+const stateCopy: Record<
+  CameraPresentationState,
+  { label: string; title: string; description: string }
+> = {
   live: {
     label: "Ao vivo agora",
     title: "Transmissão ao vivo",
@@ -48,7 +51,8 @@ const stateCopy: Record<CameraPresentationState, { label: string; title: string;
   configured: {
     label: "Vídeo disponível",
     title: "Horário da imagem não confirmado",
-    description: "O vídeo pode ser aberto, mas não foi possível confirmar se a imagem é ao vivo ou gravada.",
+    description:
+      "O vídeo pode ser aberto, mas não foi possível confirmar se a imagem é ao vivo ou gravada.",
   },
   preparing: {
     label: "Em preparação",
@@ -166,28 +170,45 @@ export function CameraPageHero({ cameraData }: Pick<CameraPageProps, "cameraData
         <span className="camera-v2-eyebrow">Imagens do Laranjal e de Pelotas</span>
         <h1 id="camera-v2-hero-title">Câmeras do Laranjal e de Pelotas.</h1>
         <p>
-          Veja o céu, a visibilidade e a superfície da Lagoa em pontos específicos. Cada câmera informa
-          se a imagem está ao vivo, é uma gravação anterior ou ainda não tem horário confirmado.
+          Veja o céu, a visibilidade e a superfície da Lagoa em pontos específicos. Cada câmera
+          informa se a imagem está ao vivo, é uma gravação anterior ou ainda não tem horário
+          confirmado.
         </p>
         <div className="camera-v2-hero__actions">
-          <a href="#explorador-de-cameras">Escolher uma câmera <ArrowRight aria-hidden="true" /></a>
+          <a href="#explorador-de-cameras">
+            Escolher uma câmera <ArrowRight aria-hidden="true" />
+          </a>
           <Link to="/radar-e-satelite-pelotas">Comparar com radar</Link>
         </div>
       </div>
       <aside className={`camera-v2-featured is-${featuredState}`} aria-label="Câmera em destaque">
         <header>
-          <span><FeaturedIcon aria-hidden="true" />{stateCopy[featuredState].label}</span>
+          <span>
+            <FeaturedIcon aria-hidden="true" />
+            {stateCopy[featuredState].label}
+          </span>
           <small>Atualizado em {formatDateTime(cameraData.source.fetchedAt)}</small>
         </header>
         <div>
           <span>Câmera em destaque</span>
           <strong>{featured?.shortName ?? "Nenhum ponto"}</strong>
-          <p>{featured ? stateCopy[featuredState].description : "Nenhuma câmera foi cadastrada."}</p>
+          <p>
+            {featured ? stateCopy[featuredState].description : "Nenhuma câmera foi cadastrada."}
+          </p>
         </div>
         <dl>
-          <div><dt>Ao vivo</dt><dd>{counts.live}</dd></div>
-          <div><dt>Gravações</dt><dd>{counts.replay}</dd></div>
-          <div><dt>Sem horário confirmado</dt><dd>{counts.configured}</dd></div>
+          <div>
+            <dt>Ao vivo</dt>
+            <dd>{counts.live}</dd>
+          </div>
+          <div>
+            <dt>Gravações</dt>
+            <dd>{counts.replay}</dd>
+          </div>
+          <div>
+            <dt>Sem horário confirmado</dt>
+            <dd>{counts.configured}</dd>
+          </div>
         </dl>
         <footer>{featured?.provider ?? cameraData.source.name}</footer>
       </aside>
@@ -195,7 +216,13 @@ export function CameraPageHero({ cameraData }: Pick<CameraPageProps, "cameraData
   );
 }
 
-function CameraExplorerV2({ cameras, referenceTime }: { cameras: WeatherCamera[]; referenceTime: string }) {
+function CameraExplorerV2({
+  cameras,
+  referenceTime,
+}: {
+  cameras: WeatherCamera[];
+  referenceTime: string;
+}) {
   const initial = useMemo(() => selectedInitialCamera(cameras), [cameras]);
   const [selectedId, setSelectedId] = useState(initial?.id ?? "");
   const [playerOpen, setPlayerOpen] = useState(false);
@@ -203,7 +230,11 @@ function CameraExplorerV2({ cameras, referenceTime }: { cameras: WeatherCamera[]
 
   if (!selected) {
     return (
-      <section className="camera-v2-empty" id="explorador-de-cameras" aria-labelledby="camera-v2-empty-title">
+      <section
+        className="camera-v2-empty"
+        id="explorador-de-cameras"
+        aria-labelledby="camera-v2-empty-title"
+      >
         <VideoOff aria-hidden="true" />
         <div>
           <span className="camera-v2-eyebrow">Nenhuma câmera cadastrada</span>
@@ -223,13 +254,19 @@ function CameraExplorerV2({ cameras, referenceTime }: { cameras: WeatherCamera[]
   };
 
   return (
-    <section className="camera-v2-explorer" id="explorador-de-cameras" aria-labelledby="camera-v2-explorer-title">
+    <section
+      className="camera-v2-explorer"
+      id="explorador-de-cameras"
+      aria-labelledby="camera-v2-explorer-title"
+    >
       <header className="camera-v2-section-heading">
         <div>
           <span className="camera-v2-eyebrow">Câmeras disponíveis</span>
           <h2 id="camera-v2-explorer-title">Escolha o local e confira a data da imagem</h2>
         </div>
-        <p>O vídeo só é carregado depois do clique. Ao trocar de câmera, o vídeo anterior é fechado.</p>
+        <p>
+          O vídeo só é carregado depois do clique. Ao trocar de câmera, o vídeo anterior é fechado.
+        </p>
       </header>
       <div className="camera-v2-selector" aria-label="Escolha uma câmera">
         {cameras.map((camera) => {
@@ -237,10 +274,19 @@ function CameraExplorerV2({ cameras, referenceTime }: { cameras: WeatherCamera[]
           const Icon = stateIcon(state);
           const active = camera.id === selected.id;
           return (
-            <article className={`is-${state}${active ? " is-active" : ""}`} id={camera.id} key={camera.id}>
+            <article
+              className={`is-${state}${active ? " is-active" : ""}`}
+              id={camera.id}
+              key={camera.id}
+            >
               <button type="button" aria-pressed={active} onClick={() => selectCamera(camera)}>
-                <span className="camera-v2-selector__icon"><Icon aria-hidden="true" /></span>
-                <span><strong>{camera.shortName}</strong><small>{camera.area}</small></span>
+                <span className="camera-v2-selector__icon">
+                  <Icon aria-hidden="true" />
+                </span>
+                <span>
+                  <strong>{camera.shortName}</strong>
+                  <small>{camera.area}</small>
+                </span>
                 <em>{stateCopy[state].label}</em>
               </button>
             </article>
@@ -249,30 +295,40 @@ function CameraExplorerV2({ cameras, referenceTime }: { cameras: WeatherCamera[]
       </div>
       <div className="camera-v2-stage">
         <div className={`camera-v2-frame is-${selectedState}`}>
-          {canPlay ? playerOpen ? (
-            <iframe
-              src={selected.embedUrl ?? undefined}
-              title={selected.streamTitle ?? selected.name}
-              loading="lazy"
-              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-              allowFullScreen
-              referrerPolicy="strict-origin-when-cross-origin"
-            />
-          ) : (
-            <button
-              className="camera-v2-launch"
-              type="button"
-              onClick={() => setPlayerOpen(true)}
-              aria-label={`${launchLabel(selected)}: ${selected.name}`}
-            >
-              {selected.thumbnailUrl ? (
-                <img src={selected.thumbnailUrl} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" />
-              ) : null}
-              <span className="camera-v2-launch__shade" aria-hidden="true" />
-              <span className="camera-v2-launch__icon"><CirclePlay aria-hidden="true" /></span>
-              <strong>{launchLabel(selected)}</strong>
-              <small>{stateCopy[selectedState].description}</small>
-            </button>
+          {canPlay ? (
+            playerOpen ? (
+              <iframe
+                src={selected.embedUrl ?? undefined}
+                title={selected.streamTitle ?? selected.name}
+                loading="lazy"
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                allowFullScreen
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            ) : (
+              <button
+                className="camera-v2-launch"
+                type="button"
+                onClick={() => setPlayerOpen(true)}
+                aria-label={`${launchLabel(selected)}: ${selected.name}`}
+              >
+                {selected.thumbnailUrl ? (
+                  <img
+                    src={selected.thumbnailUrl}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : null}
+                <span className="camera-v2-launch__shade" aria-hidden="true" />
+                <span className="camera-v2-launch__icon">
+                  <CirclePlay aria-hidden="true" />
+                </span>
+                <strong>{launchLabel(selected)}</strong>
+                <small>{stateCopy[selectedState].description}</small>
+              </button>
+            )
           ) : (
             <div className="camera-v2-placeholder" role="status">
               <VideoOff aria-hidden="true" />
@@ -281,32 +337,72 @@ function CameraExplorerV2({ cameras, referenceTime }: { cameras: WeatherCamera[]
             </div>
           )}
           <div className="camera-v2-frame__status">
-            <span><SelectedIcon aria-hidden="true" />{stateCopy[selectedState].label}</span>
+            <span>
+              <SelectedIcon aria-hidden="true" />
+              {stateCopy[selectedState].label}
+            </span>
             <small>{selected.provider ?? "Responsável não informado"}</small>
           </div>
         </div>
-        <aside className="camera-v2-details" aria-label="Detalhes da câmera selecionada" aria-live="polite">
+        <aside
+          className="camera-v2-details"
+          aria-label="Detalhes da câmera selecionada"
+          aria-live="polite"
+        >
           <span className="camera-v2-eyebrow">Câmera selecionada</span>
           <h3>{selected.name}</h3>
           <p>{selected.description}</p>
           <div className={`camera-v2-details__state is-${selectedState}`}>
             <SelectedIcon aria-hidden="true" />
-            <span><strong>{stateCopy[selectedState].title}</strong><small>{stateCopy[selectedState].description}</small></span>
+            <span>
+              <strong>{stateCopy[selectedState].title}</strong>
+              <small>{stateCopy[selectedState].description}</small>
+            </span>
           </div>
           <dl>
-            <div><dt>Local</dt><dd><MapPin aria-hidden="true" />{selected.area}</dd></div>
-            <div><dt>O que a câmera mostra</dt><dd><Eye aria-hidden="true" />{selected.observation}</dd></div>
-            <div><dt>Origem do vídeo</dt><dd><Satellite aria-hidden="true" />{sourceLabel(selected)}</dd></div>
-            <div><dt>Localização aproximada</dt><dd>{selected.latitude.toFixed(4)}, {selected.longitude.toFixed(4)}</dd></div>
+            <div>
+              <dt>Local</dt>
+              <dd>
+                <MapPin aria-hidden="true" />
+                {selected.area}
+              </dd>
+            </div>
+            <div>
+              <dt>O que a câmera mostra</dt>
+              <dd>
+                <Eye aria-hidden="true" />
+                {selected.observation}
+              </dd>
+            </div>
+            <div>
+              <dt>Origem do vídeo</dt>
+              <dd>
+                <Satellite aria-hidden="true" />
+                {sourceLabel(selected)}
+              </dd>
+            </div>
+            <div>
+              <dt>Localização aproximada</dt>
+              <dd>
+                {selected.latitude.toFixed(4)}, {selected.longitude.toFixed(4)}
+              </dd>
+            </div>
             {selected.publishedAt ? (
               <div>
                 <dt>Data da gravação</dt>
-                <dd><Clock3 aria-hidden="true" />{formatDateTime(selected.publishedAt)} · {relativePublication(selected.publishedAt, referenceTime)}</dd>
+                <dd>
+                  <Clock3 aria-hidden="true" />
+                  {formatDateTime(selected.publishedAt)} ·{" "}
+                  {relativePublication(selected.publishedAt, referenceTime)}
+                </dd>
               </div>
             ) : null}
           </dl>
           {selected.streamTitle ? (
-            <div className="camera-v2-details__title"><span>Título do vídeo</span><strong>{selected.streamTitle}</strong></div>
+            <div className="camera-v2-details__title">
+              <span>Título do vídeo</span>
+              <strong>{selected.streamTitle}</strong>
+            </div>
           ) : null}
           {selected.publicUrl ? (
             <a
@@ -337,12 +433,18 @@ export function CameraPageV2({ cameraData, weather }: CameraPageProps) {
     .slice(0, 12)
     .map((hour) => hour.precipitationProbability)
     .filter((value): value is number => value !== null)
-    .reduce<number | null>((maximum, value) => maximum === null ? value : Math.max(maximum, value), null);
+    .reduce<number | null>(
+      (maximum, value) => (maximum === null ? value : Math.max(maximum, value)),
+      null,
+    );
   const maxGust = weather.weather.hourly
     .slice(0, 24)
     .map((hour) => hour.windGust)
     .filter((value): value is number => value !== null)
-    .reduce<number | null>((maximum, value) => maximum === null ? value : Math.max(maximum, value), null);
+    .reduce<number | null>(
+      (maximum, value) => (maximum === null ? value : Math.max(maximum, value)),
+      null,
+    );
   const temperatureSource = weather.weather.currentProvenance.temperature;
   const itemListSchema = {
     "@context": "https://schema.org",
@@ -357,64 +459,126 @@ export function CameraPageV2({ cameraData, weather }: CameraPageProps) {
       url: absoluteUrl(`/cameras-ao-vivo-pelotas#${camera.id}`),
     })),
   };
-  const videoSchema = verifiedVideo ? {
-    "@context": "https://schema.org",
-    "@type": "VideoObject",
-    name: verifiedVideo.streamTitle ?? verifiedVideo.name,
-    description: verifiedVideo.description,
-    thumbnailUrl: verifiedVideo.thumbnailUrl ? [verifiedVideo.thumbnailUrl] : undefined,
-    uploadDate: verifiedVideo.publishedAt ?? undefined,
-    embedUrl: verifiedVideo.embedUrl,
-    contentUrl: verifiedVideo.publicUrl,
-    isLiveBroadcast: verifiedVideo.broadcastStatus === "live",
-  } : null;
+  const videoSchema = verifiedVideo
+    ? {
+        "@context": "https://schema.org",
+        "@type": "VideoObject",
+        name: verifiedVideo.streamTitle ?? verifiedVideo.name,
+        description: verifiedVideo.description,
+        thumbnailUrl: verifiedVideo.thumbnailUrl ? [verifiedVideo.thumbnailUrl] : undefined,
+        uploadDate: verifiedVideo.publishedAt ?? undefined,
+        embedUrl: verifiedVideo.embedUrl,
+        contentUrl: verifiedVideo.publicUrl,
+        isLiveBroadcast: verifiedVideo.broadcastStatus === "live",
+      }
+    : null;
 
   return (
     <div className="camera-v2-page">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema).replace(/</g, "\\u003c") }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(itemListSchema).replace(/</g, "\\u003c"),
+        }}
+      />
       {videoSchema ? (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoSchema).replace(/</g, "\\u003c") }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(videoSchema).replace(/</g, "\\u003c") }}
+        />
       ) : null}
 
       <nav className="camera-v2-chapters" aria-label="Seções das câmeras de Pelotas">
-        <a href="#estado-das-cameras"><span>01</span><strong>Situação</strong><small>Ao vivo ou gravação</small></a>
-        <a href="#explorador-de-cameras"><span>02</span><strong>Câmeras</strong><small>Escolha o local</small></a>
-        <a href="#contexto-meteorologico"><span>03</span><strong>Tempo</strong><small>Medição e previsão</small></a>
-        <a href="#como-interpretar-imagens"><span>04</span><strong>Como interpretar</strong><small>Limites da imagem</small></a>
-        <a href="#responsabilidade-das-fontes"><span>05</span><strong>Responsabilidade</strong><small>Serviços externos</small></a>
+        <a href="#estado-das-cameras">
+          <span>01</span>
+          <strong>Situação</strong>
+          <small>Ao vivo ou gravação</small>
+        </a>
+        <a href="#explorador-de-cameras">
+          <span>02</span>
+          <strong>Câmeras</strong>
+          <small>Escolha o local</small>
+        </a>
+        <a href="#contexto-meteorologico">
+          <span>03</span>
+          <strong>Tempo</strong>
+          <small>Medição e previsão</small>
+        </a>
+        <a href="#como-interpretar-imagens">
+          <span>04</span>
+          <strong>Como interpretar</strong>
+          <small>Limites da imagem</small>
+        </a>
+        <a href="#responsabilidade-das-fontes">
+          <span>05</span>
+          <strong>Responsabilidade</strong>
+          <small>Serviços externos</small>
+        </a>
       </nav>
 
-      <section className="camera-v2-status" id="estado-das-cameras" aria-labelledby="camera-v2-status-title">
+      <section
+        className="camera-v2-status"
+        id="estado-das-cameras"
+        aria-labelledby="camera-v2-status-title"
+      >
         <div>
           <span className="camera-v2-eyebrow">Situação na última atualização</span>
           <h2 id="camera-v2-status-title">{liveSummary(counts.live)}</h2>
-          <p>{cameraData.warning ?? "A consulta foi concluída sem aviso para a câmera principal."}</p>
+          <p>
+            {cameraData.warning ?? "A consulta foi concluída sem aviso para a câmera principal."}
+          </p>
         </div>
         <dl>
-          <div><dt>Ao vivo</dt><dd>{counts.live}</dd></div>
-          <div><dt>Gravações</dt><dd>{counts.replay}</dd></div>
-          <div><dt>Sem horário confirmado</dt><dd>{counts.configured}</dd></div>
-          <div><dt>Em preparação</dt><dd>{counts.preparing}</dd></div>
+          <div>
+            <dt>Ao vivo</dt>
+            <dd>{counts.live}</dd>
+          </div>
+          <div>
+            <dt>Gravações</dt>
+            <dd>{counts.replay}</dd>
+          </div>
+          <div>
+            <dt>Sem horário confirmado</dt>
+            <dd>{counts.configured}</dd>
+          </div>
+          <div>
+            <dt>Em preparação</dt>
+            <dd>{counts.preparing}</dd>
+          </div>
         </dl>
-        <footer><Info aria-hidden="true" />Atualizado em {formatDateTime(cameraData.source.fetchedAt)} · {cameraData.source.name}</footer>
+        <footer>
+          <Info aria-hidden="true" />
+          Atualizado em {formatDateTime(cameraData.source.fetchedAt)} · {cameraData.source.name}
+        </footer>
       </section>
 
       <CameraExplorerV2 cameras={cameraData.cameras} referenceTime={cameraData.source.fetchedAt} />
 
-      <section className="camera-v2-weather" id="contexto-meteorologico" aria-labelledby="camera-v2-weather-title">
+      <section
+        className="camera-v2-weather"
+        id="contexto-meteorologico"
+        aria-labelledby="camera-v2-weather-title"
+      >
         <header className="camera-v2-section-heading">
           <div>
             <span className="camera-v2-eyebrow">Informações do tempo</span>
             <h2 id="camera-v2-weather-title">A câmera e a previsão mostram coisas diferentes</h2>
           </div>
-          <p>A câmera mostra somente o local enquadrado. Temperatura, chance de chuva e rajadas vêm das fontes meteorológicas indicadas pelo portal.</p>
+          <p>
+            A câmera mostra somente o local enquadrado. Temperatura, chance de chuva e rajadas vêm
+            das fontes meteorológicas indicadas pelo portal.
+          </p>
         </header>
         <div className="camera-v2-weather__grid">
           <article>
             <Thermometer aria-hidden="true" />
             <span>Temperatura agora</span>
             <strong>{formatNumber(current?.temperature, " °C", 1)}</strong>
-            <small>{temperatureSource ? `Origem: ${sourceNames[temperatureSource]}` : "Origem não informada"}</small>
+            <small>
+              {temperatureSource
+                ? `Origem: ${sourceNames[temperatureSource]}`
+                : "Origem não informada"}
+            </small>
           </article>
           <article>
             <CloudRain aria-hidden="true" />
@@ -437,28 +601,77 @@ export function CameraPageV2({ cameraData, weather }: CameraPageProps) {
         </div>
       </section>
 
-      <section className="camera-v2-guidance" id="como-interpretar-imagens" aria-labelledby="camera-v2-guidance-title">
+      <section
+        className="camera-v2-guidance"
+        id="como-interpretar-imagens"
+        aria-labelledby="camera-v2-guidance-title"
+      >
         <header className="camera-v2-section-heading">
           <div>
             <span className="camera-v2-eyebrow">Antes de interpretar a imagem</span>
             <h2 id="camera-v2-guidance-title">O que observar e quais cuidados tomar</h2>
           </div>
-          <p>Lente molhada, reflexos, horário, iluminação e enquadramento podem alterar a aparência. Uma imagem não mede temperatura, vento, volume de chuva ou nível da água.</p>
+          <p>
+            Lente molhada, reflexos, horário, iluminação e enquadramento podem alterar a aparência.
+            Uma imagem não mede temperatura, vento, volume de chuva ou nível da água.
+          </p>
         </header>
         <div className="camera-v2-guidance__grid">
-          <article><Eye aria-hidden="true" /><span>01</span><h3>Visibilidade</h3><p>Horizonte oculto pode indicar neblina, nuvem baixa ou chuva, mas também pode resultar da posição e da qualidade da lente.</p></article>
-          <article><CloudRain aria-hidden="true" /><span>02</span><h3>Chuva aparente</h3><p>Gotas e superfície molhada ajudam a observar o local, mas não informam intensidade nem abrangência no município.</p></article>
-          <article><Wind aria-hidden="true" /><span>03</span><h3>Vento aparente</h3><p>Movimento de árvores ou da Lagoa oferece uma referência visual, mas não substitui a medição do vento nem a previsão de rajadas.</p></article>
-          <article><Clock3 aria-hidden="true" /><span>04</span><h3>Data da imagem</h3><p>Confirme se a indicação é Ao vivo, Última transmissão ou Horário não confirmado antes de interpretar a cena como atual.</p></article>
+          <article>
+            <Eye aria-hidden="true" />
+            <span>01</span>
+            <h3>Visibilidade</h3>
+            <p>
+              Horizonte oculto pode indicar neblina, nuvem baixa ou chuva, mas também pode resultar
+              da posição e da qualidade da lente.
+            </p>
+          </article>
+          <article>
+            <CloudRain aria-hidden="true" />
+            <span>02</span>
+            <h3>Chuva aparente</h3>
+            <p>
+              Gotas e superfície molhada ajudam a observar o local, mas não informam intensidade nem
+              abrangência no município.
+            </p>
+          </article>
+          <article>
+            <Wind aria-hidden="true" />
+            <span>03</span>
+            <h3>Vento aparente</h3>
+            <p>
+              Movimento de árvores ou da Lagoa oferece uma referência visual, mas não substitui a
+              medição do vento nem a previsão de rajadas.
+            </p>
+          </article>
+          <article>
+            <Clock3 aria-hidden="true" />
+            <span>04</span>
+            <h3>Data da imagem</h3>
+            <p>
+              Confirme se a indicação é Ao vivo, Última transmissão ou Horário não confirmado antes
+              de interpretar a cena como atual.
+            </p>
+          </article>
         </div>
       </section>
 
-      <section className="camera-v2-responsibility" id="responsabilidade-das-fontes" aria-labelledby="camera-v2-responsibility-title">
+      <section
+        className="camera-v2-responsibility"
+        id="responsabilidade-das-fontes"
+        aria-labelledby="camera-v2-responsibility-title"
+      >
         <AlertTriangle aria-hidden="true" />
         <div>
           <span className="camera-v2-eyebrow">Transmissões de terceiros</span>
-          <h2 id="camera-v2-responsibility-title">O Tempo Pelotas não controla a continuidade dos vídeos</h2>
-          <p>Os vídeos e títulos pertencem aos responsáveis indicados em cada ponto. Uma transmissão pode sair do ar, mudar de endereço ou impedir a exibição no portal. Em situação de risco, siga os alertas oficiais e as orientações das autoridades.</p>
+          <h2 id="camera-v2-responsibility-title">
+            O Tempo Pelotas não controla a continuidade dos vídeos
+          </h2>
+          <p>
+            Os vídeos e títulos pertencem aos responsáveis indicados em cada ponto. Uma transmissão
+            pode sair do ar, mudar de endereço ou impedir a exibição no portal. Em situação de
+            risco, siga os alertas oficiais e as orientações das autoridades.
+          </p>
         </div>
         <ShieldCheck aria-hidden="true" />
       </section>
@@ -469,7 +682,9 @@ export function CameraPageV2({ cameraData, weather }: CameraPageProps) {
           <h2>Compare a imagem com radar, medições e alertas</h2>
         </div>
         <div>
-          <Link to="/radar-e-satelite-pelotas">Radar e satélite <ArrowRight aria-hidden="true" /></Link>
+          <Link to="/radar-e-satelite-pelotas">
+            Radar e satélite <ArrowRight aria-hidden="true" />
+          </Link>
           <Link to="/estacao-embrapa-pelotas">Estação Embrapa</Link>
           <Link to="/chuva-em-pelotas">Chuva em Pelotas</Link>
           <Link to="/alertas">Alertas oficiais</Link>
