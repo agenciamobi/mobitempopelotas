@@ -119,11 +119,18 @@ async function computedAccessibleNames(page, session, candidates) {
       continue;
     }
 
+    const { node } = await session.send("DOM.describeNode", { nodeId });
     const { nodes } = await session.send("Accessibility.getPartialAXTree", {
       nodeId,
       fetchRelatives: false,
     });
-    const target = nodes.find((node) => !node.ignored) ?? null;
+    const target =
+      nodes.find(
+        (axNode) =>
+          !axNode.ignored && axNode.backendDOMNodeId === node.backendNodeId,
+      ) ??
+      nodes.find((axNode) => !axNode.ignored) ??
+      null;
     names.set(candidate.marker, normalizeText(target?.name?.value));
   }
 
