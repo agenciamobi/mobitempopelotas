@@ -1,16 +1,34 @@
-# Validação manual e auditável do domínio público antes e depois do cutover.
+# Validação auditável do domínio público para mudanças diretas na main e cutover.
 name: Smoke test de cutover
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - scripts/cutover-smoke.mjs
+      - scripts/seo-production-smoke.mjs
+      - .github/workflows/cutover-smoke.yml
+      - docs/PRODUCTION_CUTOVER.md
+      - public/brand/tempo-pelotas-social.png
+      - src/lib/page-meta.ts
+      - src/lib/site-config.ts
+      - src/lib/structured-data.ts
+      - src/lib/public-routes.ts
+      - src/routes/**
   pull_request:
     branches:
       - main
     paths:
       - scripts/cutover-smoke.mjs
+      - scripts/seo-production-smoke.mjs
       - .github/workflows/cutover-smoke.yml
       - docs/PRODUCTION_CUTOVER.md
+      - public/brand/tempo-pelotas-social.png
+      - src/lib/page-meta.ts
       - src/lib/site-config.ts
+      - src/lib/structured-data.ts
       - src/lib/public-routes.ts
       - src/routes/**
 
@@ -36,6 +54,11 @@ jobs:
         env:
           BASE_URL: https://tempopelotas.com.br
         run: node scripts/cutover-smoke.mjs
+
+      - name: Validar contratos SEO em produção
+        env:
+          BASE_URL: https://tempopelotas.com.br
+        run: node scripts/seo-production-smoke.mjs
 
       - name: Publicar relatório
         if: always()
