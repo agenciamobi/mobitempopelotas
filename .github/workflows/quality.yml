@@ -40,7 +40,21 @@ jobs:
         run: npm run runtime:check:example
 
       - name: Contratos rápidos
-        run: npm run test:contracts
+        shell: bash
+        run: |
+          set +e
+          npm run test:contracts 2>&1 | tee /tmp/contracts.log
+          status=${PIPESTATUS[0]}
+          set -e
+
+          if [ "$status" -ne 0 ]; then
+            failure_block="$(awk 'BEGIN { capture = 0 } /^[[:space:]]*not ok / { capture = 1; block = "" } capture { block = block $0 ORS } END { printf "%s", block }' /tmp/contracts.log | tail -n 60 | base64 -w0)"
+            if [ -z "$failure_block" ]; then
+              failure_block="$(tail -n 60 /tmp/contracts.log | base64 -w0)"
+            fi
+            echo "::error title=Contratos rápidos (base64)::$failure_block"
+            exit "$status"
+          fi
 
       - name: Verificar árvore de rotas versionada
         run: npm run routes:check
