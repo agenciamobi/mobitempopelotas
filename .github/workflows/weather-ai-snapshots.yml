@@ -60,42 +60,6 @@ jobs:
 
           echo "::add-mask::$oidc_token"
 
-          OIDC_TOKEN="$oidc_token" node --input-type=module <<'NODE'
-          import { createPublicKey, verify } from "node:crypto";
-
-          const token = process.env.OIDC_TOKEN;
-          const [encodedHeader, encodedPayload, encodedSignature] = token.split(".");
-          const header = JSON.parse(Buffer.from(encodedHeader, "base64url").toString("utf8"));
-          const claims = JSON.parse(Buffer.from(encodedPayload, "base64url").toString("utf8"));
-          const jwks = await fetch("https://token.actions.githubusercontent.com/.well-known/jwks").then((response) => {
-            if (!response.ok) throw new Error(`JWKS respondeu HTTP ${response.status}`);
-            return response.json();
-          });
-          const jwk = jwks.keys.find((candidate) => candidate.kid === header.kid);
-          if (!jwk) throw new Error(`Chave OIDC não encontrada para kid ${header.kid}`);
-          const signatureValid = verify(
-            "RSA-SHA256",
-            Buffer.from(`${encodedHeader}.${encodedPayload}`),
-            createPublicKey({ key: jwk, format: "jwk" }),
-            Buffer.from(encodedSignature, "base64url"),
-          );
-          const safeClaims = {
-            iss: claims.iss,
-            aud: claims.aud,
-            sub: claims.sub,
-            repository: claims.repository,
-            repository_id: claims.repository_id,
-            repository_owner: claims.repository_owner,
-            repository_owner_id: claims.repository_owner_id,
-            ref: claims.ref,
-            workflow_ref: claims.workflow_ref,
-            event_name: claims.event_name,
-            runner_environment: claims.runner_environment,
-          };
-          console.log("OIDC diagnóstico seguro:");
-          console.log(JSON.stringify({ alg: header.alg, kid: header.kid, signatureValid, claims: safeClaims }, null, 2));
-          NODE
-
           # Em pushes na main, o workflow pode iniciar alguns segundos antes do deploy.
           # A versão anterior deste endpoint responde 503 porque dependia de CRON_SECRET.
           # Repetimos somente esse estado transitório; erros de autenticação e demais HTTPs falham.
