@@ -1,5 +1,3 @@
-import { createPublicKey, verify } from "node:crypto";
-
 import { z } from "zod";
 
 const GITHUB_OIDC_ISSUER = "https://token.actions.githubusercontent.com";
@@ -16,6 +14,7 @@ const EXPECTED_SUBJECTS = new Set([
 ]);
 const ALLOWED_EVENTS = new Set(["schedule", "workflow_dispatch", "push"]);
 const CLOCK_TOLERANCE_SECONDS = 30;
+const JWKS_TIMEOUT_MS = 10_000;
 
 export const WEATHER_AI_GITHUB_OIDC_AUDIENCE = "tempo-pelotas-weather-ai";
 
@@ -73,8 +72,19 @@ type VerificationOptions = {
   now?: number;
 };
 
+function decodeBase64Url(value: string) {
+  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+  return bytes.buffer;
+}
+
 function decodeJwtSegment(segment: string) {
-  return JSON.parse(Buffer.from(segment, "base64url").toString("utf8")) as unknown;
+  return JSON.parse(new TextDecoder().decode(decodeBase64Url(segment))) as unknown;
 }
 
 function audienceMatches(audience: string | string[]) {
@@ -86,74 +96,125 @@ function safeFailure(reason: string): GithubOidcVerification {
   return { valid: false, reason };
 }
 
+async function fetchGithubJwks(fetchImpl: OidcFetch) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), JWKS_TIMEOUT_MS);
+
+  try {
+    const response = await fetchImpl(GITHUB_OIDC_JWKS_URL, {
+      headers: { Accept: "application/json" },
+      redirect: "error",
+      signal: controller.signal,
+    });
+    if (!response.ok) return { ok: false as const, reason: `jwks-http-${response.status}` };
+
+    const parsed = jwksSchema.safeParse(await response.json());
+    if (!parsed.success) return { ok: false as const, reason: "jwks-invalid" };
+    return { ok: true as const, value: parsed.data };
+  } catch {
+    return { ok: false as const, reason: "jwks-unavailable" };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function verifyRs256Signature(
+  jwk: z.infer<typeof jwkSchema>,
+  signingInput: string,
+  encodedSignature: string,
+) {
+  try {
+    const publicKey = await crypto.subtle.importKey(
+      "jwk",
+      jwk,
+      { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+      false,
+      ["verify"],
+    );
+    const signatureValid = await crypto.subtle.verify(
+      { name: "RSASSA-PKCS1-v1_5" },
+      publicKey,
+      decodeBase64Url(encodedSignature),
+      new TextEncoder().encode(signingInput),
+    );
+    return signatureValid ? null : "invalid-signature";
+  } catch {
+    return "signature-verification-unavailable";
+  }
+}
+
 export async function verifyWeatherAiGithubActionsToken(
   token: string,
   options: VerificationOptions = {},
 ): Promise<GithubOidcVerification> {
-  try {
-    const segments = token.split(".");
-    if (segments.length !== 3 || segments.some((segment) => !segment)) {
-      return safeFailure("token-malformed");
-    }
-
-    const [encodedHeader, encodedPayload, encodedSignature] = segments;
-    const header = jwtHeaderSchema.parse(decodeJwtSegment(encodedHeader));
-    const fetchImpl = options.fetchImpl ?? fetch;
-    const jwksResponse = await fetchImpl(GITHUB_OIDC_JWKS_URL, {
-      headers: {
-        Accept: "application/json",
-        "User-Agent": "TempoPelotas-GitHub-OIDC/1.0",
-      },
-      redirect: "error",
-      signal: AbortSignal.timeout(10_000),
-    });
-
-    if (!jwksResponse.ok) return safeFailure(`jwks-http-${jwksResponse.status}`);
-
-    const jwks = jwksSchema.parse(await jwksResponse.json());
-    const jwk = jwks.keys.find(
-      (candidate) =>
-        candidate.kid === header.kid &&
-        (!candidate.alg || candidate.alg === "RS256") &&
-        (!candidate.use || candidate.use === "sig"),
-    );
-    if (!jwk) return safeFailure("signing-key-not-found");
-
-    const publicKey = createPublicKey({ key: jwk, format: "jwk" });
-    const signatureValid = verify(
-      "RSA-SHA256",
-      Buffer.from(`${encodedHeader}.${encodedPayload}`),
-      publicKey,
-      Buffer.from(encodedSignature, "base64url"),
-    );
-    if (!signatureValid) return safeFailure("invalid-signature");
-
-    const claims = jwtClaimsSchema.parse(decodeJwtSegment(encodedPayload));
-    const nowSeconds = Math.floor((options.now ?? Date.now()) / 1_000);
-
-    if (!audienceMatches(claims.aud)) return safeFailure("invalid-audience");
-    if (claims.exp <= nowSeconds - CLOCK_TOLERANCE_SECONDS) return safeFailure("token-expired");
-    if (claims.iat > nowSeconds + CLOCK_TOLERANCE_SECONDS) return safeFailure("issued-in-future");
-    if (claims.nbf !== undefined && claims.nbf > nowSeconds + CLOCK_TOLERANCE_SECONDS) {
-      return safeFailure("not-active-yet");
-    }
-    if (String(claims.repository_id) !== EXPECTED_REPOSITORY_ID) {
-      return safeFailure("invalid-repository-id");
-    }
-    if (String(claims.repository_owner_id) !== EXPECTED_REPOSITORY_OWNER_ID) {
-      return safeFailure("invalid-owner-id");
-    }
-    if (!EXPECTED_SUBJECTS.has(claims.sub)) return safeFailure("invalid-subject");
-    if (claims.workflow_ref !== EXPECTED_WORKFLOW_REF) return safeFailure("invalid-workflow-ref");
-    if (!ALLOWED_EVENTS.has(claims.event_name)) return safeFailure("invalid-event");
-    if (claims.runner_environment && claims.runner_environment !== "github-hosted") {
-      return safeFailure("invalid-runner-environment");
-    }
-
-    return { valid: true };
-  } catch {
-    return safeFailure("token-verification-failed");
+  const segments = token.split(".");
+  if (segments.length !== 3 || segments.some((segment) => !segment)) {
+    return safeFailure("token-malformed");
   }
+
+  const [encodedHeader, encodedPayload, encodedSignature] = segments;
+  const parsedHeader = jwtHeaderSchema.safeParse(
+    (() => {
+      try {
+        return decodeJwtSegment(encodedHeader);
+      } catch {
+        return null;
+      }
+    })(),
+  );
+  if (!parsedHeader.success) return safeFailure("header-invalid");
+
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const jwksResult = await fetchGithubJwks(fetchImpl);
+  if (!jwksResult.ok) return safeFailure(jwksResult.reason);
+
+  const jwk = jwksResult.value.keys.find(
+    (candidate) =>
+      candidate.kid === parsedHeader.data.kid &&
+      (!candidate.alg || candidate.alg === "RS256") &&
+      (!candidate.use || candidate.use === "sig"),
+  );
+  if (!jwk) return safeFailure("signing-key-not-found");
+
+  const signatureError = await verifyRs256Signature(
+    jwk,
+    `${encodedHeader}.${encodedPayload}`,
+    encodedSignature,
+  );
+  if (signatureError) return safeFailure(signatureError);
+
+  let decodedClaims: unknown;
+  try {
+    decodedClaims = decodeJwtSegment(encodedPayload);
+  } catch {
+    return safeFailure("claims-invalid");
+  }
+  const parsedClaims = jwtClaimsSchema.safeParse(decodedClaims);
+  if (!parsedClaims.success) return safeFailure("claims-invalid");
+
+  const claims = parsedClaims.data;
+  const nowSeconds = Math.floor((options.now ?? Date.now()) / 1_000);
+
+  if (!audienceMatches(claims.aud)) return safeFailure("invalid-audience");
+  if (claims.exp <= nowSeconds - CLOCK_TOLERANCE_SECONDS) return safeFailure("token-expired");
+  if (claims.iat > nowSeconds + CLOCK_TOLERANCE_SECONDS) return safeFailure("issued-in-future");
+  if (claims.nbf !== undefined && claims.nbf > nowSeconds + CLOCK_TOLERANCE_SECONDS) {
+    return safeFailure("not-active-yet");
+  }
+  if (String(claims.repository_id) !== EXPECTED_REPOSITORY_ID) {
+    return safeFailure("invalid-repository-id");
+  }
+  if (String(claims.repository_owner_id) !== EXPECTED_REPOSITORY_OWNER_ID) {
+    return safeFailure("invalid-owner-id");
+  }
+  if (!EXPECTED_SUBJECTS.has(claims.sub)) return safeFailure("invalid-subject");
+  if (claims.workflow_ref !== EXPECTED_WORKFLOW_REF) return safeFailure("invalid-workflow-ref");
+  if (!ALLOWED_EVENTS.has(claims.event_name)) return safeFailure("invalid-event");
+  if (claims.runner_environment && claims.runner_environment !== "github-hosted") {
+    return safeFailure("invalid-runner-environment");
+  }
+
+  return { valid: true };
 }
 
 export async function verifyWeatherAiGithubActionsRequest(
