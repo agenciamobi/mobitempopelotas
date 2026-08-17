@@ -34,7 +34,7 @@ test("REDEMET limits animation payloads", () => {
   assert.match(stormsRoute, /Math\.min\(MAX_FRAMES/);
 });
 
-test("radar parser keeps only Cangucu frames from the official response shape", () => {
+test("radar parser keeps only Canguçu frames from the official response shape", () => {
   const payload = {
     status: true,
     data: {
@@ -47,7 +47,8 @@ test("radar parser keeps only Cangucu frames from the official response shape", 
             lon_max: "-50.0",
             lat_min: "-34.0",
             lat_max: "-26.0",
-            path: "https://estatico-redemet.decea.mil.br/radar/2026/08/17/sg/maxcappi/maps/santiago.png",
+            path:
+              "https://estatico-redemet.decea.mil.br/radar/2026/08/17/sg/maxcappi/maps/santiago.png",
             data: "2026-08-17 20:00:00",
           },
           {
@@ -65,7 +66,8 @@ test("radar parser keeps only Cangucu frames from the official response shape", 
             lon_max: "-48.0",
             lat_min: "-35.0",
             lat_max: "-27.0",
-            path: "https://estatico-redemet.decea.mil.br/radar/2026/08/17/cn/maxcappi/maps/cangucu.png",
+            path:
+              "https://estatico-redemet.decea.mil.br/radar/2026/08/17/cn/maxcappi/maps/cangucu.png",
             data: "2026-08-17 20:10:00",
           },
         ],
