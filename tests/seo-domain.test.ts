@@ -5,7 +5,13 @@ import test from "node:test";
 
 import { getCanonicalRedirectUrl } from "../src/lib/canonical-host.ts";
 import { PUBLIC_ROUTES } from "../src/lib/public-routes.ts";
-import { CANONICAL_SITE_URL, SITE_URL, absoluteUrl } from "../src/lib/site-config.ts";
+import {
+  BRAND_LOGO_URL,
+  CANONICAL_SITE_URL,
+  SITE_URL,
+  SOCIAL_IMAGE_URL,
+  absoluteUrl,
+} from "../src/lib/site-config.ts";
 import { createSitemapXml } from "../src/lib/sitemap.ts";
 
 const technicalHosts = [
@@ -49,6 +55,17 @@ test("o domínio canônico é único e não depende de ambiente", () => {
   assert.equal(CANONICAL_SITE_URL, "https://tempopelotas.com.br");
   assert.equal(SITE_URL, CANONICAL_SITE_URL);
   assert.equal(absoluteUrl("/alertas"), "https://tempopelotas.com.br/alertas");
+});
+
+test("a imagem social é raster, 1200x630 e separada do logotipo institucional", () => {
+  const socialImage = readFileSync("public/brand/tempo-pelotas-social.png");
+
+  assert.equal(SOCIAL_IMAGE_URL, absoluteUrl("/brand/tempo-pelotas-social.png"));
+  assert.equal(BRAND_LOGO_URL, absoluteUrl("/brand/tempo-pelotas-primary.svg"));
+  assert.notEqual(SOCIAL_IMAGE_URL, BRAND_LOGO_URL);
+  assert.equal(socialImage.subarray(1, 4).toString("ascii"), "PNG");
+  assert.equal(socialImage.readUInt32BE(16), 1200);
+  assert.equal(socialImage.readUInt32BE(20), 630);
 });
 
 test("hosts técnicos redirecionam permanentemente preservando caminho e consulta", () => {
