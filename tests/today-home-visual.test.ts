@@ -243,7 +243,7 @@ test("today content is concise and keeps measurement provenance explicit", () =>
 test("today planning resources derive decisions from the next 12 forecast hours", () => {
   assert.match(todayComponent, /href: "#recursos-hoje"/);
   assert.match(todayComponent, /<TodayWeatherResources data=\{recoveredData\}/);
-  assert.match(todayResources, /hourly\.slice\(0, 12\)/);
+  assert.match(todayResources, /const visibleHours = hours\.slice\(0, 12\)/);
   assert.match(todayResources, /precipitationProbability/);
   assert.match(todayResources, /hour\.windGust \?\? hour\.windSpeed/);
   assert.match(todayResources, /periodScore/);
