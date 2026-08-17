@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { parseRadarPayloadForArea } from "../src/lib/redemet/redemet-radar.server.ts";
+
 const radarRoute = readFileSync("src/routes/api/redemet/radar.ts", "utf8");
 const satelliteRoute = readFileSync("src/routes/api/redemet/satellite.ts", "utf8");
 const stormsRoute = readFileSync("src/routes/api/redemet/storms.ts", "utf8");
@@ -30,6 +32,54 @@ test("REDEMET limits animation payloads", () => {
   assert.match(radarRoute, /Math\.min\(MAX_FRAMES/);
   assert.match(satelliteRoute, /Math\.min\(MAX_FRAMES/);
   assert.match(stormsRoute, /Math\.min\(MAX_FRAMES/);
+});
+
+test("radar parser keeps only Cangucu frames from the official response shape", () => {
+  const payload = {
+    status: true,
+    data: {
+      tipo: "maxcappi",
+      radar: [
+        [
+          {
+            localidade: "sg",
+            lon_min: "-58.0",
+            lon_max: "-50.0",
+            lat_min: "-34.0",
+            lat_max: "-26.0",
+            path: "https://estatico-redemet.decea.mil.br/radar/2026/08/17/sg/maxcappi/maps/santiago.png",
+            data: "2026-08-17 20:00:00",
+          },
+          {
+            localidade: "cn",
+            lon_min: "-56.0",
+            lon_max: "-48.0",
+            lat_min: "-35.0",
+            lat_max: "-27.0",
+            path: null,
+            data: null,
+          },
+          {
+            localidade: "cn",
+            lon_min: "-56.0",
+            lon_max: "-48.0",
+            lat_min: "-35.0",
+            lat_max: "-27.0",
+            path: "https://estatico-redemet.decea.mil.br/radar/2026/08/17/cn/maxcappi/maps/cangucu.png",
+            data: "2026-08-17 20:10:00",
+          },
+        ],
+      ],
+    },
+  };
+
+  const parsed = parseRadarPayloadForArea(payload, "cn", 8);
+
+  assert.equal(parsed.matchingRecords, 2);
+  assert.equal(parsed.recordsWithPath, 1);
+  assert.equal(parsed.frames.length, 1);
+  assert.match(parsed.frames[0].imageUrl, /cn%2Fmaxcappi/);
+  assert.doesNotMatch(parsed.frames[0].imageUrl, /sg%2Fmaxcappi/);
 });
 
 test("radar editorial section skips offscreen rendering", () => {
