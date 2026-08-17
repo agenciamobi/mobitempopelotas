@@ -134,9 +134,7 @@ async function auditPage(page, target, viewport) {
       function relativeLuminance({ red, green, blue }) {
         const channel = (value) => {
           const normalized = value / 255;
-          return normalized <= 0.04045
-            ? normalized / 12.92
-            : ((normalized + 0.055) / 1.055) ** 2.4;
+          return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
         };
 
         return 0.2126 * channel(red) + 0.7152 * channel(green) + 0.0722 * channel(blue);
@@ -147,14 +145,10 @@ async function auditPage(page, target, viewport) {
 
         const values = `${style.backgroundColor} ${style.backgroundImage}`;
         const colors = values.match(/rgba?\([^)]*\)/gu) ?? [];
-        const opaqueColors = colors
-          .map(cssColor)
-          .filter((color) => color && color.alpha >= 0.5);
+        const opaqueColors = colors.map(cssColor).filter((color) => color && color.alpha >= 0.5);
 
-        return (
-          opaqueColors.length > 0 &&
-          opaqueColors.every((color) => relativeLuminance(color) >= 0.72)
-        );
+        return opaqueColors.length > 0 &&
+          opaqueColors.every((color) => relativeLuminance(color) >= 0.72);
       }
 
       const root = document.documentElement;
