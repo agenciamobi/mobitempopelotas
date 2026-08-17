@@ -147,8 +147,9 @@ async function auditPage(page, target, viewport) {
         const colors = values.match(/rgba?\([^)]*\)/gu) ?? [];
         const opaqueColors = colors.map(cssColor).filter((color) => color && color.alpha >= 0.5);
 
-        return opaqueColors.length > 0 &&
-          opaqueColors.every((color) => relativeLuminance(color) >= 0.72);
+        return (
+          opaqueColors.length > 0 && opaqueColors.every((color) => relativeLuminance(color) >= 0.72)
+        );
       }
 
       const root = document.documentElement;
