@@ -72,7 +72,8 @@ test("route generator discovers all exported file routes recursively", () => {
   assert.match(generator, /Rota duplicada detectada/);
   assert.match(generator, /Identificador de rota duplicado/);
   assert.match(generator, /routeTree\.gen\.ts regenerado/);
-  assert.match(generator, /GeneratedFileRoute/);
+  assert.match(generator, /preLoaderRoute: typeof \$\{route\.identifier\}Import/);
+  assert.match(generator, /parentRoute: typeof rootRouteImport/);
   assert.match(generator, /_addFileChildren\(rootRouteChildren\)/);
   assert.match(generator, /_addFileTypes<FileRouteTypes>\(\)/);
 });
