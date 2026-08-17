@@ -33,6 +33,7 @@ function makeAggregatedWeather(overrides: Record<string, unknown> = {}) {
       },
     ],
     alerts: [],
+    inmetForecast: [],
     officialForecast: [],
     observation: {
       status: "live",
