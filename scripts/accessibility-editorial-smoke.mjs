@@ -36,6 +36,17 @@ function normalizeText(value) {
     .trim();
 }
 
+function accessibleNameFromAriaSnapshot(snapshot) {
+  const firstNode = snapshot
+    .split("\n")
+    .map((line) => line.trim())
+    .find((line) => line.startsWith("- "));
+  if (!firstNode) return "";
+
+  const match = firstNode.match(/^-\s+[^\s:]+\s+"((?:\\.|[^"])*)"/);
+  return normalizeText(match?.[1]);
+}
+
 function emptyAudit() {
   return {
     language: "",
@@ -88,13 +99,7 @@ function markdownReport(results) {
   return `${lines.join("\n")}\n`;
 }
 
-async function computedAccessibleNames(page, session, candidates) {
-  if (candidates.length === 0) return new Map();
-
-  const { root } = await session.send("DOM.getDocument", {
-    depth: 0,
-    pierce: true,
-  });
+async function computedAccessibleNames(page, candidates) {
   const names = new Map();
 
   for (const candidate of candidates) {
@@ -109,26 +114,8 @@ async function computedAccessibleNames(page, session, candidates) {
     await locator.scrollIntoViewIfNeeded().catch(() => undefined);
     await page.waitForTimeout(25);
 
-    const { nodeId } = await session.send("DOM.querySelector", {
-      nodeId: root.nodeId,
-      selector,
-    });
-
-    if (!nodeId) {
-      names.set(candidate.marker, "");
-      continue;
-    }
-
-    const { node } = await session.send("DOM.describeNode", { nodeId });
-    const { nodes } = await session.send("Accessibility.getPartialAXTree", {
-      nodeId,
-      fetchRelatives: false,
-    });
-    const target =
-      nodes.find((axNode) => !axNode.ignored && axNode.backendDOMNodeId === node.backendNodeId) ??
-      nodes.find((axNode) => !axNode.ignored) ??
-      null;
-    names.set(candidate.marker, normalizeText(target?.name?.value));
+    const snapshot = await locator.ariaSnapshot({ timeout: 5_000 }).catch(() => "");
+    names.set(candidate.marker, accessibleNameFromAriaSnapshot(snapshot));
   }
 
   return names;
@@ -189,8 +176,6 @@ try {
       reducedMotion: "reduce",
     });
     const page = await context.newPage();
-    const session = await context.newCDPSession(page);
-    await session.send("Accessibility.enable");
 
     try {
       for (const route of routes) {
@@ -390,11 +375,7 @@ try {
           ]) {
             candidatesByMarker.set(candidate.marker, candidate);
           }
-          const names = await computedAccessibleNames(
-            page,
-            session,
-            Array.from(candidatesByMarker.values()),
-          );
+          const names = await computedAccessibleNames(page, Array.from(candidatesByMarker.values()));
 
           const audit = {
             ...domAudit,
@@ -433,8 +414,6 @@ try {
         }
       }
     } finally {
-      await session.send("Accessibility.disable").catch(() => undefined);
-      await session.detach().catch(() => undefined);
       await context.close();
     }
   }
