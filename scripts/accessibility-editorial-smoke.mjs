@@ -375,7 +375,10 @@ try {
           ]) {
             candidatesByMarker.set(candidate.marker, candidate);
           }
-          const names = await computedAccessibleNames(page, Array.from(candidatesByMarker.values()));
+          const names = await computedAccessibleNames(
+            page,
+            Array.from(candidatesByMarker.values()),
+          );
 
           const audit = {
             ...domAudit,
