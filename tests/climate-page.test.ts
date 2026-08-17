@@ -67,7 +67,7 @@ test("recent climate context uses the existing real history dataset", () => {
   assert.match(page, /summary\.strongestWindGust/);
   assert.match(page, /summary\.warmestDay/);
   assert.match(page, /summary\.coldestDay/);
-  assert.match(page, /sem preencher a ausência dos dados com números simulados/);
+  assert.match(page, /sem\s+preencher\s+a\s+ausência\s+dos\s+dados\s+com\s+números\s+simulados/);
   assert.match(page, /atualizado em \{formatDateTime\(history\.source\.fetchedAt\)\}/);
 });
 
