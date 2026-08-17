@@ -1,3 +1,4 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
 import {
@@ -8,6 +9,44 @@ import {
 const LOCATION_SLUG = "pelotas-rs";
 const EDGE_FUNCTION_NAME = "open-meteo-forecast";
 const REQUEST_TIMEOUT_MS = 35_000;
+
+type OpenMeteoSettingsDatabase = {
+  public: {
+    Tables: {
+      weather_forecast_accuracy_settings: {
+        Row: {
+          location_slug: string;
+          endpoint: string;
+          collector_token: string;
+          enabled: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          location_slug: string;
+          endpoint: string;
+          collector_token?: string;
+          enabled?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          location_slug?: string;
+          endpoint?: string;
+          collector_token?: string;
+          enabled?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+    };
+    Views: { [_ in never]: never };
+    Functions: { [_ in never]: never };
+    Enums: { [_ in never]: never };
+    CompositeTypes: { [_ in never]: never };
+  };
+};
 
 const edgeResponseSchema = z.object({
   success: z.literal(true),
@@ -31,7 +70,7 @@ export async function fetchOpenMeteoPayloadViaEdge(): Promise<OpenMeteoEdgePaylo
     throw new Error("Supabase administrativo não configurado para a previsão Open-Meteo.");
   }
 
-  const admin = createSupabaseAdminClient();
+  const admin = createSupabaseAdminClient() as unknown as SupabaseClient<OpenMeteoSettingsDatabase>;
   const { data: settings, error: settingsError } = await admin
     .from("weather_forecast_accuracy_settings")
     .select("collector_token,enabled")
