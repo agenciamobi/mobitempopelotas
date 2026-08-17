@@ -27,7 +27,7 @@ test("cache completo do Open-Meteo é privado e controla concorrência", () => {
   assert.match(migration, /last_success_at < now\(\) - make_interval/);
   assert.match(
     migration,
-    /grant execute on function public\.claim_weather_provider_refresh\(text, uuid, integer, integer\) to service_role/,
+    /grant execute on function public\.claim_weather_provider_refresh\(text, uuid, integer, integer\)\s+to\s+service_role/,
   );
 });
 
@@ -38,7 +38,7 @@ test("Edge Function exige token e preserva último payload válido", () => {
   assert.match(edgeFunction, /weather_forecast_accuracy_settings/);
   assert.match(edgeFunction, /claim_weather_provider_refresh/);
   assert.match(edgeFunction, /cacheStatus: "fresh"/);
-  assert.match(edgeFunction, /cacheStatus: "shared"/);
+  assert.match(edgeFunction, /\?\s*"shared"\s*:\s*"stale"/);
   assert.match(edgeFunction, /cacheStatus: "stale"/);
   assert.match(edgeFunction, /cacheStatus: "refreshed"/);
   assert.match(edgeFunction, /hasForecastPayload\(cached\.payload\)/);
