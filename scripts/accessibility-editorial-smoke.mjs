@@ -370,10 +370,16 @@ try {
           });
 
           const candidatesByMarker = new Map();
-          for (const candidate of [...domAudit.interactiveCandidates, ...domAudit.fieldCandidates]) {
+          for (const candidate of [
+            ...domAudit.interactiveCandidates,
+            ...domAudit.fieldCandidates,
+          ]) {
             candidatesByMarker.set(candidate.marker, candidate);
           }
-          const names = await computedAccessibleNames(session, Array.from(candidatesByMarker.values()));
+          const names = await computedAccessibleNames(
+            session,
+            Array.from(candidatesByMarker.values()),
+          );
 
           const audit = {
             ...domAudit,
