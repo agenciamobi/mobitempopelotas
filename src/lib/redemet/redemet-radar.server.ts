@@ -12,7 +12,7 @@ const TIMEZONE = "America/Sao_Paulo";
 const REQUEST_TIMEOUT_MS = 12_000;
 const DEFAULT_RADAR_AREA = "cn";
 const DEFAULT_RADAR_PRODUCT = "maxcappi";
-const FALLBACK_RADAR_PRODUCTS = ["03km", "07km"] as const;
+const FALLBACK_RADAR_PRODUCTS = ["10km", "07km", "05km", "03km"] as const;
 
 const ALLOWED_API_HOSTS = new Set(["api-redemet.decea.mil.br", "api-redemet.decea.gov.br"]);
 const ALLOWED_IMAGE_HOSTS = new Set([
