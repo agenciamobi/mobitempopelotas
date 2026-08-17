@@ -1,7 +1,21 @@
 name: Runtime de produção
 
 on:
+  schedule:
+    # 06:00 e 18:00 em America/Sao_Paulo (UTC-3), uma hora após ciclos do Weather AI.
+    - cron: "0 9,21 * * *"
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/runtime-smoke.yml
+      - src/lib/hydrology/**
+      - src/lib/redemet/**
+      - src/routes/api/redemet/**
+      - src/routes/radar-e-satelite-pelotas.tsx
+      - src/routes/situacao-hidrologica-pelotas.tsx
+      - src/production/components/home-editorial-dashboard*.tsx
 
 permissions:
   contents: read
