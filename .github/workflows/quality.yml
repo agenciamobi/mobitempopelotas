@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
@@ -26,6 +26,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
@@ -35,6 +37,28 @@ jobs:
 
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
+
+      - name: Normalizar arquivos apontados pelo ESLint uma vez
+        if: github.event_name == 'pull_request'
+        run: |
+          npx prettier --write \
+            src/components/embed/LaranjalLevelEmbed.tsx \
+            src/components/embed/LaranjalEmbedGuide.tsx \
+            src/components/embrapa/EmbrapaDataHealthPanel.tsx
+          if git diff --quiet -- \
+            src/components/embed/LaranjalLevelEmbed.tsx \
+            src/components/embed/LaranjalEmbedGuide.tsx \
+            src/components/embrapa/EmbrapaDataHealthPanel.tsx; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/components/embed/LaranjalLevelEmbed.tsx \
+            src/components/embed/LaranjalEmbedGuide.tsx \
+            src/components/embrapa/EmbrapaDataHealthPanel.tsx
+          git commit -m "chore: sync final prettier formatting"
+          git push origin HEAD:${{ github.head_ref }}
 
       - name: Validar template de ambiente
         run: npm run runtime:check:example
