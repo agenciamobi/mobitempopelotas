@@ -1,8 +1,27 @@
-# Audita a revisão realmente alterada pelo pull request contra a produção de referência.
+# Audita alterações visuais relevantes contra a produção de referência.
 name: Auditoria visual de paridade
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - src/components/**
+      - src/production/**
+      - src/routes/**/*.tsx
+      - public/**
+      - scripts/visual-parity-audit.mjs
+      - scripts/auth-visual-smoke.mjs
+      - scripts/accessibility-editorial-smoke.mjs
+      - scripts/accessibility-failure-screenshots.mjs
+      - scripts/lint-changed.mjs
+      - vite.config.ts
+      - tsconfig*.json
+      - eslint.config.js
+      - package.json
+      - package-lock.json
+      - .github/workflows/visual-parity.yml
   pull_request:
     branches:
       - main
@@ -103,7 +122,7 @@ jobs:
         env:
           PRODUCTION_URL: https://tempopelotas.com.br
           CANDIDATE_URL: http://127.0.0.1:4173
-          CANDIDATE_NAME: revisao-${{ github.event.pull_request.number || 'manual' }}
+          CANDIDATE_NAME: revisao-${{ github.event.pull_request.number || 'main' }}
           WAIT_FOR_CANDIDATE_DEPLOYMENT: "false"
           AUDIT_REVISION: ${{ github.sha }}
         run: node scripts/visual-parity-audit.mjs
