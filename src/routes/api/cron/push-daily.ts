@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 
 import { createFileRoute } from "@tanstack/react-router";
 
+import { verifyWeatherAiGithubActionsRequest } from "@/lib/github-actions-oidc.server";
 import { hasBearerSecret, pushJsonResponse } from "@/lib/push/push-http.server";
 import {
   claimPushDispatch,
@@ -118,19 +119,16 @@ function sortPelotasAlertsBySeverity(alerts: InmetAlert[]) {
 
 async function generateWeatherAiSnapshot(request: Request) {
   const cronSecret = process.env.CRON_SECRET?.trim();
-  if (!cronSecret) {
-    return pushJsonResponse(
-      {
-        success: false,
-        configured: false,
-        error: "A rotina de IA meteorológica ainda não foi configurada.",
-      },
-      503,
-    );
-  }
+  const sharedSecretAuthorized = hasBearerSecret(request, cronSecret);
 
-  if (!hasBearerSecret(request, cronSecret)) {
-    return pushJsonResponse({ success: false, error: "Não autorizado." }, 401);
+  if (!sharedSecretAuthorized) {
+    const oidcVerification = await verifyWeatherAiGithubActionsRequest(request);
+    if (!oidcVerification.valid) {
+      console.warn("[weather-ai/cron] Autorização recusada", {
+        reason: oidcVerification.reason,
+      });
+      return pushJsonResponse({ success: false, error: "Não autorizado." }, 401);
+    }
   }
 
   const result = await generateScheduledWeatherAiSnapshot();

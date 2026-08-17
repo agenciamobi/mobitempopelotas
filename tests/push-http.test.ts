@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
+import { generateKeyPairSync, sign } from "node:crypto";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import {
+  WEATHER_AI_GITHUB_OIDC_AUDIENCE,
+  verifyWeatherAiGithubActionsRequest,
+  verifyWeatherAiGithubActionsToken,
+} from "../src/lib/github-actions-oidc.server.ts";
 import {
   fetchAllowedPushEndpoint,
   hasBearerSecret,
@@ -108,6 +115,131 @@ test("compara o bearer administrativo sem aceitar segredo vazio", () => {
   assert.equal(hasBearerSecret(request, "outro-segredo"), false);
   assert.equal(hasBearerSecret(request, "   "), false);
   assert.equal(hasBearerSecret(request, undefined), false);
+});
+
+function createGithubOidcFixture() {
+  const { privateKey, publicKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
+  const publicJwk = publicKey.export({ format: "jwk" });
+  const nowSeconds = 2_000_000_000;
+
+  function token(overrides: Record<string, unknown> = {}, signingKey = privateKey) {
+    const header = {
+      alg: "RS256",
+      kid: "tempo-pelotas-test-key",
+      typ: "JWT",
+    };
+    const payload = {
+      iss: "https://token.actions.githubusercontent.com",
+      aud: WEATHER_AI_GITHUB_OIDC_AUDIENCE,
+      sub: "repo:agenciamobi@157939955/mobitempopelotas@1306185236:ref:refs/heads/main",
+      exp: nowSeconds + 300,
+      iat: nowSeconds - 10,
+      nbf: nowSeconds - 10,
+      repository: "agenciamobi/mobitempopelotas",
+      repository_id: "1306185236",
+      repository_owner: "agenciamobi",
+      repository_owner_id: "157939955",
+      ref: "refs/heads/main",
+      workflow_ref:
+        "agenciamobi/mobitempopelotas/.github/workflows/weather-ai-snapshots.yml@refs/heads/main",
+      event_name: "schedule",
+      runner_environment: "github-hosted",
+      ...overrides,
+    };
+    const encodedHeader = Buffer.from(JSON.stringify(header)).toString("base64url");
+    const encodedPayload = Buffer.from(JSON.stringify(payload)).toString("base64url");
+    const signingInput = `${encodedHeader}.${encodedPayload}`;
+    const signature = sign("RSA-SHA256", Buffer.from(signingInput), signingKey).toString("base64url");
+    return `${signingInput}.${signature}`;
+  }
+
+  const fetchImpl = async () =>
+    new Response(
+      JSON.stringify({
+        keys: [
+          {
+            ...publicJwk,
+            kid: "tempo-pelotas-test-key",
+            alg: "RS256",
+            use: "sig",
+          },
+        ],
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+
+  return {
+    token,
+    fetchImpl,
+    now: nowSeconds * 1_000,
+  };
+}
+
+test("aceita OIDC do workflow Weather AI na main e recusa claims fora do contrato", async () => {
+  const fixture = createGithubOidcFixture();
+  const valid = await verifyWeatherAiGithubActionsToken(fixture.token(), {
+    fetchImpl: fixture.fetchImpl,
+    now: fixture.now,
+  });
+  assert.deepEqual(valid, { valid: true });
+
+  const wrongAudience = await verifyWeatherAiGithubActionsToken(
+    fixture.token({ aud: "outro-servico" }),
+    { fetchImpl: fixture.fetchImpl, now: fixture.now },
+  );
+  assert.deepEqual(wrongAudience, { valid: false, reason: "invalid-audience" });
+
+  const wrongRepository = await verifyWeatherAiGithubActionsToken(
+    fixture.token({ repository_id: "999" }),
+    { fetchImpl: fixture.fetchImpl, now: fixture.now },
+  );
+  assert.deepEqual(wrongRepository, { valid: false, reason: "invalid-repository-id" });
+
+  const wrongWorkflow = await verifyWeatherAiGithubActionsToken(
+    fixture.token({
+      workflow_ref: "agenciamobi/mobitempopelotas/.github/workflows/quality.yml@refs/heads/main",
+    }),
+    { fetchImpl: fixture.fetchImpl, now: fixture.now },
+  );
+  assert.deepEqual(wrongWorkflow, { valid: false, reason: "invalid-workflow-ref" });
+
+  const expired = await verifyWeatherAiGithubActionsToken(fixture.token({ exp: 1_999_999_000 }), {
+    fetchImpl: fixture.fetchImpl,
+    now: fixture.now,
+  });
+  assert.deepEqual(expired, { valid: false, reason: "token-expired" });
+});
+
+test("recusa token OIDC com assinatura diferente da chave publicada", async () => {
+  const fixture = createGithubOidcFixture();
+  const attacker = generateKeyPairSync("rsa", { modulusLength: 2048 });
+  const result = await verifyWeatherAiGithubActionsToken(fixture.token({}, attacker.privateKey), {
+    fetchImpl: fixture.fetchImpl,
+    now: fixture.now,
+  });
+
+  assert.deepEqual(result, { valid: false, reason: "invalid-signature" });
+});
+
+test("extrai o bearer OIDC da requisição e o workflow não depende mais de secret compartilhado", async () => {
+  const fixture = createGithubOidcFixture();
+  const request = new Request("https://tempopelotas.com.br/api/cron/push-daily?task=weather-ai", {
+    headers: { Authorization: `Bearer ${fixture.token()}` },
+  });
+  const verification = await verifyWeatherAiGithubActionsRequest(request, {
+    fetchImpl: fixture.fetchImpl,
+    now: fixture.now,
+  });
+  assert.deepEqual(verification, { valid: true });
+
+  const workflow = readFileSync(".github/workflows/weather-ai-snapshots.yml", "utf8");
+  assert.match(workflow, /id-token:\s*write/);
+  assert.match(workflow, /ACTIONS_ID_TOKEN_REQUEST_URL/);
+  assert.match(workflow, /tempo-pelotas-weather-ai/);
+  assert.doesNotMatch(workflow, /TEMPO_PELOTAS_CRON_SECRET/);
 });
 
 test("recusa corpo sem JSON, inválido ou acima do limite declarado", async () => {

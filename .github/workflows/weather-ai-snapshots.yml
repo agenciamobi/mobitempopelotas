@@ -5,6 +5,18 @@ on:
     # 23:00, 05:00, 11:00 e 17:00 em America/Sao_Paulo (UTC-3).
     - cron: "0 2,8,14,20 * * *"
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/weather-ai-snapshots.yml
+      - src/lib/github-actions-oidc.server.ts
+      - src/routes/api/cron/push-daily.ts
+      - tests/push-http.test.ts
+
+permissions:
+  contents: read
+  id-token: write
 
 concurrency:
   group: weather-ai-snapshots
@@ -16,14 +28,41 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Call protected weather AI cron
+      - name: Request GitHub OIDC token and call weather AI cron
         env:
-          CRON_SECRET: ${{ secrets.TEMPO_PELOTAS_CRON_SECRET }}
+          OIDC_AUDIENCE: tempo-pelotas-weather-ai
+          CRON_URL: https://tempopelotas.com.br/api/cron/push-daily?task=weather-ai
         run: |
-          test -n "$CRON_SECRET"
+          set -euo pipefail
+
+          test -n "$ACTIONS_ID_TOKEN_REQUEST_URL"
+          test -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN"
+
+          oidc_response="$(curl \
+            --fail-with-body \
+            --silent \
+            --show-error \
+            --max-time 30 \
+            --header "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$OIDC_AUDIENCE")"
+
+          oidc_token="$(OIDC_RESPONSE="$oidc_response" python - <<'PY'
+          import json
+          import os
+
+          payload = json.loads(os.environ["OIDC_RESPONSE"])
+          token = payload.get("value", "").strip()
+          if not token:
+              raise SystemExit("GitHub OIDC não devolveu um token.")
+          print(token)
+          PY
+          )"
+
+          echo "::add-mask::$oidc_token"
+
           curl \
             --fail-with-body \
             --max-time 90 \
-            --header "Authorization: Bearer $CRON_SECRET" \
+            --header "Authorization: Bearer $oidc_token" \
             --header "Accept: application/json" \
-            "https://tempopelotas.com.br/api/cron/push-daily?task=weather-ai"
+            "$CRON_URL"
