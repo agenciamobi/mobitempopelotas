@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
@@ -35,6 +35,25 @@ jobs:
 
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
+
+      - name: Normalizar embeds do Laranjal uma vez
+        if: github.event_name == 'push'
+        run: |
+          npx prettier --write \
+            src/components/cameras/LaranjalCamerasEmbedFallback.tsx \
+            src/components/cameras/LaranjalCamerasEmbedGrid.tsx
+          if git diff --quiet -- \
+            src/components/cameras/LaranjalCamerasEmbedFallback.tsx \
+            src/components/cameras/LaranjalCamerasEmbedGrid.tsx; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/components/cameras/LaranjalCamerasEmbedFallback.tsx \
+            src/components/cameras/LaranjalCamerasEmbedGrid.tsx
+          git commit -m "chore: format Laranjal camera embeds"
+          git push
 
       - name: Validar template de ambiente
         run: npm run runtime:check:example
