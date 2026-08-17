@@ -101,8 +101,9 @@ await check("feed técnico continua não indexável", async () => {
 await check("sitemap publica apenas o host canônico", async () => {
   const response = await request(absoluteUrl("/sitemap.xml"), { headers: { Accept: "application/xml" } });
   const xml = await response.text();
+  const wwwOrigin = `${parsedBaseUrl.protocol}//www.${parsedBaseUrl.hostname}`;
   assert(response.status === 200, `HTTP ${response.status}`);
-  assert(!xml.includes("https://www.tempopelotas.com.br"), "Sitemap contém host www");
+  assert(!xml.includes(wwwOrigin), "Sitemap contém host www");
   assert(xml.includes(absoluteUrl("/")), "Home canônica ausente");
   return "sem URLs www; host canônico presente";
 });
