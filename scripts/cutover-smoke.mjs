@@ -19,6 +19,7 @@ const publicRoutes = [
   "/nivel-da-lagoa-dos-patos-laranjal",
   "/estacao-embrapa-pelotas",
   "/historico-climatico-pelotas",
+  "/clima-em-pelotas",
   "/cameras-ao-vivo-pelotas",
   "/metodologia",
 ];
@@ -122,20 +123,6 @@ for (const route of publicRoutes) {
     return `HTTP 200; canonical ${canonical}`;
   });
 }
-
-await check("Redirect legado /clima-em-pelotas", async () => {
-  const response = await request("/clima-em-pelotas", { redirect: "manual" });
-  const location = response.headers.get("location");
-
-  assert([301, 308].includes(response.status), `HTTP ${response.status}`);
-  assert(location !== null, "Cabeçalho Location ausente");
-  assert(
-    new URL(location, `${baseUrl}/`).pathname === "/historico-climatico-pelotas",
-    `Destino inesperado: ${location}`,
-  );
-
-  return `HTTP ${response.status}; ${location}`;
-});
 
 await check("robots.txt", async () => {
   const response = await request("/robots.txt", {
