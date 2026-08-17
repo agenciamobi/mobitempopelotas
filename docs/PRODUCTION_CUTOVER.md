@@ -47,6 +47,22 @@ O smoke test deve validar:
 - endpoints públicos necessários;
 - ausência de erros HTTP inesperados.
 
+O workflow `Smoke test de cutover` também executa `scripts/seo-production-smoke.mjs`. Esse segundo estágio diferencia falha de aplicação de comportamento da infraestrutura externa:
+
+- `PASS`: contrato de produção confirmado;
+- `WARN externo`: o destino canônico está correto, mas a camada de hospedagem ainda responde com redirect temporário (`302` ou `307`);
+- `FAIL`: status inesperado, redirect ausente, destino incorreto, loop, metadado incorreto ou asset ausente.
+
+Um `WARN externo` não torna o workflow vermelho porque não pode ser corrigido pelo código da aplicação, mas continua registrado no relatório como pendência operacional.
+
+### Estado observado do `www` em 17/08/2026
+
+A aplicação possui contrato explícito em `src/lib/canonical-host.ts` para responder `308` ao host `www`, preservando caminho e query string. Esse redirect é aplicado em `src/server.ts` antes da renderização.
+
+No domínio público, entretanto, a camada externa de hospedagem respondeu `302` para `www` antes de a requisição chegar à aplicação. O destino permaneceu o host canônico. Enquanto esse comportamento existir, o smoke SEO deve registrar `WARN externo`, não `FAIL`.
+
+Para eliminar o aviso e cumprir integralmente o contrato permanente, ajustar a configuração de domínio na camada de hosting. No Lovable, domínios conectados podem ter um domínio primário; domínios secundários são redirecionados pela própria plataforma. Uma opção operacional é remover o redirecionamento de domínio primário para que `www` também alcance a aplicação e seja tratado pelo `308` já implementado, ou configurar uma camada externa que emita `301/308` preservando caminho e parâmetros. Confirmar o resultado pelo smoke antes de considerar o P0 encerrado.
+
 ## Verificação manual
 
 ```powershell
@@ -88,6 +104,6 @@ Se houver falha crítica:
 2. manter `tempopelotas.com.br` como domínio público e canônico;
 3. não publicar host de preview como alternativa;
 4. preservar caminhos, redirects e metadados;
-5. corrigir em branch isolada e exigir todos os workflows verdes antes de uma nova publicação.
+5. corrigir diretamente na `main` em mudança pequena e exigir `Qualidade` e smoke sem falhas de aplicação antes da próxima publicação.
 
 O rollback deve alterar a infraestrutura, não a identidade pública do portal.
