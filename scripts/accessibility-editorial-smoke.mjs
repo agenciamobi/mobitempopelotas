@@ -1,4 +1,4 @@
-/* global process, document, window, HTMLElement, HTMLImageElement */
+/* global process, document, window, HTMLElement */
 
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -7,6 +7,7 @@ import { chromium } from "playwright";
 
 const baseUrl = process.env.CANDIDATE_URL ?? "http://127.0.0.1:4173";
 const outputDirectory = path.resolve("artifacts/visual-parity/accessibility");
+
 const routes = [
   { name: "inicio", path: "/" },
   { name: "tempo-hoje", path: "/tempo-hoje-pelotas" },
@@ -23,10 +24,17 @@ const routes = [
   { name: "metodologia", path: "/metodologia" },
   { name: "privacidade", path: "/privacidade-e-dados" },
 ];
+
 const viewports = [
   { name: "desktop-1280", width: 1280, height: 900 },
   { name: "mobile-320", width: 320, height: 720 },
 ];
+
+function normalizeText(value) {
+  return String(value ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 function emptyAudit() {
   return {
@@ -80,50 +88,35 @@ function markdownReport(results) {
   return `${lines.join("\n")}\n`;
 }
 
-function collectBackendNodeIds(node, backendByMarker) {
-  const attributes = node.attributes ?? [];
-  for (let index = 0; index < attributes.length; index += 2) {
-    if (attributes[index] === "data-a11y-smoke-id") {
-      backendByMarker.set(attributes[index + 1], node.backendNodeId);
-      break;
-    }
-  }
+async function computedAccessibleNames(session, candidates) {
+  if (candidates.length === 0) return new Map();
 
-  for (const child of node.children ?? []) {
-    collectBackendNodeIds(child, backendByMarker);
-  }
-  for (const shadowRoot of node.shadowRoots ?? []) {
-    collectBackendNodeIds(shadowRoot, backendByMarker);
-  }
-  if (node.contentDocument) {
-    collectBackendNodeIds(node.contentDocument, backendByMarker);
-  }
-}
-
-async function computedAccessibleNames(session) {
-  const [{ root }, { nodes }] = await Promise.all([
-    session.send("DOM.getDocument", { depth: -1, pierce: true }),
-    session.send("Accessibility.getFullAXTree"),
-  ]);
-  const backendByMarker = new Map();
-  collectBackendNodeIds(root, backendByMarker);
-
-  const accessibleNameByBackend = new Map();
-  for (const node of nodes) {
-    if (!node.backendDOMNodeId || node.ignored) continue;
-    const name = String(node.name?.value ?? "")
-      .replace(/\s+/g, " ")
-      .trim();
-    const existing = accessibleNameByBackend.get(node.backendDOMNodeId) ?? "";
-    if (!existing || name) {
-      accessibleNameByBackend.set(node.backendDOMNodeId, name);
-    }
-  }
-
+  const { root } = await session.send("DOM.getDocument", {
+    depth: 0,
+    pierce: true,
+  });
   const names = new Map();
-  for (const [marker, backendNodeId] of backendByMarker) {
-    names.set(marker, accessibleNameByBackend.get(backendNodeId) ?? "");
+
+  for (const candidate of candidates) {
+    const selector = `[data-a11y-smoke-id="${candidate.marker}"]`;
+    const { nodeId } = await session.send("DOM.querySelector", {
+      nodeId: root.nodeId,
+      selector,
+    });
+
+    if (!nodeId) {
+      names.set(candidate.marker, "");
+      continue;
+    }
+
+    const { nodes } = await session.send("Accessibility.getPartialAXTree", {
+      nodeId,
+      fetchRelatives: false,
+    });
+    const target = nodes.find((node) => !node.ignored) ?? null;
+    names.set(candidate.marker, normalizeText(target?.name?.value));
   }
+
   return names;
 }
 
@@ -183,6 +176,7 @@ try {
     });
     const page = await context.newPage();
     const session = await context.newCDPSession(page);
+    await session.send("Accessibility.enable");
 
     try {
       for (const route of routes) {
@@ -277,7 +271,8 @@ try {
                 typeof element.className === "string" && element.className.trim()
                   ? `.${element.className.trim().split(/\s+/).slice(0, 2).join(".")}`
                   : "";
-              return `${tag}${id}${className}`;
+              const text = normalizedText(element.textContent).slice(0, 60);
+              return `${tag}${id}${className}${text ? ` [${text}]` : ""}`;
             };
             const markerByElement = new Map();
             let markerSequence = 0;
@@ -374,7 +369,12 @@ try {
             };
           });
 
-          const names = await computedAccessibleNames(session);
+          const candidatesByMarker = new Map();
+          for (const candidate of [...domAudit.interactiveCandidates, ...domAudit.fieldCandidates]) {
+            candidatesByMarker.set(candidate.marker, candidate);
+          }
+          const names = await computedAccessibleNames(session, Array.from(candidatesByMarker.values()));
+
           const audit = {
             ...domAudit,
             unnamedInteractive: domAudit.interactiveCandidates
@@ -412,6 +412,7 @@ try {
         }
       }
     } finally {
+      await session.send("Accessibility.disable").catch(() => undefined);
       await session.detach().catch(() => undefined);
       await context.close();
     }
