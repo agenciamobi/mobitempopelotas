@@ -155,7 +155,7 @@ test("the retail hero selects credited photography from the forecast condition",
 });
 
 test("the retail hero uses a useful headline and concise current metrics", () => {
-  assert.match(todayRetailHero, /Tempo hoje em Pelotas/);
+  assert.match(todayRetailHero, /Tempo hoje <span>em \{locationName\}<\/span>/);
   assert.match(todayRetailHero, /previsão por hora, chuva e vento/);
   assert.doesNotMatch(todayRetailHero, /Seu dia em Pelotas/);
   assert.doesNotMatch(todayRetailHero, /organizado por horários/);
