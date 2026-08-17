@@ -49,7 +49,7 @@ test("Laranjal level preserves its own reference and avoids cross-station conver
   assert.match(page, /não deve ser comparado diretamente com números absolutos de outras estações/);
   assert.match(page, /Este valor não é uma classificação de risco/);
   assert.match(page, /não usa as[\s\S]*cotas de Atenção, Alerta ou Inundação de outras estações/);
-  assert.match(route, /Os números não devem ser comparados por simples subtração/);
+  assert.match(route, /os números não devem ser comparados por simples subtração/i);
   assert.match(route, /não são convertidas em classificação para o Laranjal/);
   assert.doesNotMatch(hydrologySource, /cota de inundação do Laranjal:\s*\d/i);
 });
