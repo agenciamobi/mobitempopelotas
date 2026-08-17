@@ -74,6 +74,7 @@ test("workflow agenda 23h, 05h, 11h e 17h em Brasília com OIDC", () => {
   assert.match(workflow, /ACTIONS_ID_TOKEN_REQUEST_URL/);
   assert.match(workflow, /tempo-pelotas-weather-ai/);
   assert.doesNotMatch(workflow, /TEMPO_PELOTAS_CRON_SECRET/);
+  assert.doesNotMatch(workflow, /OIDC diagnóstico seguro/);
   assert.match(workflow, /https:\/\/tempopelotas\.com\.br\/api\/cron\/push-daily\?task=weather-ai/);
   assert.doesNotMatch(workflow, /lovable\.app/);
 });
@@ -89,6 +90,19 @@ test("banco impede duplicidade por período e indexa fingerprint material", () =
   assert.match(migration, /grant select, insert, update, delete.*service_role/s);
   assert.match(migration, /revoke all.*anon/s);
   assert.match(migration, /revoke all.*authenticated/s);
+});
+
+test("slot failed pode ser reclamado sem liberar claimed ou generated", () => {
+  const migration = read(
+    "supabase/migrations/20260817221500_allow_weather_ai_failed_slot_retry.sql",
+  );
+  assert.match(migration, /before insert on public\.weather_ai_snapshots/);
+  assert.match(migration, /delete from public\.weather_ai_snapshots/);
+  assert.match(migration, /slot_key = new\.slot_key/);
+  assert.match(migration, /status = 'failed'/);
+  assert.match(migration, /security definer/);
+  assert.doesNotMatch(migration, /status = 'generated'/);
+  assert.doesNotMatch(migration, /status = 'claimed'/);
 });
 
 test("teto mensal é atômico, auditável e falha fechado", () => {
@@ -126,7 +140,7 @@ test("teto mensal é atômico, auditável e falha fechado", () => {
   assert.match(env, /GEMINI_WEATHER_MONTHLY_CALL_LIMIT=150/);
 });
 
-test("endpoint compartilhado separa IA e push e informa quando não houve chamada", () => {
+test("endpoint compartilhado separa IA e push e não expõe motivo interno de autenticação", () => {
   const route = read("src/routes/api/cron/push-daily.ts");
   assert.match(route, /process\.env\.CRON_SECRET/);
   assert.match(route, /verifyWeatherAiGithubActionsRequest/);
@@ -135,6 +149,7 @@ test("endpoint compartilhado separa IA e push e informa quando não houve chamad
   assert.match(route, /aiCalled: result\.status === "generated"/);
   assert.match(route, /searchParams\.get\("task"\) === "weather-ai"/);
   assert.match(route, /sendDailySummary/);
+  assert.doesNotMatch(route, /authReason/);
 });
 
 test("refresh, feed, JSON e push não possuem caminho direto até Gemini", () => {
