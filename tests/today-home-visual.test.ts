@@ -222,7 +222,7 @@ test("forecast and observation widgets are derived from homepage components", ()
   assert.match(internalWidgets, /home-observation-story internal-observation-widget/);
   assert.match(internalWidgets, /home-observation-story__reading/);
   assert.match(internalWidgets, /home-observation-temperature/);
-  assert.match(internalWidgets, /Abrir dados completos da estação/);
+  assert.match(internalWidgets, /Ver todas as medições da estação/);
 });
 
 test("today content is concise and keeps measurement provenance explicit", () => {
