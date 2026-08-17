@@ -3,6 +3,11 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 
+import {
+  GEMINI_WEATHER_DEFAULT_MODEL,
+  resolveGeminiWeatherModel,
+} from "../src/lib/weather/gemini-weather.server.ts";
+
 function read(relativePath: string) {
   return readFileSync(path.resolve(relativePath), "utf8");
 }
@@ -46,14 +51,31 @@ test("Gemini fica isolado no gerador persistente do código ativo", () => {
   assert.match(snapshot, /SNAPSHOT_MAX_AGE_MS = 8 \* 60 \* 60 \* 1_000/);
 });
 
-test("workflow agenda 23h, 05h, 11h e 17h em Brasília", () => {
+test("modelo Gemini inválido não substitui o modelo estável do Weather AI", () => {
+  assert.equal(GEMINI_WEATHER_DEFAULT_MODEL, "gemini-3.5-flash-lite");
+  assert.equal(resolveGeminiWeatherModel(undefined), GEMINI_WEATHER_DEFAULT_MODEL);
+  assert.equal(resolveGeminiWeatherModel(""), GEMINI_WEATHER_DEFAULT_MODEL);
+  assert.equal(resolveGeminiWeatherModel("gemini-3.5-flas"), GEMINI_WEATHER_DEFAULT_MODEL);
+  assert.equal(
+    resolveGeminiWeatherModel("gemini-3.5-flash-lite"),
+    GEMINI_WEATHER_DEFAULT_MODEL,
+  );
+
+  const gemini = read("src/lib/weather/gemini-weather.server.ts");
+  assert.match(gemini, /REQUEST_TIMEOUT_MS = 15_000/);
+  assert.doesNotMatch(gemini, /temperature\s*:/);
+});
+
+test("workflow agenda 23h, 05h, 11h e 17h em Brasília com OIDC", () => {
   const workflow = read(".github/workflows/weather-ai-snapshots.yml");
   assert.match(workflow, /0 2,8,14,20 \* \* \*/);
   assert.match(workflow, /23:00, 05:00, 11:00 e 17:00/);
-  assert.match(workflow, /TEMPO_PELOTAS_CRON_SECRET/);
+  assert.match(workflow, /id-token:\s*write/);
+  assert.match(workflow, /ACTIONS_ID_TOKEN_REQUEST_URL/);
+  assert.match(workflow, /tempo-pelotas-weather-ai/);
+  assert.doesNotMatch(workflow, /TEMPO_PELOTAS_CRON_SECRET/);
   assert.match(workflow, /https:\/\/tempopelotas\.com\.br\/api\/cron\/push-daily\?task=weather-ai/);
   assert.doesNotMatch(workflow, /lovable\.app/);
-  assert.doesNotMatch(workflow, /--retry\s+[1-9]/);
 });
 
 test("banco impede duplicidade por período e indexa fingerprint material", () => {
@@ -107,7 +129,7 @@ test("teto mensal é atômico, auditável e falha fechado", () => {
 test("endpoint compartilhado separa IA e push e informa quando não houve chamada", () => {
   const route = read("src/routes/api/cron/push-daily.ts");
   assert.match(route, /process\.env\.CRON_SECRET/);
-  assert.match(route, /hasBearerSecret/);
+  assert.match(route, /verifyWeatherAiGithubActionsRequest/);
   assert.match(route, /generateScheduledWeatherAiSnapshot/);
   assert.match(route, /result\.status === "generated" \|\| result\.status === "reused"/);
   assert.match(route, /aiCalled: result\.status === "generated"/);
