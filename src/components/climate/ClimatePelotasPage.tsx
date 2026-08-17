@@ -221,15 +221,22 @@ export function ClimatePelotasPage({ history }: { history: WeatherHistoryData })
         </a>
       </nav>
 
-      <section className="climate-definition" id="tempo-e-clima" aria-labelledby="climate-definition-title">
+      <section
+        className="climate-definition"
+        id="tempo-e-clima"
+        aria-labelledby="climate-definition-title"
+      >
         <header>
           <div>
             <span className="eyebrow">Uma diferença importante</span>
-            <h2 id="climate-definition-title">Tempo mostra o presente; clima descreve muitos anos</h2>
+            <h2 id="climate-definition-title">
+              Tempo mostra o presente; clima descreve muitos anos
+            </h2>
           </div>
           <p>
-            Uma frente fria, uma semana chuvosa ou um mês quente descrevem um período específico. Para
-            entender o clima, é preciso comparar muitos anos de observações organizadas e verificadas.
+            Uma frente fria, uma semana chuvosa ou um mês quente descrevem um período específico.
+            Para entender o clima, é preciso comparar muitos anos de observações organizadas e
+            verificadas.
           </p>
         </header>
         <div>
@@ -238,13 +245,18 @@ export function ClimatePelotasPage({ history }: { history: WeatherHistoryData })
             <span>Tempo de agora</span>
             <strong>Horas, dias e próximas semanas</strong>
             <p>Condição atual, previsão, chuva por horário, vento, radar e avisos oficiais.</p>
-            <Link to="/tempo-hoje-pelotas">Ver o tempo de hoje <ArrowRight aria-hidden="true" /></Link>
+            <Link to="/tempo-hoje-pelotas">
+              Ver o tempo de hoje <ArrowRight aria-hidden="true" />
+            </Link>
           </article>
           <article>
             <CalendarRange aria-hidden="true" />
             <span>Clima</span>
             <strong>Comportamento de longo prazo</strong>
-            <p>As Normais Climatológicas usam muitos anos de dados para representar médias e variações.</p>
+            <p>
+              As Normais Climatológicas usam muitos anos de dados para representar médias e
+              variações.
+            </p>
             <a href="https://portal.inmet.gov.br/normais" target="_blank" rel="noopener noreferrer">
               Consultar Normais do INMET <ExternalLink aria-hidden="true" />
             </a>
@@ -252,15 +264,19 @@ export function ClimatePelotasPage({ history }: { history: WeatherHistoryData })
         </div>
       </section>
 
-      <section className="climate-seasons" id="estacoes-em-pelotas" aria-labelledby="climate-seasons-title">
+      <section
+        className="climate-seasons"
+        id="estacoes-em-pelotas"
+        aria-labelledby="climate-seasons-title"
+      >
         <header>
           <div>
             <span className="eyebrow">Estações do ano</span>
             <h2 id="climate-seasons-title">O que costuma mudar ao longo do ano</h2>
           </div>
           <p>
-            As descrições abaixo mostram tendências gerais. Frentes, massas de ar e áreas de alta ou baixa
-            pressão podem produzir condições diferentes do esperado para a época.
+            As descrições abaixo mostram tendências gerais. Frentes, massas de ar e áreas de alta ou
+            baixa pressão podem produzir condições diferentes do esperado para a época.
           </p>
         </header>
         <div className="climate-season-grid">
@@ -286,15 +302,19 @@ export function ClimatePelotasPage({ history }: { history: WeatherHistoryData })
         </div>
       </section>
 
-      <section className="climate-factors" id="fatores-locais" aria-labelledby="climate-factors-title">
+      <section
+        className="climate-factors"
+        id="fatores-locais"
+        aria-labelledby="climate-factors-title"
+      >
         <header>
           <div>
             <span className="eyebrow">Por que Pelotas varia tanto</span>
             <h2 id="climate-factors-title">Fatores que ajudam a explicar o clima local</h2>
           </div>
           <p>
-            Nenhum fator atua sozinho. A combinação entre vento, umidade, relevo baixo e grandes superfícies
-            de água ajuda a definir como cada situação é percebida na cidade e na orla.
+            Nenhum fator atua sozinho. A combinação entre vento, umidade, relevo baixo e grandes
+            superfícies de água ajuda a definir como cada situação é percebida na cidade e na orla.
           </p>
         </header>
         <div>
@@ -302,7 +322,10 @@ export function ClimatePelotasPage({ history }: { history: WeatherHistoryData })
             <Waves aria-hidden="true" />
             <span>Lagoa dos Patos e oceano</span>
             <strong>Umidade, brisa e variação de temperatura</strong>
-            <p>A proximidade da água influencia umidade, vento local, neblina e mudanças de temperatura.</p>
+            <p>
+              A proximidade da água influencia umidade, vento local, neblina e mudanças de
+              temperatura.
+            </p>
           </article>
           <article>
             <Wind aria-hidden="true" />
@@ -320,20 +343,27 @@ export function ClimatePelotasPage({ history }: { history: WeatherHistoryData })
             <CloudRain aria-hidden="true" />
             <span>Chuva ao longo do ano</span>
             <strong>Chuva pode ocorrer em qualquer época</strong>
-            <p>Frentes, áreas de baixa pressão e períodos instáveis podem provocar chuva em todas as estações.</p>
+            <p>
+              Frentes, áreas de baixa pressão e períodos instáveis podem provocar chuva em todas as
+              estações.
+            </p>
           </article>
         </div>
       </section>
 
-      <section className="climate-recent" id="recorte-recente" aria-labelledby="climate-recent-title">
+      <section
+        className="climate-recent"
+        id="recorte-recente"
+        aria-labelledby="climate-recent-title"
+      >
         <header>
           <div>
             <span className="eyebrow">O que ocorreu recentemente</span>
             <h2 id="climate-recent-title">Últimos 30 dias: dados recentes, não média histórica</h2>
           </div>
           <p>
-            Estes valores descrevem somente o período indicado e o local de referência usado pela fonte.
-            Eles não mostram, sozinhos, se o período ficou acima ou abaixo do clima normal.
+            Estes valores descrevem somente o período indicado e o local de referência usado pela
+            fonte. Eles não mostram, sozinhos, se o período ficou acima ou abaixo do clima normal.
           </p>
         </header>
 
@@ -370,17 +400,30 @@ export function ClimatePelotasPage({ history }: { history: WeatherHistoryData })
               <div>
                 <span>Dia mais quente do período</span>
                 <strong>{formatNumber(summary.warmestDay.temperatureMax, " °C")}</strong>
-                <small>{summary.warmestDay.weekday}, {summary.warmestDay.label}</small>
+                <small>
+                  {summary.warmestDay.weekday}, {summary.warmestDay.label}
+                </small>
               </div>
-              <div className="climate-temperature-range" aria-label="Faixa entre a menor mínima e a maior máxima do período">
+              <div
+                className="climate-temperature-range"
+                aria-label="Faixa entre a menor mínima e a maior máxima do período"
+              >
                 <span />
-                <i style={{ left: "0%" }}><b>{formatNumber(summary.coldestDay.temperatureMin, " °C")}</b><small>menor mínima</small></i>
-                <i style={{ left: "100%" }}><b>{formatNumber(summary.warmestDay.temperatureMax, " °C")}</b><small>maior máxima</small></i>
+                <i style={{ left: "0%" }}>
+                  <b>{formatNumber(summary.coldestDay.temperatureMin, " °C")}</b>
+                  <small>menor mínima</small>
+                </i>
+                <i style={{ left: "100%" }}>
+                  <b>{formatNumber(summary.warmestDay.temperatureMax, " °C")}</b>
+                  <small>maior máxima</small>
+                </i>
               </div>
               <div>
                 <span>Noite mais fria do período</span>
                 <strong>{formatNumber(summary.coldestDay.temperatureMin, " °C")}</strong>
-                <small>{summary.coldestDay.weekday}, {summary.coldestDay.label}</small>
+                <small>
+                  {summary.coldestDay.weekday}, {summary.coldestDay.label}
+                </small>
               </div>
             </div>
 
@@ -388,9 +431,13 @@ export function ClimatePelotasPage({ history }: { history: WeatherHistoryData })
               <Database aria-hidden="true" />
               <span>
                 <strong>{history.source.name}</strong>
-                <small>{recentPeriod(history)} · atualizado em {formatDateTime(history.source.fetchedAt)}</small>
+                <small>
+                  {recentPeriod(history)} · atualizado em {formatDateTime(history.source.fetchedAt)}
+                </small>
               </span>
-              <Link to="/historico-climatico-pelotas">Ver valores diários <ArrowRight aria-hidden="true" /></Link>
+              <Link to="/historico-climatico-pelotas">
+                Ver valores diários <ArrowRight aria-hidden="true" />
+              </Link>
             </footer>
           </>
         ) : (
@@ -398,40 +445,61 @@ export function ClimatePelotasPage({ history }: { history: WeatherHistoryData })
             <Info aria-hidden="true" />
             <div>
               <strong>Os últimos 30 dias estão temporariamente indisponíveis</strong>
-              <p>A página mantém as explicações sobre o clima sem preencher a ausência dos dados com números simulados.</p>
+              <p>
+                A página mantém as explicações sobre o clima sem preencher a ausência dos dados com
+                números simulados.
+              </p>
             </div>
           </div>
         )}
       </section>
 
-      <section className="climate-sources" id="fontes-climaticas" aria-labelledby="climate-sources-title">
+      <section
+        className="climate-sources"
+        id="fontes-climaticas"
+        aria-labelledby="climate-sources-title"
+      >
         <div>
           <span className="eyebrow">Onde consultar</span>
-          <h2 id="climate-sources-title">Clima, histórico e previsão respondem perguntas diferentes</h2>
+          <h2 id="climate-sources-title">
+            Clima, histórico e previsão respondem perguntas diferentes
+          </h2>
           <p>
-            As Normais Climatológicas representam muitos anos; o histórico mostra dias passados; e a previsão
-            estima os próximos horários e dias.
+            As Normais Climatológicas representam muitos anos; o histórico mostra dias passados; e a
+            previsão estima os próximos horários e dias.
           </p>
         </div>
         <div className="climate-source-grid">
           <a href="https://portal.inmet.gov.br/normais" target="_blank" rel="noopener noreferrer">
             <CalendarRange aria-hidden="true" />
-            <span><strong>Normais Climatológicas do INMET</strong><small>Referências oficiais calculadas com muitos anos.</small></span>
+            <span>
+              <strong>Normais Climatológicas do INMET</strong>
+              <small>Referências oficiais calculadas com muitos anos.</small>
+            </span>
             <ExternalLink aria-hidden="true" />
           </a>
           <Link to="/historico-climatico-pelotas">
             <Database aria-hidden="true" />
-            <span><strong>Histórico de 30 dias</strong><small>Máximas, mínimas, chuva e rajadas dos últimos dias.</small></span>
+            <span>
+              <strong>Histórico de 30 dias</strong>
+              <small>Máximas, mínimas, chuva e rajadas dos últimos dias.</small>
+            </span>
             <ArrowRight aria-hidden="true" />
           </Link>
           <Link to="/previsao-7-dias-pelotas">
             <CloudRain aria-hidden="true" />
-            <span><strong>Previsão para 7 dias</strong><small>Tendência para os próximos dias.</small></span>
+            <span>
+              <strong>Previsão para 7 dias</strong>
+              <small>Tendência para os próximos dias.</small>
+            </span>
             <ArrowRight aria-hidden="true" />
           </Link>
           <Link to="/metodologia">
             <MapPinned aria-hidden="true" />
-            <span><strong>Como os dados funcionam</strong><small>Origem, atualização e limites das informações.</small></span>
+            <span>
+              <strong>Como os dados funcionam</strong>
+              <small>Origem, atualização e limites das informações.</small>
+            </span>
             <ArrowRight aria-hidden="true" />
           </Link>
         </div>
@@ -443,10 +511,34 @@ export function ClimatePelotasPage({ history }: { history: WeatherHistoryData })
           <h2 id="climate-related-title">Do clima de muitos anos ao tempo de hoje</h2>
         </header>
         <div>
-          <Link to="/tempo-hoje-pelotas"><Gauge aria-hidden="true" /><span><strong>Tempo hoje</strong><small>Condição atual e próximas horas.</small></span></Link>
-          <Link to="/meteograma-pelotas"><ThermometerSun aria-hidden="true" /><span><strong>Previsão hora a hora</strong><small>Temperatura, chuva, nuvens, pressão e vento.</small></span></Link>
-          <Link to="/mapa-de-geadas-rio-grande-do-sul"><Snowflake aria-hidden="true" /><span><strong>Mapa de geadas</strong><small>Registros encontrados no Rio Grande do Sul.</small></span></Link>
-          <Link to="/radar-e-satelite-pelotas"><CloudRain aria-hidden="true" /><span><strong>Radar e satélite</strong><small>Imagens e horários da região.</small></span></Link>
+          <Link to="/tempo-hoje-pelotas">
+            <Gauge aria-hidden="true" />
+            <span>
+              <strong>Tempo hoje</strong>
+              <small>Condição atual e próximas horas.</small>
+            </span>
+          </Link>
+          <Link to="/meteograma-pelotas">
+            <ThermometerSun aria-hidden="true" />
+            <span>
+              <strong>Previsão hora a hora</strong>
+              <small>Temperatura, chuva, nuvens, pressão e vento.</small>
+            </span>
+          </Link>
+          <Link to="/mapa-de-geadas-rio-grande-do-sul">
+            <Snowflake aria-hidden="true" />
+            <span>
+              <strong>Mapa de geadas</strong>
+              <small>Registros encontrados no Rio Grande do Sul.</small>
+            </span>
+          </Link>
+          <Link to="/radar-e-satelite-pelotas">
+            <CloudRain aria-hidden="true" />
+            <span>
+              <strong>Radar e satélite</strong>
+              <small>Imagens e horários da região.</small>
+            </span>
+          </Link>
         </div>
       </section>
     </div>
