@@ -37,8 +37,9 @@ export function LaranjalEmbedGuide() {
         <span className="laranjal-embed-guide-eyebrow">Recurso público</span>
         <h2 id="laranjal-embed-guide-title">Leve o nível do Laranjal para outro site.</h2>
         <p>
-          O widget é responsivo, atualiza a leitura automaticamente e mantém a fonte técnica identificada.
-          O conteúdo é carregado em um iframe isolado, sem interferir no CSS do portal que o incorpora.
+          O widget é responsivo, atualiza a leitura automaticamente e mantém a fonte técnica
+          identificada. O conteúdo é carregado em um iframe isolado, sem interferir no CSS do portal
+          que o incorpora.
         </p>
         <ul>
           <li>Leitura atual, tendência e histórico recente.</li>
@@ -69,7 +70,8 @@ export function LaranjalEmbedGuide() {
           <code>{EMBED_CODE}</code>
         </pre>
         <small>
-          Para limitar a largura, adicione <code>data-max-width="620px"</code> ao elemento <code>div</code>.
+          Para limitar a largura, adicione <code>data-max-width="620px"</code> ao elemento{" "}
+          <code>div</code>.
         </small>
       </div>
     </section>
