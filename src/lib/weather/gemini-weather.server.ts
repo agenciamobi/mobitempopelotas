@@ -4,8 +4,9 @@ import type { AggregatedWeatherData } from "./aggregated-weather.types";
 import type { GeminiWeatherStatus, WeatherBrief } from "./weather-intelligence.types";
 
 const GEMINI_API_ROOT = "https://generativelanguage.googleapis.com/v1beta/models";
-const DEFAULT_MODEL = "gemini-3.5-flash-lite";
-const REQUEST_TIMEOUT_MS = 1_200;
+export const GEMINI_WEATHER_DEFAULT_MODEL = "gemini-3.5-flash-lite";
+const SUPPORTED_MODELS = new Set([GEMINI_WEATHER_DEFAULT_MODEL]);
+const REQUEST_TIMEOUT_MS = 15_000;
 const MAX_PROMPT_CHARACTERS = 12_000;
 
 const weatherBriefSchema = z.object({
@@ -46,9 +47,23 @@ function readServerEnvironment(name: string) {
   return (globalThis as RuntimeWithProcess).process?.env?.[name]?.trim() || null;
 }
 
+export function resolveGeminiWeatherModel(configured: string | null | undefined) {
+  const normalized = configured?.trim() ?? "";
+  return SUPPORTED_MODELS.has(normalized) ? normalized : GEMINI_WEATHER_DEFAULT_MODEL;
+}
+
 function resolveModel() {
   const configured = readServerEnvironment("GEMINI_MODEL");
-  return configured && /^[a-z0-9._-]+$/i.test(configured) ? configured : DEFAULT_MODEL;
+  const model = resolveGeminiWeatherModel(configured);
+
+  if (configured && configured !== model) {
+    console.warn("[weather-ai] GEMINI_MODEL não suportado; usando o modelo padrão", {
+      configured,
+      fallback: model,
+    });
+  }
+
+  return model;
 }
 
 function isGeminiEnabled() {
@@ -196,7 +211,6 @@ export async function generateGeminiWeatherBrief(
         ],
         generationConfig: {
           candidateCount: 1,
-          temperature: 0.1,
           maxOutputTokens: 450,
           responseMimeType: "application/json",
         },
