@@ -19,7 +19,7 @@ function run(command, args, options = {}) {
 }
 
 function git(args, { allowFailure = false } = {}) {
-  const result = run("git", args);
+  const result = run("git", ["-c", `safe.directory=${ROOT}`, ...args]);
 
   if (!allowFailure && result.status !== 0) {
     throw new Error(result.stderr.trim() || `git ${args.join(" ")} falhou.`);
