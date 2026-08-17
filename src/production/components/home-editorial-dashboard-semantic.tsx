@@ -247,7 +247,6 @@ function transformDashboardNode(
   );
 
   let normalizedClassName = className;
-  let normalizedId = typeof props.id === "string" ? props.id : undefined;
 
   if (hasClass(className, "home-water-focus")) {
     normalizedClassName = appendClass(
@@ -261,10 +260,6 @@ function transformDashboardNode(
       normalizedClassName,
       waterLevelStateClass(waterStates.guaiba),
     );
-  }
-
-  if (isDomElement && node.type === "section" && hasClass(className, "home-map-story")) {
-    normalizedId = "regiao";
   }
 
   if (isDomElement && node.type === "article" && className.includes("risk-")) {
@@ -281,14 +276,7 @@ function transformDashboardNode(
   }
 
   const classChanged = normalizedClassName !== className;
-  const idChanged = normalizedId !== props.id;
-  const nextProps =
-    classChanged || idChanged
-      ? {
-          ...(classChanged ? { className: normalizedClassName || undefined } : {}),
-          ...(idChanged ? { id: normalizedId } : {}),
-        }
-      : undefined;
+  const nextProps = classChanged ? { className: normalizedClassName || undefined } : undefined;
 
   return cloneElement(node as ReactElement<ElementProps>, nextProps, transformedChildren);
 }
