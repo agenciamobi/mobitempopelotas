@@ -149,7 +149,9 @@ function createGithubOidcFixture() {
     const encodedHeader = Buffer.from(JSON.stringify(header)).toString("base64url");
     const encodedPayload = Buffer.from(JSON.stringify(payload)).toString("base64url");
     const signingInput = `${encodedHeader}.${encodedPayload}`;
-    const signature = sign("RSA-SHA256", Buffer.from(signingInput), signingKey).toString("base64url");
+    const signature = sign("RSA-SHA256", Buffer.from(signingInput), signingKey).toString(
+      "base64url",
+    );
     return `${signingInput}.${signature}`;
   }
 
