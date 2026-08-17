@@ -82,7 +82,9 @@ function currentSeason(history: WeatherHistoryData): Season {
   const reference = history.source.periodEnd
     ? new Date(`${history.source.periodEnd}T12:00:00-03:00`)
     : new Date();
-  const month = Number.isNaN(reference.getTime()) ? new Date().getMonth() + 1 : reference.getMonth() + 1;
+  const month = Number.isNaN(reference.getTime())
+    ? new Date().getMonth() + 1
+    : reference.getMonth() + 1;
   return seasons.find((season) => season.id === seasonForMonth(month)) ?? seasons[0]!;
 }
 
@@ -121,7 +123,8 @@ function formatNumber(value: number | null | undefined, unit: string, digits = 1
 }
 
 function recentPeriod(history: WeatherHistoryData) {
-  if (!history.source.periodStart || !history.source.periodEnd) return "Período recente indisponível";
+  if (!history.source.periodStart || !history.source.periodEnd)
+    return "Período recente indisponível";
   return `${formatDate(history.source.periodStart)} a ${formatDate(history.source.periodEnd)}`;
 }
 
@@ -133,10 +136,12 @@ export function ClimatePelotasHero({ history }: { history: WeatherHistoryData })
     <section className="climate-hero" aria-labelledby="climate-hero-title">
       <div className="climate-hero__content">
         <span className="eyebrow">Estações do ano em Pelotas</span>
-        <h1 id="climate-hero-title">Clima de Pelotas: chuva, frio, calor e vento ao longo do ano.</h1>
+        <h1 id="climate-hero-title">
+          Clima de Pelotas: chuva, frio, calor e vento ao longo do ano.
+        </h1>
         <p>
-          Entenda como o tempo costuma variar entre as estações, quais fatores influenciam a cidade e por
-          que uma previsão de poucos dias não representa o clima de muitos anos.
+          Entenda como o tempo costuma variar entre as estações, quais fatores influenciam a cidade
+          e por que uma previsão de poucos dias não representa o clima de muitos anos.
         </p>
         <div className="climate-hero__actions">
           <a href="#estacoes-em-pelotas">
@@ -189,11 +194,31 @@ export function ClimatePelotasPage({ history }: { history: WeatherHistoryData })
   return (
     <div className="climate-page">
       <nav className="climate-chapters" aria-label="Seções sobre o clima de Pelotas">
-        <a href="#tempo-e-clima"><span>01</span><strong>Tempo e clima</strong><small>Qual é a diferença</small></a>
-        <a href="#estacoes-em-pelotas"><span>02</span><strong>Estações do ano</strong><small>Verão, outono, inverno e primavera</small></a>
-        <a href="#fatores-locais"><span>03</span><strong>Por que varia</strong><small>Lagoa, oceano e frentes</small></a>
-        <a href="#recorte-recente"><span>04</span><strong>Últimos 30 dias</strong><small>O que ocorreu recentemente</small></a>
-        <a href="#fontes-climaticas"><span>05</span><strong>Onde consultar</strong><small>Clima, histórico e previsão</small></a>
+        <a href="#tempo-e-clima">
+          <span>01</span>
+          <strong>Tempo e clima</strong>
+          <small>Qual é a diferença</small>
+        </a>
+        <a href="#estacoes-em-pelotas">
+          <span>02</span>
+          <strong>Estações do ano</strong>
+          <small>Verão, outono, inverno e primavera</small>
+        </a>
+        <a href="#fatores-locais">
+          <span>03</span>
+          <strong>Por que varia</strong>
+          <small>Lagoa, oceano e frentes</small>
+        </a>
+        <a href="#recorte-recente">
+          <span>04</span>
+          <strong>Últimos 30 dias</strong>
+          <small>O que ocorreu recentemente</small>
+        </a>
+        <a href="#fontes-climaticas">
+          <span>05</span>
+          <strong>Onde consultar</strong>
+          <small>Clima, histórico e previsão</small>
+        </a>
       </nav>
 
       <section className="climate-definition" id="tempo-e-clima" aria-labelledby="climate-definition-title">
