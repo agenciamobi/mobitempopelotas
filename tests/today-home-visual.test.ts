@@ -209,7 +209,7 @@ test("today section navigation uses visitor-focused labels", () => {
 test("the internal hourly story uses page-specific useful copy", () => {
   assert.match(internalWidgets, /context="today-page"/);
   assert.match(homeForecastStory, /context\?: "home" \| "today-page"/);
-  assert.match(homeForecastStory, /Previsão por hora em Pelotas/);
+  assert.match(homeForecastStory, /Previsão por hora em \$\{locationName\}/);
   assert.match(homeForecastStory, /Temperatura, chuva e vento nas próximas horas/);
   assert.match(homeForecastStory, /timeReference/);
   assert.match(homeForecastStory, /Próxima hora/);
