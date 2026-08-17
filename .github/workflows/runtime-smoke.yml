@@ -154,9 +154,9 @@ jobs:
 
           const homeResponse = await request("/");
           const homeHtml = await homeResponse.text();
-          assertContains(homeHtml, "Do Guaíba à Lagoa dos Patos", "Homepage");
-          assertContains(homeHtml, "Rede da Lagoa dos Patos", "Homepage");
-          assertContains(homeHtml, "Nível do Guaíba", "Homepage");
+          assertContains(homeHtml, "Acompanhe o nível da água no Laranjal", "Homepage");
+          assertContains(homeHtml, "Outras estações da Lagoa dos Patos", "Homepage");
+          assertContains(homeHtml, "Guaíba em Porto Alegre", "Homepage");
           assertNoSensitiveMarkers(homeHtml, "Homepage");
 
           const hydrologyResponse = await request("/situacao-hidrologica-pelotas");
