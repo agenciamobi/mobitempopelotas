@@ -16,6 +16,13 @@ dist-ssr
 .nitro
 *.local
 
+# Environment files may contain server-side secrets.
+# Keep only the documented template and the intentionally public Vite production config versioned.
+.env
+.env.*
+!/.env.example
+!/.env.production
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars
