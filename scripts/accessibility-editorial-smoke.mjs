@@ -88,7 +88,7 @@ function markdownReport(results) {
   return `${lines.join("\n")}\n`;
 }
 
-async function computedAccessibleNames(session, candidates) {
+async function computedAccessibleNames(page, session, candidates) {
   if (candidates.length === 0) return new Map();
 
   const { root } = await session.send("DOM.getDocument", {
@@ -99,6 +99,16 @@ async function computedAccessibleNames(session, candidates) {
 
   for (const candidate of candidates) {
     const selector = `[data-a11y-smoke-id="${candidate.marker}"]`;
+    const locator = page.locator(selector).first();
+
+    if ((await locator.count()) === 0) {
+      names.set(candidate.marker, "");
+      continue;
+    }
+
+    await locator.scrollIntoViewIfNeeded().catch(() => undefined);
+    await page.waitForTimeout(25);
+
     const { nodeId } = await session.send("DOM.querySelector", {
       nodeId: root.nodeId,
       selector,
@@ -377,6 +387,7 @@ try {
             candidatesByMarker.set(candidate.marker, candidate);
           }
           const names = await computedAccessibleNames(
+            page,
             session,
             Array.from(candidatesByMarker.values()),
           );
