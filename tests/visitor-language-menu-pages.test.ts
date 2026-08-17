@@ -108,10 +108,10 @@ test("forecast pages avoid internal scoring and source-management language", () 
 
 test("alerts page states availability and counts directly", () => {
   assert.match(alerts, /Dados do INMET/);
-  assert.match(alerts, /Disponíveis/);
-  assert.match(alerts, /Indisponíveis/);
-  assert.match(alerts, /Ver aviso em destaque/);
-  assert.match(alerts, /Nenhum alerta oficial para Pelotas/);
+  assert.match(alerts, /Última consulta ao INMET/);
+  assert.match(alerts, /Indisponível/);
+  assert.match(alerts, /Ler alerta prioritário/);
+  assert.match(alerts, /Nenhum alerta oficial listado para Pelotas/);
   assert.match(alerts, /alertCountLabel/);
   assert.doesNotMatch(alerts, /Fonte<\/span><strong>\{source\.usable \? "Disponível" : "Restrita"\}/);
   assert.doesNotMatch(alerts, /situação prioritária/i);

@@ -25,7 +25,14 @@ export const Route = createFileRoute("/tempo-em/$citySlug")({
     if (!city) return {};
     const title = `Tempo em ${city.name}, RS`;
     const description = `Previsão do tempo para ${city.name}, com temperatura, chuva, vento, próximos 7 dias e avisos meteorológicos do INMET.`;
-    return createPageHead(title, description, regionalCityPath(city));
+    return createPageHead(title, description, regionalCityPath(city), [], {
+      geo: {
+        region: "BR-RS",
+        placename: city.name,
+        latitude: city.latitude,
+        longitude: city.longitude,
+      },
+    });
   },
   staleTime: 5 * 60 * 1_000,
   component: RegionalCityRoute,

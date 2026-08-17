@@ -7,6 +7,7 @@ const RESPONSE_HEADERS = {
   "Cache-Control": "public, max-age=120, stale-while-revalidate=600",
   "CDN-Cache-Control": "max-age=300, stale-while-revalidate=600",
   "Content-Type": "application/feed+json; charset=utf-8",
+  "X-Robots-Tag": "noindex, nofollow",
 } as const;
 
 export const Route = createFileRoute("/feed")({

@@ -169,7 +169,7 @@ test("meteogram layout protects retail rail, scrolling charts and responsive sta
 test("meteogram is discoverable and cached as an operational page", () => {
   assert.match(publicRoutes, /path: "\/meteograma-pelotas", changeFrequency: "hourly"/);
   assert.match(todayAtmosphere, /to="\/meteograma-pelotas"/);
-  assert.match(todayAtmosphere, /Abrir meteograma de 24 e 48 horas/);
+  assert.match(todayAtmosphere, /Ver previsão detalhada de 24 e 48 horas/);
   assert.match(header, /Previsão hora a hora/);
   assert.match(header, /"\/meteograma-pelotas"/);
   assert.match(functionSource, /max-age=300/);

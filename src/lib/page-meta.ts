@@ -7,16 +7,36 @@ import {
 } from "./site-config";
 import { createStructuredDataScripts } from "./structured-data";
 
+export type PageHeadGeo = {
+  region?: string;
+  placename: string;
+  latitude: number;
+  longitude: number;
+};
+
+export type PageHeadOptions = {
+  geo?: PageHeadGeo | null;
+};
+
+const PELOTAS_GEO: PageHeadGeo = {
+  region: "BR-RS",
+  placename: "Pelotas",
+  latitude: PELOTAS_LATITUDE,
+  longitude: PELOTAS_LONGITUDE,
+};
+
 export function createPageHead(
   title: string,
   description: string,
   canonicalPath: string,
   structuredData: readonly unknown[] = [],
+  options: PageHeadOptions = {},
 ) {
   const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
   const canonicalUrl = absoluteUrl(canonicalPath);
   const robots =
     "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+  const geo = options.geo === null ? null : (options.geo ?? PELOTAS_GEO);
 
   return {
     meta: [
@@ -25,16 +45,20 @@ export function createPageHead(
       { name: "author", content: SITE_NAME },
       { name: "robots", content: robots },
       { name: "googlebot", content: robots },
-      { name: "geo.region", content: "BR-RS" },
-      { name: "geo.placename", content: "Pelotas" },
-      {
-        name: "geo.position",
-        content: `${PELOTAS_LATITUDE};${PELOTAS_LONGITUDE}`,
-      },
-      {
-        name: "ICBM",
-        content: `${PELOTAS_LATITUDE}, ${PELOTAS_LONGITUDE}`,
-      },
+      ...(geo
+        ? [
+            { name: "geo.region", content: geo.region ?? "BR-RS" },
+            { name: "geo.placename", content: geo.placename },
+            {
+              name: "geo.position",
+              content: `${geo.latitude};${geo.longitude}`,
+            },
+            {
+              name: "ICBM",
+              content: `${geo.latitude}, ${geo.longitude}`,
+            },
+          ]
+        : []),
       { property: "og:title", content: fullTitle },
       { property: "og:description", content: description },
       { property: "og:type", content: "website" },

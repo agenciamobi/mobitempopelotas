@@ -13,6 +13,7 @@ on:
       - scripts/auth-visual-smoke.mjs
       - scripts/accessibility-editorial-smoke.mjs
       - scripts/accessibility-failure-screenshots.mjs
+      - scripts/lint-changed.mjs
       - vite.config.ts
       - tsconfig*.json
       - eslint.config.js
@@ -38,6 +39,8 @@ jobs:
     steps:
       - name: Checkout da revisão
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
@@ -49,12 +52,14 @@ jobs:
         run: npm ci
 
       - name: Validar build, testes, tipos e lint
+        env:
+          LINT_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
         run: |
           npm run test:contracts
           npm run build
           ROUTE_TREE_REQUIRED=1 npm run test:routes
           npm run typecheck
-          npm run lint
+          node scripts/lint-changed.mjs
 
       - name: Preparar Playwright para auditoria
         run: npm install --no-save --package-lock=false playwright@1.55.0
@@ -69,9 +74,12 @@ jobs:
           const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
           let lastError = "servidor ainda não respondeu";
 
-          for (let attempt = 1; attempt <= 36; attempt += 1) {
+          // A Home pode precisar concluir a contingência do Open-Meteo (15 s)
+          // quando o CI não possui credenciais/saída de rede. O probe precisa
+          // esperar mais do que a própria fonte antes de cancelar o SSR.
+          for (let attempt = 1; attempt <= 12; attempt += 1) {
             try {
-              const response = await fetch(url, { signal: AbortSignal.timeout(10_000) });
+              const response = await fetch(url, { signal: AbortSignal.timeout(25_000) });
               const html = await response.text();
 
               if (response.ok && html.includes("site-shell--home-editorial")) {
@@ -84,8 +92,8 @@ jobs:
               lastError = error instanceof Error ? error.message : String(error);
             }
 
-            console.log(`Aguardando revisão local (${attempt}/36): ${lastError}`);
-            await wait(5_000);
+            console.log(`Aguardando revisão local (${attempt}/12): ${lastError}`);
+            if (attempt < 12) await wait(5_000);
           }
 
           throw new Error(`A revisão local não ficou disponível: ${lastError}`);

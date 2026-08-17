@@ -11,12 +11,14 @@ const semanticDashboard = readFileSync(
   "src/production/components/home-editorial-dashboard-semantic.tsx",
   "utf8",
 );
+const weatherMap = readFileSync("src/production/components/weather-map.tsx", "utf8");
 const weatherHero = readFileSync("src/production/components/weather-hero.tsx", "utf8");
+const todayRoute = readFileSync("src/routes/tempo-hoje-pelotas.tsx", "utf8");
 
-test("the homepage radar shortcut resolves to an existing section anchor", () => {
+test("the homepage radar shortcut resolves to one existing section anchor", () => {
   assert.match(sectionNavigation, /href:\s*"#regiao"/);
-  assert.match(semanticDashboard, /hasClass\(className, "home-map-story"\)/);
-  assert.match(semanticDashboard, /normalizedId\s*=\s*"regiao"/);
+  assert.match(weatherMap, /className="map-panel" id="regiao"/);
+  assert.doesNotMatch(semanticDashboard, /normalizedId\s*=\s*"regiao"/);
 });
 
 test("the hourly forecast copy matches the seven-hour window rendered on home", () => {
@@ -28,6 +30,12 @@ test("the hero separates current wording from forecast wording", () => {
   assert.match(weatherHero, /if \(icon === "storm"\) return "Trovoadas"/);
   assert.match(weatherHero, /if \(icon === "wind"\) return "Tempo ventoso"/);
   assert.doesNotMatch(weatherHero, /\{weatherConditionLabels\[heroIcon\]\} agora em Pelotas/);
+});
+
+test("the home targets now while the dedicated route targets today's forecast", () => {
+  assert.match(weatherHero, /Tempo agora em Pelotas/);
+  assert.doesNotMatch(weatherHero, /Tempo em Pelotas hoje/);
+  assert.match(todayRoute, /Tempo hoje em Pelotas: previsão por hora/);
 });
 
 test("the hero does not credit a static photo while the live camera is visible", () => {

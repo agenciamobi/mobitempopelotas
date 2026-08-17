@@ -392,6 +392,12 @@
   outline: none;
 }
 
+@media (max-width: 900px) {
+  .editorial-footer-shell {
+    padding-bottom: calc(6.5rem + env(safe-area-inset-bottom));
+  }
+}
+
 @media (max-width: 880px) {
   .editorial-footer-lead,
   .editorial-footer-transparency {

@@ -32,7 +32,12 @@ function AccountUnavailable() {
   return (
     <main className="login-page" id="conteudo-principal">
       <Link className="login-page__brand" to="/" aria-label="Voltar ao Tempo Pelotas">
-        <img src="/brand/tempo-pelotas-header" alt="Tempo Pelotas" width={11349} height={1552} />
+        <img
+          src="/brand/tempo-pelotas-header.svg"
+          alt="Tempo Pelotas"
+          width={11349}
+          height={1552}
+        />
       </Link>
       <section className="login-card" aria-labelledby="account-unavailable-title">
         <span className="eyebrow">Conta Tempo Pelotas</span>
@@ -53,7 +58,12 @@ function VisitorLogin({ errorCode }: { errorCode?: string }) {
   return (
     <main className="login-page" id="conteudo-principal">
       <Link className="login-page__brand" to="/" aria-label="Voltar ao Tempo Pelotas">
-        <img src="/brand/tempo-pelotas-header" alt="Tempo Pelotas" width={11349} height={1552} />
+        <img
+          src="/brand/tempo-pelotas-header.svg"
+          alt="Tempo Pelotas"
+          width={11349}
+          height={1552}
+        />
       </Link>
       <GoogleLoginCard nextPath="/conta" errorCode={errorCode} />
       <Link className="login-page__back" to="/">

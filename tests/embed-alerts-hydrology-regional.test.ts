@@ -37,7 +37,7 @@ const regionalAlertPriority = readFileSync(
 );
 const regionalHero = readFileSync("src/components/regional/RegionalCityHero.tsx", "utf8");
 const regionalPage = readFileSync("src/components/regional/RegionalCityWeatherPage.tsx", "utf8");
-const regionalRefinements = readFileSync("src/components/regional/RegionalCityRefinements.css", "utf8");
+const regionalIdentity = readFileSync("src/components/regional/RegionalCityIdentity.css", "utf8");
 
 test("Laranjal widget is standalone, responsive and publicly reusable", () => {
   assert.match(embedRoute, /createFileRoute\("\/embed\/nivel-laranjal"\)/);
@@ -124,7 +124,7 @@ test("alerts page uses a concise first fold and trustworthy source states", () =
   assert.match(alertsRefinements, /@media \(max-width: 760px\)/);
 });
 
-test("hydrology pages share a compact data-led editorial hero", () => {
+test("hydrology pages preserve their approved data-led heroes", () => {
   assert.match(hydrologyHero, /Acompanhe as águas que influenciam Pelotas/);
   assert.match(hydrologyHero, /Nível da Lagoa dos Patos no Laranjal/);
   assert.match(hydrologyHero, /level\.currentLevel/);
@@ -135,7 +135,7 @@ test("hydrology pages share a compact data-led editorial hero", () => {
   assert.match(hydrologyRefinements, /min-height:\s*clamp\(470px/);
   assert.match(hydrologyRefinements, /#hydrology-level-title/);
   assert.match(levelRoute, /HydrologyEditorialHero level=\{data\.level\} variant="detail"/);
-  assert.match(overviewRoute, /HydrologyEditorialHero level=\{data\.level\} variant="overview"/);
+  assert.match(overviewRoute, /HydrologyOverviewHero/);
   assert.match(levelRoute, /LaranjalEmbedGuide/);
 });
 
@@ -167,7 +167,7 @@ test("regional city pages share alert priority, pt-BR metrics and router links",
   assert.match(regionalPage, /selectPriorityRegionalAlert/);
   assert.match(regionalPage, /to="\/tempo-em\/\$citySlug"/);
   assert.match(regionalPage, /aria-label=\{`Consultar o aviso oficial/);
-  assert.match(regionalRefinements, /min-height:\s*clamp\(470px/);
-  assert.match(regionalRefinements, /#previsao-horaria-regional/);
-  assert.match(regionalRefinements, /@media \(max-width:\s*620px\)/);
+  assert.match(regionalIdentity, /\.regional-city-page > \.regional-city-shared-forecast/);
+  assert.match(regionalIdentity, /#previsao-hoje/);
+  assert.match(regionalIdentity, /@media \(max-width: 700px\)/);
 });

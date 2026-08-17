@@ -136,7 +136,12 @@ function RegionalOfficialAlertPanel({ data }: { data: RegionalCityWeatherData })
             ? `Aviso com abrangência informada para ${data.city.name}`
             : "A consulta automática é atualizada periodicamente"}
         </small>
-        <a href={officialUrl} target="_blank" rel="noreferrer">
+        <a
+          href={officialUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`Consultar o aviso oficial do INMET para ${data.city.name} em nova aba`}
+        >
           Consultar avisos <span aria-hidden="true">→</span>
         </a>
       </div>

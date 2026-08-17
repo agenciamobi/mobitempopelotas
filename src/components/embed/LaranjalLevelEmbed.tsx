@@ -19,9 +19,20 @@ function formatDateTime(value: string | null) {
 }
 
 function trendPresentation(value: number | null) {
-  if (value === null) return { label: "Tendência indisponível", className: styles.neutral, Icon: Activity };
-  if (value > 0.25) return { label: `Subindo ${value.toFixed(1).replace(".", ",")} cm/h`, className: styles.rising, Icon: ArrowUpRight };
-  if (value < -0.25) return { label: `Baixando ${Math.abs(value).toFixed(1).replace(".", ",")} cm/h`, className: styles.falling, Icon: ArrowDownRight };
+  if (value === null)
+    return { label: "Tendência indisponível", className: styles.neutral, Icon: Activity };
+  if (value > 0.25)
+    return {
+      label: `Subindo ${value.toFixed(1).replace(".", ",")} cm/h`,
+      className: styles.rising,
+      Icon: ArrowUpRight,
+    };
+  if (value < -0.25)
+    return {
+      label: `Baixando ${Math.abs(value).toFixed(1).replace(".", ",")} cm/h`,
+      className: styles.falling,
+      Icon: ArrowDownRight,
+    };
   return { label: "Nível estável", className: styles.neutral, Icon: Activity };
 }
 
@@ -57,7 +68,11 @@ function MiniChart({ data }: { data: LaranjalLevelData }) {
 
   return (
     <div className={styles.chart}>
-      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Evolução recente do nível da Lagoa dos Patos no Laranjal">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        role="img"
+        aria-label="Evolução recente do nível da Lagoa dos Patos no Laranjal"
+      >
         <defs>
           <linearGradient id="embed-laranjal-area" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="currentColor" stopOpacity="0.32" />
@@ -68,12 +83,21 @@ function MiniChart({ data }: { data: LaranjalLevelData }) {
         <line x1={paddingX} y1={height / 2} x2={width - paddingX} y2={height / 2} />
         <line x1={paddingX} y1={height - paddingY} x2={width - paddingX} y2={height - paddingY} />
         <path d={area} fill="url(#embed-laranjal-area)" />
-        <polyline points={line} fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        <polyline
+          points={line}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
         <circle cx={coordinates.at(-1)?.x} cy={coordinates.at(-1)?.y} r="6" fill="currentColor" />
       </svg>
       <div className={styles.chartLabels}>
         <span>24 horas</span>
-        <strong>{minimum.toFixed(2).replace(".", ",")}–{maximum.toFixed(2).replace(".", ",")} m</strong>
+        <strong>
+          {minimum.toFixed(2).replace(".", ",")}–{maximum.toFixed(2).replace(".", ",")} m
+        </strong>
         <span>Última leitura</span>
       </div>
     </div>
@@ -126,20 +150,25 @@ export function LaranjalLevelEmbed({ data }: { data: LaranjalLevelData }) {
         <div className={styles.brandLine} aria-hidden="true" />
         <header className={styles.header}>
           <div className={styles.identity}>
-            <span className={styles.icon}><Waves aria-hidden="true" /></span>
+            <span className={styles.icon}>
+              <Waves aria-hidden="true" />
+            </span>
             <div>
               <span className={styles.kicker}>Estação Laranjal · Pelotas/RS</span>
               <h1 id="embed-laranjal-title">Nível da Lagoa dos Patos</h1>
             </div>
           </div>
           <span className={`${styles.status} ${live ? styles.live : styles.stale}`}>
-            <i aria-hidden="true" /> {live ? "Tempo real" : data.status === "stale" ? "Última leitura" : "Indisponível"}
+            <i aria-hidden="true" />{" "}
+            {live ? "Tempo real" : data.status === "stale" ? "Última leitura" : "Indisponível"}
           </span>
         </header>
 
         <section className={styles.reading} aria-label="Leitura atual">
           <div className={styles.value}>
-            <strong>{data.currentLevel === null ? "—" : data.currentLevel.toFixed(2).replace(".", ",")}</strong>
+            <strong>
+              {data.currentLevel === null ? "—" : data.currentLevel.toFixed(2).replace(".", ",")}
+            </strong>
             <span>m</span>
           </div>
           <div className={`${styles.trend} ${trend.className}`}>
@@ -155,7 +184,11 @@ export function LaranjalLevelEmbed({ data }: { data: LaranjalLevelData }) {
             <Clock3 aria-hidden="true" />
             <span>Atualizado em {formatDateTime(data.updatedAt)}</span>
           </div>
-          <a href="https://tempopelotas.com.br/nivel-da-lagoa-dos-patos-laranjal" target="_blank" rel="noopener noreferrer">
+          <a
+            href="https://tempopelotas.com.br/nivel-da-lagoa-dos-patos-laranjal"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Ver detalhes <ExternalLink aria-hidden="true" />
           </a>
         </footer>

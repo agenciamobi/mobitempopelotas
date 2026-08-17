@@ -9,6 +9,7 @@ export const Route = createFileRoute("/brand/tempo-pelotas-header")({
           headers: {
             Location: "/brand/tempo-pelotas-header.svg",
             "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
+            "X-Robots-Tag": "noindex, nofollow",
           },
         }),
     },

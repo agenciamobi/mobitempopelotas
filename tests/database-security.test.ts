@@ -70,6 +70,10 @@ function hasExpectedAccountGuard(statement: string, ownerColumn: string) {
   );
 }
 
+function policyRoles(statement: string) {
+  return statement.match(/\bto\s+(.+?)(?:\s+using\b|\s+with\s+check\b|$)/)?.[1] ?? "";
+}
+
 function assertPoliciesRemainAccountScoped(sql: string) {
   for (const statement of statements(sql)) {
     if (!statement.startsWith("create policy ")) continue;
@@ -80,10 +84,29 @@ function assertPoliciesRemainAccountScoped(sql: string) {
     assert.ok(tableMatch, `Policy sem tabela pública reconhecida: ${statement}`);
 
     const table = tableMatch[1] ?? "";
-    assert.ok(
-      !serverOnlyTables.has(table),
-      `Tabela server-only não pode ter policy de cliente: ${table}`,
-    );
+    if (serverOnlyTables.has(table)) {
+      const roles = policyRoles(statement);
+      if (/\b(?:public|anon|authenticated)\b/.test(roles)) {
+        assert.match(
+          statement,
+          /\busing\s*\(\s*false\s*\)/,
+          `Policy de cliente em tabela server-only deve negar leitura: ${statement}`,
+        );
+        assert.doesNotMatch(
+          statement,
+          /\b(?:using|with\s+check)\s*\(\s*true\s*\)/,
+          `Policy permissiva detectada em tabela server-only: ${statement}`,
+        );
+        if (/\bwith\s+check\b/.test(statement)) {
+          assert.match(
+            statement,
+            /\bwith\s+check\s*\(\s*false\s*\)/,
+            `Policy de cliente em tabela server-only deve negar escrita: ${statement}`,
+          );
+        }
+      }
+      continue;
+    }
 
     const ownerColumn = accountTables.get(table);
     if (!ownerColumn) continue;

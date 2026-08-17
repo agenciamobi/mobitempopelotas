@@ -205,7 +205,7 @@ export function WeatherHero({
       <div className="weather-hero-content">
         <div className="weather-hero-copy">
           <h1 id="weather-hero-title" className="weather-hero-seo-title">
-            Tempo em Pelotas hoje
+            Tempo agora em Pelotas
           </h1>
           <p className="weather-hero-headline">{heroCondition} agora em Pelotas.</p>
           <p className="weather-hero-description">{description}</p>

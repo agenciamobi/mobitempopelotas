@@ -2,11 +2,11 @@ import type { GuaibaObservationData } from "@/lib/hydrology/guaiba.server";
 import type { LagoonMonitoringNetworkData } from "@/lib/hydrology/lagoon-network.server";
 import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
 import type { AggregatedWeatherData } from "@/lib/weather/aggregated-weather.types";
-import { reconcileDailyTemperatures } from "@/lib/weather/daily-temperature-reconciliation";
+import { reconcileDailyTemperatures } from "../../lib/weather/daily-temperature-reconciliation.ts";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import type { EmbrapaObservationData } from "@/production/lib/embrapa-observation";
 import type { InmetAlertsData } from "@/production/lib/inmet-alerts";
-import { resolveMoonPhase } from "@/production/lib/astronomy";
+import { resolveMoonPhase } from "../lib/astronomy.ts";
 import type { WeatherAiSummaries } from "@/production/lib/weather-ai-summary";
 import type { AstronomyData, CurrentWeather, WeatherData } from "@/production/lib/weather-data";
 
