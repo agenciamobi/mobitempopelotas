@@ -1,4 +1,4 @@
-import { REGIONAL_CITIES, regionalCityPath } from "./regional-cities";
+import { REGIONAL_CITIES, regionalCityPath } from "./regional-cities.ts";
 
 export type PublicRouteEntry = {
   path: string;
