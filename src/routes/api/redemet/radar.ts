@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { withRedemetLastGood } from "@/lib/redemet/redemet-last-good.server";
-import { fetchRedemetRadar } from "@/lib/redemet/redemet.server";
+import { fetchRedemetRadarResilient } from "@/lib/redemet/redemet-radar.server";
 
 const DEFAULT_FRAMES = 8;
 const MAX_FRAMES = 8;
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/api/redemet/radar")({
       GET: async ({ request }) => {
         const frames = requestedFrames(request);
         const payload = await withRedemetLastGood(`radar:${frames}`, () =>
-          fetchRedemetRadar(frames),
+          fetchRedemetRadarResilient(frames),
         );
 
         return new Response(JSON.stringify(payload), { headers: RESPONSE_HEADERS });
