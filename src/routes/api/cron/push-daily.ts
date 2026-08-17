@@ -127,7 +127,10 @@ async function generateWeatherAiSnapshot(request: Request) {
       console.warn("[weather-ai/cron] Autorização recusada", {
         reason: oidcVerification.reason,
       });
-      return pushJsonResponse({ success: false, error: "Não autorizado." }, 401);
+      return pushJsonResponse(
+        { success: false, error: "Não autorizado.", authReason: oidcVerification.reason },
+        401,
+      );
     }
   }
 
