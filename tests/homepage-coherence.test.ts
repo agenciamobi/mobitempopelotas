@@ -11,13 +11,14 @@ const semanticDashboard = readFileSync(
   "src/production/components/home-editorial-dashboard-semantic.tsx",
   "utf8",
 );
+const weatherMap = readFileSync("src/production/components/weather-map.tsx", "utf8");
 const weatherHero = readFileSync("src/production/components/weather-hero.tsx", "utf8");
 const todayRoute = readFileSync("src/routes/tempo-hoje-pelotas.tsx", "utf8");
 
-test("the homepage radar shortcut resolves to an existing section anchor", () => {
+test("the homepage radar shortcut resolves to one existing section anchor", () => {
   assert.match(sectionNavigation, /href:\s*"#regiao"/);
-  assert.match(semanticDashboard, /hasClass\(className, "home-map-story"\)/);
-  assert.match(semanticDashboard, /normalizedId\s*=\s*"regiao"/);
+  assert.match(weatherMap, /className="map-panel" id="regiao"/);
+  assert.doesNotMatch(semanticDashboard, /normalizedId\s*=\s*"regiao"/);
 });
 
 test("the hourly forecast copy matches the seven-hour window rendered on home", () => {
