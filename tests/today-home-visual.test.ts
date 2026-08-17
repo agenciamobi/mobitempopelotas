@@ -232,8 +232,8 @@ test("today content is concise and keeps measurement provenance explicit", () =>
   assert.match(internalWidgets, /currentProvenance\.sunset/);
   assert.match(internalWidgets, /highlights\.slice\(0, 2\)/);
   assert.match(internalWidgets, /cautions\.slice\(0, 2\)/);
-  assert.match(internalWidgets, /Dados observados pela Embrapa/);
-  assert.match(internalWidgets, /Valor atual estimado pelo modelo/);
+  assert.match(internalWidgets, /Medição da Estação Embrapa/);
+  assert.match(internalWidgets, /Estimativa do modelo para agora/);
   assert.match(internalWidgets, /formatWind\(current\.windSpeed, current\.windDirection\)/);
   assert.match(internalWidgets, /Condições favoráveis/);
   assert.match(internalWidgets, /O que exige atenção/);
