@@ -16,6 +16,7 @@
 .pwa-launcher:focus-visible{outline:3px solid rgba(24,189,205,.48)!important;outline-offset:3px!important}
 
 @media(max-width:900px){
+  .site-shell .editorial-footer-shell{padding-bottom:calc(var(--mobile-tab-height,68px) + 2rem + env(safe-area-inset-bottom))!important}
   body:has(.pwa-launcher) .site-shell{padding-bottom:calc(var(--mobile-tab-height,68px) + 76px + env(safe-area-inset-bottom))!important}
   .pwa-launcher{right:auto!important;bottom:calc(var(--mobile-tab-height,68px) + 14px + env(safe-area-inset-bottom))!important;left:50%!important;min-width:164px;justify-content:center;transform:translateX(-50%)!important}
   .pwa-launcher:hover{transform:translate(-50%,-2px)!important}
