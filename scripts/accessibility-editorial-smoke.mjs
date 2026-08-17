@@ -125,9 +125,7 @@ async function computedAccessibleNames(page, session, candidates) {
       fetchRelatives: false,
     });
     const target =
-      nodes.find(
-        (axNode) => !axNode.ignored && axNode.backendDOMNodeId === node.backendNodeId,
-      ) ??
+      nodes.find((axNode) => !axNode.ignored && axNode.backendDOMNodeId === node.backendNodeId) ??
       nodes.find((axNode) => !axNode.ignored) ??
       null;
     names.set(candidate.marker, normalizeText(target?.name?.value));
