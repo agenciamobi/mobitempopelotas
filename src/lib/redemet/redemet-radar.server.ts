@@ -10,9 +10,16 @@ const OFFICIAL_RADAR_URL = "https://redemet.decea.mil.br/radar/";
 const IMAGE_PROXY_PATH = "/api/redemet/image";
 const TIMEZONE = "America/Sao_Paulo";
 const REQUEST_TIMEOUT_MS = 12_000;
-const DEFAULT_RADAR_AREA = "cn";
+const PELOTAS_COORDINATES = { latitude: -31.7654, longitude: -52.3376 } as const;
+const DEFAULT_RADAR_AREA = "sg";
 const DEFAULT_RADAR_PRODUCT = "maxcappi";
+const FALLBACK_RADAR_AREAS = ["sg", "cn"] as const;
 const FALLBACK_RADAR_PRODUCTS = ["10km", "07km", "05km", "03km"] as const;
+
+const RADAR_AREA_LABELS: Record<string, { name: string; sourceLabel: string }> = {
+  sg: { name: "Santiago", sourceLabel: "Radar de Santiago / RS" },
+  cn: { name: "Canguçu", sourceLabel: "Radar de Canguçu / RS" },
+};
 
 const ALLOWED_API_HOSTS = new Set(["api-redemet.decea.mil.br", "api-redemet.decea.gov.br"]);
 const ALLOWED_IMAGE_HOSTS = new Set([
@@ -111,6 +118,18 @@ function readBounds(record: JsonRecord): RedemetBounds | null {
   if (west < -180 || east > 180 || south < -90 || north > 90) return null;
 
   return { west, south, east, north };
+}
+
+function boundsContainPoint(
+  bounds: RedemetBounds,
+  point: { latitude: number; longitude: number },
+) {
+  return (
+    point.longitude >= bounds.west &&
+    point.longitude <= bounds.east &&
+    point.latitude >= bounds.south &&
+    point.latitude <= bounds.north
+  );
 }
 
 function normalizeOfficialImageUrl(value: string) {
@@ -234,13 +253,31 @@ export function parseRadarPayloadForArea(
   };
 }
 
-function emptyRadarLayer(product: string, error: string): RedemetImageLayerResponse {
+function areaMetadata(area: string) {
+  return (
+    RADAR_AREA_LABELS[area] ?? {
+      name: area.toUpperCase(),
+      sourceLabel: `Radar ${area.toUpperCase()} / REDEMET`,
+    }
+  );
+}
+
+function radarAreaCandidates() {
+  return [...new Set([configuredRadarArea(), ...FALLBACK_RADAR_AREAS])];
+}
+
+function emptyRadarLayer(
+  product: string,
+  error: string,
+  area = DEFAULT_RADAR_AREA,
+): RedemetImageLayerResponse {
+  const metadata = areaMetadata(area);
   return {
     configured: Boolean(apiKey()),
     available: false,
     provider: PROVIDER,
-    product: `Radar meteorológico de Canguçu — ${product}`,
-    sourceLabel: "Radar de Canguçu / RS",
+    product: `Radar meteorológico de ${metadata.name} — ${product}`,
+    sourceLabel: metadata.sourceLabel,
     officialUrl: OFFICIAL_RADAR_URL,
     frames: [],
     currentIndex: 0,
@@ -249,22 +286,19 @@ function emptyRadarLayer(product: string, error: string): RedemetImageLayerRespo
   };
 }
 
-async function fetchRadarProduct(
-  product: string,
-  area: string,
-  frameCount: number,
-): Promise<ParsedRadarPayload> {
+async function fetchRadarProduct(product: string, frameCount: number): Promise<unknown> {
   const key = apiKey();
   if (!key) throw new Error("REDEMET_API_KEY não configurada");
 
   const url = new URL(`produtos/radar/${encodeURIComponent(product)}`, apiBaseUrl());
-  url.searchParams.set("area", area);
   url.searchParams.set("anima", String(frameCount));
+  // O portal oficial observado nos HARs autentica produtos/radar por query string.
+  // A URL permanece exclusivamente no servidor e nunca é retornada ao navegador ou registrada em log.
+  url.searchParams.set("api_key", key);
 
   const response = await fetch(url, {
     headers: {
       Accept: "application/json",
-      "X-Api-Key": key,
       "User-Agent": "TempoPelotas/2.0 (+https://tempopelotas.com.br)",
     },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
@@ -276,15 +310,15 @@ async function fetchRadarProduct(
   const root = asRecord(payload);
   if (root?.status === false) throw new Error("upstream-status-false");
 
-  return parseRadarPayloadForArea(payload, area, frameCount);
+  return payload;
 }
 
 export async function fetchRedemetRadarResilient(
   frameCount = 10,
 ): Promise<RedemetImageLayerResponse> {
   const requestedFrames = clampFrameCount(frameCount);
-  const area = configuredRadarArea();
   const configuredProduct = configuredRadarProduct();
+  const areas = radarAreaCandidates();
 
   if (!apiKey()) {
     return emptyRadarLayer(
@@ -299,44 +333,55 @@ export async function fetchRedemetRadarResilient(
   ];
 
   for (const product of products) {
-    try {
-      const parsed = await fetchRadarProduct(product, area, requestedFrames);
+    let payload: unknown;
 
-      if (parsed.frames.length > 0) {
-        const isFallback = product !== configuredProduct;
+    try {
+      payload = await fetchRadarProduct(product, requestedFrames);
+    } catch (error) {
+      console.warn("[redemet/radar] Produto indisponível", {
+        product,
+        reason: error instanceof Error ? error.message : "falha-desconhecida",
+      });
+      continue;
+    }
+
+    for (const area of areas) {
+      const parsed = parseRadarPayloadForArea(payload, area, requestedFrames);
+      const frames = parsed.frames.filter((frame) =>
+        boundsContainPoint(frame.bounds, PELOTAS_COORDINATES),
+      );
+
+      if (frames.length > 0) {
+        const metadata = areaMetadata(area);
+        const isFallback = product !== configuredProduct || area !== configuredRadarArea();
         return {
           configured: true,
           available: true,
           provider: PROVIDER,
-          product: `Radar meteorológico de Canguçu — ${product}`,
+          product: `Radar meteorológico de ${metadata.name} — ${product}`,
           sourceLabel: isFallback
-            ? "Radar de Canguçu / RS · produto alternativo REDEMET"
-            : "Radar de Canguçu / RS",
+            ? `${metadata.sourceLabel} · seleção operacional REDEMET`
+            : metadata.sourceLabel,
           officialUrl: OFFICIAL_RADAR_URL,
-          frames: parsed.frames,
-          currentIndex: parsed.frames.length - 1,
-          updatedAt: parsed.frames.at(-1)?.observedAt ?? new Date().toISOString(),
+          frames,
+          currentIndex: frames.length - 1,
+          updatedAt: frames.at(-1)?.observedAt ?? new Date().toISOString(),
           error: null,
         };
       }
 
-      console.warn("[redemet/radar] Produto sem imagem utilizável", {
+      console.warn("[redemet/radar] Estação sem imagem útil para Pelotas", {
         area,
         product,
         matchingRecords: parsed.matchingRecords,
         recordsWithPath: parsed.recordsWithPath,
-      });
-    } catch (error) {
-      console.warn("[redemet/radar] Produto indisponível", {
-        area,
-        product,
-        reason: error instanceof Error ? error.message : "falha-desconhecida",
+        framesCoveringPelotas: frames.length,
       });
     }
   }
 
   return emptyRadarLayer(
     configuredProduct,
-    "A REDEMET não retornou imagens recentes do radar de Canguçu nos produtos consultados.",
+    "A REDEMET não retornou imagens recentes de radar com cobertura sobre Pelotas nas estações consultadas.",
   );
 }
