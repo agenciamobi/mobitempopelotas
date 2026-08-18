@@ -1,0 +1,27 @@
+/*
+ * Home v74 — correção de posicionamento da continuidade editorial.
+ *
+ * A v73 trocou faixas full-bleed antigas por blocos centrados dentro da régua
+ * editorial, mas três componentes ainda herdavam translateX(-50%) das camadas
+ * v37/v40. O resultado era deslocamento de meia largura para a esquerda.
+ * Esta camada neutraliza apenas esse legado, sem alterar a composição visual.
+ */
+
+.site-shell--home-editorial .safety-alert-banner,
+.site-shell--home-editorial .home-section-navigation,
+.site-shell--home-editorial .home-story--forecast {
+  margin-right: auto !important;
+  margin-left: auto !important;
+  transform: none !important;
+}
+
+/* Garante que a centralização permaneça estável em breakpoints menores. */
+@media (max-width: 720px) {
+  .site-shell--home-editorial .safety-alert-banner,
+  .site-shell--home-editorial .home-section-navigation,
+  .site-shell--home-editorial .home-story--forecast {
+    margin-right: auto !important;
+    margin-left: auto !important;
+    transform: none !important;
+  }
+}
