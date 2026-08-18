@@ -184,7 +184,6 @@ export function ProductionHome({
           </Link>
         ) : null}
       </div>
-      <HeroAstronomyPortal astronomy={weather.astronomy} />
 
       <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
         <InmetAlertsPanel data={inmetAlerts} variant="home" advisoryLevel={headerLevel} />
@@ -193,6 +192,7 @@ export function ProductionHome({
           station={recoveredData.weather.inmetStation}
           forecastWindSpeedKmh={forecastWindSpeedKmh}
         />
+        <HeroAstronomyPortal astronomy={weather.astronomy} />
         <SafetyAlertBanner banner={featuredSafetyBanner} />
         <HomeSectionNavigation />
         <HomeEditorialDashboard
