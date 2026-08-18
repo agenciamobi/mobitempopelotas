@@ -144,3 +144,4 @@ import "./styles/home-first-fold-editorial-v70.css";
 import "./styles/home-first-fold-editorial-v71.css";
 import "./styles/home-editorial-current.css";
 import "./styles/home-editorial-ux.css";
+import "./styles/home-editorial-forecast.css";
