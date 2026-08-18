@@ -8,6 +8,7 @@ import { parseRedemetStscPayload } from "../src/lib/redemet/redemet-stsc.server.
 const radarRoute = readFileSync("src/routes/api/redemet/radar.ts", "utf8");
 const satelliteRoute = readFileSync("src/routes/api/redemet/satellite.ts", "utf8");
 const stormsRoute = readFileSync("src/routes/api/redemet/storms.ts", "utf8");
+const radarServer = readFileSync("src/lib/redemet/redemet-radar.server.ts", "utf8");
 const cssEntry = readFileSync("src/production/production-styles.css", "utf8");
 const radarEditorialCss = readFileSync(
   "src/production/styles/home-radar-editorial-v45.css",
@@ -35,7 +36,7 @@ test("REDEMET limits animation payloads", () => {
   assert.match(stormsRoute, /Math\.min\(MAX_FRAMES/);
 });
 
-test("radar parser keeps only Canguçu frames from the official response shape", () => {
+test("radar parser keeps only the requested station from the official response shape", () => {
   const payload = {
     status: true,
     data: {
@@ -44,45 +45,52 @@ test("radar parser keeps only Canguçu frames from the official response shape",
         [
           {
             localidade: "sg",
-            lon_min: "-58.0",
-            lon_max: "-50.0",
-            lat_min: "-34.0",
-            lat_max: "-26.0",
+            lon_min: "-59.1897",
+            lon_max: "-50.839",
+            lat_min: "-32.809304",
+            lat_max: "-25.5734",
             path:
-              "https://estatico-redemet.decea.mil.br/radar/2026/08/17/sg/maxcappi/maps/santiago.png",
-            data: "2026-08-17 20:00:00",
+              "https://estatico-redemet.decea.mil.br/radar/2026/08/18/sg/maxcappi/maps/santiago.png",
+            data: "2026-08-18 00:56:39",
           },
           {
             localidade: "cn",
-            lon_min: "-56.0",
-            lon_max: "-48.0",
-            lat_min: "-35.0",
-            lat_max: "-27.0",
+            lon_min: "-57.0713",
+            lon_max: "-48.32162",
+            lat_min: "-34.988056",
+            lat_max: "-27.7468",
             path: null,
             data: null,
-          },
-          {
-            localidade: "cn",
-            lon_min: "-56.0",
-            lon_max: "-48.0",
-            lat_min: "-35.0",
-            lat_max: "-27.0",
-            path:
-              "https://estatico-redemet.decea.mil.br/radar/2026/08/17/cn/maxcappi/maps/cangucu.png",
-            data: "2026-08-17 20:10:00",
           },
         ],
       ],
     },
   };
 
-  const parsed = parseRadarPayloadForArea(payload, "cn", 8);
+  const cangucu = parseRadarPayloadForArea(payload, "cn", 8);
+  const santiago = parseRadarPayloadForArea(payload, "sg", 8);
 
-  assert.equal(parsed.matchingRecords, 2);
-  assert.equal(parsed.recordsWithPath, 1);
-  assert.equal(parsed.frames.length, 1);
-  assert.match(parsed.frames[0].imageUrl, /cn%2Fmaxcappi/);
-  assert.doesNotMatch(parsed.frames[0].imageUrl, /sg%2Fmaxcappi/);
+  assert.equal(cangucu.matchingRecords, 1);
+  assert.equal(cangucu.recordsWithPath, 0);
+  assert.equal(cangucu.frames.length, 0);
+
+  assert.equal(santiago.matchingRecords, 1);
+  assert.equal(santiago.recordsWithPath, 1);
+  assert.equal(santiago.frames.length, 1);
+  assert.match(santiago.frames[0].imageUrl, /sg%2Fmaxcappi/);
+  assert.equal(santiago.frames[0].bounds.west, -59.1897);
+  assert.equal(santiago.frames[0].bounds.east, -50.839);
+  assert.equal(santiago.frames[0].bounds.south, -32.809304);
+  assert.equal(santiago.frames[0].bounds.north, -25.5734);
+});
+
+test("radar request follows the HAR contract and keeps Santiago as operational fallback", () => {
+  assert.match(radarServer, /const DEFAULT_RADAR_AREA = "sg";/);
+  assert.match(radarServer, /const FALLBACK_RADAR_AREAS = \["sg", "cn"\]/);
+  assert.doesNotMatch(radarServer, /searchParams\.set\("area"/);
+  assert.match(radarServer, /searchParams\.set\("anima", String\(frameCount\)\)/);
+  assert.match(radarServer, /searchParams\.set\("api_key", key\)/);
+  assert.match(radarServer, /boundsContainPoint\(frame\.bounds, PELOTAS_COORDINATES\)/);
 });
 
 test("STSC parser accepts the response shape observed in the REDEMET HAR", () => {
