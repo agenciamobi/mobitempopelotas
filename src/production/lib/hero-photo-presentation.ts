@@ -30,8 +30,8 @@ const heroPhotos = {
   },
   cloudy: {
     kind: "cloudy",
-    src: "/weather/hero/pelotas-parcialmente-nublado.webp",
-    position: "center 45%",
+    src: "/weather/hero/pelotas-parcialmente-nublado.avif",
+    position: "center 50%",
     credit: "Acervo Tempo Pelotas",
   },
 } satisfies Record<HeroPhotoKind, HeroPhotoPresentation>;

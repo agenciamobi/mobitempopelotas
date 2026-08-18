@@ -9,7 +9,7 @@ const expectedAssets = [
   "/weather/hero/pelotas-laranjal-chuva.webp",
   "/weather/hero/pelotas-nevoeiro-centro.webp",
   "/weather/hero/pelotas-ceu-limpo.webp",
-  "/weather/hero/pelotas-parcialmente-nublado.webp",
+  "/weather/hero/pelotas-parcialmente-nublado.avif",
 ];
 
 test("o hero estático usa somente o acervo local de Pelotas", async () => {
