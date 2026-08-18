@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { withRedemetLastGood } from "@/lib/redemet/redemet-last-good.server";
-import { fetchRedemetStorms } from "@/lib/redemet/redemet.server";
+import { fetchRedemetStorms } from "@/lib/redemet/redemet-stsc.server";
 
 const DEFAULT_FRAMES = 12;
 const MAX_FRAMES = 12;
