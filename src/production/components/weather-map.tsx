@@ -12,7 +12,7 @@ import styles from "./weather-map.module.css";
 
 const MAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 const PELOTAS_CENTER: [number, number] = [-52.3376, -31.7654];
-const CANGUCU_CENTER: [number, number] = [-52.6756, -31.3958];
+const SANTIAGO_CENTER: [number, number] = [-54.930257, -29.225213];
 const IMAGE_SOURCE_ID = "redemet-image-source";
 const IMAGE_LAYER_ID = "redemet-image-layer";
 const STORMS_SOURCE_ID = "redemet-storms-source";
@@ -176,10 +176,10 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
             .setLngLat(PELOTAS_CENTER)
             .addTo(map),
           new maplibregl.Marker({
-            element: createLocationMarker("Canguçu", "Radar meteorológico", "radar"),
+            element: createLocationMarker("Santiago", "Radar meteorológico", "radar"),
             anchor: "bottom",
           })
-            .setLngLat(CANGUCU_CENTER)
+            .setLngLat(SANTIAGO_CENTER)
             .addTo(map),
         ];
 
@@ -282,7 +282,7 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
                     ...base,
                     product:
                       mode === "radar"
-                        ? "Radar meteorológico de Canguçu"
+                        ? "Radar meteorológico de Santiago"
                         : "Satélite meteorológico",
                   },
                 },
@@ -572,7 +572,7 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
               <div className="radar-frame-status" aria-live="polite">
                 <span>
                   {mode === "radar"
-                    ? "Radar de Canguçu"
+                    ? "Radar de Santiago"
                     : mode === "satellite"
                       ? "Imagem de satélite"
                       : `${selectedStormCount ?? 0} ocorrências no quadro`}
