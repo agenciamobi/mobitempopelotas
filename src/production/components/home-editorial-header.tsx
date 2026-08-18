@@ -7,13 +7,33 @@ import type { AdvisoryLevel } from "@/production/lib/weather-insights";
 
 const homeNavigation = [
   { label: "Agora", to: "/", ariaLabel: "Ver o tempo agora em Pelotas" },
-  { label: "Hoje", to: "/tempo-hoje-pelotas", ariaLabel: "Ver a previsão do tempo para hoje em Pelotas" },
-  { label: "7 dias", to: "/previsao-7-dias-pelotas", ariaLabel: "Ver a previsão do tempo para os próximos sete dias em Pelotas" },
+  {
+    label: "Hoje",
+    to: "/tempo-hoje-pelotas",
+    ariaLabel: "Ver a previsão do tempo para hoje em Pelotas",
+  },
+  {
+    label: "7 dias",
+    to: "/previsao-7-dias-pelotas",
+    ariaLabel: "Ver a previsão do tempo para os próximos sete dias em Pelotas",
+  },
   { label: "Chuva", to: "/chuva-em-pelotas", ariaLabel: "Ver a previsão de chuva em Pelotas" },
   { label: "Vento", to: "/vento-em-pelotas", ariaLabel: "Ver vento e rajadas em Pelotas" },
-  { label: "Lagoa", to: "/nivel-da-lagoa-dos-patos-laranjal", ariaLabel: "Ver o nível da Lagoa dos Patos no Laranjal" },
-  { label: "Radar", to: "/radar-e-satelite-pelotas", ariaLabel: "Ver radar e satélite para Pelotas e região" },
-  { label: "Câmeras", to: "/cameras-ao-vivo-pelotas", ariaLabel: "Ver câmeras ao vivo de Pelotas" },
+  {
+    label: "Lagoa",
+    to: "/nivel-da-lagoa-dos-patos-laranjal",
+    ariaLabel: "Ver o nível da Lagoa dos Patos no Laranjal",
+  },
+  {
+    label: "Radar",
+    to: "/radar-e-satelite-pelotas",
+    ariaLabel: "Ver radar e satélite para Pelotas e região",
+  },
+  {
+    label: "Câmeras",
+    to: "/cameras-ao-vivo-pelotas",
+    ariaLabel: "Ver câmeras ao vivo de Pelotas",
+  },
 ] as const;
 
 function isActivePath(pathname: string, to: string) {
@@ -27,7 +47,11 @@ function alertLabel(level: AdvisoryLevel) {
   return "Avisos";
 }
 
-export function HomeEditorialHeader({ advisoryLevel = "normal" }: { advisoryLevel?: AdvisoryLevel }) {
+export function HomeEditorialHeader({
+  advisoryLevel = "normal",
+}: {
+  advisoryLevel?: AdvisoryLevel;
+}) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const alertsActive = isActivePath(pathname, "/alertas");
 
@@ -38,7 +62,11 @@ export function HomeEditorialHeader({ advisoryLevel = "normal" }: { advisoryLeve
       </a>
       <header className="home-editorial-header" data-advisory-level={advisoryLevel}>
         <div className="home-editorial-header__inner">
-          <Link className="home-editorial-header__brand" to="/" aria-label="Tempo Pelotas — página inicial">
+          <Link
+            className="home-editorial-header__brand"
+            to="/"
+            aria-label="Tempo Pelotas — página inicial"
+          >
             <img
               src="/brand/tempo-pelotas-purple.svg"
               alt="Tempo Pelotas"
@@ -51,7 +79,10 @@ export function HomeEditorialHeader({ advisoryLevel = "normal" }: { advisoryLeve
             />
           </Link>
 
-          <nav className="home-editorial-header__nav" aria-label="Navegação principal do Tempo Pelotas">
+          <nav
+            className="home-editorial-header__nav"
+            aria-label="Navegação principal do Tempo Pelotas"
+          >
             {homeNavigation.map((item) => {
               const active = isActivePath(pathname, item.to);
               return (
