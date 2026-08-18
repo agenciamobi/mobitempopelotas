@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import { resolveHeroPhoto } from "../src/production/lib/hero-photo-presentation.ts";
 import {
   resolveHeroWeatherIcon,
   weatherConditionLabels,
@@ -12,6 +13,16 @@ function weatherWith(overrides: Partial<WeatherData>): WeatherData {
     ...fallbackWeatherData,
     ...overrides,
   };
+}
+
+function weatherWithCondition(condition: string | null): WeatherData {
+  return weatherWith({
+    current: {
+      ...fallbackWeatherData.current,
+      available: true,
+      condition,
+    },
+  });
 }
 
 test("o hero prioriza a previsão horária para representar o período atual", () => {
@@ -55,4 +66,34 @@ test("o hero usa a narrativa oficial quando não há grade de previsão", () => 
 test("o hero nunca inventa céu aberto quando a condição é desconhecida", () => {
   assert.equal(resolveHeroWeatherIcon(weatherWith({}), null), "cloud");
   assert.equal(weatherConditionLabels.moon, "Céu aberto à noite");
+});
+
+test("o hero usa o acervo local de Pelotas conforme a condição observada", () => {
+  assert.equal(
+    resolveHeroPhoto({ weather: weatherWithCondition("Nevoeiro"), icon: "cloud" }).kind,
+    "fog",
+  );
+  assert.equal(
+    resolveHeroPhoto({ weather: weatherWithCondition("Chuva com trovoadas"), icon: "storm" }).kind,
+    "rain",
+  );
+  assert.equal(
+    resolveHeroPhoto({ weather: weatherWithCondition("Céu limpo"), icon: "sun" }).kind,
+    "clear",
+  );
+  assert.equal(
+    resolveHeroPhoto({ weather: weatherWithCondition("Nublado"), icon: "cloud" }).kind,
+    "cloudy",
+  );
+});
+
+test("o acervo local substitui créditos e URLs externas no hero estático", () => {
+  const photo = resolveHeroPhoto({
+    weather: weatherWithCondition("Pancadas de chuva"),
+    icon: "rain",
+  });
+
+  assert.equal(photo.credit, "Acervo Tempo Pelotas");
+  assert.match(photo.src, /^\/weather\/hero\/pelotas-/);
+  assert.doesNotMatch(photo.src, /wikimedia|commons/i);
 });

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 
 import type { CppmetForecastItem } from "@/production/lib/cppmet-forecast";
 import { WeatherIcon } from "@/production/components/weather-icon";
+import { resolveHeroPhoto } from "@/production/lib/hero-photo-presentation";
 import {
   resolveHeroWeatherIcon,
   weatherConditionLabels,
@@ -20,26 +21,6 @@ type WeatherHeroProps = {
   } | null;
   liveCameraBackground?: ReactNode;
 };
-
-type HeroPresentation = {
-  photoHref: string;
-  photoCredit: string;
-};
-
-const heroPresentationByLevel = {
-  normal: {
-    photoHref: "https://commons.wikimedia.org/wiki/File:Amanhecer_na_Praia_do_Laranjal.jpg",
-    photoCredit: "Foto: Sebastian2112 / CC BY-SA 4.0",
-  },
-  attention: {
-    photoHref: "https://commons.wikimedia.org/wiki/File:Sunset_over_Calm_Lake.jpg",
-    photoCredit: "Foto: Kane Morley / CC BY-SA 4.0",
-  },
-  warning: {
-    photoHref: "https://commons.wikimedia.org/wiki/File:Heavy_Rain.jpg",
-    photoCredit: "Foto: Pridatko Oleksandr / domínio público",
-  },
-} satisfies Record<AdvisoryLevel, HeroPresentation>;
 
 function capitalizeSentence(value: string) {
   return value.replace(/^./, (character) => character.toUpperCase());
@@ -86,12 +67,16 @@ export function WeatherHero({
   const { current } = weather;
   const advisory = getWeatherAdvisory(weather);
   const resolvedLevel = advisoryLevel ?? advisory.level;
-  const presentation = heroPresentationByLevel[resolvedLevel];
   const today = weather.daily[0] ?? null;
   const nextHourForecast = weather.hourly[0] ?? null;
   const hourlyPreview = weather.hourly.slice(0, 4);
   const resolvedIcon = resolveHeroWeatherIcon(weather, cppmetForecast?.item.summary);
   const displayIcon = current.available ? resolvedIcon : (nextHourForecast?.icon ?? resolvedIcon);
+  const heroPhoto = resolveHeroPhoto({
+    weather,
+    icon: displayIcon,
+    officialSummary: cppmetForecast?.item.summary,
+  });
   const displayCondition = getCurrentConditionLabel(displayIcon);
   const displayTemperature = current.available
     ? current.temperature
@@ -112,10 +97,18 @@ export function WeatherHero({
     <section
       className={`weather-hero weather-hero--${resolvedLevel} weather-hero--condition-${displayIcon} weather-hero--editorial-v70 weather-hero--editorial-v71`}
       data-condition={displayIcon}
+      data-photo-kind={heroPhoto.kind}
       data-official-alerts={officialAlertCount > 0 ? "true" : "false"}
       aria-labelledby="weather-hero-title"
     >
-      <div className="weather-hero-photo" aria-hidden="true" />
+      <div
+        className="weather-hero-photo"
+        aria-hidden="true"
+        style={{
+          backgroundImage: `url("${heroPhoto.src}")`,
+          backgroundPosition: heroPhoto.position,
+        }}
+      />
       {liveCameraBackground}
       <div className="weather-hero-overlay" aria-hidden="true" />
 
@@ -271,14 +264,7 @@ export function WeatherHero({
       </div>
 
       {liveCameraBackground ? null : (
-        <a
-          className="weather-hero-credit"
-          href={presentation.photoHref}
-          target="_blank"
-          rel="noreferrer"
-        >
-          {presentation.photoCredit}
-        </a>
+        <span className="weather-hero-credit">{heroPhoto.credit}</span>
       )}
     </section>
   );
