@@ -93,7 +93,9 @@ export function WeatherHero({
   const resolvedIcon = resolveHeroWeatherIcon(weather, cppmetForecast?.item.summary);
   const displayIcon = current.available ? resolvedIcon : (nextHourForecast?.icon ?? resolvedIcon);
   const displayCondition = getCurrentConditionLabel(displayIcon);
-  const displayTemperature = current.available ? current.temperature : (nextHourForecast?.temperature ?? null);
+  const displayTemperature = current.available
+    ? current.temperature
+    : (nextHourForecast?.temperature ?? null);
   const description =
     cppmetForecast?.item.summary ??
     (current.available
@@ -124,7 +126,9 @@ export function WeatherHero({
               <span className="weather-hero-editorial-location">Pelotas, RS</span>
               <span className="weather-hero-editorial-update">{currentUpdateMeta}</span>
             </div>
-            <span className={`weather-hero-editorial-status${current.available ? " is-live" : " is-unavailable"}`}>
+            <span
+              className={`weather-hero-editorial-status${current.available ? " is-live" : " is-unavailable"}`}
+            >
               <i aria-hidden="true" />
               {current.available ? "Agora" : "Previsão"}
             </span>
@@ -136,7 +140,14 @@ export function WeatherHero({
             </h1>
 
             <div className="weather-hero-editorial-reading">
-              <div className="weather-hero-editorial-temperature" aria-label={current.available ? "Temperatura agora" : "Temperatura prevista para a próxima hora"}>
+              <div
+                className="weather-hero-editorial-temperature"
+                aria-label={
+                  current.available
+                    ? "Temperatura agora"
+                    : "Temperatura prevista para a próxima hora"
+                }
+              >
                 <strong>{formatMetric(displayTemperature, "°")}</strong>
               </div>
               <div className="weather-hero-editorial-condition">
@@ -178,25 +189,44 @@ export function WeatherHero({
             </div>
           </div>
 
-          <div className="weather-hero-editorial-facts" aria-label="Resumo das condições e da previsão de hoje">
+          <div
+            className="weather-hero-editorial-facts"
+            aria-label="Resumo das condições e da previsão de hoje"
+          >
             <HeroFact
               label="Mín. / máx."
               value={today ? `${today.min}° / ${today.max}°` : "—"}
             />
             <HeroFact
               label="Chuva"
-              value={today?.rainChance === null || today?.rainChance === undefined ? "—" : `${today.rainChance}%`}
+              value={
+                today?.rainChance === null || today?.rainChance === undefined
+                  ? "—"
+                  : `${today.rainChance}%`
+              }
             />
             <HeroFact
               label={current.available ? "Vento" : "Vento previsto"}
-              value={formatMetric(current.available ? current.windSpeed : nextHourForecast?.windSpeed ?? null, " km/h")}
+              value={formatMetric(
+                current.available ? current.windSpeed : (nextHourForecast?.windSpeed ?? null),
+                " km/h",
+              )}
             />
-            <HeroFact label="Umidade" value={formatMetric(current.available ? current.humidity : null, "%")} />
-            <HeroFact label="Pressão" value={formatMetric(current.available ? current.pressure : null, " hPa")} />
+            <HeroFact
+              label="Umidade"
+              value={formatMetric(current.available ? current.humidity : null, "%")}
+            />
+            <HeroFact
+              label="Pressão"
+              value={formatMetric(current.available ? current.pressure : null, " hPa")}
+            />
           </div>
         </div>
 
-        <aside className="weather-hero-editorial-hourly" aria-label="Previsão para as próximas horas">
+        <aside
+          className="weather-hero-editorial-hourly"
+          aria-label="Previsão para as próximas horas"
+        >
           <div className="weather-hero-editorial-hourly-heading">
             <div>
               <span>Próximas horas</span>
@@ -211,7 +241,9 @@ export function WeatherHero({
             <div className="weather-hero-editorial-hourly-list">
               {hourlyPreview.map((hour, index) => (
                 <div className="weather-hero-editorial-hour" key={`${hour.time}-${index}`}>
-                  <span className="weather-hero-editorial-hour-time">{index === 0 ? "Agora" : hour.time}</span>
+                  <span className="weather-hero-editorial-hour-time">
+                    {index === 0 && current.available ? "Agora" : hour.time}
+                  </span>
                   <span className="weather-hero-editorial-hour-icon">
                     <WeatherIcon name={hour.icon} title={weatherConditionLabels[hour.icon]} />
                   </span>
@@ -230,7 +262,7 @@ export function WeatherHero({
           )}
 
           <div className="weather-hero-editorial-source">
-            <span>Condição observada</span>
+            <span>{current.available ? "Condição observada" : "Fonte da observação"}</span>
             <strong>{current.source.name}</strong>
           </div>
         </aside>
