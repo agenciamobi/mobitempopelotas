@@ -1,0 +1,211 @@
+/*
+ * Home v78 — consolidação global do sistema editorial.
+ *
+ * Esta camada não reestrutura componentes. Ela equaliza régua, raio, sombra,
+ * espaçamento vertical, títulos e fechamento da home para que as rodadas
+ * v72–v77 funcionem como um único produto visual.
+ */
+
+.site-shell--home-editorial {
+  --home-frame-max: 1440px;
+  --home-frame-gap: 48px;
+  --home-surface-radius: 16px;
+  --home-surface-line: rgb(7 27 44 / 9%);
+  --home-surface-shadow: 0 14px 38px rgb(7 27 44 / 4.5%);
+  --home-section-gap: 28px;
+}
+
+/* Régua e ritmo entre os capítulos principais. */
+.site-shell--home-editorial .inmet-official-panel,
+.site-shell--home-editorial .home-story--forecast,
+.site-shell--home-editorial .home-map-story,
+.site-shell--home-editorial .home-observation-story,
+.site-shell--home-editorial .home-story--water,
+.site-shell--home-editorial .home-explore-portal,
+.site-shell--home-editorial .editorial-answer-section {
+  width: min(var(--home-frame-max), calc(100% - var(--home-frame-gap))) !important;
+  max-width: var(--home-frame-max) !important;
+  margin-right: auto !important;
+  margin-left: auto !important;
+  border-radius: var(--home-surface-radius) !important;
+  box-shadow: var(--home-surface-shadow) !important;
+  transform: none !important;
+}
+
+.site-shell--home-editorial .home-story--forecast,
+.site-shell--home-editorial .home-map-story,
+.site-shell--home-editorial .home-observation-story,
+.site-shell--home-editorial .home-story--water,
+.site-shell--home-editorial .home-explore-portal,
+.site-shell--home-editorial .editorial-answer-section {
+  margin-top: var(--home-section-gap) !important;
+}
+
+/* Âncoras internas não devem ficar escondidas sob o header. */
+.site-shell--home-editorial #previsao-hoje,
+.site-shell--home-editorial #observacao-embrapa,
+.site-shell--home-editorial #situacao-das-aguas,
+.site-shell--home-editorial #explorar-portal,
+.site-shell--home-editorial #como-interpretar-o-tempo {
+  scroll-margin-top: 96px;
+}
+
+/* Uma única assinatura superior para capítulos de conteúdo. Alertas mantêm sua cor semântica. */
+.site-shell--home-editorial .home-map-story::before,
+.site-shell--home-editorial .home-observation-story::before,
+.site-shell--home-editorial .home-story--water::before,
+.site-shell--home-editorial .home-explore-portal::before {
+  height: 2px !important;
+  background: #18bdcd !important;
+}
+
+/* Hierarquia tipográfica consistente entre os capítulos. */
+.site-shell--home-editorial .home-story-heading h2,
+.site-shell--home-editorial .home-map-story__copy > h2,
+.site-shell--home-editorial .home-observation-story h2,
+.site-shell--home-editorial .home-explore-portal-heading h2,
+.site-shell--home-editorial .editorial-answer-copy h2 {
+  font-weight: 760 !important;
+  letter-spacing: -0.055em !important;
+  text-wrap: balance;
+}
+
+.site-shell--home-editorial .home-map-story__copy > h2,
+.site-shell--home-editorial .home-observation-story h2,
+.site-shell--home-editorial .home-story--water .home-story-heading h2 {
+  font-size: clamp(1.95rem, 2.85vw, 3.1rem) !important;
+}
+
+.site-shell--home-editorial .home-explore-portal-heading h2 {
+  font-size: clamp(2.2rem, 3.25vw, 3.65rem) !important;
+}
+
+.site-shell--home-editorial .editorial-answer-copy h2 {
+  font-size: clamp(1.9rem, 2.8vw, 3rem) !important;
+}
+
+/* Texto auxiliar sempre no mesmo contraste e ritmo. */
+.site-shell--home-editorial .home-story-heading > p,
+.site-shell--home-editorial .home-map-story__copy > p,
+.site-shell--home-editorial .home-observation-story__intro > p,
+.site-shell--home-editorial .home-explore-portal-heading p,
+.site-shell--home-editorial .editorial-answer-summary {
+  color: #617681 !important;
+  line-height: 1.68 !important;
+}
+
+/* Evita que superfícies internas voltem a competir com a seção que as contém. */
+.site-shell--home-editorial .home-map-story__frame,
+.site-shell--home-editorial .home-observation-story__reading,
+.site-shell--home-editorial .home-water-focus,
+.site-shell--home-editorial .home-water-table,
+.site-shell--home-editorial .home-explore-portal-groups,
+.site-shell--home-editorial .editorial-answer-grid {
+  box-shadow: none !important;
+}
+
+/* Fechamento: o conteúdo termina leve e o footer assume a assinatura institucional. */
+.site-shell--home-editorial .editorial-answer-section {
+  margin-bottom: 0 !important;
+}
+
+.site-shell--home-editorial + .editorial-footer-shell,
+.site-shell--home-editorial .editorial-footer-shell,
+.site-shell .editorial-footer-shell {
+  margin-top: 28px !important;
+  padding-right: 24px;
+  padding-left: 24px;
+}
+
+.site-shell .editorial-footer {
+  width: min(1440px, 100%) !important;
+  padding: clamp(40px, 4.5vw, 64px) clamp(28px, 4.2vw, 58px) clamp(24px, 3vw, 38px) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 14px 38px rgb(7 27 44 / 5%) !important;
+}
+
+.site-shell .editorial-footer-brand-line {
+  height: 2px !important;
+}
+
+.site-shell .editorial-footer-brand-logo {
+  width: clamp(190px, 18vw, 270px) !important;
+}
+
+.site-shell .editorial-footer-eyebrow {
+  margin-top: clamp(24px, 2.8vw, 38px) !important;
+}
+
+.site-shell .editorial-footer-lead h2 {
+  max-width: 980px !important;
+  font-size: clamp(2.65rem, 4.35vw, 4.9rem) !important;
+  font-weight: 820 !important;
+  line-height: 0.94 !important;
+  letter-spacing: -0.065em !important;
+}
+
+.site-shell .editorial-footer-lead {
+  gap: clamp(34px, 5vw, 74px) !important;
+  padding-bottom: clamp(34px, 3.8vw, 54px) !important;
+}
+
+.site-shell .editorial-footer-directory {
+  padding: clamp(32px, 3.8vw, 52px) 0 !important;
+}
+
+.site-shell .editorial-footer-transparency {
+  padding: clamp(22px, 2.6vw, 34px) 0 !important;
+}
+
+@media (max-width: 980px) {
+  .site-shell--home-editorial {
+    --home-frame-gap: 32px;
+    --home-section-gap: 22px;
+  }
+
+  .site-shell--home-editorial .home-map-story,
+  .site-shell--home-editorial .home-observation-story,
+  .site-shell--home-editorial .home-story--water,
+  .site-shell--home-editorial .home-explore-portal,
+  .site-shell--home-editorial .editorial-answer-section {
+    border-radius: 14px !important;
+  }
+
+  .site-shell .editorial-footer-shell {
+    padding-right: 16px !important;
+    padding-left: 16px !important;
+  }
+}
+
+@media (max-width: 620px) {
+  .site-shell--home-editorial {
+    --home-frame-gap: 20px;
+    --home-section-gap: 16px;
+  }
+
+  .site-shell--home-editorial .inmet-official-panel,
+  .site-shell--home-editorial .home-story--forecast,
+  .site-shell--home-editorial .home-map-story,
+  .site-shell--home-editorial .home-observation-story,
+  .site-shell--home-editorial .home-story--water,
+  .site-shell--home-editorial .home-explore-portal,
+  .site-shell--home-editorial .editorial-answer-section {
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgb(7 27 44 / 4%) !important;
+  }
+
+  .site-shell .editorial-footer-shell {
+    margin-top: 18px !important;
+    padding-right: 10px !important;
+    padding-left: 10px !important;
+  }
+
+  .site-shell .editorial-footer {
+    padding: 38px 20px 24px !important;
+    border-radius: 12px !important;
+  }
+
+  .site-shell .editorial-footer-lead h2 {
+    font-size: clamp(2.35rem, 12vw, 3.55rem) !important;
+  }
+}
