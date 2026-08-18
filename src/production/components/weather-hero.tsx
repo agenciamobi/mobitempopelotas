@@ -102,7 +102,7 @@ export function WeatherHero({
       ? "Condições locais, previsão das próximas horas e sinais de mudança no tempo em Pelotas."
       : "A medição atual está indisponível. Os valores exibidos como previsão permanecem identificados como estimativa.");
   const currentUpdateMeta = getCurrentUpdateMeta(current);
-  const forecastReason = advisory.level === "normal" ? null : advisory.reasons[0] ?? null;
+  const forecastReason = advisory.level === "normal" ? null : (advisory.reasons[0] ?? null);
   const secondaryAction =
     officialAlertCount > 0
       ? { href: "/alertas", label: "Ver aviso oficial" }
@@ -193,10 +193,7 @@ export function WeatherHero({
             className="weather-hero-editorial-facts"
             aria-label="Resumo das condições e da previsão de hoje"
           >
-            <HeroFact
-              label="Mín. / máx."
-              value={today ? `${today.min}° / ${today.max}°` : "—"}
-            />
+            <HeroFact label="Mín. / máx." value={today ? `${today.min}° / ${today.max}°` : "—"} />
             <HeroFact
               label="Chuva"
               value={
