@@ -150,3 +150,4 @@ import "./styles/home-editorial-continuity-v76.css";
 import "./styles/home-editorial-closing-v77.css";
 import "./styles/home-editorial-system-v78.css";
 import "./styles/home-editorial-evidence-v79.css";
+import "./styles/home-editorial-optical-v80.css";
