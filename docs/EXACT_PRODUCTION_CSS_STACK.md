@@ -10,13 +10,16 @@ Arquivos de refinamento são adicionados ao final da cascata para evitar reescri
 
 ## Estado atual da primeira dobra
 
-Desde a revisão `v70`, a Home deixa de reutilizar o header editorial completo das páginas internas e passa a usar um header compacto dedicado, seguido por um hero meteorológico unificado.
+Desde a revisão `v70`, a Home deixou de reutilizar o header editorial completo das páginas internas e passou a usar um header compacto dedicado, seguido por um hero meteorológico unificado.
 
-A camada final responsável por essa direção é:
+A revisão `v71` mantém essa arquitetura e remove a última sensação de dashboard da primeira dobra: a previsão das próximas horas passa a integrar o próprio palco do hero, a fotografia recebe mais presença, os CTAs ficam menos promocionais e o aviso oficial do INMET assume uma composição horizontal editorial.
 
-- `src/production/styles/home-first-fold-editorial-v70.css`.
+As camadas finais responsáveis por essa direção são:
 
-Ela sobrescreve somente a primeira dobra da Home e mantém as versões anteriores na pilha como compatibilidade para seletores e páginas ainda dependentes delas.
+- `src/production/styles/home-first-fold-editorial-v70.css`;
+- `src/production/styles/home-first-fold-editorial-v71.css`.
+
+A `v71` é carregada por último e sobrescreve somente os refinamentos da primeira dobra da Home, mantendo as versões anteriores na pilha como compatibilidade para seletores e páginas ainda dependentes delas.
 
 ## Objetivo
 
@@ -24,4 +27,4 @@ Manter a homepage Lovable alinhada ao código ativo sem apagar a história da ca
 
 ## Sincronização
 
-Alterações nessa pilha devem ser validadas por `Qualidade` e pela auditoria visual antes da integração na `main`, preservando o fluxo de sincronização com Lovable.
+Alterações nessa pilha devem ser validadas por `Qualidade` e pela auditoria visual após a atualização da `main`, preservando o fluxo de sincronização com Lovable.
