@@ -12,14 +12,17 @@ Arquivos de refinamento são adicionados ao final da cascata para evitar reescri
 
 Desde a revisão `v70`, a Home deixou de reutilizar o header editorial completo das páginas internas e passou a usar um header compacto dedicado, seguido por um hero meteorológico unificado.
 
-A revisão `v71` mantém essa arquitetura e remove a última sensação de dashboard da primeira dobra: a previsão das próximas horas passa a integrar o próprio palco do hero, a fotografia recebe mais presença, os CTAs ficam menos promocionais e o aviso oficial do INMET assume uma composição horizontal editorial.
+A revisão `v71` removeu a sensação de dashboard da primeira dobra: a previsão das próximas horas passou a integrar o próprio palco do hero, a fotografia recebeu mais presença, os CTAs ficaram menos promocionais e o aviso oficial do INMET assumiu uma composição horizontal editorial.
+
+A revisão `v72` faz o polimento final dessa arquitetura: reduz a altura do hero no desktop, garante o resumo meteorológico sem truncamento, reposiciona a origem da observação como crédito técnico, elimina a duplicidade visual de ações de alerta, reforça a legibilidade das métricas e simplifica a faixa do INMET.
 
 As camadas finais responsáveis por essa direção são:
 
 - `src/production/styles/home-first-fold-editorial-v70.css`;
-- `src/production/styles/home-first-fold-editorial-v71.css`.
+- `src/production/styles/home-first-fold-editorial-v71.css`;
+- `src/production/styles/home-first-fold-editorial-v72.css`.
 
-A `v71` é carregada por último e sobrescreve somente os refinamentos da primeira dobra da Home, mantendo as versões anteriores na pilha como compatibilidade para seletores e páginas ainda dependentes delas.
+A `v72` é carregada por último e sobrescreve somente os refinamentos finais da primeira dobra da Home, mantendo as versões anteriores na pilha como compatibilidade para seletores e páginas ainda dependentes delas.
 
 ## Objetivo
 

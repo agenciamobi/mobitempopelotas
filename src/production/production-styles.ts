@@ -142,3 +142,4 @@ import "./styles/document-scroll.css";
 import "./styles/home-first-fold-magazine-v69.css";
 import "./styles/home-first-fold-editorial-v70.css";
 import "./styles/home-first-fold-editorial-v71.css";
+import "./styles/home-first-fold-editorial-v72.css";
