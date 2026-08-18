@@ -28,7 +28,7 @@ O Tempo Pelotas é um portal meteorológico regional focado em Pelotas e Zona Su
 | Domínio | Estado atual | Observação |
 | --- | --- | --- |
 | Portal público | Ativo | Produção em `tempopelotas.com.br` |
-| Home meteorológica | Ativo | Tempo atual, contexto editorial, alertas e blocos locais |
+| Home meteorológica | Ativo | Header editorial compacto, hero unificado com temperatura dominante, próximas horas, alertas oficiais e blocos locais |
 | Previsão hoje/amanhã/7 dias | Ativo | Páginas dedicadas e conteúdo indexável |
 | Chuva, vento e meteograma | Ativo | Visões temáticas e hora a hora |
 | Alertas oficiais | Ativo | INMET e conteúdo preventivo claramente separado |
