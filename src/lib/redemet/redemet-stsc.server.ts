@@ -214,10 +214,11 @@ async function requestOfficialStsc() {
   if (!key) throw new Error("REDEMET_API_KEY não configurada");
 
   const url = new URL("produtos/stsc/0", apiBaseUrl());
+  url.searchParams.set("api_key", key);
+
   const response = await fetch(url, {
     headers: {
       Accept: "application/json",
-      "X-Api-Key": key,
       "User-Agent": "TempoPelotas/1.0 (+https://tempopelotas.com.br)",
     },
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
