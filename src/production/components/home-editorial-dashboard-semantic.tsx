@@ -59,8 +59,7 @@ const stationStateLabels: Record<string, string> = {
 const editorialCopyReplacements: Record<string, string> = {
   "Próximos dias": "Tendência do tempo",
   "Previsão para os próximos dias": "Como o tempo deve evoluir na semana",
-  "Veja como o tempo deve mudar ao longo do dia":
-    "Veja como o tempo deve mudar nas próximas horas",
+  "Veja como o tempo deve mudar ao longo do dia": "Próximas horas em Pelotas",
 };
 
 function WaterTrendLegend() {
