@@ -1,6 +1,7 @@
 "use client";
 
 import { Header } from "@/components/layout/Header";
+import { HomeEditorialHeader } from "@/production/components/home-editorial-header";
 import type { AdvisoryLevel } from "@/production/lib/weather-insights";
 
 type SiteHeaderProps = {
@@ -9,9 +10,13 @@ type SiteHeaderProps = {
 };
 
 /**
- * Compatibilidade para telas editoriais antigas.
- * O conteúdo e a navegação pertencem ao Header global.
+ * Mantém o header global nas páginas internas e usa uma composição editorial
+ * mais compacta na Home, onde a informação meteorológica deve dominar a dobra.
  */
-export function SiteHeader({ advisoryLevel = "normal" }: SiteHeaderProps) {
+export function SiteHeader({ advisoryLevel = "normal", variant = "default" }: SiteHeaderProps) {
+  if (variant === "hero") {
+    return <HomeEditorialHeader advisoryLevel={advisoryLevel} />;
+  }
+
   return <Header advisoryLevel={advisoryLevel} />;
 }
