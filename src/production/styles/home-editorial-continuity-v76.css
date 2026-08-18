@@ -1,0 +1,648 @@
+/*
+ * Home v76 — continuidade editorial para radar, observação local e águas.
+ *
+ * Objetivo: levar a linguagem consolidada da primeira dobra e da previsão para
+ * os capítulos seguintes sem reintroduzir cards SaaS, full-bleed acidental ou
+ * superfícies decorativas concorrentes. Mantém estados semânticos e controles.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* Régua editorial comum                                                      */
+/* -------------------------------------------------------------------------- */
+.site-shell--home-editorial .home-map-story,
+.site-shell--home-editorial .home-observation-story,
+.site-shell--home-editorial .home-story--water {
+  width: min(1440px, calc(100% - 48px)) !important;
+  max-width: 1440px !important;
+  margin: 28px auto 0 !important;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid rgb(7 27 44 / 9%) !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: 0 18px 48px rgb(7 27 44 / 5%) !important;
+  transform: none !important;
+}
+
+.site-shell--home-editorial .home-map-story::before,
+.site-shell--home-editorial .home-observation-story::before,
+.site-shell--home-editorial .home-story--water::before {
+  top: 0 !important;
+  right: 0 !important;
+  left: 0 !important;
+  width: auto !important;
+  height: 2px !important;
+  background: linear-gradient(90deg, #18bdcd, #5e2ced 62%, #e70b85) !important;
+}
+
+.site-shell--home-editorial .home-story--water::after,
+.site-shell--home-editorial .home-observation-story::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Radar e satélite                                                           */
+/* -------------------------------------------------------------------------- */
+.site-shell--home-editorial .home-map-story {
+  display: grid !important;
+  grid-template-columns: minmax(280px, 0.42fr) minmax(0, 1.58fr) !important;
+  grid-template-rows: auto !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  padding: 0 !important;
+  contain: layout paint style;
+}
+
+.site-shell--home-editorial .home-map-story__copy {
+  grid-column: 1 !important;
+  display: grid !important;
+  align-content: center;
+  gap: 0 !important;
+  min-width: 0;
+  padding: clamp(34px, 4vw, 54px) clamp(30px, 3.8vw, 48px) !important;
+  border-right: 1px solid rgb(7 27 44 / 9%);
+  background: #fff;
+}
+
+.site-shell--home-editorial .home-map-story__copy > .eyebrow {
+  margin: 0 0 12px !important;
+  color: #087f91;
+  font-size: 0.6rem;
+  font-weight: 820;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.site-shell--home-editorial .home-map-story__copy > h2 {
+  max-width: 11ch !important;
+  margin: 0 0 18px !important;
+  color: #071b2c;
+  font-size: clamp(2rem, 3.15vw, 3.35rem) !important;
+  font-weight: 750;
+  line-height: 0.99 !important;
+  letter-spacing: -0.06em;
+  text-wrap: balance;
+}
+
+.site-shell--home-editorial .home-map-story__copy > p {
+  max-width: 440px !important;
+  margin: 0 !important;
+  color: #617681;
+  font-size: clamp(0.82rem, 0.9vw, 0.92rem) !important;
+  line-height: 1.68 !important;
+}
+
+.site-shell--home-editorial .home-map-story__copy > p + p {
+  margin-top: 22px !important;
+  padding-top: 18px !important;
+  border-top: 1px solid rgb(7 27 44 / 9%);
+}
+
+.site-shell--home-editorial .home-map-story__copy > .home-map-story__hint {
+  color: #71848d !important;
+  font-size: 0.74rem !important;
+  line-height: 1.58 !important;
+}
+
+.site-shell--home-editorial .home-map-story__copy > .home-map-story__hint strong {
+  color: #203b4b;
+  font-weight: 780;
+}
+
+.site-shell--home-editorial .home-map-story__frame {
+  grid-column: 2 !important;
+  min-width: 0;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #e7efed;
+  box-shadow: none !important;
+}
+
+.site-shell--home-editorial .home-map-story .map-canvas {
+  min-height: 540px !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Medição local — Embrapa                                                   */
+/* -------------------------------------------------------------------------- */
+.site-shell--home-editorial .home-observation-story {
+  display: grid !important;
+  grid-template-columns: minmax(300px, 0.64fr) minmax(0, 1.36fr) !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  padding: 0 !important;
+  color: #071b2c;
+}
+
+.site-shell--home-editorial .home-observation-story__intro {
+  display: grid;
+  align-content: center;
+  max-width: none !important;
+  padding: clamp(34px, 4vw, 54px) clamp(30px, 3.8vw, 48px) !important;
+  border-right: 1px solid rgb(7 27 44 / 9%);
+  background: #fff;
+}
+
+.site-shell--home-editorial .home-observation-story__intro .eyebrow {
+  color: #087f91 !important;
+  font-size: 0.6rem;
+  font-weight: 820;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.site-shell--home-editorial .home-observation-story h2 {
+  max-width: 12ch !important;
+  margin: 12px 0 0 !important;
+  color: #071b2c !important;
+  font-size: clamp(2rem, 3.15vw, 3.35rem) !important;
+  font-weight: 750;
+  line-height: 0.99 !important;
+  letter-spacing: -0.06em !important;
+  text-wrap: balance;
+}
+
+.site-shell--home-editorial .home-observation-story__intro > p {
+  max-width: 460px !important;
+  margin: 20px 0 0 !important;
+  color: #617681 !important;
+  font-size: clamp(0.82rem, 0.9vw, 0.92rem) !important;
+  line-height: 1.68 !important;
+}
+
+.site-shell--home-editorial .home-observation-story__intro > a,
+.site-shell--home-editorial .home-observation-story__intro > a:visited {
+  width: fit-content;
+  min-height: auto !important;
+  margin-top: 24px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #071b2c !important;
+  box-shadow: none !important;
+  font-size: 0.78rem !important;
+  font-weight: 820;
+  text-decoration: underline !important;
+  text-decoration-color: rgb(24 189 205 / 45%) !important;
+  text-underline-offset: 5px;
+}
+
+.site-shell--home-editorial .home-observation-story__reading {
+  display: grid !important;
+  grid-template-columns: minmax(210px, 0.58fr) minmax(0, 1.42fr) !important;
+  min-width: 0;
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #f8faf9 !important;
+  box-shadow: none !important;
+}
+
+.site-shell--home-editorial .home-observation-temperature {
+  display: grid;
+  min-height: 280px !important;
+  align-content: center;
+  gap: 10px;
+  padding: clamp(28px, 3.2vw, 42px) !important;
+  border-right: 1px solid rgb(7 27 44 / 9%) !important;
+  background: #f3f8f7 !important;
+}
+
+.site-shell--home-editorial .home-observation-temperature small {
+  min-height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #087f91 !important;
+  font-size: 0.62rem !important;
+  font-weight: 800;
+}
+
+.site-shell--home-editorial .home-observation-temperature small::before {
+  width: 6px !important;
+  height: 6px !important;
+  box-shadow: none !important;
+}
+
+.site-shell--home-editorial .home-observation-temperature strong {
+  margin-top: 8px !important;
+  color: #071b2c !important;
+  font-size: clamp(4.6rem, 5.7vw, 6.25rem) !important;
+  font-weight: 730;
+  line-height: 0.84 !important;
+  letter-spacing: -0.09em;
+}
+
+.site-shell--home-editorial .home-observation-temperature span {
+  color: #617681 !important;
+  font-size: 0.82rem !important;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dl {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dl > div {
+  display: grid;
+  min-height: 140px !important;
+  align-content: center;
+  gap: 8px;
+  padding: 24px clamp(22px, 2.6vw, 34px) !important;
+  border: 0 !important;
+  border-right: 1px solid rgb(7 27 44 / 8%) !important;
+  border-bottom: 1px solid rgb(7 27 44 / 8%) !important;
+  background: transparent !important;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dl > div:nth-child(2n) {
+  border-right: 0 !important;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dl > div:nth-last-child(-n + 2) {
+  border-bottom: 0 !important;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dt {
+  color: #7a8b94 !important;
+  font-size: 0.58rem !important;
+  font-weight: 780;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.site-shell--home-editorial .home-observation-story__reading dd {
+  color: #142f40 !important;
+  font-size: clamp(1.15rem, 1.45vw, 1.5rem) !important;
+  font-weight: 790;
+  line-height: 1.12;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Lagoa dos Patos — leitura local + rede regional                            */
+/* -------------------------------------------------------------------------- */
+.site-shell--home-editorial .home-story--water {
+  isolation: isolate;
+  padding: 0 !important;
+}
+
+.site-shell--home-editorial .home-story--water .home-story-heading {
+  display: grid !important;
+  grid-template-columns: minmax(0, 0.92fr) minmax(360px, 0.58fr) !important;
+  align-items: end !important;
+  gap: clamp(34px, 4vw, 60px) !important;
+  margin: 0 !important;
+  padding: clamp(34px, 4vw, 54px) clamp(30px, 4vw, 54px) 30px !important;
+  border-bottom: 1px solid rgb(7 27 44 / 9%);
+  background: #fff;
+}
+
+.site-shell--home-editorial .home-story--water .home-story-heading .eyebrow {
+  color: #087f91;
+  font-size: 0.6rem;
+  font-weight: 820;
+  letter-spacing: 0.09em;
+}
+
+.site-shell--home-editorial .home-story--water .home-story-heading h2 {
+  max-width: 13ch !important;
+  margin: 10px 0 0 !important;
+  color: #071b2c !important;
+  font-size: clamp(2rem, 3.15vw, 3.35rem) !important;
+  font-weight: 750;
+  line-height: 0.99 !important;
+  letter-spacing: -0.06em !important;
+}
+
+.site-shell--home-editorial .home-story--water .home-story-heading > p {
+  max-width: 510px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  color: #617681 !important;
+  font-size: clamp(0.82rem, 0.9vw, 0.92rem) !important;
+  line-height: 1.68 !important;
+}
+
+.site-shell--home-editorial .home-water-story__layout {
+  display: grid !important;
+  grid-template-columns: minmax(330px, 0.68fr) minmax(0, 1.32fr) !important;
+  gap: 0 !important;
+  align-items: stretch !important;
+  padding: 0 !important;
+}
+
+.site-shell--home-editorial .home-water-focus {
+  min-width: 0;
+  padding: clamp(30px, 3.6vw, 46px) !important;
+  border: 0 !important;
+  border-right: 1px solid rgb(7 27 44 / 9%) !important;
+  border-radius: 0 !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.site-shell--home-editorial .home-water-focus::after {
+  display: none !important;
+  content: none !important;
+}
+
+.site-shell--home-editorial .home-water-focus::before {
+  top: 30px !important;
+  bottom: 30px !important;
+  width: 3px !important;
+}
+
+.site-shell--home-editorial .home-water-focus__reading {
+  margin-top: clamp(30px, 3.5vw, 46px) !important;
+}
+
+.site-shell--home-editorial .home-water-focus__reading::before {
+  margin-bottom: 10px !important;
+  color: #7a8b94;
+  font-size: 0.6rem !important;
+  letter-spacing: 0.07em;
+}
+
+.site-shell--home-editorial .home-water-focus__reading strong {
+  font-size: clamp(4.5rem, 5.8vw, 6.25rem) !important;
+  font-weight: 730 !important;
+  line-height: 0.82 !important;
+}
+
+.site-shell--home-editorial .home-water-trend {
+  min-height: 34px !important;
+  margin-top: 20px !important;
+  padding: 3px 10px 3px 4px !important;
+  font-size: 0.72rem !important;
+}
+
+.site-shell--home-editorial .home-water-trend > b {
+  width: 26px !important;
+  height: 26px !important;
+}
+
+.site-shell--home-editorial .home-water-focus dl {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 0 !important;
+  margin: 30px 0 0 !important;
+  border-top: 1px solid rgb(7 27 44 / 9%) !important;
+  border-bottom: 1px solid rgb(7 27 44 / 9%) !important;
+}
+
+.site-shell--home-editorial .home-water-focus dl > div,
+.site-shell--home-editorial .home-water-focus dl > div:first-child,
+.site-shell--home-editorial .home-water-focus dl > div:last-child {
+  min-height: 78px !important;
+  padding: 14px 14px !important;
+  border: 0 !important;
+  border-right: 1px solid rgb(7 27 44 / 8%) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.site-shell--home-editorial .home-water-focus dl > div:nth-child(2) {
+  border-right: 0 !important;
+}
+
+.site-shell--home-editorial .home-water-focus dl > div:last-child {
+  grid-column: 1 / -1;
+  border-top: 1px solid rgb(7 27 44 / 8%) !important;
+  border-right: 0 !important;
+}
+
+.site-shell--home-editorial .home-water-focus > a,
+.site-shell--home-editorial .home-water-focus > a:visited {
+  width: fit-content;
+  min-height: auto !important;
+  margin-top: 22px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #071b2c !important;
+  box-shadow: none !important;
+  font-size: 0.78rem !important;
+  text-decoration: underline !important;
+  text-decoration-color: rgb(24 189 205 / 45%) !important;
+  text-underline-offset: 5px;
+}
+
+.site-shell--home-editorial .home-water-table {
+  min-width: 0;
+  padding: clamp(28px, 3.4vw, 44px) clamp(28px, 3.4vw, 44px) 32px !important;
+  background: #fafcfc;
+}
+
+.site-shell--home-editorial .home-water-table__heading {
+  padding: 0 0 20px !important;
+  border-bottom: 1px solid rgb(7 27 44 / 9%) !important;
+}
+
+.site-shell--home-editorial .home-water-table__heading strong {
+  font-size: clamp(1.35rem, 1.8vw, 1.75rem) !important;
+}
+
+.site-shell--home-editorial .home-water-table__columns {
+  min-height: 42px !important;
+  padding: 0 12px !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgb(7 27 44 / 8%) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.site-shell--home-editorial .home-water-table__rows {
+  gap: 0 !important;
+  margin-top: 0 !important;
+}
+
+.site-shell--home-editorial .home-water-table__rows article {
+  min-height: 74px !important;
+  padding: 14px 12px 14px 18px !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgb(7 27 44 / 8%) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.site-shell--home-editorial .home-water-table__rows article::before {
+  top: 18px !important;
+  bottom: 18px !important;
+  width: 3px !important;
+}
+
+.site-shell--home-editorial .home-water-table__rows article.risk-flooding,
+.site-shell--home-editorial .home-water-table__rows article.level-state--flood {
+  background: rgb(217 45 32 / 3%) !important;
+}
+
+.site-shell--home-editorial .home-water-context {
+  min-height: 74px !important;
+  margin-top: 12px !important;
+  padding: 14px 12px 14px 18px !important;
+  border: 0 !important;
+  border-top: 1px solid rgb(94 44 237 / 17%) !important;
+  border-bottom: 1px solid rgb(94 44 237 / 17%) !important;
+  border-radius: 0 !important;
+  background: rgb(94 44 237 / 2.5%) !important;
+  box-shadow: inset 3px 0 0 rgb(94 44 237 / 42%) !important;
+}
+
+.site-shell--home-editorial .home-water-story__footer {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 28px !important;
+  margin: 0 !important;
+  padding: 18px clamp(30px, 4vw, 54px) !important;
+  border: 0 !important;
+  border-top: 1px solid rgb(7 27 44 / 9%) !important;
+  border-radius: 0 !important;
+  background: #f7f9f9 !important;
+}
+
+.site-shell--home-editorial .home-water-story__footer p {
+  padding-left: 0 !important;
+  color: #617681 !important;
+  font-size: 0.76rem !important;
+}
+
+.site-shell--home-editorial .home-water-story__footer p::before {
+  display: none !important;
+  content: none !important;
+}
+
+.site-shell--home-editorial .home-water-story__footer > a,
+.site-shell--home-editorial .home-water-story__footer > a:visited {
+  min-height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #071b2c !important;
+  font-size: 0.76rem !important;
+  text-decoration: underline !important;
+  text-decoration-color: rgb(24 189 205 / 45%) !important;
+  text-underline-offset: 5px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Responsividade                                                             */
+/* -------------------------------------------------------------------------- */
+@media (max-width: 980px) {
+  .site-shell--home-editorial .home-map-story,
+  .site-shell--home-editorial .home-observation-story,
+  .site-shell--home-editorial .home-story--water {
+    width: min(880px, calc(100% - 32px)) !important;
+  }
+
+  .site-shell--home-editorial .home-map-story,
+  .site-shell--home-editorial .home-observation-story,
+  .site-shell--home-editorial .home-water-story__layout,
+  .site-shell--home-editorial .home-story--water .home-story-heading {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .site-shell--home-editorial .home-map-story__copy,
+  .site-shell--home-editorial .home-observation-story__intro,
+  .site-shell--home-editorial .home-water-focus {
+    border-right: 0 !important;
+    border-bottom: 1px solid rgb(7 27 44 / 9%) !important;
+  }
+
+  .site-shell--home-editorial .home-map-story__frame {
+    grid-column: 1 !important;
+  }
+
+  .site-shell--home-editorial .home-map-story .map-canvas {
+    min-height: 480px !important;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading {
+    grid-template-columns: minmax(210px, 0.55fr) minmax(0, 1.45fr) !important;
+  }
+
+  .site-shell--home-editorial .home-story--water .home-story-heading {
+    gap: 18px !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .site-shell--home-editorial .home-map-story,
+  .site-shell--home-editorial .home-observation-story,
+  .site-shell--home-editorial .home-story--water {
+    width: calc(100% - 20px) !important;
+    margin-top: 18px !important;
+    border-radius: 14px !important;
+  }
+
+  .site-shell--home-editorial .home-map-story__copy,
+  .site-shell--home-editorial .home-observation-story__intro,
+  .site-shell--home-editorial .home-story--water .home-story-heading,
+  .site-shell--home-editorial .home-water-focus,
+  .site-shell--home-editorial .home-water-table {
+    padding: 24px 20px !important;
+  }
+
+  .site-shell--home-editorial .home-map-story__copy > h2,
+  .site-shell--home-editorial .home-observation-story h2,
+  .site-shell--home-editorial .home-story--water .home-story-heading h2 {
+    font-size: clamp(2rem, 10vw, 2.8rem) !important;
+  }
+
+  .site-shell--home-editorial .home-map-story .map-canvas {
+    min-height: 390px !important;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading {
+    grid-template-columns: 1fr !important;
+  }
+
+  .site-shell--home-editorial .home-observation-temperature {
+    min-height: 220px !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgb(7 27 44 / 9%) !important;
+  }
+
+  .site-shell--home-editorial .home-observation-story__reading dl > div {
+    min-height: 112px !important;
+    padding: 18px 20px !important;
+  }
+
+  .site-shell--home-editorial .home-water-focus__reading strong {
+    font-size: clamp(4rem, 20vw, 5.2rem) !important;
+  }
+
+  .site-shell--home-editorial .home-water-focus dl {
+    grid-template-columns: 1fr !important;
+  }
+
+  .site-shell--home-editorial .home-water-focus dl > div,
+  .site-shell--home-editorial .home-water-focus dl > div:first-child,
+  .site-shell--home-editorial .home-water-focus dl > div:nth-child(2),
+  .site-shell--home-editorial .home-water-focus dl > div:last-child {
+    grid-column: 1 !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgb(7 27 44 / 8%) !important;
+  }
+
+  .site-shell--home-editorial .home-water-focus dl > div:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .site-shell--home-editorial .home-water-story__footer {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    padding: 16px 20px !important;
+  }
+}
