@@ -1,15 +1,27 @@
 # Pilha CSS literal da produção
 
-A homepage em `src/production` utiliza os arquivos CSS carregados pelo `app/layout.tsx` do repositório `agenciamobi/tempopelotas`, preservando a mesma ordem de cascata.
+A homepage em `src/production` utiliza a pilha CSS carregada por `src/production/production-styles.css`, preservando a ordem de cascata necessária para compatibilidade com o histórico visual do projeto.
 
 ## Regra de compatibilidade
 
-O único trecho removido é o `@import "tailwindcss"` de `globals.css`, porque o runtime TanStack já carrega Tailwind por `src/styles.css`. Todos os demais arquivos e seletores são mantidos literalmente.
+O runtime TanStack carrega Tailwind por `src/styles.css`; a pilha editorial permanece concentrada em `src/production/production-styles.css`.
+
+Arquivos de refinamento são adicionados ao final da cascata para evitar reescrita destrutiva de estilos históricos ainda usados por páginas internas.
+
+## Estado atual da primeira dobra
+
+Desde a revisão `v70`, a Home deixa de reutilizar o header editorial completo das páginas internas e passa a usar um header compacto dedicado, seguido por um hero meteorológico unificado.
+
+A camada final responsável por essa direção é:
+
+- `src/production/styles/home-first-fold-editorial-v70.css`.
+
+Ela sobrescreve somente a primeira dobra da Home e mantém as versões anteriores na pilha como compatibilidade para seletores e páginas ainda dependentes delas.
 
 ## Objetivo
 
-Evitar reconstruções ou aproximações visuais e manter a homepage Lovable alinhada à produção Vercel em desktop, tablet e mobile.
+Manter a homepage Lovable alinhada ao código ativo sem apagar a história da cascata, mas permitindo que a primeira dobra evolua para uma linguagem editorial meteorológica mais clara, responsiva e orientada à informação principal.
 
 ## Sincronização
 
-Este registro acompanha o lote da pilha CSS e força um novo evento de sincronização entre a `main` do GitHub e o projeto Lovable.
+Alterações nessa pilha devem ser validadas por `Qualidade` e pela auditoria visual antes da integração na `main`, preservando o fluxo de sincronização com Lovable.
