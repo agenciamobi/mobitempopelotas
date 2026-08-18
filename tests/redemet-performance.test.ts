@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { parseRadarPayloadForArea } from "../src/lib/redemet/redemet-radar.server.ts";
+import { parseRedemetStscPayload } from "../src/lib/redemet/redemet-stsc.server.ts";
 
 const radarRoute = readFileSync("src/routes/api/redemet/radar.ts", "utf8");
 const satelliteRoute = readFileSync("src/routes/api/redemet/satellite.ts", "utf8");
@@ -82,6 +83,35 @@ test("radar parser keeps only Canguçu frames from the official response shape",
   assert.equal(parsed.frames.length, 1);
   assert.match(parsed.frames[0].imageUrl, /cn%2Fmaxcappi/);
   assert.doesNotMatch(parsed.frames[0].imageUrl, /sg%2Fmaxcappi/);
+});
+
+test("STSC parser accepts the response shape observed in the REDEMET HAR", () => {
+  const payload = {
+    status: true,
+    message: 200,
+    data: [
+      {
+        cor: "#ff0000",
+        start: "2026-08-17 23:49",
+        stop: "2026-08-18 00:04",
+        horario: "2026-08-17 23:50:59",
+        ultima_ocorrencia: "2026-08-17 23:50:59",
+        pontos: [
+          { la: "-31.75", lo: "-52.35" },
+          { la: "-10.00", lo: "-40.00" },
+        ],
+      },
+    ],
+  };
+
+  const frames = parseRedemetStscPayload(payload);
+
+  assert.equal(frames.length, 1);
+  assert.equal(frames[0].points.length, 1);
+  assert.equal(frames[0].points[0].latitude, -31.75);
+  assert.equal(frames[0].points[0].longitude, -52.35);
+  assert.equal(frames[0].observedAt, "2026-08-18T02:50:59.000Z");
+  assert.match(stormsRoute, /redemet-stsc\.server/);
 });
 
 test("radar editorial section skips offscreen rendering", () => {
