@@ -41,6 +41,7 @@
 
 /* Superfície principal: o fundo já cria separação, não precisamos contornar tudo. */
 .site-shell--home-editorial .home-story--forecast {
+  --forecast-reading-width: 1220px;
   overflow: hidden !important;
   background: #fff !important;
   border: 0 !important;
@@ -53,10 +54,20 @@
   box-shadow: none !important;
 }
 
+/* Mantém conteúdo editorial dentro de uma largura de leitura confortável em telas grandes. */
+.site-shell--home-editorial .home-story--forecast > .home-story-heading,
+.site-shell--home-editorial .home-story--forecast > .home-forecast-window,
+.site-shell--home-editorial .home-story--forecast > .home-hourly-story,
+.site-shell--home-editorial .home-story--forecast > .home-next-days {
+  box-sizing: border-box !important;
+  width: min(100%, var(--forecast-reading-width)) !important;
+  margin-inline: auto !important;
+}
+
 /* Cabeçalho: hierarquia por espaço. */
 .site-shell--home-editorial .home-story--forecast > .home-story-heading {
   display: block !important;
-  padding: 50px clamp(34px, 4vw, 58px) 28px !important;
+  padding: 46px clamp(34px, 4vw, 58px) 22px !important;
   border: 0 !important;
 }
 
@@ -79,7 +90,7 @@
 
 /* Sol, Lua e estação passam a ser uma linha contextual leve. */
 .site-shell--home-editorial .home-forecast-astronomy {
-  margin-top: 24px !important;
+  margin-top: 22px !important;
   padding: 0 !important;
   border: 0 !important;
   background: transparent !important;
@@ -131,13 +142,12 @@
   font-weight: 760 !important;
 }
 
-/* Dois destaques úteis, sem faixa, bordas ou card interno. */
+/* Dois destaques úteis, compactos e próximos da linha de contexto. */
 .site-shell--home-editorial .home-story--forecast .home-forecast-window {
   display: flex !important;
   align-items: flex-start !important;
-  gap: clamp(34px, 5vw, 72px) !important;
-  margin: 0 !important;
-  padding: 4px clamp(34px, 4vw, 58px) 34px !important;
+  gap: clamp(34px, 5vw, 64px) !important;
+  padding: 0 clamp(34px, 4vw, 58px) 18px !important;
   border: 0 !important;
   background: transparent !important;
 }
@@ -147,7 +157,7 @@
 }
 
 .site-shell--home-editorial .home-story--forecast .home-forecast-window > div {
-  flex: 0 1 220px !important;
+  flex: 0 1 205px !important;
   min-height: 0 !important;
   padding: 0 !important;
   border: 0 !important;
@@ -178,13 +188,13 @@
   font-size: 0.67rem !important;
 }
 
-/* Timeline horária: espaço separa os horários, não grades. */
+/* Timeline horária: uma linha contínua, sem grades ou excesso de largura. */
 .site-shell--home-editorial .home-story--forecast .home-hourly-story {
   display: grid !important;
   grid-template-columns: repeat(7, minmax(108px, 1fr)) !important;
-  gap: 12px !important;
+  gap: 8px !important;
   overflow: visible !important;
-  padding: 0 clamp(34px, 4vw, 58px) 50px !important;
+  padding: 10px clamp(34px, 4vw, 58px) 30px !important;
   border: 0 !important;
   background: transparent !important;
 }
@@ -193,16 +203,17 @@
 .site-shell--home-editorial .home-story--forecast .home-hourly-story article + article {
   min-width: 0 !important;
   min-height: 0 !important;
-  padding: 18px 14px 16px !important;
+  padding: 14px 12px 12px !important;
   border: 0 !important;
-  border-radius: 12px !important;
+  border-radius: 8px !important;
   background: transparent !important;
   box-shadow: none !important;
 }
 
+/* Maior chance: assinatura, não card promocional. */
 .site-shell--home-editorial .home-story--forecast .home-hourly-story article.is-rain-peak {
-  background: #faf8ff !important;
-  box-shadow: inset 0 3px 0 #8b4bea !important;
+  background: rgb(92 43 235 / 1.8%) !important;
+  box-shadow: inset 0 2px 0 #7642e8 !important;
 }
 
 .site-shell--home-editorial .home-story--forecast .home-hourly-story__topline {
@@ -214,22 +225,13 @@
   font-weight: 780 !important;
 }
 
-.site-shell--home-editorial .home-hourly-story__condition {
+.site-shell--home-editorial .home-hourly-story__condition,
+.site-shell--home-editorial .home-story--forecast .home-hourly-story__topline b {
   display: none !important;
 }
 
-.site-shell--home-editorial .home-story--forecast .home-hourly-story__topline b {
-  margin-left: auto !important;
-  padding: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
-  color: #b30d79 !important;
-  font-size: 0.49rem !important;
-  letter-spacing: 0.04em !important;
-}
-
 .site-shell--home-editorial .home-story--forecast .home-hourly-story__weather {
-  margin-top: 18px !important;
+  margin-top: 14px !important;
   gap: 9px !important;
 }
 
@@ -244,7 +246,7 @@
 }
 
 .site-shell--home-editorial .home-story--forecast .home-hourly-story__rain {
-  margin-top: 18px !important;
+  margin-top: 15px !important;
 }
 
 .site-shell--home-editorial .home-story--forecast .home-hourly-story__rain > div {
@@ -262,37 +264,47 @@
 
 .site-shell--home-editorial .home-story--forecast .home-hourly-story__rain > div > strong {
   color: #103443 !important;
-  font-size: 0.82rem !important;
+  font-size: 0.86rem !important;
   font-weight: 820 !important;
 }
 
 .site-shell--home-editorial .home-story--forecast .home-hourly-story__rain > div > strong::after {
   content: " chuva";
   color: #74868f;
-  font-size: 0.58rem;
+  font-size: 0.61rem;
   font-weight: 600;
+}
+
+.site-shell--home-editorial .home-story--forecast .home-hourly-story article.is-rain-peak .home-hourly-story__rain::after {
+  content: "Maior chance";
+  display: block;
+  margin-top: 5px;
+  color: #a30b70;
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
 }
 
 .site-shell--home-editorial .home-story--forecast .home-hourly-story__wind {
   display: block !important;
-  margin-top: 16px !important;
+  margin-top: 13px !important;
   padding-top: 0 !important;
   border: 0 !important;
-  color: #6c808a !important;
-  font-size: 0.61rem !important;
+  color: #617782 !important;
+  font-size: 0.65rem !important;
   line-height: 1.4 !important;
 }
 
-/* Semana: novo capítulo, não continuação de uma tabela. */
+/* Semana: novo capítulo, com menos vazio e sem voltar à estética de cards. */
 .site-shell--home-editorial .home-story--forecast .home-next-days {
-  margin-top: 0 !important;
-  padding: 54px clamp(34px, 4vw, 58px) 48px !important;
+  padding: 34px clamp(34px, 4vw, 58px) 44px !important;
   border: 0 !important;
   background: #fff !important;
 }
 
 .site-shell--home-editorial .home-story--forecast .home-next-days__heading {
-  margin-bottom: 28px !important;
+  margin-bottom: 22px !important;
 }
 
 .site-shell--home-editorial .home-story--forecast .home-next-days__heading > strong {
@@ -306,44 +318,38 @@
 .site-shell--home-editorial .home-next-days__list {
   display: grid !important;
   grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-  gap: 0 !important;
+  gap: 26px !important;
   overflow: visible !important;
   border: 0 !important;
 }
 
-.site-shell--home-editorial .home-next-days__list article {
+.site-shell--home-editorial .home-next-days__list article,
+.site-shell--home-editorial .home-next-days__list article:first-child,
+.site-shell--home-editorial .home-next-days__list article:last-child {
   min-width: 0 !important;
   min-height: 0 !important;
-  padding: 0 24px !important;
+  padding: 0 !important;
   border: 0 !important;
   border-radius: 0 !important;
   background: transparent !important;
   box-shadow: none !important;
 }
 
-.site-shell--home-editorial .home-next-days__list article:first-child {
-  padding-left: 0 !important;
-}
-
-.site-shell--home-editorial .home-next-days__list article:last-child {
-  padding-right: 0 !important;
-}
-
 .site-shell--home-editorial .home-next-days__list article + article {
-  border-left: 1px solid rgb(7 27 44 / 7%) !important;
+  border-left: 0 !important;
 }
 
 .site-shell--home-editorial .home-next-days__list article.is-rainiest {
-  background: linear-gradient(180deg, rgb(92 43 235 / 3.5%), transparent 62%) !important;
+  background: transparent !important;
   box-shadow: none !important;
 }
 
 .site-shell--home-editorial .home-next-days__list article.is-rainiest::before {
   content: "";
   display: block;
-  width: 38px;
-  height: 3px;
-  margin-bottom: 15px;
+  width: 34px;
+  height: 2px;
+  margin-bottom: 13px;
   border-radius: 999px;
   background: #6b38e8;
 }
@@ -357,7 +363,7 @@
 }
 
 .site-shell--home-editorial .home-next-days__condition {
-  margin-top: 18px !important;
+  margin-top: 16px !important;
   padding: 0 !important;
   border: 0 !important;
 }
@@ -374,7 +380,7 @@
 
 .site-shell--home-editorial .home-next-days__day-summary {
   min-height: 0 !important;
-  margin-top: 20px !important;
+  margin-top: 17px !important;
 }
 
 .site-shell--home-editorial .home-next-days__day-summary strong {
@@ -390,7 +396,7 @@
 }
 
 .site-shell--home-editorial .home-next-days__rain-meter {
-  margin-top: 20px !important;
+  margin-top: 17px !important;
   padding: 0 !important;
   border: 0 !important;
 }
@@ -422,7 +428,7 @@
 }
 
 .site-shell--home-editorial .home-next-days__temperatures {
-  margin-top: 18px !important;
+  margin-top: 16px !important;
   padding-top: 0 !important;
   border: 0 !important;
 }
@@ -433,19 +439,23 @@
 
 /* Tablets: preserva leitura horizontal sem comprimir informação. */
 @media (max-width: 1040px) {
+  .site-shell--home-editorial .home-story--forecast {
+    --forecast-reading-width: 100%;
+  }
+
   .site-shell--home-editorial .home-story--forecast > .home-story-heading {
-    padding: 38px 32px 24px !important;
+    padding: 38px 32px 22px !important;
   }
 
   .site-shell--home-editorial .home-story--forecast .home-forecast-window {
-    padding: 2px 32px 30px !important;
+    padding: 0 32px 18px !important;
   }
 
   .site-shell--home-editorial .home-story--forecast .home-hourly-story {
     grid-template-columns: repeat(7, minmax(126px, 1fr)) !important;
     gap: 8px !important;
     overflow-x: auto !important;
-    padding: 0 32px 42px !important;
+    padding: 8px 32px 28px !important;
     scroll-snap-type: x proximity;
     scrollbar-width: thin;
   }
@@ -455,11 +465,12 @@
   }
 
   .site-shell--home-editorial .home-story--forecast .home-next-days {
-    padding: 46px 32px 42px !important;
+    padding: 32px 32px 40px !important;
   }
 
   .site-shell--home-editorial .home-next-days__list {
     grid-template-columns: repeat(4, minmax(240px, 1fr)) !important;
+    gap: 18px !important;
     overflow-x: auto !important;
     scroll-snap-type: x proximity;
     scrollbar-width: thin;
@@ -477,7 +488,7 @@
   }
 
   .site-shell--home-editorial .home-story--forecast > .home-story-heading {
-    padding: 30px 20px 22px !important;
+    padding: 30px 20px 20px !important;
   }
 
   .site-shell--home-editorial .home-story--forecast .home-story-heading h2 {
@@ -491,8 +502,8 @@
   .site-shell--home-editorial .home-story--forecast .home-forecast-window {
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 20px !important;
-    padding: 0 20px 28px !important;
+    gap: 18px !important;
+    padding: 0 20px 16px !important;
   }
 
   .site-shell--home-editorial .home-story--forecast .home-forecast-window > div {
@@ -501,15 +512,15 @@
 
   .site-shell--home-editorial .home-story--forecast .home-hourly-story {
     margin: 0 !important;
-    padding: 0 20px 38px !important;
+    padding: 8px 20px 28px !important;
   }
 
   .site-shell--home-editorial .home-story--forecast .home-hourly-story article {
-    padding: 16px 12px 15px !important;
+    padding: 15px 12px 14px !important;
   }
 
   .site-shell--home-editorial .home-story--forecast .home-next-days {
-    padding: 42px 20px 36px !important;
+    padding: 30px 20px 36px !important;
   }
 
   .site-shell--home-editorial .home-next-days__list {
