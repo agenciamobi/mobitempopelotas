@@ -4,7 +4,8 @@ import { setResponseHeaders } from "@tanstack/react-start/server";
 import { fetchInmetSatellite } from "@/lib/weather/inmet-satellite.server";
 import { withRedemetLastGood } from "./redemet-last-good.server";
 import { fetchRedemetRadarResilient } from "./redemet-radar.server";
-import { fetchRedemetSatellite, fetchRedemetStorms } from "./redemet.server";
+import { fetchRedemetSatellite } from "./redemet.server";
+import { fetchRedemetStorms } from "./redemet-stsc.server";
 import type { RedemetOverview } from "./redemet.types";
 
 export const getRedemetOverview = createServerFn({ method: "GET" }).handler(

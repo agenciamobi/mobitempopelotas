@@ -23,7 +23,7 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 | Previsão meteorológica | 98% | Open-Meteo, MET Norway, Embrapa, INMET, CPPMet, síntese Gemini e avaliação automática de precisão integrados |
 | Home editorial | 96% | Hero, alertas, blocos editoriais, contingência e navegação orientada ao visitante implementados |
 | Hidrologia | 92% | Laranjal, Lagoa dos Patos, rede regional, Guaíba, tendências e metodologia integrados; validação contínua das fontes permanece necessária |
-| Radar, satélite, trovoadas e mapas | 92% | REDEMET e MapLibre implementados com configuração server-side, proxy controlado e estados explícitos de indisponibilidade |
+| Radar, satélite, trovoadas e mapas | 92% | REDEMET e MapLibre implementados; radar escolhe estação operacional com cobertura real sobre Pelotas (Santiago no estado observado em 18/08/2026), satélite e STSC usam contratos atuais e mantêm estados explícitos de indisponibilidade |
 | Câmeras | 92% | YouTube, descoberta de live, replay, ID manual e contingências implementados |
 | Supabase, histórico e autenticação | 92% | Projeto oficial ativo, migrations aplicadas, RLS endurecida, Google OAuth habilitado, callback de produção aceito e direitos do titular protegidos; ciclo autenticado com contas descartáveis ainda precisa de validação interativa |
 | PWA, push e cron | 78% | Cron meteorológico está ativo; PWA e Web Push permanecem temporariamente desativados até a conclusão da investigação de rolagem e dos testes reais de navegador |
@@ -62,10 +62,10 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 | 16 | Defesa Civil — banners preventivos | Migrado | `_legacy/lib/safety-banners.ts`, componentes e CSS | componentes preventivos e `/alertas` | Links oficiais | Conteúdo educativo separado de alertas vigentes | Baixo | Canais oficiais e prioridade editorial correta | 3 |
 | 17 | Gemini — resumo meteorológico | Migrado | `_legacy/lib/weather-ai-summary.ts` | `src/lib/weather/gemini-summary.server.ts` | `GEMINI_API_KEY`, `GEMINI_MODEL` | Chamada somente no servidor e fallback determinístico | Médio | JSON válido, cache, timeout e nenhuma chave no cliente | 2 |
 | 18 | Insights e regras editoriais | Migrado | `_legacy/lib/weather-insights.ts` | módulos puros em `src/lib/weather/` e `src/production/lib/` | Contratos normalizados | Funções desacopladas do visual | Baixo | Títulos, chips e prioridades reproduzíveis | 2 |
-| 19 | REDEMET — cliente server-side | Migrado | `_legacy/lib/redemet.ts`, tipos e último quadro | `src/lib/redemet/*.server.ts` | `REDEMET_API_KEY`, base URL, área e produto | Server functions, validação e cache | Alto | Chave privada, schemas válidos e logs sanitizados | 5 |
-| 20 | REDEMET — radar de Canguçu | Migrado | rotas de radar e proxy de imagem | rotas de servidor e componentes de mapa | REDEMET | Proxy com allowlist e limites | Alto | MaxCAPPI, horário, opacidade, legenda e fallback | 5 |
+| 19 | REDEMET — cliente server-side | Migrado | `_legacy/lib/redemet.ts`, tipos e último quadro | `src/lib/redemet/*.server.ts` | `REDEMET_API_KEY`, base URL, área e produto | Server functions, validação, cache e contratos separados para radar/STSC | Alto | Chave privada, schemas válidos, hosts allowlisted e logs sanitizados | 5 |
+| 20 | REDEMET — radar regional para Pelotas | Migrado | rotas de radar e proxy de imagem | `src/lib/redemet/redemet-radar.server.ts`, rota de radar, proxy e componentes de mapa | `REDEMET_API_KEY`, `REDEMET_RADAR_AREA=sg`, produto inicial `maxcappi` | Produto é consultado sem fixar uma estação na URL; `sg`/`cn` são selecionados depois da resposta e cada quadro precisa ter bounds que cubram Pelotas | Alto | Estação real identificada, MAXCAPPI ou fallback recente, horário e bounds válidos; Canguçu sem `path` nunca é confundido com Santiago | 5 |
 | 21 | REDEMET — satélite | Migrado | rota de satélite | server function e mapa | REDEMET | URLs e produtos normalizados | Médio | Realçado, infravermelho e visível com timeline e atribuição | 5 |
-| 22 | REDEMET — trovoadas STSC | Migrado | rota de trovoadas | server function e camada MapLibre | REDEMET | Coordenadas validadas e filtro regional | Alto | Pontos recentes sem transformar monitoramento em alerta oficial | 5 |
+| 22 | REDEMET — trovoadas STSC | Migrado | rota de trovoadas | `src/lib/redemet/redemet-stsc.server.ts`, server function e camada MapLibre | REDEMET | Contrato `produtos/stsc/0`, quadros em `data[]`, coordenadas validadas e filtro regional de até 450 km | Alto | Pontos recentes, timestamp normalizado e origem explícita, sem transformar monitoramento em alerta oficial | 5 |
 | 23 | MapLibre e mapa regional | Migrado | `_legacy/components/weather-map.tsx` | componentes de mapas em `src/components/` e `src/production/` | `maplibre-gl` | Carregamento client-only e proteção SSR | Médio | Sem erro de hidratação, responsivo, teclado e tela cheia | 5 |
 | 24 | Google Maps | Revisar | Variáveis e referências sem uso funcional | Nenhum consumo aprovado | Chaves Maps | Não portar sem caso de uso | Baixo | Chaves removidas ou restritas; integração apenas se necessária | 9 |
 | 25 | Câmera do Laranjal / YouTube | Migrado | serviços, APIs e página do legado | `src/lib/cameras/*.server.ts`, rota e componentes | `YOUTUBE_API_KEY`, handle e ID manual | API primária e contingências adaptadas | Médio | Live reconhecida, replay separado, embed nocookie e diagnóstico seguro | 5 |
@@ -100,7 +100,7 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 
 ## Recursos desenvolvidos após o snapshot e confirmados no destino
 
-- REDEMET: radar de Canguçu, satélite, trovoadas, proxy seguro e último quadro válido;
+- REDEMET: radar regional com Santiago operacional e Canguçu como alternativa quando voltar a fornecer imagem válida, satélite, STSC no contrato atual, proxy seguro e último quadro válido;
 - CPPMet/UFPel integrado ao hero;
 - banners educativos da Defesa Civil;
 - câmera do Laranjal com YouTube, página pública e ID manual;
@@ -120,6 +120,8 @@ Entregas posteriores ao snapshot são conferidas diretamente no repositório de 
 - Web Push nativo com VAPID, paginação, leases e avisos oficiais separados da previsão, atualmente suspenso;
 - dados estruturados editoriais com WebSite, WebPage e BreadcrumbList conectados por `@id`;
 - conta com Google OAuth, privilégios mínimos, consentimentos versionados, exportação, exclusão e política pública de retenção.
+
+A pesquisa CPTEC/SIGMA realizada em agosto de 2026 foi preservada em `docs/CPTEC_SIGMA_RESEARCH.md` apenas como evidência técnica e backlog. Ela não é dependência do runtime e não deve ser integrada ao portal público antes da revisão planejada para novembro/dezembro de 2026. A operação corrente da REDEMET está documentada em `docs/REDEMET_OPERATIONS.md`.
 
 ## Sequência de execução atualizada
 

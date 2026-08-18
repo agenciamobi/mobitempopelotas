@@ -9,6 +9,9 @@ const radarRoute = readFileSync("src/routes/api/redemet/radar.ts", "utf8");
 const satelliteRoute = readFileSync("src/routes/api/redemet/satellite.ts", "utf8");
 const stormsRoute = readFileSync("src/routes/api/redemet/storms.ts", "utf8");
 const radarServer = readFileSync("src/lib/redemet/redemet-radar.server.ts", "utf8");
+const redemetFunctions = readFileSync("src/lib/redemet/redemet.functions.ts", "utf8");
+const radarPage = readFileSync("src/routes/radar-e-satelite-pelotas.tsx", "utf8");
+const envExample = readFileSync(".env.example", "utf8");
 const cssEntry = readFileSync("src/production/production-styles.css", "utf8");
 const radarEditorialCss = readFileSync(
   "src/production/styles/home-radar-editorial-v45.css",
@@ -91,6 +94,9 @@ test("radar request follows the HAR contract and keeps Santiago as operational f
   assert.match(radarServer, /searchParams\.set\("anima", String\(frameCount\)\)/);
   assert.match(radarServer, /searchParams\.set\("api_key", key\)/);
   assert.match(radarServer, /boundsContainPoint\(frame\.bounds, PELOTAS_COORDINATES\)/);
+  assert.match(envExample, /^REDEMET_RADAR_AREA=sg$/m);
+  assert.match(radarPage, /Radar meteorológico de Santiago com cobertura sobre Pelotas/);
+  assert.doesNotMatch(radarPage, /"Radar meteorológico de Canguçu"/);
 });
 
 test("STSC parser accepts the response shape observed in the REDEMET HAR", () => {
@@ -120,6 +126,11 @@ test("STSC parser accepts the response shape observed in the REDEMET HAR", () =>
   assert.equal(frames[0].points[0].longitude, -52.35);
   assert.equal(frames[0].observedAt, "2026-08-18T02:50:59.000Z");
   assert.match(stormsRoute, /redemet-stsc\.server/);
+  assert.match(redemetFunctions, /fetchRedemetStorms.*redemet-stsc\.server/s);
+  assert.doesNotMatch(
+    redemetFunctions,
+    /fetchRedemetSatellite\s*,\s*fetchRedemetStorms\s*}\s*from\s*"\.\/redemet\.server"/,
+  );
 });
 
 test("radar editorial section skips offscreen rendering", () => {

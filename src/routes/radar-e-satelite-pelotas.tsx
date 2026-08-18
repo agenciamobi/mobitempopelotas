@@ -23,6 +23,7 @@ const RADAR_PAGE_CONTENT = {
   facts: [
     "Reproduzir a sequência ajuda a perceber deslocamento e mudança, mas não garante que o mesmo movimento continuará.",
     "O radar oferece uma visão regional e não confirma sozinho chuva em um endereço ou bairro específico.",
+    "Quando uma estação de radar não fornece imagem recente, o portal pode usar outra estação oficial cuja cobertura inclua Pelotas; a origem e o horário do quadro permanecem identificados.",
     "Nuvens no satélite não significam necessariamente chuva no solo em Pelotas.",
     "Trovoada detectada indica atividade elétrica e não substitui um aviso oficial de risco.",
     "Cada imagem pode ter um horário diferente; compare registros feitos em momentos próximos.",
@@ -91,7 +92,8 @@ export const Route = createFileRoute("/radar-e-satelite-pelotas")({
           { name: "Radar e satélite em Pelotas", path: PAGE_PATH },
         ],
         about: [
-          "Radar meteorológico de Canguçu",
+          "Radar meteorológico de Santiago com cobertura sobre Pelotas",
+          "Seleção operacional de estação REDEMET conforme disponibilidade e cobertura",
           "Imagens de satélite sobre Pelotas",
           "Monitoramento regional de trovoadas",
           "Precipitação na Zona Sul do Rio Grande do Sul",
