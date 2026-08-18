@@ -166,10 +166,10 @@ export function InmetOfficialForecastPanel({
     <section className="inmet-official-panel" aria-labelledby="inmet-official-title">
       <header className="inmet-official-header">
         <div className="inmet-official-heading">
-          <h2 id="inmet-official-title">Previsão do tempo para Pelotas</h2>
+          <h2 id="inmet-official-title">Previsão oficial do INMET</h2>
           <p>
-            Leitura institucional por períodos, apresentada separadamente da previsão horária por
-            modelos e das medições observadas em estação.
+            Previsão municipal oficial para Pelotas, organizada por períodos e apresentada
+            separadamente das medições observadas e dos modelos horários.
           </p>
         </div>
       </header>
