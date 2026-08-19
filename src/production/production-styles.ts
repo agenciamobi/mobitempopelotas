@@ -37,7 +37,7 @@ import "./styles/lagoon-monitoring-network.css";
 import "./styles/lagoon-monitoring-api.css";
 import "./styles/hydrology-page-reorganization.css";
 import "./styles/inmet-alerts.css";
-import "./styles/editorial-readable-v2.css";
+import "./styles/topic-readable.css";
 import "./styles/topic-editorial-home-visual.css";
 import "./styles/topic-special-pages-refinement.css";
 import "./styles/topic-special-pages-mobile-fix.css";
