@@ -21,6 +21,10 @@ const homeForecastCss = readFileSync(
   "src/production/components/home-forecast-editorial.css",
   "utf8",
 );
+const homeTrendCss = readFileSync(
+  "src/production/components/home-forecast-trend.css",
+  "utf8",
+);
 const homeRadarCss = readFileSync(
   "src/production/components/home-radar-editorial.css",
   "utf8",
@@ -78,6 +82,7 @@ test("internal footer preserves compact operational links", () => {
 test("homepage narrative is composed from isolated public chapters", () => {
   assert.doesNotMatch(productionHome, /HomeEditorialDashboard/);
   assert.match(productionHome, /<HomeForecastEditorial/);
+  assert.match(productionHome, /<HomeForecastTrend/);
   assert.match(productionHome, /<HomeRadarEditorial/);
   assert.match(productionHome, /<HomeObservationEditorial/);
   assert.match(productionHome, /<HomeWaterEditorial/);
@@ -88,6 +93,7 @@ test("homepage narrative is composed from isolated public chapters", () => {
 test("homepage chapters use local namespaces without important overrides", () => {
   const componentLayers = [
     [homeForecastCss, /\.tp-home-forecast/],
+    [homeTrendCss, /\.tp-home-trend/],
     [homeRadarCss, /\.tp-home-radar/],
     [homeObservationCss, /\.tp-home-observation/],
     [homeWaterCss, /\.tp-home-water/],
@@ -122,21 +128,29 @@ test("homepage guide closes as an open transparency chapter", () => {
   assert.doesNotMatch(homeGuideCss, /box-shadow/);
 });
 
-test("forecast keeps data-journalism hierarchy in its isolated component", () => {
-  assert.match(homeForecastCss, /Home — previsão editorial autocontida/);
+test("forecast and weekly trend keep data-journalism hierarchy in isolated chapters", () => {
+  assert.match(homeForecastCss, /Home — próximas horas autocontidas/);
   assert.match(homeForecastCss, /\.tp-home-forecast\s*\{[\s\S]*background:\s*transparent/);
   assert.match(homeForecastCss, /\.tp-home-forecast__hours\s*\{[\s\S]*border-bottom:/);
-  assert.match(homeForecastCss, /\.tp-home-forecast-week__list\s*\{[\s\S]*border-top:/);
+  assert.match(homeTrendCss, /Home — tendência semanal autocontida/);
+  assert.match(homeTrendCss, /\.tp-home-trend__list\s*\{[\s\S]*border-top:/);
   assert.doesNotMatch(homeForecastCss, /!important/);
+  assert.doesNotMatch(homeTrendCss, /!important/);
+});
+
+test("homepage radar is a scientific monitor instead of a floating dashboard", () => {
+  assert.match(homeRadarCss, /Civic Tech \/ Scientific/);
+  assert.match(homeRadarCss, /\.tp-home-radar \.map-layer-switcher\s*\{[\s\S]*box-shadow:\s*none/);
+  assert.match(homeRadarCss, /\.tp-home-radar \.radar-player\s*\{[\s\S]*background:\s*#f8faf9/);
+  assert.match(homeRadarCss, /\.tp-home-radar__guide-items/);
+  assert.doesNotMatch(homeRadarCss, /!important/);
 });
 
 test("homepage footer remains compact, transparent about sources and responsive", () => {
-  assert.match(homeFooterCss, /Footer da Home — fechamento editorial e funcional/);
-  assert.match(homeFooterCss, /\.editorial-footer-transparency/);
-  assert.match(homeFooterCss, /box-shadow:\s*none/);
-  assert.match(homeFooterCss, /@media \(max-width: 880px\)/);
+  assert.match(homeFooterCss, /Footer da Home — fonte autônoma de verdade/);
+  assert.match(homeFooterCss, /\.tp-home-footer-transparency/);
+  assert.doesNotMatch(homeFooterCss, /!important/);
   assert.match(homeFooterCss, /@media \(max-width: 720px\)/);
-  assert.match(homeFooterCss, /@media \(max-width: 460px\)/);
 });
 
 test("desktop megamenu is opaque, compact and visibly interactive", () => {
@@ -153,7 +167,8 @@ test("stable homepage composition covers tablet, mobile, focus and reduced motio
   assert.match(homeShellCss, /:focus-visible/);
   assert.match(homeShellCss, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(homeForecastCss, /@media \(max-width: 700px\)/);
-  assert.match(homeRadarCss, /@media \(max-width: 700px\)/);
+  assert.match(homeTrendCss, /@media \(max-width: 700px\)/);
+  assert.match(homeRadarCss, /@media \(max-width: 760px\)/);
   assert.match(homeObservationCss, /@media \(max-width: 700px\)/);
   assert.match(homeWaterCss, /@media \(max-width: 720px\)/);
   assert.match(homeExploreCss, /@media \(max-width: 640px\)/);
