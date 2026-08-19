@@ -9,21 +9,29 @@ const forecastCss = readFileSync(
   "src/production/components/home-forecast-editorial.css",
   "utf8",
 );
+const radarCss = readFileSync(
+  "src/production/components/home-radar-editorial.css",
+  "utf8",
+);
 
 test("the open-canvas homepage layer remains the final global home layer", () => {
   for (const entry of [cssEntry, tsEntry]) {
     assert.match(entry, /home-editorial-layout\.css/);
     assert.doesNotMatch(entry, /home-editorial-forecast\.css/);
+    assert.doesNotMatch(entry, /home-radar-editorial-v45\.css/);
+    assert.doesNotMatch(entry, /home-weekly-radar-usability-v47\.css/);
   }
 });
 
-test("public information chapters are open while the radar stays contained", () => {
+test("public information chapters stay open while the interactive radar owns one scientific frame", () => {
   assert.match(
     layoutCss,
     /\.home-observation-story,[\s\S]*\.home-story--water,[\s\S]*\.home-explore-portal,[\s\S]*\.editorial-answer-section[\s\S]*border:\s*0 !important/,
   );
-  assert.match(layoutCss, /\.home-map-story\s*\{[\s\S]*border:\s*1px solid var\(--home-open-line\) !important/);
-  assert.match(layoutCss, /\.home-map-story\s*\{[\s\S]*border-radius:\s*8px !important/);
+  assert.match(radarCss, /\.tp-home-radar\s*\{[\s\S]*border-top:\s*1px solid/);
+  assert.match(radarCss, /\.tp-home-radar__frame\s*\{[\s\S]*border:\s*1px solid/);
+  assert.match(radarCss, /border-radius:\s*8px/);
+  assert.doesNotMatch(radarCss, /box-shadow/);
 });
 
 test("legacy decorative chapter bars do not return on open homepage sections", () => {
@@ -46,4 +54,5 @@ test("open homepage chapters have an explicit mobile composition", () => {
   assert.match(layoutCss, /width:\s*calc\(100% - 16px\) !important/);
   assert.match(layoutCss, /\.home-explore-portal\s*\{[\s\S]*grid-template-columns:\s*1fr !important/);
   assert.match(layoutCss, /#como-interpretar-o-tempo\.editorial-answer-section/);
+  assert.match(radarCss, /@media \(max-width: 700px\)/);
 });
