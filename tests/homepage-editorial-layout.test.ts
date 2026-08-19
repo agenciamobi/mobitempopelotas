@@ -32,6 +32,8 @@ const guideCss = readFileSync("src/production/components/home-data-guide.css", "
 
 test("the homepage uses one minimal late shell instead of global visual override layers", () => {
   const removedLegacyLayers = [
+    "theme-refinement.css",
+    "theme-polish.css",
     "home.css",
     "home-lagoon-card.css",
     "home-location-and-level.css",
