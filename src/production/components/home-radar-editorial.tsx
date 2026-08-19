@@ -3,6 +3,7 @@ import { WeatherMap } from "@/production/components/weather-map";
 import type { WeatherData } from "@/production/lib/weather-data";
 
 import "./home-radar-editorial.css";
+import "./home-radar-visual-refinement.css";
 
 export function HomeRadarEditorial({ regionalWeather }: { regionalWeather: WeatherData["regional"] }) {
   return (
