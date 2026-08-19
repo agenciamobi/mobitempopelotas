@@ -1,0 +1,67 @@
+/*
+ * Página de avisos do INMET — refinamentos autocontidos.
+ * Mantém a leitura dos avisos oficiais fora das antigas camadas visuais da Home.
+ */
+
+.inmet-alert-card {
+  gap: 17px;
+  padding: 24px 26px 24px 30px;
+}
+
+.inmet-alert-card__topline {
+  justify-content: flex-start;
+}
+
+.inmet-alert-card__heading {
+  align-items: center;
+}
+
+.inmet-alert-card__heading > div {
+  max-width: 900px;
+  gap: 8px;
+}
+
+.inmet-alert-card__heading p {
+  color: #526d79;
+  font-size: 0.88rem;
+}
+
+.inmet-alert-area,
+.inmet-alert-description {
+  color: #405d6a;
+  font-size: 1rem;
+}
+
+.inmet-alert-area {
+  width: fit-content;
+  max-width: 100%;
+  padding: 10px 13px;
+  border-radius: 11px;
+  background: rgb(7 30 47 / 4.5%);
+}
+
+.inmet-alert-description,
+.inmet-alert-card details {
+  max-width: 980px;
+}
+
+.inmet-alert-card > a {
+  margin-top: 1px;
+}
+
+@media (max-width: 760px) {
+  .inmet-alert-card__heading {
+    display: grid;
+    align-items: start;
+  }
+
+  .inmet-alert-event {
+    order: -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .inmet-alert-card {
+    padding: 21px 17px 21px 22px;
+  }
+}
