@@ -328,12 +328,13 @@ Estado desta direção na `main` em 18/08/2026:
 - **Embrapa:** aplicado com leitura pública resumida para temperatura, umidade, vento e chuva do dia.
 - **Lagoa dos Patos:** aplicado com Laranjal como referência principal e rede regional resumida a três pontos na Home.
 - **Explore:** convertido para diretório editorial de conteúdo.
+- **Footer:** aplicado como fechamento editorial mais compacto, preservando navegação, transparência, fontes e acesso aos avisos sem aparência de landing page.
 - **PRO:** posição conceitual reservada, ainda sem bloco público ativo.
+- **Contratos da Home:** ampliados para proteger a ordem INMET, os fatos essenciais do Hero, o índice sem numeração, a ausência do banner preventivo permanente e o carregamento dos estilos editoriais estáveis de header/footer.
 
 Pendências antes de encerrar a reformulação:
 
-1. revisar fechamento editorial e footer;
-2. consolidar resíduos de CSS histórico sem criar nova série versionada;
-3. revisar mobile em larguras críticas;
-4. validar contratos, build, typecheck, lint e rotas;
-5. conferir o resultado visual no deploy antes de considerar a Home concluída.
+1. consolidar resíduos de CSS histórico sem criar nova série versionada;
+2. revisar mobile em larguras críticas;
+3. validar contratos, build, typecheck, lint e rotas;
+4. conferir o resultado visual no deploy antes de considerar a Home concluída.
