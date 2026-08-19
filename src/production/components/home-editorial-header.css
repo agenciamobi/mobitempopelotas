@@ -1,0 +1,187 @@
+/*
+ * Header editorial da Home.
+ * Navegação de portal: plana, discreta e orientada a conteúdo.
+ */
+
+.home-editorial-header {
+  border-bottom: 1px solid rgb(7 27 44 / 8%);
+  background: rgb(255 255 255 / 97%);
+  box-shadow: none !important;
+  backdrop-filter: blur(14px);
+}
+
+.home-editorial-header__inner {
+  min-height: 68px !important;
+}
+
+.home-editorial-header__brand img {
+  width: clamp(180px, 12vw, 208px) !important;
+}
+
+.home-editorial-header__nav {
+  align-self: stretch;
+  gap: 0 !important;
+}
+
+.home-editorial-header__nav a {
+  position: relative;
+  min-height: 68px !important;
+  padding-inline: clamp(8px, 0.9vw, 13px) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #5f7480 !important;
+  font-size: 0.69rem !important;
+  font-weight: 690 !important;
+}
+
+.home-editorial-header__nav a::after {
+  position: absolute;
+  right: 11px;
+  bottom: -1px;
+  left: 11px;
+  height: 2px;
+  background: transparent;
+  content: "";
+}
+
+.home-editorial-header__nav a:hover,
+.home-editorial-header__nav a:focus-visible {
+  background: transparent !important;
+  color: #071b2c !important;
+  outline: none;
+}
+
+.home-editorial-header__nav a.is-active {
+  background: transparent !important;
+  color: #071b2c !important;
+  font-weight: 780 !important;
+}
+
+.home-editorial-header__nav a.is-active::after {
+  background: #18bdcd;
+}
+
+.home-editorial-header__actions {
+  gap: 7px !important;
+}
+
+.home-editorial-header .header-account-link {
+  min-height: 34px !important;
+  padding-inline: 9px !important;
+  border: 0 !important;
+  border-radius: 4px !important;
+  background: transparent !important;
+  color: #536a77 !important;
+  box-shadow: none !important;
+  font-size: 0.66rem !important;
+  font-weight: 720 !important;
+}
+
+.home-editorial-header .header-account-link:hover,
+.home-editorial-header .header-account-link:focus-visible {
+  background: #f2f6f6 !important;
+  color: #071b2c !important;
+  outline: none;
+}
+
+.home-editorial-header__alert {
+  min-height: 34px !important;
+  padding-inline: 9px !important;
+  border: 1px solid rgb(7 27 44 / 9%) !important;
+  border-radius: 4px !important;
+  background: #fff !important;
+  color: #526b78 !important;
+  box-shadow: none !important;
+}
+
+.home-editorial-header__alert:hover,
+.home-editorial-header__alert:focus-visible {
+  border-color: rgb(24 189 205 / 28%) !important;
+  background: #f5fafa !important;
+  color: #071b2c !important;
+}
+
+.home-editorial-header__alert.is-attention {
+  border-color: rgb(242 112 53 / 26%) !important;
+  background: #fff9f5 !important;
+  color: #a9471f !important;
+}
+
+.home-editorial-header__alert.is-warning {
+  border-color: rgb(207 52 44 / 28%) !important;
+  background: #fff6f5 !important;
+  color: #ae3029 !important;
+}
+
+@media (max-width: 1240px) {
+  .home-editorial-header__inner {
+    width: min(100% - 32px, 1180px) !important;
+  }
+
+  .home-editorial-header__brand img {
+    width: 184px !important;
+  }
+
+  .home-editorial-header__nav a {
+    padding-inline: 7px !important;
+    font-size: 0.66rem !important;
+  }
+}
+
+@media (max-width: 1040px) {
+  .home-editorial-header__inner {
+    min-height: 64px !important;
+  }
+
+  .home-editorial-header__nav {
+    top: 64px !important;
+    min-height: 42px;
+    padding: 0 16px !important;
+    border-bottom: 1px solid rgb(7 27 44 / 8%) !important;
+    background: rgb(255 255 255 / 98%) !important;
+  }
+
+  .home-editorial-header__nav a {
+    min-height: 42px !important;
+    padding-inline: 11px !important;
+  }
+
+  .home-editorial-header__nav a::after {
+    right: 10px;
+    left: 10px;
+  }
+}
+
+@media (max-width: 720px) {
+  .home-editorial-header__inner {
+    width: calc(100% - 20px) !important;
+    min-height: 62px !important;
+  }
+
+  .home-editorial-header__brand img {
+    width: clamp(150px, 44vw, 176px) !important;
+  }
+
+  .home-editorial-header__nav {
+    top: 62px !important;
+    padding-inline: 10px !important;
+  }
+
+  .home-editorial-header__nav a {
+    min-height: 40px !important;
+    padding-inline: 12px !important;
+  }
+
+  .home-editorial-header .header-account-link {
+    min-height: 32px !important;
+    padding-inline: 6px !important;
+  }
+
+  .home-editorial-header__alert {
+    width: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+    justify-content: center;
+  }
+}
