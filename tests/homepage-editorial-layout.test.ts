@@ -7,6 +7,10 @@ const tsEntry = readFileSync("src/production/production-styles.ts", "utf8");
 const shellCss = readFileSync("src/production/styles/home-editorial-shell.css", "utf8");
 const heroCss = readFileSync("src/production/components/weather-hero-direction.css", "utf8");
 const alertPageCss = readFileSync("src/production/components/inmet-alerts-page.css", "utf8");
+const waterSemanticCss = readFileSync(
+  "src/production/styles/water-level-semantic-colors.css",
+  "utf8",
+);
 const forecastCss = readFileSync(
   "src/production/components/home-forecast-editorial.css",
   "utf8",
@@ -28,6 +32,12 @@ const guideCss = readFileSync("src/production/components/home-data-guide.css", "
 
 test("the homepage uses one minimal late shell instead of global visual override layers", () => {
   const removedLegacyLayers = [
+    "home.css",
+    "home-lagoon-card.css",
+    "home-location-and-level.css",
+    "home-flow-footer-refinement.css",
+    "home-cppmet-layout-water-audit.css",
+    "home-cppmet-final-fixes.css",
     "home-hero-curve-fixes.css",
     "home-hero-alert-states.css",
     "home-hero-composition.css",
@@ -122,6 +132,14 @@ test("the INMET alerts page owns refinements outside the homepage cascade", () =
   assert.match(alertPageCss, /@media \(max-width: 560px\)/);
   assert.doesNotMatch(alertPageCss, /\.site-shell--home-editorial/);
   assert.doesNotMatch(alertPageCss, /!important/);
+});
+
+test("shared water states no longer depend on the legacy homepage widgets", () => {
+  assert.match(waterSemanticCss, /\.guaiba-level-card\.level-state--stable::before/);
+  assert.match(waterSemanticCss, /\.guaiba-level-card\.level-state--unavailable::before/);
+  assert.match(waterSemanticCss, /\.lagoon-monitoring-card\.level-state--stable/);
+  assert.match(waterSemanticCss, /\.lagoon-monitoring-card\.level-state--unavailable/);
+  assert.doesNotMatch(waterSemanticCss, /\.home-water-/);
 });
 
 test("public homepage chapters are open and locally owned", () => {
