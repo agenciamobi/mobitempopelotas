@@ -4,7 +4,6 @@ import test from "node:test";
 
 const cssEntry = readFileSync("src/production/production-styles.css", "utf8");
 const tsEntry = readFileSync("src/production/production-styles.ts", "utf8");
-const layoutCss = readFileSync("src/production/styles/home-editorial-layout.css", "utf8");
 const forecastCss = readFileSync(
   "src/production/components/home-forecast-editorial.css",
   "utf8",
@@ -13,46 +12,55 @@ const radarCss = readFileSync(
   "src/production/components/home-radar-editorial.css",
   "utf8",
 );
+const observationCss = readFileSync(
+  "src/production/components/home-observation-editorial.css",
+  "utf8",
+);
+const waterCss = readFileSync(
+  "src/production/components/home-water-editorial.css",
+  "utf8",
+);
+const exploreCss = readFileSync("src/components/weather/HomeExplorePortal.css", "utf8");
+const guideCss = readFileSync("src/production/components/home-data-guide.css", "utf8");
 
-test("the open-canvas homepage layer remains the final global home layer", () => {
+test("the homepage no longer depends on the late global override layers", () => {
   for (const entry of [cssEntry, tsEntry]) {
-    assert.match(entry, /home-editorial-layout\.css/);
     assert.doesNotMatch(entry, /home-editorial-forecast\.css/);
+    assert.doesNotMatch(entry, /home-editorial-layout\.css/);
     assert.doesNotMatch(entry, /home-radar-editorial-v45\.css/);
     assert.doesNotMatch(entry, /home-weekly-radar-usability-v47\.css/);
+    assert.doesNotMatch(entry, /home-water-editorial-v49\.css/);
+    assert.doesNotMatch(entry, /home-closing-editorial-v50\.css/);
+    assert.doesNotMatch(entry, /home-explore-refinement-v19\.css/);
   }
 });
 
-test("public information chapters stay open while the interactive radar owns one scientific frame", () => {
-  assert.match(
-    layoutCss,
-    /\.home-observation-story,[\s\S]*\.home-story--water,[\s\S]*\.home-explore-portal,[\s\S]*\.editorial-answer-section[\s\S]*border:\s*0 !important/,
-  );
+test("public homepage chapters are open and locally owned", () => {
+  for (const css of [forecastCss, observationCss, waterCss, exploreCss, guideCss]) {
+    assert.doesNotMatch(css, /!important/);
+    assert.doesNotMatch(css, /box-shadow/);
+  }
+
+  assert.match(forecastCss, /\.tp-home-forecast\s*\{/);
+  assert.match(observationCss, /\.tp-home-observation\s*\{/);
+  assert.match(waterCss, /\.tp-home-water\s*\{/);
+  assert.match(exploreCss, /\.tp-home-explore\s*\{/);
+  assert.match(guideCss, /\.tp-home-guide\s*\{/);
+});
+
+test("the interactive radar keeps one scientific frame instead of a chapter card", () => {
   assert.match(radarCss, /\.tp-home-radar\s*\{[\s\S]*border-top:\s*1px solid/);
   assert.match(radarCss, /\.tp-home-radar__frame\s*\{[\s\S]*border:\s*1px solid/);
   assert.match(radarCss, /border-radius:\s*8px/);
   assert.doesNotMatch(radarCss, /box-shadow/);
+  assert.doesNotMatch(radarCss, /!important/);
 });
 
-test("legacy decorative chapter bars do not return on open homepage sections", () => {
-  assert.match(
-    layoutCss,
-    /\.home-observation-story::before,[\s\S]*\.home-explore-portal::before,[\s\S]*\.editorial-answer-section::before[\s\S]*display:\s*none !important/,
-  );
-  assert.match(layoutCss, /Remove marcadores de capítulo herdados das versões antigas/);
-});
-
-test("forecast is owned by its isolated component rather than the global cascade", () => {
-  assert.match(forecastCss, /\.tp-home-forecast\s*\{/);
-  assert.match(forecastCss, /\.tp-home-forecast__hours\s*\{/);
-  assert.match(forecastCss, /\.tp-home-forecast-week__list\s*\{/);
-  assert.doesNotMatch(forecastCss, /!important/);
-});
-
-test("open homepage chapters have an explicit mobile composition", () => {
-  assert.match(layoutCss, /@media \(max-width: 720px\)/);
-  assert.match(layoutCss, /width:\s*calc\(100% - 16px\) !important/);
-  assert.match(layoutCss, /\.home-explore-portal\s*\{[\s\S]*grid-template-columns:\s*1fr !important/);
-  assert.match(layoutCss, /#como-interpretar-o-tempo\.editorial-answer-section/);
+test("isolated chapters include explicit mobile composition", () => {
+  assert.match(forecastCss, /@media \(max-width: 700px\)/);
   assert.match(radarCss, /@media \(max-width: 700px\)/);
+  assert.match(observationCss, /@media \(max-width: 700px\)/);
+  assert.match(waterCss, /@media \(max-width: 720px\)/);
+  assert.match(exploreCss, /@media \(max-width: 640px\)/);
+  assert.match(guideCss, /@media \(max-width: 640px\)/);
 });
