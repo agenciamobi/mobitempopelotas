@@ -1,22 +1,25 @@
 /*
  * Home — observação local da Embrapa em linguagem Civic Tech editorial.
- * Dados observados ganham rastreabilidade e hierarquia, sem card promocional.
+ * O bloco se comporta como uma leitura observacional aberta: dado principal,
+ * métricas de apoio, fonte e horário — sem aparência de dashboard por cards.
  */
 
 .tp-home-observation {
   --tp-observation-line: rgb(7 30 47 / 10%);
+  --tp-observation-line-soft: rgb(7 30 47 / 7%);
+  --tp-observation-cyan: #087f91;
   width: min(1220px, calc(100% - 48px));
   margin: 0 auto clamp(66px, 7vw, 96px);
   padding-top: clamp(54px, 6vw, 82px);
   border-top: 1px solid var(--tp-observation-line);
   color: #071e2f;
   content-visibility: auto;
-  contain-intrinsic-size: auto 480px;
+  contain-intrinsic-size: auto 500px;
 }
 
 .tp-home-observation__intro {
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(300px, 0.52fr);
+  grid-template-columns: minmax(0, 0.98fr) minmax(300px, 0.48fr);
   align-items: end;
   gap: clamp(42px, 6vw, 90px);
   margin-bottom: 30px;
@@ -25,7 +28,7 @@
 .tp-home-observation__intro > div:first-child > span {
   display: block;
   margin-bottom: 9px;
-  color: #087f91;
+  color: var(--tp-observation-cyan);
   font-size: 0.68rem;
   font-weight: 820;
   letter-spacing: 0.09em;
@@ -33,10 +36,10 @@
 }
 
 .tp-home-observation__intro h2 {
-  max-width: 780px;
+  max-width: 790px;
   margin: 0;
   font-size: clamp(2.2rem, 3.7vw, 3.8rem);
-  font-weight: 770;
+  font-weight: 730;
   line-height: 0.98;
   letter-spacing: -0.055em;
   text-wrap: balance;
@@ -52,26 +55,32 @@
 .tp-home-observation__context p {
   margin: 0;
   color: #5e747f;
-  font-size: 0.88rem;
-  line-height: 1.68;
+  font-size: 0.86rem;
+  line-height: 1.66;
 }
 
 .tp-home-observation__context a {
   display: inline-flex;
   width: fit-content;
+  min-height: 40px;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   color: #173847;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 800;
   text-decoration: underline;
   text-decoration-color: rgb(24 189 205 / 48%);
   text-underline-offset: 5px;
 }
 
+.tp-home-observation__context a:hover,
+.tp-home-observation__context a:focus-visible {
+  color: #5e2ced;
+}
+
 .tp-home-observation__reading {
   display: grid;
-  grid-template-columns: minmax(270px, 0.72fr) minmax(0, 1.28fr);
+  grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
   border-top: 1px solid var(--tp-observation-line);
   border-bottom: 1px solid var(--tp-observation-line);
 }
@@ -80,22 +89,30 @@
   display: grid;
   align-content: center;
   gap: 8px;
-  min-height: 210px;
-  padding: 28px clamp(30px, 4vw, 50px) 30px 0;
+  min-height: 220px;
+  padding: 30px clamp(34px, 4vw, 56px) 32px 0;
   border-right: 1px solid var(--tp-observation-line);
 }
 
-.tp-home-observation__temperature small {
+.tp-home-observation__status {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  color: #087f91;
-  font-size: 0.68rem;
-  font-weight: 770;
-  line-height: 1.4;
+  gap: 7px 12px;
 }
 
-.tp-home-observation__temperature small::before {
+.tp-home-observation__status > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--tp-observation-cyan);
+  font-size: 0.61rem;
+  font-weight: 820;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.tp-home-observation__status > span::before {
   flex: 0 0 auto;
   width: 6px;
   height: 6px;
@@ -104,38 +121,41 @@
   content: "";
 }
 
-.tp-home-observation__temperature strong {
-  margin-top: 6px;
-  font-size: clamp(4.6rem, 7vw, 7rem);
-  font-weight: 730;
+.tp-home-observation__status small {
+  color: #73868f;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.tp-home-observation__temperature > strong {
+  margin-top: 7px;
+  font-size: clamp(4.8rem, 7.2vw, 7.2rem);
+  font-weight: 690;
   font-variant-numeric: tabular-nums;
-  line-height: 0.86;
-  letter-spacing: -0.085em;
+  line-height: 0.84;
+  letter-spacing: -0.09em;
 }
 
 .tp-home-observation__temperature > span {
   color: #607680;
-  font-size: 0.88rem;
+  font-size: 0.84rem;
 }
 
 .tp-home-observation__metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: clamp(22px, 3.8vw, 52px);
   margin: 0;
+  padding: 30px 0 32px clamp(34px, 4vw, 56px);
 }
 
 .tp-home-observation__metrics > div {
   display: grid;
+  min-width: 0;
   align-content: center;
   gap: 7px;
-  min-width: 0;
-  min-height: 210px;
-  padding: 28px clamp(20px, 2.6vw, 34px);
-  border-right: 1px solid var(--tp-observation-line);
-}
-
-.tp-home-observation__metrics > div:last-child {
-  border-right: 0;
 }
 
 .tp-home-observation__metrics dt,
@@ -145,7 +165,7 @@
 
 .tp-home-observation__metrics dt {
   color: #748790;
-  font-size: 0.64rem;
+  font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -153,11 +173,48 @@
 
 .tp-home-observation__metrics dd {
   color: #173746;
-  font-size: clamp(1.22rem, 1.65vw, 1.62rem);
-  font-weight: 780;
+  font-size: clamp(1.35rem, 1.9vw, 1.9rem);
+  font-weight: 760;
   font-variant-numeric: tabular-nums;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.tp-home-observation__metrics small {
+  max-width: 150px;
+  color: #7b8d95;
+  font-size: 0.61rem;
+  line-height: 1.42;
+}
+
+.tp-home-observation__source-note {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: minmax(120px, 0.34fr) minmax(180px, 0.62fr) minmax(0, 1.3fr);
+  align-items: baseline;
+  gap: 8px 22px;
+  padding: 13px 0 14px;
+  border-top: 1px solid var(--tp-observation-line-soft);
+}
+
+.tp-home-observation__source-note > span {
+  color: #7b8c94;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.tp-home-observation__source-note > strong {
+  color: #294553;
+  font-size: 0.7rem;
+}
+
+.tp-home-observation__source-note p {
+  margin: 0;
+  color: #748790;
+  font-size: 0.67rem;
+  line-height: 1.48;
 }
 
 .tp-home-observation__unavailable {
@@ -195,22 +252,22 @@
   }
 
   .tp-home-observation__reading {
-    grid-template-columns: minmax(230px, 0.65fr) minmax(0, 1.35fr);
-  }
-
-  .tp-home-observation__metrics {
     grid-template-columns: 1fr;
   }
 
-  .tp-home-observation__metrics > div {
-    min-height: 70px;
-    padding: 16px 24px;
+  .tp-home-observation__temperature {
+    min-height: 0;
+    padding: 28px 0 30px;
     border-right: 0;
-    border-bottom: 1px solid var(--tp-observation-line);
+    border-bottom: 1px solid var(--tp-observation-line-soft);
   }
 
-  .tp-home-observation__metrics > div:last-child {
-    border-bottom: 0;
+  .tp-home-observation__metrics {
+    padding: 24px 0 26px;
+  }
+
+  .tp-home-observation__source-note {
+    grid-template-columns: minmax(120px, 0.4fr) minmax(180px, 0.7fr) minmax(0, 1.2fr);
   }
 }
 
@@ -229,23 +286,65 @@
     font-size: clamp(2.05rem, 10.5vw, 3rem);
   }
 
-  .tp-home-observation__reading {
-    grid-template-columns: 1fr;
+  .tp-home-observation__context p {
+    font-size: 0.8rem;
   }
 
-  .tp-home-observation__temperature {
-    min-height: 0;
-    padding: 26px 0 28px;
-    border-right: 0;
-    border-bottom: 1px solid var(--tp-observation-line);
-  }
-
-  .tp-home-observation__temperature strong {
+  .tp-home-observation__temperature > strong {
     font-size: clamp(4.7rem, 22vw, 6.4rem);
   }
 
+  .tp-home-observation__metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding: 22px 0 24px;
+  }
+
   .tp-home-observation__metrics > div {
-    padding-inline: 0;
+    align-content: start;
+  }
+
+  .tp-home-observation__metrics dt {
+    min-height: 30px;
+    font-size: 0.56rem;
+    line-height: 1.32;
+  }
+
+  .tp-home-observation__metrics dd {
+    font-size: clamp(1.05rem, 5vw, 1.35rem);
+  }
+
+  .tp-home-observation__metrics small {
+    display: none;
+  }
+
+  .tp-home-observation__source-note {
+    grid-template-columns: 1fr;
+    gap: 4px;
+    padding: 14px 0 16px;
+  }
+
+  .tp-home-observation__source-note p {
+    margin-top: 3px;
+  }
+}
+
+@media (max-width: 420px) {
+  .tp-home-observation {
+    width: calc(100% - 24px);
+  }
+
+  .tp-home-observation__status {
+    display: grid;
+    gap: 5px;
+  }
+
+  .tp-home-observation__metrics {
+    gap: 9px;
+  }
+
+  .tp-home-observation__metrics dd {
+    font-size: 1rem;
   }
 }
 
