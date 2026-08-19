@@ -26,9 +26,9 @@
   display: block;
   margin-bottom: 9px;
   color: #087f91;
-  font-size: 0.61rem;
+  font-size: 0.68rem;
   font-weight: 820;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
@@ -52,8 +52,8 @@
 .tp-home-observation__context p {
   margin: 0;
   color: #5e747f;
-  font-size: 0.79rem;
-  line-height: 1.65;
+  font-size: 0.88rem;
+  line-height: 1.68;
 }
 
 .tp-home-observation__context a {
@@ -62,7 +62,7 @@
   align-items: center;
   gap: 10px;
   color: #173847;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 800;
   text-decoration: underline;
   text-decoration-color: rgb(24 189 205 / 48%);
@@ -90,7 +90,7 @@
   align-items: center;
   gap: 8px;
   color: #087f91;
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   font-weight: 770;
   line-height: 1.4;
 }
@@ -115,7 +115,7 @@
 
 .tp-home-observation__temperature > span {
   color: #607680;
-  font-size: 0.82rem;
+  font-size: 0.88rem;
 }
 
 .tp-home-observation__metrics {
@@ -145,9 +145,9 @@
 
 .tp-home-observation__metrics dt {
   color: #748790;
-  font-size: 0.58rem;
+  font-size: 0.64rem;
   font-weight: 800;
-  letter-spacing: 0.075em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
@@ -175,7 +175,8 @@
 
 .tp-home-observation__unavailable span {
   color: #6d818a;
-  font-size: 0.76rem;
+  font-size: 0.84rem;
+  line-height: 1.5;
 }
 
 @media (max-width: 980px) {
