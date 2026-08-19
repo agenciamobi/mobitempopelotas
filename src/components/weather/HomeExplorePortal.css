@@ -20,9 +20,9 @@
 .tp-home-explore__heading > span,
 .tp-home-explore__group > small {
   color: #087f91;
-  font-size: 0.61rem;
+  font-size: 0.68rem;
   font-weight: 820;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
@@ -40,8 +40,8 @@
   max-width: 720px;
   margin: 17px 0 0;
   color: #5e747f;
-  font-size: 0.82rem;
-  line-height: 1.65;
+  font-size: 0.9rem;
+  line-height: 1.68;
 }
 
 .tp-home-explore__groups {
@@ -72,16 +72,16 @@
 
 .tp-home-explore__group > small {
   color: #71858e;
-  font-size: 0.56rem;
+  font-size: 0.62rem;
 }
 
 .tp-home-explore__group h3 {
   max-width: 23ch;
   margin: 0;
   color: #102f3f;
-  font-size: clamp(1.02rem, 1.24vw, 1.2rem);
+  font-size: clamp(1.06rem, 1.3vw, 1.24rem);
   font-weight: 760;
-  line-height: 1.2;
+  line-height: 1.22;
   letter-spacing: -0.032em;
   text-wrap: balance;
 }
@@ -90,8 +90,8 @@
   max-width: 35ch;
   margin: 0;
   color: #657983;
-  font-size: 0.76rem;
-  line-height: 1.58;
+  font-size: 0.84rem;
+  line-height: 1.62;
 }
 
 .tp-home-explore__group nav {
@@ -102,13 +102,13 @@
 
 .tp-home-explore__group nav a {
   display: flex;
-  min-height: 40px;
+  min-height: 42px;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   border-bottom: 1px solid rgb(7 30 47 / 7%);
   color: #173545;
-  font-size: 0.73rem;
+  font-size: 0.8rem;
   font-weight: 710;
   text-decoration: none;
   transition: color 150ms ease;
