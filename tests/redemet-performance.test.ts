@@ -13,20 +13,12 @@ const redemetFunctions = readFileSync("src/lib/redemet/redemet.functions.ts", "u
 const radarPage = readFileSync("src/routes/radar-e-satelite-pelotas.tsx", "utf8");
 const envExample = readFileSync(".env.example", "utf8");
 const cssEntry = readFileSync("src/production/production-styles.css", "utf8");
-const radarEditorialCss = readFileSync(
-  "src/production/styles/home-radar-editorial-v45.css",
+const radarComponent = readFileSync(
+  "src/production/components/home-radar-editorial.tsx",
   "utf8",
 );
-const radarCohesionCss = readFileSync(
-  "src/production/styles/home-radar-embrapa-cohesion-v46.css",
-  "utf8",
-);
-const radarUsabilityCss = readFileSync(
-  "src/production/styles/home-weekly-radar-usability-v47.css",
-  "utf8",
-);
-const weeklyPortal = readFileSync(
-  "src/production/components/home-trend-editorial-portal.tsx",
+const radarCss = readFileSync(
+  "src/production/components/home-radar-editorial.css",
   "utf8",
 );
 
@@ -133,25 +125,19 @@ test("STSC parser accepts the response shape observed in the REDEMET HAR", () =>
   );
 });
 
-test("radar editorial section skips offscreen rendering", () => {
-  assert.match(cssEntry, /home-radar-editorial-v45\.css/);
-  assert.match(cssEntry, /home-radar-embrapa-cohesion-v46\.css/);
-  assert.match(cssEntry, /home-weekly-radar-usability-v47\.css/);
-  assert.match(radarEditorialCss, /content-visibility:\s*auto/);
-  assert.match(radarEditorialCss, /contain-intrinsic-size:/);
-  assert.match(radarCohesionCss, /contain:\s*layout paint style/);
+test("radar editorial section skips offscreen rendering in its isolated component", () => {
+  assert.match(radarComponent, /className="tp-home-radar"/);
+  assert.match(radarComponent, /<WeatherMap regionalWeather=\{regionalWeather\} \/>/);
+  assert.match(radarCss, /content-visibility:\s*auto/);
+  assert.match(radarCss, /contain-intrinsic-size:/);
+  assert.doesNotMatch(cssEntry, /home-radar-editorial-v45\.css/);
+  assert.doesNotMatch(cssEntry, /home-weekly-radar-usability-v47\.css/);
 });
 
-test("radar final layers reduce expensive effects and preserve map gestures", () => {
-  assert.match(radarCohesionCss, /backdrop-filter:\s*none\s*!important/);
-  assert.match(radarCohesionCss, /grid-template-columns:\s*minmax\(300px, 0\.58fr\)/);
-  assert.match(radarUsabilityCss, /\.radar-player\s*\{[\s\S]*pointer-events:\s*none/);
-  assert.match(radarUsabilityCss, /map-canvas--satellite[\s\S]*width:\s*min\(680px/);
-  assert.match(radarUsabilityCss, /maplibregl-ctrl-bottom-right[\s\S]*top:\s*82px/);
-});
-
-test("weekly cards receive adaptive summaries for all visible days", () => {
-  assert.match(weeklyPortal, /weather\.daily\.slice\(1, 5\)/);
-  assert.match(weeklyPortal, /home-next-days__day-summary/);
-  assert.match(radarUsabilityCss, /home-next-days__day-summary/);
+test("radar isolated layer preserves map gestures and compact operational controls", () => {
+  assert.match(radarCss, /\.tp-home-radar \.map-canvas\s*\{[\s\S]*cursor:\s*grab/);
+  assert.match(radarCss, /\.tp-home-radar \.radar-player\s*\{[\s\S]*pointer-events:\s*none/);
+  assert.match(radarCss, /map-canvas--satellite[\s\S]*width:\s*min\(680px/);
+  assert.match(radarCss, /maplibregl-ctrl-bottom-right[\s\S]*top:\s*80px/);
+  assert.doesNotMatch(radarCss, /!important/);
 });
