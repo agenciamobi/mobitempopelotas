@@ -43,8 +43,8 @@ export function HomeObservationEditorial({
         </div>
         <div className="tp-home-observation__context">
           <p>
-            Diferente da previsão, esta seção mostra a observação local mais recente disponível da
-            Embrapa Clima Temperado.
+            Leitura observacional mais recente disponível da Embrapa Clima Temperado. Aqui o portal
+            separa o que foi medido do que ainda é previsão.
           </p>
           <Link href="/estacao-embrapa-pelotas">
             Ver dados completos da estação <span aria-hidden="true">→</span>
@@ -55,7 +55,10 @@ export function HomeObservationEditorial({
       {available ? (
         <div className="tp-home-observation__reading">
           <div className="tp-home-observation__temperature">
-            <small>{observationStatusLabel(observation)}</small>
+            <div className="tp-home-observation__status">
+              <span>Dado observado</span>
+              <small>{observationStatusLabel(observation)}</small>
+            </div>
             <strong>{formatNumber(weather.current.temperature)}°</strong>
             <span>
               {weather.current.feelsLike === null
@@ -72,6 +75,7 @@ export function HomeObservationEditorial({
                   ? "Indisponível"
                   : `${formatNumber(weather.current.humidity, 0)}%`}
               </dd>
+              <small>umidade relativa observada</small>
             </div>
             <div>
               <dt>Vento agora</dt>
@@ -80,12 +84,20 @@ export function HomeObservationEditorial({
                   ? "Indisponível"
                   : `${formatNumber(weather.current.windSpeed)} km/h`}
               </dd>
+              <small>velocidade na leitura atual</small>
             </div>
             <div>
               <dt>Chuva registrada hoje</dt>
               <dd>{formatNumber(observation.accumulated.rainDaily)} mm</dd>
+              <small>acumulado diário disponível</small>
             </div>
           </dl>
+
+          <div className="tp-home-observation__source-note">
+            <span>Fonte observacional</span>
+            <strong>Embrapa Clima Temperado</strong>
+            <p>Esta leitura descreve condições observadas; a previsão meteorológica aparece acima.</p>
+          </div>
         </div>
       ) : (
         <div className="tp-home-observation__unavailable" role="status">
