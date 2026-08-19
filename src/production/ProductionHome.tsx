@@ -1,13 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { useMemo } from "react";
 
-import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { HomeExplorePortal } from "@/components/weather/HomeExplorePortal";
 import type { WeatherCameraData } from "@/lib/cameras/cameras.types";
 import type { GuaibaObservationData } from "@/lib/hydrology/guaiba.server";
 import type { LagoonMonitoringNetworkData } from "@/lib/hydrology/lagoon-network.server";
 import type { LaranjalLevelData } from "@/lib/hydrology/laranjal-level.server";
-import { HOME_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import {
   toProductionAlerts,
@@ -15,6 +13,7 @@ import {
   toProductionSummaries,
   toProductionWeatherData,
 } from "@/production/adapters/home";
+import { HomeDataGuide } from "@/production/components/home-data-guide";
 import { HomeForecastEditorial } from "@/production/components/home-forecast-editorial";
 import { HomeLiveCameraBackground } from "@/production/components/home-live-camera-background";
 import { HomeObservationEditorial } from "@/production/components/home-observation-editorial";
@@ -118,7 +117,7 @@ export function ProductionHome({
             </p>
           </section>
           <HomeExplorePortal />
-          <EditorialContentSection id="como-interpretar-o-tempo" content={HOME_EDITORIAL_CONTENT} />
+          <HomeDataGuide />
         </main>
         <SiteFooter source={unavailableSource} />
       </div>
@@ -195,7 +194,7 @@ export function ProductionHome({
         <HomeObservationEditorial weather={weather} observation={observation} />
         <HomeWaterEditorial laranjal={laranjal} guaiba={guaiba} lagoon={lagoon} />
         <HomeExplorePortal />
-        <EditorialContentSection id="como-interpretar-o-tempo" content={HOME_EDITORIAL_CONTENT} />
+        <HomeDataGuide />
       </main>
 
       <SiteFooter source={weather.source} />
