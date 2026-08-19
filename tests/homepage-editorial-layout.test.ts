@@ -6,6 +6,7 @@ const cssEntry = readFileSync("src/production/production-styles.css", "utf8");
 const tsEntry = readFileSync("src/production/production-styles.ts", "utf8");
 const shellCss = readFileSync("src/production/styles/home-editorial-shell.css", "utf8");
 const heroCss = readFileSync("src/production/components/weather-hero-direction.css", "utf8");
+const alertPageCss = readFileSync("src/production/components/inmet-alerts-page.css", "utf8");
 const forecastCss = readFileSync(
   "src/production/components/home-forecast-editorial.css",
   "utf8",
@@ -68,6 +69,8 @@ test("the homepage uses one minimal late shell instead of global visual override
     "home-editorial-refinement-v2.css",
     "home-editorial-responsive-fix.css",
     "home-editorial-alignment-readable.css",
+    "home-editorial-clarity-v3.css",
+    "home-visitor-copy-v4.css",
     "home-journey-refinement-v5.css",
     "home-grid-alignment-v6.css",
     "home-cleanup-v39.css",
@@ -110,6 +113,15 @@ test("the homepage hero is fully owned by its local namespace", () => {
   assert.match(heroCss, /@media \(max-width: 720px\)/);
   assert.doesNotMatch(heroCss, /\.weather-hero/);
   assert.doesNotMatch(heroCss, /!important/);
+});
+
+test("the INMET alerts page owns refinements outside the homepage cascade", () => {
+  assert.match(alertPageCss, /Página de avisos do INMET/);
+  assert.match(alertPageCss, /\.inmet-alert-card\s*\{/);
+  assert.match(alertPageCss, /\.inmet-alert-area/);
+  assert.match(alertPageCss, /@media \(max-width: 560px\)/);
+  assert.doesNotMatch(alertPageCss, /\.site-shell--home-editorial/);
+  assert.doesNotMatch(alertPageCss, /!important/);
 });
 
 test("public homepage chapters are open and locally owned", () => {
