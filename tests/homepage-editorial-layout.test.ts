@@ -5,6 +5,7 @@ import test from "node:test";
 const cssEntry = readFileSync("src/production/production-styles.css", "utf8");
 const tsEntry = readFileSync("src/production/production-styles.ts", "utf8");
 const shellCss = readFileSync("src/production/styles/home-editorial-shell.css", "utf8");
+const heroCss = readFileSync("src/production/components/weather-hero-direction.css", "utf8");
 const forecastCss = readFileSync(
   "src/production/components/home-forecast-editorial.css",
   "utf8",
@@ -26,6 +27,16 @@ const guideCss = readFileSync("src/production/components/home-data-guide.css", "
 
 test("the homepage uses one minimal late shell instead of global visual override layers", () => {
   const removedLegacyLayers = [
+    "home-hero-curve-fixes.css",
+    "home-hero-alert-states.css",
+    "home-hero-composition.css",
+    "home-first-fold-refinement.css",
+    "home-first-fold-editorial-light.css",
+    "home-first-fold-editorial-light-refinement.css",
+    "home-first-fold-editorial-light-v2.css",
+    "home-first-fold-editorial-light-v2-responsive.css",
+    "home-first-fold-operational-v3.css",
+    "home-hero-stripe-adaptation.css",
     "home-alert-flow-v7.css",
     "home-alert-flow-v9.css",
     "home-detail-navigation-v10.css",
@@ -37,7 +48,21 @@ test("the homepage uses one minimal late shell instead of global visual override
     "home-operational-bridge-v21.css",
     "home-operational-bridge-v21-fix.css",
     "home-tomorrow-focus-v25.css",
+    "home-hero-condition-v29.css",
+    "home-hero-editorial-v34.css",
+    "home-hero-now-label-v35.css",
     "home-supporting-editorial-v37.css",
+    "home-hero-edge-to-edge-v43.css",
+    "home-hero-live-camera-v54.css",
+    "home-information-reorganization-v61.css",
+    "home-hero-proportional-v62.css",
+    "home-live-camera-native-scale-v63.css",
+    "home-live-camera-exact-geometry-v64.css",
+    "home-advisory-color-scope-v65.css",
+    "home-hero-alignment-v66.css",
+    "home-first-fold-magazine-v69.css",
+    "home-first-fold-editorial-v70.css",
+    "home-first-fold-editorial-v71.css",
     "home-editorial-current.css",
     "home-editorial-ux.css",
     "home-editorial-forecast.css",
@@ -67,6 +92,16 @@ test("the late homepage shell contains only transversal behavior", () => {
   assert.doesNotMatch(shellCss, /\.tp-home-(forecast|radar|observation|water|explore|guide|inmet|hero|alert)/);
   assert.doesNotMatch(shellCss, /!important/);
   assert.doesNotMatch(shellCss, /box-shadow/);
+});
+
+test("the homepage hero is fully owned by its local namespace", () => {
+  assert.match(heroCss, /Hero da Home — fonte autônoma de verdade/);
+  assert.match(heroCss, /\.tp-home-hero-shell\s*\{/);
+  assert.match(heroCss, /\.tp-home-hero\s*\{/);
+  assert.match(heroCss, /\.tp-home-hero__live-camera/);
+  assert.match(heroCss, /@media \(max-width: 700px\)/);
+  assert.doesNotMatch(heroCss, /\.weather-hero/);
+  assert.doesNotMatch(heroCss, /!important/);
 });
 
 test("public homepage chapters are open and locally owned", () => {
