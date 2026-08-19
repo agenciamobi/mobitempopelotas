@@ -19,6 +19,13 @@ function formatNumber(value: number | null, maximumFractionDigits = 1) {
   }).format(value);
 }
 
+function formatSignedCentimeters(value: number | null) {
+  if (value === null) return "Indisponível";
+  if (Math.abs(value) < 0.05) return "0 cm";
+  const signal = value > 0 ? "+" : "−";
+  return `${signal}${formatNumber(Math.abs(value))} cm`;
+}
+
 function formatUpdatedAt(value: string | null) {
   if (!value) return "Horário indisponível";
 
@@ -80,6 +87,7 @@ export function HomeWaterEditorial({
   const laranjalTrend = trendLabel(laranjal.trendCmPerHour);
   const guaibaTrend = trendLabel(guaiba.trendCmPerHour);
   const laranjalAvailable = laranjal.status !== "unavailable" && laranjal.currentLevel !== null;
+  const visibleStationCount = stations.length;
 
   return (
     <section
@@ -90,12 +98,17 @@ export function HomeWaterEditorial({
       <header className="tp-home-water__intro">
         <div>
           <span>Lagoa dos Patos · monitoramento local</span>
-          <h2 id="tp-home-water-title">Situação das águas no Laranjal e na Lagoa</h2>
+          <h2 id="tp-home-water-title">Nível da Lagoa no Laranjal e referências regionais</h2>
         </div>
-        <p>
-          O Laranjal é a referência local para Pelotas. Outros pontos ajudam a entender como o nível
-          varia ao longo da Lagoa dos Patos.
-        </p>
+        <div className="tp-home-water__intro-context">
+          <p>
+            Para Pelotas, a leitura do Laranjal é a referência principal. A rede regional entra como
+            contexto para acompanhar o comportamento da Lagoa dos Patos em outros pontos.
+          </p>
+          <Link href="/situacao-hidrologica-pelotas">
+            Abrir monitoramento hidrológico completo <span aria-hidden="true">→</span>
+          </Link>
+        </div>
       </header>
 
       <div className="tp-home-water__layout">
@@ -103,18 +116,18 @@ export function HomeWaterEditorial({
           <div className="tp-home-water__focus-topline">
             <div>
               <span>Praia do Laranjal</span>
-              <small>{laranjal.source.station}</small>
+              <small>Pelotas / RS · {laranjal.source.station}</small>
             </div>
             <b>
               {laranjal.status === "live"
-                ? "Dados atualizados"
+                ? "Leitura atualizada"
                 : laranjal.status === "stale"
-                  ? "Dados atrasados"
-                  : "Sem dados"}
+                  ? "Leitura atrasada"
+                  : "Sem leitura"}
             </b>
           </div>
 
-          <div className="tp-home-water__level">
+          <div className="tp-home-water__level" aria-label="Nível atual da Lagoa no Laranjal">
             <strong>{laranjalAvailable ? formatNumber(laranjal.currentLevel, 2) : "Sem leitura"}</strong>
             {laranjalAvailable ? <span>m</span> : null}
           </div>
@@ -126,22 +139,23 @@ export function HomeWaterEditorial({
 
           <dl className="tp-home-water__focus-metrics">
             <div>
-              <dt>6 horas</dt>
-              <dd>
-                {laranjal.change6hCm === null ? "Indisponível" : `${formatNumber(laranjal.change6hCm)} cm`}
-              </dd>
+              <dt>Mudança em 6 h</dt>
+              <dd>{formatSignedCentimeters(laranjal.change6hCm)}</dd>
             </div>
             <div>
-              <dt>24 horas</dt>
-              <dd>
-                {laranjal.change24hCm === null ? "Indisponível" : `${formatNumber(laranjal.change24hCm)} cm`}
-              </dd>
+              <dt>Mudança em 24 h</dt>
+              <dd>{formatSignedCentimeters(laranjal.change24hCm)}</dd>
             </div>
             <div>
               <dt>Última leitura</dt>
               <dd>{formatUpdatedAt(laranjal.updatedAt)}</dd>
             </div>
           </dl>
+
+          <div className="tp-home-water__focus-source">
+            <span>Fonte local</span>
+            <strong>{laranjal.source.name}</strong>
+          </div>
 
           <Link href="/nivel-da-lagoa-dos-patos-laranjal">
             Ver nível e histórico do Laranjal <span aria-hidden="true">→</span>
@@ -152,38 +166,46 @@ export function HomeWaterEditorial({
           <div className="tp-home-water__network-heading">
             <div>
               <span>Rede regional</span>
-              <strong>Outros pontos da Lagoa dos Patos</strong>
+              <strong>Três referências para entender a Lagoa</strong>
             </div>
             <small>
-              {lagoon.available} de {lagoon.total} locais com dados
+              {visibleStationCount} pontos exibidos · {lagoon.available} de {lagoon.total} disponíveis
             </small>
           </div>
 
-          <div className="tp-home-water__columns" aria-hidden="true">
-            <span>Local</span>
-            <span>Nível</span>
-            <span>Tendência</span>
-            <span>Situação</span>
-          </div>
+          <p className="tp-home-water__network-note">
+            Cada estação usa sua própria referência local de medição. Para interpretar a rede,
+            priorize tendência e situação do ponto em vez de comparar apenas o valor absoluto.
+          </p>
 
           <div className="tp-home-water__rows">
             {stations.map((station) => {
               const trend = trendLabel(station.trendCmPerHour);
               return (
-                <article key={station.station.id}>
-                  <div>
+                <article
+                  className={`tp-home-water__station is-risk-${station.risk}`}
+                  key={station.station.id}
+                >
+                  <div className="tp-home-water__station-place">
                     <strong>{station.station.city}</strong>
                     <span>{station.station.name}</span>
+                    <small>{station.station.role}</small>
                   </div>
-                  <b>
-                    {station.currentLevelCm === null
-                      ? "Sem leitura"
-                      : `${formatNumber(station.currentLevelCm)} cm`}
-                  </b>
-                  <span className={`is-${trend.direction}`}>
-                    {trend.symbol} {trend.label}
-                  </span>
-                  <small>{stationState(station)}</small>
+                  <div className="tp-home-water__station-level">
+                    <span>Nível</span>
+                    <b>
+                      {station.currentLevelCm === null
+                        ? "Sem leitura"
+                        : `${formatNumber(station.currentLevelCm)} cm`}
+                    </b>
+                  </div>
+                  <div className="tp-home-water__station-state">
+                    <strong>{stationState(station)}</strong>
+                    <span className={`is-${trend.direction}`}>
+                      {trend.symbol} {trend.label}
+                    </span>
+                    <small>{formatUpdatedAt(station.updatedAt)}</small>
+                  </div>
                 </article>
               );
             })}
@@ -191,23 +213,35 @@ export function HomeWaterEditorial({
 
           <div className="tp-home-water__guaiba">
             <div>
-              <span>{guaiba.station}</span>
-              <strong>Referência do Guaíba</strong>
+              <span>Contexto ao norte</span>
+              <strong>{guaiba.station}</strong>
+              <small>{guaiba.source.name}</small>
             </div>
-            <b>{guaiba.currentLevel === null ? "Sem leitura" : `${formatNumber(guaiba.currentLevel, 2)} m`}</b>
-            <span className={`is-${guaibaTrend.direction}`}>
-              {guaibaTrend.symbol} {guaibaTrend.label}
-            </span>
-            <small>{formatUpdatedAt(guaiba.updatedAt)}</small>
+            <div>
+              <span>Nível</span>
+              <b>{guaiba.currentLevel === null ? "Sem leitura" : `${formatNumber(guaiba.currentLevel, 2)} m`}</b>
+            </div>
+            <div>
+              <strong>Referência do Guaíba</strong>
+              <span className={`is-${guaibaTrend.direction}`}>
+                {guaibaTrend.symbol} {guaibaTrend.label}
+              </span>
+              <small>{formatUpdatedAt(guaiba.updatedAt)}</small>
+            </div>
           </div>
         </div>
       </div>
 
       <footer className="tp-home-water__footer">
-        <div className="tp-home-water__legend" aria-label="Legenda de tendência">
-          <span className="is-falling">↓ Baixando</span>
-          <span className="is-rising">↑ Subindo</span>
-          <span className="is-stable">→ Estável</span>
+        <div>
+          <div className="tp-home-water__legend" aria-label="Legenda de tendência">
+            <span className="is-falling">↓ Baixando</span>
+            <span className="is-rising">↑ Subindo</span>
+            <span className="is-stable">→ Estável</span>
+          </div>
+          <small>
+            Rede regional: {lagoon.source.name} · {lagoon.source.organizations}
+          </small>
         </div>
         <Link href="/situacao-hidrologica-pelotas">
           Ver situação completa das águas <span aria-hidden="true">→</span>
