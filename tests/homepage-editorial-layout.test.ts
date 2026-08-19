@@ -35,6 +35,7 @@ test("the homepage uses one minimal late shell instead of global visual override
     "theme-refinement.css",
     "theme-polish.css",
     "project-refinement.css",
+    "editorial-readable-final.css",
     "home.css",
     "home-lagoon-card.css",
     "home-location-and-level.css",
