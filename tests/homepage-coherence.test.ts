@@ -16,6 +16,8 @@ const forecastCss = readFileSync(
   "src/production/components/home-forecast-editorial.css",
   "utf8",
 );
+const trend = readFileSync("src/production/components/home-forecast-trend.tsx", "utf8");
+const trendCss = readFileSync("src/production/components/home-forecast-trend.css", "utf8");
 const radar = readFileSync("src/production/components/home-radar-editorial.tsx", "utf8");
 const radarCss = readFileSync(
   "src/production/components/home-radar-editorial.css",
@@ -54,11 +56,16 @@ test("the homepage radar shortcut resolves to the isolated regional monitor", ()
   assert.match(productionHome, /<HomeRadarEditorial regionalWeather=\{weather\.regional\} \/>/);
 });
 
-test("the homepage radar is isolated from the historical map-story cascade", () => {
+test("the homepage radar is isolated as a civic-tech monitoring console", () => {
   assert.match(radar, /className="tp-home-radar"/);
-  assert.match(radar, /import "\.\/home-radar-editorial\.css"/);
+  assert.match(radar, /Monitoramento em tempo real/);
+  assert.match(radar, /Radar e satélite para acompanhar chuva, nebulosidade e trovoadas/);
+  assert.match(radar, /Abrir monitoramento completo/);
   assert.match(radarCss, /\.tp-home-radar\s*\{[\s\S]*content-visibility:\s*auto/);
   assert.match(radarCss, /\.tp-home-radar__frame\s*\{[\s\S]*border:\s*1px solid/);
+  assert.match(radarCss, /\.tp-home-radar \.radar-player\s*\{[\s\S]*background:\s*#f8faf9/);
+  assert.match(radarCss, /\.tp-home-radar \.map-layer-switcher\s*\{[\s\S]*box-shadow:\s*none/);
+  assert.match(radarCss, /\.tp-home-radar__guide-items/);
   assert.doesNotMatch(radar, /home-map-story/);
   assert.doesNotMatch(radarCss, /\.home-map-story/);
   assert.doesNotMatch(radarCss, /!important/);
@@ -95,25 +102,40 @@ test("the homepage no longer renders the legacy editorial dashboard", () => {
 test("the hourly forecast headline is explicit, local and owned by the isolated component", () => {
   assert.match(forecast, /<h2 id="tp-home-forecast-title">Próximas horas em Pelotas<\/h2>/);
   assert.match(forecast, /className="tp-home-forecast"/);
+  assert.doesNotMatch(forecast, /tp-home-trend/);
   assert.doesNotMatch(forecast, /home-story--forecast/);
+});
+
+test("the weekly trend is a separate chapter immediately before radar", () => {
+  assert.match(trend, /className="tp-home-trend"/);
+  assert.match(trend, /Como o tempo deve evoluir na semana/);
+  assert.match(trendCss, /\.tp-home-trend__list/);
+  assert.match(
+    productionHome,
+    /<HomeForecastEditorial[\s\S]*<InmetOfficialForecastPanel[\s\S]*<HomeForecastTrend[\s\S]*<HomeRadarEditorial/,
+  );
 });
 
 test("the main meteorological narrative follows the definitive homepage order", () => {
   assert.match(
     productionHome,
-    /<HomeForecastEditorial[\s\S]*<InmetOfficialForecastPanel[\s\S]*<HomeRadarEditorial[\s\S]*<HomeObservationEditorial[\s\S]*<HomeWaterEditorial[\s\S]*<HomeExplorePortal/,
+    /<HomeForecastEditorial[\s\S]*<InmetOfficialForecastPanel[\s\S]*<HomeForecastTrend[\s\S]*<HomeRadarEditorial[\s\S]*<HomeObservationEditorial[\s\S]*<HomeWaterEditorial[\s\S]*<HomeExplorePortal/,
   );
 });
 
-test("the editorial forecast owns responsive styles without important overrides", () => {
+test("forecast and weekly trend own responsive styles without important overrides", () => {
   assert.match(forecast, /import "\.\/home-forecast-editorial\.css"/);
+  assert.match(trend, /import "\.\/home-forecast-trend\.css"/);
   assert.match(forecastCss, /\.tp-home-forecast\s*\{/);
   assert.match(forecastCss, /\.tp-home-forecast__hours/);
-  assert.match(forecastCss, /\.tp-home-forecast-week__list/);
+  assert.doesNotMatch(forecastCss, /tp-home-forecast-week/);
+  assert.match(trendCss, /\.tp-home-trend\s*\{/);
+  assert.match(trendCss, /\.tp-home-trend__list/);
   assert.match(forecastCss, /@media \(max-width: 1040px\)/);
   assert.match(forecastCss, /@media \(max-width: 700px\)/);
+  assert.match(trendCss, /@media \(max-width: 700px\)/);
   assert.doesNotMatch(forecastCss, /!important/);
-  assert.doesNotMatch(forecastCss, /\.home-story--forecast/);
+  assert.doesNotMatch(trendCss, /!important/);
 });
 
 test("the hero separates current wording from forecast wording", () => {
