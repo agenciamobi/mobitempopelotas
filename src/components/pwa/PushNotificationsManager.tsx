@@ -115,8 +115,6 @@ export function PushNotificationsManager() {
 
     const previousElement = document.activeElement as HTMLElement | null;
     const launcherElement = launcherRef.current;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -149,7 +147,6 @@ export function PushNotificationsManager() {
     window.requestAnimationFrame(() => dialogRef.current?.focus());
 
     return () => {
-      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
       window.requestAnimationFrame(() => (previousElement ?? launcherElement)?.focus());
     };
@@ -269,8 +266,8 @@ export function PushNotificationsManager() {
     const registration = await navigator.serviceWorker.ready;
     await registration.showNotification("Tempo Pelotas", {
       body: "Os avisos estão funcionando neste aparelho.",
-      icon: "/brand/tempo-pelotas-icon.svg",
-      badge: "/brand/tempo-pelotas-icon.svg",
+      icon: "/brand/tempo-pelotas-icon.png",
+      badge: "/brand/tempo-pelotas-icon.png",
       tag: "teste-tempo-pelotas",
       data: { url: "/" },
     });
@@ -288,6 +285,7 @@ export function PushNotificationsManager() {
         type="button"
         onClick={() => setIsOpen(true)}
         aria-haspopup="dialog"
+        aria-expanded={isOpen}
       >
         <span>
           <BellIcon />
@@ -299,7 +297,7 @@ export function PushNotificationsManager() {
         <div
           className="push-dialog-backdrop"
           role="presentation"
-          onMouseDown={() => setIsOpen(false)}
+          onPointerDown={() => setIsOpen(false)}
         >
           <section
             ref={dialogRef}
@@ -309,7 +307,7 @@ export function PushNotificationsManager() {
             aria-labelledby="push-dialog-title"
             aria-describedby="push-dialog-description"
             tabIndex={-1}
-            onMouseDown={(event) => event.stopPropagation()}
+            onPointerDown={(event) => event.stopPropagation()}
           >
             <button
               className="push-dialog-close"
