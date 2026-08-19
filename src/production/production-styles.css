@@ -76,13 +76,6 @@
 @import "./styles/header-template-refinement.css";
 @import "./styles/header-template-refinement-v2.css";
 @import "./styles/home-hero-stripe-adaptation.css";
-@import "./styles/home-alert-flow-v7.css";
-@import "./styles/home-alert-flow-v9.css";
-@import "./styles/home-detail-navigation-v10.css";
-@import "./styles/home-detail-content-v10.css";
-@import "./styles/home-cohesion-v12.css";
-@import "./styles/home-cohesion-v12-content.css";
-@import "./styles/home-navigation-v13.css";
 @import "./styles/home-final-cohesion-v20.css";
 @import "./styles/home-operational-bridge-v21.css";
 @import "./styles/home-operational-bridge-v21-fix.css";
