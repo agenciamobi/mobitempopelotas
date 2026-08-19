@@ -8,6 +8,10 @@ const shellCss = readFileSync("src/production/styles/home-editorial-shell.css", 
 const heroCss = readFileSync("src/production/components/weather-hero-direction.css", "utf8");
 const alertPageCss = readFileSync("src/production/components/inmet-alerts-page.css", "utf8");
 const brandCss = readFileSync("src/production/styles/brand-palette-theme.css", "utf8");
+const mobileUsabilityCss = readFileSync(
+  "src/production/styles/mobile-usability-refinement.css",
+  "utf8",
+);
 const waterSemanticCss = readFileSync(
   "src/production/styles/water-level-semantic-colors.css",
   "utf8",
@@ -127,6 +131,15 @@ test("the shared brand palette no longer styles obsolete homepage structures", (
   assert.doesNotMatch(brandCss, /\.site-header--hero/);
   assert.doesNotMatch(brandCss, /\.dashboard-layout--after-hero/);
   assert.doesNotMatch(brandCss, /\.hydrology-home/);
+});
+
+test("shared mobile usability does not restyle the isolated homepage", () => {
+  assert.match(mobileUsabilityCss, /Usabilidade mobile compartilhada/);
+  assert.match(mobileUsabilityCss, /\.mobile-tab-bar/);
+  assert.match(mobileUsabilityCss, /\.pwa-launcher/);
+  assert.doesNotMatch(mobileUsabilityCss, /\.site-shell--home\s+\.weather-hero/);
+  assert.doesNotMatch(mobileUsabilityCss, /\.site-shell--home\s*>\s*\.site-header--hero/);
+  assert.doesNotMatch(mobileUsabilityCss, /\.embrapa-observation-home/);
 });
 
 test("the homepage hero is fully owned by its local namespace", () => {
