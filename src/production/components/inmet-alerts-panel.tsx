@@ -7,6 +7,7 @@ import type {
 import type { AdvisoryLevel } from "@/production/lib/weather-insights";
 
 import "./inmet-alerts-home.css";
+import "./inmet-alerts-page.css";
 
 type InmetAlertsPanelProps = {
   data: InmetAlertsData;
@@ -258,132 +259,119 @@ export function InmetAlertsPanel({
 }: InmetAlertsPanelProps) {
   if (variant === "home") return <HomePanel data={data} advisoryLevel={advisoryLevel} />;
 
-  if (data.status === "unavailable") {
-    return (
-      <section className="inmet-alerts-section is-unavailable" aria-labelledby="inmet-alerts-title">
-        <header className="inmet-alerts-heading">
-          <div>
-            <span className="eyebrow">Avisos oficiais do INMET</span>
-            <h2 id="inmet-alerts-title">Avisos meteorológicos no Rio Grande do Sul</h2>
-          </div>
-          <span className="inmet-source-status">Não foi possível atualizar</span>
-        </header>
-        <div className="inmet-alerts-empty">
-          <strong>Não conseguimos consultar os avisos agora.</strong>
-          <p>Isso não significa que não existam avisos. Confira diretamente no site do INMET.</p>
-          <a href={data.source.portalUrl} target="_blank" rel="noreferrer">
-            Abrir site do INMET <span aria-hidden="true">↗</span>
-          </a>
-        </div>
-      </section>
-    );
-  }
-
-  if (data.alerts.length === 0) {
-    return (
-      <section className="inmet-alerts-section is-clear" aria-labelledby="inmet-alerts-title">
-        <header className="inmet-alerts-heading">
-          <div>
-            <span className="eyebrow">Avisos oficiais do INMET</span>
-            <h2 id="inmet-alerts-title">Avisos de tempo no Rio Grande do Sul</h2>
-          </div>
-          <span className="inmet-source-status">Atualizado</span>
-        </header>
-        <div className="inmet-alerts-empty">
-          <strong>O INMET não informa avisos ativos para o Rio Grande do Sul neste momento.</strong>
-          <p>
-            A situação pode mudar. O portal consulta novamente os dados em intervalos regulares.
-          </p>
-          <a href={data.source.portalUrl} target="_blank" rel="noreferrer">
-            Conferir no site do INMET <span aria-hidden="true">↗</span>
-          </a>
-        </div>
-      </section>
-    );
-  }
-
   const pelotas = data.alerts.filter((alert) => alert.relevance === "pelotas");
   const regional = data.alerts.filter((alert) => alert.relevance === "regional");
   const state = data.alerts.filter((alert) => alert.relevance === "state");
-  const groups = [
-    {
-      id: "pelotas",
-      title: "Avisos que incluem Pelotas",
-      description: "O aviso cita Pelotas diretamente.",
-      alerts: pelotas,
-    },
-    {
-      id: "regional",
-      title: "Avisos para áreas próximas à Zona Sul",
-      description: "Confira os municípios incluídos e o período de validade de cada aviso.",
-      alerts: regional,
-    },
-    {
-      id: "estado",
-      title: "Avisos para outras áreas do Rio Grande do Sul",
-      description: "Consulte estes avisos ao viajar ou acompanhar outras regiões do estado.",
-      alerts: state,
-    },
-  ].filter((group) => group.alerts.length > 0);
 
   return (
-    <section className="inmet-alerts-section" aria-labelledby="inmet-alerts-title">
+    <section
+      className={`inmet-alerts-section${data.status === "unavailable" ? " is-unavailable" : ""}`}
+      aria-labelledby="inmet-alerts-title"
+    >
       <header className="inmet-alerts-heading">
         <div>
-          <span className="eyebrow">Avisos oficiais do INMET</span>
-          <h2 id="inmet-alerts-title">Avisos de tempo no Rio Grande do Sul</h2>
+          <span className="eyebrow">Avisos oficiais</span>
+          <h2 id="inmet-alerts-title">INMET: o que está vigente agora</h2>
           <p>
-            {relevanceSummary(data)} Os avisos que incluem Pelotas e a Zona Sul aparecem primeiro.
+            Avisos meteorológicos oficiais em vigor ou programados para começar em até 48 horas,
+            organizados por relevância para Pelotas e a Zona Sul.
           </p>
         </div>
-        <div className="inmet-alerts-counts" aria-label="Quantidade de avisos por área">
-          <div>
-            <strong>{data.counts.pelotas}</strong>
-            <span>Pelotas</span>
-          </div>
-          <div>
-            <strong>{data.counts.regional}</strong>
-            <span>Zona Sul</span>
-          </div>
-          <div>
-            <strong>{data.counts.state}</strong>
-            <span>Outras áreas</span>
-          </div>
-        </div>
+        <span className="inmet-source-status">
+          {data.status === "live" ? "Consulta oficial ativa" : "Consulta oficial em contingência"}
+        </span>
       </header>
 
-      <div className="inmet-alert-groups">
-        {groups.map((group) => (
-          <section
-            className={`inmet-alert-group group-${group.id}`}
-            key={group.id}
-            aria-labelledby={`inmet-group-${group.id}`}
-          >
-            <header>
-              <div>
-                <h3 id={`inmet-group-${group.id}`}>{group.title}</h3>
-                <p>{group.description}</p>
-              </div>
-              <span>{group.alerts.length}</span>
-            </header>
-            <div className="inmet-alert-list">
-              {group.alerts.map((alert) => (
-                <AlertRow alert={alert} key={alert.id} />
-              ))}
-            </div>
-          </section>
-        ))}
+      <div className="inmet-alerts-counts" aria-label="Resumo dos avisos">
+        <div>
+          <strong>{data.counts.pelotas}</strong>
+          <span>Pelotas</span>
+        </div>
+        <div>
+          <strong>{data.counts.regional}</strong>
+          <span>Zona Sul</span>
+        </div>
+        <div>
+          <strong>{data.counts.state}</strong>
+          <span>Demais RS</span>
+        </div>
       </div>
 
+      {data.alerts.length ? (
+        <div className="inmet-alert-groups">
+          {pelotas.length ? (
+            <AlertGroup
+              title="Pelotas"
+              description="Avisos que incluem Pelotas entre os municípios informados pelo INMET."
+              alerts={pelotas}
+            />
+          ) : null}
+          {regional.length ? (
+            <AlertGroup
+              title="Zona Sul e entorno"
+              description="Avisos para municípios próximos, costa ou áreas regionais relacionadas à Zona Sul."
+              alerts={regional}
+            />
+          ) : null}
+          {state.length ? (
+            <AlertGroup
+              title="Outras áreas do Rio Grande do Sul"
+              description="Avisos estaduais sem indicação direta de Pelotas ou da Zona Sul."
+              alerts={state}
+            />
+          ) : null}
+        </div>
+      ) : (
+        <div className="inmet-alerts-empty">
+          <strong>
+            {data.status === "live"
+              ? "Nenhum aviso oficial vigente no momento"
+              : "Não foi possível confirmar os avisos oficiais agora"}
+          </strong>
+          <p>
+            {data.status === "live"
+              ? "A consulta automática do Tempo Pelotas continuará verificando novos avisos do INMET."
+              : "Quando a consulta do INMET estiver indisponível, o portal não deve interpretar ausência de dados como ausência de risco."}
+          </p>
+          <a href="https://alertas2.inmet.gov.br/" target="_blank" rel="noreferrer">
+            Consultar diretamente o INMET <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      )}
+
       <footer className="inmet-alerts-footer">
-        <p>
-          Última atualização: {formatDateTime(data.source.fetchedAt) ?? "horário não informado"}.
-          Consulte a área completa e as orientações no aviso original.
-        </p>
-        <a href={data.source.portalUrl} target="_blank" rel="noreferrer">
-          Abrir site oficial do INMET <span aria-hidden="true">↗</span>
+        <p>{relevanceSummary(data)}</p>
+        <a href={data.sourceUrl} target="_blank" rel="noreferrer">
+          Fonte oficial: INMET <span aria-hidden="true">↗</span>
         </a>
       </footer>
+    </section>
+  );
+}
+
+function AlertGroup({
+  title,
+  description,
+  alerts,
+}: {
+  title: string;
+  description: string;
+  alerts: InmetAlert[];
+}) {
+  return (
+    <section className="inmet-alert-group">
+      <header>
+        <div>
+          <h3>{title}</h3>
+          <p>{description}</p>
+        </div>
+        <span>{alerts.length}</span>
+      </header>
+      <div className="inmet-alert-list">
+        {alerts.map((alert) => (
+          <AlertRow key={alert.id} alert={alert} />
+        ))}
+      </div>
     </section>
   );
 }
