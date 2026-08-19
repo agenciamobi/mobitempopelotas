@@ -18,6 +18,7 @@ import {
 import { HomeEditorialDashboard } from "@/production/components/home-editorial-dashboard-semantic";
 import { HomeForecastEditorial } from "@/production/components/home-forecast-editorial";
 import { HomeLiveCameraBackground } from "@/production/components/home-live-camera-background";
+import { HomeRadarEditorial } from "@/production/components/home-radar-editorial";
 import { HomeSectionNavigation } from "@/production/components/home-section-navigation";
 import {
   hasVerifiedInmetAlertSemantics,
@@ -189,6 +190,7 @@ export function ProductionHome({
           station={recoveredData.weather.inmetStation}
           forecastWindSpeedKmh={forecastWindSpeedKmh}
         />
+        <HomeRadarEditorial regionalWeather={weather.regional} />
         <HomeEditorialDashboard
           weather={weather}
           advisoryLevel={headerLevel}
