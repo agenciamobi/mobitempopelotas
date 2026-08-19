@@ -708,3 +708,757 @@ Atualizar `PROJECT_CURRENT_STATE.md` no mesmo conjunto de mudanças sempre que o
 - conclusão ou criação de uma pendência estrutural importante.
 
 O objetivo é que uma pessoa possa abrir este arquivo meses depois e responder rapidamente: **o que o Tempo Pelotas faz hoje, de onde vêm os dados, como opera e o que ainda não está concluído?**
+
+## 26. Direção de produto aprovada — Tempo Pelotas público e Tempo Pelotas PRO
+
+A próxima evolução estrutural do projeto é transformar a área autenticada em um produto pago, mantendo o portal público útil, aberto e editorialmente simples.
+
+A regra central passa a ser:
+
+> **O Tempo Pelotas público informa. O Tempo Pelotas PRO analisa, compara, acompanha e interpreta.**
+
+O PRO não deve cobrar pelo simples acesso a uma imagem de satélite, radar, aviso oficial ou dado que já faz sentido permanecer público. O valor comercial deve vir da profundidade, organização, histórico, cruzamento entre fontes, personalização, alertas avançados, dados derivados e interpretação assistida por IA.
+
+### 26.1. Papel do portal público
+
+O portal público deve responder rapidamente às perguntas mais comuns:
+
+- como está o tempo agora;
+- vai chover e em qual janela;
+- qual é a previsão resumida para as próximas horas e dias;
+- existe alerta oficial;
+- como está o nível da Lagoa e a situação das águas;
+- onde consultar radar, satélite e câmeras;
+- quais são as principais medições locais.
+
+O front público deve continuar funcional sem autenticação, sem assinatura e sem chamada de IA no caminho crítico. A direção visual deve privilegiar informação simples, leitura editorial, identidade local e boa hierarquia, evitando transformar a Home em um dashboard técnico.
+
+### 26.2. Papel do PRO
+
+O PRO será a camada de inteligência meteorológica e hidrológica para usuários que precisam acompanhar Pelotas e a região em maior profundidade.
+
+O produto pago deve concentrar, progressivamente:
+
+- previsão horária expandida;
+- comparação entre fontes e modelos;
+- séries temporais e históricos ampliados;
+- acumulados de chuva;
+- evolução de temperatura, pressão, umidade, vento e rajadas;
+- comparação entre estações;
+- evolução hidrológica regional;
+- mais camadas em mapas, radar e satélite quando as fontes e permissões permitirem;
+- linhas do tempo e contexto temporal mais detalhado;
+- filtros por período e variável;
+- favoritos e locais de interesse;
+- dashboards configuráveis;
+- alertas personalizados;
+- exportação de dados e relatórios quando a origem permitir;
+- indicadores e dados derivados do próprio Tempo Pelotas;
+- análises automáticas com IA;
+- comparação interpretativa de cenários;
+- resumo do que mudou desde a última atualização;
+- consulta orientada aos dados em linguagem natural em etapa posterior.
+
+A primeira versão comercial deve preferir **um único plano PRO**. Não criar múltiplos tiers antes de existir evidência real de uso que justifique segmentação.
+
+## 27. Limite permanente para IA no produto
+
+A IA é uma camada opcional de interpretação e nunca uma dependência para acesso aos dados meteorológicos e hidrológicos.
+
+### 27.1. Front público
+
+Regra permanente:
+
+- não criar novos recursos públicos que chamem IA por acesso de página;
+- não expor chave, SDK ou chamada de modelo no navegador;
+- preferir regras determinísticas, templates, cálculos, reconciliação de fontes e snapshots persistidos;
+- manter fallback determinístico sempre disponível;
+- manter alertas oficiais independentes de IA;
+- não permitir que IA altere, substitua ou produza um aviso oficial.
+
+A exceção existente é o Weather AI atual, que já opera como snapshot editorial server-side, fora do carregamento da página, com quatro oportunidades diárias, fingerprint, reaproveitamento e teto mensal. Esse mecanismo pode permanecer enquanto for útil, mas não deve servir como justificativa para espalhar IA pelo front público.
+
+### 27.2. PRO
+
+No PRO, IA passa a ser parte legítima da proposta de valor, desde que continue controlada por orçamento e rastreabilidade.
+
+Toda utilidade de IA do PRO deve obrigatoriamente possuir:
+
+- identificador de recurso;
+- finalidade clara;
+- limite diário próprio;
+- eventual limite mensal financeiro;
+- modelo configurável;
+- cache e TTL;
+- fingerprint dos dados utilizados quando aplicável;
+- fallback não-IA ou estado explícito de indisponibilidade;
+- log de execução;
+- custo estimado;
+- motivo da execução;
+- política de exceção;
+- kill switch.
+
+A regra deve ser **limite por utilidade**, e não um único contador genérico para toda a plataforma.
+
+Exemplos de utilidades futuras:
+
+- `pro_weather_summary` — resumo refinado do cenário atual;
+- `pro_model_comparison` — comparação entre modelos/fontes;
+- `pro_change_detection` — o que mudou desde a análise anterior;
+- `pro_risk_interpretation` — interpretação de risco nas próximas horas sem substituir alertas oficiais;
+- `pro_hydrology_summary` — síntese da evolução das águas;
+- `pro_ask_data` — consulta explícita do assinante aos dados.
+
+Análises compartilhadas devem ser pré-geradas e reutilizadas por todos os assinantes enquanto os dados de origem forem compatíveis. Não gerar a mesma interpretação para cada pageview.
+
+Consultas realmente personalizadas, como `pro_ask_data`, devem consumir cota diária por usuário e existir somente após ação explícita do assinante.
+
+Exceções acima da cota normal só podem ocorrer por regra registrada, por exemplo evento severo, necessidade operacional ou acionamento administrativo. Toda exceção deve ficar auditável.
+
+## 28. Leitura do estado atual para chegada do PRO
+
+A base técnica atual reduz bastante o trabalho necessário para o produto pago, mas ainda não existe uma camada comercial completa.
+
+### 28.1. O que já pode ser reaproveitado
+
+- autenticação Google com Supabase Auth;
+- sessão SSR por cookies;
+- rota amigável `/conta`;
+- RLS e padrões de isolamento já existentes;
+- perfil do usuário;
+- preferências e consentimentos versionados;
+- exportação e exclusão de conta;
+- histórico/snapshots meteorológicos;
+- observação Embrapa centralizada;
+- arquivo de precisão de previsão;
+- mapa MapLibre e camadas meteorológicas existentes;
+- radar, satélite e STSC;
+- hidrologia regional;
+- Recharts;
+- rotinas server-side e crons;
+- Weather AI persistido e seu padrão de orçamento;
+- contratos automatizados e workflows de qualidade;
+- Lovable para sincronização/publicação do código conectado à `main`.
+
+### 28.2. O que ainda não existe
+
+No estado atual não há evidência no runtime de:
+
+- produto/plano comercial PRO;
+- provedor de cobrança definido;
+- checkout;
+- customer portal de cobrança;
+- webhooks de pagamento;
+- tabela de assinaturas;
+- estado de pagamento normalizado;
+- entitlement PRO;
+- guard server-side por recurso premium;
+- dashboard PRO separado da conta;
+- catálogo de features premium;
+- limite diário de IA por utilidade e por usuário;
+- camada de analytics de conversão/receita;
+- política documentada de uso comercial para cada nova fonte que venha a compor o PRO.
+
+O `package.json` atual também não contém SDK específico de cobrança. A escolha do provedor deve ser feita antes da fase de checkout, sem acoplar o modelo de dados central a um fornecedor específico.
+
+## 29. Arquitetura de infraestrutura para o PRO
+
+### 29.1. GitHub
+
+O repositório operacional permanece `agenciamobi/mobitempopelotas`, branch `main`.
+
+A implementação do PRO será feita diretamente na `main`, sem PR, conforme decisão operacional atual. Isso aumenta a importância de:
+
+- commits pequenos;
+- feature flags;
+- migrations compatíveis com versões anteriores;
+- CI antes de ativar recurso;
+- não misturar alteração estrutural de banco, cobrança e grande refino visual no mesmo commit;
+- nunca depender de force-push para correção.
+
+### 29.2. Lovable
+
+Lovable é o ambiente conectado de deploy, preview e sincronização do projeto.
+
+**Lovable não gerencia o Supabase deste projeto.**
+
+O código pode ser publicado pelo fluxo conectado ao Lovable, mas o banco de dados não deve ser considerado aplicado, migrado ou validado apenas porque uma alteração chegou ao deploy da aplicação.
+
+### 29.3. Supabase
+
+O Tempo Pelotas usa **Supabase externo**.
+
+O repositório mantém as migrations como fonte versionada da evolução do schema, mas aplicar uma migration ao ambiente oficial é uma etapa independente do deploy do Lovable.
+
+Regra para o PRO:
+
+1. criar migration retrocompatível no GitHub;
+2. revisar RLS, grants, funções e impactos de LGPD;
+3. aplicar no Supabase externo oficial;
+4. regenerar tipos quando necessário;
+5. validar o schema aplicado;
+6. somente depois habilitar no runtime a feature que depende daquela migration.
+
+Enquanto o Supabase externo não estiver acessível por ferramenta nesta sessão de trabalho, alterações de banco podem ser preparadas no repositório, mas **não podem ser declaradas como implantadas ou validadas em produção**.
+
+## 30. Modelo de dados alvo do PRO
+
+Os nomes definitivos podem ser ajustados na implementação, mas o domínio deve separar identidade, cobrança, entitlement, preferências de produto e consumo de IA.
+
+### 30.1. Cobrança e entitlement
+
+Estrutura recomendada:
+
+- `products` — produto lógico, inicialmente `tempo_pelotas_pro`;
+- `plans` — preço/ciclo e configuração comercial, inicialmente um plano principal;
+- `billing_customers` — vínculo entre usuário e identificador do provedor;
+- `subscriptions` — estado normalizado da assinatura;
+- `subscription_events` — eventos recebidos do provedor, com idempotência;
+- `entitlements` — direitos efetivos concedidos ao usuário.
+
+`subscriptions` não deve ser consultada pelo browser para decidir acesso. O backend resolve entitlement e entrega somente o necessário para a interface.
+
+Estados mínimos a normalizar, independentemente do provedor escolhido:
+
+- `incomplete`;
+- `active`;
+- `past_due`;
+- `canceled`;
+- `expired`.
+
+Se existir trial, grace period ou cancelamento ao fim do ciclo, a regra deve ser explícita e testada.
+
+### 30.2. Preferências PRO
+
+Estrutura recomendada:
+
+- `saved_locations` — locais/estações favoritos quando a funcionalidade existir;
+- `dashboard_preferences` — organização e filtros do painel;
+- `alert_rules` — regras personalizadas de chuva, vento, nível ou outros indicadores;
+- `report_preferences` — configuração de relatórios quando implementados.
+
+### 30.3. IA PRO
+
+Estrutura recomendada:
+
+- `ai_feature_policies` — limites, modelo, TTL, flag e política por utilidade;
+- `ai_daily_usage` — contador diário por utilidade e escopo;
+- `ai_usage_events` — log individual de tentativa/execução;
+- `ai_artifacts` — análises persistidas e reutilizáveis;
+- `ai_user_queries` — apenas se `Pergunte aos dados` for lançado, com retenção mínima e política própria.
+
+O mecanismo existente de `weather_ai_snapshots`, `weather_ai_monthly_usage` e `weather_ai_calls` deve ser preservado durante a transição. A unificação só deve ocorrer quando o novo gerenciador de orçamento estiver coberto por testes e sem risco de aumentar chamadas públicas.
+
+## 31. Entitlement e segurança de acesso
+
+O PRO precisa ser protegido no servidor. Esconder componente React não é controle de acesso.
+
+A aplicação deve evoluir para helpers server-side equivalentes a:
+
+- `requireAuthenticatedUser()`;
+- `getUserSubscription()`;
+- `getUserEntitlements()`;
+- `requireEntitlement("pro")`;
+- `requireFeature("model_comparison")`.
+
+Regras:
+
+- usuário não autenticado não acessa dados privados;
+- usuário autenticado sem assinatura ativa pode acessar `/conta`, checkout e páginas públicas, mas não o painel PRO;
+- usuário com entitlement ativo acessa os recursos contratados;
+- estado do front nunca é fonte de verdade;
+- resposta autenticada usa `private, no-store` e `Vary` apropriado;
+- nenhuma rota premium deve entrar no sitemap;
+- endpoints premium precisam de rate limit quando houver custo ou risco de abuso;
+- RLS continua sendo defesa adicional, não substituto do guard da aplicação.
+
+## 32. Cobrança — arquitetura antes de escolher provedor
+
+O provedor de cobrança ainda deve ser definido. O núcleo do produto deve ser provider-agnostic.
+
+Criar uma camada de adaptação com operações conceituais:
+
+- criar checkout;
+- consultar customer;
+- abrir portal de cobrança;
+- validar assinatura do webhook;
+- normalizar evento;
+- sincronizar assinatura;
+- cancelar/agendar cancelamento.
+
+Requisitos obrigatórios:
+
+- webhook com validação criptográfica;
+- idempotência por ID de evento;
+- processamento seguro contra replay;
+- log sanitizado;
+- atualização de entitlement somente no servidor;
+- reconciliação periódica opcional para detectar divergência entre banco local e provedor;
+- nenhum secret de cobrança no cliente.
+
+O fluxo de ativação alvo é:
+
+`checkout confirmado -> webhook válido -> subscription normalizada -> entitlement ativo -> acesso ao /painel`.
+
+Não liberar PRO apenas pelo retorno do navegador após o checkout.
+
+## 33. Arquitetura de rotas recomendada
+
+Separar claramente marketing, conta e produto autenticado.
+
+### Pública e indexável
+
+- `/pro` — apresentação do produto, diferenciais, preço e CTA;
+
+### Autenticada, noindex
+
+- `/conta` — identidade, assinatura, cobrança, privacidade e sessão;
+- `/painel` — visão geral do PRO;
+- `/painel/tempo` — previsão detalhada e séries;
+- `/painel/mapas` — camadas avançadas quando disponíveis;
+- `/painel/modelos` — comparação de fontes/modelos;
+- `/painel/aguas` — hidrologia detalhada;
+- `/painel/historico` — séries e comparação temporal;
+- `/painel/analises` — análises automáticas/IA;
+- `/painel/alertas` — regras personalizadas quando o canal estiver validado.
+
+Não é obrigatório lançar todas as subrotas na primeira versão. O shell deve permitir crescimento sem transformar `/conta` no dashboard técnico.
+
+## 34. Escopo recomendado para o primeiro PRO em produção
+
+A primeira versão paga deve ser forte o suficiente para justificar assinatura, mas menor que a visão final.
+
+### MVP comercial recomendado
+
+1. dashboard PRO com situação atual refinada;
+2. previsão horária mais extensa e filtros;
+3. gráficos de temperatura, chuva, vento/rajadas e pressão quando disponíveis;
+4. histórico e comparação temporal já sustentados pelo arquivo atual;
+5. hidrologia detalhada com evolução e comparação entre pontos disponíveis;
+6. mapa com controles e camadas adicionais que tenham uso/licença confirmados;
+7. comparação de duas ou mais fontes/modelos onde os dados forem estruturados e confiáveis;
+8. bloco `O que mudou`;
+9. resumo inteligente PRO compartilhado e persistido;
+10. tela de assinatura/estado de pagamento na conta.
+
+### Pode entrar após o primeiro lançamento
+
+- `Pergunte aos dados`;
+- relatórios PDF recorrentes;
+- exportações amplas;
+- alertas push avançados;
+- e-mail transacional/alertas por e-mail;
+- mais locais favoritos;
+- novos níveis de assinatura;
+- API comercial para terceiros.
+
+## 35. Diferença de produto entre público e PRO
+
+| Domínio | Público | PRO |
+| --- | --- | --- |
+| Agora | leitura simples | leitura refinada + séries/contexto |
+| Próximas horas | resumo | horizonte maior, filtros e gráficos |
+| Próximos dias | tendência simples | comparação, evolução e divergências |
+| Radar/satélite | visualização base | mais contexto, camadas/timeline conforme permissões |
+| Alertas oficiais | sempre públicos | públicos + contexto e personalização, sem substituir fonte oficial |
+| Lagoa/águas | nível e tendência principal | histórico, comparação, filtros e análise |
+| Histórico | visão pública limitada | histórico ampliado e comparação |
+| Modelos/fontes | fonte editorial consolidada | comparação explícita e divergências |
+| IA | somente mecanismo público já existente e controlado | análises refinadas, quotas por utilidade e recursos personalizados |
+| Exportação | apenas direitos LGPD da conta | dados/relatórios do produto quando permitido |
+| Personalização | preferências básicas | dashboard, favoritos, alertas e configurações avançadas |
+
+## 36. Governança das fontes antes da monetização
+
+O PRO não pode ser construído partindo do pressuposto de que toda informação publicamente acessível pode ser redistribuída comercialmente sem restrição.
+
+Antes de uma fonte ganhar uso novo dentro do produto pago, registrar:
+
+- instituição/fonte;
+- produto ou endpoint;
+- formato;
+- acesso autenticado ou público;
+- permissão de uso público;
+- permissão de uso comercial;
+- regras de redistribuição;
+- regras de cache/armazenamento;
+- possibilidade de gerar dados derivados;
+- atribuição obrigatória;
+- limites de uso/rate limit;
+- contato ou documento de referência;
+- data da última revisão;
+- decisão: `PUBLIC`, `PRO_ALLOWED`, `DERIVED_ONLY`, `VIEW_ONLY`, `BLOCKED`, `REVIEW`.
+
+Princípios:
+
+- não cobrar pela simples ocultação de um produto oficial que já é adequado ao portal aberto;
+- cobrar pela experiência, processamento, organização, histórico, comparação e interpretação desenvolvidos pelo Tempo Pelotas;
+- não extrair números por OCR de imagens para transformá-los em feed operacional sem endpoint estruturado e validação;
+- preservar atribuição visível;
+- manter CPTEC/SIGMA fora do runtime até a revisão institucional já planejada;
+- revisar qualquer nova camada REDEMET, INMET, ANA, SIMAGRO ou outra fonte antes de torná-la diferencial comercial.
+
+## 37. Design e UX do PRO
+
+A área pública e o PRO devem compartilhar identidade, mas não densidade.
+
+### Público
+
+Direção:
+
+- editorial;
+- data journalism;
+- identidade local;
+- informação simples;
+- poucas bordas e pouco ruído;
+- fotografia regional quando fizer sentido;
+- sem aparência de SaaS técnico na Home.
+
+### PRO
+
+Direção:
+
+- weather intelligence platform;
+- maior densidade informacional;
+- gráficos e comparação;
+- controles e filtros claros;
+- superfícies modulares;
+- navegação persistente do painel;
+- estados de atualização/fonte sempre visíveis;
+- sem ornamentação que prejudique leitura técnica.
+
+O PRO deve parecer mais poderoso que o front público, não apenas mais cheio.
+
+## 38. Alertas, PWA e notificações no PRO
+
+O código de Web Push existe, mas permanece suspenso para ativação pública enquanto a validação real de navegadores não for concluída.
+
+Para o PRO:
+
+- não usar Web Push como bloqueador do primeiro lançamento pago;
+- primeiro validar novamente service worker, inscrição, unsubscribe, permissões e rolagem;
+- depois vincular alertas personalizados a `alert_rules`;
+- deduplicar eventos;
+- aplicar cooldown;
+- registrar entrega e falha;
+- não transformar interpretação de IA em alerta oficial;
+- sempre priorizar dados/avisos oficiais quando o assunto for evento severo.
+
+## 39. LGPD, conta e cobrança no cenário PRO
+
+A chegada da assinatura amplia o escopo dos direitos do titular e da política de privacidade.
+
+Antes de produção:
+
+- exportação da conta deve incluir os novos dados pessoais que façam sentido exportar;
+- exclusão deve remover preferências e artefatos pessoais conforme a política definida;
+- registros fiscais/financeiros que precisem de retenção legal não devem ser apagados cegamente por cascade;
+- a política deve explicar quais dados de cobrança ficam no provedor e quais identificadores ficam no Tempo Pelotas;
+- prompts/consultas pessoais à IA devem ter retenção mínima;
+- logs de IA não devem registrar secrets nem dados desnecessários;
+- regras de alertas/localizações devem ser tratadas como dados pessoais do usuário;
+- consentimentos de marketing continuam separados de mensagens transacionais necessárias à assinatura.
+
+## 40. Observabilidade de produto e custo
+
+O PRO precisa nascer mensurável.
+
+Métricas mínimas:
+
+- visita à página `/pro`;
+- clique para assinar;
+- checkout iniciado;
+- checkout concluído;
+- assinatura ativa;
+- cancelamento;
+- falha/past due;
+- conversão visitante -> assinatura;
+- MRR/receita recorrente conforme o provedor;
+- churn;
+- assinantes ativos;
+- usuários PRO ativos por período;
+- uso por módulo;
+- custo de IA por utilidade;
+- custo de IA por assinante;
+- cache hit de análises compartilhadas;
+- chamadas evitadas por fingerprint;
+- erros por fonte externa;
+- tempo de resposta dos módulos PRO;
+- falhas de entitlement/webhook.
+
+Não registrar conteúdo pessoal de forma desnecessária apenas para analytics.
+
+## 41. Contratos e testes que devem existir antes do lançamento
+
+Criar cobertura específica do PRO sem depender apenas de teste visual.
+
+Contratos mínimos:
+
+- usuário anônimo não acessa `/painel`;
+- usuário autenticado sem entitlement não acessa PRO;
+- assinatura ativa concede entitlement;
+- assinatura cancelada expira conforme regra comercial;
+- webhook duplicado não duplica evento nem entitlement;
+- webhook inválido é recusado;
+- retorno de checkout sem webhook válido não libera acesso;
+- RLS impede leitura de assinatura/preferências de outro usuário;
+- rota PRO é `noindex`;
+- `/pro` pública permanece indexável;
+- quota diária de IA bloqueia chamada excedente;
+- exceção de IA exige motivo permitido;
+- cache/fingerprint evita nova chamada quando aplicável;
+- falha de IA não torna o painel meteorológico indisponível;
+- front público continua sem chamada direta de IA;
+- nenhum secret de cobrança, Gemini ou Supabase administrativo aparece no bundle cliente;
+- exclusão/exportação tratam as novas tabelas de forma coerente;
+- build, typecheck, lint incremental e árvore de rotas continuam verdes.
+
+E2E real obrigatório antes do lançamento:
+
+1. conta A sem assinatura;
+2. conta B com assinatura ativa;
+3. tentativa de isolamento cruzado;
+4. checkout sandbox;
+5. ativação por webhook;
+6. acesso ao painel;
+7. cancelamento;
+8. expiração/estado final;
+9. exportação de dados;
+10. exclusão da conta conforme política;
+11. login/logout em navegador real;
+12. validação mobile.
+
+## 42. Feature flags para implantação segura na `main`
+
+Como o trabalho será feito diretamente na `main`, recursos estruturais devem nascer desativados até o ambiente estar pronto.
+
+Flags recomendadas:
+
+- `PRO_ENABLED`;
+- `PRO_BILLING_ENABLED`;
+- `PRO_AI_ENABLED`;
+- `PRO_ALERTS_ENABLED`;
+- `PRO_MODEL_COMPARISON_ENABLED`.
+
+Regras:
+
+- flags estruturais devem ser avaliadas server-side quando protegem acesso/custo;
+- não usar flag cliente como segurança;
+- página pública `/pro` pode ser publicada antes do checkout, se deixar claro o estado comercial;
+- `/painel` não deve ser habilitado em produção antes de schema, entitlement e E2E estarem confirmados.
+
+## 43. Roadmap de implementação até produção
+
+### Fase 0 — decisão e documentação
+
+Estado: **iniciada por esta atualização**.
+
+Entregas:
+
+- consolidar público x PRO;
+- congelar regra de IA pública;
+- definir escopo inicial do PRO;
+- registrar infraestrutura correta: Lovable para deploy, Supabase externo separado;
+- manter `PROJECT_CURRENT_STATE.md` como fonte de direção.
+
+Critério de saída: equipe consegue explicar o produto pago sem depender de decisões implícitas.
+
+### Fase 1 — estabilizar a conta existente
+
+Entregas:
+
+- executar E2E com duas contas descartáveis;
+- corrigir qualquer falha de RLS, callback, sessão, exportação ou exclusão;
+- reconciliar documentação antiga que ainda mencione `/minha-conta` quando o fluxo vigente é `/conta`;
+- garantir que a conta atual continue funcional antes de introduzir cobrança.
+
+Critério de saída: autenticação e LGPD validadas ponta a ponta em produção/ambiente equivalente.
+
+### Fase 2 — auditoria das fontes para uso PRO
+
+Entregas:
+
+- criar matriz de uso/licença;
+- classificar fontes atuais;
+- marcar quais dados podem ser públicos, PRO, derivados, apenas visualização ou dependem de revisão;
+- impedir que uma camada incerta entre no MVP pago.
+
+Critério de saída: todos os recursos do MVP PRO têm origem e regra de uso conhecidas.
+
+### Fase 3 — fundação de banco e entitlement
+
+Entregas no repositório:
+
+- migrations de billing/subscription/entitlement;
+- RLS e grants;
+- tipos;
+- helpers server-side;
+- testes estáticos/de contrato;
+- flags desligadas por padrão.
+
+Checkpoint externo obrigatório:
+
+- aplicar migrations no Supabase externo;
+- validar schema real;
+- validar duas contas;
+- registrar evidência.
+
+Critério de saída: entitlement pode ser calculado com segurança sem qualquer cobrança real ainda.
+
+### Fase 4 — escolher e integrar cobrança
+
+Entregas:
+
+- escolher provedor;
+- definir preço e ciclo;
+- cadastrar produto/preço no provedor;
+- implementar adapter;
+- checkout server-side;
+- webhook validado e idempotente;
+- sincronização de assinatura;
+- estado da assinatura em `/conta`;
+- customer portal/cancelamento quando suportado;
+- sandbox completo.
+
+Critério de saída: pagamento de teste gera entitlement e cancelamento remove/agenda acesso conforme regra.
+
+### Fase 5 — shell do painel PRO sem IA
+
+Entregas:
+
+- `/painel` protegido no servidor;
+- navegação do painel;
+- visão geral;
+- data freshness e fontes visíveis;
+- componentes reutilizando dados atuais;
+- gráficos determinísticos;
+- histórico/hidrologia detalhados;
+- skeletons, empty states e erros por fonte;
+- mobile e acessibilidade.
+
+Critério de saída: já existe valor real suficiente no PRO mesmo com `PRO_AI_ENABLED=false`.
+
+### Fase 6 — profundidade de dados
+
+Entregas:
+
+- comparação entre fontes/modelos escolhidos;
+- séries mais longas quando sustentadas pelo arquivo;
+- novos agregados derivados;
+- mapa/camadas adicionais aprovadas;
+- comparativos hidrológicos;
+- favoritos/configurações essenciais.
+
+Critério de saída: o PRO não é apenas uma versão visualmente diferente do portal público.
+
+### Fase 7 — camada de IA PRO
+
+Entregas:
+
+- gateway único de IA server-side;
+- políticas por utilidade;
+- quotas diárias;
+- orçamento mensal;
+- artefatos persistidos;
+- fingerprint;
+- cache compartilhado;
+- logs e custo estimado;
+- kill switch;
+- primeira análise PRO: resumo refinado + `O que mudou`;
+- comparação interpretativa somente quando as fontes estruturadas sustentarem o conteúdo.
+
+Critério de saída: IA agrega interpretação sem criar dependência, duplicação de chamadas ou custo imprevisível.
+
+### Fase 8 — hardening comercial e operacional
+
+Entregas:
+
+- termos/privacidade atualizados;
+- política de cancelamento/reembolso conforme modelo comercial;
+- export/delete revisados;
+- rate limits;
+- observabilidade de cobrança;
+- dashboards de erro/custo;
+- backup/rollback de banco documentado;
+- smoke de rotas PRO;
+- Core Web Vitals e WCAG;
+- testes de navegador e mobile;
+- revisão de secrets;
+- revisão final das fontes usadas no plano pago.
+
+Critério de saída: checklist de produção sem bloqueadores críticos.
+
+### Fase 9 — lançamento controlado
+
+Sequência:
+
+1. publicar código com flags seguras;
+2. confirmar migrations do Supabase externo;
+3. confirmar cobrança em modo produção;
+4. fazer assinatura real controlada;
+5. verificar webhook e entitlement;
+6. acessar o painel como assinante real;
+7. testar cancelamento/portal;
+8. ativar `PRO_ENABLED`;
+9. ativar `PRO_BILLING_ENABLED`;
+10. manter `PRO_AI_ENABLED` inicialmente controlado se necessário;
+11. acompanhar erros, custo e conversão nas primeiras horas/dias;
+12. ampliar divulgação apenas depois da estabilidade operacional.
+
+## 44. Critérios de GO LIVE do Tempo Pelotas PRO
+
+O PRO só pode ser considerado em produção quando todos os itens críticos abaixo estiverem confirmados:
+
+- autenticação E2E real concluída;
+- Supabase externo com migrations aplicadas e RLS validada;
+- cobrança de produção configurada;
+- webhook assinado e idempotente;
+- assinatura ativa gera entitlement sem ação manual;
+- usuário sem assinatura não consegue contornar o guard;
+- cancelamento funciona conforme regra comercial;
+- `/painel` é noindex;
+- dados públicos continuam disponíveis sem login;
+- portal público funciona com IA desligada;
+- PRO funciona meteorologicamente com IA desligada;
+- quotas de IA e teto financeiro funcionam;
+- nenhuma chamada de IA ocorre por simples pageview público;
+- nenhuma fonte usada no MVP pago permanece com autorização de uso indefinida;
+- política de privacidade e conta cobrem cobrança e novos dados;
+- exportação/exclusão foram revisadas;
+- secrets não aparecem no cliente/logs;
+- smoke de produção passa;
+- CI aplicável está verde;
+- responsividade e acessibilidade foram testadas;
+- rollback de aplicação e banco está documentado.
+
+## 45. Prioridade imediata a partir desta decisão
+
+A ordem recomendada agora é:
+
+1. não ampliar mais a complexidade da Home pública sem necessidade;
+2. concluir refinos editoriais atuais do front simples;
+3. validar definitivamente o fluxo `/conta` com duas contas;
+4. auditar fontes para uso comercial/derivado;
+5. escolher provedor de cobrança e regra de preço;
+6. preparar migrations de subscription + entitlement;
+7. implementar guards do PRO ainda atrás de flag;
+8. construir o primeiro `/painel` sem IA;
+9. adicionar profundidade de dados;
+10. implementar IA PRO com orçamento por utilidade;
+11. executar hardening e lançamento controlado.
+
+Até a Fase 4, nenhuma tela deve sugerir que o PRO está disponível para compra em produção.
+
+A partir da implementação do PRO, este arquivo também deve ser atualizado quando ocorrer:
+
+- mudança de escopo público x PRO;
+- criação de plano/preço;
+- escolha ou troca de provedor de cobrança;
+- mudança de entitlement;
+- nova feature premium;
+- nova utilidade de IA;
+- alteração de quota/custo estrutural;
+- nova fonte usada como diferencial comercial;
+- mudança de política de cancelamento;
+- ativação de uma feature flag estrutural;
+- passagem de uma fase do roadmap para concluída.
