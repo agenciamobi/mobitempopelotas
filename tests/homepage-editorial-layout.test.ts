@@ -5,14 +5,15 @@ import test from "node:test";
 const cssEntry = readFileSync("src/production/production-styles.css", "utf8");
 const tsEntry = readFileSync("src/production/production-styles.ts", "utf8");
 const layoutCss = readFileSync("src/production/styles/home-editorial-layout.css", "utf8");
+const forecastCss = readFileSync(
+  "src/production/components/home-forecast-editorial.css",
+  "utf8",
+);
 
-test("the open-canvas homepage layer is the final global home layer", () => {
+test("the open-canvas homepage layer remains the final global home layer", () => {
   for (const entry of [cssEntry, tsEntry]) {
-    assert.match(entry, /home-editorial-forecast\.css/);
     assert.match(entry, /home-editorial-layout\.css/);
-    assert.ok(
-      entry.indexOf("home-editorial-forecast.css") < entry.indexOf("home-editorial-layout.css"),
-    );
+    assert.doesNotMatch(entry, /home-editorial-forecast\.css/);
   }
 });
 
@@ -31,6 +32,13 @@ test("legacy decorative chapter bars do not return on open homepage sections", (
     /\.home-observation-story::before,[\s\S]*\.home-explore-portal::before,[\s\S]*\.editorial-answer-section::before[\s\S]*display:\s*none !important/,
   );
   assert.match(layoutCss, /Remove marcadores de capítulo herdados das versões antigas/);
+});
+
+test("forecast is owned by its isolated component rather than the global cascade", () => {
+  assert.match(forecastCss, /\.tp-home-forecast\s*\{/);
+  assert.match(forecastCss, /\.tp-home-forecast__hours\s*\{/);
+  assert.match(forecastCss, /\.tp-home-forecast-week__list\s*\{/);
+  assert.doesNotMatch(forecastCss, /!important/);
 });
 
 test("open homepage chapters have an explicit mobile composition", () => {
