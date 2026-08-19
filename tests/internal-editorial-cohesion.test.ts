@@ -16,45 +16,46 @@ const headerMegaCss = readFileSync(
   "src/production/styles/header-megamenu-editorial-v52.css",
   "utf8",
 );
-const homeCurrentCss = readFileSync("src/production/styles/home-editorial-current.css", "utf8");
 const homeUxCss = readFileSync("src/production/styles/home-editorial-ux.css", "utf8");
 const homeForecastCss = readFileSync(
   "src/production/components/home-forecast-editorial.css",
   "utf8",
 );
-const homeLayoutCss = readFileSync("src/production/styles/home-editorial-layout.css", "utf8");
-const homeDirectionCss = readFileSync(
-  "src/production/components/home-editorial-dashboard-direction.css",
+const homeRadarCss = readFileSync(
+  "src/production/components/home-radar-editorial.css",
   "utf8",
 );
+const homeObservationCss = readFileSync(
+  "src/production/components/home-observation-editorial.css",
+  "utf8",
+);
+const homeWaterCss = readFileSync(
+  "src/production/components/home-water-editorial.css",
+  "utf8",
+);
+const homeExploreCss = readFileSync("src/components/weather/HomeExplorePortal.css", "utf8");
+const homeGuideCss = readFileSync("src/production/components/home-data-guide.css", "utf8");
 const homeFooterCss = readFileSync(
   "src/production/components/site-footer-home.css",
   "utf8",
 );
 const productionHome = readFileSync("src/production/ProductionHome.tsx", "utf8");
-const semanticDashboard = readFileSync(
-  "src/production/components/home-editorial-dashboard-semantic.tsx",
-  "utf8",
-);
 
-test("stable homepage layers preserve the canonical final global cascade", () => {
-  const stableHomeLayers = [
-    "home-editorial-current.css",
-    "home-editorial-ux.css",
+test("homepage has left the old global override architecture", () => {
+  const removedLayers = [
+    "home-editorial-forecast.css",
     "home-editorial-layout.css",
+    "home-radar-editorial-v45.css",
+    "home-weekly-radar-usability-v47.css",
+    "home-water-editorial-v49.css",
+    "home-water-semantic-v53.css",
+    "home-closing-editorial-v50.css",
+    "home-explore-refinement-v19.css",
   ];
 
   for (const entry of [cssEntry, tsEntry]) {
-    for (const layer of stableHomeLayers) {
-      assert.match(entry, new RegExp(layer.replace(".", "\\.")));
-    }
-
-    assert.doesNotMatch(entry, /home-editorial-forecast\.css/);
-
-    for (let index = 1; index < stableHomeLayers.length; index += 1) {
-      assert.ok(
-        entry.indexOf(stableHomeLayers[index - 1]) < entry.indexOf(stableHomeLayers[index]),
-      );
+    for (const layer of removedLayers) {
+      assert.doesNotMatch(entry, new RegExp(layer.replaceAll(".", "\\.")));
     }
   }
 });
@@ -71,39 +72,51 @@ test("internal footer preserves compact operational links", () => {
   assert.match(internalFixCss, /grid-template-columns:\s*repeat\(2/);
 });
 
-test("homepage replaces the embedded legacy directory with the complete portal directory", () => {
-  const explorePortalUsages = [...productionHome.matchAll(/<HomeExplorePortal\s*\/>/g)];
+test("homepage narrative is composed from isolated public chapters", () => {
+  assert.doesNotMatch(productionHome, /HomeEditorialDashboard/);
+  assert.match(productionHome, /<HomeForecastEditorial/);
+  assert.match(productionHome, /<HomeRadarEditorial/);
+  assert.match(productionHome, /<HomeObservationEditorial/);
+  assert.match(productionHome, /<HomeWaterEditorial/);
+  assert.match(productionHome, /<HomeExplorePortal/);
+  assert.match(productionHome, /<HomeDataGuide/);
+});
 
-  assert.ok(explorePortalUsages.length >= 2, "normal and unavailable states must expose navigation");
-  assert.match(semanticDashboard, /hasClass\(className, "home-explore-story"\)/);
-  assert.match(semanticDashboard, /home-explore-story"\)\)\s*\{\s*return null;/);
+test("homepage chapters use local namespaces without important overrides", () => {
+  const componentLayers = [
+    [homeForecastCss, /\.tp-home-forecast/],
+    [homeRadarCss, /\.tp-home-radar/],
+    [homeObservationCss, /\.tp-home-observation/],
+    [homeWaterCss, /\.tp-home-water/],
+    [homeExploreCss, /\.tp-home-explore/],
+    [homeGuideCss, /\.tp-home-guide/],
+  ] as const;
+
+  for (const [css, namespace] of componentLayers) {
+    assert.match(css, namespace);
+    assert.doesNotMatch(css, /!important/);
+  }
 });
 
 test("Lagoa homepage is civic-tech data on an open editorial canvas", () => {
-  assert.match(homeDirectionCss, /Lagoa dos Patos — Civic Tech local/);
-  assert.match(homeDirectionCss, /\.home-water-table__rows article[\s\S]*border-bottom:/);
-  assert.match(homeLayoutCss, /\.home-story--water,[\s\S]*border:\s*0 !important/);
-  assert.match(homeLayoutCss, /\.home-water-story__layout[\s\S]*border-top:\s*1px solid var\(--home-open-line\) !important/);
-  assert.match(homeLayoutCss, /\.home-water-focus,[\s\S]*\.home-water-table[\s\S]*background:\s*transparent !important/);
+  assert.match(homeWaterCss, /Home — Lagoa dos Patos em linguagem Civic Tech local/);
+  assert.match(homeWaterCss, /\.tp-home-water__layout\s*\{[\s\S]*border-top:/);
+  assert.match(homeWaterCss, /\.tp-home-water__rows article/);
+  assert.doesNotMatch(homeWaterCss, /box-shadow/);
 });
 
 test("homepage directory is editorial navigation instead of a promotional card grid", () => {
-  assert.match(homeCurrentCss, /Diretório do portal/);
-  assert.match(homeLayoutCss, /\.home-explore-portal,[\s\S]*border:\s*0 !important/);
-  assert.match(homeLayoutCss, /\.home-explore-portal::before,[\s\S]*display:\s*none !important/);
-  assert.match(homeLayoutCss, /\.home-explore-portal-groups[\s\S]*border-top-color:\s*var\(--home-open-line\)/);
+  assert.match(homeExploreCss, /diretório editorial autocontido/i);
+  assert.match(homeExploreCss, /\.tp-home-explore__groups\s*\{[\s\S]*border-top:/);
+  assert.doesNotMatch(homeExploreCss, /border-radius/);
+  assert.doesNotMatch(homeExploreCss, /box-shadow/);
 });
 
-test("homepage answer section closes as an open editorial chapter", () => {
-  assert.match(homeCurrentCss, /Metodologia, transparência e FAQ/);
-  assert.match(
-    homeLayoutCss,
-    /#como-interpretar-o-tempo\.editorial-answer-section[\s\S]*border-top:\s*1px solid var\(--home-open-line\) !important/,
-  );
-  assert.match(
-    homeLayoutCss,
-    /\.editorial-answer-section::before,[\s\S]*\.editorial-answer-section::after[\s\S]*display:\s*none !important/,
-  );
+test("homepage guide closes as an open transparency chapter", () => {
+  assert.match(homeGuideCss, /guia de leitura e transparência editorial/i);
+  assert.match(homeGuideCss, /\.tp-home-guide\s*\{[\s\S]*border-top:/);
+  assert.match(homeGuideCss, /\.tp-home-guide__details\s*\{[\s\S]*border-top:/);
+  assert.doesNotMatch(homeGuideCss, /box-shadow/);
 });
 
 test("forecast keeps data-journalism hierarchy in its isolated component", () => {
@@ -135,9 +148,10 @@ test("desktop megamenu is opaque, compact and visibly interactive", () => {
 
 test("stable homepage composition covers tablet, mobile, focus and reduced motion", () => {
   assert.match(homeUxCss, /:focus-visible/);
-  assert.match(homeLayoutCss, /@media \(max-width: 980px\)/);
-  assert.match(homeLayoutCss, /@media \(max-width: 720px\)/);
-  assert.match(homeLayoutCss, /@media \(prefers-reduced-motion: reduce\)/);
-  assert.match(homeForecastCss, /@media \(max-width: 1040px\)/);
   assert.match(homeForecastCss, /@media \(max-width: 700px\)/);
+  assert.match(homeRadarCss, /@media \(max-width: 700px\)/);
+  assert.match(homeObservationCss, /@media \(max-width: 700px\)/);
+  assert.match(homeWaterCss, /@media \(max-width: 720px\)/);
+  assert.match(homeExploreCss, /@media \(max-width: 640px\)/);
+  assert.match(homeGuideCss, /@media \(max-width: 640px\)/);
 });
