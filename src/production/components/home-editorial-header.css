@@ -63,14 +63,14 @@
 }
 
 .home-editorial-header__actions {
-  gap: 7px !important;
+  gap: 10px !important;
 }
 
 .home-editorial-header .header-account-link {
   min-height: 34px !important;
-  padding-inline: 9px !important;
+  padding-inline: 7px !important;
   border: 0 !important;
-  border-radius: 4px !important;
+  border-radius: 0 !important;
   background: transparent !important;
   color: #536a77 !important;
   box-shadow: none !important;
@@ -80,37 +80,53 @@
 
 .home-editorial-header .header-account-link:hover,
 .home-editorial-header .header-account-link:focus-visible {
-  background: #f2f6f6 !important;
+  background: transparent !important;
   color: #071b2c !important;
   outline: none;
+  text-decoration: underline;
+  text-decoration-color: rgb(24 189 205 / 48%);
+  text-underline-offset: 4px;
 }
 
 .home-editorial-header__alert {
+  position: relative;
   min-height: 34px !important;
-  padding-inline: 9px !important;
-  border: 1px solid rgb(7 27 44 / 9%) !important;
-  border-radius: 4px !important;
-  background: #fff !important;
+  gap: 6px !important;
+  padding: 0 2px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
   color: #526b78 !important;
   box-shadow: none !important;
+  font-size: 0.65rem !important;
+  font-weight: 760 !important;
+}
+
+.home-editorial-header__alert svg {
+  width: 15px !important;
+  height: 15px !important;
 }
 
 .home-editorial-header__alert:hover,
 .home-editorial-header__alert:focus-visible {
-  border-color: rgb(24 189 205 / 28%) !important;
-  background: #f5fafa !important;
+  border: 0 !important;
+  background: transparent !important;
   color: #071b2c !important;
+  outline: none;
+  text-decoration: underline;
+  text-decoration-color: rgb(24 189 205 / 48%);
+  text-underline-offset: 4px;
 }
 
 .home-editorial-header__alert.is-attention {
-  border-color: rgb(242 112 53 / 26%) !important;
-  background: #fff9f5 !important;
+  border: 0 !important;
+  background: transparent !important;
   color: #a9471f !important;
 }
 
 .home-editorial-header__alert.is-warning {
-  border-color: rgb(207 52 44 / 28%) !important;
-  background: #fff6f5 !important;
+  border: 0 !important;
+  background: transparent !important;
   color: #ae3029 !important;
 }
 
@@ -175,7 +191,7 @@
 
   .home-editorial-header .header-account-link {
     min-height: 32px !important;
-    padding-inline: 6px !important;
+    padding-inline: 4px !important;
   }
 
   .home-editorial-header__alert {
