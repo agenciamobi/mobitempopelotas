@@ -25,17 +25,30 @@ const exploreCss = readFileSync("src/components/weather/HomeExplorePortal.css", 
 const guideCss = readFileSync("src/production/components/home-data-guide.css", "utf8");
 
 test("the homepage uses one minimal late shell instead of global visual override layers", () => {
+  const removedLegacyLayers = [
+    "home-alert-flow-v7.css",
+    "home-alert-flow-v9.css",
+    "home-detail-navigation-v10.css",
+    "home-detail-content-v10.css",
+    "home-cohesion-v12.css",
+    "home-cohesion-v12-content.css",
+    "home-navigation-v13.css",
+    "home-editorial-current.css",
+    "home-editorial-ux.css",
+    "home-editorial-forecast.css",
+    "home-editorial-layout.css",
+    "home-radar-editorial-v45.css",
+    "home-weekly-radar-usability-v47.css",
+    "home-water-editorial-v49.css",
+    "home-closing-editorial-v50.css",
+    "home-explore-refinement-v19.css",
+  ];
+
   for (const entry of [cssEntry, tsEntry]) {
     assert.match(entry, /home-editorial-shell\.css/);
-    assert.doesNotMatch(entry, /home-editorial-current\.css/);
-    assert.doesNotMatch(entry, /home-editorial-ux\.css/);
-    assert.doesNotMatch(entry, /home-editorial-forecast\.css/);
-    assert.doesNotMatch(entry, /home-editorial-layout\.css/);
-    assert.doesNotMatch(entry, /home-radar-editorial-v45\.css/);
-    assert.doesNotMatch(entry, /home-weekly-radar-usability-v47\.css/);
-    assert.doesNotMatch(entry, /home-water-editorial-v49\.css/);
-    assert.doesNotMatch(entry, /home-closing-editorial-v50\.css/);
-    assert.doesNotMatch(entry, /home-explore-refinement-v19\.css/);
+    for (const layer of removedLegacyLayers) {
+      assert.doesNotMatch(entry, new RegExp(layer.replaceAll(".", "\\.")));
+    }
   }
 });
 
