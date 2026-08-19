@@ -1,0 +1,62 @@
+/*
+ * Home — shell editorial mínimo.
+ * Mantém apenas comportamento transversal que deve atingir todos os capítulos
+ * autocontidos. A aparência de cada seção pertence ao seu próprio namespace.
+ */
+
+.site-shell--home-editorial {
+  --tp-home-canvas: #f4f6f6;
+  --tp-home-text: #071e2f;
+  --tp-home-focus: #18bdcd;
+  min-width: 0;
+  background: var(--tp-home-canvas);
+  color: var(--tp-home-text);
+}
+
+.site-shell--home-editorial .home-editorial-main {
+  display: block;
+  min-width: 0;
+  padding-bottom: 1px;
+  background: var(--tp-home-canvas);
+}
+
+.site-shell--home-editorial #previsao-hoje,
+.site-shell--home-editorial #regiao,
+.site-shell--home-editorial #observacao-embrapa,
+.site-shell--home-editorial #situacao-das-aguas,
+.site-shell--home-editorial #explorar-portal,
+.site-shell--home-editorial #como-interpretar-o-tempo {
+  scroll-margin-top: 92px;
+}
+
+.site-shell--home-editorial a,
+.site-shell--home-editorial button,
+.site-shell--home-editorial summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.site-shell--home-editorial a:focus-visible,
+.site-shell--home-editorial button:focus-visible,
+.site-shell--home-editorial summary:focus-visible {
+  outline: 2px solid rgb(24 189 205 / 48%);
+  outline-offset: 3px;
+}
+
+@media (max-width: 720px) {
+  .site-shell--home-editorial #previsao-hoje,
+  .site-shell--home-editorial #regiao,
+  .site-shell--home-editorial #observacao-embrapa,
+  .site-shell--home-editorial #situacao-das-aguas,
+  .site-shell--home-editorial #explorar-portal,
+  .site-shell--home-editorial #como-interpretar-o-tempo {
+    scroll-margin-top: 76px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell--home-editorial *,
+  .site-shell--home-editorial *::before,
+  .site-shell--home-editorial *::after {
+    scroll-behavior: auto;
+  }
+}
