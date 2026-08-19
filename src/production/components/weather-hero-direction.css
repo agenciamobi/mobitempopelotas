@@ -1,14 +1,222 @@
 /*
- * Hero da Home — direção editorial orientada a dados.
- * Mantém o palco magazine/broadcast e limita os fatos da primeira dobra
- * aos três sinais mais úteis para leitura imediata.
+ * Hero da Home — Magazine / Broadcast local.
+ * Fotografia real e leitura imediata dominam a primeira dobra; os dados aparecem
+ * como apoio editorial, sem transformar o palco em dashboard.
  */
 
-@media (min-width: 721px) {
+.site-shell--home-editorial .home-hero-camera-shell {
+  margin-top: 18px !important;
+}
+
+.site-shell--home-editorial .weather-hero.weather-hero--editorial-v71 {
+  overflow: hidden;
+  border-radius: 9px !important;
+  box-shadow: none !important;
+}
+
+.site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-photo {
+  filter: saturate(0.9) contrast(1.02) brightness(1.02) !important;
+  transform: scale(1.002) !important;
+}
+
+.site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-overlay {
+  background:
+    linear-gradient(
+      90deg,
+      rgb(4 18 31 / 88%) 0%,
+      rgb(4 18 31 / 74%) 31%,
+      rgb(4 18 31 / 49%) 56%,
+      rgb(4 18 31 / 18%) 78%,
+      rgb(4 18 31 / 14%) 100%
+    ),
+    linear-gradient(
+      180deg,
+      rgb(4 18 31 / 8%) 0%,
+      rgb(4 18 31 / 10%) 49%,
+      rgb(4 18 31 / 72%) 100%
+    ) !important;
+}
+
+.site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-editorial-copy {
+  max-width: 820px !important;
+}
+
+.site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-seo-title {
+  color: rgb(157 228 235 / 86%) !important;
+  font-size: 0.59rem !important;
+  font-weight: 820 !important;
+  letter-spacing: 0.105em !important;
+}
+
+.site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-editorial-temperature strong {
+  font-weight: 590 !important;
+  letter-spacing: -0.09em !important;
+  text-shadow: none !important;
+}
+
+.site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-editorial-condition p {
+  font-weight: 640 !important;
+}
+
+.site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-editorial-description {
+  max-width: 68ch !important;
+  color: rgb(255 255 255 / 76%) !important;
+}
+
+.site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-editorial-primary {
+  border-radius: 5px !important;
+  box-shadow: none !important;
+}
+
+.site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-editorial-secondary {
+  text-decoration-thickness: 1px;
+}
+
+.site-shell--home-editorial
+  .weather-hero--editorial-v71
+  .weather-hero-editorial-facts--essential {
+  max-width: 760px;
+  gap: clamp(22px, 3vw, 42px);
+  padding-top: 0.88rem !important;
+  grid-template-columns: 1.2fr repeat(2, minmax(0, 1fr));
+  border-top: 1px solid rgb(255 255 255 / 17%) !important;
+}
+
+.site-shell--home-editorial
+  .weather-hero--editorial-v71
+  .weather-hero-editorial-facts--essential
+  .weather-hero-editorial-fact,
+.site-shell--home-editorial
+  .weather-hero--editorial-v71
+  .weather-hero-editorial-facts--essential
+  .weather-hero-editorial-fact
+  + .weather-hero-editorial-fact {
+  padding: 0 !important;
+  border: 0 !important;
+}
+
+.site-shell--home-editorial
+  .weather-hero--editorial-v71
+  .weather-hero-editorial-facts--essential
+  .weather-hero-editorial-fact
+  span {
+  color: rgb(255 255 255 / 57%) !important;
+  font-size: 0.57rem !important;
+  letter-spacing: 0.055em !important;
+}
+
+.site-shell--home-editorial
+  .weather-hero--editorial-v71
+  .weather-hero-editorial-facts--essential
+  .weather-hero-editorial-fact
+  strong {
+  margin-top: 0.26rem !important;
+  font-size: 0.92rem !important;
+  font-weight: 720 !important;
+}
+
+.site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-editorial-hourly-strip {
+  margin-top: 0.92rem !important;
+  padding-top: 0.88rem !important;
+  border-top: 1px solid rgb(255 255 255 / 15%) !important;
+}
+
+.site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-editorial-hour {
+  border-left-color: rgb(255 255 255 / 10%) !important;
+}
+
+.site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-editorial-hour-time {
+  color: rgb(255 255 255 / 65%) !important;
+}
+
+.site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-editorial-hour > small {
+  color: rgb(255 255 255 / 49%) !important;
+}
+
+.site-shell--home-editorial .home-hero-camera-source {
+  margin-top: 0.62rem !important;
+}
+
+@media (max-width: 1040px) {
+  .site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-overlay {
+    background:
+      linear-gradient(
+        90deg,
+        rgb(4 18 31 / 84%) 0%,
+        rgb(4 18 31 / 62%) 55%,
+        rgb(4 18 31 / 30%) 100%
+      ),
+      linear-gradient(
+        180deg,
+        rgb(4 18 31 / 15%) 0%,
+        rgb(4 18 31 / 32%) 54%,
+        rgb(4 18 31 / 88%) 100%
+      ) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .site-shell--home-editorial .home-hero-camera-shell {
+    width: calc(100% - 16px) !important;
+    margin-top: 52px !important;
+  }
+
+  .site-shell--home-editorial .weather-hero.weather-hero--editorial-v71 {
+    border-radius: 7px !important;
+  }
+
+  .site-shell--home-editorial .weather-hero--editorial-v71 .weather-hero-overlay {
+    background:
+      linear-gradient(
+        180deg,
+        rgb(4 18 31 / 34%) 0%,
+        rgb(4 18 31 / 52%) 39%,
+        rgb(4 18 31 / 91%) 100%
+      ),
+      linear-gradient(90deg, rgb(4 18 31 / 50%) 0%, rgb(4 18 31 / 18%) 100%) !important;
+  }
+
   .site-shell--home-editorial
     .weather-hero--editorial-v71
     .weather-hero-editorial-facts--essential {
-    max-width: 720px;
-    grid-template-columns: 1.2fr repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+
+  .site-shell--home-editorial
+    .weather-hero--editorial-v71
+    .weather-hero-editorial-facts--essential
+    .weather-hero-editorial-fact:first-child {
+    grid-column: auto !important;
+    padding-bottom: 0 !important;
+    border-bottom: 0 !important;
+  }
+}
+
+@media (max-width: 460px) {
+  .site-shell--home-editorial
+    .weather-hero--editorial-v71
+    .weather-hero-editorial-facts--essential {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .site-shell--home-editorial
+    .weather-hero--editorial-v71
+    .weather-hero-editorial-facts--essential
+    .weather-hero-editorial-fact {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .site-shell--home-editorial
+    .weather-hero--editorial-v71
+    .weather-hero-editorial-facts--essential
+    .weather-hero-editorial-fact
+    strong {
+    margin-top: 0 !important;
+    text-align: right;
   }
 }
