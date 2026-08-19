@@ -1,32 +1,34 @@
 /*
- * Home — Lagoa dos Patos em linguagem Civic Tech local.
- * Laranjal é a referência principal; a rede regional entra como contexto comparável.
+ * Home — Lagoa dos Patos em linguagem Civic Tech local-first.
+ * Laranjal domina a leitura; a rede regional explica contexto sem virar dashboard.
  */
 
 .tp-home-water {
   --tp-water-line: rgb(7 30 47 / 10%);
+  --tp-water-line-soft: rgb(7 30 47 / 7%);
   --tp-water-muted: #667b86;
+  --tp-water-cyan: #087f91;
   width: min(1220px, calc(100% - 48px));
-  margin: 0 auto clamp(68px, 7vw, 98px);
-  padding-top: clamp(54px, 6vw, 82px);
+  margin: 0 auto clamp(72px, 7vw, 102px);
+  padding-top: clamp(58px, 6vw, 86px);
   border-top: 1px solid var(--tp-water-line);
   color: #071e2f;
   content-visibility: auto;
-  contain-intrinsic-size: auto 650px;
+  contain-intrinsic-size: auto 760px;
 }
 
 .tp-home-water__intro {
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(300px, 0.52fr);
+  grid-template-columns: minmax(0, 0.96fr) minmax(310px, 0.54fr);
   align-items: end;
-  gap: clamp(42px, 6vw, 90px);
-  margin-bottom: 30px;
+  gap: clamp(44px, 7vw, 96px);
+  margin-bottom: 34px;
 }
 
-.tp-home-water__intro > div > span {
+.tp-home-water__intro > div:first-child > span {
   display: block;
-  margin-bottom: 9px;
-  color: #087f91;
+  margin-bottom: 10px;
+  color: var(--tp-water-cyan);
   font-size: 0.68rem;
   font-weight: 820;
   letter-spacing: 0.09em;
@@ -34,36 +36,67 @@
 }
 
 .tp-home-water__intro h2 {
-  max-width: 790px;
+  max-width: 820px;
   margin: 0;
-  font-size: clamp(2.2rem, 3.7vw, 3.8rem);
-  font-weight: 770;
-  line-height: 0.98;
-  letter-spacing: -0.055em;
+  font-size: clamp(2.3rem, 3.9vw, 4rem);
+  font-weight: 750;
+  line-height: 0.97;
+  letter-spacing: -0.058em;
   text-wrap: balance;
 }
 
-.tp-home-water__intro > p {
-  margin: 0;
+.tp-home-water__intro-context {
+  display: grid;
+  gap: 15px;
   padding-top: 16px;
   border-top: 1px solid var(--tp-water-line);
+}
+
+.tp-home-water__intro-context p {
+  margin: 0;
   color: #5e747f;
   font-size: 0.88rem;
   line-height: 1.68;
 }
 
+.tp-home-water__intro-context a,
+.tp-home-water__focus > a,
+.tp-home-water__footer a {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 9px;
+  color: #173847;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-color: rgb(24 189 205 / 48%);
+  text-underline-offset: 5px;
+}
+
+.tp-home-water__intro-context a:hover,
+.tp-home-water__intro-context a:focus-visible,
+.tp-home-water__focus > a:hover,
+.tp-home-water__focus > a:focus-visible,
+.tp-home-water__footer a:hover,
+.tp-home-water__footer a:focus-visible {
+  color: #5e2ced;
+}
+
 .tp-home-water__layout {
   display: grid;
-  grid-template-columns: minmax(310px, 0.7fr) minmax(0, 1.3fr);
+  grid-template-columns: minmax(390px, 0.96fr) minmax(0, 1.04fr);
   border-top: 1px solid var(--tp-water-line);
   border-bottom: 1px solid var(--tp-water-line);
 }
 
+/* Laranjal: dado local protagonista. */
 .tp-home-water__focus {
   display: grid;
   align-content: start;
-  gap: 20px;
-  padding: 28px clamp(30px, 4vw, 48px) 30px 0;
+  gap: 22px;
+  min-width: 0;
+  padding: 32px clamp(34px, 4vw, 54px) 34px 0;
   border-right: 1px solid var(--tp-water-line);
 }
 
@@ -72,32 +105,32 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: 18px;
 }
 
 .tp-home-water__focus-topline > div,
 .tp-home-water__network-heading > div {
   display: grid;
-  gap: 3px;
+  gap: 4px;
 }
 
 .tp-home-water__focus-topline span,
 .tp-home-water__network-heading span {
   color: #173746;
   font-size: 0.84rem;
-  font-weight: 790;
+  font-weight: 800;
 }
 
 .tp-home-water__focus-topline small,
 .tp-home-water__network-heading small {
   color: #788b94;
-  font-size: 0.68rem;
-  line-height: 1.4;
+  font-size: 0.66rem;
+  line-height: 1.45;
 }
 
 .tp-home-water__focus-topline b {
-  color: #087f91;
-  font-size: 0.64rem;
+  color: var(--tp-water-cyan);
+  font-size: 0.6rem;
   font-weight: 820;
   letter-spacing: 0.065em;
   text-transform: uppercase;
@@ -107,36 +140,37 @@
 .tp-home-water__level {
   display: flex;
   align-items: flex-end;
-  gap: 9px;
+  gap: 10px;
+  min-height: 110px;
 }
 
 .tp-home-water__level strong {
-  font-size: clamp(4.4rem, 6.6vw, 6.7rem);
-  font-weight: 730;
+  font-size: clamp(5.2rem, 8.2vw, 8rem);
+  font-weight: 710;
   font-variant-numeric: tabular-nums;
-  line-height: 0.86;
-  letter-spacing: -0.085em;
+  line-height: 0.82;
+  letter-spacing: -0.095em;
 }
 
 .tp-home-water__level span {
-  padding-bottom: 7px;
+  padding-bottom: 8px;
   color: #58707b;
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.12rem;
+  font-weight: 720;
 }
 
 .tp-home-water__trend {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   margin: 0;
   color: #526b76;
-  font-size: 0.84rem;
-  font-weight: 670;
+  font-size: 0.9rem;
+  font-weight: 700;
 }
 
 .tp-home-water__trend b {
-  font-size: 1rem;
+  font-size: 1.05rem;
 }
 
 .tp-home-water .is-rising {
@@ -151,19 +185,24 @@
   color: #667b86;
 }
 
+.tp-home-water .is-unknown {
+  color: #788b94;
+}
+
 .tp-home-water__focus-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 0;
   border-top: 1px solid var(--tp-water-line);
+  border-bottom: 1px solid var(--tp-water-line);
 }
 
 .tp-home-water__focus-metrics > div {
   display: grid;
-  gap: 5px;
+  gap: 6px;
   min-width: 0;
-  padding: 13px 12px 2px;
-  border-right: 1px solid var(--tp-water-line);
+  padding: 15px 14px 16px;
+  border-right: 1px solid var(--tp-water-line-soft);
 }
 
 .tp-home-water__focus-metrics > div:first-child {
@@ -182,7 +221,7 @@
 
 .tp-home-water__focus-metrics dt {
   color: #7a8d95;
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   font-weight: 800;
   letter-spacing: 0.065em;
   text-transform: uppercase;
@@ -190,129 +229,184 @@
 
 .tp-home-water__focus-metrics dd {
   color: #203f4e;
-  font-size: 0.78rem;
-  font-weight: 720;
+  font-size: 0.82rem;
+  font-weight: 760;
+  font-variant-numeric: tabular-nums;
   line-height: 1.4;
 }
 
-.tp-home-water__focus > a,
-.tp-home-water__footer > a {
-  display: inline-flex;
-  width: fit-content;
-  align-items: center;
-  gap: 10px;
-  color: #173847;
-  font-size: 0.78rem;
-  font-weight: 800;
-  text-decoration: underline;
-  text-decoration-color: rgb(24 189 205 / 48%);
-  text-underline-offset: 5px;
+.tp-home-water__focus-source {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  color: #758992;
 }
 
-.tp-home-water__network {
-  min-width: 0;
-  padding: 28px 0 0 clamp(30px, 4vw, 48px);
-}
-
-.tp-home-water__network-heading {
-  min-height: 52px;
-  padding-bottom: 14px;
-}
-
-.tp-home-water__network-heading strong {
-  color: #173746;
-  font-size: 1.05rem;
-  line-height: 1.3;
-}
-
-.tp-home-water__columns,
-.tp-home-water__rows article,
-.tp-home-water__guaiba {
-  display: grid;
-  grid-template-columns: minmax(150px, 1.15fr) minmax(88px, 0.56fr) minmax(150px, 0.9fr) minmax(116px, 0.75fr);
-  align-items: center;
-  gap: 14px;
-}
-
-.tp-home-water__columns {
-  min-height: 34px;
-  border-top: 1px solid var(--tp-water-line);
-  border-bottom: 1px solid var(--tp-water-line);
-  color: #83939a;
+.tp-home-water__focus-source span {
   font-size: 0.6rem;
   font-weight: 800;
   letter-spacing: 0.065em;
   text-transform: uppercase;
 }
 
-.tp-home-water__rows article {
-  min-height: 76px;
+.tp-home-water__focus-source strong {
+  color: #294553;
+  font-size: 0.72rem;
+  font-weight: 760;
+}
+
+/* Rede: contexto comparável, não segunda área protagonista. */
+.tp-home-water__network {
+  min-width: 0;
+  padding: 32px 0 0 clamp(34px, 4vw, 54px);
+}
+
+.tp-home-water__network-heading {
+  padding-bottom: 12px;
+}
+
+.tp-home-water__network-heading strong {
+  color: #173746;
+  font-size: 1.08rem;
+  line-height: 1.28;
+}
+
+.tp-home-water__network-heading > small {
+  max-width: 160px;
+  text-align: right;
+}
+
+.tp-home-water__network-note {
+  max-width: 670px;
+  margin: 0 0 18px;
+  color: #71848d;
+  font-size: 0.68rem;
+  line-height: 1.55;
+}
+
+.tp-home-water__rows {
+  border-top: 1px solid var(--tp-water-line);
+}
+
+.tp-home-water__station,
+.tp-home-water__guaiba {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(190px, 1.12fr) minmax(92px, 0.46fr) minmax(160px, 0.82fr);
+  align-items: center;
+  gap: 20px;
+  min-height: 112px;
   border-bottom: 1px solid var(--tp-water-line);
 }
 
-.tp-home-water__rows article > div {
+.tp-home-water__station::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -1px;
+  width: 2px;
+  background: transparent;
+  content: "";
+}
+
+.tp-home-water__station.is-risk-attention::before {
+  background: #e8a62a;
+}
+
+.tp-home-water__station.is-risk-flooding::before {
+  background: #c95843;
+}
+
+.tp-home-water__station-place,
+.tp-home-water__station-level,
+.tp-home-water__station-state,
+.tp-home-water__guaiba > div {
   display: grid;
-  gap: 2px;
+  min-width: 0;
+  gap: 4px;
 }
 
-.tp-home-water__rows article > div strong {
+.tp-home-water__station-place strong,
+.tp-home-water__station-state strong,
+.tp-home-water__guaiba strong {
   color: #173746;
-  font-size: 0.84rem;
+  font-size: 0.82rem;
+  font-weight: 780;
 }
 
-.tp-home-water__rows article > div span,
-.tp-home-water__rows article > span,
-.tp-home-water__rows article > small,
+.tp-home-water__station-place > span,
+.tp-home-water__station-place > small,
+.tp-home-water__station-state > span,
+.tp-home-water__station-state > small,
+.tp-home-water__station-level > span,
 .tp-home-water__guaiba span,
 .tp-home-water__guaiba small {
   color: #748791;
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   line-height: 1.45;
 }
 
-.tp-home-water__rows article > b,
-.tp-home-water__guaiba > b {
-  color: #1d3e4e;
-  font-size: 0.84rem;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
+.tp-home-water__station-place > small {
+  display: -webkit-box;
+  overflow: hidden;
+  max-width: 280px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
-.tp-home-water__rows article > span.is-rising,
-.tp-home-water__rows article > span.is-falling,
-.tp-home-water__rows article > span.is-stable,
-.tp-home-water__guaiba > span.is-rising,
-.tp-home-water__guaiba > span.is-falling,
-.tp-home-water__guaiba > span.is-stable {
-  font-weight: 700;
+.tp-home-water__station-level > span,
+.tp-home-water__guaiba > div:nth-child(2) > span {
+  color: #84949b;
+  font-size: 0.57rem;
+  font-weight: 800;
+  letter-spacing: 0.065em;
+  text-transform: uppercase;
+}
+
+.tp-home-water__station-level b,
+.tp-home-water__guaiba b {
+  color: #173746;
+  font-size: 1rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.tp-home-water__station-state > span {
+  font-weight: 720;
 }
 
 .tp-home-water__guaiba {
-  min-height: 70px;
-  background: #f7f9f8;
+  min-height: 98px;
+  background: rgb(7 30 47 / 2%);
 }
 
-.tp-home-water__guaiba > div {
-  display: grid;
-  gap: 2px;
-}
-
-.tp-home-water__guaiba > div span {
-  color: #758992;
-  font-size: 0.66rem;
-}
-
-.tp-home-water__guaiba > div strong {
-  color: #274552;
-  font-size: 0.78rem;
+.tp-home-water__guaiba > div:first-child > span {
+  color: var(--tp-water-cyan);
+  font-size: 0.57rem;
+  font-weight: 800;
+  letter-spacing: 0.065em;
+  text-transform: uppercase;
 }
 
 .tp-home-water__footer {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 24px;
-  padding-top: 18px;
+  gap: 28px;
+  padding-top: 20px;
+}
+
+.tp-home-water__footer > div {
+  display: grid;
+  gap: 8px;
+}
+
+.tp-home-water__footer > div > small {
+  color: #7b8d95;
+  font-size: 0.62rem;
+  line-height: 1.45;
 }
 
 .tp-home-water__legend {
@@ -322,11 +416,11 @@
 }
 
 .tp-home-water__legend span {
-  font-size: 0.68rem;
-  font-weight: 700;
+  font-size: 0.66rem;
+  font-weight: 720;
 }
 
-@media (max-width: 1040px) {
+@media (max-width: 1080px) {
   .tp-home-water {
     width: calc(100% - 40px);
   }
@@ -334,11 +428,11 @@
   .tp-home-water__intro {
     grid-template-columns: 1fr;
     align-items: start;
-    gap: 22px;
+    gap: 24px;
   }
 
-  .tp-home-water__intro > p {
-    max-width: 720px;
+  .tp-home-water__intro-context {
+    max-width: 760px;
   }
 
   .tp-home-water__layout {
@@ -352,78 +446,132 @@
   }
 
   .tp-home-water__network {
-    padding: 28px 0 0;
+    padding: 32px 0 0;
+  }
+
+  .tp-home-water__level strong {
+    font-size: clamp(5rem, 12vw, 7.2rem);
   }
 }
 
 @media (max-width: 720px) {
   .tp-home-water {
     width: calc(100% - 32px);
-    margin-bottom: 58px;
-    padding-top: 44px;
+    margin-bottom: 60px;
+    padding-top: 46px;
+    contain-intrinsic-size: auto 1080px;
+  }
+
+  .tp-home-water__intro {
+    margin-bottom: 26px;
   }
 
   .tp-home-water__intro h2 {
-    font-size: clamp(2.05rem, 10.5vw, 3rem);
+    font-size: clamp(2.05rem, 10.5vw, 3.05rem);
+  }
+
+  .tp-home-water__focus {
+    gap: 20px;
+    padding: 26px 0 30px;
+  }
+
+  .tp-home-water__focus-topline {
+    display: grid;
+  }
+
+  .tp-home-water__focus-topline b {
+    width: fit-content;
   }
 
   .tp-home-water__level strong {
-    font-size: clamp(4.5rem, 22vw, 6.2rem);
+    font-size: clamp(5rem, 23vw, 6.8rem);
   }
 
   .tp-home-water__focus-metrics {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .tp-home-water__focus-metrics > div,
   .tp-home-water__focus-metrics > div:first-child,
   .tp-home-water__focus-metrics > div:last-child {
-    padding: 10px 0;
-    border-right: 0;
-    border-bottom: 1px solid var(--tp-water-line);
+    padding: 12px 8px;
+  }
+
+  .tp-home-water__focus-metrics > div:first-child {
+    padding-left: 0;
   }
 
   .tp-home-water__focus-metrics > div:last-child {
-    border-bottom: 0;
+    padding-right: 0;
   }
 
-  .tp-home-water__columns {
-    display: none;
+  .tp-home-water__focus-metrics dd {
+    font-size: 0.72rem;
   }
 
-  .tp-home-water__rows article,
+  .tp-home-water__network-heading {
+    display: grid;
+    gap: 8px;
+  }
+
+  .tp-home-water__network-heading > small {
+    max-width: none;
+    text-align: left;
+  }
+
+  .tp-home-water__station,
   .tp-home-water__guaiba {
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 7px 18px;
-    padding: 14px 0;
+    gap: 12px 18px;
+    min-height: 0;
+    padding: 18px 0;
   }
 
-  .tp-home-water__rows article > div,
-  .tp-home-water__guaiba > div {
+  .tp-home-water__station-place,
+  .tp-home-water__guaiba > div:first-child {
     grid-column: 1;
   }
 
-  .tp-home-water__rows article > b,
-  .tp-home-water__guaiba > b {
+  .tp-home-water__station-level,
+  .tp-home-water__guaiba > div:nth-child(2) {
     grid-column: 2;
     grid-row: 1;
+    align-self: start;
     text-align: right;
   }
 
-  .tp-home-water__rows article > span,
-  .tp-home-water__guaiba > span {
-    grid-column: 1;
+  .tp-home-water__station-state,
+  .tp-home-water__guaiba > div:nth-child(3) {
+    grid-column: 1 / -1;
+    padding-top: 10px;
+    border-top: 1px solid var(--tp-water-line-soft);
   }
 
-  .tp-home-water__rows article > small,
-  .tp-home-water__guaiba > small {
-    grid-column: 2;
-    text-align: right;
+  .tp-home-water__station-place > small {
+    max-width: 100%;
   }
 
   .tp-home-water__footer {
-    align-items: flex-start;
     flex-direction: column;
+  }
+}
+
+@media (max-width: 460px) {
+  .tp-home-water {
+    width: calc(100% - 24px);
+  }
+
+  .tp-home-water__focus-metrics {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tp-home-water__focus-metrics > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .tp-home-water__focus-metrics > div:last-child {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--tp-water-line-soft);
   }
 }
 
