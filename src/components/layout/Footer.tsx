@@ -95,6 +95,84 @@ const footerGroups = [
   },
 ] as const;
 
+const homeFooterGroups = [
+  {
+    title: "Previsão",
+    links: [
+      {
+        label: "Hoje em Pelotas",
+        ariaLabel: "Ver a previsão do tempo para hoje em Pelotas",
+        to: "/tempo-hoje-pelotas",
+      },
+      {
+        label: "Amanhã",
+        ariaLabel: "Ver a previsão do tempo para amanhã em Pelotas",
+        to: "/tempo-amanha-pelotas",
+      },
+      {
+        label: "Próximos 7 dias",
+        ariaLabel: "Ver a previsão do tempo para os próximos 7 dias em Pelotas",
+        to: "/previsao-7-dias-pelotas",
+      },
+      {
+        label: "Chuva em Pelotas",
+        ariaLabel: "Ver probabilidade e volume de chuva em Pelotas",
+        to: "/chuva-em-pelotas",
+      },
+    ],
+  },
+  {
+    title: "Monitoramento",
+    links: [
+      {
+        label: "Radar e satélite",
+        ariaLabel: "Acompanhar radar e satélite meteorológico para Pelotas e região",
+        to: "/radar-e-satelite-pelotas",
+      },
+      {
+        label: "Estação Embrapa",
+        ariaLabel: "Consultar dados meteorológicos da estação Embrapa em Pelotas",
+        to: "/estacao-embrapa-pelotas",
+      },
+      {
+        label: "Câmeras ao vivo",
+        ariaLabel: "Ver câmeras ao vivo de Pelotas e região",
+        to: "/cameras-ao-vivo-pelotas",
+      },
+      {
+        label: "Histórico climático",
+        ariaLabel: "Consultar o histórico climático recente de Pelotas",
+        to: "/historico-climatico-pelotas",
+      },
+    ],
+  },
+  {
+    title: "Águas e serviço",
+    links: [
+      {
+        label: "Nível no Laranjal",
+        ariaLabel: "Ver o nível da Lagoa dos Patos na Praia do Laranjal",
+        to: "/nivel-da-lagoa-dos-patos-laranjal",
+      },
+      {
+        label: "Situação das águas",
+        ariaLabel: "Ver a situação hidrológica de Pelotas e da Lagoa dos Patos",
+        to: "/situacao-hidrologica-pelotas",
+      },
+      {
+        label: "Avisos meteorológicos",
+        ariaLabel: "Consultar avisos meteorológicos oficiais para Pelotas",
+        to: "/alertas",
+      },
+      {
+        label: "Metodologia e fontes",
+        ariaLabel: "Conhecer a metodologia e as fontes do Tempo Pelotas",
+        to: "/metodologia",
+      },
+    ],
+  },
+] as const;
+
 const mobiUrl =
   "https://agenciamobi.com.br/?utm_source=tempopelotas&utm_medium=footer&utm_campaign=portal_tempo_pelotas";
 
@@ -110,49 +188,152 @@ function isActivePath(pathname: string, to: string) {
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 
-function footerClassName(className: string, variant: FooterVariant) {
-  if (variant !== "home") return className;
-
-  return className
-    .split(" ")
-    .map((token) =>
-      token.startsWith("editorial-footer")
-        ? token.replace("editorial-footer", "tp-home-footer")
-        : token,
-    )
-    .join(" ");
-}
-
 export function Footer({ source, variant = "default" }: FooterProps) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const lead = getFooterLead(pathname);
-  const cls = (className: string) => footerClassName(className, variant);
-  const titleId = variant === "home" ? "tp-home-footer-title" : "editorial-footer-title";
   const sourceStatus = source
     ? source.isFallback
       ? "Operação em contingência"
       : "Fontes identificadas"
     : "Fontes e método publicados";
 
+  if (variant === "home") {
+    return (
+      <footer className="tp-home-footer-shell">
+        <div className="tp-home-footer">
+          <section className="tp-home-footer-top" aria-labelledby="tp-home-footer-title">
+            <div className="tp-home-footer-identity">
+              <Link className="tp-home-footer-brand" to="/" aria-label="Tempo Pelotas — página inicial">
+                <img
+                  className="tp-home-footer-brand-logo"
+                  src="/brand/tempo-pelotas-purple.svg"
+                  alt=""
+                  width={344}
+                  height={50}
+                  loading="lazy"
+                  decoding="async"
+                  draggable={false}
+                />
+              </Link>
+              <h2 id="tp-home-footer-title">Tempo e água de Pelotas, com fonte visível.</h2>
+              <p>
+                Previsão, observação local, radar e hidrologia organizados para leitura rápida e
+                aprofundamento quando necessário.
+              </p>
+            </div>
+
+            <div
+              className={`tp-home-footer-status${source?.isFallback ? " is-fallback" : ""}`}
+              aria-label="Estado das fontes do portal"
+            >
+              <span aria-hidden="true" />
+              <div>
+                <small>Estado dos dados</small>
+                <strong>{sourceStatus}</strong>
+              </div>
+            </div>
+          </section>
+
+          <section className="tp-home-footer-directory" aria-label="Navegação principal do portal">
+            <div className="tp-home-footer-groups">
+              {homeFooterGroups.map((group) => (
+                <nav className="tp-home-footer-group" aria-label={group.title} key={group.title}>
+                  <strong>{group.title}</strong>
+                  <ul>
+                    {group.links.map((link) => (
+                      <li key={link.to}>
+                        <Link
+                          to={link.to}
+                          aria-label={link.ariaLabel}
+                          aria-current={isActivePath(pathname, link.to) ? "page" : undefined}
+                        >
+                          <span>{link.label}</span>
+                          <ArrowRight aria-hidden="true" />
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              ))}
+            </div>
+          </section>
+
+          <section
+            className="tp-home-footer-transparency"
+            aria-label="Fontes e orientação de segurança"
+          >
+            <div className="tp-home-footer-sources">
+              <span>Fontes meteorológicas e locais</span>
+              <p>
+                Embrapa Clima Temperado · INMET · CPPMet/UFPel · Open-Meteo · REDEMET/DECEA ·
+                LabHidroSens/UFPel · MetSul/TideSat · Nível Guaíba · FURG & Portos RS
+              </p>
+            </div>
+
+            <div className="tp-home-footer-guidance">
+              <span aria-hidden="true">i</span>
+              <p>
+                Em situações de risco, siga os comunicados da Defesa Civil, do INMET e das
+                autoridades locais.
+              </p>
+            </div>
+
+            <nav className="tp-home-footer-legal" aria-label="Transparência e dados">
+              <Link
+                to="/metodologia"
+                aria-label="Conhecer a metodologia e as fontes do Tempo Pelotas"
+                aria-current={isActivePath(pathname, "/metodologia") ? "page" : undefined}
+              >
+                Metodologia
+              </Link>
+              <Link
+                to="/privacidade-e-dados"
+                aria-label="Consultar a política de privacidade e dados do Tempo Pelotas"
+                aria-current={isActivePath(pathname, "/privacidade-e-dados") ? "page" : undefined}
+              >
+                Privacidade e dados
+              </Link>
+              <a href="/feed" type="application/feed+json" aria-label="Abrir o feed JSON de dados do Tempo Pelotas">
+                Feed de dados
+              </a>
+            </nav>
+          </section>
+
+          <div className="tp-home-footer-base">
+            <span>© {new Date().getFullYear()} Tempo Pelotas</span>
+            <p>
+              Projeto do{" "}
+              <a
+                href={mobiUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Conhecer o Ecossistema MOBI, abre em nova aba"
+              >
+                Ecossistema MOBI
+              </a>
+            </p>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
+  const lead = getFooterLead(pathname);
+
   return (
-    <footer className={cls("editorial-footer-shell")}>
-      <div className={cls("editorial-footer")}>
-        <div className={cls("editorial-footer-brand-line")} aria-hidden="true">
+    <footer className="editorial-footer-shell">
+      <div className="editorial-footer">
+        <div className="editorial-footer-brand-line" aria-hidden="true">
           <span />
           <span />
           <span />
           <span />
         </div>
 
-        <section className={cls("editorial-footer-lead")} aria-labelledby={titleId}>
-          <div className={cls("editorial-footer-lead-copy")}>
-            <Link
-              className={cls("editorial-footer-brand")}
-              to="/"
-              aria-label="Tempo Pelotas — página inicial"
-            >
+        <section className="editorial-footer-lead" aria-labelledby="editorial-footer-title">
+          <div className="editorial-footer-lead-copy">
+            <Link className="editorial-footer-brand" to="/" aria-label="Tempo Pelotas — página inicial">
               <img
-                className={cls("editorial-footer-brand-logo")}
+                className="editorial-footer-brand-logo"
                 src="/brand/tempo-pelotas-purple.svg"
                 alt=""
                 width={344}
@@ -162,14 +343,14 @@ export function Footer({ source, variant = "default" }: FooterProps) {
                 draggable={false}
               />
             </Link>
-            <span className={cls("editorial-footer-eyebrow")}>{lead.eyebrow}</span>
-            <h2 id={titleId}>{lead.title}</h2>
+            <span className="editorial-footer-eyebrow">{lead.eyebrow}</span>
+            <h2 id="editorial-footer-title">{lead.title}</h2>
             <p>{lead.description}</p>
           </div>
 
-          <div className={cls("editorial-footer-lead-aside")}>
+          <div className="editorial-footer-lead-aside">
             <div
-              className={cls(`editorial-footer-status${source?.isFallback ? " is-fallback" : ""}`)}
+              className={`editorial-footer-status${source?.isFallback ? " is-fallback" : ""}`}
               aria-label="Estado das fontes do portal"
             >
               <span aria-hidden="true" />
@@ -179,9 +360,9 @@ export function Footer({ source, variant = "default" }: FooterProps) {
               </div>
             </div>
 
-            <div className={cls("editorial-footer-actions")}>
+            <div className="editorial-footer-actions">
               <Link
-                className={cls("editorial-footer-action editorial-footer-action-primary")}
+                className="editorial-footer-action editorial-footer-action-primary"
                 to="/tempo-hoje-pelotas"
                 aria-label="Ver a previsão do tempo para hoje em Pelotas"
                 aria-current={isActivePath(pathname, "/tempo-hoje-pelotas") ? "page" : undefined}
@@ -190,7 +371,7 @@ export function Footer({ source, variant = "default" }: FooterProps) {
                 <ArrowRight aria-hidden="true" />
               </Link>
               <Link
-                className={cls("editorial-footer-action")}
+                className="editorial-footer-action"
                 to="/alertas"
                 aria-label="Consultar avisos meteorológicos oficiais para Pelotas"
                 aria-current={isActivePath(pathname, "/alertas") ? "page" : undefined}
@@ -201,10 +382,10 @@ export function Footer({ source, variant = "default" }: FooterProps) {
           </div>
         </section>
 
-        <section className={cls("editorial-footer-directory")} aria-label="Navegação do portal">
-          <div className={cls("editorial-footer-groups")}>
+        <section className="editorial-footer-directory" aria-label="Navegação do portal">
+          <div className="editorial-footer-groups">
             {footerGroups.map((group) => (
-              <nav className={cls("editorial-footer-group")} aria-label={group.title} key={group.title}>
+              <nav className="editorial-footer-group" aria-label={group.title} key={group.title}>
                 <strong>{group.title}</strong>
                 <ul>
                   {group.links.map((link) => (
@@ -226,10 +407,10 @@ export function Footer({ source, variant = "default" }: FooterProps) {
         </section>
 
         <section
-          className={cls("editorial-footer-transparency")}
+          className="editorial-footer-transparency"
           aria-label="Fontes e orientação de segurança"
         >
-          <div className={cls("editorial-footer-sources")}>
+          <div className="editorial-footer-sources">
             <span>Fontes meteorológicas e locais</span>
             <p>
               Embrapa Clima Temperado · INMET · CPPMet/UFPel · Open-Meteo · REDEMET/DECEA ·
@@ -237,7 +418,7 @@ export function Footer({ source, variant = "default" }: FooterProps) {
             </p>
           </div>
 
-          <div className={cls("editorial-footer-guidance")}>
+          <div className="editorial-footer-guidance">
             <span aria-hidden="true">i</span>
             <p>
               Em situações de risco, siga os comunicados da Defesa Civil, do INMET e das autoridades
@@ -245,7 +426,7 @@ export function Footer({ source, variant = "default" }: FooterProps) {
             </p>
           </div>
 
-          <nav className={cls("editorial-footer-legal")} aria-label="Transparência e dados">
+          <nav className="editorial-footer-legal" aria-label="Transparência e dados">
             <Link
               to="/metodologia"
               aria-label="Conhecer a metodologia e as fontes do Tempo Pelotas"
@@ -260,17 +441,13 @@ export function Footer({ source, variant = "default" }: FooterProps) {
             >
               Privacidade e dados
             </Link>
-            <a
-              href="/feed"
-              type="application/feed+json"
-              aria-label="Abrir o feed JSON de dados do Tempo Pelotas"
-            >
+            <a href="/feed" type="application/feed+json" aria-label="Abrir o feed JSON de dados do Tempo Pelotas">
               Feed de dados
             </a>
           </nav>
         </section>
 
-        <div className={cls("editorial-footer-base")}>
+        <div className="editorial-footer-base">
           <span>© {new Date().getFullYear()} Tempo Pelotas</span>
           <p>
             Projeto do{" "}
