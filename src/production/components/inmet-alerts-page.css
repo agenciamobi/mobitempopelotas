@@ -21,6 +21,10 @@
   gap: 8px;
 }
 
+.inmet-alert-card h3 {
+  font-size: clamp(1.16rem, 1.85vw, 1.48rem);
+}
+
 .inmet-alert-card__heading p {
   color: #526d79;
   font-size: 0.88rem;
