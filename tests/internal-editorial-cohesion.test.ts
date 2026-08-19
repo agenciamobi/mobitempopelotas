@@ -16,7 +16,7 @@ const headerMegaCss = readFileSync(
   "src/production/styles/header-megamenu-editorial-v52.css",
   "utf8",
 );
-const homeUxCss = readFileSync("src/production/styles/home-editorial-ux.css", "utf8");
+const homeShellCss = readFileSync("src/production/styles/home-editorial-shell.css", "utf8");
 const homeForecastCss = readFileSync(
   "src/production/components/home-forecast-editorial.css",
   "utf8",
@@ -43,6 +43,8 @@ const productionHome = readFileSync("src/production/ProductionHome.tsx", "utf8")
 
 test("homepage has left the old global override architecture", () => {
   const removedLayers = [
+    "home-editorial-current.css",
+    "home-editorial-ux.css",
     "home-editorial-forecast.css",
     "home-editorial-layout.css",
     "home-radar-editorial-v45.css",
@@ -54,6 +56,7 @@ test("homepage has left the old global override architecture", () => {
   ];
 
   for (const entry of [cssEntry, tsEntry]) {
+    assert.match(entry, /home-editorial-shell\.css/);
     for (const layer of removedLayers) {
       assert.doesNotMatch(entry, new RegExp(layer.replaceAll(".", "\\.")));
     }
@@ -147,7 +150,8 @@ test("desktop megamenu is opaque, compact and visibly interactive", () => {
 });
 
 test("stable homepage composition covers tablet, mobile, focus and reduced motion", () => {
-  assert.match(homeUxCss, /:focus-visible/);
+  assert.match(homeShellCss, /:focus-visible/);
+  assert.match(homeShellCss, /@media \(prefers-reduced-motion: reduce\)/);
   assert.match(homeForecastCss, /@media \(max-width: 700px\)/);
   assert.match(homeRadarCss, /@media \(max-width: 700px\)/);
   assert.match(homeObservationCss, /@media \(max-width: 700px\)/);

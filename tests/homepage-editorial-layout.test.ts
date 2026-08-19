@@ -4,6 +4,7 @@ import test from "node:test";
 
 const cssEntry = readFileSync("src/production/production-styles.css", "utf8");
 const tsEntry = readFileSync("src/production/production-styles.ts", "utf8");
+const shellCss = readFileSync("src/production/styles/home-editorial-shell.css", "utf8");
 const forecastCss = readFileSync(
   "src/production/components/home-forecast-editorial.css",
   "utf8",
@@ -23,8 +24,11 @@ const waterCss = readFileSync(
 const exploreCss = readFileSync("src/components/weather/HomeExplorePortal.css", "utf8");
 const guideCss = readFileSync("src/production/components/home-data-guide.css", "utf8");
 
-test("the homepage no longer depends on the late global override layers", () => {
+test("the homepage uses one minimal late shell instead of global visual override layers", () => {
   for (const entry of [cssEntry, tsEntry]) {
+    assert.match(entry, /home-editorial-shell\.css/);
+    assert.doesNotMatch(entry, /home-editorial-current\.css/);
+    assert.doesNotMatch(entry, /home-editorial-ux\.css/);
     assert.doesNotMatch(entry, /home-editorial-forecast\.css/);
     assert.doesNotMatch(entry, /home-editorial-layout\.css/);
     assert.doesNotMatch(entry, /home-radar-editorial-v45\.css/);
@@ -33,6 +37,18 @@ test("the homepage no longer depends on the late global override layers", () => 
     assert.doesNotMatch(entry, /home-closing-editorial-v50\.css/);
     assert.doesNotMatch(entry, /home-explore-refinement-v19\.css/);
   }
+});
+
+test("the late homepage shell contains only transversal behavior", () => {
+  assert.match(shellCss, /Home — shell editorial mínimo/);
+  assert.match(shellCss, /\.site-shell--home-editorial\s*\{/);
+  assert.match(shellCss, /\.home-editorial-main/);
+  assert.match(shellCss, /scroll-margin-top:\s*92px/);
+  assert.match(shellCss, /:focus-visible/);
+  assert.match(shellCss, /prefers-reduced-motion/);
+  assert.doesNotMatch(shellCss, /\.tp-home-(forecast|radar|observation|water|explore|guide|inmet|hero|alert)/);
+  assert.doesNotMatch(shellCss, /!important/);
+  assert.doesNotMatch(shellCss, /box-shadow/);
 });
 
 test("public homepage chapters are open and locally owned", () => {
