@@ -1,0 +1,128 @@
+/* PWA instalada — conectividade, safe areas e economia de dados. */
+
+.pwa-connectivity-notice {
+  position: fixed;
+  z-index: 125;
+  top: calc(12px + env(safe-area-inset-top));
+  left: 50%;
+  display: grid;
+  width: min(calc(100% - 32px), 420px);
+  min-height: 48px;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 1px solid rgb(7 30 47 / 18%);
+  border-radius: 8px;
+  background: #f8faf9;
+  color: #071e2f;
+  box-shadow: 0 8px 24px rgb(7 30 47 / 12%);
+  transform: translateX(-50%);
+}
+
+.pwa-connectivity-notice > span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f27035;
+}
+
+.pwa-connectivity-notice.is-restored > span {
+  background: #18bdcd;
+}
+
+.pwa-connectivity-notice > div {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.pwa-connectivity-notice strong {
+  color: #173746;
+  font-size: 0.74rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.pwa-connectivity-notice small {
+  color: #667b85;
+  font-size: 0.64rem;
+  line-height: 1.4;
+}
+
+html[data-save-data="true"] .tp-home-hero__live-camera iframe,
+html[data-effective-connection="slow-2g"] .tp-home-hero__live-camera iframe,
+html[data-effective-connection="2g"] .tp-home-hero__live-camera iframe,
+html[data-network="offline"] .tp-home-hero__live-camera iframe,
+html[data-save-data="true"] .weather-hero-live-camera iframe,
+html[data-effective-connection="slow-2g"] .weather-hero-live-camera iframe,
+html[data-effective-connection="2g"] .weather-hero-live-camera iframe,
+html[data-network="offline"] .weather-hero-live-camera iframe {
+  display: none;
+}
+
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  html,
+  body {
+    min-height: 100dvh;
+    background: #f5f7f6;
+  }
+
+  html {
+    overscroll-behavior-y: none;
+  }
+
+  body {
+    min-height: 100dvh;
+  }
+
+  .site-shell {
+    min-height: 100dvh;
+  }
+
+  .tp-home-header,
+  .site-header.production-header {
+    top: 0;
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .production-mobile-navigation,
+  .mobile-tab-bar {
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+  }
+}
+
+@media (display-mode: standalone) and (max-width: 900px),
+  (display-mode: fullscreen) and (max-width: 900px) {
+  .production-mobile-navigation,
+  .mobile-tab-bar {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+
+  .site-shell {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+
+  .pwa-launcher.is-update {
+    bottom: calc(82px + env(safe-area-inset-bottom));
+  }
+
+  .pwa-connectivity-notice {
+    top: calc(62px + env(safe-area-inset-top));
+  }
+}
+
+@media (max-width: 560px) {
+  .pwa-connectivity-notice {
+    width: calc(100% - 20px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pwa-connectivity-notice {
+    scroll-behavior: auto;
+  }
+}
