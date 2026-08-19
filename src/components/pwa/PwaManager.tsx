@@ -67,7 +67,6 @@ export function PwaManager() {
   const [message, setMessage] = useState<string | null>(null);
   const hasUpdate = Boolean(waitingWorker);
   const canInstall = Boolean(installPrompt) || isIos;
-  const shouldLockBodyScroll = isOpen && (hasUpdate || canInstall);
 
   useEffect(() => {
     const standaloneQuery = window.matchMedia("(display-mode: standalone)");
@@ -114,6 +113,7 @@ export function PwaManager() {
         if ("serviceWorker" in navigator) {
           registration = await navigator.serviceWorker.register("/sw.js", {
             scope: "/",
+            updateViaCache: "none",
           });
 
           if (registration.waiting) setWaitingWorker(registration.waiting);
@@ -156,12 +156,10 @@ export function PwaManager() {
   }, []);
 
   useEffect(() => {
-    if (!shouldLockBodyScroll) return;
+    if (!isOpen) return;
 
     const previousElement = document.activeElement as HTMLElement | null;
     const launcherElement = launcherRef.current;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -196,11 +194,10 @@ export function PwaManager() {
     window.requestAnimationFrame(() => dialogRef.current?.focus());
 
     return () => {
-      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
       window.requestAnimationFrame(() => (previousElement ?? launcherElement)?.focus());
     };
-  }, [shouldLockBodyScroll]);
+  }, [isOpen]);
 
   async function installApp() {
     setMessage(null);
@@ -226,16 +223,14 @@ export function PwaManager() {
       } else {
         setIsOpen(false);
         setMessage(
-          "A instalação foi cancelada. Recarregue a página para receber uma nova opção de instalação.",
+          "A instalação foi cancelada. O navegador poderá oferecer a opção novamente mais tarde.",
         );
       }
     } catch (error) {
       console.error("Não foi possível abrir a instalação do Tempo Pelotas:", error);
       setInstallPrompt(null);
       setIsOpen(false);
-      setMessage(
-        "Não foi possível abrir a instalação neste navegador. Recarregue a página e tente novamente.",
-      );
+      setMessage("Não foi possível abrir a instalação neste navegador agora.");
     } finally {
       setIsBusy(false);
     }
@@ -263,6 +258,7 @@ export function PwaManager() {
         type="button"
         onClick={() => setIsOpen(true)}
         aria-haspopup="dialog"
+        aria-expanded={isOpen}
       >
         <span>{hasUpdate ? <UpdateIcon /> : <InstallIcon />}</span>
         {launcherLabel}
@@ -272,7 +268,7 @@ export function PwaManager() {
         <div
           className="pwa-dialog-backdrop"
           role="presentation"
-          onMouseDown={() => setIsOpen(false)}
+          onPointerDown={() => setIsOpen(false)}
         >
           <section
             ref={dialogRef}
@@ -282,7 +278,7 @@ export function PwaManager() {
             aria-labelledby="pwa-dialog-title"
             aria-describedby="pwa-dialog-description"
             tabIndex={-1}
-            onMouseDown={(event) => event.stopPropagation()}
+            onPointerDown={(event) => event.stopPropagation()}
           >
             <button
               className="pwa-dialog-close"
@@ -295,12 +291,12 @@ export function PwaManager() {
 
             <span className="pwa-dialog-eyebrow">Aplicativo Tempo Pelotas</span>
             <h2 id="pwa-dialog-title">
-              {hasUpdate ? "Há uma nova versão disponível" : "Tenha o portal na tela inicial"}
+              {hasUpdate ? "Há uma nova versão disponível" : "Tempo Pelotas na tela inicial"}
             </h2>
             <p className="pwa-dialog-intro" id="pwa-dialog-description">
               {hasUpdate
-                ? "Atualize para receber as correções mais recentes do portal. A página será recarregada automaticamente."
-                : "Instale o Tempo Pelotas para abrir o portal com mais rapidez e ter uma página de orientação disponível mesmo sem conexão."}
+                ? "Atualize para receber as correções mais recentes. A página será recarregada quando a nova versão assumir o controle."
+                : "Instale o portal para abrir com mais rapidez e manter uma tela de orientação disponível quando a conexão cair."}
             </p>
 
             <div className="pwa-option-card">
@@ -308,11 +304,11 @@ export function PwaManager() {
                 {hasUpdate ? <UpdateIcon /> : <InstallIcon />}
               </span>
               <div>
-                <strong>{hasUpdate ? "Atualização pronta" : "Instalar no aparelho"}</strong>
+                <strong>{hasUpdate ? "Atualização pronta" : "Instalar neste aparelho"}</strong>
                 <p>
                   {hasUpdate
-                    ? "Os dados meteorológicos continuarão sendo consultados nas fontes oficiais após a atualização."
-                    : "A instalação não altera os dados do portal e não envia notificações sem sua autorização."}
+                    ? "A atualização troca apenas os arquivos do aplicativo; os dados meteorológicos continuam vindo das fontes identificadas pelo portal."
+                    : "A instalação não libera notificações automaticamente e não transforma previsão antiga em dado offline atual."}
                 </p>
               </div>
               <button
@@ -331,8 +327,8 @@ export function PwaManager() {
             ) : null}
 
             <small className="pwa-disclaimer">
-              A página offline serve apenas como orientação. Previsão, alertas e níveis das águas
-              precisam de conexão para serem atualizados.
+              A tela offline é apenas informativa. Previsão, avisos, radar e níveis das águas precisam
+              de conexão para receber novas leituras.
             </small>
           </section>
         </div>
