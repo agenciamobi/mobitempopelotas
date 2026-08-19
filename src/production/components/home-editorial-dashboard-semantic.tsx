@@ -21,6 +21,7 @@ type HomeEditorialDashboardProps = {
   laranjal: LaranjalLevelData;
   guaiba: GuaibaObservationData;
   lagoon: LagoonMonitoringNetworkData;
+  afterForecast?: ReactNode;
 };
 
 type SemanticContext = {
@@ -119,6 +120,7 @@ function transformDashboardNode(
   context: SemanticContext,
   waterStates: WaterVisualStates,
   stationStates: StationVisualState[],
+  afterForecast: ReactNode,
 ): ReactNode {
   if (typeof node === "string") return normalizeTextNode(node);
   if (!isValidElement<ElementProps>(node)) return node;
@@ -160,7 +162,7 @@ function transformDashboardNode(
     return cloneElement(
       node as ReactElement<ElementProps>,
       undefined,
-      transformDashboardNode(timeLabel, nextContext, waterStates, stationStates),
+      transformDashboardNode(timeLabel, nextContext, waterStates, stationStates, afterForecast),
     );
   }
 
@@ -242,7 +244,7 @@ function transformDashboardNode(
   }
 
   const transformedChildren = Children.map(props.children, (child) =>
-    transformDashboardNode(child, nextContext, waterStates, stationStates),
+    transformDashboardNode(child, nextContext, waterStates, stationStates, afterForecast),
   );
 
   let normalizedClassName = className;
@@ -276,30 +278,48 @@ function transformDashboardNode(
 
   const classChanged = normalizedClassName !== className;
   const nextProps = classChanged ? { className: normalizedClassName || undefined } : undefined;
+  const transformedElement = cloneElement(
+    node as ReactElement<ElementProps>,
+    nextProps,
+    transformedChildren,
+  );
 
-  return cloneElement(node as ReactElement<ElementProps>, nextProps, transformedChildren);
+  if (
+    afterForecast &&
+    isDomElement &&
+    node.type === "section" &&
+    hasClass(className, "home-story--forecast")
+  ) {
+    return (
+      <>
+        {transformedElement}
+        {afterForecast}
+      </>
+    );
+  }
+
+  return transformedElement;
 }
 
 export function HomeEditorialDashboard(dashboardProps: HomeEditorialDashboardProps) {
-  const dashboard = HomeEditorialDashboardBase(dashboardProps);
+  const { afterForecast = null, ...baseProps } = dashboardProps;
+  const dashboard = HomeEditorialDashboardBase(baseProps);
   const waterStates: WaterVisualStates = {
     laranjal: getWaterLevelVisualState({
-      rate: dashboardProps.laranjal.trendCmPerHour,
+      rate: baseProps.laranjal.trendCmPerHour,
       available:
-        dashboardProps.laranjal.status !== "unavailable" &&
-        dashboardProps.laranjal.currentLevel !== null,
+        baseProps.laranjal.status !== "unavailable" && baseProps.laranjal.currentLevel !== null,
     }),
     guaiba: getWaterLevelVisualState({
-      rate: dashboardProps.guaiba.trendCmPerHour,
+      rate: baseProps.guaiba.trendCmPerHour,
       available:
-        dashboardProps.guaiba.status !== "unavailable" &&
-        dashboardProps.guaiba.currentLevel !== null,
-      currentLevel: dashboardProps.guaiba.currentLevel,
-      threshold: dashboardProps.guaiba.floodReference,
+        baseProps.guaiba.status !== "unavailable" && baseProps.guaiba.currentLevel !== null,
+      currentLevel: baseProps.guaiba.currentLevel,
+      threshold: baseProps.guaiba.floodReference,
     }),
-    guaibaReferenceLabel: dashboardProps.guaiba.station,
+    guaibaReferenceLabel: baseProps.guaiba.station,
   };
-  const stationStates = dashboardProps.lagoon.observations.map((station) => ({
+  const stationStates = baseProps.lagoon.observations.map((station) => ({
     city: station.station.city,
     name: station.station.name,
     state: getWaterLevelVisualState({
@@ -321,5 +341,6 @@ export function HomeEditorialDashboard(dashboardProps: HomeEditorialDashboardPro
     },
     waterStates,
     stationStates,
+    afterForecast,
   );
 }
