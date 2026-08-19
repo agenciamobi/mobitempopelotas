@@ -62,10 +62,10 @@ export function HomeEditorialHeader({
       <a className="skip-link" href="#conteudo-principal">
         Pular para o conteúdo principal
       </a>
-      <header className="home-editorial-header" data-advisory-level={advisoryLevel}>
-        <div className="home-editorial-header__inner">
+      <header className="tp-home-header" data-advisory-level={advisoryLevel}>
+        <div className="tp-home-header__inner">
           <Link
-            className="home-editorial-header__brand"
+            className="tp-home-header__brand"
             to="/"
             aria-label="Tempo Pelotas — página inicial"
           >
@@ -81,10 +81,7 @@ export function HomeEditorialHeader({
             />
           </Link>
 
-          <nav
-            className="home-editorial-header__nav"
-            aria-label="Navegação principal do Tempo Pelotas"
-          >
+          <nav className="tp-home-header__nav" aria-label="Navegação principal do Tempo Pelotas">
             {homeNavigation.map((item) => {
               const active = isActivePath(pathname, item.to);
               return (
@@ -101,10 +98,10 @@ export function HomeEditorialHeader({
             })}
           </nav>
 
-          <div className="home-editorial-header__actions">
+          <div className="tp-home-header__actions">
             <AuthAccountAction />
             <Link
-              className={`home-editorial-header__alert is-${advisoryLevel}${alertsActive ? " is-active" : ""}`}
+              className={`tp-home-header__alert is-${advisoryLevel}${alertsActive ? " is-active" : ""}`}
               to="/alertas"
               aria-label="Consultar avisos meteorológicos oficiais para Pelotas"
               aria-current={alertsActive ? "page" : undefined}
