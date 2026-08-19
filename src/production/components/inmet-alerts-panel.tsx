@@ -6,6 +6,8 @@ import type {
 } from "@/production/lib/inmet-alerts";
 import type { AdvisoryLevel } from "@/production/lib/weather-insights";
 
+import "./inmet-alerts-home.css";
+
 type InmetAlertsPanelProps = {
   data: InmetAlertsData;
   variant?: "home" | "page";
@@ -208,25 +210,25 @@ function HomePanel({
 
   return (
     <section
-      className={`home-inmet-alerts ${colorClass}${verified ? " is-officially-classified" : " is-unverified"}`}
+      className={`tp-home-alert ${colorClass}${verified ? " is-officially-classified" : " is-unverified"}`}
       data-alert-period={primary.period}
       data-alert-severity={primary.severity}
       data-alert-official-semantics={verified ? "verified" : "unverified"}
       aria-label={`${title}. ${periodLabel(primary)}`}
       aria-labelledby="home-inmet-title"
     >
-      <div className="home-inmet-alerts__main">
-        <div className="home-inmet-alerts__mark" aria-hidden="true">
+      <div className="tp-home-alert__main">
+        <div className="tp-home-alert__mark" aria-hidden="true">
           <small>INMET</small>
           <strong>!</strong>
         </div>
-        <div className="home-inmet-alerts__copy">
-          <div className="home-inmet-alerts__topline">
+        <div className="tp-home-alert__copy">
+          <div className="tp-home-alert__topline">
             <span>Aviso oficial do INMET</span>
             <b>{statusLabel}</b>
           </div>
           <h2 id="home-inmet-title">{title}</h2>
-          <div className="home-inmet-alerts__meta">
+          <div className="tp-home-alert__meta">
             <span>
               <small>Abrangência</small>
               <strong>{homeAreaLabel(primary)}</strong>
@@ -238,7 +240,7 @@ function HomePanel({
           </div>
         </div>
       </div>
-      <div className="home-inmet-alerts__aside">
+      <div className="tp-home-alert__aside">
         <strong>Áreas e orientações oficiais</strong>
         <small>{homeAlertCountLabel(data)}</small>
         <Link href="/alertas">
