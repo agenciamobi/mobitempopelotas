@@ -1,6 +1,6 @@
 # Tempo Pelotas — direção definitiva da homepage
 
-Última atualização: 18/08/2026  
+Última atualização: 19/08/2026  
 Branch operacional: `main`
 
 ## 1. Definição
@@ -84,7 +84,7 @@ Navegação editorial simples por âncoras:
 
 Sem numeração visual, sem card, sem descrição longa.
 
-### 3.5. Próximas horas + tendência
+### 3.5. Próximas horas
 
 Direção: **Data Journalism**.
 
@@ -94,12 +94,11 @@ Mostrar:
 - temperatura;
 - chance de chuva;
 - rajadas relevantes;
-- maior chance de chuva com destaque tipográfico;
-- tendência dos próximos dias logo abaixo.
+- maior chance de chuva com destaque tipográfico.
 
-Evitar card individual como unidade básica de cada hora ou dia.
+Evitar card individual como unidade básica de cada hora.
 
-Astronomia permanece como informação secundária integrada ao bloco.
+Astronomia permanece como informação secundária integrada ao capítulo.
 
 ### 3.6. Previsão oficial do INMET
 
@@ -124,15 +123,45 @@ Visual:
 - métricas alinhadas tipograficamente;
 - sem pill/card decorativo desnecessário.
 
-### 3.7. Radar e satélite
+### 3.7. Tendência da semana
+
+Direção: **Data Journalism**.
+
+A tendência dos próximos dias é um capítulo próprio, separado da linha horária e posicionado **imediatamente antes de Radar e satélite**. Essa ordem fecha a leitura de previsão antes de a página entrar no monitoramento visual observado.
+
+Mostrar:
+
+- próximos dias em sequência;
+- condição predominante;
+- síntese curta e determinística;
+- chance de chuva;
+- máxima e mínima;
+- destaque tipográfico para o dia com maior chance de chuva quando fizer sentido.
+
+A grade deve usar hairlines e espaço, não card promocional por dia. Em tablet/mobile pode haver rolagem horizontal porque cada dia constitui uma unidade real de leitura.
+
+### 3.8. Radar e satélite
 
 Direção: **Civic Tech / Scientific**.
 
-Mapa e imagem são protagonistas. A Home deve manter controles essenciais; análise e camadas avançadas ficam para páginas dedicadas e, futuramente, PRO.
+Mapa e imagem são protagonistas. A Home mantém os controles essenciais e a rota `/radar-e-satelite-pelotas` aprofunda interpretação, comparação e contexto.
 
-Sempre exibir fonte, horário e estado de disponibilidade.
+Composição aprovada para a Home:
 
-### 3.8. Medição local — Embrapa
+- abertura editorial com finalidade do monitoramento;
+- metadados de fonte, radar de referência e foco territorial;
+- controle segmentado plano para `Radar · Satélite · Trovoadas`;
+- subtipos de satélite organizados como segunda linha técnica quando aplicável;
+- mapa amplo como superfície principal;
+- timeline/reprodução visualmente separada da imagem, sem grande painel escuro flutuante;
+- opacidade, horário e legenda mantidos como controles técnicos;
+- fonte e estado de disponibilidade compreensíveis sem glassmorphism;
+- guia curto `Como interpretar` abaixo do mapa, distinguindo radar, satélite e trovoadas;
+- orientação explícita de que monitoramento visual não substitui avisos oficiais.
+
+A central não deve sugerir que a sequência observada é projeção futura. Camadas avançadas e análise mais densa permanecem para páginas dedicadas e, futuramente, PRO.
+
+### 3.9. Medição local — Embrapa
 
 Direção: **Civic Tech editorial**.
 
@@ -148,7 +177,7 @@ Prioridade:
 
 Outras métricas permanecem na página dedicada da estação.
 
-### 3.9. Lagoa dos Patos
+### 3.10. Lagoa dos Patos
 
 Direção: **Civic Tech local**.
 
@@ -162,7 +191,7 @@ Laranjal é a referência principal da Home:
 
 A rede regional deve aparecer de forma resumida na Home. A visão densa/completa pertence a `/situacao-hidrologica-pelotas`.
 
-### 3.10. Tempo Pelotas PRO
+### 3.11. Tempo Pelotas PRO
 
 Reservar posição natural na arquitetura, mas manter desligado até o produto estar pronto.
 
@@ -174,7 +203,7 @@ Quando ativado, o bloco deve explicar valor, não bloquear informação pública
 - análises e interpretação;
 - camadas adicionais.
 
-### 3.11. Explore o Tempo Pelotas
+### 3.12. Explore o Tempo Pelotas
 
 Diretório editorial de conteúdo, não conjunto de cards promocionais.
 
@@ -187,7 +216,7 @@ Categorias principais:
 
 Usar divisores, headings e links internos para distribuir tráfego às páginas públicas detalhadas.
 
-### 3.12. Entenda os dados
+### 3.13. Entenda os dados
 
 Fechamento editorial explicando de forma simples a diferença entre:
 
@@ -198,7 +227,7 @@ Fechamento editorial explicando de forma simples a diferença entre:
 
 Deve apontar para metodologia e transparência das fontes.
 
-### 3.13. Footer
+### 3.14. Footer
 
 Editorial e funcional. Não repetir toda a Home.
 
@@ -212,7 +241,7 @@ Editorial e funcional. Não repetir toda a Home.
 - sombras excepcionais;
 - gradientes concentrados no Hero quando necessários para legibilidade da fotografia.
 
-A política de canvas aberto é parte da arquitetura, não apenas um refinamento cosmético: Hero, avisos oficiais, mapa e controles interativos podem justificar contenção; previsão, medição local, águas, diretório e metodologia devem preferir página aberta, grid, espaço e hairlines.
+A política de canvas aberto é parte da arquitetura, não apenas um refinamento cosmético: Hero, avisos oficiais, mapa e controles interativos podem justificar contenção; previsão, tendência, medição local, águas, diretório e metodologia devem preferir página aberta, grid, espaço e hairlines.
 
 ### 4.2. Cor
 
@@ -284,23 +313,24 @@ Requisitos:
 
 A implementação deve ocorrer diretamente na `main`, em commits pequenos e coerentes.
 
-Ordem:
+Ordem de refinamento por domínio:
 
 1. composição e hierarquia da Home;
-2. Hero;
-3. previsão;
+2. Header e Hero;
+3. próximas horas;
 4. INMET;
-5. radar/satélite;
-6. Embrapa;
-7. águas;
-8. Explore e ponto futuro do PRO;
-9. fechamento/footer;
-10. consolidação de CSS;
-11. auditoria de responsividade, acessibilidade, contratos e produção.
+5. tendência semanal;
+6. radar/satélite;
+7. Embrapa;
+8. águas;
+9. Explore e ponto futuro do PRO;
+10. fechamento/footer;
+11. consolidação de CSS;
+12. auditoria de responsividade, acessibilidade, contratos e produção.
 
 Não criar nova sequência de arquivos `v81`, `v82`, `v83` etc. Refinamentos devem fortalecer arquivos estáveis por domínio ou estilos localizados em componentes quando isso reduzir acoplamento.
 
-A camada `home-editorial-layout.css` é uma fonte estável de composição estrutural, não uma nova sequência versionada: ela fixa a política de canvas aberto e deve substituir gradualmente overrides históricos equivalentes durante a consolidação.
+A Home atual usa namespaces locais `tp-home-*` e um `home-editorial-shell.css` mínimo apenas para comportamento transversal. Arquivos históricos de composição não devem voltar à entrada global quando o domínio já possui fonte local de verdade.
 
 ## 8. Critério de aceite
 
@@ -320,27 +350,28 @@ A identidade desejada é:
 
 ## 9. Status de implementação
 
-Estado desta direção na `main` em 18/08/2026:
+Estado desta direção na `main` em 19/08/2026:
 
-- **Composição principal:** aplicada. INMET passou a entrar depois da previsão pública e o banner preventivo permanente da Defesa Civil saiu da sequência principal da Home.
-- **Header editorial:** aplicado com navegação plana, estado ativo por linha e ações discretas.
-- **Hero Magazine / Broadcast:** aplicado. Fotografia recuperou protagonismo e os fatos prioritários ficaram limitados a mínima/máxima, chuva e vento.
-- **Índice da página:** aplicado como navegação editorial sem numeração e sem cards.
-- **Previsão:** aplicada na camada estável `home-editorial-forecast.css`, com capítulo aberto, timeline e tendência semanal orientadas por tipografia, espaço e hairlines.
-- **INMET:** aplicado em linguagem Data Journalism Premium, com superfície contínua, síntese principal, hairlines e próximos períodos em sequência.
-- **Radar e satélite:** aplicado em linguagem Civic Tech / Scientific, com mapa dominante e controles visualmente mais funcionais que promocionais. O mapa permanece uma unidade contida porque é uma interação real.
-- **Embrapa:** aplicada com leitura pública resumida para temperatura, umidade, vento e chuva do dia; a seção externa passou a usar canvas aberto.
-- **Lagoa dos Patos:** aplicada com Laranjal como referência principal, rede regional resumida a três pontos e composição externa aberta.
+- **Composição principal:** aplicada. A narrativa meteorológica pública está organizada em alerta, índice, próximas horas, INMET, tendência semanal, radar/satélite, observação local, águas e aprofundamentos.
+- **Header editorial:** aplicado em namespace próprio, com navegação plana, estado ativo por linha e ações discretas.
+- **Hero Magazine / Broadcast:** aplicado em namespace próprio. Fotografia/câmera mantém protagonismo e os fatos prioritários ficam limitados a mínima/máxima, chuva e vento.
+- **Índice da página:** aplicado como sumário editorial por âncoras, sem numeração, cards ou tab bar de produto.
+- **Próximas horas:** isoladas em `home-forecast-editorial.tsx/css`, com timeline, astronomia e dois sinais principais em canvas aberto.
+- **INMET:** aplicado em linguagem Data Journalism Premium no componente `tp-home-inmet`, com síntese principal, próximos períodos, hairlines e fonte explícita.
+- **Tendência semanal:** separada da previsão horária em `home-forecast-trend.tsx/css` e posicionada imediatamente antes do radar, com grade editorial de quatro dias e destaque tipográfico de chuva.
+- **Radar e satélite:** convertido em central Civic Tech / Scientific. O mapa segue como interação contida, mas a Home agora apresenta abertura editorial, metadados, controle segmentado plano, timeline técnica clara separada da imagem, fonte/estado legíveis e guia de interpretação.
+- **Embrapa:** aplicada com leitura pública resumida para temperatura, umidade, vento e chuva do dia; a seção externa usa canvas aberto.
+- **Lagoa dos Patos:** aplicada com Laranjal como referência principal, rede regional resumida e composição externa aberta.
 - **Explore:** convertido para diretório editorial de conteúdo e retirado da lógica de card promocional.
 - **Entenda os dados:** convertido para fechamento editorial aberto, sem superfície institucional pesada.
-- **Footer:** aplicado como fechamento editorial mais compacto, preservando navegação, transparência, fontes e acesso aos avisos sem aparência de landing page.
-- **Canvas editorial aberto:** formalizado em `home-editorial-layout.css`, carregado depois de `home-editorial-forecast.css` nas duas entradas de estilos.
+- **Footer:** isolado em namespace próprio e aplicado como fechamento editorial compacto, preservando navegação, transparência, fontes e acesso aos avisos.
+- **Cascata da Home:** componentes públicos principais possuem fontes locais `tp-home-*`; `home-editorial-shell.css` permanece como shell mínimo transversal. As antigas camadas de override da Home foram retiradas da entrada global conforme seus domínios foram isolados.
 - **PRO:** posição conceitual reservada, ainda sem bloco público ativo.
-- **Contratos da Home:** ampliados para proteger a ordem INMET, os fatos essenciais do Hero, o índice sem numeração, a ausência do banner preventivo permanente, os estilos editoriais estáveis e a política de canvas aberto.
+- **Contratos da Home:** ampliados para proteger a ordem `próximas horas → INMET → tendência → radar`, os namespaces locais, o radar científico, a ausência de overrides `!important` nos capítulos novos e a composição responsiva.
 
 Pendências antes de encerrar a reformulação:
 
-1. consolidar e remover resíduos de CSS histórico que já foram substituídos pelas fontes estáveis, sem criar nova série versionada;
-2. revisar visualmente mobile/tablet nas larguras críticas e corrigir apenas problemas observados;
+1. conferir visualmente o novo radar em desktop/tablet/mobile no deploy, principalmente alturas do mapa, barra de satélite, timeline e controles MapLibre;
+2. continuar auditando apenas CSS compartilhado que ainda possa interferir em internals do mapa, sem reintroduzir camadas globais da Home;
 3. validar contratos, build, typecheck, lint e rotas em ambiente com execução disponível;
-4. conferir o resultado visual sincronizado no deploy antes de considerar a Home concluída.
+4. executar auditoria final WCAG 2.2 AA, Core Web Vitals e responsividade ampla antes de considerar a Home concluída.
