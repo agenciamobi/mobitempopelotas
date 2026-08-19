@@ -3,6 +3,30 @@
  * Mantém a leitura dos avisos oficiais fora das antigas camadas visuais da Home.
  */
 
+.inmet-alerts-heading p {
+  font-size: 1.04rem;
+  line-height: 1.7;
+}
+
+.inmet-source-status {
+  font-size: 0.73rem;
+}
+
+.inmet-alerts-counts span {
+  font-size: 0.7rem;
+}
+
+.inmet-alert-group > header p {
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.inmet-alert-severity,
+.inmet-alert-relevance,
+.inmet-alert-event {
+  font-size: 0.71rem;
+}
+
 .inmet-alert-card {
   gap: 17px;
   padding: 24px 26px 24px 30px;
@@ -49,8 +73,33 @@
   max-width: 980px;
 }
 
+.inmet-alert-card summary {
+  font-size: 0.86rem;
+}
+
+.inmet-alert-card details p {
+  font-size: 0.92rem;
+  line-height: 1.72;
+}
+
+.inmet-alert-card > a,
+.inmet-alerts-empty > a,
+.inmet-alerts-footer > a {
+  font-size: 0.86rem;
+}
+
 .inmet-alert-card > a {
   margin-top: 1px;
+}
+
+.inmet-alerts-footer p {
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.inmet-alerts-empty p {
+  font-size: 0.94rem;
+  line-height: 1.68;
 }
 
 @media (max-width: 760px) {
