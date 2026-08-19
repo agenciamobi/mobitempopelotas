@@ -98,14 +98,36 @@ const footerGroups = [
 const mobiUrl =
   "https://agenciamobi.com.br/?utm_source=tempopelotas&utm_medium=footer&utm_campaign=portal_tempo_pelotas";
 
+type FooterVariant = "default" | "home";
+
+type FooterProps = {
+  source?: WeatherData["source"];
+  variant?: FooterVariant;
+};
+
 function isActivePath(pathname: string, to: string) {
   if (to === "/") return pathname === "/";
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 
-export function Footer({ source }: { source?: WeatherData["source"] }) {
+function footerClassName(className: string, variant: FooterVariant) {
+  if (variant !== "home") return className;
+
+  return className
+    .split(" ")
+    .map((token) =>
+      token.startsWith("editorial-footer")
+        ? token.replace("editorial-footer", "tp-home-footer")
+        : token,
+    )
+    .join(" ");
+}
+
+export function Footer({ source, variant = "default" }: FooterProps) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const lead = getFooterLead(pathname);
+  const cls = (className: string) => footerClassName(className, variant);
+  const titleId = variant === "home" ? "tp-home-footer-title" : "editorial-footer-title";
   const sourceStatus = source
     ? source.isFallback
       ? "Operação em contingência"
@@ -113,20 +135,24 @@ export function Footer({ source }: { source?: WeatherData["source"] }) {
     : "Fontes e método publicados";
 
   return (
-    <footer className="editorial-footer-shell">
-      <div className="editorial-footer">
-        <div className="editorial-footer-brand-line" aria-hidden="true">
+    <footer className={cls("editorial-footer-shell")}>
+      <div className={cls("editorial-footer")}>
+        <div className={cls("editorial-footer-brand-line")} aria-hidden="true">
           <span />
           <span />
           <span />
           <span />
         </div>
 
-        <section className="editorial-footer-lead" aria-labelledby="editorial-footer-title">
-          <div className="editorial-footer-lead-copy">
-            <Link className="editorial-footer-brand" to="/" aria-label="Tempo Pelotas — página inicial">
+        <section className={cls("editorial-footer-lead")} aria-labelledby={titleId}>
+          <div className={cls("editorial-footer-lead-copy")}>
+            <Link
+              className={cls("editorial-footer-brand")}
+              to="/"
+              aria-label="Tempo Pelotas — página inicial"
+            >
               <img
-                className="editorial-footer-brand-logo"
+                className={cls("editorial-footer-brand-logo")}
                 src="/brand/tempo-pelotas-purple.svg"
                 alt=""
                 width={344}
@@ -136,14 +162,14 @@ export function Footer({ source }: { source?: WeatherData["source"] }) {
                 draggable={false}
               />
             </Link>
-            <span className="editorial-footer-eyebrow">{lead.eyebrow}</span>
-            <h2 id="editorial-footer-title">{lead.title}</h2>
+            <span className={cls("editorial-footer-eyebrow")}>{lead.eyebrow}</span>
+            <h2 id={titleId}>{lead.title}</h2>
             <p>{lead.description}</p>
           </div>
 
-          <div className="editorial-footer-lead-aside">
+          <div className={cls("editorial-footer-lead-aside")}>
             <div
-              className={`editorial-footer-status${source?.isFallback ? " is-fallback" : ""}`}
+              className={cls(`editorial-footer-status${source?.isFallback ? " is-fallback" : ""}`)}
               aria-label="Estado das fontes do portal"
             >
               <span aria-hidden="true" />
@@ -153,9 +179,9 @@ export function Footer({ source }: { source?: WeatherData["source"] }) {
               </div>
             </div>
 
-            <div className="editorial-footer-actions">
+            <div className={cls("editorial-footer-actions")}>
               <Link
-                className="editorial-footer-action editorial-footer-action-primary"
+                className={cls("editorial-footer-action editorial-footer-action-primary")}
                 to="/tempo-hoje-pelotas"
                 aria-label="Ver a previsão do tempo para hoje em Pelotas"
                 aria-current={isActivePath(pathname, "/tempo-hoje-pelotas") ? "page" : undefined}
@@ -164,7 +190,7 @@ export function Footer({ source }: { source?: WeatherData["source"] }) {
                 <ArrowRight aria-hidden="true" />
               </Link>
               <Link
-                className="editorial-footer-action"
+                className={cls("editorial-footer-action")}
                 to="/alertas"
                 aria-label="Consultar avisos meteorológicos oficiais para Pelotas"
                 aria-current={isActivePath(pathname, "/alertas") ? "page" : undefined}
@@ -175,10 +201,10 @@ export function Footer({ source }: { source?: WeatherData["source"] }) {
           </div>
         </section>
 
-        <section className="editorial-footer-directory" aria-label="Navegação do portal">
-          <div className="editorial-footer-groups">
+        <section className={cls("editorial-footer-directory")} aria-label="Navegação do portal">
+          <div className={cls("editorial-footer-groups")}>
             {footerGroups.map((group) => (
-              <nav className="editorial-footer-group" aria-label={group.title} key={group.title}>
+              <nav className={cls("editorial-footer-group")} aria-label={group.title} key={group.title}>
                 <strong>{group.title}</strong>
                 <ul>
                   {group.links.map((link) => (
@@ -200,10 +226,10 @@ export function Footer({ source }: { source?: WeatherData["source"] }) {
         </section>
 
         <section
-          className="editorial-footer-transparency"
+          className={cls("editorial-footer-transparency")}
           aria-label="Fontes e orientação de segurança"
         >
-          <div className="editorial-footer-sources">
+          <div className={cls("editorial-footer-sources")}>
             <span>Fontes meteorológicas e locais</span>
             <p>
               Embrapa Clima Temperado · INMET · CPPMet/UFPel · Open-Meteo · REDEMET/DECEA ·
@@ -211,7 +237,7 @@ export function Footer({ source }: { source?: WeatherData["source"] }) {
             </p>
           </div>
 
-          <div className="editorial-footer-guidance">
+          <div className={cls("editorial-footer-guidance")}>
             <span aria-hidden="true">i</span>
             <p>
               Em situações de risco, siga os comunicados da Defesa Civil, do INMET e das autoridades
@@ -219,7 +245,7 @@ export function Footer({ source }: { source?: WeatherData["source"] }) {
             </p>
           </div>
 
-          <nav className="editorial-footer-legal" aria-label="Transparência e dados">
+          <nav className={cls("editorial-footer-legal")} aria-label="Transparência e dados">
             <Link
               to="/metodologia"
               aria-label="Conhecer a metodologia e as fontes do Tempo Pelotas"
@@ -244,7 +270,7 @@ export function Footer({ source }: { source?: WeatherData["source"] }) {
           </nav>
         </section>
 
-        <div className="editorial-footer-base">
+        <div className={cls("editorial-footer-base")}>
           <span>© {new Date().getFullYear()} Tempo Pelotas</span>
           <p>
             Projeto do{" "}
