@@ -146,8 +146,14 @@
   border-left: 0;
 }
 
-.tp-home-forecast-hour.is-rain-peak {
-  box-shadow: inset 0 2px 0 var(--tp-forecast-purple);
+.tp-home-forecast-hour.is-rain-peak::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: var(--tp-forecast-purple);
+  content: "";
 }
 
 .tp-home-forecast-hour__topline {
@@ -244,6 +250,7 @@
 }
 
 .tp-home-forecast-day {
+  position: relative;
   min-width: 0;
   padding: 22px 22px 24px;
   border-left: 1px solid var(--tp-forecast-line);
@@ -254,8 +261,14 @@
   border-left: 0;
 }
 
-.tp-home-forecast-day.is-rainiest {
-  box-shadow: inset 0 2px 0 var(--tp-forecast-purple);
+.tp-home-forecast-day.is-rainiest::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: var(--tp-forecast-purple);
+  content: "";
 }
 
 .tp-home-forecast-day__topline {
