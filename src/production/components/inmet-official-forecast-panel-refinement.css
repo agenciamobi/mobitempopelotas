@@ -1,38 +1,463 @@
-/* Refinamento do cabeçalho oficial: conteúdo essencial e continuidade com o aviso INMET. */
-.inmet-official-panel {
-  margin-top: 0;
+/*
+ * INMET na Home — Data Journalism Premium.
+ * A previsão oficial deve parecer informação pública bem editada, não um dashboard
+ * de cards. Preserva a semântica e os dados; muda apenas hierarquia, ritmo e superfície.
+ */
+
+.site-shell--home-editorial .inmet-official-panel {
+  margin-top: 22px !important;
+  overflow: hidden;
+  border: 1px solid rgb(7 27 44 / 11%) !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  box-shadow: none !important;
 }
 
-.home-inmet-alerts + .inmet-official-panel {
-  margin-top: 0;
+.site-shell--home-editorial .home-inmet-alerts + .inmet-official-panel {
+  margin-top: 18px !important;
 }
 
-.inmet-official-header {
-  grid-template-columns: minmax(0, 1fr);
-  align-items: center;
-  gap: 0;
-  padding: clamp(2rem, 4vw, 3.25rem);
+.site-shell--home-editorial .inmet-official-panel::before,
+.site-shell--home-editorial .inmet-official-header::after,
+.site-shell--home-editorial .inmet-official-featured::after {
+  display: none !important;
+  content: none !important;
 }
 
-.inmet-official-heading {
-  max-width: 980px;
-  gap: 0.9rem;
+.site-shell--home-editorial .inmet-official-header {
+  display: block !important;
+  padding: clamp(25px, 3vw, 38px) clamp(28px, 4vw, 54px) 21px !important;
+  border-bottom: 1px solid rgb(7 27 44 / 9%);
+  background: #fbfcfb !important;
+  color: #071b2c !important;
 }
 
-.inmet-official-heading h2 {
-  max-width: 900px;
+.site-shell--home-editorial .inmet-official-heading {
+  display: grid;
+  max-width: 860px;
+  gap: 8px !important;
 }
 
-.inmet-official-heading > p {
-  max-width: 760px;
+.site-shell--home-editorial .inmet-official-heading::before {
+  display: block;
+  width: 32px;
+  height: 2px;
+  margin-bottom: 1px;
+  background: #18bdcd;
+  content: "";
 }
 
-@media (max-width: 680px) {
-  .inmet-official-panel {
-    margin-top: 0;
+.site-shell--home-editorial .inmet-official-heading h2 {
+  max-width: 760px !important;
+  margin: 0;
+  color: #071b2c !important;
+  font-size: clamp(1.55rem, 2.15vw, 2.25rem) !important;
+  font-weight: 760 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.052em !important;
+  text-wrap: balance;
+}
+
+.site-shell--home-editorial .inmet-official-heading > p {
+  max-width: 760px !important;
+  margin: 0;
+  color: #617580 !important;
+  font-size: clamp(0.78rem, 0.9vw, 0.88rem) !important;
+  line-height: 1.58 !important;
+}
+
+.site-shell--home-editorial .inmet-official-forecast-layout {
+  display: grid !important;
+  padding: 0 clamp(30px, 4vw, 54px) !important;
+  grid-template-columns: minmax(0, 0.74fr) minmax(0, 1.26fr) !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  background: #fff !important;
+}
+
+.site-shell--home-editorial .inmet-official-featured {
+  display: grid;
+  min-height: 100%;
+  align-content: start;
+  gap: 20px !important;
+  padding: 24px clamp(28px, 3.4vw, 46px) 27px 0 !important;
+  overflow: visible;
+  border: 0 !important;
+  border-right: 1px solid rgb(7 27 44 / 9%) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.site-shell--home-editorial .inmet-official-card-topline {
+  align-items: center !important;
+}
+
+.site-shell--home-editorial .inmet-official-card-topline > div {
+  gap: 1px !important;
+}
+
+.site-shell--home-editorial .inmet-official-card-topline span {
+  color: #70828c !important;
+  font-size: 0.56rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+}
+
+.site-shell--home-editorial .inmet-official-card-topline strong {
+  color: #183545 !important;
+  font-size: 0.8rem !important;
+  font-weight: 730 !important;
+}
+
+.site-shell--home-editorial .inmet-official-card-topline b {
+  min-height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #087f91 !important;
+  font-size: 0.57rem !important;
+  font-weight: 840 !important;
+  letter-spacing: 0.075em !important;
+  text-transform: uppercase;
+}
+
+.site-shell--home-editorial .inmet-official-featured-summary {
+  display: grid !important;
+  padding: 2px 0 2px 15px;
+  grid-template-columns: 42px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 14px !important;
+  border-left: 2px solid #18bdcd;
+}
+
+.site-shell--home-editorial .inmet-official-featured-summary > div {
+  gap: 5px !important;
+}
+
+.site-shell--home-editorial .inmet-official-featured-summary small {
+  color: #087f91 !important;
+  font-size: 0.56rem !important;
+  font-weight: 840 !important;
+  letter-spacing: 0.08em !important;
+}
+
+.site-shell--home-editorial .inmet-official-featured-summary h3 {
+  max-width: 560px;
+  color: #071b2c !important;
+  font-size: clamp(1.25rem, 1.72vw, 1.72rem) !important;
+  font-weight: 720 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.043em !important;
+}
+
+.site-shell--home-editorial .inmet-official-icon,
+.site-shell--home-editorial .inmet-official-icon.is-featured {
+  display: grid;
+  width: 42px !important;
+  height: 42px !important;
+  place-items: center;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #1594a5 !important;
+  box-shadow: none !important;
+}
+
+.site-shell--home-editorial .inmet-official-icon svg,
+.site-shell--home-editorial .inmet-official-icon.is-featured svg {
+  width: 34px !important;
+  height: 34px !important;
+}
+
+.site-shell--home-editorial .inmet-official-metrics {
+  display: grid;
+  margin: 0 !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  border-top: 1px solid rgb(7 27 44 / 9%) !important;
+  border-bottom: 0 !important;
+}
+
+.site-shell--home-editorial .inmet-official-metrics > div,
+.site-shell--home-editorial .inmet-official-metrics > div:first-child,
+.site-shell--home-editorial .inmet-official-metrics > div:last-child {
+  min-height: 68px !important;
+  padding: 12px 13px !important;
+  border: 0 !important;
+  border-right: 1px solid rgb(7 27 44 / 7%) !important;
+  background: transparent !important;
+}
+
+.site-shell--home-editorial .inmet-official-metrics > div:first-child {
+  padding-left: 0 !important;
+}
+
+.site-shell--home-editorial .inmet-official-metrics > div:last-child {
+  padding-right: 0 !important;
+  border-right: 0 !important;
+}
+
+.site-shell--home-editorial .inmet-official-metrics dt {
+  color: #7a8b94 !important;
+  font-size: 0.53rem !important;
+  font-weight: 790 !important;
+  letter-spacing: 0.055em !important;
+  text-transform: uppercase;
+}
+
+.site-shell--home-editorial .inmet-official-metrics dd {
+  margin: 0 !important;
+  color: #193746 !important;
+  font-size: 0.7rem !important;
+  font-weight: 720 !important;
+  line-height: 1.35 !important;
+}
+
+.site-shell--home-editorial .inmet-official-featured .inmet-official-metrics .is-temperature dd {
+  font-size: clamp(1.16rem, 1.5vw, 1.48rem) !important;
+  font-weight: 760 !important;
+  letter-spacing: -0.04em !important;
+}
+
+.site-shell--home-editorial .inmet-official-metrics dd small {
+  display: block;
+  margin-top: 2px;
+  color: #87959c;
+  font-size: 0.53rem;
+  font-weight: 620;
+  line-height: 1.4;
+}
+
+.site-shell--home-editorial .inmet-official-next-periods {
+  display: grid !important;
+  gap: 0 !important;
+  padding-left: clamp(28px, 3.4vw, 46px) !important;
+}
+
+.site-shell--home-editorial .inmet-official-next-periods article {
+  display: grid !important;
+  min-height: 0 !important;
+  padding: 15px 0 !important;
+  grid-template-columns: minmax(105px, 0.27fr) minmax(0, 0.82fr) minmax(215px, 0.82fr) !important;
+  align-items: center !important;
+  gap: clamp(15px, 2vw, 28px) !important;
+  border: 0 !important;
+  border-bottom: 1px solid rgb(7 27 44 / 9%) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.site-shell--home-editorial .inmet-official-next-periods article:last-child {
+  border-bottom: 0 !important;
+}
+
+.site-shell--home-editorial .inmet-official-next-periods article:hover {
+  border-color: rgb(7 27 44 / 9%) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.site-shell--home-editorial .inmet-official-compact-summary {
+  display: grid !important;
+  grid-template-columns: 38px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.site-shell--home-editorial .inmet-official-compact-summary .inmet-official-icon {
+  width: 38px !important;
+  height: 38px !important;
+}
+
+.site-shell--home-editorial .inmet-official-compact-summary .inmet-official-icon svg {
+  width: 29px !important;
+  height: 29px !important;
+}
+
+.site-shell--home-editorial .inmet-official-compact-summary h3 {
+  margin: 0;
+  color: #193746 !important;
+  font-size: 0.83rem !important;
+  font-weight: 690 !important;
+  line-height: 1.36 !important;
+  letter-spacing: -0.018em !important;
+}
+
+.site-shell--home-editorial .inmet-official-next-periods .inmet-official-metrics {
+  border: 0 !important;
+}
+
+.site-shell--home-editorial .inmet-official-next-periods .inmet-official-metrics > div,
+.site-shell--home-editorial .inmet-official-next-periods .inmet-official-metrics > div:first-child,
+.site-shell--home-editorial .inmet-official-next-periods .inmet-official-metrics > div:last-child {
+  min-height: 0 !important;
+  padding: 2px 10px !important;
+}
+
+.site-shell--home-editorial .inmet-official-next-periods .inmet-official-metrics > div:first-child {
+  padding-left: 0 !important;
+}
+
+.site-shell--home-editorial .inmet-official-footer {
+  display: grid !important;
+  padding: 13px clamp(30px, 4vw, 54px) 14px !important;
+  grid-template-columns: minmax(0, 1.18fr) minmax(280px, 0.82fr) !important;
+  gap: clamp(26px, 4vw, 54px) !important;
+  border-top: 1px solid rgb(7 27 44 / 9%) !important;
+  background: #f8faf9 !important;
+}
+
+.site-shell--home-editorial .inmet-official-footer > div {
+  gap: 3px !important;
+}
+
+.site-shell--home-editorial .inmet-official-footer > div:last-child {
+  justify-items: end;
+  text-align: right;
+}
+
+.site-shell--home-editorial .inmet-official-footer strong {
+  color: #203b4b !important;
+  font-size: 0.67rem !important;
+}
+
+.site-shell--home-editorial .inmet-official-footer span {
+  color: #74868f !important;
+  font-size: 0.62rem !important;
+  line-height: 1.5 !important;
+}
+
+.site-shell--home-editorial .inmet-official-unavailable {
+  margin: 0 !important;
+  padding: 28px clamp(30px, 4vw, 54px) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #fbfcfb !important;
+}
+
+@media (max-width: 1060px) {
+  .site-shell--home-editorial .inmet-official-forecast-layout {
+    grid-template-columns: 1fr !important;
   }
 
-  .inmet-official-header {
-    padding: 1.4rem;
+  .site-shell--home-editorial .inmet-official-featured {
+    padding-right: 0 !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgb(7 27 44 / 9%) !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-next-periods {
+    padding-left: 0 !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-next-periods article {
+    grid-template-columns: minmax(110px, 0.3fr) minmax(0, 0.9fr) minmax(210px, 0.8fr) !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .site-shell--home-editorial .inmet-official-panel {
+    width: calc(100% - 16px) !important;
+    border-radius: 6px !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-header {
+    padding: 22px 19px 17px !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-heading h2 {
+    font-size: clamp(1.45rem, 7vw, 1.9rem) !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-heading > p {
+    font-size: 0.76rem !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-forecast-layout {
+    padding: 0 19px !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-featured {
+    gap: 17px !important;
+    padding: 20px 0 22px !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-featured-summary {
+    padding-left: 12px;
+    grid-template-columns: 36px minmax(0, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-icon,
+  .site-shell--home-editorial .inmet-official-icon.is-featured {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-icon svg,
+  .site-shell--home-editorial .inmet-official-icon.is-featured svg {
+    width: 30px !important;
+    height: 30px !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-metrics {
+    grid-template-columns: 1fr !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-metrics > div,
+  .site-shell--home-editorial .inmet-official-metrics > div:first-child,
+  .site-shell--home-editorial .inmet-official-metrics > div:last-child {
+    min-height: 0 !important;
+    padding: 10px 0 !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgb(7 27 44 / 7%) !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-metrics > div:last-child {
+    border-bottom: 0 !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-next-periods article {
+    padding: 17px 0 !important;
+    grid-template-columns: 1fr !important;
+    gap: 11px !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-next-periods .inmet-official-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    padding-top: 10px;
+    border-top: 1px solid rgb(7 27 44 / 7%) !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-next-periods .inmet-official-metrics > div,
+  .site-shell--home-editorial .inmet-official-next-periods .inmet-official-metrics > div:first-child,
+  .site-shell--home-editorial .inmet-official-next-periods .inmet-official-metrics > div:last-child {
+    padding: 2px 8px !important;
+    border-right: 1px solid rgb(7 27 44 / 7%) !important;
+    border-bottom: 0 !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-next-periods .inmet-official-metrics > div:first-child {
+    padding-left: 0 !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-next-periods .inmet-official-metrics > div:last-child {
+    padding-right: 0 !important;
+    border-right: 0 !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-footer {
+    padding: 13px 19px 15px !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .site-shell--home-editorial .inmet-official-footer > div:last-child {
+    justify-items: start;
+    text-align: left;
   }
 }
