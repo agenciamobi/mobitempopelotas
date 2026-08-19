@@ -1,4 +1,11 @@
-import { Children, cloneElement, isValidElement, type ReactElement, type ReactNode } from "react";
+import {
+  Children,
+  cloneElement,
+  Fragment,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 
 import { HomeEditorialDashboard as HomeEditorialDashboardBase } from "@/production/components/home-editorial-dashboard";
 import { WeatherIcon } from "@/production/components/weather-icon";
@@ -13,6 +20,8 @@ import {
   type WaterLevelVisualState,
   waterLevelStateClass,
 } from "@/production/lib/water-level-state";
+
+import "./home-editorial-dashboard-direction.css";
 
 type HomeEditorialDashboardProps = {
   weather: WeatherData;
@@ -51,6 +60,8 @@ type ElementProps = Record<string, unknown> & {
   title?: string;
 };
 
+const HOME_LAGOON_STATION_PRIORITY = ["sao-lourenco-do-sul", "furg-ccmar", "itapua"] as const;
+
 const stationStateLabels: Record<string, string> = {
   "Acima do nível de atenção": "Acima da cota local",
   "Perto do nível de atenção": "Próximo da cota local",
@@ -62,6 +73,21 @@ const editorialCopyReplacements: Record<string, string> = {
   "Previsão para os próximos dias": "Como o tempo deve evoluir na semana",
   "Veja como o tempo deve mudar ao longo do dia": "Próximas horas em Pelotas",
 };
+
+function summarizeLagoonForHome(lagoon: LagoonMonitoringNetworkData): LagoonMonitoringNetworkData {
+  const prioritized = HOME_LAGOON_STATION_PRIORITY.flatMap((stationId) =>
+    lagoon.observations.filter((observation) => observation.station.id === stationId),
+  );
+  const prioritizedIds = new Set(prioritized.map((observation) => observation.station.id));
+  const fallback = lagoon.observations.filter(
+    (observation) => !prioritizedIds.has(observation.station.id),
+  );
+
+  return {
+    ...lagoon,
+    observations: [...prioritized, ...fallback].slice(0, 3),
+  };
+}
 
 function WaterTrendLegend() {
   return (
@@ -193,6 +219,14 @@ function transformDashboardNode(
 
   if (
     isDomElement &&
+    node.type === "div" &&
+    normalizedText.startsWith("Vento mais forte hoje")
+  ) {
+    return null;
+  }
+
+  if (
+    isDomElement &&
     node.type === "span" &&
     nextContext.guaibaContext &&
     normalizedText === "Referência adicional"
@@ -291,10 +325,10 @@ function transformDashboardNode(
     hasClass(className, "home-story--forecast")
   ) {
     return (
-      <>
+      <Fragment key="forecast-with-official-source">
         {transformedElement}
         {afterForecast}
-      </>
+      </Fragment>
     );
   }
 
@@ -303,7 +337,8 @@ function transformDashboardNode(
 
 export function HomeEditorialDashboard(dashboardProps: HomeEditorialDashboardProps) {
   const { afterForecast = null, ...baseProps } = dashboardProps;
-  const dashboard = HomeEditorialDashboardBase(baseProps);
+  const homeLagoon = summarizeLagoonForHome(baseProps.lagoon);
+  const dashboard = HomeEditorialDashboardBase({ ...baseProps, lagoon: homeLagoon });
   const waterStates: WaterVisualStates = {
     laranjal: getWaterLevelVisualState({
       rate: baseProps.laranjal.trendCmPerHour,
@@ -319,7 +354,7 @@ export function HomeEditorialDashboard(dashboardProps: HomeEditorialDashboardPro
     }),
     guaibaReferenceLabel: baseProps.guaiba.station,
   };
-  const stationStates = baseProps.lagoon.observations.map((station) => ({
+  const stationStates = homeLagoon.observations.map((station) => ({
     city: station.station.city,
     name: station.station.name,
     state: getWaterLevelVisualState({
