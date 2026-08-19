@@ -18,7 +18,10 @@ const headerMegaCss = readFileSync(
 );
 const homeCurrentCss = readFileSync("src/production/styles/home-editorial-current.css", "utf8");
 const homeUxCss = readFileSync("src/production/styles/home-editorial-ux.css", "utf8");
-const homeForecastCss = readFileSync("src/production/styles/home-editorial-forecast.css", "utf8");
+const homeForecastCss = readFileSync(
+  "src/production/components/home-forecast-editorial.css",
+  "utf8",
+);
 const homeLayoutCss = readFileSync("src/production/styles/home-editorial-layout.css", "utf8");
 const homeDirectionCss = readFileSync(
   "src/production/components/home-editorial-dashboard-direction.css",
@@ -34,11 +37,10 @@ const semanticDashboard = readFileSync(
   "utf8",
 );
 
-test("stable homepage layers preserve the canonical final cascade", () => {
+test("stable homepage layers preserve the canonical final global cascade", () => {
   const stableHomeLayers = [
     "home-editorial-current.css",
     "home-editorial-ux.css",
-    "home-editorial-forecast.css",
     "home-editorial-layout.css",
   ];
 
@@ -46,6 +48,8 @@ test("stable homepage layers preserve the canonical final cascade", () => {
     for (const layer of stableHomeLayers) {
       assert.match(entry, new RegExp(layer.replace(".", "\\.")));
     }
+
+    assert.doesNotMatch(entry, /home-editorial-forecast\.css/);
 
     for (let index = 1; index < stableHomeLayers.length; index += 1) {
       assert.ok(
@@ -102,11 +106,12 @@ test("homepage answer section closes as an open editorial chapter", () => {
   );
 });
 
-test("forecast keeps data-journalism hierarchy without returning to a large card surface", () => {
-  assert.match(homeForecastCss, /Home editorial — previsão horária e tendência semanal/);
-  assert.match(homeForecastCss, /\.home-story--forecast\s*\{[\s\S]*background:\s*transparent !important/);
-  assert.match(homeForecastCss, /\.home-story--forecast\s*\{[\s\S]*border-radius:\s*0 !important/);
-  assert.match(homeForecastCss, /\.home-story--forecast\s*\{[\s\S]*box-shadow:\s*none !important/);
+test("forecast keeps data-journalism hierarchy in its isolated component", () => {
+  assert.match(homeForecastCss, /Home — previsão editorial autocontida/);
+  assert.match(homeForecastCss, /\.tp-home-forecast\s*\{[\s\S]*background:\s*transparent/);
+  assert.match(homeForecastCss, /\.tp-home-forecast__hours\s*\{[\s\S]*border-bottom:/);
+  assert.match(homeForecastCss, /\.tp-home-forecast-week__list\s*\{[\s\S]*border-top:/);
+  assert.doesNotMatch(homeForecastCss, /!important/);
 });
 
 test("homepage footer remains compact, transparent about sources and responsive", () => {
