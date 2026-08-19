@@ -6,7 +6,6 @@
  */
 @import "./styles/globals.css";
 @import "./styles/topic-pages.css";
-@import "./styles/home.css";
 @import "./styles/map.css";
 @import "./styles/radar-map.css";
 @import "./styles/mobile-app.css";
@@ -16,7 +15,6 @@
 @import "./styles/cameras.css";
 @import "./styles/lagoon-level.css";
 @import "./styles/lagoon-layout-refinement.css";
-@import "./styles/home-lagoon-card.css";
 @import "./styles/hydrology.css";
 @import "./styles/hydrology-monitor-grid.css";
 @import "./styles/guaiba-card.css";
@@ -33,11 +31,9 @@
 @import "./styles/pwa-fullscreen-refinement.css";
 @import "./styles/mobile-history-footer-refinement.css";
 @import "./styles/brand-assets.css";
-@import "./styles/home-location-and-level.css";
 @import "./styles/mobile-usability-refinement.css";
 @import "./styles/mobile-interaction-fixes.css";
 @import "./styles/theme-refinement.css";
-@import "./styles/home-flow-footer-refinement.css";
 @import "./styles/theme-polish.css";
 @import "./styles/topic-theme-polish.css";
 @import "./styles/footer-theme-v2.css";
@@ -65,8 +61,6 @@
 @import "./styles/footer-editorial-v23.css";
 @import "./styles/footer-production-cleanup.css";
 @import "./styles/water-level-semantic-colors.css";
-@import "./styles/home-cppmet-layout-water-audit.css";
-@import "./styles/home-cppmet-final-fixes.css";
 @import "./styles/safety-alerts.css";
 @import "./styles/header-megamenu-v25.css";
 @import "./styles/internal-editorial-v27.css";
