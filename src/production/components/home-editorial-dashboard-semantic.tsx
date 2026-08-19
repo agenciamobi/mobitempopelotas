@@ -1,9 +1,9 @@
 import {
   Children,
   cloneElement,
-  isValidElement,
   type ReactElement,
   type ReactNode,
+  isValidElement,
 } from "react";
 
 import { HomeEditorialDashboard as HomeEditorialDashboardBase } from "@/production/components/home-editorial-dashboard";
@@ -135,7 +135,9 @@ function transformDashboardNode(
   if (
     isDomElement &&
     node.type === "section" &&
-    (hasClass(className, "home-story--forecast") || hasClass(className, "home-explore-story"))
+    (hasClass(className, "home-story--forecast") ||
+      hasClass(className, "home-map-story") ||
+      hasClass(className, "home-explore-story"))
   ) {
     return null;
   }
