@@ -313,3 +313,27 @@ E quando visualmente o produto não parecer um dashboard genérico, uma landing 
 A identidade desejada é:
 
 > **um portal de informação meteorológica criado em Pelotas, para Pelotas, com fontes sérias, leitura clara e linguagem própria.**
+
+## 9. Status de implementação
+
+Estado desta direção na `main` em 18/08/2026:
+
+- **Composição principal:** aplicada. INMET passou a entrar depois da previsão pública e o banner preventivo permanente da Defesa Civil saiu da sequência principal da Home.
+- **Header editorial:** aplicado com navegação plana, estado ativo por linha e ações discretas.
+- **Hero Magazine / Broadcast:** aplicado. Fotografia recuperou protagonismo e os fatos prioritários ficaram limitados a mínima/máxima, chuva e vento.
+- **Índice da página:** aplicado como navegação editorial sem numeração e sem cards.
+- **Previsão:** já está na camada estável `home-editorial-forecast.css`, com timeline e tendência semanal orientadas por tipografia e espaço.
+- **INMET:** aplicado em linguagem Data Journalism Premium, com superfície contínua, síntese principal, hairlines e próximos períodos em sequência.
+- **Radar e satélite:** aplicado em linguagem Civic Tech / Scientific, com mapa dominante e controles visualmente mais funcionais que promocionais.
+- **Embrapa:** aplicado com leitura pública resumida para temperatura, umidade, vento e chuva do dia.
+- **Lagoa dos Patos:** aplicado com Laranjal como referência principal e rede regional resumida a três pontos na Home.
+- **Explore:** convertido para diretório editorial de conteúdo.
+- **PRO:** posição conceitual reservada, ainda sem bloco público ativo.
+
+Pendências antes de encerrar a reformulação:
+
+1. revisar fechamento editorial e footer;
+2. consolidar resíduos de CSS histórico sem criar nova série versionada;
+3. revisar mobile em larguras críticas;
+4. validar contratos, build, typecheck, lint e rotas;
+5. conferir o resultado visual no deploy antes de considerar a Home concluída.
