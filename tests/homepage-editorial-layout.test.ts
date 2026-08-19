@@ -7,6 +7,7 @@ const tsEntry = readFileSync("src/production/production-styles.ts", "utf8");
 const shellCss = readFileSync("src/production/styles/home-editorial-shell.css", "utf8");
 const heroCss = readFileSync("src/production/components/weather-hero-direction.css", "utf8");
 const alertPageCss = readFileSync("src/production/components/inmet-alerts-page.css", "utf8");
+const brandCss = readFileSync("src/production/styles/brand-palette-theme.css", "utf8");
 const waterSemanticCss = readFileSync(
   "src/production/styles/water-level-semantic-colors.css",
   "utf8",
@@ -117,6 +118,15 @@ test("the late homepage shell contains only transversal behavior", () => {
   assert.doesNotMatch(shellCss, /\.tp-home-(forecast|radar|observation|water|explore|guide|inmet|hero|alert)/);
   assert.doesNotMatch(shellCss, /!important/);
   assert.doesNotMatch(shellCss, /box-shadow/);
+});
+
+test("the shared brand palette no longer styles obsolete homepage structures", () => {
+  assert.match(brandCss, /--brand-cyan:\s*#18bdcd/);
+  assert.match(brandCss, /\.site-shell--topic\[data-topic=/);
+  assert.doesNotMatch(brandCss, /\.weather-hero/);
+  assert.doesNotMatch(brandCss, /\.site-header--hero/);
+  assert.doesNotMatch(brandCss, /\.dashboard-layout--after-hero/);
+  assert.doesNotMatch(brandCss, /\.hydrology-home/);
 });
 
 test("the homepage hero is fully owned by its local namespace", () => {
