@@ -142,10 +142,11 @@ test("the shared brand palette no longer styles obsolete homepage structures", (
   assert.doesNotMatch(brandCss, /\.hydrology-home/);
 });
 
-test("shared mobile usability does not restyle the isolated homepage", () => {
+test("shared mobile usability does not restyle isolated homepage or PWA components", () => {
   assert.match(mobileUsabilityCss, /Usabilidade mobile compartilhada/);
   assert.match(mobileUsabilityCss, /\.mobile-tab-bar/);
-  assert.match(mobileUsabilityCss, /\.pwa-launcher/);
+  assert.doesNotMatch(mobileUsabilityCss, /\.pwa-launcher/);
+  assert.doesNotMatch(mobileUsabilityCss, /\.pwa-dialog/);
   assert.doesNotMatch(mobileUsabilityCss, /\.site-shell--home\s+\.weather-hero/);
   assert.doesNotMatch(mobileUsabilityCss, /\.site-shell--home\s*>\s*\.site-header--hero/);
   assert.doesNotMatch(mobileUsabilityCss, /\.embrapa-observation-home/);
