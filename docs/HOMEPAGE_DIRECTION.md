@@ -212,6 +212,8 @@ Editorial e funcional. Não repetir toda a Home.
 - sombras excepcionais;
 - gradientes concentrados no Hero quando necessários para legibilidade da fotografia.
 
+A política de canvas aberto é parte da arquitetura, não apenas um refinamento cosmético: Hero, avisos oficiais, mapa e controles interativos podem justificar contenção; previsão, medição local, águas, diretório e metodologia devem preferir página aberta, grid, espaço e hairlines.
+
 ### 4.2. Cor
 
 - navy: texto e estrutura institucional;
@@ -298,6 +300,8 @@ Ordem:
 
 Não criar nova sequência de arquivos `v81`, `v82`, `v83` etc. Refinamentos devem fortalecer arquivos estáveis por domínio ou estilos localizados em componentes quando isso reduzir acoplamento.
 
+A camada `home-editorial-layout.css` é uma fonte estável de composição estrutural, não uma nova sequência versionada: ela fixa a política de canvas aberto e deve substituir gradualmente overrides históricos equivalentes durante a consolidação.
+
 ## 8. Critério de aceite
 
 A reformulação estará concluída quando a Home permitir responder em poucos segundos:
@@ -322,19 +326,21 @@ Estado desta direção na `main` em 18/08/2026:
 - **Header editorial:** aplicado com navegação plana, estado ativo por linha e ações discretas.
 - **Hero Magazine / Broadcast:** aplicado. Fotografia recuperou protagonismo e os fatos prioritários ficaram limitados a mínima/máxima, chuva e vento.
 - **Índice da página:** aplicado como navegação editorial sem numeração e sem cards.
-- **Previsão:** já está na camada estável `home-editorial-forecast.css`, com timeline e tendência semanal orientadas por tipografia e espaço.
+- **Previsão:** aplicada na camada estável `home-editorial-forecast.css`, com capítulo aberto, timeline e tendência semanal orientadas por tipografia, espaço e hairlines.
 - **INMET:** aplicado em linguagem Data Journalism Premium, com superfície contínua, síntese principal, hairlines e próximos períodos em sequência.
-- **Radar e satélite:** aplicado em linguagem Civic Tech / Scientific, com mapa dominante e controles visualmente mais funcionais que promocionais.
-- **Embrapa:** aplicado com leitura pública resumida para temperatura, umidade, vento e chuva do dia.
-- **Lagoa dos Patos:** aplicado com Laranjal como referência principal e rede regional resumida a três pontos na Home.
-- **Explore:** convertido para diretório editorial de conteúdo.
+- **Radar e satélite:** aplicado em linguagem Civic Tech / Scientific, com mapa dominante e controles visualmente mais funcionais que promocionais. O mapa permanece uma unidade contida porque é uma interação real.
+- **Embrapa:** aplicada com leitura pública resumida para temperatura, umidade, vento e chuva do dia; a seção externa passou a usar canvas aberto.
+- **Lagoa dos Patos:** aplicada com Laranjal como referência principal, rede regional resumida a três pontos e composição externa aberta.
+- **Explore:** convertido para diretório editorial de conteúdo e retirado da lógica de card promocional.
+- **Entenda os dados:** convertido para fechamento editorial aberto, sem superfície institucional pesada.
 - **Footer:** aplicado como fechamento editorial mais compacto, preservando navegação, transparência, fontes e acesso aos avisos sem aparência de landing page.
+- **Canvas editorial aberto:** formalizado em `home-editorial-layout.css`, carregado depois de `home-editorial-forecast.css` nas duas entradas de estilos.
 - **PRO:** posição conceitual reservada, ainda sem bloco público ativo.
-- **Contratos da Home:** ampliados para proteger a ordem INMET, os fatos essenciais do Hero, o índice sem numeração, a ausência do banner preventivo permanente e o carregamento dos estilos editoriais estáveis de header/footer.
+- **Contratos da Home:** ampliados para proteger a ordem INMET, os fatos essenciais do Hero, o índice sem numeração, a ausência do banner preventivo permanente, os estilos editoriais estáveis e a política de canvas aberto.
 
 Pendências antes de encerrar a reformulação:
 
-1. consolidar resíduos de CSS histórico sem criar nova série versionada;
-2. revisar mobile em larguras críticas;
-3. validar contratos, build, typecheck, lint e rotas;
-4. conferir o resultado visual no deploy antes de considerar a Home concluída.
+1. consolidar e remover resíduos de CSS histórico que já foram substituídos pelas fontes estáveis, sem criar nova série versionada;
+2. revisar visualmente mobile/tablet nas larguras críticas e corrigir apenas problemas observados;
+3. validar contratos, build, typecheck, lint e rotas em ambiente com execução disponível;
+4. conferir o resultado visual sincronizado no deploy antes de considerar a Home concluída.
