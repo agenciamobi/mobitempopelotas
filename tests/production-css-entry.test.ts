@@ -31,7 +31,7 @@ test("carrega as folhas estruturais no head global antes da hidratação", async
   );
 });
 
-test("mantém a entrada CSS global idêntica ao manifesto de produção", async () => {
+test("mantém a entrada CSS global idêntica ao manifesto de produção sem proteger bloat histórico", async () => {
   const [productionCss, productionManifest] = await Promise.all([
     readFile(PRODUCTION_CSS_PATH, "utf8"),
     readFile(PRODUCTION_MANIFEST_PATH, "utf8"),
@@ -43,11 +43,19 @@ test("mantém a entrada CSS global idêntica ao manifesto de produção", async 
     /import "\.\/styles\/([^"]+\.css)";/g,
   );
 
-  assert.ok(cssImports.length >= 100, "a pilha editorial completa deve permanecer declarada");
+  assert.ok(cssImports.length > 0, "a entrada de produção precisa declarar suas folhas globais");
   assert.deepEqual(
     cssImports,
     manifestImports,
     "a entrada global e o manifesto devem preservar os mesmos arquivos e a mesma ordem",
+  );
+  assert.ok(cssImports.includes("globals.css"));
+  assert.ok(cssImports.includes("map.css"));
+  assert.ok(cssImports.includes("document-scroll.css"));
+  assert.ok(cssImports.includes("home-editorial-shell.css"));
+  assert.ok(
+    cssImports.length < 100,
+    "a limpeza da cascata não deve regredir para mais de cem folhas globais",
   );
 });
 
