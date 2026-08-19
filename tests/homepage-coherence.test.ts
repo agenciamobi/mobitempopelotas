@@ -14,6 +14,10 @@ const semanticDashboard = readFileSync(
 const weatherMap = readFileSync("src/production/components/weather-map.tsx", "utf8");
 const weatherHero = readFileSync("src/production/components/weather-hero.tsx", "utf8");
 const homeHeader = readFileSync("src/production/components/home-editorial-header.tsx", "utf8");
+const homeHeaderCss = readFileSync(
+  "src/production/components/home-editorial-header.css",
+  "utf8",
+);
 const siteFooter = readFileSync("src/production/components/site-footer.tsx", "utf8");
 const todayRoute = readFileSync("src/routes/tempo-hoje-pelotas.tsx", "utf8");
 
@@ -66,6 +70,17 @@ test("the homepage does not keep a permanent civil-defense promo in the main nar
 test("the homepage header and footer load their stable editorial direction styles", () => {
   assert.match(homeHeader, /import "\.\/home-editorial-header\.css"/);
   assert.match(siteFooter, /import "\.\/site-footer-home\.css"/);
+});
+
+test("the homepage header is isolated from the historical first-fold cascade", () => {
+  assert.match(homeHeader, /className="tp-home-header"/);
+  assert.match(homeHeader, /tp-home-header__nav/);
+  assert.match(homeHeaderCss, /\.tp-home-header\s*\{[\s\S]*position:\s*sticky/);
+  assert.match(homeHeaderCss, /\.tp-home-header__inner\s*\{[\s\S]*grid-template-columns/);
+  assert.match(homeHeaderCss, /@media \(max-width: 1040px\)/);
+  assert.match(homeHeaderCss, /@media \(max-width: 720px\)/);
+  assert.doesNotMatch(homeHeader, /className="home-editorial-header"/);
+  assert.doesNotMatch(homeHeaderCss, /\.home-editorial-header/);
 });
 
 test("the home targets now while the dedicated route targets today's forecast", () => {
