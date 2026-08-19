@@ -5,6 +5,8 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { AuthAccountAction } from "@/components/auth/AuthAccountAction";
 import type { AdvisoryLevel } from "@/production/lib/weather-insights";
 
+import "./home-editorial-header.css";
+
 const homeNavigation = [
   { label: "Agora", to: "/", ariaLabel: "Ver o tempo agora em Pelotas" },
   {
