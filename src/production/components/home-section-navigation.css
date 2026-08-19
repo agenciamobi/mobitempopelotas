@@ -1,16 +1,16 @@
 /*
  * Índice editorial da Home — navegação autocontida por âncoras.
- * Sem tabs, cards, numeração ou herança dos antigos home-navigation-vXX.
+ * Funciona como sumário de matéria: links tipográficos, sem tabs, cards ou divisórias.
  */
 
 .tp-home-index {
   display: grid;
-  width: min(1440px, calc(100% - 48px));
-  margin: 18px auto 0;
+  width: min(1220px, calc(100% - 48px));
+  margin: 16px auto 0;
   padding: 0;
   grid-template-columns: auto minmax(0, 1fr);
-  align-items: stretch;
-  gap: 24px;
+  align-items: center;
+  gap: clamp(28px, 4vw, 56px);
   border: 0;
   border-bottom: 1px solid rgb(7 27 44 / 10%);
   background: transparent;
@@ -18,58 +18,45 @@
 
 .tp-home-index__label {
   display: flex;
-  min-width: 112px;
   align-items: center;
-  padding: 13px 0 8px;
+  padding: 14px 0 13px;
   color: #71838c;
   font-size: 0.57rem;
   font-weight: 820;
   letter-spacing: 0.09em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .tp-home-index__links {
   display: flex;
   min-width: 0;
-  align-items: stretch;
+  align-items: center;
+  gap: clamp(20px, 2.5vw, 38px);
 }
 
 .tp-home-index__links a {
   position: relative;
-  display: flex;
-  min-width: 0;
+  display: inline-flex;
   min-height: 48px;
-  flex: 1 1 0;
+  flex: 0 0 auto;
   align-items: center;
-  padding: 10px clamp(14px, 1.8vw, 24px) 13px;
+  padding: 12px 0 13px;
   border: 0;
-  border-right: 1px solid rgb(7 27 44 / 8%);
   background: transparent;
-  color: #455f6c;
+  color: #526b77;
   text-decoration: none;
   transition: color 160ms ease;
 }
 
 .tp-home-index__links a::after {
   position: absolute;
-  right: clamp(14px, 1.8vw, 24px);
+  right: 0;
   bottom: -1px;
-  left: clamp(14px, 1.8vw, 24px);
+  left: 0;
   height: 2px;
   background: transparent;
   content: "";
-}
-
-.tp-home-index__links a:first-child {
-  padding-left: 0;
-}
-
-.tp-home-index__links a:first-child::after {
-  left: 0;
-}
-
-.tp-home-index__links a:last-child {
-  border-right: 0;
 }
 
 .tp-home-index__links a:hover,
@@ -91,21 +78,22 @@
 
 @media (max-width: 1240px) {
   .tp-home-index {
-    width: min(100% - 32px, 1180px);
+    width: calc(100% - 32px);
   }
 }
 
 @media (max-width: 980px) {
   .tp-home-index {
     grid-template-columns: 1fr;
-    gap: 6px;
+    gap: 0;
   }
 
   .tp-home-index__label {
-    min-width: 0;
+    padding-bottom: 4px;
   }
 
   .tp-home-index__links {
+    gap: 24px;
     overflow-x: auto;
     overscroll-behavior-inline: contain;
     scroll-snap-type: x proximity;
@@ -118,24 +106,28 @@
 
   .tp-home-index__links a {
     min-width: max-content;
-    flex: 0 0 auto;
-    padding-inline: 15px;
     scroll-snap-align: start;
-  }
-
-  .tp-home-index__links a:first-child {
-    padding-left: 0;
   }
 }
 
 @media (max-width: 720px) {
   .tp-home-index {
-    width: calc(100% - 16px);
-    margin-top: 14px;
+    width: calc(100% - 24px);
+    margin-top: 12px;
+  }
+
+  .tp-home-index__label {
+    padding-top: 12px;
+  }
+
+  .tp-home-index__links {
+    gap: 20px;
   }
 
   .tp-home-index__links a {
-    min-height: 44px;
+    min-height: 42px;
+    padding-top: 9px;
+    padding-bottom: 11px;
   }
 }
 
