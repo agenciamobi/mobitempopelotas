@@ -26,11 +26,9 @@ import {
   InmetAlertsPanel,
 } from "@/production/components/inmet-alerts-panel";
 import { InmetOfficialForecastPanel } from "@/production/components/inmet-official-forecast-panel";
-import { SafetyAlertBanner } from "@/production/components/safety-alerts";
 import { SiteFooter } from "@/production/components/site-footer";
 import { SiteHeader } from "@/production/components/site-header";
 import { WeatherHero } from "@/production/components/weather-hero";
-import { getFeaturedSafetyBanner } from "@/production/lib/safety-banners";
 import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-browser-recovery";
 import type { WeatherData } from "@/production/lib/weather-data";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/production/lib/weather-insights";
@@ -144,7 +142,6 @@ export function ProductionHome({
       : "normal";
   const headerLevel =
     advisoryRank[officialLevel] > advisoryRank[advisory.level] ? officialLevel : advisory.level;
-  const featuredSafetyBanner = getFeaturedSafetyBanner(hasPelotasOfficialAlerts);
   const cppmetToday = recoveredData.weather.officialForecast[0] ?? null;
   const forecastWindSpeedKmh = strongestHourlyWindSpeed(weather);
   const mainClassName = hasPelotasOfficialAlerts
@@ -187,13 +184,7 @@ export function ProductionHome({
 
       <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
         <InmetAlertsPanel data={inmetAlerts} variant="home" advisoryLevel={headerLevel} />
-        <InmetOfficialForecastPanel
-          periods={recoveredData.weather.inmetForecast}
-          station={recoveredData.weather.inmetStation}
-          forecastWindSpeedKmh={forecastWindSpeedKmh}
-        />
         <HeroAstronomyPortal astronomy={weather.astronomy} />
-        <SafetyAlertBanner banner={featuredSafetyBanner} />
         <HomeSectionNavigation />
         <HomeEditorialDashboard
           weather={weather}
@@ -202,6 +193,13 @@ export function ProductionHome({
           laranjal={laranjal}
           guaiba={guaiba}
           lagoon={lagoon}
+          afterForecast={
+            <InmetOfficialForecastPanel
+              periods={recoveredData.weather.inmetForecast}
+              station={recoveredData.weather.inmetStation}
+              forecastWindSpeedKmh={forecastWindSpeedKmh}
+            />
+          }
         />
         <HomeHourlyConditionPortal hours={weather.hourly} />
         <HomeTrendEditorialPortal weather={weather} narrative={summaries.tomorrow} />
