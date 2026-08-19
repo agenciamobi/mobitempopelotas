@@ -151,7 +151,7 @@ export function ProductionHome({
   return (
     <div className="site-shell site-shell--home site-shell--home-editorial">
       <SiteHeader advisoryLevel={headerLevel} variant="hero" />
-      <div className={`home-hero-camera-shell${liveLaranjalCamera ? " has-live-camera" : ""}`}>
+      <div className={`tp-home-hero-shell${liveLaranjalCamera ? " has-live-camera" : ""}`}>
         <WeatherHero
           weather={weather}
           advisoryLevel={headerLevel}
@@ -170,7 +170,7 @@ export function ProductionHome({
         />
         {liveLaranjalCamera ? (
           <Link
-            className="home-hero-camera-source"
+            className="tp-home-hero-source"
             to="/cameras-ao-vivo-pelotas"
             aria-label="Abrir a câmera ao vivo da Praia do Laranjal"
           >

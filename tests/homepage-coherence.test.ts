@@ -13,6 +13,10 @@ const semanticDashboard = readFileSync(
 );
 const weatherMap = readFileSync("src/production/components/weather-map.tsx", "utf8");
 const weatherHero = readFileSync("src/production/components/weather-hero.tsx", "utf8");
+const weatherHeroCss = readFileSync(
+  "src/production/components/weather-hero-direction.css",
+  "utf8",
+);
 const homeHeader = readFileSync("src/production/components/home-editorial-header.tsx", "utf8");
 const homeHeaderCss = readFileSync(
   "src/production/components/home-editorial-header.css",
@@ -49,7 +53,7 @@ test("the hero separates current wording from forecast wording", () => {
 });
 
 test("the hero keeps only the essential public facts", () => {
-  assert.match(weatherHero, /weather-hero-editorial-facts--essential/);
+  assert.match(weatherHero, /className="tp-home-hero__facts"/);
   assert.match(weatherHero, /label="Mín\. \/ máx\."/);
   assert.match(weatherHero, /label="Chuva"/);
   assert.match(weatherHero, /"Vento previsto"/);
@@ -83,6 +87,21 @@ test("the homepage header is isolated from the historical first-fold cascade", (
   assert.doesNotMatch(homeHeaderCss, /\.home-editorial-header/);
 });
 
+test("the homepage hero is isolated from the historical first-fold cascade", () => {
+  assert.match(weatherHero, /className=\{`tp-home-hero tp-home-hero--\$\{resolvedLevel\}/);
+  assert.match(weatherHero, /tp-home-hero__temperature/);
+  assert.match(weatherHero, /tp-home-hero__hourly/);
+  assert.match(weatherHeroCss, /\.tp-home-hero\s*\{[\s\S]*min-height:\s*530px/);
+  assert.match(weatherHeroCss, /\.tp-home-hero__layout\s*\{[\s\S]*display:\s*flex/);
+  assert.match(weatherHeroCss, /\.tp-home-hero__facts\s*\{[\s\S]*grid-template-columns/);
+  assert.match(weatherHeroCss, /@media \(max-width: 1040px\)/);
+  assert.match(weatherHeroCss, /@media \(max-width: 720px\)/);
+  assert.doesNotMatch(weatherHero, /weather-hero--editorial-v7[01]/);
+  assert.doesNotMatch(weatherHero, /weather-hero-editorial-/);
+  assert.doesNotMatch(weatherHeroCss, /weather-hero--editorial-v7[01]/);
+  assert.doesNotMatch(weatherHeroCss, /weather-hero-editorial-/);
+});
+
 test("the home targets now while the dedicated route targets today's forecast", () => {
   assert.match(weatherHero, /Tempo agora em Pelotas/);
   assert.doesNotMatch(weatherHero, /Tempo em Pelotas hoje/);
@@ -92,7 +111,7 @@ test("the home targets now while the dedicated route targets today's forecast", 
 test("the hero does not credit a static photo while the live camera is visible", () => {
   assert.match(
     weatherHero,
-    /\{liveCameraBackground \? null : \([\s\S]*className="weather-hero-credit"/,
+    /\{liveCameraBackground \? null : \([\s\S]*className="tp-home-hero__credit"/,
   );
 });
 

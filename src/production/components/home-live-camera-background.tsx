@@ -64,7 +64,7 @@ export function HomeLiveCameraBackground({
 
   return (
     <div
-      className={`weather-hero-live-camera${isReady ? " is-ready" : ""}`}
+      className={`tp-home-hero__live-camera${isReady ? " is-ready" : ""}`}
       data-player-attempt={attempt}
       aria-hidden="true"
     >

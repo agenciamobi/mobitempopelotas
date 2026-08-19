@@ -52,7 +52,7 @@ function formatMetric(value: number | null, unit: string) {
 
 function HeroFact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="weather-hero-editorial-fact">
+    <div className="tp-home-hero__fact">
       <span>{label}</span>
       <strong>{value}</strong>
     </div>
@@ -97,14 +97,14 @@ export function WeatherHero({
 
   return (
     <section
-      className={`weather-hero weather-hero--${resolvedLevel} weather-hero--condition-${displayIcon} weather-hero--editorial-v70 weather-hero--editorial-v71`}
+      className={`tp-home-hero tp-home-hero--${resolvedLevel} tp-home-hero--condition-${displayIcon}`}
       data-condition={displayIcon}
       data-photo-kind={heroPhoto.kind}
       data-official-alerts={officialAlertCount > 0 ? "true" : "false"}
       aria-labelledby="weather-hero-title"
     >
       <div
-        className="weather-hero-photo"
+        className="tp-home-hero__photo"
         aria-hidden="true"
         style={{
           backgroundImage: `url("${heroPhoto.src}")`,
@@ -112,31 +112,31 @@ export function WeatherHero({
         }}
       />
       {liveCameraBackground}
-      <div className="weather-hero-overlay" aria-hidden="true" />
+      <div className="tp-home-hero__overlay" aria-hidden="true" />
 
-      <div className="weather-hero-editorial-layout">
-        <div className="weather-hero-editorial-main">
-          <div className="weather-hero-editorial-meta">
-            <div className="weather-hero-editorial-context">
-              <span className="weather-hero-editorial-location">Pelotas, RS</span>
+      <div className="tp-home-hero__layout">
+        <div className="tp-home-hero__main">
+          <div className="tp-home-hero__meta">
+            <div className="tp-home-hero__context">
+              <span className="tp-home-hero__location">Pelotas, RS</span>
               <span
-                className={`weather-hero-editorial-status${current.available ? " is-live" : " is-unavailable"}`}
+                className={`tp-home-hero__status${current.available ? " is-live" : " is-unavailable"}`}
               >
                 <i aria-hidden="true" />
                 {current.available ? "Agora" : "Previsão"}
               </span>
-              <span className="weather-hero-editorial-update">{currentUpdateMeta}</span>
+              <span className="tp-home-hero__update">{currentUpdateMeta}</span>
             </div>
           </div>
 
-          <div className="weather-hero-editorial-copy">
-            <h1 id="weather-hero-title" className="weather-hero-seo-title">
+          <div className="tp-home-hero__copy">
+            <h1 id="weather-hero-title" className="tp-home-hero__seo-title">
               Tempo agora em Pelotas
             </h1>
 
-            <div className="weather-hero-editorial-reading">
+            <div className="tp-home-hero__reading">
               <div
-                className="weather-hero-editorial-temperature"
+                className="tp-home-hero__temperature"
                 aria-label={
                   current.available
                     ? "Temperatura agora"
@@ -145,8 +145,8 @@ export function WeatherHero({
               >
                 <strong>{formatMetric(displayTemperature, "°")}</strong>
               </div>
-              <div className="weather-hero-editorial-condition">
-                <div className="weather-hero-editorial-condition-icon">
+              <div className="tp-home-hero__condition">
+                <div className="tp-home-hero__condition-icon">
                   <WeatherIcon name={displayIcon} title={`Condição: ${displayCondition}`} />
                 </div>
                 <div>
@@ -162,37 +162,34 @@ export function WeatherHero({
               </div>
             </div>
 
-            <p className="weather-hero-editorial-source-inline">
-              <span>{current.available ? "Condição observada" : "Fonte da observação"}</span>
-              <strong>{current.source.name}</strong>
-            </p>
-
-            <p className="weather-hero-editorial-description">{description}</p>
+            <p className="tp-home-hero__description">{description}</p>
 
             {officialAlertCount > 0 ? (
-              <Link className="weather-hero-editorial-alert" href="/alertas">
-                <span className="weather-hero-editorial-alert-dot" aria-hidden="true" />
+              <Link className="tp-home-hero__alert" href="/alertas">
+                <span className="tp-home-hero__alert-dot" aria-hidden="true" />
                 <strong>{getOfficialAlertActionLabel(officialAlertCount)}</strong>
                 <i aria-hidden="true">→</i>
               </Link>
             ) : forecastReason ? (
-              <p className="weather-hero-editorial-note">{capitalizeSentence(forecastReason)}</p>
+              <p className="tp-home-hero__note">{capitalizeSentence(forecastReason)}</p>
             ) : null}
 
-            <div className="weather-hero-editorial-actions">
-              <Link className="weather-hero-editorial-primary" href="/tempo-hoje-pelotas">
+            <div className="tp-home-hero__actions">
+              <Link className="tp-home-hero__primary" href="/tempo-hoje-pelotas">
                 Ver previsão por hora <span aria-hidden="true">→</span>
               </Link>
-              <Link className="weather-hero-editorial-secondary" href={secondaryAction.href}>
+              <Link className="tp-home-hero__secondary" href={secondaryAction.href}>
                 {secondaryAction.label} <span aria-hidden="true">→</span>
               </Link>
             </div>
+
+            <p className="tp-home-hero__source-inline">
+              <span>{current.available ? "Condição observada" : "Fonte da observação"}</span>
+              <strong>{current.source.name}</strong>
+            </p>
           </div>
 
-          <div
-            className="weather-hero-editorial-facts weather-hero-editorial-facts--essential"
-            aria-label="Resumo das condições e da previsão de hoje"
-          >
+          <div className="tp-home-hero__facts" aria-label="Resumo das condições e da previsão de hoje">
             <HeroFact label="Mín. / máx." value={today ? `${today.min}° / ${today.max}°` : "—"} />
             <HeroFact
               label="Chuva"
@@ -212,11 +209,8 @@ export function WeatherHero({
           </div>
         </div>
 
-        <div
-          className="weather-hero-editorial-hourly weather-hero-editorial-hourly-strip"
-          aria-label="Previsão para as próximas horas"
-        >
-          <div className="weather-hero-editorial-hourly-heading">
+        <div className="tp-home-hero__hourly" aria-label="Previsão para as próximas horas">
+          <div className="tp-home-hero__hourly-heading">
             <div>
               <span>Próximas horas</span>
               <strong>Como o tempo evolui</strong>
@@ -224,13 +218,13 @@ export function WeatherHero({
           </div>
 
           {hourlyPreview.length > 0 ? (
-            <div className="weather-hero-editorial-hourly-list">
+            <div className="tp-home-hero__hourly-list">
               {hourlyPreview.map((hour, index) => (
-                <div className="weather-hero-editorial-hour" key={`${hour.time}-${index}`}>
-                  <span className="weather-hero-editorial-hour-time">
+                <div className="tp-home-hero__hour" key={`${hour.time}-${index}`}>
+                  <span className="tp-home-hero__hour-time">
                     {index === 0 && current.available ? "Agora" : hour.time}
                   </span>
-                  <span className="weather-hero-editorial-hour-icon">
+                  <span className="tp-home-hero__hour-icon">
                     <WeatherIcon name={hour.icon} title={weatherConditionLabels[hour.icon]} />
                   </span>
                   <strong>{hour.temperature}°</strong>
@@ -241,14 +235,14 @@ export function WeatherHero({
               ))}
             </div>
           ) : (
-            <div className="weather-hero-editorial-hourly-empty">
+            <div className="tp-home-hero__hourly-empty">
               <strong>Previsão por hora indisponível</strong>
               <p>Os dados serão atualizados assim que a fonte responder novamente.</p>
             </div>
           )}
 
           <Link
-            className="weather-hero-editorial-hourly-more"
+            className="tp-home-hero__hourly-more"
             href="/tempo-hoje-pelotas"
             aria-label="Ver a previsão completa por hora"
           >
@@ -258,7 +252,7 @@ export function WeatherHero({
       </div>
 
       {liveCameraBackground ? null : (
-        <span className="weather-hero-credit">{heroPhoto.credit}</span>
+        <span className="tp-home-hero__credit">{heroPhoto.credit}</span>
       )}
     </section>
   );
