@@ -47,8 +47,8 @@
   max-width: 760px;
   margin: 0;
   color: #5f747f;
-  font-size: clamp(0.78rem, 0.9vw, 0.88rem);
-  line-height: 1.6;
+  font-size: clamp(0.86rem, 0.95vw, 0.94rem);
+  line-height: 1.66;
 }
 
 .tp-home-inmet__layout {
@@ -80,24 +80,24 @@
 
 .tp-home-inmet__topline span {
   color: #71848d;
-  font-size: 0.56rem;
+  font-size: 0.64rem;
   font-weight: 790;
-  letter-spacing: 0.075em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
 .tp-home-inmet__topline strong {
   color: #183746;
-  font-size: 0.8rem;
+  font-size: 0.86rem;
   font-weight: 740;
   text-transform: capitalize;
 }
 
 .tp-home-inmet__topline b {
   color: var(--tp-inmet-cyan);
-  font-size: 0.57rem;
+  font-size: 0.64rem;
   font-weight: 840;
-  letter-spacing: 0.075em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   white-space: nowrap;
 }
@@ -118,9 +118,9 @@
 
 .tp-home-inmet__featured-summary small {
   color: var(--tp-inmet-cyan);
-  font-size: 0.56rem;
+  font-size: 0.64rem;
   font-weight: 830;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.075em;
   text-transform: uppercase;
 }
 
@@ -194,17 +194,17 @@
 
 .tp-home-inmet__metrics dt {
   color: #7a8c94;
-  font-size: 0.53rem;
+  font-size: 0.61rem;
   font-weight: 790;
-  letter-spacing: 0.055em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
 .tp-home-inmet__metrics dd {
   color: #193746;
-  font-size: 0.71rem;
+  font-size: 0.79rem;
   font-weight: 720;
-  line-height: 1.35;
+  line-height: 1.38;
 }
 
 .tp-home-inmet__featured .tp-home-inmet__metrics .is-temperature dd {
@@ -221,7 +221,7 @@
 .tp-home-inmet__metrics dd small {
   margin-top: 2px;
   color: #86969d;
-  font-size: 0.53rem;
+  font-size: 0.61rem;
   font-weight: 620;
   line-height: 1.4;
 }
@@ -265,9 +265,9 @@
 }
 
 .tp-home-inmet__compact-summary h3 {
-  font-size: 0.83rem;
+  font-size: 0.9rem;
   font-weight: 690;
-  line-height: 1.36;
+  line-height: 1.4;
   letter-spacing: -0.018em;
 }
 
@@ -306,14 +306,14 @@
 
 .tp-home-inmet__footer strong {
   color: #203b4b;
-  font-size: 0.67rem;
+  font-size: 0.74rem;
 }
 
 .tp-home-inmet__footer span {
   max-width: 76ch;
   color: #74868f;
-  font-size: 0.62rem;
-  line-height: 1.5;
+  font-size: 0.69rem;
+  line-height: 1.55;
 }
 
 .tp-home-inmet__unavailable {
@@ -321,6 +321,8 @@
   gap: 5px;
   padding: 30px clamp(30px, 4vw, 52px);
   color: #607681;
+  font-size: 0.84rem;
+  line-height: 1.55;
 }
 
 .tp-home-inmet__unavailable strong {
