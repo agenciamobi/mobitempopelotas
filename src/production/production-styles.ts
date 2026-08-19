@@ -46,8 +46,6 @@ import "./styles/project-refinement.css";
 import "./styles/inmet-alerts.css";
 import "./styles/editorial-readable-final.css";
 import "./styles/editorial-readable-v2.css";
-import "./styles/home-editorial-clarity-v3.css";
-import "./styles/home-visitor-copy-v4.css";
 import "./styles/topic-editorial-home-visual.css";
 import "./styles/topic-special-pages-refinement.css";
 import "./styles/topic-special-pages-mobile-fix.css";
