@@ -23,6 +23,10 @@ const forecastCss = readFileSync(
   "src/production/components/home-forecast-editorial.css",
   "utf8",
 );
+const trendCss = readFileSync(
+  "src/production/components/home-forecast-trend.css",
+  "utf8",
+);
 const radarCss = readFileSync(
   "src/production/components/home-radar-editorial.css",
   "utf8",
@@ -124,7 +128,7 @@ test("the late homepage shell contains only transversal behavior", () => {
   assert.match(shellCss, /scroll-margin-top:\s*92px/);
   assert.match(shellCss, /:focus-visible/);
   assert.match(shellCss, /prefers-reduced-motion/);
-  assert.doesNotMatch(shellCss, /\.tp-home-(forecast|radar|observation|water|explore|guide|inmet|hero|alert)/);
+  assert.doesNotMatch(shellCss, /\.tp-home-(forecast|trend|radar|observation|water|explore|guide|inmet|hero|alert)/);
   assert.doesNotMatch(shellCss, /!important/);
   assert.doesNotMatch(shellCss, /box-shadow/);
 });
@@ -195,29 +199,31 @@ test("shared water states no longer depend on the legacy homepage widgets", () =
 });
 
 test("public homepage chapters are open and locally owned", () => {
-  for (const css of [forecastCss, observationCss, waterCss, exploreCss, guideCss]) {
+  for (const css of [forecastCss, trendCss, observationCss, waterCss, exploreCss, guideCss]) {
     assert.doesNotMatch(css, /!important/);
     assert.doesNotMatch(css, /box-shadow/);
   }
 
   assert.match(forecastCss, /\.tp-home-forecast\s*\{/);
+  assert.match(trendCss, /\.tp-home-trend\s*\{/);
   assert.match(observationCss, /\.tp-home-observation\s*\{/);
   assert.match(waterCss, /\.tp-home-water\s*\{/);
   assert.match(exploreCss, /\.tp-home-explore\s*\{/);
   assert.match(guideCss, /\.tp-home-guide\s*\{/);
 });
 
-test("the interactive radar keeps one scientific frame instead of a chapter card", () => {
+test("the interactive radar keeps one scientific frame and one light technical timeline", () => {
   assert.match(radarCss, /\.tp-home-radar\s*\{[\s\S]*border-top:\s*1px solid/);
   assert.match(radarCss, /\.tp-home-radar__frame\s*\{[\s\S]*border:\s*1px solid/);
-  assert.match(radarCss, /border-radius:\s*8px/);
-  assert.doesNotMatch(radarCss, /box-shadow/);
+  assert.match(radarCss, /\.tp-home-radar \.radar-player\s*\{[\s\S]*background:\s*#f8faf9/);
+  assert.match(radarCss, /\.tp-home-radar__guide-items/);
   assert.doesNotMatch(radarCss, /!important/);
 });
 
 test("isolated chapters include explicit mobile composition", () => {
   assert.match(forecastCss, /@media \(max-width: 700px\)/);
-  assert.match(radarCss, /@media \(max-width: 700px\)/);
+  assert.match(trendCss, /@media \(max-width: 700px\)/);
+  assert.match(radarCss, /@media \(max-width: 760px\)/);
   assert.match(observationCss, /@media \(max-width: 700px\)/);
   assert.match(waterCss, /@media \(max-width: 720px\)/);
   assert.match(exploreCss, /@media \(max-width: 640px\)/);
