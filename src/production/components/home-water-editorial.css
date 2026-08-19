@@ -1,0 +1,434 @@
+/*
+ * Home — Lagoa dos Patos em linguagem Civic Tech local.
+ * Laranjal é a referência principal; a rede regional entra como contexto comparável.
+ */
+
+.tp-home-water {
+  --tp-water-line: rgb(7 30 47 / 10%);
+  --tp-water-muted: #667b86;
+  width: min(1220px, calc(100% - 48px));
+  margin: 0 auto clamp(68px, 7vw, 98px);
+  padding-top: clamp(54px, 6vw, 82px);
+  border-top: 1px solid var(--tp-water-line);
+  color: #071e2f;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 650px;
+}
+
+.tp-home-water__intro {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(300px, 0.52fr);
+  align-items: end;
+  gap: clamp(42px, 6vw, 90px);
+  margin-bottom: 30px;
+}
+
+.tp-home-water__intro > div > span {
+  display: block;
+  margin-bottom: 9px;
+  color: #087f91;
+  font-size: 0.61rem;
+  font-weight: 820;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tp-home-water__intro h2 {
+  max-width: 790px;
+  margin: 0;
+  font-size: clamp(2.2rem, 3.7vw, 3.8rem);
+  font-weight: 770;
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+}
+
+.tp-home-water__intro > p {
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--tp-water-line);
+  color: #5e747f;
+  font-size: 0.79rem;
+  line-height: 1.65;
+}
+
+.tp-home-water__layout {
+  display: grid;
+  grid-template-columns: minmax(310px, 0.7fr) minmax(0, 1.3fr);
+  border-top: 1px solid var(--tp-water-line);
+  border-bottom: 1px solid var(--tp-water-line);
+}
+
+.tp-home-water__focus {
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  padding: 28px clamp(30px, 4vw, 48px) 30px 0;
+  border-right: 1px solid var(--tp-water-line);
+}
+
+.tp-home-water__focus-topline,
+.tp-home-water__network-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.tp-home-water__focus-topline > div,
+.tp-home-water__network-heading > div {
+  display: grid;
+  gap: 3px;
+}
+
+.tp-home-water__focus-topline span,
+.tp-home-water__network-heading span {
+  color: #173746;
+  font-size: 0.78rem;
+  font-weight: 790;
+}
+
+.tp-home-water__focus-topline small,
+.tp-home-water__network-heading small {
+  color: #788b94;
+  font-size: 0.61rem;
+  line-height: 1.35;
+}
+
+.tp-home-water__focus-topline b {
+  color: #087f91;
+  font-size: 0.57rem;
+  font-weight: 820;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tp-home-water__level {
+  display: flex;
+  align-items: flex-end;
+  gap: 9px;
+}
+
+.tp-home-water__level strong {
+  font-size: clamp(4.4rem, 6.6vw, 6.7rem);
+  font-weight: 730;
+  font-variant-numeric: tabular-nums;
+  line-height: 0.86;
+  letter-spacing: -0.085em;
+}
+
+.tp-home-water__level span {
+  padding-bottom: 7px;
+  color: #58707b;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.tp-home-water__trend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #526b76;
+  font-size: 0.76rem;
+  font-weight: 670;
+}
+
+.tp-home-water__trend b {
+  font-size: 1rem;
+}
+
+.tp-home-water .is-rising {
+  color: #9b5260;
+}
+
+.tp-home-water .is-falling {
+  color: #237286;
+}
+
+.tp-home-water .is-stable {
+  color: #667b86;
+}
+
+.tp-home-water__focus-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  border-top: 1px solid var(--tp-water-line);
+}
+
+.tp-home-water__focus-metrics > div {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 13px 12px 2px;
+  border-right: 1px solid var(--tp-water-line);
+}
+
+.tp-home-water__focus-metrics > div:first-child {
+  padding-left: 0;
+}
+
+.tp-home-water__focus-metrics > div:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.tp-home-water__focus-metrics dt,
+.tp-home-water__focus-metrics dd {
+  margin: 0;
+}
+
+.tp-home-water__focus-metrics dt {
+  color: #7a8d95;
+  font-size: 0.54rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.tp-home-water__focus-metrics dd {
+  color: #203f4e;
+  font-size: 0.7rem;
+  font-weight: 720;
+  line-height: 1.35;
+}
+
+.tp-home-water__focus > a,
+.tp-home-water__footer > a {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 10px;
+  color: #173847;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-decoration-color: rgb(24 189 205 / 48%);
+  text-underline-offset: 5px;
+}
+
+.tp-home-water__network {
+  min-width: 0;
+  padding: 28px 0 0 clamp(30px, 4vw, 48px);
+}
+
+.tp-home-water__network-heading {
+  min-height: 52px;
+  padding-bottom: 14px;
+}
+
+.tp-home-water__network-heading strong {
+  color: #173746;
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.tp-home-water__columns,
+.tp-home-water__rows article,
+.tp-home-water__guaiba {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.15fr) minmax(88px, 0.56fr) minmax(150px, 0.9fr) minmax(116px, 0.75fr);
+  align-items: center;
+  gap: 14px;
+}
+
+.tp-home-water__columns {
+  min-height: 30px;
+  border-top: 1px solid var(--tp-water-line);
+  border-bottom: 1px solid var(--tp-water-line);
+  color: #83939a;
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.tp-home-water__rows article {
+  min-height: 72px;
+  border-bottom: 1px solid var(--tp-water-line);
+}
+
+.tp-home-water__rows article > div {
+  display: grid;
+  gap: 2px;
+}
+
+.tp-home-water__rows article > div strong {
+  color: #173746;
+  font-size: 0.76rem;
+}
+
+.tp-home-water__rows article > div span,
+.tp-home-water__rows article > span,
+.tp-home-water__rows article > small,
+.tp-home-water__guaiba span,
+.tp-home-water__guaiba small {
+  color: #748791;
+  font-size: 0.6rem;
+  line-height: 1.4;
+}
+
+.tp-home-water__rows article > b,
+.tp-home-water__guaiba > b {
+  color: #1d3e4e;
+  font-size: 0.76rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.tp-home-water__rows article > span.is-rising,
+.tp-home-water__rows article > span.is-falling,
+.tp-home-water__rows article > span.is-stable,
+.tp-home-water__guaiba > span.is-rising,
+.tp-home-water__guaiba > span.is-falling,
+.tp-home-water__guaiba > span.is-stable {
+  font-weight: 700;
+}
+
+.tp-home-water__guaiba {
+  min-height: 66px;
+  background: #f7f9f8;
+}
+
+.tp-home-water__guaiba > div {
+  display: grid;
+  gap: 2px;
+}
+
+.tp-home-water__guaiba > div span {
+  color: #758992;
+  font-size: 0.58rem;
+}
+
+.tp-home-water__guaiba > div strong {
+  color: #274552;
+  font-size: 0.71rem;
+}
+
+.tp-home-water__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 18px;
+}
+
+.tp-home-water__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.tp-home-water__legend span {
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+@media (max-width: 1040px) {
+  .tp-home-water {
+    width: calc(100% - 40px);
+  }
+
+  .tp-home-water__intro {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 22px;
+  }
+
+  .tp-home-water__intro > p {
+    max-width: 720px;
+  }
+
+  .tp-home-water__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .tp-home-water__focus {
+    padding-right: 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--tp-water-line);
+  }
+
+  .tp-home-water__network {
+    padding: 28px 0 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .tp-home-water {
+    width: calc(100% - 32px);
+    margin-bottom: 58px;
+    padding-top: 44px;
+  }
+
+  .tp-home-water__intro h2 {
+    font-size: clamp(2.05rem, 10.5vw, 3rem);
+  }
+
+  .tp-home-water__level strong {
+    font-size: clamp(4.5rem, 22vw, 6.2rem);
+  }
+
+  .tp-home-water__focus-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .tp-home-water__focus-metrics > div,
+  .tp-home-water__focus-metrics > div:first-child,
+  .tp-home-water__focus-metrics > div:last-child {
+    padding: 10px 0;
+    border-right: 0;
+    border-bottom: 1px solid var(--tp-water-line);
+  }
+
+  .tp-home-water__focus-metrics > div:last-child {
+    border-bottom: 0;
+  }
+
+  .tp-home-water__columns {
+    display: none;
+  }
+
+  .tp-home-water__rows article,
+  .tp-home-water__guaiba {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 7px 18px;
+    padding: 14px 0;
+  }
+
+  .tp-home-water__rows article > div,
+  .tp-home-water__guaiba > div {
+    grid-column: 1;
+  }
+
+  .tp-home-water__rows article > b,
+  .tp-home-water__guaiba > b {
+    grid-column: 2;
+    grid-row: 1;
+    text-align: right;
+  }
+
+  .tp-home-water__rows article > span,
+  .tp-home-water__guaiba > span {
+    grid-column: 1;
+  }
+
+  .tp-home-water__rows article > small,
+  .tp-home-water__guaiba > small {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  .tp-home-water__footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-home-water {
+    content-visibility: visible;
+  }
+}
