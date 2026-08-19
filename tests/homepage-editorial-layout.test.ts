@@ -34,6 +34,7 @@ test("the homepage uses one minimal late shell instead of global visual override
   const removedLegacyLayers = [
     "theme-refinement.css",
     "theme-polish.css",
+    "project-refinement.css",
     "home.css",
     "home-lagoon-card.css",
     "home-location-and-level.css",
