@@ -36,7 +36,6 @@ import "./styles/guaiba-city-directory.css";
 import "./styles/lagoon-monitoring-network.css";
 import "./styles/lagoon-monitoring-api.css";
 import "./styles/hydrology-page-reorganization.css";
-import "./styles/project-refinement.css";
 import "./styles/inmet-alerts.css";
 import "./styles/editorial-readable-final.css";
 import "./styles/editorial-readable-v2.css";
