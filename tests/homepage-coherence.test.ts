@@ -11,10 +11,6 @@ const sectionNavigationCss = readFileSync(
   "src/production/components/home-section-navigation.css",
   "utf8",
 );
-const semanticDashboard = readFileSync(
-  "src/production/components/home-editorial-dashboard-semantic.tsx",
-  "utf8",
-);
 const forecast = readFileSync("src/production/components/home-forecast-editorial.tsx", "utf8");
 const forecastCss = readFileSync(
   "src/production/components/home-forecast-editorial.css",
@@ -31,6 +27,11 @@ const observation = readFileSync(
 );
 const observationCss = readFileSync(
   "src/production/components/home-observation-editorial.css",
+  "utf8",
+);
+const water = readFileSync("src/production/components/home-water-editorial.tsx", "utf8");
+const waterCss = readFileSync(
+  "src/production/components/home-water-editorial.css",
   "utf8",
 );
 const weatherMap = readFileSync("src/production/components/weather-map.tsx", "utf8");
@@ -51,7 +52,6 @@ test("the homepage radar shortcut resolves to the isolated regional monitor", ()
   assert.match(sectionNavigation, /href:\s*"#regiao"/);
   assert.match(weatherMap, /className="map-panel" id="regiao"/);
   assert.match(productionHome, /<HomeRadarEditorial regionalWeather=\{weather\.regional\} \/>/);
-  assert.doesNotMatch(semanticDashboard, /normalizedId\s*=\s*"regiao"/);
 });
 
 test("the homepage radar is isolated from the historical map-story cascade", () => {
@@ -62,10 +62,6 @@ test("the homepage radar is isolated from the historical map-story cascade", () 
   assert.doesNotMatch(radar, /home-map-story/);
   assert.doesNotMatch(radarCss, /\.home-map-story/);
   assert.doesNotMatch(radarCss, /!important/);
-  assert.match(
-    semanticDashboard,
-    /hasClass\(className, "home-map-story"\)[\s\S]*return null;/,
-  );
 });
 
 test("the Embrapa reading is isolated as civic-tech observed data", () => {
@@ -77,10 +73,23 @@ test("the Embrapa reading is isolated as civic-tech observed data", () => {
   assert.match(observationCss, /\.tp-home-observation__reading\s*\{[\s\S]*border-top:/);
   assert.doesNotMatch(observationCss, /!important/);
   assert.doesNotMatch(observationCss, /box-shadow/);
-  assert.match(
-    semanticDashboard,
-    /hasClass\(className, "home-observation-story"\)[\s\S]*return null;/,
-  );
+});
+
+test("the Lagoa section is isolated as local civic-tech data", () => {
+  assert.match(productionHome, /<HomeWaterEditorial laranjal=\{laranjal\} guaiba=\{guaiba\} lagoon=\{lagoon\} \/>/);
+  assert.match(water, /className="tp-home-water"/);
+  assert.match(water, /id="situacao-das-aguas"/);
+  assert.match(water, /Praia do Laranjal/);
+  assert.match(water, /HOME_LAGOON_STATION_PRIORITY/);
+  assert.match(waterCss, /\.tp-home-water__layout\s*\{[\s\S]*grid-template-columns:/);
+  assert.match(waterCss, /\.tp-home-water__rows article/);
+  assert.doesNotMatch(waterCss, /!important/);
+  assert.doesNotMatch(waterCss, /box-shadow/);
+});
+
+test("the homepage no longer renders the legacy editorial dashboard", () => {
+  assert.doesNotMatch(productionHome, /HomeEditorialDashboard/);
+  assert.doesNotMatch(productionHome, /home-editorial-dashboard-semantic/);
 });
 
 test("the hourly forecast headline is explicit, local and owned by the isolated component", () => {
@@ -92,18 +101,8 @@ test("the hourly forecast headline is explicit, local and owned by the isolated 
 test("the main meteorological narrative follows the definitive homepage order", () => {
   assert.match(
     productionHome,
-    /<HomeForecastEditorial[\s\S]*<InmetOfficialForecastPanel[\s\S]*<HomeRadarEditorial[\s\S]*<HomeObservationEditorial[\s\S]*<HomeEditorialDashboard/,
+    /<HomeForecastEditorial[\s\S]*<InmetOfficialForecastPanel[\s\S]*<HomeRadarEditorial[\s\S]*<HomeObservationEditorial[\s\S]*<HomeWaterEditorial[\s\S]*<HomeExplorePortal/,
   );
-});
-
-test("legacy forecast markup is removed before the remaining dashboard reaches the DOM", () => {
-  assert.match(
-    semanticDashboard,
-    /hasClass\(className, "home-story--forecast"\)[\s\S]*return null;/,
-  );
-  assert.doesNotMatch(productionHome, /HeroAstronomyPortal/);
-  assert.doesNotMatch(productionHome, /HomeHourlyConditionPortal/);
-  assert.doesNotMatch(productionHome, /HomeTrendEditorialPortal/);
 });
 
 test("the editorial forecast owns responsive styles without important overrides", () => {
