@@ -1,0 +1,231 @@
+/*
+ * Footer da Home — fechamento editorial e funcional.
+ * Reduz o comportamento de landing page e mantém navegação, fontes e transparência.
+ */
+
+.site-shell--home-editorial .editorial-footer-shell {
+  margin-top: 54px;
+  padding: 0 24px 24px;
+}
+
+.site-shell--home-editorial .editorial-footer {
+  width: min(1440px, 100%);
+  padding: clamp(38px, 4vw, 58px) clamp(28px, 4.5vw, 64px) clamp(24px, 3vw, 38px);
+  border: 1px solid rgb(7 27 44 / 10%);
+  border-radius: 8px;
+  background: #f7f9f8;
+  box-shadow: none;
+}
+
+.site-shell--home-editorial .editorial-footer-brand-line {
+  height: 2px;
+}
+
+.site-shell--home-editorial .editorial-footer-lead {
+  grid-template-columns: minmax(0, 1.18fr) minmax(290px, 0.82fr);
+  align-items: end;
+  gap: clamp(38px, 5vw, 78px);
+  padding-bottom: clamp(30px, 3.5vw, 46px);
+}
+
+.site-shell--home-editorial .editorial-footer-brand-logo {
+  width: clamp(184px, 17vw, 230px);
+}
+
+.site-shell--home-editorial .editorial-footer-eyebrow {
+  margin-top: 24px;
+  color: #70838d;
+  font-size: 0.58rem;
+  font-weight: 820;
+  letter-spacing: 0.1em;
+}
+
+.site-shell--home-editorial .editorial-footer-lead h2 {
+  max-width: 780px;
+  margin-top: 10px;
+  font-size: clamp(1.8rem, 2.8vw, 3rem);
+  font-weight: 760;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.site-shell--home-editorial .editorial-footer-lead-copy > p {
+  max-width: 650px;
+  margin-top: 18px;
+  color: #617580;
+  font-size: clamp(0.8rem, 0.9vw, 0.9rem);
+  line-height: 1.62;
+}
+
+.site-shell--home-editorial .editorial-footer-lead-aside {
+  gap: 20px;
+  padding-left: clamp(24px, 3vw, 42px);
+}
+
+.site-shell--home-editorial .editorial-footer-status {
+  gap: 10px;
+}
+
+.site-shell--home-editorial .editorial-footer-status > span {
+  width: 8px;
+  height: 8px;
+  box-shadow: 0 0 0 4px rgb(35 135 91 / 9%);
+}
+
+.site-shell--home-editorial .editorial-footer-status.is-fallback > span {
+  box-shadow: 0 0 0 4px rgb(197 106 37 / 9%);
+}
+
+.site-shell--home-editorial .editorial-footer-status small {
+  font-size: 0.58rem;
+}
+
+.site-shell--home-editorial .editorial-footer-status strong {
+  font-size: 0.78rem;
+  font-weight: 720;
+}
+
+.site-shell--home-editorial .editorial-footer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.site-shell--home-editorial .editorial-footer-action {
+  min-height: 38px;
+  justify-content: center;
+  padding: 8px 11px;
+  border-radius: 5px;
+  font-size: 0.67rem;
+  box-shadow: none;
+}
+
+.site-shell--home-editorial .editorial-footer-action:hover,
+.site-shell--home-editorial .editorial-footer-action:focus-visible {
+  transform: none;
+}
+
+.site-shell--home-editorial .editorial-footer-directory {
+  padding: clamp(30px, 3.4vw, 46px) 0;
+}
+
+.site-shell--home-editorial .editorial-footer-group {
+  padding-inline: clamp(20px, 2.7vw, 38px);
+}
+
+.site-shell--home-editorial .editorial-footer-group > strong {
+  margin-bottom: 14px;
+  font-size: 0.62rem;
+  font-weight: 830;
+  letter-spacing: 0.07em;
+}
+
+.site-shell--home-editorial .editorial-footer-group a {
+  min-height: 38px;
+  color: #536c79;
+  font-size: 0.69rem;
+  font-weight: 680;
+}
+
+.site-shell--home-editorial .editorial-footer-group a:hover,
+.site-shell--home-editorial .editorial-footer-group a:focus-visible {
+  transform: none;
+}
+
+.site-shell--home-editorial .editorial-footer-transparency {
+  padding: clamp(22px, 2.8vw, 34px) 0;
+  grid-template-columns: minmax(250px, 0.9fr) minmax(0, 1.1fr) auto;
+  gap: clamp(22px, 3vw, 38px);
+}
+
+.site-shell--home-editorial .editorial-footer-sources span {
+  font-size: 0.59rem;
+  letter-spacing: 0.065em;
+}
+
+.site-shell--home-editorial .editorial-footer-sources p,
+.site-shell--home-editorial .editorial-footer-guidance p {
+  color: #657984;
+  font-size: 0.67rem;
+  line-height: 1.5;
+}
+
+.site-shell--home-editorial .editorial-footer-guidance > span {
+  width: 21px;
+  height: 21px;
+  border-radius: 50%;
+  font-size: 0.63rem;
+}
+
+.site-shell--home-editorial .editorial-footer-legal a,
+.site-shell--home-editorial .editorial-footer-base {
+  font-size: 0.66rem;
+}
+
+@media (max-width: 880px) {
+  .site-shell--home-editorial .editorial-footer-lead,
+  .site-shell--home-editorial .editorial-footer-transparency {
+    grid-template-columns: 1fr;
+  }
+
+  .site-shell--home-editorial .editorial-footer-lead {
+    gap: 26px;
+  }
+
+  .site-shell--home-editorial .editorial-footer-lead-aside {
+    padding-top: 22px;
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .site-shell--home-editorial .editorial-footer-shell {
+    margin-top: 38px;
+    padding: 0 8px calc(5.5rem + env(safe-area-inset-bottom));
+  }
+
+  .site-shell--home-editorial .editorial-footer {
+    padding: 34px 20px 24px;
+    border-radius: 6px;
+  }
+
+  .site-shell--home-editorial .editorial-footer-lead h2 {
+    font-size: clamp(1.75rem, 8vw, 2.35rem);
+  }
+
+  .site-shell--home-editorial .editorial-footer-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .site-shell--home-editorial .editorial-footer-action {
+    width: 100%;
+  }
+
+  .site-shell--home-editorial .editorial-footer-groups {
+    grid-template-columns: 1fr;
+  }
+
+  .site-shell--home-editorial .editorial-footer-group,
+  .site-shell--home-editorial .editorial-footer-group:nth-child(3) {
+    padding: 20px 0 0;
+    border-top: 1px solid rgb(7 30 47 / 10%);
+    border-left: 0;
+  }
+
+  .site-shell--home-editorial .editorial-footer-group:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+}
+
+@media (max-width: 460px) {
+  .site-shell--home-editorial .editorial-footer-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .site-shell--home-editorial .editorial-footer-legal {
+    flex-wrap: wrap;
+    gap: 0.65rem 1rem;
+  }
+}
