@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+import "./pwa-app-experience.css";
+
 type NavigatorConnection = EventTarget & {
   effectiveType?: string;
   saveData?: boolean;
@@ -115,11 +117,11 @@ export function PwaAppExperience() {
     >
       <span aria-hidden="true" />
       <div>
-        <strong>{notice === "offline" ? "Você está sem conexão" : "Conexão restabelecida"}</strong>
+        <strong>{notice === "offline" ? "Sem conexão" : "Conexão restabelecida"}</strong>
         <small>
           {notice === "offline"
-            ? "As informações abertas podem estar desatualizadas."
-            : "O app voltou a consultar as fontes meteorológicas."}
+            ? "Os dados abertos podem estar desatualizados até a internet voltar."
+            : "O portal voltou a consultar as fontes meteorológicas."}
         </small>
       </div>
     </div>
