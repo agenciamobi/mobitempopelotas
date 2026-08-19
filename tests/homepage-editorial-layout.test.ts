@@ -12,6 +12,7 @@ const mobileUsabilityCss = readFileSync(
   "src/production/styles/mobile-usability-refinement.css",
   "utf8",
 );
+const topicReadableCss = readFileSync("src/production/styles/topic-readable.css", "utf8");
 const waterSemanticCss = readFileSync(
   "src/production/styles/water-level-semantic-colors.css",
   "utf8",
@@ -41,6 +42,7 @@ test("the homepage uses one minimal late shell instead of global visual override
     "theme-polish.css",
     "project-refinement.css",
     "editorial-readable-final.css",
+    "editorial-readable-v2.css",
     "home.css",
     "home-lagoon-card.css",
     "home-location-and-level.css",
@@ -106,6 +108,7 @@ test("the homepage uses one minimal late shell instead of global visual override
 
   for (const entry of [cssEntry, tsEntry]) {
     assert.match(entry, /home-editorial-shell\.css/);
+    assert.match(entry, /topic-readable\.css/);
     for (const layer of removedLegacyLayers) {
       assert.doesNotMatch(entry, new RegExp(layer.replaceAll(".", "\\.")));
     }
@@ -140,6 +143,14 @@ test("shared mobile usability does not restyle the isolated homepage", () => {
   assert.doesNotMatch(mobileUsabilityCss, /\.site-shell--home\s+\.weather-hero/);
   assert.doesNotMatch(mobileUsabilityCss, /\.site-shell--home\s*>\s*\.site-header--hero/);
   assert.doesNotMatch(mobileUsabilityCss, /\.embrapa-observation-home/);
+});
+
+test("internal reading scale is isolated from the homepage", () => {
+  assert.match(topicReadableCss, /Páginas internas — escala de leitura compartilhada/);
+  assert.match(topicReadableCss, /\.site-shell--topic/);
+  assert.doesNotMatch(topicReadableCss, /\.site-shell--home/);
+  assert.doesNotMatch(topicReadableCss, /\.tp-home-/);
+  assert.doesNotMatch(topicReadableCss, /!important/);
 });
 
 test("the homepage hero is fully owned by its local namespace", () => {
