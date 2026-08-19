@@ -5,7 +5,6 @@ import "./HomeExplorePortal.css";
 type ExploreGroup = {
   eyebrow: string;
   title: string;
-  description: string;
   links: ReadonlyArray<{ label: string; to: string }>;
 };
 
@@ -13,8 +12,6 @@ const exploreGroups: ReadonlyArray<ExploreGroup> = [
   {
     eyebrow: "Previsão",
     title: "Planeje as próximas horas e os próximos dias",
-    description:
-      "Consulte a evolução por hora, o tempo de amanhã e a tendência meteorológica para a semana.",
     links: [
       { label: "Previsão de hoje", to: "/tempo-hoje-pelotas" },
       { label: "Tempo amanhã", to: "/tempo-amanha-pelotas" },
@@ -23,9 +20,7 @@ const exploreGroups: ReadonlyArray<ExploreGroup> = [
   },
   {
     eyebrow: "Chuva e vento",
-    title: "Veja os períodos que exigem mais atenção",
-    description:
-      "Acompanhe probabilidade e volume de chuva, vento, rajadas previstas e avisos oficiais.",
+    title: "Acompanhe os períodos que exigem mais atenção",
     links: [
       { label: "Chuva em Pelotas", to: "/chuva-em-pelotas" },
       { label: "Vento e rajadas", to: "/vento-em-pelotas" },
@@ -34,9 +29,7 @@ const exploreGroups: ReadonlyArray<ExploreGroup> = [
   },
   {
     eyebrow: "Monitoramento",
-    title: "Consulte medições, radar e imagens locais",
-    description:
-      "Acesse a estação da Embrapa, os produtos REDEMET, as câmeras e o histórico climático.",
+    title: "Consulte medições e imagens da região",
     links: [
       { label: "Estação Embrapa", to: "/estacao-embrapa-pelotas" },
       { label: "Radar e satélite", to: "/radar-e-satelite-pelotas" },
@@ -46,9 +39,7 @@ const exploreGroups: ReadonlyArray<ExploreGroup> = [
   },
   {
     eyebrow: "Águas e fontes",
-    title: "Acompanhe a Lagoa e entenda de onde vêm os dados",
-    description:
-      "Veja leituras locais e regionais, referências das estações e a metodologia usada pelo portal.",
+    title: "Aprofunde Lagoa, hidrologia e metodologia",
     links: [
       { label: "Situação das águas", to: "/situacao-hidrologica-pelotas" },
       { label: "Nível no Laranjal", to: "/nivel-da-lagoa-dos-patos-laranjal" },
@@ -65,20 +56,21 @@ export function HomeExplorePortal() {
       aria-labelledby="tp-home-explore-title"
     >
       <header className="tp-home-explore__heading">
-        <span>Explore o Tempo Pelotas</span>
-        <h2 id="tp-home-explore-title">Mais informações, sem sobrecarregar a página inicial</h2>
+        <span>Explore o portal</span>
+        <h2 id="tp-home-explore-title">Aprofunde o que importa para você</h2>
         <p>
-          A homepage resume o que importa agora. Use este diretório para aprofundar previsão,
-          monitoramento, águas e metodologia.
+          A página inicial resume a situação. As páginas abaixo concentram previsão detalhada,
+          monitoramento, águas e metodologia sem repetir toda a informação aqui.
         </p>
       </header>
 
       <div className="tp-home-explore__groups">
         {exploreGroups.map((group) => (
-          <article className="tp-home-explore__group" key={group.eyebrow}>
-            <small>{group.eyebrow}</small>
-            <h3>{group.title}</h3>
-            <p>{group.description}</p>
+          <section className="tp-home-explore__group" key={group.eyebrow}>
+            <header>
+              <small>{group.eyebrow}</small>
+              <h3>{group.title}</h3>
+            </header>
             <nav aria-label={group.eyebrow}>
               {group.links.map((link) => (
                 <Link to={link.to} key={link.to}>
@@ -87,7 +79,7 @@ export function HomeExplorePortal() {
                 </Link>
               ))}
             </nav>
-          </article>
+          </section>
         ))}
       </div>
     </section>
