@@ -37,8 +37,11 @@ const homeWaterCss = readFileSync(
   "src/production/components/home-water-editorial.css",
   "utf8",
 );
+const homeExplore = readFileSync("src/components/weather/HomeExplorePortal.tsx", "utf8");
 const homeExploreCss = readFileSync("src/components/weather/HomeExplorePortal.css", "utf8");
+const homeGuide = readFileSync("src/production/components/home-data-guide.tsx", "utf8");
 const homeGuideCss = readFileSync("src/production/components/home-data-guide.css", "utf8");
+const footer = readFileSync("src/components/layout/Footer.tsx", "utf8");
 const homeFooterCss = readFileSync(
   "src/production/components/site-footer-home.css",
   "utf8",
@@ -107,24 +110,34 @@ test("homepage chapters use local namespaces without important overrides", () =>
   }
 });
 
-test("Lagoa homepage is civic-tech data on an open editorial canvas", () => {
-  assert.match(homeWaterCss, /Home — Lagoa dos Patos em linguagem Civic Tech local/);
+test("Lagoa homepage is civic-tech local-first data on an open editorial canvas", () => {
+  assert.match(homeWaterCss, /Home — Lagoa dos Patos em linguagem Civic Tech local-first/);
   assert.match(homeWaterCss, /\.tp-home-water__layout\s*\{[\s\S]*border-top:/);
-  assert.match(homeWaterCss, /\.tp-home-water__rows article/);
+  assert.match(homeWaterCss, /\.tp-home-water__station/);
+  assert.match(homeWaterCss, /\.tp-home-water__network-note/);
   assert.doesNotMatch(homeWaterCss, /box-shadow/);
 });
 
 test("homepage directory is editorial navigation instead of a promotional card grid", () => {
+  assert.match(homeExplore, /Aprofunde o que importa para você/);
+  assert.match(homeExplore, /className="tp-home-explore__group"/);
+  assert.doesNotMatch(homeExplore, /group\.description/);
   assert.match(homeExploreCss, /diretório editorial autocontido/i);
   assert.match(homeExploreCss, /\.tp-home-explore__groups\s*\{[\s\S]*border-top:/);
   assert.doesNotMatch(homeExploreCss, /border-radius/);
   assert.doesNotMatch(homeExploreCss, /box-shadow/);
 });
 
-test("homepage guide closes as an open transparency chapter", () => {
+test("homepage guide explains observation, forecast, official warning and monitoring separately", () => {
+  assert.match(homeGuide, /const dataTypes/);
+  assert.match(homeGuide, /label: "Observação"/);
+  assert.match(homeGuide, /label: "Previsão"/);
+  assert.match(homeGuide, /label: "Aviso oficial"/);
+  assert.match(homeGuide, /label: "Radar e satélite"/);
   assert.match(homeGuideCss, /guia de leitura e transparência editorial/i);
-  assert.match(homeGuideCss, /\.tp-home-guide\s*\{[\s\S]*border-top:/);
+  assert.match(homeGuideCss, /\.tp-home-guide__types\s*\{[\s\S]*grid-template-columns:/);
   assert.match(homeGuideCss, /\.tp-home-guide__details\s*\{[\s\S]*border-top:/);
+  assert.doesNotMatch(homeGuideCss, /counter-reset/);
   assert.doesNotMatch(homeGuideCss, /box-shadow/);
 });
 
@@ -146,9 +159,16 @@ test("homepage radar is a scientific monitor instead of a floating dashboard", (
   assert.doesNotMatch(homeRadarCss, /!important/);
 });
 
-test("homepage footer remains compact, transparent about sources and responsive", () => {
+test("homepage footer is a dedicated editorial close without promotional CTA chrome", () => {
+  assert.match(footer, /if \(variant === "home"\)/);
+  assert.match(footer, /const homeFooterGroups/);
+  assert.match(footer, /className="tp-home-footer-top"/);
+  assert.match(footer, /Tempo e água de Pelotas, com fonte visível/);
   assert.match(homeFooterCss, /Footer da Home — fonte autônoma de verdade/);
+  assert.match(homeFooterCss, /\.tp-home-footer-shell\s*\{[\s\S]*background:\s*#f5f7f6/);
   assert.match(homeFooterCss, /\.tp-home-footer-transparency/);
+  assert.doesNotMatch(homeFooterCss, /tp-home-footer-actions/);
+  assert.doesNotMatch(homeFooterCss, /tp-home-footer-brand-line/);
   assert.doesNotMatch(homeFooterCss, /!important/);
   assert.match(homeFooterCss, /@media \(max-width: 720px\)/);
 });
@@ -173,4 +193,5 @@ test("stable homepage composition covers tablet, mobile, focus and reduced motio
   assert.match(homeWaterCss, /@media \(max-width: 720px\)/);
   assert.match(homeExploreCss, /@media \(max-width: 640px\)/);
   assert.match(homeGuideCss, /@media \(max-width: 640px\)/);
+  assert.match(homeFooterCss, /@media \(max-width: 720px\)/);
 });
