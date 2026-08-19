@@ -77,7 +77,6 @@
 @import "./styles/header-template-refinement-v2.css";
 @import "./styles/home-hero-stripe-adaptation.css";
 @import "./styles/home-alert-flow-v7.css";
-@import "./styles/home-forecast-refinement-v8.css";
 @import "./styles/home-alert-flow-v9.css";
 @import "./styles/home-detail-navigation-v10.css";
 @import "./styles/home-detail-content-v10.css";
@@ -85,7 +84,6 @@
 @import "./styles/home-cohesion-v12-content.css";
 @import "./styles/home-cohesion-v12-water.css";
 @import "./styles/home-navigation-v13.css";
-@import "./styles/home-next-days-cards-v14.css";
 @import "./styles/home-hero-cleanup-v16.css";
 @import "./styles/home-observation-refinement-v17.css";
 @import "./styles/home-water-refinement-v18.css";
@@ -115,13 +113,8 @@
 @import "./styles/home-hero-now-label-v35.css";
 @import "./styles/inmet-editorial-v36.css";
 @import "./styles/home-supporting-editorial-v37.css";
-@import "./styles/home-hero-astronomy-v38.css";
 @import "./styles/home-cleanup-v39.css";
-@import "./styles/home-hourly-editorial-v40.css";
-@import "./styles/home-hourly-condition-v41.css";
-@import "./styles/home-hourly-spacing-fixes-v42.css";
 @import "./styles/home-hero-edge-to-edge-v43.css";
-@import "./styles/home-weekly-trend-v44.css";
 @import "./styles/home-radar-editorial-v45.css";
 @import "./styles/home-radar-embrapa-cohesion-v46.css";
 @import "./styles/home-weekly-radar-usability-v47.css";
