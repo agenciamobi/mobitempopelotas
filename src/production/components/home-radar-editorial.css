@@ -30,9 +30,9 @@
   display: block;
   margin-bottom: 9px;
   color: #087f91;
-  font-size: 0.61rem;
+  font-size: 0.68rem;
   font-weight: 820;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
@@ -55,13 +55,13 @@
 .tp-home-radar__context p {
   margin: 0;
   color: #5e747f;
-  font-size: 0.79rem;
-  line-height: 1.6;
+  font-size: 0.88rem;
+  line-height: 1.65;
 }
 
 .tp-home-radar__context p + p {
   color: #71838c;
-  font-size: 0.69rem;
+  font-size: 0.76rem;
 }
 
 .tp-home-radar__context strong {
@@ -107,8 +107,8 @@
   border-top: 1px solid var(--tp-radar-line);
   background: rgb(255 255 255 / 88%);
   color: #687d87;
-  font-size: 0.64rem;
-  line-height: 1.5;
+  font-size: 0.72rem;
+  line-height: 1.55;
 }
 
 .tp-home-radar .map-layer-switcher {
