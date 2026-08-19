@@ -3,29 +3,56 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const rootRoute = readFileSync("src/routes/__root.tsx", "utf8");
+const manager = readFileSync("src/components/pwa/PwaManager.tsx", "utf8");
+const managerCss = readFileSync("src/components/pwa/pwa-manager.css", "utf8");
 const experience = readFileSync("src/components/pwa/PwaAppExperience.tsx", "utf8");
-const styles = readFileSync("src/production/styles/pwa-app-refinement-v60.css", "utf8");
+const experienceCss = readFileSync("src/components/pwa/pwa-app-experience.css", "utf8");
 const styleImports = readFileSync("src/production/production-styles.ts", "utf8");
 const globalStyles = readFileSync("src/production/production-styles.css", "utf8");
 const serviceWorker = readFileSync("public/sw.js", "utf8");
 const offlinePage = readFileSync("public/offline.html", "utf8");
+const manifest = readFileSync("public/manifest.webmanifest", "utf8");
 
-test("temporarily disables PWA mounting and clears persistent browser state", () => {
-  assert.doesNotMatch(rootRoute, /import \{ PwaAppExperience \}/);
-  assert.doesNotMatch(rootRoute, /import \{ PwaManager \}/);
-  assert.doesNotMatch(rootRoute, /<PwaAppExperience \/>/);
-  assert.doesNotMatch(rootRoute, /<PwaManager \/>/);
-  assert.doesNotMatch(rootRoute, /rel: "manifest"/);
-  assert.match(rootRoute, /PWA_EMERGENCY_RESET_SCRIPT/);
-  assert.match(rootRoute, /navigator\.serviceWorker\.getRegistrations\(\)/);
-  assert.match(rootRoute, /registration\.unregister\(\)/);
-  assert.match(rootRoute, /caches\.keys\(\)/);
-  assert.match(rootRoute, /caches\.delete\(cacheName\)/);
-  assert.match(rootRoute, /element\.style\.removeProperty\("overflow"\)/);
+test("PWA is mounted with manifest and mobile metadata", () => {
+  assert.match(rootRoute, /import \{ PwaAppExperience \}/);
+  assert.match(rootRoute, /import \{ PwaManager \}/);
+  assert.match(rootRoute, /<PwaAppExperience \/>/);
+  assert.match(rootRoute, /<PwaManager \/>/);
+  assert.match(rootRoute, /rel: "manifest", href: "\/manifest\.webmanifest"/);
+  assert.match(rootRoute, /mobile-web-app-capable/);
+  assert.match(rootRoute, /apple-mobile-web-app-capable/);
+  assert.match(rootRoute, /apple-mobile-web-app-status-bar-style/);
   assert.match(rootRoute, /viewport-fit=cover/);
+  assert.doesNotMatch(rootRoute, /PWA_EMERGENCY_RESET_SCRIPT/);
+  assert.doesNotMatch(rootRoute, /getRegistrations\(\)/);
+  assert.doesNotMatch(rootRoute, /caches\.keys\(\)/);
 });
 
-test("installed app implementation remains available for later reactivation", () => {
+test("installer no longer mutates persistent document scroll state", () => {
+  assert.match(manager, /navigator\.serviceWorker\.register\("\/sw\.js"/);
+  assert.match(manager, /scope:\s*"\/"/);
+  assert.match(manager, /updateViaCache:\s*"none"/);
+  assert.match(manager, /aria-expanded=\{isOpen\}/);
+  assert.match(manager, /event\.key === "Escape"/);
+  assert.match(manager, /event\.key !== "Tab"/);
+  assert.doesNotMatch(manager, /document\.body\.style\.overflow/);
+  assert.doesNotMatch(manager, /style\.removeProperty\("overflow"\)/);
+});
+
+test("PWA visual experience is component-owned and editorial", () => {
+  assert.match(experience, /import "\.\/pwa-app-experience\.css"/);
+  assert.match(managerCss, /PWA — instalação e atualização em linguagem editorial/);
+  assert.match(managerCss, /\.pwa-option-card\s*\{[\s\S]*border-top:/);
+  assert.match(managerCss, /\.pwa-dialog\s*\{[\s\S]*border-radius:\s*14px/);
+  assert.doesNotMatch(managerCss, /backdrop-filter/);
+  assert.doesNotMatch(managerCss, /linear-gradient/);
+  assert.match(experienceCss, /@media \(display-mode: standalone\), \(display-mode: fullscreen\)/);
+  assert.match(experienceCss, /env\(safe-area-inset-top\)/);
+  assert.match(experienceCss, /env\(safe-area-inset-bottom\)/);
+  assert.match(experienceCss, /\.pwa-connectivity-notice/);
+});
+
+test("installed app tracks connectivity and economizes the live camera", () => {
   assert.match(experience, /data\.pwaMode/);
   assert.match(experience, /data\.saveData/);
   assert.match(experience, /data\.effectiveConnection/);
@@ -34,50 +61,50 @@ test("installed app implementation remains available for later reactivation", ()
   assert.match(experience, /window\.addEventListener\("offline"/);
   assert.match(experience, /visibilitychange/);
   assert.match(experience, /getRegistration\("\/"\)/);
-  assert.match(experience, /Você está sem conexão/);
+  assert.match(experience, /Sem conexão/);
   assert.match(experience, /Conexão restabelecida/);
+  assert.match(experienceCss, /data-save-data="true"/);
+  assert.match(experienceCss, /data-effective-connection="slow-2g"/);
+  assert.match(experienceCss, /data-effective-connection="2g"/);
+  assert.match(experienceCss, /data-network="offline"/);
+  assert.match(experienceCss, /\.tp-home-hero__live-camera iframe[\s\S]*display:\s*none/);
 });
 
-test("PWA visual layer remains preserved but inactive", () => {
-  assert.match(styles, /@media \(display-mode: standalone\), \(display-mode: fullscreen\)/);
-  assert.match(styles, /--pwa-app-header-height/);
-  assert.match(styles, /--pwa-app-nav-height/);
-  assert.match(styles, /env\(safe-area-inset-top\)/);
-  assert.match(styles, /env\(safe-area-inset-bottom\)/);
-  assert.match(styles, /\.production-mobile-navigation/);
-  assert.match(styles, /\.pwa-connectivity-notice/);
-  assert.match(styles, /\.pwa-dialog::before/);
+test("legacy PWA layers stay out of the global production cascade", () => {
+  for (const entry of [styleImports, globalStyles]) {
+    assert.doesNotMatch(entry, /styles\/pwa\.css/);
+    assert.doesNotMatch(entry, /pwa-fullscreen-refinement\.css/);
+    assert.doesNotMatch(entry, /pwa-app-refinement-v60\.css/);
+  }
 });
 
-test("live camera fallback styles remain available for future PWA reactivation", () => {
-  assert.match(styles, /data-save-data="true"/);
-  assert.match(styles, /data-effective-connection="slow-2g"/);
-  assert.match(styles, /data-effective-connection="2g"/);
-  assert.match(styles, /data-network="offline"/);
-  assert.match(styles, /\.weather-hero-live-camera iframe[\s\S]*display:\s*none/);
-});
-
-test("PWA refinement remains the final production style layer", () => {
-  const tsCamera = styleImports.indexOf("home-hero-live-camera-v54.css");
-  const tsPwa = styleImports.indexOf("pwa-app-refinement-v60.css");
-  const cssCamera = globalStyles.indexOf("home-hero-live-camera-v54.css");
-  const cssPwa = globalStyles.indexOf("pwa-app-refinement-v60.css");
-
-  assert.ok(tsCamera >= 0 && tsPwa > tsCamera);
-  assert.ok(cssCamera >= 0 && cssPwa > cssCamera);
-});
-
-test("service worker source remains versioned for later reactivation", () => {
-  assert.match(serviceWorker, /tempo-pelotas-v5/);
+test("service worker keeps live pages network-first and caches only application assets", () => {
+  assert.match(serviceWorker, /tempo-pelotas-v6/);
   assert.match(serviceWorker, /navigationPreload\?\.enable\(\)/);
   assert.match(serviceWorker, /event\.preloadResponse/);
   assert.match(serviceWorker, /onlineOnlyNavigation\(event\)/);
+  assert.match(serviceWorker, /url\.pathname\.startsWith\("\/assets\/"\)/);
+  assert.match(serviceWorker, /url\.pathname\.startsWith\("\/brand\/"\)/);
+  assert.doesNotMatch(serviceWorker, /url\.pathname\.endsWith\("\.png"\)/);
+  assert.doesNotMatch(serviceWorker, /url\.pathname\.endsWith\("\.webp"\)/);
+  assert.doesNotMatch(serviceWorker, /url\.pathname\.endsWith\("\.jpg"\)/);
 });
 
-test("offline page remains preserved for later reactivation", () => {
+test("manifest favors local utility and allows radar in landscape", () => {
+  assert.match(manifest, /"name": "Tempo Pelotas"/);
+  assert.match(manifest, /"orientation": "any"/);
+  assert.match(manifest, /"name": "Tempo agora em Pelotas"/);
+  assert.match(manifest, /"name": "Radar e satélite"/);
+  assert.match(manifest, /"name": "Situação das águas"/);
+  assert.match(manifest, /"name": "Avisos meteorológicos"/);
+  assert.match(manifest, /tempo-pelotas-maskable\.png/);
+});
+
+test("offline page is explicit that it does not show current conditions", () => {
   assert.match(offlinePage, /viewport-fit=cover/);
   assert.match(offlinePage, /Aplicativo Tempo Pelotas/);
   assert.match(offlinePage, /Aguardando conexão/);
+  assert.match(offlinePage, /Esta tela não representa a situação meteorológica atual/);
   assert.match(offlinePage, /window\.addEventListener\("online"/);
   assert.match(offlinePage, /env\(safe-area-inset-bottom\)/);
 });
