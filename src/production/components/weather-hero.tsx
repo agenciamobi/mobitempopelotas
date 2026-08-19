@@ -11,6 +11,8 @@ import {
 import type { WeatherData, WeatherIconName } from "@/production/lib/weather-data";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/production/lib/weather-insights";
 
+import "./weather-hero-direction.css";
+
 type WeatherHeroProps = {
   weather: WeatherData;
   advisoryLevel?: AdvisoryLevel;
@@ -69,7 +71,7 @@ export function WeatherHero({
   const resolvedLevel = advisoryLevel ?? advisory.level;
   const today = weather.daily[0] ?? null;
   const nextHourForecast = weather.hourly[0] ?? null;
-  const hourlyPreview = weather.hourly.slice(0, 3);
+  const hourlyPreview = weather.hourly.slice(0, 4);
   const resolvedIcon = resolveHeroWeatherIcon(weather, cppmetForecast?.item.summary);
   const displayIcon = current.available ? resolvedIcon : (nextHourForecast?.icon ?? resolvedIcon);
   const heroPhoto = resolveHeroPhoto({
@@ -188,7 +190,7 @@ export function WeatherHero({
           </div>
 
           <div
-            className="weather-hero-editorial-facts"
+            className="weather-hero-editorial-facts weather-hero-editorial-facts--essential"
             aria-label="Resumo das condições e da previsão de hoje"
           >
             <HeroFact label="Mín. / máx." value={today ? `${today.min}° / ${today.max}°` : "—"} />
