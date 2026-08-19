@@ -9,6 +9,9 @@ const experience = readFileSync("src/components/pwa/PwaAppExperience.tsx", "utf8
 const experienceCss = readFileSync("src/components/pwa/pwa-app-experience.css", "utf8");
 const styleImports = readFileSync("src/production/production-styles.ts", "utf8");
 const globalStyles = readFileSync("src/production/production-styles.css", "utf8");
+const footerLegacyCss = readFileSync("src/production/styles/footer-editorial-v51-fix.css", "utf8");
+const mobileUsabilityCss = readFileSync("src/production/styles/mobile-usability-refinement.css", "utf8");
+const mobileWidthGuardCss = readFileSync("src/production/styles/mobile-width-guard.css", "utf8");
 const serviceWorker = readFileSync("public/sw.js", "utf8");
 const offlinePage = readFileSync("public/offline.html", "utf8");
 const manifest = readFileSync("public/manifest.webmanifest", "utf8");
@@ -70,11 +73,16 @@ test("installed app tracks connectivity and economizes the live camera", () => {
   assert.match(experienceCss, /\.tp-home-hero__live-camera iframe[\s\S]*display:\s*none/);
 });
 
-test("legacy PWA layers stay out of the global production cascade", () => {
+test("legacy PWA layers and unrelated global styles cannot restyle the installer", () => {
   for (const entry of [styleImports, globalStyles]) {
     assert.doesNotMatch(entry, /styles\/pwa\.css/);
     assert.doesNotMatch(entry, /pwa-fullscreen-refinement\.css/);
     assert.doesNotMatch(entry, /pwa-app-refinement-v60\.css/);
+  }
+
+  for (const stylesheet of [footerLegacyCss, mobileUsabilityCss, mobileWidthGuardCss]) {
+    assert.doesNotMatch(stylesheet, /\.pwa-launcher/);
+    assert.doesNotMatch(stylesheet, /\.pwa-dialog/);
   }
 });
 
