@@ -28,8 +28,6 @@ import "./styles/mobile-history-footer-refinement.css";
 import "./styles/brand-assets.css";
 import "./styles/mobile-usability-refinement.css";
 import "./styles/mobile-interaction-fixes.css";
-import "./styles/theme-refinement.css";
-import "./styles/theme-polish.css";
 import "./styles/topic-theme-polish.css";
 import "./styles/footer-theme-v2.css";
 import "./styles/footer-shell-v2.css";
