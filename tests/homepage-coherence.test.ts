@@ -25,6 +25,14 @@ const radarCss = readFileSync(
   "src/production/components/home-radar-editorial.css",
   "utf8",
 );
+const observation = readFileSync(
+  "src/production/components/home-observation-editorial.tsx",
+  "utf8",
+);
+const observationCss = readFileSync(
+  "src/production/components/home-observation-editorial.css",
+  "utf8",
+);
 const weatherMap = readFileSync("src/production/components/weather-map.tsx", "utf8");
 const weatherHero = readFileSync("src/production/components/weather-hero.tsx", "utf8");
 const weatherHeroCss = readFileSync(
@@ -60,16 +68,31 @@ test("the homepage radar is isolated from the historical map-story cascade", () 
   );
 });
 
+test("the Embrapa reading is isolated as civic-tech observed data", () => {
+  assert.match(productionHome, /<HomeObservationEditorial weather=\{weather\} observation=\{observation\} \/>/);
+  assert.match(observation, /className="tp-home-observation"/);
+  assert.match(observation, /id="observacao-embrapa"/);
+  assert.match(observation, /Chuva registrada hoje/);
+  assert.doesNotMatch(observation, /Vento mais forte hoje/);
+  assert.match(observationCss, /\.tp-home-observation__reading\s*\{[\s\S]*border-top:/);
+  assert.doesNotMatch(observationCss, /!important/);
+  assert.doesNotMatch(observationCss, /box-shadow/);
+  assert.match(
+    semanticDashboard,
+    /hasClass\(className, "home-observation-story"\)[\s\S]*return null;/,
+  );
+});
+
 test("the hourly forecast headline is explicit, local and owned by the isolated component", () => {
   assert.match(forecast, /<h2 id="tp-home-forecast-title">Próximas horas em Pelotas<\/h2>/);
   assert.match(forecast, /className="tp-home-forecast"/);
   assert.doesNotMatch(forecast, /home-story--forecast/);
 });
 
-test("the official INMET forecast follows the public editorial forecast", () => {
+test("the main meteorological narrative follows the definitive homepage order", () => {
   assert.match(
     productionHome,
-    /<HomeForecastEditorial[\s\S]*<InmetOfficialForecastPanel[\s\S]*<HomeRadarEditorial[\s\S]*<HomeEditorialDashboard/,
+    /<HomeForecastEditorial[\s\S]*<InmetOfficialForecastPanel[\s\S]*<HomeRadarEditorial[\s\S]*<HomeObservationEditorial[\s\S]*<HomeEditorialDashboard/,
   );
 });
 
