@@ -69,7 +69,7 @@ export function WeatherHero({
   const resolvedLevel = advisoryLevel ?? advisory.level;
   const today = weather.daily[0] ?? null;
   const nextHourForecast = weather.hourly[0] ?? null;
-  const hourlyPreview = weather.hourly.slice(0, 4);
+  const hourlyPreview = weather.hourly.slice(0, 3);
   const resolvedIcon = resolveHeroWeatherIcon(weather, cppmetForecast?.item.summary);
   const displayIcon = current.available ? resolvedIcon : (nextHourForecast?.icon ?? resolvedIcon);
   const heroPhoto = resolveHeroPhoto({
@@ -84,8 +84,8 @@ export function WeatherHero({
   const description =
     cppmetForecast?.item.summary ??
     (current.available
-      ? "Condições locais, previsão das próximas horas e sinais de mudança no tempo em Pelotas."
-      : "A medição atual está indisponível. Os valores exibidos como previsão permanecem identificados como estimativa.");
+      ? "Condição observada e sinais mais importantes para as próximas horas em Pelotas."
+      : "A medição atual está indisponível. A próxima hora permanece identificada como previsão.");
   const currentUpdateMeta = getCurrentUpdateMeta(current);
   const forecastReason = advisory.level === "normal" ? null : (advisory.reasons[0] ?? null);
   const secondaryAction =
@@ -206,14 +206,6 @@ export function WeatherHero({
                 current.available ? current.windSpeed : (nextHourForecast?.windSpeed ?? null),
                 " km/h",
               )}
-            />
-            <HeroFact
-              label="Umidade"
-              value={formatMetric(current.available ? current.humidity : null, "%")}
-            />
-            <HeroFact
-              label="Pressão"
-              value={formatMetric(current.available ? current.pressure : null, " hPa")}
             />
           </div>
         </div>
