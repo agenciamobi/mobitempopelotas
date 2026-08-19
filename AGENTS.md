@@ -164,3 +164,95 @@ Depois da geração, revisar manualmente texto, ortografia, logotipo, números e
 - CTA visível;
 - ortografia revisada;
 - sem marcas d'água, logos de terceiros ou elementos visuais que confundam a autoria.
+
+## Banco editorial de ideias para redes sociais
+
+A fonte de referência para pautas de redes sociais é:
+
+`docs/social/tempo-pelotas-ideias-posts.csv`
+
+O arquivo reúne **350 ideias de posts** numeradas de `TP-001` a `TP-350`. Os IDs são referências estáveis: ao ampliar o banco, adicionar novos IDs sequenciais e **não renumerar nem reutilizar IDs existentes**.
+
+O CSV funciona como **backlog editorial e índice de pautas**, não como fonte factual de dados meteorológicos ou hidrológicos. Uma ideia registrada no CSV nunca autoriza reutilizar números antigos, presumir uma condição atual ou publicar um alerta sem nova verificação.
+
+### Estrutura do CSV
+
+As colunas canônicas do banco editorial são:
+
+- `id` — identificador estável da pauta;
+- `pilar` — macrotema editorial;
+- `serie` — série ou família recorrente de conteúdo;
+- `titulo_post` — proposta-base de título/assunto;
+- `pagina_destino` — rota preferencial do portal para o CTA, desde que ainda exista e seja adequada;
+- `prioridade` — orientação editorial inicial (`Alta`, `Média` etc.);
+- `frequencia_sugerida` — cadência possível, não obrigatória;
+- `sazonalidade` — condição, estação ou período em que a pauta tende a ser mais relevante.
+
+Os pilares atuais incluem conteúdo institucional, rotina editorial, previsão, chuva, vento, radar/satélite, alertas oficiais, observação local/Embrapa, meteograma, histórico e clima, hidrologia, geadas, câmeras, transparência e tecnologia, sazonal/cotidiano, região e educação meteorológica.
+
+### Como uma IA deve escolher uma pauta
+
+Antes de criar uma publicação:
+
+1. considerar primeiro o que é relevante **agora** para Pelotas e região: condição meteorológica, sazonalidade, eventual alerta oficial, situação hidrológica e interesse local;
+2. consultar o CSV para encontrar uma pauta correspondente, preferindo itens de prioridade `Alta` quando houver aderência real ao momento;
+3. evitar repetir a mesma série em sequência quando existirem outras pautas igualmente relevantes;
+4. alternar conteúdo de utilidade imediata, educação, cobertura regional, hidrologia e institucional para não transformar o perfil em um feed repetitivo de temperatura;
+5. verificar se a `pagina_destino` ainda é válida no código/`PUBLIC_ROUTES`/`PROJECT_CURRENT_STATE.md`; se a arquitetura mudou, usar a rota atual correta e reconciliar o CSV quando necessário;
+6. tratar o título do CSV como ponto de partida editorial. Ele pode ser refinado para clareza, contexto e atualidade, desde que não altere fatos nem crie sensacionalismo.
+
+A condição real do momento tem prioridade sobre uma cadência fixa. Em um episódio de chuva relevante, vento forte, alerta oficial ou mudança hidrológica, a utilidade pública deve prevalecer sobre o calendário planejado.
+
+### Verificação obrigatória antes de produzir conteúdo factual
+
+Para qualquer post com dados atuais, uma IA/agente deve consultar as fontes vigentes do produto antes de escrever a legenda ou montar a arte.
+
+Regras:
+
+- **previsão:** usar a previsão atual do portal para o mesmo horizonte temporal citado na publicação;
+- **observação:** usar uma medição válida e seu timestamp; não apresentar dado atrasado como atual;
+- **Embrapa:** respeitar o estado de leitura atualizada, atrasada ou indisponível;
+- **radar/satélite:** usar quadro real válido, timestamp e atribuição; nunca gerar um radar meteorológico fictício por IA;
+- **trovoadas/STSC:** tratar como monitoramento de atividade elétrica, nunca como alerta oficial;
+- **alertas:** publicar como alerta apenas quando houver aviso oficial válido, preservando órgão emissor, área e período;
+- **hidrologia:** informar nível, tendência e horário somente quando houver leitura válida; nível/tendência não equivalem a previsão de cheia;
+- **câmeras:** confirmar `live`/`replay`/indisponibilidade; nunca apresentar replay como transmissão ao vivo;
+- **comparações entre cidades:** usar o mesmo horizonte e a mesma referência temporal para todas;
+- **histórico/recordes:** não usar a palavra `recorde` com base apenas na janela de 30 dias ou em uma série insuficiente.
+
+Distinguir sempre quatro categorias sem misturá-las: **previsão**, **observação**, **monitoramento** e **alerta oficial**.
+
+### Da pauta à arte
+
+Depois de selecionar a pauta e validar os dados:
+
+1. seguir integralmente o **Padrão oficial de artes para redes sociais** deste `AGENTS.md`;
+2. usar o logotipo oficial `https://tempopelotas.com.br/brand/tempo-pelotas-purple.svg` como fonte de verdade;
+3. adaptar headline, trecho de ênfase, texto de apoio e indicadores ao assunto escolhido;
+4. usar fotografia real/local ou captura real do recurso quando pertinente;
+5. usar `tempopelotas.com.br` como CTA institucional e, na legenda/link, preferir a `pagina_destino` indicada no CSV quando válida;
+6. para radar, satélite, gráficos, mapa de geadas, hidrologia e câmeras, preferir material real do produto em vez de reconstrução visual generativa;
+7. revisar texto, números, unidades, timestamps, ortografia, domínio e logotipo antes da publicação.
+
+### Mix editorial recomendado
+
+Como referência flexível — nunca como regra que se sobreponha à relevância do momento — buscar um equilíbrio próximo de:
+
+- **40–50%** utilidade e atualidade: tempo do dia, previsão, chuva, vento, alertas, radar e Lagoa;
+- **20–25%** educação meteorológica, clima, metodologia e transparência;
+- **15–20%** cobertura das cidades e panoramas da Zona Sul;
+- **10–15%** institucional, funcionalidades, bastidores técnicos e divulgação do portal.
+
+Em períodos de eventos meteorológicos/hidrológicos relevantes, aumentar temporariamente a proporção de conteúdo de serviço.
+
+### Manutenção do banco editorial
+
+Atualizar `docs/social/tempo-pelotas-ideias-posts.csv` quando:
+
+- surgir uma nova página, funcionalidade ou fonte que gere novas pautas;
+- uma rota pública for renomeada/removida;
+- uma ideia se tornar tecnicamente incorreta devido a mudança do produto;
+- uma nova cidade/região passar a ser atendida;
+- uma série editorial nova for aprovada.
+
+Não apagar uma ideia apenas porque já foi publicada: a maioria das pautas é reutilizável em outro contexto ou período. Quando necessário, o controle de posts efetivamente publicados deve existir em arquivo/sistema separado do banco de ideias.
