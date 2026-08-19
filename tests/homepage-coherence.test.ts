@@ -15,6 +15,11 @@ const semanticDashboard = readFileSync(
   "src/production/components/home-editorial-dashboard-semantic.tsx",
   "utf8",
 );
+const forecast = readFileSync("src/production/components/home-forecast-editorial.tsx", "utf8");
+const forecastCss = readFileSync(
+  "src/production/components/home-forecast-editorial.css",
+  "utf8",
+);
 const weatherMap = readFileSync("src/production/components/weather-map.tsx", "utf8");
 const weatherHero = readFileSync("src/production/components/weather-hero.tsx", "utf8");
 const weatherHeroCss = readFileSync(
@@ -35,18 +40,38 @@ test("the homepage radar shortcut resolves to one existing section anchor", () =
   assert.doesNotMatch(semanticDashboard, /normalizedId\s*=\s*"regiao"/);
 });
 
-test("the hourly forecast headline is explicit and local", () => {
+test("the hourly forecast headline is explicit, local and owned by the isolated component", () => {
+  assert.match(forecast, /<h2 id="tp-home-forecast-title">Próximas horas em Pelotas<\/h2>/);
+  assert.match(forecast, /className="tp-home-forecast"/);
+  assert.doesNotMatch(forecast, /home-story--forecast/);
+});
+
+test("the official INMET forecast follows the public editorial forecast", () => {
   assert.match(
-    semanticDashboard,
-    /"Veja como o tempo deve mudar ao longo do dia": "Próximas horas em Pelotas"/,
+    productionHome,
+    /<HomeForecastEditorial[\s\S]*<InmetOfficialForecastPanel[\s\S]*<HomeEditorialDashboard/,
   );
 });
 
-test("the official INMET forecast follows the public hourly forecast", () => {
+test("legacy forecast markup is removed before the remaining dashboard reaches the DOM", () => {
   assert.match(
-    productionHome,
-    /<HomeEditorialDashboard[\s\S]*afterForecast=\{[\s\S]*<InmetOfficialForecastPanel/,
+    semanticDashboard,
+    /hasClass\(className, "home-story--forecast"\)[\s\S]*return null;/,
   );
+  assert.doesNotMatch(productionHome, /HeroAstronomyPortal/);
+  assert.doesNotMatch(productionHome, /HomeHourlyConditionPortal/);
+  assert.doesNotMatch(productionHome, /HomeTrendEditorialPortal/);
+});
+
+test("the editorial forecast owns responsive styles without important overrides", () => {
+  assert.match(forecast, /import "\.\/home-forecast-editorial\.css"/);
+  assert.match(forecastCss, /\.tp-home-forecast\s*\{/);
+  assert.match(forecastCss, /\.tp-home-forecast__hours/);
+  assert.match(forecastCss, /\.tp-home-forecast-week__list/);
+  assert.match(forecastCss, /@media \(max-width: 1040px\)/);
+  assert.match(forecastCss, /@media \(max-width: 700px\)/);
+  assert.doesNotMatch(forecastCss, /!important/);
+  assert.doesNotMatch(forecastCss, /\.home-story--forecast/);
 });
 
 test("the hero separates current wording from forecast wording", () => {

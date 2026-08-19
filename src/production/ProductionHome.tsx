@@ -15,12 +15,10 @@ import {
   toProductionSummaries,
   toProductionWeatherData,
 } from "@/production/adapters/home";
-import { HeroAstronomyPortal } from "@/production/components/hero-astronomy-portal";
 import { HomeEditorialDashboard } from "@/production/components/home-editorial-dashboard-semantic";
-import { HomeHourlyConditionPortal } from "@/production/components/home-hourly-condition-portal";
+import { HomeForecastEditorial } from "@/production/components/home-forecast-editorial";
 import { HomeLiveCameraBackground } from "@/production/components/home-live-camera-background";
 import { HomeSectionNavigation } from "@/production/components/home-section-navigation";
-import { HomeTrendEditorialPortal } from "@/production/components/home-trend-editorial-portal";
 import {
   hasVerifiedInmetAlertSemantics,
   InmetAlertsPanel,
@@ -184,8 +182,13 @@ export function ProductionHome({
 
       <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
         <InmetAlertsPanel data={inmetAlerts} variant="home" advisoryLevel={headerLevel} />
-        <HeroAstronomyPortal astronomy={weather.astronomy} />
         <HomeSectionNavigation />
+        <HomeForecastEditorial weather={weather} narrative={summaries.tomorrow} />
+        <InmetOfficialForecastPanel
+          periods={recoveredData.weather.inmetForecast}
+          station={recoveredData.weather.inmetStation}
+          forecastWindSpeedKmh={forecastWindSpeedKmh}
+        />
         <HomeEditorialDashboard
           weather={weather}
           advisoryLevel={headerLevel}
@@ -193,16 +196,7 @@ export function ProductionHome({
           laranjal={laranjal}
           guaiba={guaiba}
           lagoon={lagoon}
-          afterForecast={
-            <InmetOfficialForecastPanel
-              periods={recoveredData.weather.inmetForecast}
-              station={recoveredData.weather.inmetStation}
-              forecastWindSpeedKmh={forecastWindSpeedKmh}
-            />
-          }
         />
-        <HomeHourlyConditionPortal hours={weather.hourly} />
-        <HomeTrendEditorialPortal weather={weather} narrative={summaries.tomorrow} />
         <HomeExplorePortal />
         <EditorialContentSection id="como-interpretar-o-tempo" content={HOME_EDITORIAL_CONTENT} />
       </main>

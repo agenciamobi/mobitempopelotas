@@ -1,14 +1,12 @@
 import {
   Children,
   cloneElement,
-  Fragment,
   isValidElement,
   type ReactElement,
   type ReactNode,
 } from "react";
 
 import { HomeEditorialDashboard as HomeEditorialDashboardBase } from "@/production/components/home-editorial-dashboard";
-import { WeatherIcon } from "@/production/components/weather-icon";
 import type { EmbrapaObservationData } from "@/production/lib/embrapa-observation";
 import type { GuaibaObservationData } from "@/production/lib/guaiba-monitor";
 import type { LagoonMonitoringNetworkData } from "@/production/lib/lagoon-monitoring-network";
@@ -30,11 +28,9 @@ type HomeEditorialDashboardProps = {
   laranjal: LaranjalLevelData;
   guaiba: GuaibaObservationData;
   lagoon: LagoonMonitoringNetworkData;
-  afterForecast?: ReactNode;
 };
 
 type SemanticContext = {
-  currentHour: boolean;
   laranjalUnavailable: boolean;
   stationUnavailable: boolean;
   guaibaContext: boolean;
@@ -66,12 +62,6 @@ const stationStateLabels: Record<string, string> = {
   "Acima do nível de atenção": "Acima da cota local",
   "Perto do nível de atenção": "Próximo da cota local",
   "Sem sinal de atenção": "Abaixo da cota local",
-};
-
-const editorialCopyReplacements: Record<string, string> = {
-  "Próximos dias": "Tendência do tempo",
-  "Previsão para os próximos dias": "Como o tempo deve evoluir na semana",
-  "Veja como o tempo deve mudar ao longo do dia": "Próximas horas em Pelotas",
 };
 
 function summarizeLagoonForHome(lagoon: LagoonMonitoringNetworkData): LagoonMonitoringNetworkData {
@@ -129,39 +119,28 @@ function appendClass(className: string, token: string) {
   return className ? `${className} ${token}` : token;
 }
 
-function normalizeTextNode(node: ReactNode): ReactNode {
-  if (typeof node !== "string") return node;
-
-  const trimmed = node.trim();
-  if (trimmed === "por volta de Agora") return "neste momento";
-  if (editorialCopyReplacements[trimmed]) {
-    return node.replace(trimmed, editorialCopyReplacements[trimmed]);
-  }
-
-  return node;
-}
-
 function transformDashboardNode(
   node: ReactNode,
   context: SemanticContext,
   waterStates: WaterVisualStates,
   stationStates: StationVisualState[],
-  afterForecast: ReactNode,
 ): ReactNode {
-  if (typeof node === "string") return normalizeTextNode(node);
+  if (typeof node === "string") return node;
   if (!isValidElement<ElementProps>(node)) return node;
 
   const props = node.props;
   const className = typeof props.className === "string" ? props.className : "";
   const isDomElement = typeof node.type === "string";
 
-  if (isDomElement && node.type === "section" && hasClass(className, "home-explore-story")) {
+  if (
+    isDomElement &&
+    node.type === "section" &&
+    (hasClass(className, "home-story--forecast") || hasClass(className, "home-explore-story"))
+  ) {
     return null;
   }
 
   const nextContext: SemanticContext = {
-    currentHour:
-      context.currentHour || (node.type === "article" && hasClass(className, "is-current")),
     laranjalUnavailable:
       context.laranjalUnavailable ||
       (node.type === "article" &&
@@ -173,24 +152,6 @@ function transformDashboardNode(
     guaibaContext: context.guaibaContext || hasClass(className, "home-water-context"),
     waterFooter: context.waterFooter || hasClass(className, "home-water-story__footer"),
   };
-
-  if (node.type === WeatherIcon && nextContext.currentHour) {
-    return cloneElement(node as ReactElement<ElementProps>, { title: "Tempo agora" });
-  }
-
-  if (
-    isDomElement &&
-    node.type === "div" &&
-    hasClass(className, "home-hourly-story__topline") &&
-    nextContext.currentHour
-  ) {
-    const [timeLabel] = Children.toArray(props.children);
-    return cloneElement(
-      node as ReactElement<ElementProps>,
-      undefined,
-      transformDashboardNode(timeLabel, nextContext, waterStates, stationStates, afterForecast),
-    );
-  }
 
   if (
     isDomElement &&
@@ -278,7 +239,7 @@ function transformDashboardNode(
   }
 
   const transformedChildren = Children.map(props.children, (child) =>
-    transformDashboardNode(child, nextContext, waterStates, stationStates, afterForecast),
+    transformDashboardNode(child, nextContext, waterStates, stationStates),
   );
 
   let normalizedClassName = className;
@@ -312,47 +273,32 @@ function transformDashboardNode(
 
   const classChanged = normalizedClassName !== className;
   const nextProps = classChanged ? { className: normalizedClassName || undefined } : undefined;
-  const transformedElement = cloneElement(
+
+  return cloneElement(
     node as ReactElement<ElementProps>,
     nextProps,
     transformedChildren,
   );
-
-  if (
-    afterForecast &&
-    isDomElement &&
-    node.type === "section" &&
-    hasClass(className, "home-story--forecast")
-  ) {
-    return (
-      <Fragment key="forecast-with-official-source">
-        {transformedElement}
-        {afterForecast}
-      </Fragment>
-    );
-  }
-
-  return transformedElement;
 }
 
 export function HomeEditorialDashboard(dashboardProps: HomeEditorialDashboardProps) {
-  const { afterForecast = null, ...baseProps } = dashboardProps;
-  const homeLagoon = summarizeLagoonForHome(baseProps.lagoon);
-  const dashboard = HomeEditorialDashboardBase({ ...baseProps, lagoon: homeLagoon });
+  const homeLagoon = summarizeLagoonForHome(dashboardProps.lagoon);
+  const dashboard = HomeEditorialDashboardBase({ ...dashboardProps, lagoon: homeLagoon });
   const waterStates: WaterVisualStates = {
     laranjal: getWaterLevelVisualState({
-      rate: baseProps.laranjal.trendCmPerHour,
+      rate: dashboardProps.laranjal.trendCmPerHour,
       available:
-        baseProps.laranjal.status !== "unavailable" && baseProps.laranjal.currentLevel !== null,
+        dashboardProps.laranjal.status !== "unavailable" &&
+        dashboardProps.laranjal.currentLevel !== null,
     }),
     guaiba: getWaterLevelVisualState({
-      rate: baseProps.guaiba.trendCmPerHour,
+      rate: dashboardProps.guaiba.trendCmPerHour,
       available:
-        baseProps.guaiba.status !== "unavailable" && baseProps.guaiba.currentLevel !== null,
-      currentLevel: baseProps.guaiba.currentLevel,
-      threshold: baseProps.guaiba.floodReference,
+        dashboardProps.guaiba.status !== "unavailable" && dashboardProps.guaiba.currentLevel !== null,
+      currentLevel: dashboardProps.guaiba.currentLevel,
+      threshold: dashboardProps.guaiba.floodReference,
     }),
-    guaibaReferenceLabel: baseProps.guaiba.station,
+    guaibaReferenceLabel: dashboardProps.guaiba.station,
   };
   const stationStates = homeLagoon.observations.map((station) => ({
     city: station.station.city,
@@ -368,7 +314,6 @@ export function HomeEditorialDashboard(dashboardProps: HomeEditorialDashboardPro
   return transformDashboardNode(
     dashboard,
     {
-      currentHour: false,
       laranjalUnavailable: false,
       stationUnavailable: false,
       guaibaContext: false,
@@ -376,6 +321,5 @@ export function HomeEditorialDashboard(dashboardProps: HomeEditorialDashboardPro
     },
     waterStates,
     stationStates,
-    afterForecast,
   );
 }
