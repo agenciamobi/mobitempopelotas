@@ -7,6 +7,7 @@ const manager = readFileSync("src/components/pwa/PwaManager.tsx", "utf8");
 const managerCss = readFileSync("src/components/pwa/pwa-manager.css", "utf8");
 const experience = readFileSync("src/components/pwa/PwaAppExperience.tsx", "utf8");
 const experienceCss = readFileSync("src/components/pwa/pwa-app-experience.css", "utf8");
+const pushManager = readFileSync("src/components/pwa/PushNotificationsManager.tsx", "utf8");
 const styleImports = readFileSync("src/production/production-styles.ts", "utf8");
 const globalStyles = readFileSync("src/production/production-styles.css", "utf8");
 const footerLegacyCss = readFileSync("src/production/styles/footer-editorial-v51-fix.css", "utf8");
@@ -21,6 +22,7 @@ test("PWA is mounted with manifest and mobile metadata", () => {
   assert.match(rootRoute, /import \{ PwaManager \}/);
   assert.match(rootRoute, /<PwaAppExperience \/>/);
   assert.match(rootRoute, /<PwaManager \/>/);
+  assert.doesNotMatch(rootRoute, /PushNotificationsManager/);
   assert.match(rootRoute, /rel: "manifest", href: "\/manifest\.webmanifest"/);
   assert.match(rootRoute, /mobile-web-app-capable/);
   assert.match(rootRoute, /apple-mobile-web-app-capable/);
@@ -40,6 +42,14 @@ test("installer no longer mutates persistent document scroll state", () => {
   assert.match(manager, /event\.key !== "Tab"/);
   assert.doesNotMatch(manager, /document\.body\.style\.overflow/);
   assert.doesNotMatch(manager, /style\.removeProperty\("overflow"\)/);
+});
+
+test("preserved Web Push dialog also avoids persistent scroll mutation", () => {
+  assert.match(pushManager, /aria-expanded=\{isOpen\}/);
+  assert.match(pushManager, /onPointerDown=\{\(\) => setIsOpen\(false\)\}/);
+  assert.match(pushManager, /tempo-pelotas-icon\.png/);
+  assert.doesNotMatch(pushManager, /document\.body\.style\.overflow/);
+  assert.doesNotMatch(pushManager, /previousOverflow/);
 });
 
 test("PWA visual experience is component-owned and editorial", () => {
