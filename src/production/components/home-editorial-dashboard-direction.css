@@ -1,0 +1,76 @@
+/*
+ * Dashboard editorial da Home — ajustes de densidade pública.
+ * A página inicial resume; as páginas temáticas preservam a profundidade.
+ */
+
+@media (min-width: 721px) {
+  .site-shell--home-editorial
+    .home-observation-story
+    .home-observation-story__reading
+    dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .site-shell--home-editorial
+    .home-observation-story
+    .home-observation-story__reading
+    dl
+    > div,
+  .site-shell--home-editorial
+    .home-observation-story
+    .home-observation-story__reading
+    dl
+    > div:nth-child(2n),
+  .site-shell--home-editorial
+    .home-observation-story
+    .home-observation-story__reading
+    dl
+    > div:nth-last-child(-n + 2) {
+    border-right: 1px solid rgb(7 27 44 / 8%) !important;
+    border-bottom: 0 !important;
+  }
+
+  .site-shell--home-editorial
+    .home-observation-story
+    .home-observation-story__reading
+    dl
+    > div:last-child {
+    border-right: 0 !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .site-shell--home-editorial
+    .home-observation-story
+    .home-observation-story__reading
+    dl {
+    grid-template-columns: 1fr !important;
+  }
+
+  .site-shell--home-editorial
+    .home-observation-story
+    .home-observation-story__reading
+    dl
+    > div,
+  .site-shell--home-editorial
+    .home-observation-story
+    .home-observation-story__reading
+    dl
+    > div:nth-child(2n),
+  .site-shell--home-editorial
+    .home-observation-story
+    .home-observation-story__reading
+    dl
+    > div:nth-last-child(-n + 2) {
+    border-right: 0 !important;
+    border-bottom: 1px solid rgb(7 27 44 / 8%) !important;
+  }
+
+  .site-shell--home-editorial
+    .home-observation-story
+    .home-observation-story__reading
+    dl
+    > div:last-child {
+    border-bottom: 0 !important;
+  }
+}
