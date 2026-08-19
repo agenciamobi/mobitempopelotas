@@ -1,0 +1,351 @@
+id,pilar,serie,titulo_post,pagina_destino,prioridade,frequencia_sugerida,sazonalidade
+TP-001,Institucional,Conheça o Tempo Pelotas,Tempo Pelotas: sua referência local para acompanhar o tempo,/,Alta,Mensal,Evergreen
+TP-002,Institucional,Conheça o Tempo Pelotas,Tudo o que você encontra no Tempo Pelotas,/,Alta,Bimestral,Evergreen
+TP-003,Institucional,Conheça o Tempo Pelotas,Previsão + observação local: por que as duas importam,/metodologia,Alta,Trimestral,Evergreen
+TP-004,Institucional,Conheça o Tempo Pelotas,Pelotas e Zona Sul em foco,/tempo-na-regiao-sul-rs,Alta,Mensal,Evergreen
+TP-005,Institucional,Conheça o Tempo Pelotas,Por que usar uma fonte local de meteorologia?,/metodologia,Alta,Trimestral,Evergreen
+TP-006,Institucional,Conheça o Tempo Pelotas,"Antes de sair de casa, confira o Tempo Pelotas",/,Alta,Quinzenal,Evergreen
+TP-007,Institucional,Conheça o Tempo Pelotas,Seu fim de semana começa pela previsão,/previsao-7-dias-pelotas,Alta,Semanal,Todo o ano
+TP-008,Institucional,Conheça o Tempo Pelotas,O tempo muda. Sua informação também precisa mudar.,/,Alta,Mensal,Evergreen
+TP-009,Institucional,Conheça o Tempo Pelotas,Do céu à Lagoa: Tempo Pelotas acompanha a região,/situacao-hidrologica-pelotas,Alta,Bimestral,Evergreen
+TP-010,Institucional,Conheça o Tempo Pelotas,"Radar, satélite e trovoadas em um só mapa",/radar-e-satelite-pelotas,Alta,Mensal,Todo o ano
+TP-011,Institucional,Conheça o Tempo Pelotas,Acompanhe a Lagoa dos Patos no Laranjal,/nivel-da-lagoa-dos-patos-laranjal,Alta,Quinzenal,Todo o ano
+TP-012,Institucional,Conheça o Tempo Pelotas,O que aconteceu com o tempo nos últimos 30 dias?,/historico-climatico-pelotas,Média,Mensal,Todo o ano
+TP-013,Institucional,Conheça o Tempo Pelotas,Veja Pelotas ao vivo antes de sair,/cameras-ao-vivo-pelotas,Média,Quinzenal,Todo o ano
+TP-014,Institucional,Conheça o Tempo Pelotas,Tempo Pelotas também é transparência,/metodologia,Média,Trimestral,Evergreen
+TP-015,Institucional,Conheça o Tempo Pelotas,Salve o Tempo Pelotas nos favoritos,/,Média,Bimestral,Evergreen
+TP-016,Rotina editorial,Tempo do Dia,"Bom dia, Pelotas: como começa o tempo hoje?",/tempo-hoje-pelotas,Alta,Diária,Todo o ano
+TP-017,Rotina editorial,Tempo do Dia,Pelotas agora: o que o céu mostra neste momento,/,Alta,Diária,Todo o ano
+TP-018,Rotina editorial,Tempo do Dia,Próximas 6 horas em Pelotas,/meteograma-pelotas,Alta,Diária,Todo o ano
+TP-019,Rotina editorial,Tempo do Dia,Resumo da tarde: o tempo mudou?,/tempo-hoje-pelotas,Média,Diária,Todo o ano
+TP-020,Rotina editorial,Tempo do Dia,Noite em Pelotas: o que esperar,/meteograma-pelotas,Média,Diária,Todo o ano
+TP-021,Rotina editorial,Tempo do Dia,Amanhã em Pelotas: o que já dá para planejar,/tempo-amanha-pelotas,Alta,Diária,Todo o ano
+TP-022,Rotina editorial,Tempo do Dia,Semana em Pelotas: visão geral dos próximos 7 dias,/previsao-7-dias-pelotas,Alta,2x por semana,Todo o ano
+TP-023,Rotina editorial,Tempo do Dia,Fim de semana em Pelotas,/previsao-7-dias-pelotas,Alta,Semanal,Todo o ano
+TP-024,Rotina editorial,Tempo do Dia,Segunda-feira meteorológica,/previsao-7-dias-pelotas,Média,Semanal,Todo o ano
+TP-025,Rotina editorial,Tempo do Dia,Sextou com previsão,/previsao-7-dias-pelotas,Alta,Semanal,Todo o ano
+TP-026,Rotina editorial,Tempo do Dia,Antes do almoço: chuva ou tempo firme?,/chuva-em-pelotas,Média,Diária,Todo o ano
+TP-027,Rotina editorial,Tempo do Dia,Antes de dormir: como amanhece Pelotas?,/tempo-amanha-pelotas,Média,Diária,Todo o ano
+TP-028,Previsão,Planeje com o Tempo,Vai esfriar nas próximas horas?,/previsao-7-dias-pelotas,Alta,Semanal,Todo o ano
+TP-029,Previsão,Planeje com o Tempo,A máxima de hoje ainda vai subir?,/previsao-7-dias-pelotas,Alta,Semanal,Todo o ano
+TP-030,Previsão,Planeje com o Tempo,A mínima de amanhã chama atenção?,/previsao-7-dias-pelotas,Alta,Semanal,Todo o ano
+TP-031,Previsão,Planeje com o Tempo,Qual é o melhor período do dia para atividades ao ar livre?,/meteograma-pelotas,Alta,Semanal,Todo o ano
+TP-032,Previsão,Planeje com o Tempo,"Manhã, tarde ou noite: quando a chance de chuva é maior?",/previsao-7-dias-pelotas,Alta,Semanal,Todo o ano
+TP-033,Previsão,Planeje com o Tempo,O tempo muda rápido hoje?,/meteograma-pelotas,Alta,Semanal,Todo o ano
+TP-034,Previsão,Planeje com o Tempo,Como fica a sensação de frio com vento?,/previsao-7-dias-pelotas,Alta,Semanal,Todo o ano
+TP-035,Previsão,Planeje com o Tempo,Planejamento da semana: quais dias tendem a ser mais estáveis?,/previsao-7-dias-pelotas,Alta,Semanal,Todo o ano
+TP-036,Previsão,Planeje com o Tempo,Qual dia da semana tende a ser o mais quente?,/previsao-7-dias-pelotas,Alta,Semanal,Todo o ano
+TP-037,Previsão,Planeje com o Tempo,Qual dia da semana tende a ser o mais frio?,/previsao-7-dias-pelotas,Alta,Semanal,Todo o ano
+TP-038,Previsão,Planeje com o Tempo,Chuva no horizonte: em quais dias aparece?,/previsao-7-dias-pelotas,Alta,Semanal,Todo o ano
+TP-039,Previsão,Planeje com o Tempo,Vento no horizonte: quando as rajadas podem aumentar?,/previsao-7-dias-pelotas,Alta,Semanal,Todo o ano
+TP-040,Previsão,Planeje com o Tempo,Previsão para quem trabalha cedo,/meteograma-pelotas,Média,Semanal,Todo o ano
+TP-041,Previsão,Planeje com o Tempo,Previsão para quem volta para casa no fim do dia,/meteograma-pelotas,Média,Semanal,Todo o ano
+TP-042,Previsão,Planeje com o Tempo,Previsão para ciclistas em Pelotas,/previsao-7-dias-pelotas,Média,Semanal,Todo o ano
+TP-043,Previsão,Planeje com o Tempo,Previsão para quem vai ao Laranjal,/previsao-7-dias-pelotas,Média,Semanal,Todo o ano
+TP-044,Previsão,Planeje com o Tempo,Previsão para eventos ao ar livre,/previsao-7-dias-pelotas,Média,Semanal,Todo o ano
+TP-045,Previsão,Planeje com o Tempo,O que muda de hoje para amanhã?,/tempo-amanha-pelotas,Média,Semanal,Todo o ano
+TP-046,Previsão,Planeje com o Tempo,7 dias em 15 segundos,/previsao-7-dias-pelotas,Média,Semanal,Todo o ano
+TP-047,Previsão,Planeje com o Tempo,A previsão mudou desde ontem?,/previsao-7-dias-pelotas,Média,Semanal,Todo o ano
+TP-048,Chuva,Olho na Chuva,Vai chover hoje em Pelotas?,/chuva-em-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-049,Chuva,Olho na Chuva,Que horas a chuva pode chegar?,/chuva-em-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-050,Chuva,Olho na Chuva,"Chuva de manhã, tarde ou noite?",/chuva-em-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-051,Chuva,Olho na Chuva,Quanto pode chover nas próximas horas?,/chuva-em-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-052,Chuva,Olho na Chuva,Chuva isolada ou período mais persistente?,/chuva-em-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-053,Chuva,Olho na Chuva,A chuva passa rápido?,/chuva-em-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-054,Chuva,Olho na Chuva,Fim de semana com chuva?,/chuva-em-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-055,Chuva,Olho na Chuva,Chuva na região: Pelotas e cidades próximas,/chuva-em-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-056,Chuva,Olho na Chuva,Radar agora: onde estão as áreas de chuva?,/radar-e-satelite-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-057,Chuva,Olho na Chuva,Radar x previsão: qual a diferença?,/radar-e-satelite-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-058,Chuva,Olho na Chuva,Por que o radar pode mostrar chuva perto e não chover na sua rua?,/radar-e-satelite-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-059,Chuva,Olho na Chuva,Chuva prevista não é chuva medida,/historico-climatico-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-060,Chuva,Olho na Chuva,Depois da chuva: quanto foi medido?,/historico-climatico-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-061,Chuva,Olho na Chuva,Chuva acumulada nos últimos dias,/historico-climatico-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-062,Chuva,Olho na Chuva,Chuva + vento: combinação para acompanhar,/chuva-em-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-063,Chuva,Olho na Chuva,Chuva forte: onde conferir alertas oficiais,/alertas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-064,Chuva,Olho na Chuva,Como acompanhar a chuva em tempo real no Tempo Pelotas,/chuva-em-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-065,Chuva,Olho na Chuva,Nuvens chegando: o satélite ajuda a entender o cenário,/radar-e-satelite-pelotas,Alta,Conforme condição,Principalmente dias chuvosos
+TP-066,Vento,Vento em Pelotas,Como está o vento em Pelotas agora?,/vento-em-pelotas,Alta,Conforme condição,Todo o ano
+TP-067,Vento,Vento em Pelotas,O vento aumenta hoje?,/vento-em-pelotas,Alta,Conforme condição,Todo o ano
+TP-068,Vento,Vento em Pelotas,Quando as rajadas ficam mais fortes?,/vento-em-pelotas,Alta,Conforme condição,Todo o ano
+TP-069,Vento,Vento em Pelotas,Vento no Laranjal: o que acompanhar antes de ir,/vento-em-pelotas,Alta,Conforme condição,Todo o ano
+TP-070,Vento,Vento em Pelotas,"Vento sul, norte ou nordeste: o que o portal mostra?",/vento-em-pelotas,Alta,Conforme condição,Todo o ano
+TP-071,Vento,Vento em Pelotas,Rajada não é vento médio,/vento-em-pelotas,Alta,Conforme condição,Todo o ano
+TP-072,Vento,Vento em Pelotas,Dia de vento: previsão x observação,/vento-em-pelotas,Alta,Conforme condição,Todo o ano
+TP-073,Vento,Vento em Pelotas,Vento durante a madrugada,/vento-em-pelotas,Alta,Conforme condição,Todo o ano
+TP-074,Vento,Vento em Pelotas,Vento no fim de semana,/vento-em-pelotas,Alta,Conforme condição,Todo o ano
+TP-075,Vento,Vento em Pelotas,Vento e mudança de temperatura,/vento-em-pelotas,Alta,Conforme condição,Todo o ano
+TP-076,Vento,Vento em Pelotas,Vento forte e alertas oficiais,/alertas,Média,Conforme condição,Todo o ano
+TP-077,Vento,Vento em Pelotas,Qual período do dia tende a ter menos vento?,/vento-em-pelotas,Média,Conforme condição,Todo o ano
+TP-078,Vento,Vento em Pelotas,Como ler a página de vento do Tempo Pelotas,/vento-em-pelotas,Média,Conforme condição,Todo o ano
+TP-079,Vento,Vento em Pelotas,Vento na Zona Sul: compare cidades da região,/tempo-na-regiao-sul-rs,Média,Conforme condição,Todo o ano
+TP-080,Vento,Vento em Pelotas,O vento mudou de direção?,/vento-em-pelotas,Média,Conforme condição,Todo o ano
+TP-081,Vento,Vento em Pelotas,3 coisas para conferir em um dia ventoso,/vento-em-pelotas,Média,Conforme condição,Todo o ano
+TP-082,Radar e satélite,Mapa Agora,Radar agora: o que está se aproximando de Pelotas?,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-083,Radar e satélite,Mapa Agora,Como ler o radar meteorológico,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-084,Radar e satélite,Mapa Agora,Por que o radar de Santiago pode aparecer no Tempo Pelotas?,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-085,Radar e satélite,Mapa Agora,Radar indisponível: o que acontece no portal?,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-086,Radar e satélite,Mapa Agora,Satélite realçado: o que você está vendo?,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-087,Radar e satélite,Mapa Agora,Satélite infravermelho: para que serve?,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-088,Radar e satélite,Mapa Agora,Satélite visível: quando essa imagem faz mais sentido?,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-089,Radar e satélite,Mapa Agora,Radar e satélite lado a lado,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-090,Radar e satélite,Mapa Agora,Trovoadas na região: como o Tempo Pelotas monitora,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-091,Radar e satélite,Mapa Agora,Trovoada detectada não é alerta oficial,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-092,Radar e satélite,Mapa Agora,Mapa meteorológico da região em 30 segundos,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-093,Radar e satélite,Mapa Agora,Como usar a timeline do radar,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-094,Radar e satélite,Mapa Agora,O que significa o horário no radar?,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-095,Radar e satélite,Mapa Agora,O que significa o horário no satélite?,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-096,Radar e satélite,Mapa Agora,A chuva está vindo de onde?,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-097,Radar e satélite,Mapa Agora,Nuvens sobre a Zona Sul,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-098,Radar e satélite,Mapa Agora,Atividade elétrica perto da região,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-099,Radar e satélite,Mapa Agora,Radar + previsão hora a hora,/radar-e-satelite-pelotas,Alta,Conforme condição,Todo o ano
+TP-100,Alertas oficiais,Alerta Oficial,Há alerta oficial para Pelotas?,/alertas,Alta,Conforme emissão,Eventos meteorológicos
+TP-101,Alertas oficiais,Alerta Oficial,Alerta oficial x previsão: entenda a diferença,/alertas,Alta,Conforme emissão,Eventos meteorológicos
+TP-102,Alertas oficiais,Alerta Oficial,Como consultar os alertas no Tempo Pelotas,/alertas,Alta,Conforme emissão,Eventos meteorológicos
+TP-103,Alertas oficiais,Alerta Oficial,"O que conferir em um alerta: período, área e órgão emissor",/alertas,Alta,Conforme emissão,Eventos meteorológicos
+TP-104,Alertas oficiais,Alerta Oficial,Alerta de chuva: confira a fonte oficial,/alertas,Alta,Conforme emissão,Eventos meteorológicos
+TP-105,Alertas oficiais,Alerta Oficial,Alerta de vento: confira a área afetada,/alertas,Alta,Conforme emissão,Eventos meteorológicos
+TP-106,Alertas oficiais,Alerta Oficial,Alerta de tempestade: informação sem alarmismo,/alertas,Alta,Conforme emissão,Eventos meteorológicos
+TP-107,Alertas oficiais,Alerta Oficial,Quando não há alerta oficial,/alertas,Alta,Conforme emissão,Eventos meteorológicos
+TP-108,Alertas oficiais,Alerta Oficial,Radar não substitui alerta oficial,/alertas,Alta,Conforme emissão,Eventos meteorológicos
+TP-109,Alertas oficiais,Alerta Oficial,Trovoadas não substituem alerta oficial,/alertas,Alta,Conforme emissão,Eventos meteorológicos
+TP-110,Alertas oficiais,Alerta Oficial,Alerta acabou? Confira o período de validade,/alertas,Alta,Conforme emissão,Eventos meteorológicos
+TP-111,Alertas oficiais,Alerta Oficial,Alertas para a região: acompanhe também as cidades vizinhas,/alertas,Alta,Conforme emissão,Eventos meteorológicos
+TP-112,Alertas oficiais,Alerta Oficial,Compartilhe alertas com contexto,/alertas,Alta,Conforme emissão,Eventos meteorológicos
+TP-113,Alertas oficiais,Alerta Oficial,Por que o Tempo Pelotas separa alertas de previsão,/alertas,Alta,Conforme emissão,Eventos meteorológicos
+TP-114,Observação local,Estação Embrapa,Temperatura medida agora em Pelotas,/estacao-embrapa-pelotas,Alta,Conforme dado,Todo o ano
+TP-115,Observação local,Estação Embrapa,Previsão x temperatura observada,/estacao-embrapa-pelotas,Alta,Conforme dado,Todo o ano
+TP-116,Observação local,Estação Embrapa,Quanto choveu de verdade?,/estacao-embrapa-pelotas,Alta,Conforme dado,Todo o ano
+TP-117,Observação local,Estação Embrapa,Rajada medida na estação,/estacao-embrapa-pelotas,Alta,Conforme dado,Todo o ano
+TP-118,Observação local,Estação Embrapa,Umidade agora em Pelotas,/estacao-embrapa-pelotas,Alta,Conforme dado,Todo o ano
+TP-119,Observação local,Estação Embrapa,A estação está atualizada?,/estacao-embrapa-pelotas,Alta,Conforme dado,Todo o ano
+TP-120,Observação local,Estação Embrapa,Por que o horário da estação importa?,/estacao-embrapa-pelotas,Alta,Conforme dado,Todo o ano
+TP-121,Observação local,Estação Embrapa,Observação local: o que a Embrapa acrescenta ao portal,/estacao-embrapa-pelotas,Alta,Conforme dado,Todo o ano
+TP-122,Observação local,Estação Embrapa,Previsão e observação não precisam ser iguais,/estacao-embrapa-pelotas,Alta,Conforme dado,Todo o ano
+TP-123,Observação local,Estação Embrapa,O dia esquentou mais ou menos do que o previsto?,/estacao-embrapa-pelotas,Média,Conforme dado,Todo o ano
+TP-124,Observação local,Estação Embrapa,Como acompanhar a estação Embrapa no Tempo Pelotas,/estacao-embrapa-pelotas,Média,Conforme dado,Todo o ano
+TP-125,Observação local,Estação Embrapa,Dados atrasados: por que o portal sinaliza isso,/estacao-embrapa-pelotas,Média,Conforme dado,Todo o ano
+TP-126,Observação local,Estação Embrapa,Medição local em destaque,/estacao-embrapa-pelotas,Média,Conforme dado,Todo o ano
+TP-127,Observação local,Estação Embrapa,Do dado bruto ao contexto local,/estacao-embrapa-pelotas,Média,Conforme dado,Todo o ano
+TP-128,Meteograma,Hora a Hora,Meteograma: o dia inteiro em uma única leitura,/meteograma-pelotas,Média,Quinzenal,Todo o ano
+TP-129,Meteograma,Hora a Hora,Como ler o meteograma do Tempo Pelotas,/meteograma-pelotas,Média,Quinzenal,Todo o ano
+TP-130,Meteograma,Hora a Hora,Temperatura hora a hora,/meteograma-pelotas,Média,Quinzenal,Todo o ano
+TP-131,Meteograma,Hora a Hora,Chuva hora a hora,/meteograma-pelotas,Média,Quinzenal,Todo o ano
+TP-132,Meteograma,Hora a Hora,Vento hora a hora,/meteograma-pelotas,Média,Quinzenal,Todo o ano
+TP-133,Meteograma,Hora a Hora,Visibilidade: quando acompanhar esse dado,/meteograma-pelotas,Média,Quinzenal,Todo o ano
+TP-134,Meteograma,Hora a Hora,Nebulosidade ao longo do dia,/meteograma-pelotas,Média,Quinzenal,Todo o ano
+TP-135,Meteograma,Hora a Hora,Pressão atmosférica no meteograma,/meteograma-pelotas,Média,Quinzenal,Todo o ano
+TP-136,Meteograma,Hora a Hora,Manhã x tarde x noite no meteograma,/meteograma-pelotas,Média,Quinzenal,Todo o ano
+TP-137,Meteograma,Hora a Hora,O que muda nas próximas 12 horas?,/meteograma-pelotas,Média,Quinzenal,Todo o ano
+TP-138,Meteograma,Hora a Hora,O que muda nas próximas 24 horas?,/meteograma-pelotas,Média,Quinzenal,Todo o ano
+TP-139,Meteograma,Hora a Hora,Meteograma para planejar seu dia,/meteograma-pelotas,Média,Quinzenal,Todo o ano
+TP-140,Histórico e clima,Pelotas em Contexto,Como foram os últimos 30 dias em Pelotas?,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-141,Histórico e clima,Pelotas em Contexto,O dia mais quente dos últimos 30 dias,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-142,Histórico e clima,Pelotas em Contexto,O dia mais frio dos últimos 30 dias,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-143,Histórico e clima,Pelotas em Contexto,Quanto choveu nos últimos 30 dias?,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-144,Histórico e clima,Pelotas em Contexto,Maior rajada dos últimos 30 dias,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-145,Histórico e clima,Pelotas em Contexto,Temperatura: esta semana x semana passada,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-146,Histórico e clima,Pelotas em Contexto,Chuva: esta semana x semana passada,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-147,Histórico e clima,Pelotas em Contexto,O tempo de hoje está fora do padrão recente?,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-148,Histórico e clima,Pelotas em Contexto,Clima não é previsão do tempo,/clima-em-pelotas,Média,Semanal,Todo o ano
+TP-149,Histórico e clima,Pelotas em Contexto,Como é o clima de Pelotas ao longo do ano?,/clima-em-pelotas,Média,Semanal,Todo o ano
+TP-150,Histórico e clima,Pelotas em Contexto,Por que Pelotas tem tanta variação de tempo?,/clima-em-pelotas,Média,Semanal,Todo o ano
+TP-151,Histórico e clima,Pelotas em Contexto,30 dias em um gráfico,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-152,Histórico e clima,Pelotas em Contexto,Previsão acertou? Como medir isso com responsabilidade,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-153,Histórico e clima,Pelotas em Contexto,Por que um único dia não mede a qualidade de uma previsão,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-154,Histórico e clima,Pelotas em Contexto,Como o Tempo Pelotas arquiva previsões,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-155,Histórico e clima,Pelotas em Contexto,Observação real ajuda a melhorar a leitura da previsão,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-156,Histórico e clima,Pelotas em Contexto,Histórico para entender o presente,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-157,Histórico e clima,Pelotas em Contexto,Não é recorde só porque parece extremo,/historico-climatico-pelotas,Média,Semanal,Todo o ano
+TP-158,Hidrologia,Olho na Lagoa,Nível da Lagoa dos Patos no Laranjal agora,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-159,Hidrologia,Olho na Lagoa,A Lagoa está subindo ou baixando?,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-160,Hidrologia,Olho na Lagoa,Quando foi feita a última leitura no Laranjal?,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-161,Hidrologia,Olho na Lagoa,Como ler o nível da Lagoa no Tempo Pelotas,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-162,Hidrologia,Olho na Lagoa,Nível atual não é previsão de cheia,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-163,Hidrologia,Olho na Lagoa,"Tendência da Lagoa: o que significa subir, estabilizar ou baixar?",/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-164,Hidrologia,Olho na Lagoa,Situação hidrológica regional,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-165,Hidrologia,Olho na Lagoa,Laranjal + São Lourenço do Sul + Arambaré,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-166,Hidrologia,Olho na Lagoa,Laranjal + São José do Norte,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-167,Hidrologia,Olho na Lagoa,Lagoa dos Patos e Guaíba: por que acompanhar os dois?,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-168,Hidrologia,Olho na Lagoa,Água vindo do norte: como o portal acompanha a região,/situacao-hidrologica-pelotas,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-169,Hidrologia,Olho na Lagoa,Nível no Laranjal: resumo das últimas leituras,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-170,Hidrologia,Olho na Lagoa,O que muda quando uma estação fica indisponível?,/situacao-hidrologica-pelotas,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-171,Hidrologia,Olho na Lagoa,Dado atrasado não é dado atual,/situacao-hidrologica-pelotas,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-172,Hidrologia,Olho na Lagoa,Como incorporar o nível do Laranjal em outro site,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-173,Hidrologia,Olho na Lagoa,Widget do nível da Lagoa: informação local reutilizável,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-174,Hidrologia,Olho na Lagoa,Lagoa em alta: onde acompanhar sem boatos,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-175,Hidrologia,Olho na Lagoa,Lagoa em baixa: acompanhe a tendência real,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-176,Hidrologia,Olho na Lagoa,Chuva regional e nível da Lagoa: acompanhe as duas informações,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-177,Hidrologia,Olho na Lagoa,Vento e Lagoa: duas páginas para acompanhar em dias sensíveis,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-178,Hidrologia,Olho na Lagoa,Laranjal antes e depois de um evento de chuva,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-179,Hidrologia,Olho na Lagoa,Mapa mental da hidrologia regional,/situacao-hidrologica-pelotas,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-180,Hidrologia,Olho na Lagoa,Por que o Tempo Pelotas monitora também o Guaíba?,/situacao-hidrologica-pelotas,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-181,Hidrologia,Olho na Lagoa,Hidrologia com horário e fonte,/situacao-hidrologica-pelotas,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-182,Hidrologia,Olho na Lagoa,Compartilhe o nível da Lagoa com o link correto,/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-183,Hidrologia,Olho na Lagoa,"Laranjal em um card: nível, tendência e última leitura",/nivel-da-lagoa-dos-patos-laranjal,Alta,Conforme interesse/condição,Todo o ano; maior frequência em períodos de cheia
+TP-184,Geadas,Frio e Geada,Há registro de geada no Rio Grande do Sul?,/mapa-de-geadas-rio-grande-do-sul,Média,Conforme condição,Outono e inverno
+TP-185,Geadas,Frio e Geada,Mapa de geadas: como consultar,/mapa-de-geadas-rio-grande-do-sul,Média,Conforme condição,Outono e inverno
+TP-186,Geadas,Frio e Geada,Geada prevista x geada registrada,/mapa-de-geadas-rio-grande-do-sul,Média,Conforme condição,Outono e inverno
+TP-187,Geadas,Frio e Geada,Frio forte: o que observar além da temperatura mínima,/mapa-de-geadas-rio-grande-do-sul,Média,Conforme condição,Outono e inverno
+TP-188,Geadas,Frio e Geada,Geada na região: confira os registros oficiais,/mapa-de-geadas-rio-grande-do-sul,Média,Conforme condição,Outono e inverno
+TP-189,Geadas,Frio e Geada,Manhã gelada em Pelotas,/mapa-de-geadas-rio-grande-do-sul,Média,Conforme condição,Outono e inverno
+TP-190,Geadas,Frio e Geada,Geada e agricultura: por que acompanhar a madrugada e o amanhecer,/mapa-de-geadas-rio-grande-do-sul,Média,Conforme condição,Outono e inverno
+TP-191,Geadas,Frio e Geada,Onde houve geada no RS?,/mapa-de-geadas-rio-grande-do-sul,Média,Conforme condição,Outono e inverno
+TP-192,Geadas,Frio e Geada,Mapa de geadas em 15 segundos,/mapa-de-geadas-rio-grande-do-sul,Média,Conforme condição,Outono e inverno
+TP-193,Geadas,Frio e Geada,Nem toda manhã fria tem geada,/mapa-de-geadas-rio-grande-do-sul,Média,Conforme condição,Outono e inverno
+TP-194,Câmeras,Pelotas ao Vivo,Pelotas ao vivo: como está o céu agora?,/cameras-ao-vivo-pelotas,Média,Conforme disponibilidade,Todo o ano
+TP-195,Câmeras,Pelotas ao Vivo,Câmera ao vivo ou replay? O Tempo Pelotas mostra a diferença,/cameras-ao-vivo-pelotas,Média,Conforme disponibilidade,Todo o ano
+TP-196,Câmeras,Pelotas ao Vivo,Antes de sair: dê uma olhada nas câmeras,/cameras-ao-vivo-pelotas,Média,Conforme disponibilidade,Todo o ano
+TP-197,Câmeras,Pelotas ao Vivo,Nevoeiro visto pela câmera,/cameras-ao-vivo-pelotas,Média,Conforme disponibilidade,Todo o ano
+TP-198,Câmeras,Pelotas ao Vivo,Chuva vista ao vivo,/cameras-ao-vivo-pelotas,Média,Conforme disponibilidade,Todo o ano
+TP-199,Câmeras,Pelotas ao Vivo,Fim de tarde em Pelotas,/cameras-ao-vivo-pelotas,Média,Conforme disponibilidade,Todo o ano
+TP-200,Câmeras,Pelotas ao Vivo,Por que a câmera pode ficar indisponível?,/cameras-ao-vivo-pelotas,Média,Conforme disponibilidade,Todo o ano
+TP-201,Câmeras,Pelotas ao Vivo,Câmeras + previsão: veja e planeje,/cameras-ao-vivo-pelotas,Média,Conforme disponibilidade,Todo o ano
+TP-202,Transparência e tecnologia,Por Trás do Tempo,De onde vêm os dados do Tempo Pelotas?,/metodologia,Média,Quinzenal,Evergreen
+TP-203,Transparência e tecnologia,Por Trás do Tempo,Por que o Tempo Pelotas usa mais de uma fonte?,/metodologia,Média,Quinzenal,Evergreen
+TP-204,Transparência e tecnologia,Por Trás do Tempo,Previsão não é observação,/metodologia,Média,Quinzenal,Evergreen
+TP-205,Transparência e tecnologia,Por Trás do Tempo,Radar não é previsão,/metodologia,Média,Quinzenal,Evergreen
+TP-206,Transparência e tecnologia,Por Trás do Tempo,Alerta oficial não é radar,/metodologia,Média,Quinzenal,Evergreen
+TP-207,Transparência e tecnologia,Por Trás do Tempo,Por que mostramos o horário dos dados?,/metodologia,Média,Quinzenal,Evergreen
+TP-208,Transparência e tecnologia,Por Trás do Tempo,O que significa dado atrasado?,/metodologia,Média,Quinzenal,Evergreen
+TP-209,Transparência e tecnologia,Por Trás do Tempo,O que fazemos quando uma fonte externa fica indisponível?,/metodologia,Média,Quinzenal,Evergreen
+TP-210,Transparência e tecnologia,Por Trás do Tempo,Como o Tempo Pelotas protege chaves e integrações,/metodologia,Média,Quinzenal,Evergreen
+TP-211,Transparência e tecnologia,Por Trás do Tempo,Como o mapa meteorológico é montado,/metodologia,Média,Quinzenal,Evergreen
+TP-212,Transparência e tecnologia,Por Trás do Tempo,Por que o portal tem páginas específicas para chuva e vento?,/metodologia,Média,Quinzenal,Evergreen
+TP-213,Transparência e tecnologia,Por Trás do Tempo,Como o Tempo Pelotas atende 24 cidades da região,/tempo-na-regiao-sul-rs,Média,Quinzenal,Evergreen
+TP-214,Transparência e tecnologia,Por Trás do Tempo,Como o portal registra histórico e snapshots,/metodologia,Média,Quinzenal,Evergreen
+TP-215,Transparência e tecnologia,Por Trás do Tempo,"IA no Tempo Pelotas: contexto, não fonte única da verdade",/metodologia,Média,Quinzenal,Evergreen
+TP-216,Transparência e tecnologia,Por Trás do Tempo,Privacidade e dados no Tempo Pelotas,/privacidade-e-dados,Média,Quinzenal,Evergreen
+TP-217,Transparência e tecnologia,Por Trás do Tempo,O que é o pelotas.json?,/metodologia,Média,Quinzenal,Evergreen
+TP-218,Transparência e tecnologia,Por Trás do Tempo,O portal tem feed JSON?,/metodologia,Média,Quinzenal,Evergreen
+TP-219,Transparência e tecnologia,Por Trás do Tempo,SEO local também ajuda a encontrar informação meteorológica,/metodologia,Média,Quinzenal,Evergreen
+TP-220,Sazonal e cotidiano,Tempo na Vida Real,Nevoeiro em Pelotas: acompanhe a visibilidade,/meteograma-pelotas,Alta,Sazonal/conforme condição,Outono/inverno
+TP-221,Sazonal e cotidiano,Tempo na Vida Real,Manhã de nevoeiro: o que mudou nas últimas horas?,/meteograma-pelotas,Alta,Sazonal/conforme condição,Outono/inverno
+TP-222,Sazonal e cotidiano,Tempo na Vida Real,Primeiro frio forte da temporada,/tempo-hoje-pelotas,Alta,Sazonal/conforme condição,Outono/inverno
+TP-223,Sazonal e cotidiano,Tempo na Vida Real,Semana de frio: quais dias terão as menores mínimas?,/previsao-7-dias-pelotas,Alta,Sazonal/conforme condição,Outono/inverno
+TP-224,Sazonal e cotidiano,Tempo na Vida Real,Onda de calor? Confira primeiro os avisos oficiais,/alertas,Alta,Sazonal/conforme condição,Primavera/verão
+TP-225,Sazonal e cotidiano,Tempo na Vida Real,Tarde quente em Pelotas,/,Alta,Sazonal/conforme condição,Primavera/verão
+TP-226,Sazonal e cotidiano,Tempo na Vida Real,Dia de praia no Laranjal: o que conferir no tempo,/tempo-hoje-pelotas,Alta,Sazonal/conforme condição,Primavera/verão
+TP-227,Sazonal e cotidiano,Tempo na Vida Real,Fim de semana no Laranjal,/previsao-7-dias-pelotas,Alta,Sazonal/conforme condição,Primavera/verão
+TP-228,Sazonal e cotidiano,Tempo na Vida Real,Virada de tempo,/meteograma-pelotas,Alta,Sazonal/conforme condição,Todo o ano
+TP-229,Sazonal e cotidiano,Tempo na Vida Real,Frente fria chegando?,/blog,Alta,Sazonal/conforme condição,Todo o ano
+TP-230,Sazonal e cotidiano,Tempo na Vida Real,Temporais: onde acompanhar informação oficial,/alertas,Alta,Sazonal/conforme condição,Primavera/verão
+TP-231,Sazonal e cotidiano,Tempo na Vida Real,Madrugada fria: previsão para o amanhecer,/tempo-amanha-pelotas,Alta,Sazonal/conforme condição,Outono/inverno
+TP-232,Sazonal e cotidiano,Tempo na Vida Real,Pôr do sol com céu aberto?,/meteograma-pelotas,Alta,Sazonal/conforme condição,Todo o ano
+TP-233,Sazonal e cotidiano,Tempo na Vida Real,Chuva no horário de saída do trabalho?,/chuva-em-pelotas,Alta,Sazonal/conforme condição,Todo o ano
+TP-234,Sazonal e cotidiano,Tempo na Vida Real,Tempo para a volta às aulas,/tempo-hoje-pelotas,Média,Sazonal/conforme condição,Fevereiro/março
+TP-235,Sazonal e cotidiano,Tempo na Vida Real,Tempo para o feriadão,/previsao-7-dias-pelotas,Média,Sazonal/conforme condição,Feriados
+TP-236,Sazonal e cotidiano,Tempo na Vida Real,Tempo para o Carnaval na região,/tempo-na-regiao-sul-rs,Média,Sazonal/conforme condição,Carnaval
+TP-237,Sazonal e cotidiano,Tempo na Vida Real,Semana Farroupilha: previsão para eventos ao ar livre,/previsao-7-dias-pelotas,Média,Sazonal/conforme condição,Setembro
+TP-238,Sazonal e cotidiano,Tempo na Vida Real,Natal em Pelotas: como fica o tempo?,/previsao-7-dias-pelotas,Média,Sazonal/conforme condição,Dezembro
+TP-239,Sazonal e cotidiano,Tempo na Vida Real,Ano Novo: previsão para Pelotas e região,/tempo-na-regiao-sul-rs,Média,Sazonal/conforme condição,Dezembro
+TP-240,Sazonal e cotidiano,Tempo na Vida Real,"Verão na Zona Sul: acompanhe chuva, vento e calor",/tempo-na-regiao-sul-rs,Média,Sazonal/conforme condição,Verão
+TP-241,Sazonal e cotidiano,Tempo na Vida Real,Outono em Pelotas: o que muda no acompanhamento do tempo,/clima-em-pelotas,Média,Sazonal/conforme condição,Outono
+TP-242,Sazonal e cotidiano,Tempo na Vida Real,"Inverno em Pelotas: frio, nevoeiro, vento e geada",/,Média,Sazonal/conforme condição,Inverno
+TP-243,Sazonal e cotidiano,Tempo na Vida Real,Primavera em Pelotas: atenção às mudanças rápidas,/,Média,Sazonal/conforme condição,Primavera
+TP-244,Sazonal e cotidiano,Tempo na Vida Real,Tempo para quem trabalha no campo,/tempo-na-regiao-sul-rs,Média,Sazonal/conforme condição,Todo o ano
+TP-245,Sazonal e cotidiano,Tempo na Vida Real,Tempo para quem pega estrada na Zona Sul,/tempo-na-regiao-sul-rs,Média,Sazonal/conforme condição,Todo o ano
+TP-246,Sazonal e cotidiano,Tempo na Vida Real,Tempo para quem trabalha no porto e litoral,/tempo-em/rio-grande-rs,Média,Sazonal/conforme condição,Todo o ano
+TP-247,Sazonal e cotidiano,Tempo na Vida Real,Dia de vento e praia: consulte antes de sair,/vento-em-pelotas,Média,Sazonal/conforme condição,Primavera/verão
+TP-248,Sazonal e cotidiano,Tempo na Vida Real,Noite de evento em Pelotas,/meteograma-pelotas,Média,Sazonal/conforme condição,Conforme agenda
+TP-249,Sazonal e cotidiano,Tempo na Vida Real,Domingo de passeio: o que esperar do tempo,/previsao-7-dias-pelotas,Média,Sazonal/conforme condição,Semanal
+TP-250,Região,Tempo em Capão do Leão,Tempo em Capão do Leão hoje,/tempo-em/capao-do-leao-rs,Alta,Semanal,Todo o ano
+TP-251,Região,Tempo em Capão do Leão,Fim de semana em Capão do Leão,/tempo-em/capao-do-leao-rs,Alta,Semanal,Todo o ano
+TP-252,Região,Tempo em Capão do Leão,Capão do Leão x Pelotas: como o tempo se compara?,/tempo-em/capao-do-leao-rs,Média,Quinzenal,Todo o ano
+TP-253,Região,Tempo em Canguçu,Tempo em Canguçu hoje,/tempo-em/cangucu-rs,Alta,Semanal,Todo o ano
+TP-254,Região,Tempo em Canguçu,Fim de semana em Canguçu,/tempo-em/cangucu-rs,Alta,Semanal,Todo o ano
+TP-255,Região,Tempo em Canguçu,Canguçu x Pelotas: como o tempo se compara?,/tempo-em/cangucu-rs,Média,Quinzenal,Todo o ano
+TP-256,Região,Tempo em Morro Redondo,Tempo em Morro Redondo hoje,/tempo-em/morro-redondo-rs,Alta,Semanal,Todo o ano
+TP-257,Região,Tempo em Morro Redondo,Fim de semana em Morro Redondo,/tempo-em/morro-redondo-rs,Alta,Semanal,Todo o ano
+TP-258,Região,Tempo em Morro Redondo,Morro Redondo x Pelotas: como o tempo se compara?,/tempo-em/morro-redondo-rs,Média,Quinzenal,Todo o ano
+TP-259,Região,Tempo em Turuçu,Tempo em Turuçu hoje,/tempo-em/turucu-rs,Alta,Semanal,Todo o ano
+TP-260,Região,Tempo em Turuçu,Fim de semana em Turuçu,/tempo-em/turucu-rs,Alta,Semanal,Todo o ano
+TP-261,Região,Tempo em Turuçu,Turuçu x Pelotas: como o tempo se compara?,/tempo-em/turucu-rs,Média,Quinzenal,Todo o ano
+TP-262,Região,Tempo em Arroio do Padre,Tempo em Arroio do Padre hoje,/tempo-em/arroio-do-padre-rs,Alta,Semanal,Todo o ano
+TP-263,Região,Tempo em Arroio do Padre,Fim de semana em Arroio do Padre,/tempo-em/arroio-do-padre-rs,Alta,Semanal,Todo o ano
+TP-264,Região,Tempo em Arroio do Padre,Arroio do Padre x Pelotas: como o tempo se compara?,/tempo-em/arroio-do-padre-rs,Média,Quinzenal,Todo o ano
+TP-265,Região,Tempo em Pedro Osório,Tempo em Pedro Osório hoje,/tempo-em/pedro-osorio-rs,Alta,Semanal,Todo o ano
+TP-266,Região,Tempo em Pedro Osório,Fim de semana em Pedro Osório,/tempo-em/pedro-osorio-rs,Alta,Semanal,Todo o ano
+TP-267,Região,Tempo em Pedro Osório,Pedro Osório x Pelotas: como o tempo se compara?,/tempo-em/pedro-osorio-rs,Média,Quinzenal,Todo o ano
+TP-268,Região,Tempo em Cerrito,Tempo em Cerrito hoje,/tempo-em/cerrito-rs,Alta,Semanal,Todo o ano
+TP-269,Região,Tempo em Cerrito,Fim de semana em Cerrito,/tempo-em/cerrito-rs,Alta,Semanal,Todo o ano
+TP-270,Região,Tempo em Cerrito,Cerrito x Pelotas: como o tempo se compara?,/tempo-em/cerrito-rs,Média,Quinzenal,Todo o ano
+TP-271,Região,Tempo em Piratini,Tempo em Piratini hoje,/tempo-em/piratini-rs,Alta,Semanal,Todo o ano
+TP-272,Região,Tempo em Piratini,Fim de semana em Piratini,/tempo-em/piratini-rs,Alta,Semanal,Todo o ano
+TP-273,Região,Tempo em Piratini,Piratini x Pelotas: como o tempo se compara?,/tempo-em/piratini-rs,Média,Quinzenal,Todo o ano
+TP-274,Região,Tempo em Rio Grande,Tempo em Rio Grande hoje,/tempo-em/rio-grande-rs,Alta,Semanal,Todo o ano
+TP-275,Região,Tempo em Rio Grande,Fim de semana em Rio Grande,/tempo-em/rio-grande-rs,Alta,Semanal,Todo o ano
+TP-276,Região,Tempo em Rio Grande,Rio Grande x Pelotas: como o tempo se compara?,/tempo-em/rio-grande-rs,Média,Quinzenal,Todo o ano
+TP-277,Região,Tempo em São José do Norte,Tempo em São José do Norte hoje,/tempo-em/sao-jose-do-norte-rs,Alta,Semanal,Todo o ano
+TP-278,Região,Tempo em São José do Norte,Fim de semana em São José do Norte,/tempo-em/sao-jose-do-norte-rs,Alta,Semanal,Todo o ano
+TP-279,Região,Tempo em São José do Norte,São José do Norte x Pelotas: como o tempo se compara?,/tempo-em/sao-jose-do-norte-rs,Média,Quinzenal,Todo o ano
+TP-280,Região,Tempo em São Lourenço do Sul,Tempo em São Lourenço do Sul hoje,/tempo-em/sao-lourenco-do-sul-rs,Alta,Semanal,Todo o ano
+TP-281,Região,Tempo em São Lourenço do Sul,Fim de semana em São Lourenço do Sul,/tempo-em/sao-lourenco-do-sul-rs,Alta,Semanal,Todo o ano
+TP-282,Região,Tempo em São Lourenço do Sul,São Lourenço do Sul x Pelotas: como o tempo se compara?,/tempo-em/sao-lourenco-do-sul-rs,Média,Quinzenal,Todo o ano
+TP-283,Região,Tempo em Cristal,Tempo em Cristal hoje,/tempo-em/cristal-rs,Alta,Semanal,Todo o ano
+TP-284,Região,Tempo em Cristal,Fim de semana em Cristal,/tempo-em/cristal-rs,Alta,Semanal,Todo o ano
+TP-285,Região,Tempo em Cristal,Cristal x Pelotas: como o tempo se compara?,/tempo-em/cristal-rs,Média,Quinzenal,Todo o ano
+TP-286,Região,Tempo em Jaguarão,Tempo em Jaguarão hoje,/tempo-em/jaguarao-rs,Alta,Semanal,Todo o ano
+TP-287,Região,Tempo em Jaguarão,Fim de semana em Jaguarão,/tempo-em/jaguarao-rs,Alta,Semanal,Todo o ano
+TP-288,Região,Tempo em Jaguarão,Jaguarão x Pelotas: como o tempo se compara?,/tempo-em/jaguarao-rs,Média,Quinzenal,Todo o ano
+TP-289,Região,Tempo em Arroio Grande,Tempo em Arroio Grande hoje,/tempo-em/arroio-grande-rs,Alta,Semanal,Todo o ano
+TP-290,Região,Tempo em Arroio Grande,Fim de semana em Arroio Grande,/tempo-em/arroio-grande-rs,Alta,Semanal,Todo o ano
+TP-291,Região,Tempo em Arroio Grande,Arroio Grande x Pelotas: como o tempo se compara?,/tempo-em/arroio-grande-rs,Média,Quinzenal,Todo o ano
+TP-292,Região,Tempo em Herval,Tempo em Herval hoje,/tempo-em/herval-rs,Alta,Semanal,Todo o ano
+TP-293,Região,Tempo em Herval,Fim de semana em Herval,/tempo-em/herval-rs,Alta,Semanal,Todo o ano
+TP-294,Região,Tempo em Herval,Herval x Pelotas: como o tempo se compara?,/tempo-em/herval-rs,Média,Quinzenal,Todo o ano
+TP-295,Região,Tempo em Santa Vitória do Palmar,Tempo em Santa Vitória do Palmar hoje,/tempo-em/santa-vitoria-do-palmar-rs,Alta,Semanal,Todo o ano
+TP-296,Região,Tempo em Santa Vitória do Palmar,Fim de semana em Santa Vitória do Palmar,/tempo-em/santa-vitoria-do-palmar-rs,Alta,Semanal,Todo o ano
+TP-297,Região,Tempo em Santa Vitória do Palmar,Santa Vitória do Palmar x Pelotas: como o tempo se compara?,/tempo-em/santa-vitoria-do-palmar-rs,Média,Quinzenal,Todo o ano
+TP-298,Região,Tempo em Chuí,Tempo em Chuí hoje,/tempo-em/chui-rs,Alta,Semanal,Todo o ano
+TP-299,Região,Tempo em Chuí,Fim de semana em Chuí,/tempo-em/chui-rs,Alta,Semanal,Todo o ano
+TP-300,Região,Tempo em Chuí,Chuí x Pelotas: como o tempo se compara?,/tempo-em/chui-rs,Média,Quinzenal,Todo o ano
+TP-301,Região,Tempo em Pinheiro Machado,Tempo em Pinheiro Machado hoje,/tempo-em/pinheiro-machado-rs,Alta,Semanal,Todo o ano
+TP-302,Região,Tempo em Pinheiro Machado,Fim de semana em Pinheiro Machado,/tempo-em/pinheiro-machado-rs,Alta,Semanal,Todo o ano
+TP-303,Região,Tempo em Pinheiro Machado,Pinheiro Machado x Pelotas: como o tempo se compara?,/tempo-em/pinheiro-machado-rs,Média,Quinzenal,Todo o ano
+TP-304,Região,Tempo em Pedras Altas,Tempo em Pedras Altas hoje,/tempo-em/pedras-altas-rs,Alta,Semanal,Todo o ano
+TP-305,Região,Tempo em Pedras Altas,Fim de semana em Pedras Altas,/tempo-em/pedras-altas-rs,Alta,Semanal,Todo o ano
+TP-306,Região,Tempo em Pedras Altas,Pedras Altas x Pelotas: como o tempo se compara?,/tempo-em/pedras-altas-rs,Média,Quinzenal,Todo o ano
+TP-307,Região,Tempo em Bagé,Tempo em Bagé hoje,/tempo-em/bage-rs,Alta,Semanal,Todo o ano
+TP-308,Região,Tempo em Bagé,Fim de semana em Bagé,/tempo-em/bage-rs,Alta,Semanal,Todo o ano
+TP-309,Região,Tempo em Bagé,Bagé x Pelotas: como o tempo se compara?,/tempo-em/bage-rs,Média,Quinzenal,Todo o ano
+TP-310,Região,Tempo em Candiota,Tempo em Candiota hoje,/tempo-em/candiota-rs,Alta,Semanal,Todo o ano
+TP-311,Região,Tempo em Candiota,Fim de semana em Candiota,/tempo-em/candiota-rs,Alta,Semanal,Todo o ano
+TP-312,Região,Tempo em Candiota,Candiota x Pelotas: como o tempo se compara?,/tempo-em/candiota-rs,Média,Quinzenal,Todo o ano
+TP-313,Região,Tempo em Aceguá,Tempo em Aceguá hoje,/tempo-em/acegua-rs,Alta,Semanal,Todo o ano
+TP-314,Região,Tempo em Aceguá,Fim de semana em Aceguá,/tempo-em/acegua-rs,Alta,Semanal,Todo o ano
+TP-315,Região,Tempo em Aceguá,Aceguá x Pelotas: como o tempo se compara?,/tempo-em/acegua-rs,Média,Quinzenal,Todo o ano
+TP-316,Região,Tempo em Dom Pedrito,Tempo em Dom Pedrito hoje,/tempo-em/dom-pedrito-rs,Alta,Semanal,Todo o ano
+TP-317,Região,Tempo em Dom Pedrito,Fim de semana em Dom Pedrito,/tempo-em/dom-pedrito-rs,Alta,Semanal,Todo o ano
+TP-318,Região,Tempo em Dom Pedrito,Dom Pedrito x Pelotas: como o tempo se compara?,/tempo-em/dom-pedrito-rs,Média,Quinzenal,Todo o ano
+TP-319,Região,Panorama Regional,Panorama do tempo: Pelotas e entorno,/tempo-na-regiao-sul-rs,Alta,Semanal,Todo o ano
+TP-320,Região,Panorama Regional,Onde pode chover em Pelotas e entorno?,/tempo-na-regiao-sul-rs,Alta,Conforme condição,Dias com chuva
+TP-321,Região,Panorama Regional,Quem terá mais vento em Pelotas e entorno?,/tempo-na-regiao-sul-rs,Média,Conforme condição,Dias de vento
+TP-322,Região,Panorama Regional,Panorama do tempo: Costa Doce,/tempo-na-regiao-sul-rs,Alta,Semanal,Todo o ano
+TP-323,Região,Panorama Regional,Onde pode chover em Costa Doce?,/tempo-na-regiao-sul-rs,Alta,Conforme condição,Dias com chuva
+TP-324,Região,Panorama Regional,Quem terá mais vento em Costa Doce?,/tempo-na-regiao-sul-rs,Média,Conforme condição,Dias de vento
+TP-325,Região,Panorama Regional,Panorama do tempo: Fronteira Sul,/tempo-na-regiao-sul-rs,Alta,Semanal,Todo o ano
+TP-326,Região,Panorama Regional,Onde pode chover em Fronteira Sul?,/tempo-na-regiao-sul-rs,Alta,Conforme condição,Dias com chuva
+TP-327,Região,Panorama Regional,Quem terá mais vento em Fronteira Sul?,/tempo-na-regiao-sul-rs,Média,Conforme condição,Dias de vento
+TP-328,Região,Panorama Regional,Panorama do tempo: Campanha,/tempo-na-regiao-sul-rs,Alta,Semanal,Todo o ano
+TP-329,Região,Panorama Regional,Onde pode chover em Campanha?,/tempo-na-regiao-sul-rs,Alta,Conforme condição,Dias com chuva
+TP-330,Região,Panorama Regional,Quem terá mais vento em Campanha?,/tempo-na-regiao-sul-rs,Média,Conforme condição,Dias de vento
+TP-331,Educação meteorológica,Entenda o Tempo,Por que Pelotas tem nevoeiro?,/blog,Média,Semanal,Evergreen
+TP-332,Educação meteorológica,Entenda o Tempo,Como se forma a geada?,/blog,Média,Semanal,Evergreen
+TP-333,Educação meteorológica,Entenda o Tempo,Como funciona um radar meteorológico?,/blog,Média,Semanal,Evergreen
+TP-334,Educação meteorológica,Entenda o Tempo,Qual a diferença entre radar e satélite?,/blog,Média,Semanal,Evergreen
+TP-335,Educação meteorológica,Entenda o Tempo,O que é uma rajada de vento?,/blog,Média,Semanal,Evergreen
+TP-336,Educação meteorológica,Entenda o Tempo,O que significa probabilidade de chuva?,/blog,Média,Semanal,Evergreen
+TP-337,Educação meteorológica,Entenda o Tempo,O que é precipitação acumulada?,/blog,Média,Semanal,Evergreen
+TP-338,Educação meteorológica,Entenda o Tempo,O que é nebulosidade?,/blog,Média,Semanal,Evergreen
+TP-339,Educação meteorológica,Entenda o Tempo,O que é visibilidade meteorológica?,/blog,Média,Semanal,Evergreen
+TP-340,Educação meteorológica,Entenda o Tempo,O que é pressão atmosférica?,/blog,Média,Semanal,Evergreen
+TP-341,Educação meteorológica,Entenda o Tempo,Por que a previsão muda?,/blog,Média,Semanal,Evergreen
+TP-342,Educação meteorológica,Entenda o Tempo,Por que duas fontes podem mostrar valores diferentes?,/blog,Média,Semanal,Evergreen
+TP-343,Educação meteorológica,Entenda o Tempo,O que é um alerta meteorológico oficial?,/blog,Média,Semanal,Evergreen
+TP-344,Educação meteorológica,Entenda o Tempo,O que é atividade elétrica detectada?,/blog,Média,Semanal,Evergreen
+TP-345,Educação meteorológica,Entenda o Tempo,Como ler uma previsão de 7 dias com responsabilidade,/blog,Média,Semanal,Evergreen
+TP-346,Educação meteorológica,Entenda o Tempo,O que é uma estação meteorológica?,/blog,Média,Semanal,Evergreen
+TP-347,Educação meteorológica,Entenda o Tempo,Por que medir o nível da Lagoa?,/blog,Média,Semanal,Evergreen
+TP-348,Educação meteorológica,Entenda o Tempo,O que significa tendência hidrológica?,/blog,Média,Semanal,Evergreen
+TP-349,Educação meteorológica,Entenda o Tempo,Por que o nível da Lagoa pode variar?,/blog,Média,Semanal,Evergreen
+TP-350,Educação meteorológica,Entenda o Tempo,Como compartilhar informação meteorológica sem espalhar desinformação,/blog,Média,Semanal,Evergreen
