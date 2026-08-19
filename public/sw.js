@@ -1,6 +1,6 @@
 /* global self, caches, fetch, Response, URL */
 
-const CACHE_VERSION = "tempo-pelotas-v5";
+const CACHE_VERSION = "tempo-pelotas-v6";
 const APP_SHELL_CACHE = `${CACHE_VERSION}-app-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_FALLBACK_URL = "/offline.html";
@@ -85,6 +85,10 @@ async function staleWhileRevalidate(request, event) {
   return (await networkPromise) || Response.error();
 }
 
+function isCacheableStaticAsset(url) {
+  return url.pathname.startsWith("/assets/") || url.pathname.startsWith("/brand/");
+}
+
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
@@ -98,19 +102,7 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  const isStaticAsset =
-    url.pathname.startsWith("/assets/") ||
-    url.pathname.startsWith("/brand/") ||
-    url.pathname.endsWith(".css") ||
-    url.pathname.endsWith(".js") ||
-    url.pathname.endsWith(".svg") ||
-    url.pathname.endsWith(".png") ||
-    url.pathname.endsWith(".jpg") ||
-    url.pathname.endsWith(".jpeg") ||
-    url.pathname.endsWith(".webp") ||
-    url.pathname.endsWith(".woff2");
-
-  if (isStaticAsset) {
+  if (isCacheableStaticAsset(url)) {
     event.respondWith(staleWhileRevalidate(request, event));
   }
 });
