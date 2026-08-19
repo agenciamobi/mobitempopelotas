@@ -1,16 +1,16 @@
 {
   "id": "/",
-  "name": "TEMPO Pelotas",
+  "name": "Tempo Pelotas",
   "short_name": "Tempo Pelotas",
-  "description": "Previsão do tempo, avisos e situação das águas para ajudar a comunidade de Pelotas a se preparar.",
+  "description": "Tempo, radar, avisos e situação das águas com foco em Pelotas e na Zona Sul do Rio Grande do Sul.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#eaf0f3",
+  "background_color": "#f5f7f6",
   "theme_color": "#071e2f",
   "lang": "pt-BR",
-  "orientation": "portrait-primary",
-  "categories": ["weather", "utilities", "local", "news"],
+  "orientation": "any",
+  "categories": ["weather", "utilities", "news"],
   "prefer_related_applications": false,
   "icons": [
     {
@@ -34,39 +34,27 @@
   ],
   "shortcuts": [
     {
-      "name": "Tempo agora",
+      "name": "Tempo agora em Pelotas",
       "short_name": "Agora",
-      "description": "Abrir as condições atuais de Pelotas.",
+      "description": "Abrir as condições atuais e as próximas horas em Pelotas.",
       "url": "/"
     },
     {
-      "name": "Previsão de 7 dias",
-      "short_name": "7 dias",
-      "description": "Consultar máximas, mínimas e tendência semanal.",
-      "url": "/previsao-7-dias-pelotas"
+      "name": "Radar e satélite",
+      "short_name": "Radar",
+      "description": "Acompanhar chuva, nebulosidade e trovoadas na região.",
+      "url": "/radar-e-satelite-pelotas"
     },
     {
       "name": "Situação das águas",
       "short_name": "Águas",
-      "description": "Acompanhar a Lagoa dos Patos, o Guaíba e os pontos monitorados da região.",
+      "description": "Acompanhar o Laranjal e o contexto hidrológico da Lagoa dos Patos.",
       "url": "/situacao-hidrologica-pelotas"
-    },
-    {
-      "name": "Nível da Lagoa dos Patos",
-      "short_name": "Lagoa",
-      "description": "Abrir a leitura disponível para o Laranjal.",
-      "url": "/nivel-da-lagoa-dos-patos-laranjal"
-    },
-    {
-      "name": "Câmeras ao vivo",
-      "short_name": "Câmeras",
-      "description": "Observar céu, visibilidade e condições locais.",
-      "url": "/cameras-ao-vivo-pelotas"
     },
     {
       "name": "Avisos meteorológicos",
       "short_name": "Avisos",
-      "description": "Consultar condições que merecem atenção em Pelotas.",
+      "description": "Consultar avisos oficiais aplicáveis a Pelotas.",
       "url": "/alertas"
     }
   ]
