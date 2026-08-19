@@ -7,6 +7,8 @@ const tsEntry = readFileSync("src/production/production-styles.ts", "utf8");
 const shellCss = readFileSync("src/production/styles/home-editorial-shell.css", "utf8");
 const heroCss = readFileSync("src/production/components/weather-hero-direction.css", "utf8");
 const alertPageCss = readFileSync("src/production/components/inmet-alerts-page.css", "utf8");
+const footerCss = readFileSync("src/production/components/site-footer-home.css", "utf8");
+const siteFooterSource = readFileSync("src/production/components/site-footer.tsx", "utf8");
 const brandCss = readFileSync("src/production/styles/brand-palette-theme.css", "utf8");
 const mobileUsabilityCss = readFileSync(
   "src/production/styles/mobile-usability-refinement.css",
@@ -161,6 +163,18 @@ test("the homepage hero is fully owned by its local namespace", () => {
   assert.match(heroCss, /@media \(max-width: 720px\)/);
   assert.doesNotMatch(heroCss, /\.weather-hero/);
   assert.doesNotMatch(heroCss, /!important/);
+});
+
+test("the homepage footer owns a local namespace", () => {
+  assert.match(siteFooterSource, /variant="home"/);
+  assert.match(footerCss, /Footer da Home — fonte autônoma de verdade/);
+  assert.match(footerCss, /\.tp-home-footer-shell\s*\{/);
+  assert.match(footerCss, /\.tp-home-footer\s*\{/);
+  assert.match(footerCss, /@media \(max-width: 720px\)/);
+  assert.doesNotMatch(footerCss, /\.site-shell--home-editorial/);
+  assert.doesNotMatch(footerCss, /\.editorial-footer/);
+  assert.doesNotMatch(footerCss, /!important/);
+  assert.doesNotMatch(footerCss, /box-shadow/);
 });
 
 test("the INMET alerts page owns refinements outside the homepage cascade", () => {
