@@ -48,7 +48,7 @@ test("PNG icon routes return immutable image responses", () => {
 });
 
 test("installed and offline experiences cache and display the PNG identity", () => {
-  assert.match(serviceWorker, /tempo-pelotas-v5/);
+  assert.match(serviceWorker, /tempo-pelotas-v6/);
   assert.match(serviceWorker, /\/brand\/tempo-pelotas-icon\.png/);
   assert.match(serviceWorker, /\/brand\/tempo-pelotas-maskable\.png/);
   assert.match(offline, /src="\/brand\/tempo-pelotas-icon\.png"/);
