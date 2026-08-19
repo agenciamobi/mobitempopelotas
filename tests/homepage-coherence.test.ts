@@ -13,6 +13,8 @@ const semanticDashboard = readFileSync(
 );
 const weatherMap = readFileSync("src/production/components/weather-map.tsx", "utf8");
 const weatherHero = readFileSync("src/production/components/weather-hero.tsx", "utf8");
+const homeHeader = readFileSync("src/production/components/home-editorial-header.tsx", "utf8");
+const siteFooter = readFileSync("src/production/components/site-footer.tsx", "utf8");
 const todayRoute = readFileSync("src/routes/tempo-hoje-pelotas.tsx", "utf8");
 
 test("the homepage radar shortcut resolves to one existing section anchor", () => {
@@ -54,6 +56,16 @@ test("the hero keeps only the essential public facts", () => {
 test("the homepage section index is editorial instead of numbered", () => {
   assert.match(sectionNavigation, /home-section-navigation--editorial-index/);
   assert.doesNotMatch(sectionNavigation, /String\(index \+ 1\)/);
+});
+
+test("the homepage does not keep a permanent civil-defense promo in the main narrative", () => {
+  assert.doesNotMatch(productionHome, /SafetyAlertBanner/);
+  assert.doesNotMatch(productionHome, /getFeaturedSafetyBanner/);
+});
+
+test("the homepage header and footer load their stable editorial direction styles", () => {
+  assert.match(homeHeader, /import "\.\/home-editorial-header\.css"/);
+  assert.match(siteFooter, /import "\.\/site-footer-home\.css"/);
 });
 
 test("the home targets now while the dedicated route targets today's forecast", () => {
