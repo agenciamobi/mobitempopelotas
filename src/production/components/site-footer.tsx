@@ -8,9 +8,9 @@ type SiteFooterProps = {
 };
 
 /**
- * Compatibilidade para telas editoriais antigas.
- * Diretório, fontes, transparência e assinatura pertencem ao Footer global.
+ * Footer da Home com namespace próprio. Conteúdo, navegação e fontes continuam
+ * compartilhados com o Footer global; somente a camada visual é isolada.
  */
 export function SiteFooter({ source }: SiteFooterProps) {
-  return <Footer source={source} />;
+  return <Footer source={source} variant="home" />;
 }
