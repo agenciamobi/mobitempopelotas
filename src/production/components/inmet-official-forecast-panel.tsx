@@ -5,8 +5,7 @@ import type {
   InmetStationReference,
 } from "@/lib/weather/official-sources.types";
 
-import "./inmet-official-forecast-panel.css";
-import "./inmet-official-forecast-panel-refinement.css";
+import "./inmet-official-forecast-home.css";
 
 type ForecastIconName = "sun" | "cloud" | "rain" | "storm" | "fog" | "wind";
 
@@ -123,7 +122,7 @@ function PeriodMetrics({
   const windSpeed = forecastWindSpeedLabel(forecastWindSpeedKmh);
 
   return (
-    <dl className="inmet-official-metrics">
+    <dl className="tp-home-inmet__metrics">
       {temperature ? (
         <div className="is-temperature">
           <dt>Temperatura</dt>
@@ -163,9 +162,9 @@ export function InmetOfficialForecastPanel({
   const nextPeriods = visiblePeriods.slice(1);
 
   return (
-    <section className="inmet-official-panel" aria-labelledby="inmet-official-title">
-      <header className="inmet-official-header">
-        <div className="inmet-official-heading">
+    <section className="tp-home-inmet" aria-labelledby="inmet-official-title">
+      <header className="tp-home-inmet__header">
+        <div className="tp-home-inmet__heading">
           <h2 id="inmet-official-title">Previsão oficial do INMET</h2>
           <p>
             Previsão municipal oficial para Pelotas, organizada por períodos e apresentada
@@ -175,9 +174,9 @@ export function InmetOfficialForecastPanel({
       </header>
 
       {featuredPeriod ? (
-        <div className="inmet-official-forecast-layout">
-          <article className="inmet-official-featured">
-            <div className="inmet-official-card-topline">
+        <div className="tp-home-inmet__layout">
+          <article className="tp-home-inmet__featured">
+            <div className="tp-home-inmet__topline">
               <div>
                 <span>{formatDate(featuredPeriod.date).weekday}</span>
                 <strong>{formatDate(featuredPeriod.date).date}</strong>
@@ -185,8 +184,8 @@ export function InmetOfficialForecastPanel({
               <b>{featuredPeriod.period}</b>
             </div>
 
-            <div className="inmet-official-featured-summary">
-              <span className="inmet-official-icon is-featured">
+            <div className="tp-home-inmet__featured-summary">
+              <span className="tp-home-inmet__icon is-featured">
                 <ForecastIcon name={resolveForecastIcon(featuredPeriod.summary)} />
               </span>
               <div>
@@ -201,12 +200,12 @@ export function InmetOfficialForecastPanel({
             />
           </article>
 
-          <div className="inmet-official-next-periods" aria-label="Próximos períodos da previsão oficial">
+          <div className="tp-home-inmet__next" aria-label="Próximos períodos da previsão oficial">
             {nextPeriods.map((period) => {
               const formattedDate = formatDate(period.date);
               return (
                 <article key={period.id}>
-                  <div className="inmet-official-card-topline">
+                  <div className="tp-home-inmet__topline">
                     <div>
                       <span>{formattedDate.weekday}</span>
                       <strong>{formattedDate.date}</strong>
@@ -214,8 +213,8 @@ export function InmetOfficialForecastPanel({
                     <b>{period.period}</b>
                   </div>
 
-                  <div className="inmet-official-compact-summary">
-                    <span className="inmet-official-icon">
+                  <div className="tp-home-inmet__compact-summary">
+                    <span className="tp-home-inmet__icon">
                       <ForecastIcon name={resolveForecastIcon(period.summary)} />
                     </span>
                     <h3>{period.summary}</h3>
@@ -228,7 +227,7 @@ export function InmetOfficialForecastPanel({
           </div>
         </div>
       ) : (
-        <div className="inmet-official-unavailable">
+        <div className="tp-home-inmet__unavailable">
           <strong>Previsão oficial temporariamente indisponível</strong>
           <span>
             A previsão horária do portal continua operando de forma independente enquanto uma nova
@@ -237,7 +236,7 @@ export function InmetOfficialForecastPanel({
         </div>
       )}
 
-      <footer className="inmet-official-footer">
+      <footer className="tp-home-inmet__footer">
         <div>
           <strong>Como interpretar esta seção</strong>
           <span>
