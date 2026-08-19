@@ -31,9 +31,9 @@
   display: block;
   margin-bottom: 9px;
   color: var(--tp-forecast-cyan);
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   font-weight: 820;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
@@ -79,12 +79,12 @@
 
 .tp-home-forecast__astronomy dt {
   color: #7a8b93;
-  font-size: 0.65rem;
+  font-size: 0.69rem;
 }
 
 .tp-home-forecast__astronomy dd {
   color: #294553;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 760;
 }
 
@@ -104,9 +104,9 @@
 
 .tp-home-forecast__signals dt {
   color: #6e818b;
-  font-size: 0.59rem;
+  font-size: 0.66rem;
   font-weight: 790;
-  letter-spacing: 0.075em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
@@ -124,8 +124,8 @@
 
 .tp-home-forecast__signals small {
   color: #758790;
-  font-size: 0.65rem;
-  line-height: 1.45;
+  font-size: 0.72rem;
+  line-height: 1.48;
 }
 
 .tp-home-forecast__hours {
@@ -166,15 +166,15 @@
 
 .tp-home-forecast-hour__topline > strong {
   color: #173645;
-  font-size: 0.67rem;
+  font-size: 0.72rem;
   font-weight: 790;
 }
 
 .tp-home-forecast-hour__topline > span {
   color: #9f0b71;
-  font-size: 0.48rem;
+  font-size: 0.56rem;
   font-weight: 820;
-  letter-spacing: 0.055em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
@@ -199,22 +199,22 @@
 
 .tp-home-forecast-hour__condition {
   display: block;
-  min-height: 30px;
+  min-height: 34px;
   margin-top: 8px;
   color: #5b727d;
-  font-size: 0.63rem;
-  line-height: 1.35;
+  font-size: 0.7rem;
+  line-height: 1.4;
 }
 
 .tp-home-forecast-hour__rain {
   margin: 13px 0 0;
   color: #71848d;
-  font-size: 0.61rem;
+  font-size: 0.68rem;
 }
 
 .tp-home-forecast-hour__rain strong {
   color: #103443;
-  font-size: 0.88rem;
+  font-size: 0.96rem;
   font-weight: 820;
 }
 
@@ -222,8 +222,8 @@
   display: block;
   margin-top: 11px;
   color: #647a85;
-  font-size: 0.62rem;
-  line-height: 1.4;
+  font-size: 0.68rem;
+  line-height: 1.45;
 }
 
 .tp-home-forecast-week {
@@ -284,18 +284,18 @@
 }
 
 .tp-home-forecast-day__topline strong {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
 }
 
 .tp-home-forecast-day__topline span {
   color: #7a8c94;
-  font-size: 0.6rem;
+  font-size: 0.68rem;
 }
 
 .tp-home-forecast-day__topline b {
   color: #9f0b71;
-  font-size: 0.5rem;
-  letter-spacing: 0.055em;
+  font-size: 0.56rem;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
 }
 
@@ -313,26 +313,26 @@
 
 .tp-home-forecast-day__condition span {
   color: #526d79;
-  font-size: 0.67rem;
+  font-size: 0.72rem;
 }
 
 .tp-home-forecast-day__summary {
-  min-height: 92px;
+  min-height: 98px;
   margin-top: 18px;
 }
 
 .tp-home-forecast-day__summary > strong {
   display: block;
   color: #173645;
-  font-size: 0.88rem;
-  line-height: 1.28;
+  font-size: 0.94rem;
+  line-height: 1.3;
 }
 
 .tp-home-forecast-day__summary p {
   margin: 7px 0 0;
   color: #6b7f89;
-  font-size: 0.65rem;
-  line-height: 1.5;
+  font-size: 0.72rem;
+  line-height: 1.52;
 }
 
 .tp-home-forecast-day__metrics {
@@ -350,14 +350,14 @@
 
 .tp-home-forecast-day__metrics dt {
   color: #768992;
-  font-size: 0.55rem;
+  font-size: 0.62rem;
   text-transform: uppercase;
 }
 
 .tp-home-forecast-day__metrics dd {
   margin-top: 3px;
   color: #173645;
-  font-size: 0.86rem;
+  font-size: 0.94rem;
   font-weight: 810;
 }
 
@@ -365,8 +365,8 @@
   display: block;
   margin-top: 3px;
   color: #7b8c94;
-  font-size: 0.53rem;
-  line-height: 1.3;
+  font-size: 0.6rem;
+  line-height: 1.35;
 }
 
 .tp-home-forecast__links {
@@ -383,7 +383,7 @@
   align-items: center;
   gap: 7px;
   color: #173645;
-  font-size: 0.69rem;
+  font-size: 0.76rem;
   font-weight: 800;
   text-decoration: underline;
   text-decoration-color: rgb(24 189 205 / 48%);
