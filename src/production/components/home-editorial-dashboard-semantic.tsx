@@ -137,6 +137,7 @@ function transformDashboardNode(
     node.type === "section" &&
     (hasClass(className, "home-story--forecast") ||
       hasClass(className, "home-map-story") ||
+      hasClass(className, "home-observation-story") ||
       hasClass(className, "home-explore-story"))
   ) {
     return null;
@@ -179,14 +180,6 @@ function transformDashboardNode(
 
   const textContent = getTextContent(props.children);
   const normalizedText = textContent.trim();
-
-  if (
-    isDomElement &&
-    node.type === "div" &&
-    normalizedText.startsWith("Vento mais forte hoje")
-  ) {
-    return null;
-  }
 
   if (
     isDomElement &&
@@ -235,8 +228,7 @@ function transformDashboardNode(
     }
 
     if (node.type === "span") {
-      const label = textContent.includes("Sensação") ? "Sensação indisponível" : "Indisponível";
-      return cloneElement(node as ReactElement<ElementProps>, undefined, label);
+      return cloneElement(node as ReactElement<ElementProps>, undefined, "Indisponível");
     }
   }
 
@@ -276,11 +268,7 @@ function transformDashboardNode(
   const classChanged = normalizedClassName !== className;
   const nextProps = classChanged ? { className: normalizedClassName || undefined } : undefined;
 
-  return cloneElement(
-    node as ReactElement<ElementProps>,
-    nextProps,
-    transformedChildren,
-  );
+  return cloneElement(node as ReactElement<ElementProps>, nextProps, transformedChildren);
 }
 
 export function HomeEditorialDashboard(dashboardProps: HomeEditorialDashboardProps) {
