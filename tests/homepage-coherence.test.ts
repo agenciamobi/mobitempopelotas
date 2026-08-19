@@ -20,6 +20,11 @@ const forecastCss = readFileSync(
   "src/production/components/home-forecast-editorial.css",
   "utf8",
 );
+const radar = readFileSync("src/production/components/home-radar-editorial.tsx", "utf8");
+const radarCss = readFileSync(
+  "src/production/components/home-radar-editorial.css",
+  "utf8",
+);
 const weatherMap = readFileSync("src/production/components/weather-map.tsx", "utf8");
 const weatherHero = readFileSync("src/production/components/weather-hero.tsx", "utf8");
 const weatherHeroCss = readFileSync(
@@ -34,10 +39,25 @@ const homeHeaderCss = readFileSync(
 const siteFooter = readFileSync("src/production/components/site-footer.tsx", "utf8");
 const todayRoute = readFileSync("src/routes/tempo-hoje-pelotas.tsx", "utf8");
 
-test("the homepage radar shortcut resolves to one existing section anchor", () => {
+test("the homepage radar shortcut resolves to the isolated regional monitor", () => {
   assert.match(sectionNavigation, /href:\s*"#regiao"/);
   assert.match(weatherMap, /className="map-panel" id="regiao"/);
+  assert.match(productionHome, /<HomeRadarEditorial regionalWeather=\{weather\.regional\} \/>/);
   assert.doesNotMatch(semanticDashboard, /normalizedId\s*=\s*"regiao"/);
+});
+
+test("the homepage radar is isolated from the historical map-story cascade", () => {
+  assert.match(radar, /className="tp-home-radar"/);
+  assert.match(radar, /import "\.\/home-radar-editorial\.css"/);
+  assert.match(radarCss, /\.tp-home-radar\s*\{[\s\S]*content-visibility:\s*auto/);
+  assert.match(radarCss, /\.tp-home-radar__frame\s*\{[\s\S]*border:\s*1px solid/);
+  assert.doesNotMatch(radar, /home-map-story/);
+  assert.doesNotMatch(radarCss, /\.home-map-story/);
+  assert.doesNotMatch(radarCss, /!important/);
+  assert.match(
+    semanticDashboard,
+    /hasClass\(className, "home-map-story"\)[\s\S]*return null;/,
+  );
 });
 
 test("the hourly forecast headline is explicit, local and owned by the isolated component", () => {
@@ -49,7 +69,7 @@ test("the hourly forecast headline is explicit, local and owned by the isolated 
 test("the official INMET forecast follows the public editorial forecast", () => {
   assert.match(
     productionHome,
-    /<HomeForecastEditorial[\s\S]*<InmetOfficialForecastPanel[\s\S]*<HomeEditorialDashboard/,
+    /<HomeForecastEditorial[\s\S]*<InmetOfficialForecastPanel[\s\S]*<HomeRadarEditorial[\s\S]*<HomeEditorialDashboard/,
   );
 });
 
