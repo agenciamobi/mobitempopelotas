@@ -1,3 +1,5 @@
+import "./home-section-navigation.css";
+
 const homeSections = [
   {
     href: "#previsao-hoje",
@@ -28,16 +30,19 @@ const homeSections = [
 
 export function HomeSectionNavigation() {
   return (
-    <nav className="home-section-navigation" aria-label="Seções da página inicial">
+    <nav
+      className="home-section-navigation home-section-navigation--editorial-index"
+      aria-label="Seções da página inicial"
+    >
       <span className="home-section-navigation__label">Nesta página</span>
       <div className="home-section-navigation__links">
-        {homeSections.map((section, index) => (
-          <a href={section.href} key={section.href}>
-            <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-            <span>
-              <strong>{section.label}</strong>
-              <small>{section.description}</small>
-            </span>
+        {homeSections.map((section) => (
+          <a
+            href={section.href}
+            key={section.href}
+            aria-label={`${section.label}: ${section.description}`}
+          >
+            <strong>{section.label}</strong>
           </a>
         ))}
       </div>
