@@ -1,0 +1,110 @@
+/*
+ * Índice editorial da Home.
+ * Navegação simples por âncoras, sem aparência de cards ou etapas numeradas.
+ */
+
+.site-shell--home-editorial
+  .home-section-navigation--editorial-index
+  .home-section-navigation__label {
+  padding: 12px 0 7px;
+}
+
+.site-shell--home-editorial
+  .home-section-navigation--editorial-index
+  .home-section-navigation__links {
+  display: flex;
+  min-width: 0;
+  align-items: stretch;
+}
+
+.site-shell--home-editorial
+  .home-section-navigation--editorial-index
+  .home-section-navigation__links
+  a {
+  display: flex;
+  min-width: 0;
+  min-height: 48px !important;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 11px clamp(14px, 1.8vw, 24px) 12px !important;
+  border: 0;
+  border-right: 1px solid rgb(7 27 44 / 9%);
+  border-radius: 0;
+  background: transparent;
+  color: #314c5b;
+  box-shadow: none;
+}
+
+.site-shell--home-editorial
+  .home-section-navigation--editorial-index
+  .home-section-navigation__links
+  a:first-child {
+  padding-left: 0 !important;
+}
+
+.site-shell--home-editorial
+  .home-section-navigation--editorial-index
+  .home-section-navigation__links
+  a:last-child {
+  border-right: 0;
+}
+
+.site-shell--home-editorial
+  .home-section-navigation--editorial-index
+  .home-section-navigation__links
+  a:hover,
+.site-shell--home-editorial
+  .home-section-navigation--editorial-index
+  .home-section-navigation__links
+  a:focus-visible {
+  background: transparent;
+  color: #071b2c;
+  outline: none;
+}
+
+.site-shell--home-editorial
+  .home-section-navigation--editorial-index
+  .home-section-navigation__links
+  strong {
+  font-size: 0.72rem;
+  font-weight: 720;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .site-shell--home-editorial .home-section-navigation--editorial-index {
+    width: calc(100% - 16px);
+  }
+
+  .site-shell--home-editorial
+    .home-section-navigation--editorial-index
+    .home-section-navigation__links {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: none;
+  }
+
+  .site-shell--home-editorial
+    .home-section-navigation--editorial-index
+    .home-section-navigation__links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .site-shell--home-editorial
+    .home-section-navigation--editorial-index
+    .home-section-navigation__links
+    a {
+    min-width: max-content;
+    flex: 0 0 auto;
+    padding-inline: 15px !important;
+  }
+
+  .site-shell--home-editorial
+    .home-section-navigation--editorial-index
+    .home-section-navigation__links
+    a:first-child {
+    padding-left: 0 !important;
+  }
+}
