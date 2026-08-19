@@ -23,236 +23,28 @@ Documentos especializados em `docs/` continuam sendo a fonte detalhada de cada s
 
 Nunca versione HARs brutos, cookies, tokens, chaves, secrets, headers autenticados ou URLs contendo credenciais. Use apenas conclusões técnicas sanitizadas em documentos do repositório.
 
-## Padrão oficial de artes para redes sociais
+## Redes sociais
 
-Este bloco é instrução de marca para qualquer IA, agente, designer ou automação que crie artes do Tempo Pelotas. O padrão abaixo foi aprovado em 19/08/2026 e deve ser tratado como referência visual principal para novas peças, adaptando o conteúdo ao assunto sem descaracterizar a identidade.
+As regras de social media ficam separadas da documentação geral do agente.
 
-### Logotipo: fonte de verdade
+Quando a tarefa envolver **criação de arte para redes sociais**, leia obrigatoriamente:
 
-Para artes de redes sociais, a fonte de verdade do logotipo roxo é:
+1. `docs/social/README.md` — índice e ordem de leitura;
+2. `docs/social/ART_GUIDE.md` — fonte de verdade visual específica do Tempo Pelotas;
+3. `docs/social/EDITORIAL_GUIDE.md` — seleção de pauta e validação factual, quando houver conteúdo atual;
+4. `docs/social/tempo-pelotas-ideias-posts.csv` — banco editorial de 350 ideias, quando a tarefa envolver escolha de assunto.
 
-`https://tempopelotas.com.br/brand/tempo-pelotas-purple.svg`
+`docs/social/ART_SYSTEM_TEMPLATE.md` é o **modelo reutilizável para implantação desse sistema em outros projetos da MOBI**. Ele não substitui `ART_GUIDE.md` e não deve ser tratado como identidade visual do Tempo Pelotas.
 
-Regras obrigatórias:
+### Regras rápidas que nunca podem ser ignoradas
 
-- usar o SVG oficial sempre que a ferramenta suportar vetor;
-- nunca redesenhar, reinterpretar, reescrever ou recriar o logotipo por prompt;
-- nunca substituir a tipografia interna do logotipo por fontes aproximadas;
-- nunca alterar proporções, espaçamento, desenho, contornos ou relação entre `TEMPO` e `Pelotas`;
-- não aplicar outra cor ao logotipo salvo quando existir uma variante oficial específica para isso;
-- se uma ferramenta generativa não aceitar SVG, converter temporariamente o SVG para PNG de alta resolução com fundo transparente apenas como referência de entrada; o SVG continua sendo a fonte de verdade;
-- sempre que possível, gerar foto/fundo e composição sem o logo e aplicar o SVG oficial como camada final determinística. Isso evita deformações típicas de modelos generativos.
+- logotipo oficial de artes: `https://tempopelotas.com.br/brand/tempo-pelotas-purple.svg`;
+- não redesenhar ou deformar o logotipo por IA;
+- feed principal: `4:5`, preferencialmente `1080 × 1350 px`;
+- domínio/CTA institucional: `tempopelotas.com.br`;
+- não inventar previsão, medição, alerta, nível, radar, timestamp ou qualquer dado factual;
+- radar, satélite, mapas, gráficos, hidrologia e câmeras devem usar material real quando representarem dados do produto;
+- separar sempre previsão, observação, monitoramento e alerta oficial;
+- antes de publicar informação atual, validar as fontes vigentes do produto.
 
-O uso deste SVG em artes sociais não altera outras referências técnicas de logo já usadas pelo site, SEO ou dados estruturados.
-
-### Formato oficial do feed
-
-- proporção: `4:5`;
-- tamanho final preferencial: `1080 × 1350 px`;
-- composição mobile-first, pensada para leitura rápida no feed;
-- manter área segura de aproximadamente 70–90 px nas laterais, topo e base;
-- evitar texto importante encostado nas bordas;
-- exportar com nitidez suficiente para que textos, ícones e logotipo permaneçam legíveis em telas pequenas.
-
-### Linguagem visual aprovada
-
-A arte deve parecer uma peça oficial do Tempo Pelotas, não um template genérico de meteorologia.
-
-Direção visual:
-
-- fotografia real de Pelotas, Laranjal, Lagoa dos Patos ou região como plano de fundo sempre que houver imagem pertinente ao tema;
-- enquadramento fotográfico com forte identidade local;
-- overlay escuro em azul-marinho/roxo profundo, preservando detalhes da foto e criando contraste;
-- roxo da marca como principal cor de destaque. O SVG oficial utiliza o roxo `#5F2DED` como referência dominante;
-- branco para títulos, textos e ícones principais;
-- tons de roxo podem variar em transparência, degradês discretos e superfícies, desde que mantenham coerência com o logotipo;
-- evitar amarelo/dourado como cor estrutural da identidade;
-- evitar azul-claro genérico de aplicativo de previsão, excesso de glassmorphism, brilhos aleatórios, cards demais ou aparência de template de IA;
-- acabamento editorial, tecnológico, local, confiável e limpo.
-
-### Estrutura visual padrão
-
-A composição aprovada deve seguir esta hierarquia como ponto de partida:
-
-1. **Topo / marca** — logotipo oficial com boa área de respiro. Logo abaixo, quando fizer sentido, usar um selo compacto como `PELOTAS E REGIÃO`.
-2. **Headline principal** — título grande, direto e legível em 2 a 4 linhas. Predominantemente branco.
-3. **Linha de ênfase** — destacar a informação principal com uma faixa, pincelada, bloco ou superfície roxa. Ex.: `em Pelotas`, `chuva forte`, `vento intenso`, `nível da Lagoa`.
-4. **Texto de apoio** — no máximo 2 ou 3 linhas, explicando o benefício ou contexto local. Evitar parágrafos longos.
-5. **Faixa de indicadores** — painel horizontal com 3 ou 4 ícones/indicadores relacionados ao tema. Ex.: temperatura, chuva, vento, nebulosidade. Os itens devem mudar conforme o assunto.
-6. **CTA principal** — bloco roxo de alta visibilidade próximo à base com `ACESSE` e `tempopelotas.com.br`.
-7. **Microprovas opcionais** — uma linha final curta com até 3 atributos reais, por exemplo `DADOS CONFIÁVEIS`, `ATUALIZAÇÃO CONSTANTE`, `INFORMAÇÃO LOCAL`, desde que sejam adequados à peça.
-
-A arte não precisa repetir mecanicamente todos os elementos. O que deve permanecer é a linguagem visual, hierarquia, identidade e CTA. Em peças de alerta ou informação urgente, simplifique a composição para priorizar a mensagem.
-
-### Como adaptar o padrão para assuntos diferentes
-
-Mantenha a estrutura e troque fotografia, headline, destaque, texto de apoio e indicadores conforme o tema.
-
-Exemplos de adaptação:
-
-- **Nevoeiro:** foto real de Pelotas com baixa visibilidade; headline sobre nevoeiro/visibilidade; indicadores como visibilidade, umidade, temperatura e vento, somente quando houver dados disponíveis.
-- **Chuva:** foto local de chuva/nuvens ou radar quando permitido; headline sobre chuva em Pelotas; indicadores como chuva, radar, vento e alertas.
-- **Frio/geada:** foto local de frio/geada; destaque de temperatura ou risco de geada; indicadores disponíveis de temperatura, vento, umidade e condição prevista.
-- **Calor:** foto local de sol/calor; destaque de temperatura; usar somente métricas realmente existentes na fonte de dados do produto.
-- **Vento:** foto local compatível; destaque para vento/rajadas; indicadores de velocidade, rajada, direção e alertas quando suportados.
-- **Alertas:** reduzir elementos decorativos; o tipo de alerta e a área afetada devem dominar a peça. Nunca inventar nível, período, órgão emissor ou severidade.
-- **Lagoa dos Patos / situação hidrológica:** usar foto da Lagoa, Laranjal ou estação relevante; headline sobre nível/tendência; indicadores como nível, tendência, horário da leitura e contexto regional, apenas com dados reais disponíveis.
-- **Divulgação institucional:** usar a composição aprovada com headline como `Sua previsão do tempo em Pelotas`, apoio sobre temperatura/chuva/vento/condições em tempo real e CTA para o domínio.
-
-### Regra editorial e factual
-
-Artes meteorológicas e hidrológicas não podem inventar valores, horários, tendências, avisos, probabilidades ou fontes.
-
-Antes de inserir números ou afirmações factuais:
-
-- consultar a fonte atual usada pelo produto ou os dados fornecidos explicitamente para a peça;
-- manter unidades e horários claros;
-- diferenciar medição observada, previsão e alerta oficial;
-- não transformar uma condição prevista em fato observado;
-- não transformar tendência em certeza;
-- não criar selo de `alerta`, `risco`, `perigo` ou equivalente sem base real.
-
-Quando a peça for apenas institucional, prefira benefícios permanentes e evite números meteorológicos específicos.
-
-### Uso de fotografias
-
-Priorizar imagens reais de Pelotas e região fornecidas pelo projeto ou pelo usuário. Não substituir uma foto local disponível por uma cidade genérica criada por IA.
-
-A foto pode receber crop, ajuste de contraste, tratamento de cor, desfoque localizado e overlay roxo/escuro. Evitar alterar arquitetura, ruas, monumentos ou elementos reconhecíveis a ponto de a imagem deixar de representar o local real.
-
-### Tipografia e legibilidade
-
-- usar sans-serif moderna, robusta e de alta legibilidade para headline e textos auxiliares;
-- a escrita cursiva/expressiva da marca deve permanecer restrita ao próprio logotipo oficial;
-- headline com peso alto e contraste forte;
-- corpo com tamanho suficiente para leitura em celular;
-- não ultrapassar aproximadamente 25–30% da peça com texto corrido;
-- priorizar uma única mensagem central por arte.
-
-### CTA oficial
-
-O domínio principal deve aparecer exatamente como:
-
-`tempopelotas.com.br`
-
-Preferência visual aprovada:
-
-- superfície roxa arredondada;
-- pequeno rótulo `ACESSE`;
-- domínio em destaque grande, branco e legível;
-- ícone de globo pode ser usado, desde que simples e coerente com o restante da peça.
-
-### Prompt-base para recriação por IA generativa
-
-Ao usar uma IA de imagem, partir desta estrutura e substituir apenas os campos entre colchetes:
-
-> Crie uma arte vertical 4:5 para Instagram do Tempo Pelotas. Use uma fotografia real de Pelotas ou região relacionada a [ASSUNTO] como plano de fundo. Preserve a identidade local e aplique overlay escuro/roxo profundo. Use como fonte de verdade o logotipo oficial `https://tempopelotas.com.br/brand/tempo-pelotas-purple.svg`, sem redesenhar ou reinterpretar o logo. Identidade visual baseada em roxo `#5F2DED`, branco e tons escuros. Estilo editorial, tecnológico, premium, limpo e confiável. No topo, inserir o logotipo oficial e, quando adequado, selo `PELOTAS E REGIÃO`. Headline grande: `[TÍTULO]`. Destacar `[TRECHO PRINCIPAL]` sobre faixa/pincelada roxa. Texto de apoio curto: `[APOIO]`. Criar uma faixa com até quatro indicadores coerentes com o assunto: `[INDICADORES]`. Na base, CTA roxo com `ACESSE tempopelotas.com.br`. Evitar amarelo/dourado, aparência genérica de app meteorológico, excesso de elementos e qualquer dado não fornecido. Formato final 1080 × 1350 px.
-
-Depois da geração, revisar manualmente texto, ortografia, logotipo, números e domínio. Se o modelo deformar o logotipo ou qualquer texto crítico, substituir esses elementos em pós-produção em vez de aceitar a versão gerada.
-
-### Checklist antes de aprovar uma arte
-
-- formato 4:5 e resolução adequada;
-- logo oficial correto e sem deformação;
-- identidade predominantemente roxa/branca/escura;
-- fotografia reconhecivelmente local quando aplicável;
-- headline legível em celular;
-- uma mensagem principal clara;
-- indicadores coerentes com o assunto;
-- nenhum dado inventado;
-- domínio escrito exatamente `tempopelotas.com.br`;
-- CTA visível;
-- ortografia revisada;
-- sem marcas d'água, logos de terceiros ou elementos visuais que confundam a autoria.
-
-## Banco editorial de ideias para redes sociais
-
-A fonte de referência para pautas de redes sociais é:
-
-`docs/social/tempo-pelotas-ideias-posts.csv`
-
-O arquivo reúne **350 ideias de posts** numeradas de `TP-001` a `TP-350`. Os IDs são referências estáveis: ao ampliar o banco, adicionar novos IDs sequenciais e **não renumerar nem reutilizar IDs existentes**.
-
-O CSV funciona como **backlog editorial e índice de pautas**, não como fonte factual de dados meteorológicos ou hidrológicos. Uma ideia registrada no CSV nunca autoriza reutilizar números antigos, presumir uma condição atual ou publicar um alerta sem nova verificação.
-
-### Estrutura do CSV
-
-As colunas canônicas do banco editorial são:
-
-- `id` — identificador estável da pauta;
-- `pilar` — macrotema editorial;
-- `serie` — série ou família recorrente de conteúdo;
-- `titulo_post` — proposta-base de título/assunto;
-- `pagina_destino` — rota preferencial do portal para o CTA, desde que ainda exista e seja adequada;
-- `prioridade` — orientação editorial inicial (`Alta`, `Média` etc.);
-- `frequencia_sugerida` — cadência possível, não obrigatória;
-- `sazonalidade` — condição, estação ou período em que a pauta tende a ser mais relevante.
-
-Os pilares atuais incluem conteúdo institucional, rotina editorial, previsão, chuva, vento, radar/satélite, alertas oficiais, observação local/Embrapa, meteograma, histórico e clima, hidrologia, geadas, câmeras, transparência e tecnologia, sazonal/cotidiano, região e educação meteorológica.
-
-### Como uma IA deve escolher uma pauta
-
-Antes de criar uma publicação:
-
-1. considerar primeiro o que é relevante **agora** para Pelotas e região: condição meteorológica, sazonalidade, eventual alerta oficial, situação hidrológica e interesse local;
-2. consultar o CSV para encontrar uma pauta correspondente, preferindo itens de prioridade `Alta` quando houver aderência real ao momento;
-3. evitar repetir a mesma série em sequência quando existirem outras pautas igualmente relevantes;
-4. alternar conteúdo de utilidade imediata, educação, cobertura regional, hidrologia e institucional para não transformar o perfil em um feed repetitivo de temperatura;
-5. verificar se a `pagina_destino` ainda é válida no código/`PUBLIC_ROUTES`/`PROJECT_CURRENT_STATE.md`; se a arquitetura mudou, usar a rota atual correta e reconciliar o CSV quando necessário;
-6. tratar o título do CSV como ponto de partida editorial. Ele pode ser refinado para clareza, contexto e atualidade, desde que não altere fatos nem crie sensacionalismo.
-
-A condição real do momento tem prioridade sobre uma cadência fixa. Em um episódio de chuva relevante, vento forte, alerta oficial ou mudança hidrológica, a utilidade pública deve prevalecer sobre o calendário planejado.
-
-### Verificação obrigatória antes de produzir conteúdo factual
-
-Para qualquer post com dados atuais, uma IA/agente deve consultar as fontes vigentes do produto antes de escrever a legenda ou montar a arte.
-
-Regras:
-
-- **previsão:** usar a previsão atual do portal para o mesmo horizonte temporal citado na publicação;
-- **observação:** usar uma medição válida e seu timestamp; não apresentar dado atrasado como atual;
-- **Embrapa:** respeitar o estado de leitura atualizada, atrasada ou indisponível;
-- **radar/satélite:** usar quadro real válido, timestamp e atribuição; nunca gerar um radar meteorológico fictício por IA;
-- **trovoadas/STSC:** tratar como monitoramento de atividade elétrica, nunca como alerta oficial;
-- **alertas:** publicar como alerta apenas quando houver aviso oficial válido, preservando órgão emissor, área e período;
-- **hidrologia:** informar nível, tendência e horário somente quando houver leitura válida; nível/tendência não equivalem a previsão de cheia;
-- **câmeras:** confirmar `live`/`replay`/indisponibilidade; nunca apresentar replay como transmissão ao vivo;
-- **comparações entre cidades:** usar o mesmo horizonte e a mesma referência temporal para todas;
-- **histórico/recordes:** não usar a palavra `recorde` com base apenas na janela de 30 dias ou em uma série insuficiente.
-
-Distinguir sempre quatro categorias sem misturá-las: **previsão**, **observação**, **monitoramento** e **alerta oficial**.
-
-### Da pauta à arte
-
-Depois de selecionar a pauta e validar os dados:
-
-1. seguir integralmente o **Padrão oficial de artes para redes sociais** deste `AGENTS.md`;
-2. usar o logotipo oficial `https://tempopelotas.com.br/brand/tempo-pelotas-purple.svg` como fonte de verdade;
-3. adaptar headline, trecho de ênfase, texto de apoio e indicadores ao assunto escolhido;
-4. usar fotografia real/local ou captura real do recurso quando pertinente;
-5. usar `tempopelotas.com.br` como CTA institucional e, na legenda/link, preferir a `pagina_destino` indicada no CSV quando válida;
-6. para radar, satélite, gráficos, mapa de geadas, hidrologia e câmeras, preferir material real do produto em vez de reconstrução visual generativa;
-7. revisar texto, números, unidades, timestamps, ortografia, domínio e logotipo antes da publicação.
-
-### Mix editorial recomendado
-
-Como referência flexível — nunca como regra que se sobreponha à relevância do momento — buscar um equilíbrio próximo de:
-
-- **40–50%** utilidade e atualidade: tempo do dia, previsão, chuva, vento, alertas, radar e Lagoa;
-- **20–25%** educação meteorológica, clima, metodologia e transparência;
-- **15–20%** cobertura das cidades e panoramas da Zona Sul;
-- **10–15%** institucional, funcionalidades, bastidores técnicos e divulgação do portal.
-
-Em períodos de eventos meteorológicos/hidrológicos relevantes, aumentar temporariamente a proporção de conteúdo de serviço.
-
-### Manutenção do banco editorial
-
-Atualizar `docs/social/tempo-pelotas-ideias-posts.csv` quando:
-
-- surgir uma nova página, funcionalidade ou fonte que gere novas pautas;
-- uma rota pública for renomeada/removida;
-- uma ideia se tornar tecnicamente incorreta devido a mudança do produto;
-- uma nova cidade/região passar a ser atendida;
-- uma série editorial nova for aprovada.
-
-Não apagar uma ideia apenas porque já foi publicada: a maioria das pautas é reutilizável em outro contexto ou período. Quando necessário, o controle de posts efetivamente publicados deve existir em arquivo/sistema separado do banco de ideias.
+O `AGENTS.md` deve permanecer como índice operacional. Não duplicar aqui o manual completo de identidade, composição visual ou planejamento editorial; atualizar os arquivos de `docs/social/` correspondentes.
