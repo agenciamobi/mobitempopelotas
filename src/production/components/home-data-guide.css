@@ -25,9 +25,9 @@
   display: block;
   margin-bottom: 9px;
   color: #087f91;
-  font-size: 0.61rem;
+  font-size: 0.68rem;
   font-weight: 820;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
@@ -45,8 +45,8 @@
   max-width: 760px;
   margin: 20px 0 0;
   color: #5e747f;
-  font-size: 0.82rem;
-  line-height: 1.68;
+  font-size: 0.9rem;
+  line-height: 1.7;
 }
 
 .tp-home-guide__intro ul {
@@ -66,13 +66,13 @@
   padding: 14px 0;
   border-bottom: 1px solid var(--tp-guide-line);
   color: #60757f;
-  font-size: 0.74rem;
-  line-height: 1.58;
+  font-size: 0.82rem;
+  line-height: 1.62;
 }
 
 .tp-home-guide__intro li::before {
   color: #1590a1;
-  font-size: 0.6rem;
+  font-size: 0.66rem;
   font-weight: 820;
   font-variant-numeric: tabular-nums;
   content: counter(guide-fact, decimal-leading-zero);
@@ -111,9 +111,9 @@
 .tp-home-guide__faq summary {
   padding: 15px 0;
   color: #1a3b4a;
-  font-size: 0.78rem;
+  font-size: 0.86rem;
   font-weight: 760;
-  line-height: 1.4;
+  line-height: 1.42;
   cursor: pointer;
 }
 
@@ -121,8 +121,8 @@
   max-width: 78ch;
   margin: -2px 0 16px;
   color: #667b85;
-  font-size: 0.73rem;
-  line-height: 1.62;
+  font-size: 0.82rem;
+  line-height: 1.66;
 }
 
 .tp-home-guide__related ul {
@@ -135,7 +135,7 @@
 
 .tp-home-guide__related a {
   display: flex;
-  min-height: 70px;
+  min-height: 72px;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
@@ -149,14 +149,14 @@
 }
 
 .tp-home-guide__related strong {
-  font-size: 0.76rem;
+  font-size: 0.84rem;
   font-weight: 760;
 }
 
 .tp-home-guide__related small {
   color: #6b8089;
-  font-size: 0.65rem;
-  line-height: 1.45;
+  font-size: 0.72rem;
+  line-height: 1.48;
 }
 
 .tp-home-guide__related b {
