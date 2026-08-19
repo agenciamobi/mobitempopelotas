@@ -99,7 +99,7 @@ test("the homepage hero is fully owned by its local namespace", () => {
   assert.match(heroCss, /\.tp-home-hero-shell\s*\{/);
   assert.match(heroCss, /\.tp-home-hero\s*\{/);
   assert.match(heroCss, /\.tp-home-hero__live-camera/);
-  assert.match(heroCss, /@media \(max-width: 700px\)/);
+  assert.match(heroCss, /@media \(max-width: 720px\)/);
   assert.doesNotMatch(heroCss, /\.weather-hero/);
   assert.doesNotMatch(heroCss, /!important/);
 });
