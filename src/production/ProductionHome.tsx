@@ -15,6 +15,7 @@ import {
 } from "@/production/adapters/home";
 import { HomeDataGuide } from "@/production/components/home-data-guide";
 import { HomeForecastEditorial } from "@/production/components/home-forecast-editorial";
+import { HomeForecastTrend } from "@/production/components/home-forecast-trend";
 import { HomeLiveCameraBackground } from "@/production/components/home-live-camera-background";
 import { HomeObservationEditorial } from "@/production/components/home-observation-editorial";
 import { HomeRadarEditorial } from "@/production/components/home-radar-editorial";
@@ -184,12 +185,13 @@ export function ProductionHome({
       <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
         <InmetAlertsPanel data={inmetAlerts} variant="home" advisoryLevel={headerLevel} />
         <HomeSectionNavigation />
-        <HomeForecastEditorial weather={weather} narrative={summaries.tomorrow} />
+        <HomeForecastEditorial weather={weather} />
         <InmetOfficialForecastPanel
           periods={recoveredData.weather.inmetForecast}
           station={recoveredData.weather.inmetStation}
           forecastWindSpeedKmh={forecastWindSpeedKmh}
         />
+        <HomeForecastTrend weather={weather} narrative={summaries.tomorrow} />
         <HomeRadarEditorial regionalWeather={weather.regional} />
         <HomeObservationEditorial weather={weather} observation={observation} />
         <HomeWaterEditorial laranjal={laranjal} guaiba={guaiba} lagoon={lagoon} />
