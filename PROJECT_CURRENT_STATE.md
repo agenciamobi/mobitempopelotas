@@ -1,6 +1,6 @@
 # Tempo Pelotas — estado atual do projeto
 
-Última atualização: 18/08/2026  
+Última atualização: 19/08/2026  
 Branch operacional: `main`  
 Domínio canônico: `https://tempopelotas.com.br`
 
@@ -28,7 +28,7 @@ O Tempo Pelotas é um portal meteorológico regional focado em Pelotas e Zona Su
 | Domínio | Estado atual | Observação |
 | --- | --- | --- |
 | Portal público | Ativo | Produção em `tempopelotas.com.br` |
-| Home meteorológica | Ativo | Header editorial compacto, hero unificado com temperatura dominante, próximas horas, alertas oficiais e blocos locais |
+| Home meteorológica | Ativo | Header e hero editoriais; próximas horas e tendência semanal em capítulos separados; tendência posicionada imediatamente antes da central de radar/satélite; alertas e blocos locais autocontidos |
 | Previsão hoje/amanhã/7 dias | Ativo | Páginas dedicadas e conteúdo indexável |
 | Chuva, vento e meteograma | Ativo | Visões temáticas e hora a hora |
 | Alertas oficiais | Ativo | INMET e conteúdo preventivo claramente separado |
@@ -299,6 +299,8 @@ Características atuais:
 - comparação contextual com previsão por hora;
 - proteção contra SSR/hidratação;
 - layout responsivo e controles de mapa.
+
+Na Home, o monitoramento é apresentado como uma **central Civic Tech / Scientific autocontida**. A tendência semanal encerra a leitura de previsão imediatamente antes do radar. A central usa barra plana de camadas para Radar, Satélite e Trovoadas, mapa como protagonista, timeline técnica clara separada visualmente da imagem, fonte/estado de disponibilidade visíveis e um guia editorial de interpretação. A rota `/radar-e-satelite-pelotas` continua sendo o aprofundamento público do tema.
 
 ## 10. Câmeras
 
