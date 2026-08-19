@@ -21,8 +21,18 @@ test("the homepage radar shortcut resolves to one existing section anchor", () =
   assert.doesNotMatch(semanticDashboard, /normalizedId\s*=\s*"regiao"/);
 });
 
-test("the hourly forecast copy matches the seven-hour window rendered on home", () => {
-  assert.match(semanticDashboard, /Veja como o tempo deve mudar nas próximas horas/);
+test("the hourly forecast headline is explicit and local", () => {
+  assert.match(
+    semanticDashboard,
+    /"Veja como o tempo deve mudar ao longo do dia": "Próximas horas em Pelotas"/,
+  );
+});
+
+test("the official INMET forecast follows the public hourly forecast", () => {
+  assert.match(
+    productionHome,
+    /<HomeEditorialDashboard[\s\S]*afterForecast=\{[\s\S]*<InmetOfficialForecastPanel/,
+  );
 });
 
 test("the hero separates current wording from forecast wording", () => {
@@ -30,6 +40,20 @@ test("the hero separates current wording from forecast wording", () => {
   assert.match(weatherHero, /if \(icon === "storm"\) return "Trovoadas"/);
   assert.match(weatherHero, /if \(icon === "wind"\) return "Tempo ventoso"/);
   assert.doesNotMatch(weatherHero, /\{weatherConditionLabels\[heroIcon\]\} agora em Pelotas/);
+});
+
+test("the hero keeps only the essential public facts", () => {
+  assert.match(weatherHero, /weather-hero-editorial-facts--essential/);
+  assert.match(weatherHero, /label="Mín\. \/ máx\."/);
+  assert.match(weatherHero, /label="Chuva"/);
+  assert.match(weatherHero, /"Vento previsto"/);
+  assert.doesNotMatch(weatherHero, /label="Umidade"/);
+  assert.doesNotMatch(weatherHero, /label="Pressão"/);
+});
+
+test("the homepage section index is editorial instead of numbered", () => {
+  assert.match(sectionNavigation, /home-section-navigation--editorial-index/);
+  assert.doesNotMatch(sectionNavigation, /String\(index \+ 1\)/);
 });
 
 test("the home targets now while the dedicated route targets today's forecast", () => {
