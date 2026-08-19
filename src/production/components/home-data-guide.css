@@ -1,22 +1,21 @@
 /*
  * Home — guia de leitura e transparência editorial.
- * Fecha a homepage como matéria de serviço: explicação, FAQ e aprofundamento.
+ * Fecha a homepage explicando quatro tipos de informação antes do FAQ e das fontes.
  */
 
 .tp-home-guide {
   --tp-guide-line: rgb(7 30 47 / 10%);
+  --tp-guide-line-soft: rgb(7 30 47 / 7%);
+  --tp-guide-cyan: #087f91;
   width: min(1220px, calc(100% - 48px));
-  margin: 0 auto clamp(68px, 7vw, 98px);
-  padding-top: clamp(54px, 6vw, 82px);
+  margin: 0 auto clamp(72px, 7vw, 104px);
+  padding-top: clamp(58px, 6vw, 86px);
   border-top: 1px solid var(--tp-guide-line);
   color: #071e2f;
 }
 
 .tp-home-guide__intro {
-  display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(330px, 0.62fr);
-  gap: clamp(44px, 7vw, 100px);
-  align-items: start;
+  max-width: 930px;
 }
 
 .tp-home-guide__intro > div > span,
@@ -24,20 +23,20 @@
 .tp-home-guide__related > span {
   display: block;
   margin-bottom: 9px;
-  color: #087f91;
-  font-size: 0.68rem;
+  color: var(--tp-guide-cyan);
+  font-size: 0.66rem;
   font-weight: 820;
   letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
 .tp-home-guide__intro h2 {
-  max-width: 16ch;
+  max-width: 17ch;
   margin: 0;
-  font-size: clamp(2.2rem, 3.8vw, 3.9rem);
-  font-weight: 770;
-  line-height: 0.98;
-  letter-spacing: -0.055em;
+  font-size: clamp(2.3rem, 3.9vw, 4rem);
+  font-weight: 750;
+  line-height: 0.97;
+  letter-spacing: -0.058em;
   text-wrap: balance;
 }
 
@@ -49,41 +48,52 @@
   line-height: 1.7;
 }
 
-.tp-home-guide__intro ul {
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--tp-guide-line);
-  list-style: none;
-  counter-reset: guide-fact;
-}
-
-.tp-home-guide__intro li {
-  counter-increment: guide-fact;
+.tp-home-guide__types {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  gap: 13px;
-  align-items: start;
-  padding: 14px 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: clamp(34px, 4vw, 48px);
+  border-top: 1px solid var(--tp-guide-line);
   border-bottom: 1px solid var(--tp-guide-line);
-  color: #60757f;
-  font-size: 0.82rem;
-  line-height: 1.62;
 }
 
-.tp-home-guide__intro li::before {
-  color: #1590a1;
-  font-size: 0.66rem;
+.tp-home-guide__types article {
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  min-width: 0;
+  padding: 21px clamp(18px, 2.2vw, 30px) 24px;
+  border-left: 1px solid var(--tp-guide-line-soft);
+}
+
+.tp-home-guide__types article:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.tp-home-guide__types article:last-child {
+  padding-right: 0;
+}
+
+.tp-home-guide__types strong {
+  color: #173746;
+  font-size: 0.78rem;
   font-weight: 820;
-  font-variant-numeric: tabular-nums;
-  content: counter(guide-fact, decimal-leading-zero);
+  letter-spacing: -0.015em;
+}
+
+.tp-home-guide__types p {
+  margin: 0;
+  color: #687d87;
+  font-size: 0.76rem;
+  line-height: 1.6;
 }
 
 .tp-home-guide__details {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(310px, 0.85fr);
-  gap: clamp(42px, 6vw, 86px);
-  margin-top: clamp(42px, 5vw, 66px);
-  padding-top: clamp(34px, 4vw, 50px);
+  grid-template-columns: minmax(0, 1.14fr) minmax(310px, 0.86fr);
+  gap: clamp(44px, 6vw, 90px);
+  margin-top: clamp(44px, 5vw, 64px);
+  padding-top: clamp(36px, 4vw, 50px);
   border-top: 1px solid var(--tp-guide-line);
 }
 
@@ -91,25 +101,26 @@
 .tp-home-guide__related h3 {
   margin: 0;
   color: #173746;
-  font-size: clamp(1.25rem, 1.7vw, 1.65rem);
-  font-weight: 760;
+  font-size: clamp(1.28rem, 1.8vw, 1.7rem);
+  font-weight: 750;
   line-height: 1.12;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.038em;
 }
 
 .tp-home-guide__faq > div,
 .tp-home-guide__related ul {
-  margin: 20px 0 0;
+  margin: 19px 0 0;
   padding: 0;
   border-top: 1px solid var(--tp-guide-line);
 }
 
-.tp-home-guide__faq details {
-  border-bottom: 1px solid var(--tp-guide-line);
+.tp-home-guide__faq details,
+.tp-home-guide__related li {
+  border-bottom: 1px solid var(--tp-guide-line-soft);
 }
 
 .tp-home-guide__faq summary {
-  padding: 15px 0;
+  padding: 16px 0;
   color: #1a3b4a;
   font-size: 0.86rem;
   font-weight: 760;
@@ -118,26 +129,22 @@
 }
 
 .tp-home-guide__faq details p {
-  max-width: 78ch;
-  margin: -2px 0 16px;
+  max-width: 76ch;
+  margin: -2px 0 17px;
   color: #667b85;
   font-size: 0.82rem;
-  line-height: 1.66;
+  line-height: 1.68;
 }
 
 .tp-home-guide__related ul {
   list-style: none;
 }
 
-.tp-home-guide__related li {
-  border-bottom: 1px solid var(--tp-guide-line);
-}
-
 .tp-home-guide__related a {
-  display: flex;
-  min-height: 72px;
+  display: grid;
+  min-height: 76px;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 18px;
   color: #173746;
   text-decoration: none;
@@ -150,7 +157,7 @@
 
 .tp-home-guide__related strong {
   font-size: 0.84rem;
-  font-weight: 760;
+  font-weight: 770;
 }
 
 .tp-home-guide__related small {
@@ -176,34 +183,71 @@
   outline-offset: 3px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 980px) {
   .tp-home-guide {
     width: calc(100% - 40px);
   }
 
-  .tp-home-guide__intro,
+  .tp-home-guide__types {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .tp-home-guide__types article,
+  .tp-home-guide__types article:first-child,
+  .tp-home-guide__types article:last-child {
+    padding: 22px 24px;
+    border-bottom: 1px solid var(--tp-guide-line-soft);
+    border-left: 1px solid var(--tp-guide-line-soft);
+  }
+
+  .tp-home-guide__types article:nth-child(odd) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .tp-home-guide__types article:nth-child(even) {
+    padding-right: 0;
+  }
+
+  .tp-home-guide__types article:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
   .tp-home-guide__details {
     grid-template-columns: 1fr;
-  }
-
-  .tp-home-guide__intro {
-    gap: 30px;
-  }
-
-  .tp-home-guide__intro ul {
-    max-width: 760px;
+    gap: 42px;
   }
 }
 
 @media (max-width: 640px) {
   .tp-home-guide {
     width: calc(100% - 32px);
-    margin-bottom: 58px;
-    padding-top: 44px;
+    margin-bottom: 60px;
+    padding-top: 46px;
   }
 
   .tp-home-guide__intro h2 {
-    font-size: clamp(2rem, 10vw, 2.85rem);
+    font-size: clamp(2.05rem, 10.5vw, 3rem);
+  }
+
+  .tp-home-guide__types {
+    grid-template-columns: 1fr;
+    margin-top: 30px;
+  }
+
+  .tp-home-guide__types article,
+  .tp-home-guide__types article:first-child,
+  .tp-home-guide__types article:last-child,
+  .tp-home-guide__types article:nth-child(odd),
+  .tp-home-guide__types article:nth-child(even),
+  .tp-home-guide__types article:nth-last-child(-n + 2) {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--tp-guide-line-soft);
+    border-left: 0;
+  }
+
+  .tp-home-guide__types article:last-child {
+    border-bottom: 0;
   }
 
   .tp-home-guide__details {
