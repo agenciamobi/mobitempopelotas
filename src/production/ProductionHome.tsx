@@ -15,12 +15,12 @@ import {
   toProductionSummaries,
   toProductionWeatherData,
 } from "@/production/adapters/home";
-import { HomeEditorialDashboard } from "@/production/components/home-editorial-dashboard-semantic";
 import { HomeForecastEditorial } from "@/production/components/home-forecast-editorial";
 import { HomeLiveCameraBackground } from "@/production/components/home-live-camera-background";
 import { HomeObservationEditorial } from "@/production/components/home-observation-editorial";
 import { HomeRadarEditorial } from "@/production/components/home-radar-editorial";
 import { HomeSectionNavigation } from "@/production/components/home-section-navigation";
+import { HomeWaterEditorial } from "@/production/components/home-water-editorial";
 import {
   hasVerifiedInmetAlertSemantics,
   InmetAlertsPanel,
@@ -193,14 +193,7 @@ export function ProductionHome({
         />
         <HomeRadarEditorial regionalWeather={weather.regional} />
         <HomeObservationEditorial weather={weather} observation={observation} />
-        <HomeEditorialDashboard
-          weather={weather}
-          advisoryLevel={headerLevel}
-          observation={observation}
-          laranjal={laranjal}
-          guaiba={guaiba}
-          lagoon={lagoon}
-        />
+        <HomeWaterEditorial laranjal={laranjal} guaiba={guaiba} lagoon={lagoon} />
         <HomeExplorePortal />
         <EditorialContentSection id="como-interpretar-o-tempo" content={HOME_EDITORIAL_CONTENT} />
       </main>
