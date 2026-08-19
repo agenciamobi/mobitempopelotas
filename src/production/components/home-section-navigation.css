@@ -1,71 +1,56 @@
 /*
- * Índice editorial da Home.
- * Navegação simples por âncoras: sem cards, tabs ou acentos decorativos.
+ * Índice editorial da Home — navegação autocontida por âncoras.
+ * Sem tabs, cards, numeração ou herança dos antigos home-navigation-vXX.
  */
 
-.site-shell--home-editorial .home-section-navigation--editorial-index {
-  overflow: visible !important;
-  padding: 0 !important;
-  border: 0 !important;
-  border-bottom: 1px solid rgb(7 27 44 / 10%) !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
+.tp-home-index {
+  display: grid;
+  width: min(1440px, calc(100% - 48px));
+  margin: 18px auto 0;
+  padding: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: 24px;
+  border: 0;
+  border-bottom: 1px solid rgb(7 27 44 / 10%);
+  background: transparent;
 }
 
-.site-shell--home-editorial .home-section-navigation--editorial-index::before,
-.site-shell--home-editorial .home-section-navigation--editorial-index::after {
-  display: none !important;
-  content: none !important;
-}
-
-.site-shell--home-editorial
-  .home-section-navigation--editorial-index
-  .home-section-navigation__label {
-  padding: 13px 0 8px !important;
-  color: #71838c !important;
-  font-size: 0.57rem !important;
-  font-weight: 820 !important;
-  letter-spacing: 0.09em !important;
+.tp-home-index__label {
+  display: flex;
+  min-width: 112px;
+  align-items: center;
+  padding: 13px 0 8px;
+  color: #71838c;
+  font-size: 0.57rem;
+  font-weight: 820;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
 }
 
-.site-shell--home-editorial
-  .home-section-navigation--editorial-index
-  .home-section-navigation__links {
+.tp-home-index__links {
   display: flex;
   min-width: 0;
   align-items: stretch;
-  gap: 0 !important;
-  border: 0 !important;
-  background: transparent !important;
 }
 
-.site-shell--home-editorial
-  .home-section-navigation--editorial-index
-  .home-section-navigation__links
-  a {
+.tp-home-index__links a {
   position: relative;
   display: flex;
   min-width: 0;
-  min-height: 48px !important;
+  min-height: 48px;
   flex: 1 1 0;
   align-items: center;
-  justify-content: flex-start;
-  padding: 10px clamp(14px, 1.8vw, 24px) 13px !important;
-  border: 0 !important;
-  border-right: 1px solid rgb(7 27 44 / 8%) !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: #455f6c !important;
-  box-shadow: none !important;
-  transition: color 160ms ease !important;
+  padding: 10px clamp(14px, 1.8vw, 24px) 13px;
+  border: 0;
+  border-right: 1px solid rgb(7 27 44 / 8%);
+  background: transparent;
+  color: #455f6c;
+  text-decoration: none;
+  transition: color 160ms ease;
 }
 
-.site-shell--home-editorial
-  .home-section-navigation--editorial-index
-  .home-section-navigation__links
-  a::after {
+.tp-home-index__links a::after {
   position: absolute;
   right: clamp(14px, 1.8vw, 24px);
   bottom: -1px;
@@ -75,108 +60,87 @@
   content: "";
 }
 
-.site-shell--home-editorial
-  .home-section-navigation--editorial-index
-  .home-section-navigation__links
-  a:first-child {
-  padding-left: 0 !important;
+.tp-home-index__links a:first-child {
+  padding-left: 0;
 }
 
-.site-shell--home-editorial
-  .home-section-navigation--editorial-index
-  .home-section-navigation__links
-  a:first-child::after {
+.tp-home-index__links a:first-child::after {
   left: 0;
 }
 
-.site-shell--home-editorial
-  .home-section-navigation--editorial-index
-  .home-section-navigation__links
-  a:last-child {
-  border-right: 0 !important;
+.tp-home-index__links a:last-child {
+  border-right: 0;
 }
 
-.site-shell--home-editorial
-  .home-section-navigation--editorial-index
-  .home-section-navigation__links
-  a:hover,
-.site-shell--home-editorial
-  .home-section-navigation--editorial-index
-  .home-section-navigation__links
-  a:focus-visible {
-  background: transparent !important;
-  color: #071b2c !important;
-  outline: none;
+.tp-home-index__links a:hover,
+.tp-home-index__links a:focus-visible {
+  color: #071b2c;
 }
 
-.site-shell--home-editorial
-  .home-section-navigation--editorial-index
-  .home-section-navigation__links
-  a:hover::after,
-.site-shell--home-editorial
-  .home-section-navigation--editorial-index
-  .home-section-navigation__links
-  a:focus-visible::after {
+.tp-home-index__links a:hover::after,
+.tp-home-index__links a:focus-visible::after {
   background: #18bdcd;
 }
 
-.site-shell--home-editorial
-  .home-section-navigation--editorial-index
-  .home-section-navigation__links
-  strong {
+.tp-home-index__links strong {
   font-size: 0.72rem;
   font-weight: 720;
   line-height: 1.2;
   white-space: nowrap;
 }
 
-@media (max-width: 720px) {
-  .site-shell--home-editorial .home-section-navigation--editorial-index {
-    width: calc(100% - 16px);
+@media (max-width: 1240px) {
+  .tp-home-index {
+    width: min(100% - 32px, 1180px);
+  }
+}
+
+@media (max-width: 980px) {
+  .tp-home-index {
+    grid-template-columns: 1fr;
+    gap: 6px;
   }
 
-  .site-shell--home-editorial
-    .home-section-navigation--editorial-index
-    .home-section-navigation__links {
+  .tp-home-index__label {
+    min-width: 0;
+  }
+
+  .tp-home-index__links {
     overflow-x: auto;
     overscroll-behavior-inline: contain;
+    scroll-snap-type: x proximity;
     scrollbar-width: none;
   }
 
-  .site-shell--home-editorial
-    .home-section-navigation--editorial-index
-    .home-section-navigation__links::-webkit-scrollbar {
+  .tp-home-index__links::-webkit-scrollbar {
     display: none;
   }
 
-  .site-shell--home-editorial
-    .home-section-navigation--editorial-index
-    .home-section-navigation__links
-    a {
+  .tp-home-index__links a {
     min-width: max-content;
     flex: 0 0 auto;
-    padding-inline: 15px !important;
+    padding-inline: 15px;
+    scroll-snap-align: start;
   }
 
-  .site-shell--home-editorial
-    .home-section-navigation--editorial-index
-    .home-section-navigation__links
-    a:first-child {
-    padding-left: 0 !important;
+  .tp-home-index__links a:first-child {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .tp-home-index {
+    width: calc(100% - 16px);
+    margin-top: 14px;
   }
 
-  .site-shell--home-editorial
-    .home-section-navigation--editorial-index
-    .home-section-navigation__links
-    a::after {
-    right: 15px;
-    left: 15px;
+  .tp-home-index__links a {
+    min-height: 44px;
   }
+}
 
-  .site-shell--home-editorial
-    .home-section-navigation--editorial-index
-    .home-section-navigation__links
-    a:first-child::after {
-    left: 0;
+@media (prefers-reduced-motion: reduce) {
+  .tp-home-index__links a {
+    transition: none;
   }
 }

@@ -7,6 +7,10 @@ const sectionNavigation = readFileSync(
   "src/production/components/home-section-navigation.tsx",
   "utf8",
 );
+const sectionNavigationCss = readFileSync(
+  "src/production/components/home-section-navigation.css",
+  "utf8",
+);
 const semanticDashboard = readFileSync(
   "src/production/components/home-editorial-dashboard-semantic.tsx",
   "utf8",
@@ -61,9 +65,14 @@ test("the hero keeps only the essential public facts", () => {
   assert.doesNotMatch(weatherHero, /label="Pressão"/);
 });
 
-test("the homepage section index is editorial instead of numbered", () => {
-  assert.match(sectionNavigation, /home-section-navigation--editorial-index/);
+test("the homepage section index is isolated and editorial instead of numbered", () => {
+  assert.match(sectionNavigation, /className="tp-home-index"/);
+  assert.match(sectionNavigation, /tp-home-index__links/);
   assert.doesNotMatch(sectionNavigation, /String\(index \+ 1\)/);
+  assert.doesNotMatch(sectionNavigation, /home-section-navigation--editorial-index/);
+  assert.match(sectionNavigationCss, /\.tp-home-index\s*\{[\s\S]*border-bottom/);
+  assert.match(sectionNavigationCss, /@media \(max-width: 980px\)/);
+  assert.doesNotMatch(sectionNavigationCss, /\.home-section-navigation/);
 });
 
 test("the homepage does not keep a permanent civil-defense promo in the main narrative", () => {

@@ -30,12 +30,9 @@ const homeSections = [
 
 export function HomeSectionNavigation() {
   return (
-    <nav
-      className="home-section-navigation home-section-navigation--editorial-index"
-      aria-label="Seções da página inicial"
-    >
-      <span className="home-section-navigation__label">Nesta página</span>
-      <div className="home-section-navigation__links">
+    <nav className="tp-home-index" aria-label="Seções da página inicial">
+      <span className="tp-home-index__label">Nesta página</span>
+      <div className="tp-home-index__links">
         {homeSections.map((section) => (
           <a
             href={section.href}
