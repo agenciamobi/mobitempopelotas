@@ -8,7 +8,7 @@
   --tp-guide-line-soft: rgb(7 30 47 / 7%);
   --tp-guide-cyan: #087f91;
   width: min(1220px, calc(100% - 48px));
-  margin: 0 auto clamp(72px, 7vw, 104px);
+  margin: 0 auto clamp(28px, 3vw, 36px);
   padding-top: clamp(58px, 6vw, 86px);
   border-top: 1px solid var(--tp-guide-line);
   color: #071e2f;
@@ -222,7 +222,7 @@
 @media (max-width: 640px) {
   .tp-home-guide {
     width: calc(100% - 32px);
-    margin-bottom: 60px;
+    margin-bottom: 28px;
     padding-top: 46px;
   }
 
