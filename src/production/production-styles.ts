@@ -66,3 +66,4 @@ import "./styles/header-navigation-legibility-v68.css";
 import "./styles/document-scroll.css";
 import "./styles/home-editorial-shell.css";
 import "./styles/internal-home-surface-contract.css";
+import "./styles/standalone-home-surface-contract.css";
