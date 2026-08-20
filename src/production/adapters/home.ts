@@ -178,6 +178,7 @@ export function toProductionObservation(data: AggregatedWeatherData): EmbrapaObs
 
 export function toProductionAlerts(data: AggregatedWeatherData): InmetAlertsData {
   const alerts = data.alerts;
+  const sourceUrl = "https://avisos.inmet.gov.br/";
   return {
     status: data.sources.inmet.usable ? "live" : "unavailable",
     alerts,
@@ -187,10 +188,11 @@ export function toProductionAlerts(data: AggregatedWeatherData): InmetAlertsData
       regional: alerts.filter((alert) => alert.relevance === "regional").length,
       state: alerts.filter((alert) => alert.relevance === "state").length,
     },
+    sourceUrl,
     source: {
       name: "INMET",
-      feedUrl: "https://apiprevmet3.inmet.gov.br/avisos/ativos",
-      portalUrl: "https://alertas2.inmet.gov.br/",
+      feedUrl: "https://apiprevmet3.inmet.gov.br/avisos/rss",
+      portalUrl: sourceUrl,
       fetchedAt: data.sources.inmet.fetchedAt,
     },
     error: data.sources.inmet.reason,
