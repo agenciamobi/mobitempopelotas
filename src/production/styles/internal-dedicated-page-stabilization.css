@@ -1,0 +1,79 @@
+/*
+ * Ajustes finais para componentes dedicados que ainda carregam decisões visuais
+ * anteriores ao shell editorial da Home. Este arquivo deve ficar por último na
+ * pilha de produção para resolver apenas incompatibilidades de contexto.
+ */
+
+/* Radar/REDEMET: o hero agora é claro, portanto os selos não podem herdar a
+ * versão de alto contraste desenhada para o antigo hero escuro/gradiente. */
+.site-shell--topic .redemet-hero .redemet-freshness {
+  border-color: rgb(23 99 59 / 18%);
+  color: #17633b;
+  background: #eaf7ef;
+}
+
+.site-shell--topic .redemet-hero .redemet-freshness.is-attention {
+  border-color: rgb(139 93 0 / 18%);
+  color: #8b5d00;
+  background: #fff8e5;
+}
+
+.site-shell--topic .redemet-hero .redemet-freshness.is-stale {
+  border-color: rgb(163 65 45 / 18%);
+  color: #a3412d;
+  background: #fff1ed;
+}
+
+.site-shell--topic .redemet-hero .redemet-freshness.is-unknown {
+  border-color: rgb(93 109 117 / 16%);
+  color: #5d6d75;
+  background: #f3f6f7;
+}
+
+/* Cards auxiliares do radar seguem a mesma linguagem das superfícies da Home. */
+.site-shell--topic .redemet-source-summary,
+.site-shell--topic .redemet-explainer article,
+.site-shell--topic .redemet-related > a {
+  border-radius: 14px;
+  background-color: #fbfcfc;
+  box-shadow: none;
+}
+
+.site-shell--topic .redemet-related > a {
+  transform: none;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.site-shell--topic .redemet-related > a:hover {
+  transform: none;
+  border-color: rgb(24 189 205 / 22%);
+  background: #f7faf9;
+  box-shadow: none;
+}
+
+.site-shell--topic .redemet-related > a:focus-visible {
+  outline: 2px solid rgb(24 189 205 / 45%);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+@media (max-width: 720px) {
+  .site-shell--topic .redemet-source-summary,
+  .site-shell--topic .redemet-explainer article,
+  .site-shell--topic .redemet-related > a {
+    border-radius: 11px;
+  }
+}
+
+@media (forced-colors: active) {
+  .site-shell--topic .redemet-hero .redemet-freshness,
+  .site-shell--topic .redemet-source-summary,
+  .site-shell--topic .redemet-explainer article,
+  .site-shell--topic .redemet-related > a {
+    border-color: CanvasText;
+    background: Canvas;
+    color: CanvasText;
+  }
+}
