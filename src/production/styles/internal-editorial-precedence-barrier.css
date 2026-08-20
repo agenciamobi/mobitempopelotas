@@ -27,7 +27,10 @@
 .site-shell--home-editorial.internal-weather-shell
   .internal-weather-main
   > [class$="-page"]
-  > aside {
+  > aside,
+.site-shell--home-editorial.internal-weather-shell
+  .internal-weather-main
+  > .editorial-answer-section {
   border: 1px solid var(--route-editorial-line) !important;
   border-radius: var(--route-editorial-radius) !important;
   background-color: var(--route-editorial-surface) !important;
@@ -53,7 +56,13 @@
 .site-shell--home-editorial.internal-weather-shell
   .internal-weather-main
   > [class$="-page"]
-  > :is(section, aside)::after {
+  > :is(section, aside)::after,
+.site-shell--home-editorial.internal-weather-shell
+  .internal-weather-main
+  > .editorial-answer-section::before,
+.site-shell--home-editorial.internal-weather-shell
+  .internal-weather-main
+  > .editorial-answer-section::after {
   display: none !important;
   content: none !important;
   background: none !important;
@@ -64,7 +73,12 @@
   .internal-weather-main
   > [class$="-page"]
   > :is(section, nav, aside)
-  :is(article, [class*="card"], [class*="panel"]) {
+  :is(article, [class*="card"], [class*="panel"]),
+.site-shell--home-editorial.internal-weather-shell
+  .internal-weather-main
+  > .editorial-answer-section
+  :is(article, [class*="card"], [class*="panel"], details) {
+  border-color: var(--route-editorial-line) !important;
   border-radius: var(--route-editorial-inner-radius) !important;
   box-shadow: none !important;
 }
@@ -79,11 +93,24 @@
   .internal-weather-main
   > [class$="-page"]
   > section
-  > h2 {
+  > h2,
+.site-shell--home-editorial.internal-weather-shell
+  .internal-weather-main
+  > .editorial-answer-section
+  h2 {
   color: var(--route-editorial-ink) !important;
   font-weight: 790 !important;
   line-height: 1 !important;
   letter-spacing: -0.05em !important;
+}
+
+.site-shell--home-editorial.internal-weather-shell
+  .internal-weather-main
+  > .editorial-answer-section
+  :is(.editorial-answer-related a, details) {
+  background-color: var(--route-editorial-soft) !important;
+  background-image: none !important;
+  box-shadow: none !important;
 }
 
 /*
@@ -206,6 +233,9 @@
     .internal-weather-main
     > [class$="-page"]
     > :is(section, nav, aside),
+  .site-shell--home-editorial.internal-weather-shell
+    .internal-weather-main
+    > .editorial-answer-section,
   .site-shell--topic
     .site-container--topic
     > [class*="-page"]
