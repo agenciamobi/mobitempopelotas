@@ -14,7 +14,7 @@ import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.funct
 
 const PAGE_TITLE = "Como os dados do Tempo Pelotas funcionam";
 const PAGE_DESCRIPTION =
-  "Veja de onde vêm as informações de tempo e nível da água, como a precisão das previsões é medida, o que acontece quando uma fonte falha e quais são os limites de cada dado.";
+  "Veja de onde vêm as informações de tempo e nível da água, como o Tempo Pelotas integra e dissemina fontes oficiais, como a precisão das previsões é medida e quais são os limites de cada dado.";
 const PAGE_PATH = "/metodologia";
 
 export const Route = createFileRoute("/metodologia")({
@@ -31,6 +31,7 @@ export const Route = createFileRoute("/metodologia")({
         about: [
           "Metodologia meteorológica",
           "Fontes de dados meteorológicos em Pelotas",
+          "Integração e disseminação de informações oficiais",
           "Embrapa Clima Temperado",
           "INMET",
           "CPPMet/UFPel",
