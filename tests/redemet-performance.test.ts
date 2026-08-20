@@ -9,6 +9,7 @@ const radarRoute = readFileSync("src/routes/api/redemet/radar.ts", "utf8");
 const satelliteRoute = readFileSync("src/routes/api/redemet/satellite.ts", "utf8");
 const stormsRoute = readFileSync("src/routes/api/redemet/storms.ts", "utf8");
 const radarServer = readFileSync("src/lib/redemet/redemet-radar.server.ts", "utf8");
+const stormsServer = readFileSync("src/lib/redemet/redemet-stsc.server.ts", "utf8");
 const redemetFunctions = readFileSync("src/lib/redemet/redemet.functions.ts", "utf8");
 const radarPage = readFileSync("src/routes/radar-e-satelite-pelotas.tsx", "utf8");
 const envExample = readFileSync(".env.example", "utf8");
@@ -29,6 +30,8 @@ test("REDEMET limits animation payloads", () => {
   assert.match(radarRoute, /Math\.min\(MAX_FRAMES/);
   assert.match(satelliteRoute, /Math\.min\(MAX_FRAMES/);
   assert.match(stormsRoute, /Math\.min\(MAX_FRAMES/);
+  assert.match(stormsServer, /const DEFAULT_FRAMES = 12;/);
+  assert.match(stormsServer, /const MAX_FRAMES = 12;/);
 });
 
 test("radar parser keeps only the requested station from the official response shape", () => {
@@ -122,6 +125,16 @@ test("STSC parser accepts the response shape observed in the REDEMET HAR", () =>
   assert.doesNotMatch(
     redemetFunctions,
     /fetchRedemetSatellite\s*,\s*fetchRedemetStorms\s*}\s*from\s*"\.\/redemet\.server"/,
+  );
+});
+
+test("STSC requests the animation window upstream instead of slicing a single default frame", () => {
+  assert.match(stormsServer, /requestOfficialStsc\(frameCount: number\)/);
+  assert.match(stormsServer, /searchParams\.set\("anima", String\(frameCount\)\)/);
+  assert.match(stormsServer, /const payload = await requestOfficialStsc\(framesRequested\);/);
+  assert.match(
+    stormsServer,
+    /clampFrameCount\(frameCount, MAX_FRAMES, DEFAULT_FRAMES\)/,
   );
 });
 
