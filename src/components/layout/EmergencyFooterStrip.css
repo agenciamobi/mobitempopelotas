@@ -7,7 +7,7 @@
 .tp-public-service-strip {
   --tp-public-service-blue: #00167b;
   --tp-public-service-orange: #ef6213;
-  --tp-public-service-phone: #2f7ff0;
+  --tp-public-service-phone: #5f2ded;
   --tp-public-service-ink: #071e2f;
   --tp-public-service-line: rgb(7 30 47 / 10%);
   width: 100%;
@@ -66,12 +66,13 @@
   color: var(--tp-public-service-ink);
   text-align: center;
   text-decoration: none;
-  transition: border-color 150ms ease, transform 150ms ease;
+  transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
 }
 
 .tp-public-service-phones__grid a:hover,
 .tp-public-service-phones__grid a:focus-visible {
-  border-color: rgb(47 127 240 / 42%);
+  border-color: rgb(95 45 237 / 40%);
+  box-shadow: 0 8px 24px rgb(95 45 237 / 8%);
   transform: translateY(-1px);
 }
 
