@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
+import { OfficialDataAccessNotice } from "@/components/content/OfficialDataAccessNotice";
 import { RadarForecastContext } from "@/components/redemet/RadarForecastContext";
 import { RedemetOverview } from "@/components/redemet/RedemetOverview";
 import { RADAR_EDITORIAL_CONTENT } from "@/lib/editorial-content";
@@ -21,6 +22,7 @@ const RADAR_PAGE_CONTENT = {
   answer:
     "Confira o horário de cada imagem e depois reproduza a sequência. O radar ajuda a localizar áreas associadas à chuva; o satélite mostra a cobertura e a organização das nuvens; e os registros de trovoadas indicam atividade elétrica detectada. Os valores exibidos ao lado pertencem à previsão por hora mais próxima, enquanto as imagens mostram o passado recente.",
   facts: [
+    "Os produtos de radar, satélite e STSC são coletados por integração server-side com acesso autorizado à API da REDEMET/DECEA; a origem e o horário permanecem identificados no portal.",
     "Reproduzir a sequência ajuda a perceber deslocamento e mudança, mas não garante que o mesmo movimento continuará.",
     "O radar oferece uma visão regional e não confirma sozinho chuva em um endereço ou bairro específico.",
     "Quando uma estação de radar não fornece imagem recente, o portal pode usar outra estação oficial cuja cobertura inclua Pelotas; a origem e o horário do quadro permanecem identificados.",
@@ -30,6 +32,11 @@ const RADAR_PAGE_CONTENT = {
     "Temperatura, chance de chuva, vento, nuvens baixas e visibilidade são valores previstos e não são medidos pela imagem.",
   ],
   faqs: [
+    {
+      question: "Como o Tempo Pelotas recebe os dados da REDEMET?",
+      answer:
+        "O portal possui acesso autorizado à API da REDEMET/DECEA e consulta os produtos oficiais por conexão entre sistemas no servidor. A credencial não é enviada ao navegador, e cada quadro mantém a identificação da fonte e do horário recebido.",
+    },
     {
       question: "Como usar a reprodução automática das imagens?",
       answer:
@@ -94,6 +101,7 @@ export const Route = createFileRoute("/radar-e-satelite-pelotas")({
         about: [
           "Radar meteorológico de Santiago com cobertura sobre Pelotas",
           "Seleção operacional de estação REDEMET conforme disponibilidade e cobertura",
+          "API autorizada da REDEMET/DECEA",
           "Imagens de satélite sobre Pelotas",
           "Monitoramento regional de trovoadas",
           "Precipitação na Zona Sul do Rio Grande do Sul",
@@ -122,6 +130,7 @@ function RedemetPage() {
   return (
     <div className="radar-satellite-page">
       <RedemetOverview data={data.redemet} />
+      <OfficialDataAccessNotice scope="meteorology" />
       <RadarForecastContext radar={data.redemet.radar} weather={data.weather} />
       <EditorialContentSection
         id="como-interpretar-radar-satelite"
