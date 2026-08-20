@@ -7,9 +7,15 @@ const page = readFileSync("src/components/hydrology/HydrologyOverviewV2.tsx", "u
 const styles = readFileSync("src/components/hydrology/HydrologyOverviewV2.css", "utf8");
 const defesaCivilServer = readFileSync("src/lib/hydrology/defesa-civil-rs.server.ts", "utf8");
 const defesaCivilFunction = readFileSync("src/lib/hydrology/defesa-civil-rs.functions.ts", "utf8");
-const defesaCivilArea = readFileSync("src/components/hydrology/DefesaCivilHydroNetwork.tsx", "utf8");
+const defesaCivilArea = readFileSync(
+  "src/components/hydrology/DefesaCivilHydroNetwork.tsx",
+  "utf8",
+);
 const defesaCivilMap = readFileSync("src/components/hydrology/DefesaCivilHydroMap.tsx", "utf8");
-const defesaCivilStyles = readFileSync("src/components/hydrology/DefesaCivilHydroNetwork.css", "utf8");
+const defesaCivilStyles = readFileSync(
+  "src/components/hydrology/DefesaCivilHydroNetwork.css",
+  "utf8",
+);
 
 const hydrologySource = `${route}\n${page}`;
 const defesaCivilSource = `${defesaCivilServer}\n${defesaCivilFunction}\n${defesaCivilArea}\n${defesaCivilMap}`;
@@ -34,7 +40,10 @@ test("hydrology route loads six independent sources in the shared shell", () => 
 });
 
 test("Defesa Civil RS integration is server-side, public-contract based and publication-gated", () => {
-  assert.match(defesaCivilServer, /https:\/\/redehidrometeorologica\.defesacivil\.rs\.gov\.br\/graphql/);
+  assert.match(
+    defesaCivilServer,
+    /https:\/\/redehidrometeorologica\.defesacivil\.rs\.gov\.br\/graphql/,
+  );
   assert.match(defesaCivilServer, /casa-militar-defesa-civil-rs/);
   assert.match(defesaCivilServer, /codigos: \["43"\]/);
   assert.match(defesaCivilServer, /tipo: UNIDADE_FEDERATIVA/);
@@ -70,8 +79,14 @@ test("Defesa Civil RS adapter preserves observation identity, timestamp and miss
 test("Defesa Civil RS area keeps observed data separate from alert and risk classification", () => {
   assert.match(defesaCivilArea, /Rede oficial · Defesa Civil RS/);
   assert.match(defesaCivilArea, /não transforma essas medições em alerta ou previsão de cheia/);
-  assert.match(defesaCivilArea, /não\s+representa estado operacional, nível de atenção ou classificação oficial de risco/);
-  assert.match(defesaCivilArea, /não\s+substitui os canais oficiais de alerta e orientação da Defesa Civil/);
+  assert.match(
+    defesaCivilArea,
+    /não\s+representa estado operacional, nível de atenção ou classificação oficial de risco/,
+  );
+  assert.match(
+    defesaCivilArea,
+    /não\s+substitui os canais oficiais de alerta e orientação da Defesa Civil/,
+  );
   assert.match(defesaCivilArea, /Fonte e responsabilidade dos dados/);
   assert.match(defesaCivilArea, /Abrir mapa oficial/);
   assert.match(defesaCivilArea, /Documentação da API/);
@@ -161,7 +176,10 @@ test("absence of transmission is never interpreted as normal level", () => {
   assert.match(page, /Uma estação sem transmissão não deve ser interpretada como nível normal/);
   assert.match(route, /Quando uma estação não transmite, não há dado atual/);
   assert.match(route, /Ausência de transmissão significa que o rio está normal\?/);
-  assert.doesNotMatch(hydrologySource, /sem transmissão\s+(?:significa|confirma|indica)\s+(?:que\s+)?(?:o\s+)?nível normal/i);
+  assert.doesNotMatch(
+    hydrologySource,
+    /sem transmissão\s+(?:significa|confirma|indica)\s+(?:que\s+)?(?:o\s+)?nível normal/i,
+  );
 });
 
 test("hydrology page publishes transparent dataset metadata only with a local reading", () => {

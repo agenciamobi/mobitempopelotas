@@ -105,8 +105,10 @@ export function DefesaCivilHydroMap({ stations }: { stations: DefesaCivilHydroSt
             const coordinates = feature.geometry.coordinates as [number, number];
             const properties = feature.properties as Record<string, unknown>;
             const name = typeof properties.name === "string" ? properties.name : "Estação";
-            const code = typeof properties.code === "string" ? properties.code : "Código não informado";
-            const basin = typeof properties.basin === "string" ? properties.basin : "Bacia não informada";
+            const code =
+              typeof properties.code === "string" ? properties.code : "Código não informado";
+            const basin =
+              typeof properties.basin === "string" ? properties.basin : "Bacia não informada";
 
             new maplibregl.Popup({ closeButton: true, maxWidth: "310px" })
               .setLngLat(coordinates)

@@ -2,8 +2,7 @@ import { z } from "zod";
 
 import { PELOTAS_LATITUDE, PELOTAS_LONGITUDE } from "@/lib/site-config";
 
-const DEFESA_CIVIL_GRAPHQL_URL =
-  "https://redehidrometeorologica.defesacivil.rs.gov.br/graphql";
+const DEFESA_CIVIL_GRAPHQL_URL = "https://redehidrometeorologica.defesacivil.rs.gov.br/graphql";
 const DEFESA_CIVIL_MAP_URL = "https://redehidrometeorologica.defesacivil.rs.gov.br/Mapa";
 const DEFESA_CIVIL_DOCS_URL = "https://sistemas.defesacivil.rs.gov.br/api-redehidrometeorologica";
 const DEFESA_CIVIL_CLIENT = "casa-militar-defesa-civil-rs";
@@ -156,7 +155,10 @@ const graphqlResponseSchema = z
       .object({
         tags_data: z
           .object({
-            qualle_meteorologia: z.union([z.array(stationSchema), stationSchema]).nullable().optional(),
+            qualle_meteorologia: z
+              .union([z.array(stationSchema), stationSchema])
+              .nullable()
+              .optional(),
           })
           .passthrough()
           .nullable()
@@ -165,13 +167,7 @@ const graphqlResponseSchema = z
       .passthrough()
       .nullable()
       .optional(),
-    errors: z
-      .array(
-        z
-          .object({ message: z.string().optional() })
-          .passthrough(),
-      )
-      .optional(),
+    errors: z.array(z.object({ message: z.string().optional() }).passthrough()).optional(),
   })
   .passthrough();
 
@@ -506,10 +502,11 @@ export async function fetchDefesaCivilHydroData(
     .sort((first, second) => first.distanceFromPelotasKm - second.distanceFromPelotasKm)
     .slice(0, MAX_REGIONAL_STATIONS);
 
-  const latestObservationAt = regionalStations
-    .map((station) => station.observedAt)
-    .filter((value): value is string => Boolean(value))
-    .sort((first, second) => new Date(second).getTime() - new Date(first).getTime())[0] ?? null;
+  const latestObservationAt =
+    regionalStations
+      .map((station) => station.observedAt)
+      .filter((value): value is string => Boolean(value))
+      .sort((first, second) => new Date(second).getTime() - new Date(first).getTime())[0] ?? null;
 
   const recentStationCount = regionalStations.filter(
     (station) => station.freshness === "recent",

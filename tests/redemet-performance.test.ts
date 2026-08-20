@@ -14,14 +14,8 @@ const redemetFunctions = readFileSync("src/lib/redemet/redemet.functions.ts", "u
 const radarPage = readFileSync("src/routes/radar-e-satelite-pelotas.tsx", "utf8");
 const envExample = readFileSync(".env.example", "utf8");
 const cssEntry = readFileSync("src/production/production-styles.css", "utf8");
-const radarComponent = readFileSync(
-  "src/production/components/home-radar-editorial.tsx",
-  "utf8",
-);
-const radarCss = readFileSync(
-  "src/production/components/home-radar-editorial.css",
-  "utf8",
-);
+const radarComponent = readFileSync("src/production/components/home-radar-editorial.tsx", "utf8");
+const radarCss = readFileSync("src/production/components/home-radar-editorial.css", "utf8");
 
 test("REDEMET limits animation payloads", () => {
   assert.match(radarRoute, /const MAX_FRAMES = 8;/);
@@ -47,8 +41,7 @@ test("radar parser keeps only the requested station from the official response s
             lon_max: "-50.839",
             lat_min: "-32.809304",
             lat_max: "-25.5734",
-            path:
-              "https://estatico-redemet.decea.mil.br/radar/2026/08/18/sg/maxcappi/maps/santiago.png",
+            path: "https://estatico-redemet.decea.mil.br/radar/2026/08/18/sg/maxcappi/maps/santiago.png",
             data: "2026-08-18 00:56:39",
           },
           {
@@ -132,10 +125,7 @@ test("STSC requests the animation window upstream instead of slicing a single de
   assert.match(stormsServer, /requestOfficialStsc\(frameCount: number\)/);
   assert.match(stormsServer, /searchParams\.set\("anima", String\(frameCount\)\)/);
   assert.match(stormsServer, /const payload = await requestOfficialStsc\(framesRequested\);/);
-  assert.match(
-    stormsServer,
-    /clampFrameCount\(frameCount, MAX_FRAMES, DEFAULT_FRAMES\)/,
-  );
+  assert.match(stormsServer, /clampFrameCount\(frameCount, MAX_FRAMES, DEFAULT_FRAMES\)/);
 });
 
 test("radar editorial section skips offscreen rendering in its isolated component", () => {
@@ -152,7 +142,10 @@ test("radar isolated layer preserves map gestures and compact operational contro
   assert.doesNotMatch(radarCss, /\.tp-home-radar \.map-canvas\s*\{[^}]*pointer-events:\s*none/);
   assert.match(radarCss, /\.tp-home-radar \.radar-player\s*\{[^}]*border-top:/);
   assert.doesNotMatch(radarCss, /\.tp-home-radar \.radar-player\s*\{[^}]*pointer-events:\s*none/);
-  assert.match(radarCss, /\.tp-home-radar \.map-canvas--satellite \.regional-map-engine\s*\{[^}]*top:\s*108px/);
+  assert.match(
+    radarCss,
+    /\.tp-home-radar \.map-canvas--satellite \.regional-map-engine\s*\{[^}]*top:\s*108px/,
+  );
   assert.match(
     radarCss,
     /\.tp-home-radar \.map-canvas \.maplibregl-ctrl-bottom-right\s*\{[^}]*top:\s*auto[^}]*bottom:\s*10px/,

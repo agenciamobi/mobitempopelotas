@@ -80,7 +80,10 @@ function StationCard({ station }: { station: DefesaCivilHydroStation }) {
             {freshness.label}
           </span>
           <h3>{station.name}</h3>
-          <p>{station.code}{station.basin ? ` · ${station.basin}` : ""}</p>
+          <p>
+            {station.code}
+            {station.basin ? ` · ${station.basin}` : ""}
+          </p>
         </div>
         <span className="defesa-civil-hydro__distance">
           <MapPin aria-hidden="true" />
@@ -99,17 +102,25 @@ function StationCard({ station }: { station: DefesaCivilHydroStation }) {
       {hasHydrology ? (
         <dl className="defesa-civil-hydro__metrics">
           <div>
-            <dt><Gauge aria-hidden="true" /> Nível</dt>
-            <dd>{station.river.levelM === null ? "—" : `${formatNumber(station.river.levelM, 2)} m`}</dd>
+            <dt>
+              <Gauge aria-hidden="true" /> Nível
+            </dt>
+            <dd>
+              {station.river.levelM === null ? "—" : `${formatNumber(station.river.levelM, 2)} m`}
+            </dd>
             <small>{station.river.name ?? "Rio não informado"}</small>
           </div>
           <div>
-            <dt><CloudRain aria-hidden="true" /> Chuva 1 h</dt>
+            <dt>
+              <CloudRain aria-hidden="true" /> Chuva 1 h
+            </dt>
             <dd>{station.rain.h1Mm === null ? "—" : `${formatNumber(station.rain.h1Mm)} mm`}</dd>
             <small>acumulado da estação</small>
           </div>
           <div>
-            <dt><Droplets aria-hidden="true" /> Chuva 24 h</dt>
+            <dt>
+              <Droplets aria-hidden="true" /> Chuva 24 h
+            </dt>
             <dd>{station.rain.h24Mm === null ? "—" : `${formatNumber(station.rain.h24Mm)} mm`}</dd>
             <small>acumulado da estação</small>
           </div>
@@ -119,23 +130,42 @@ function StationCard({ station }: { station: DefesaCivilHydroStation }) {
       {hasWeather ? (
         <dl className="defesa-civil-hydro__weather-metrics">
           <div>
-            <dt><Thermometer aria-hidden="true" /> Temperatura</dt>
-            <dd>{station.weather.temperatureC === null ? "—" : `${formatNumber(station.weather.temperatureC)} °C`}</dd>
+            <dt>
+              <Thermometer aria-hidden="true" /> Temperatura
+            </dt>
+            <dd>
+              {station.weather.temperatureC === null
+                ? "—"
+                : `${formatNumber(station.weather.temperatureC)} °C`}
+            </dd>
           </div>
           <div>
-            <dt><Droplets aria-hidden="true" /> Umidade</dt>
-            <dd>{station.weather.humidityPct === null ? "—" : `${formatNumber(station.weather.humidityPct, 0)}%`}</dd>
+            <dt>
+              <Droplets aria-hidden="true" /> Umidade
+            </dt>
+            <dd>
+              {station.weather.humidityPct === null
+                ? "—"
+                : `${formatNumber(station.weather.humidityPct, 0)}%`}
+            </dd>
           </div>
           <div>
-            <dt><Wind aria-hidden="true" /> Vento</dt>
-            <dd>{station.weather.windAverageKmh === null ? "—" : `${formatNumber(station.weather.windAverageKmh)} km/h`}</dd>
+            <dt>
+              <Wind aria-hidden="true" /> Vento
+            </dt>
+            <dd>
+              {station.weather.windAverageKmh === null
+                ? "—"
+                : `${formatNumber(station.weather.windAverageKmh)} km/h`}
+            </dd>
           </div>
         </dl>
       ) : null}
 
       {!hasHydrology && !hasWeather ? (
         <p className="defesa-civil-hydro__empty-reading">
-          A estação foi identificada pela rede, mas não trouxe uma das variáveis exibidas neste recorte.
+          A estação foi identificada pela rede, mas não trouxe uma das variáveis exibidas neste
+          recorte.
         </p>
       ) : null}
     </article>
@@ -162,21 +192,32 @@ export function DefesaCivilHydroNetwork({ data }: { data: DefesaCivilHydroData }
         </div>
         <p>
           Leituras observadas da Rede de Monitoramento Hidrometeorológico do Estado. O Tempo Pelotas
-          preserva estação, horário e unidade e não transforma essas medições em alerta ou previsão de cheia.
+          preserva estação, horário e unidade e não transforma essas medições em alerta ou previsão
+          de cheia.
         </p>
       </header>
 
       <div className="defesa-civil-hydro__notice" role="status">
         <div>
-          <strong>{available ? "Dados da rede disponíveis" : "Integração temporariamente sem leituras regionais"}</strong>
-          <span>{data.error ?? "As estações são selecionadas por proximidade geográfica de Pelotas e apresentadas sem reclassificação de risco."}</span>
+          <strong>
+            {available
+              ? "Dados da rede disponíveis"
+              : "Integração temporariamente sem leituras regionais"}
+          </strong>
+          <span>
+            {data.error ??
+              "As estações são selecionadas por proximidade geográfica de Pelotas e apresentadas sem reclassificação de risco."}
+          </span>
         </div>
         <small>Consulta do portal: {formatDateTime(data.source.fetchedAt)}</small>
       </div>
 
       {available ? (
         <>
-          <dl className="defesa-civil-hydro__summary" aria-label="Resumo da rede hidrometeorológica">
+          <dl
+            className="defesa-civil-hydro__summary"
+            aria-label="Resumo da rede hidrometeorológica"
+          >
             <div>
               <dt>Estações no recorte</dt>
               <dd>{data.regionalStationCount}</dd>
@@ -204,13 +245,22 @@ export function DefesaCivilHydroNetwork({ data }: { data: DefesaCivilHydroData }
               <span>Distribuição das estações</span>
               <strong>Onde a rede está medindo perto de Pelotas</strong>
               <p>
-                A posição ajuda a entender de qual ponto vem cada observação. Valores de nível de estações
-                diferentes não compartilham necessariamente a mesma referência vertical.
+                A posição ajuda a entender de qual ponto vem cada observação. Valores de nível de
+                estações diferentes não compartilham necessariamente a mesma referência vertical.
               </p>
-              <div className="defesa-civil-hydro__legend" aria-label="Legenda de recência das leituras">
-                <span className="is-recent"><i aria-hidden="true" /> até 30 min</span>
-                <span className="is-delayed"><i aria-hidden="true" /> 30 min a 3 h</span>
-                <span className="is-old"><i aria-hidden="true" /> mais de 3 h</span>
+              <div
+                className="defesa-civil-hydro__legend"
+                aria-label="Legenda de recência das leituras"
+              >
+                <span className="is-recent">
+                  <i aria-hidden="true" /> até 30 min
+                </span>
+                <span className="is-delayed">
+                  <i aria-hidden="true" /> 30 min a 3 h
+                </span>
+                <span className="is-old">
+                  <i aria-hidden="true" /> mais de 3 h
+                </span>
               </div>
             </div>
             <DefesaCivilHydroMap stations={data.stations} />
@@ -222,8 +272,9 @@ export function DefesaCivilHydroNetwork({ data }: { data: DefesaCivilHydroData }
               <h3>Primeiro a localização; depois, o valor.</h3>
             </div>
             <p>
-              A recência é calculada pelo Tempo Pelotas somente para informar a idade da observação. Ela não
-              representa estado operacional, nível de atenção ou classificação oficial de risco.
+              A recência é calculada pelo Tempo Pelotas somente para informar a idade da observação.
+              Ela não representa estado operacional, nível de atenção ou classificação oficial de
+              risco.
             </p>
           </div>
           <div className="defesa-civil-hydro__stations">
@@ -238,9 +289,10 @@ export function DefesaCivilHydroNetwork({ data }: { data: DefesaCivilHydroData }
         <div>
           <strong>Fonte e responsabilidade dos dados</strong>
           <p>
-            Dados originados na Rede de Monitoramento Hidrometeorológico e disponibilizados pela Defesa Civil
-            do Estado do Rio Grande do Sul. O Tempo Pelotas atua como interface independente de consulta e não
-            substitui os canais oficiais de alerta e orientação da Defesa Civil.
+            Dados originados na Rede de Monitoramento Hidrometeorológico e disponibilizados pela
+            Defesa Civil do Estado do Rio Grande do Sul. O Tempo Pelotas atua como interface
+            independente de consulta e não substitui os canais oficiais de alerta e orientação da
+            Defesa Civil.
           </p>
         </div>
         <div>
