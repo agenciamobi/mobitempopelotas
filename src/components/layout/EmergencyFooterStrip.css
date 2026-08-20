@@ -11,7 +11,7 @@
   --tp-public-service-ink: #071e2f;
   --tp-public-service-line: rgb(7 30 47 / 10%);
   width: 100%;
-  padding: clamp(24px, 3vw, 38px) 0;
+  padding: clamp(20px, 2vw, 28px) 0 clamp(24px, 3vw, 38px);
   background: #f8faf9;
   color: var(--tp-public-service-ink);
 }
@@ -35,45 +35,60 @@
 }
 
 .tp-public-service-phones h2 {
+  position: relative;
   margin: 0;
-  padding: 14px 18px 13px;
-  background: var(--tp-public-service-orange);
-  color: #fff;
+  padding: 15px 18px 13px;
+  border-bottom: 1px solid rgb(95 45 237 / 12%);
+  background: #fff;
+  color: var(--tp-public-service-phone);
   font-size: clamp(1.05rem, 1.5vw, 1.28rem);
   font-weight: 720;
   line-height: 1.15;
   letter-spacing: -0.025em;
 }
 
+.tp-public-service-phones h2::after {
+  position: absolute;
+  bottom: -1px;
+  left: 18px;
+  width: 44px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--tp-public-service-phone);
+  content: "";
+}
+
 .tp-public-service-phones__grid {
   display: grid;
-  padding: 10px;
+  padding: 10px 14px 14px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: 0;
 }
 
 .tp-public-service-phones__grid a {
   display: grid;
   min-width: 0;
-  min-height: 78px;
-  padding: 8px 8px 9px;
+  min-height: 74px;
+  padding: 8px 12px;
   place-items: center;
   align-content: center;
   gap: 7px;
-  border: 1px solid rgb(7 30 47 / 10%);
-  border-radius: 12px;
-  background: #fff;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--tp-public-service-ink);
   text-align: center;
   text-decoration: none;
-  transition: border-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
+  transition: background-color 150ms ease;
+}
+
+.tp-public-service-phones__grid a + a {
+  border-left: 1px solid var(--tp-public-service-line);
 }
 
 .tp-public-service-phones__grid a:hover,
 .tp-public-service-phones__grid a:focus-visible {
-  border-color: rgb(95 45 237 / 40%);
-  box-shadow: 0 8px 24px rgb(95 45 237 / 8%);
-  transform: translateY(-1px);
+  background: rgb(95 45 237 / 4%);
 }
 
 .tp-public-service-phones__grid strong {
@@ -83,7 +98,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  border-radius: 8px;
+  border-radius: 9px;
   background: var(--tp-public-service-phone);
   color: #fff;
   font-size: clamp(1rem, 1.35vw, 1.15rem);
@@ -242,7 +257,7 @@
 
 @media (max-width: 720px) {
   .tp-public-service-strip {
-    padding: 20px 0 24px;
+    padding: 18px 0 24px;
   }
 
   .tp-public-service-strip__inner {
@@ -257,14 +272,21 @@
 
   .tp-public-service-phones__grid {
     grid-template-columns: 1fr;
-    gap: 8px;
+    padding: 8px 12px 12px;
+    gap: 0;
   }
 
   .tp-public-service-phones__grid a {
     min-height: 62px;
+    padding: 8px 0;
     grid-template-columns: minmax(112px, 0.42fr) minmax(0, 1fr);
     place-items: center stretch;
     gap: 10px;
+  }
+
+  .tp-public-service-phones__grid a + a {
+    border-top: 1px solid var(--tp-public-service-line);
+    border-left: 0;
   }
 
   .tp-public-service-phones__grid strong {
