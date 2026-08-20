@@ -1,0 +1,177 @@
+/*
+ * Refinos editoriais da Home — 20/08/2026.
+ * Consolida superfícies brancas com cantos suaves e reforça semântica visual
+ * de tendência/atualidade sem alterar a origem dos dados.
+ */
+
+/* Radar e satélite: mesma superfície editorial suave usada no painel oficial do INMET. */
+.tp-home-radar {
+  overflow: hidden;
+  padding: clamp(46px, 5vw, 70px) clamp(24px, 3vw, 34px) clamp(24px, 3vw, 32px);
+  border: 1px solid var(--tp-radar-line);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.tp-home-radar__intro,
+.tp-home-radar__guide {
+  width: 100%;
+}
+
+.tp-home-radar__guide {
+  padding-bottom: 2px;
+}
+
+/* Aviso INMET + índice da Home: uma única camada visual. */
+.tp-home-alert-index-shell {
+  width: min(1220px, calc(100% - 48px));
+  margin: 16px auto 0;
+  overflow: hidden;
+  border: 1px solid rgb(7 30 47 / 10%);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.tp-home-alert-index-shell .tp-home-alert {
+  width: 100%;
+  margin: 0;
+  padding: 18px 24px;
+  border-right: 0;
+  border-left: 0;
+  border-radius: 0;
+}
+
+.tp-home-alert-index-shell .tp-home-index {
+  width: 100%;
+  margin: 0;
+  padding: 0 24px;
+  border-bottom: 0;
+  background: #fff;
+}
+
+/* Laranjal: o nível principal passa a carregar a cor da tendência. */
+.tp-home-water__level {
+  width: fit-content;
+  min-width: clamp(220px, 20vw, 300px);
+  min-height: 0;
+  padding: 24px 26px 20px;
+  border-radius: 10px;
+  background: #788b94;
+  color: #fff;
+}
+
+.tp-home-water__level.is-rising {
+  background: #9b5260;
+}
+
+.tp-home-water__level.is-falling {
+  background: #237286;
+}
+
+.tp-home-water__level.is-stable {
+  background: #667b86;
+}
+
+.tp-home-water__level.is-unknown {
+  background: #788b94;
+}
+
+.tp-home-water__level strong,
+.tp-home-water__level span {
+  color: #fff;
+}
+
+/* Atualidade da leitura: texto e estado caminham juntos, sem duplicar badge no topo. */
+.tp-home-water__reading.is-live dt {
+  color: #087f91;
+}
+
+.tp-home-water__reading.is-stale dt {
+  color: #b66b1f;
+}
+
+.tp-home-water__reading.is-unavailable dt {
+  color: #9b5260;
+}
+
+/* Rede regional: seta grande reforça tendência sem depender apenas da cor. */
+.tp-home-water__station-state-wrap {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 48px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.tp-home-water__trend-mark {
+  display: grid;
+  width: 44px;
+  height: 52px;
+  place-items: center;
+  font-size: 2.45rem;
+  font-weight: 820;
+  line-height: 1;
+}
+
+.tp-home-water__station-state-wrap .tp-home-water__station-state {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.tp-home-water__guaiba > .tp-home-water__station-state-wrap {
+  display: grid;
+}
+
+@media (max-width: 1240px) {
+  .tp-home-alert-index-shell {
+    width: calc(100% - 32px);
+  }
+}
+
+@media (max-width: 1040px) {
+  .tp-home-radar {
+    padding-inline: 24px;
+  }
+}
+
+@media (max-width: 720px) {
+  .tp-home-radar {
+    padding: 38px 16px 20px;
+    border-radius: 12px;
+  }
+
+  .tp-home-alert-index-shell {
+    width: calc(100% - 24px);
+    margin-top: 12px;
+    border-radius: 12px;
+  }
+
+  .tp-home-alert-index-shell .tp-home-alert {
+    padding: 16px;
+  }
+
+  .tp-home-alert-index-shell .tp-home-index {
+    padding-inline: 16px;
+  }
+
+  .tp-home-water__level {
+    width: 100%;
+    max-width: 320px;
+    padding: 22px 20px 18px;
+  }
+
+  .tp-home-water__station-state-wrap,
+  .tp-home-water__guaiba > .tp-home-water__station-state-wrap {
+    grid-column: 1 / -1;
+    width: 100%;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .tp-home-water__trend-mark {
+    width: 38px;
+    height: 44px;
+    font-size: 2.1rem;
+  }
+}
