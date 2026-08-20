@@ -8,6 +8,7 @@ import { SiteHeader } from "@/production/components/site-header";
 import type { WeatherData } from "@/production/lib/weather-data";
 
 import "./status-dos-dados.css";
+import "./status-dos-dados-history.css";
 
 const PAGE_TITLE = "Status dos dados e integrações — Tempo Pelotas";
 const PAGE_DESCRIPTION =
