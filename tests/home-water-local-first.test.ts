@@ -15,13 +15,45 @@ test("homepage water chapter treats Laranjal as the local reference", () => {
   assert.match(water, /formatSignedCentimeters/);
 });
 
-test("regional network is contextual instead of a raw comparison table", () => {
-  assert.match(water, /Três referências para entender a Lagoa/);
-  assert.match(water, /Cada estação usa sua própria referência local de medição/);
+test("regional water references follow Guaiba to ocean geographic order", () => {
+  const gasometroRank = water.indexOf('["gasometro", 0]');
+  const caisRank = water.indexOf('["cais-maua", 1]');
+  assert.ok(gasometroRank >= 0 && caisRank > gasometroRank);
+
+  const itapua = water.indexOf('"itapua"');
+  const arambare = water.indexOf('"arambare"');
+  const saoLourenco = water.indexOf('"sao-lourenco-do-sul"');
+  const saoJose = water.indexOf('"sao-jose-do-norte"');
+  const rioGrande = water.indexOf('"furg-ccmar"');
+
+  assert.ok(itapua >= 0);
+  assert.ok(arambare > itapua);
+  assert.ok(saoLourenco > arambare);
+  assert.ok(saoJose > saoLourenco);
+  assert.ok(rioGrande > saoJose);
+
+  assert.match(water, /Porto Alegre \/ RS — Usina do Gasômetro/);
+  assert.match(water, /Porto Alegre \/ RS — Cais Mauá/);
+});
+
+test("regional network preserves source context and local reference semantics", () => {
+  assert.match(water, /Pontos para acompanhar a Lagoa dos Patos/);
+  assert.match(water, /As réguas possuem referências próprias/);
   assert.match(water, /station\.station\.role/);
   assert.match(water, /is-risk-\$\{station\.risk\}/);
-  assert.match(water, /Contexto ao norte/);
   assert.match(water, /lagoon\.source\.organizations/);
+});
+
+test("water chapter keeps breathing room after the regional station list", () => {
+  assert.match(
+    waterCss,
+    /\.tp-home-water__network\s*\{[\s\S]*padding:\s*32px 0 28px clamp\(34px, 4vw, 54px\)/,
+  );
+  assert.match(
+    waterCss,
+    /\.tp-home-water__footer\s*\{[\s\S]*padding-top:\s*26px/,
+  );
+  assert.match(waterCss, /@media \(max-width: 720px\)[\s\S]*padding-bottom:\s*24px/);
 });
 
 test("water chapter stays open, responsive and free of dashboard chrome", () => {
