@@ -341,7 +341,7 @@ export function InmetAlertsPanel({
 
       <footer className="inmet-alerts-footer">
         <p>{relevanceSummary(data)}</p>
-        <a href={data.sourceUrl} target="_blank" rel="noreferrer">
+        <a href={data.source.portalUrl} target="_blank" rel="noreferrer">
           Fonte oficial: INMET <span aria-hidden="true">↗</span>
         </a>
       </footer>
