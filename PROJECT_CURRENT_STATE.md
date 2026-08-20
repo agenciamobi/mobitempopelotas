@@ -1,6 +1,6 @@
 # Tempo Pelotas — estado atual do projeto
 
-Última atualização: 19/08/2026  
+Última atualização: 20/08/2026  
 Branch operacional: `main`  
 Domínio canônico: `https://tempopelotas.com.br`
 
@@ -1464,3 +1464,35 @@ A partir da implementação do PRO, este arquivo também deve ser atualizado qua
 - mudança de política de cancelamento;
 - ativação de uma feature flag estrutural;
 - passagem de uma fase do roadmap para concluída.
+
+## 46. Defesa Civil RS — Rede de Monitoramento Hidrometeorológico
+
+Estado em 20/08/2026: **integração técnica preparada; publicação pública desativada por feature flag até validação institucional das condições de uso**.
+
+A Defesa Civil do Estado do Rio Grande do Sul disponibiliza uma API GraphQL pública para a Rede de Monitoramento Hidrometeorológico. O Tempo Pelotas possui agora uma integração exclusivamente server-side preparada para consumir esse contrato sem substituir silenciosamente as fontes hidrológicas já existentes.
+
+Arquitetura implementada:
+
+- consulta ao endpoint GraphQL somente pelo runtime do servidor;
+- validação e normalização dos payloads com Zod;
+- preservação de código da estação, localização, bacia, timestamp e unidades;
+- suporte, quando fornecidos pela estação, a nível de rio, chuva, temperatura, sensação térmica, umidade, pressão, radiação solar e vento;
+- recorte regional por distância de Pelotas, sem inferir influência hidrológica direta apenas pela proximidade;
+- mapa MapLibre e cards por estação dentro de `/situacao-hidrologica-pelotas`;
+- cache, timeout, retry transitório e falha isolada das demais fontes da página;
+- atribuição explícita à Defesa Civil RS e links para mapa/documentação oficiais.
+
+A integração é controlada por `DEFESA_CIVIL_HYDRO_ENABLED=false`, variável exclusivamente server-side. Enquanto estiver ausente ou `false`, esse fluxo não consulta a API e a área pública da Defesa Civil não é renderizada.
+
+A recência calculada pelo Tempo Pelotas (`recent`, `delayed`, `old`, `unknown`) serve apenas para informar a idade da observação e **não representa classificação oficial de risco, estado operacional, atenção, alerta ou inundação**. A interface também não converte uma medição observada em previsão de cheia.
+
+Antes de ativar a publicação em produção, ainda devem ser confirmados:
+
+- condições de uso público/comercial e forma definitiva de atribuição;
+- contrato recomendado para descoberta/listagem das estações do RS;
+- timezone de timestamps quando o payload vier sem offset;
+- semântica e referência vertical de `rio_nivel` em cada estação;
+- limites de requisição e regras de cache/armazenamento/redistribuição;
+- estações efetivamente disponíveis na Zona Sul e variáveis entregues por cada uma.
+
+Documentação detalhada: `docs/DEFESA_CIVIL_RS_HYDRO_INTEGRATION.md`.
