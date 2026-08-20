@@ -2,7 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { createPageHead } from "@/lib/page-meta";
 import { getDataStatusPageData } from "@/lib/status/data-status.functions";
-import type { ServiceCategory, ServiceState } from "@/lib/status/data-status.types";
+import type {
+  DataStatusPageData,
+  ServiceCategory,
+  ServiceState,
+} from "@/lib/status/data-status.types";
 import { SiteFooter } from "@/production/components/site-footer";
 import { SiteHeader } from "@/production/components/site-header";
 import type { WeatherData } from "@/production/lib/weather-data";
@@ -70,7 +74,7 @@ export const Route = createFileRoute("/status-dos-dados")({
 });
 
 function DataStatusPage() {
-  const data = Route.useLoaderData();
+  const data = Route.useLoaderData() as DataStatusPageData;
   const categories: ServiceCategory[] = ["Meteorologia e avisos", "Radar e satélite", "Hidrologia"];
   const counts = {
     operational: data.services.filter((service) => service.state === "operational").length,
@@ -110,257 +114,193 @@ function DataStatusPage() {
               atualizações parciais e manutenções detectadas pelo Tempo Pelotas.
             </p>
           </div>
-
-          <aside className={`data-status-overview is-${data.overall}`} aria-label="Estado geral dos dados">
-            <span aria-hidden="true" />
-            <div>
-              <small>Estado geral</small>
-              <strong>{overallLabel}</strong>
-              <p>Última verificação: {formatCheckedAt(data.checkedAt)}</p>
-            </div>
-          </aside>
+          <div className={`data-status-summary is-${data.overall}`} role="status">
+            <span>Estado geral</span>
+            <strong>{overallLabel}</strong>
+            <small>Verificado em {formatCheckedAt(data.checkedAt)}</small>
+          </div>
         </header>
 
-        <section className="data-status-summary" aria-label="Resumo da disponibilidade">
-          <div>
+        <section className="data-status-counts" aria-label="Resumo dos estados das fontes">
+          <article>
+            <span>Ativas</span>
             <strong>{counts.operational}</strong>
-            <span>Ativos</span>
-          </div>
-          <div>
+          </article>
+          <article>
+            <span>Parciais</span>
             <strong>{counts.partial}</strong>
-            <span>Atualização parcial</span>
-          </div>
-          <div>
+          </article>
+          <article>
+            <span>Manutenção</span>
             <strong>{counts.maintenance}</strong>
-            <span>Em manutenção</span>
-          </div>
-          <div>
-            <strong>{counts.offline}</strong>
+          </article>
+          <article>
             <span>Offline</span>
-          </div>
-          <div>
-            <strong>{counts.implementation}</strong>
+            <strong>{counts.offline}</strong>
+          </article>
+          <article>
             <span>Em implantação</span>
-          </div>
+            <strong>{counts.implementation}</strong>
+          </article>
         </section>
 
-        <div className="data-status-groups">
-          {categories.map((category) => {
-            const headingId = categoryId(category);
-            const categoryServices = data.services.filter((service) => service.category === category);
+        <nav className="data-status-nav" aria-label="Categorias de integrações">
+          {categories.map((category) => (
+            <a href={`#${categoryId(category)}`} key={category}>
+              {category}
+            </a>
+          ))}
+          <a href="#historico-incidentes">Histórico</a>
+        </nav>
 
-            return (
-              <section className="data-status-group" key={category} aria-labelledby={headingId}>
-                <header>
-                  <h2 id={headingId}>{category}</h2>
-                  <strong>{categoryServices.length} integrações</strong>
-                </header>
+        {categories.map((category) => {
+          const services = data.services.filter((service) => service.category === category);
+          if (!services.length) return null;
 
-                <div className="data-status-services">
-                  {categoryServices.map((service) => (
-                    <article className={`data-status-service is-${service.state}`} key={service.id}>
-                      <div className="data-status-service__heading">
-                        <span className="data-status-service__dot" aria-hidden="true" />
-                        <div>
-                          <p>{service.provider}</p>
-                          <h3>{service.name}</h3>
-                        </div>
-                        <strong>{labelForState(service.state)}</strong>
+          return (
+            <section
+              className="data-status-category"
+              id={categoryId(category)}
+              key={category}
+              aria-labelledby={`${categoryId(category)}-title`}
+            >
+              <header>
+                <span>{category}</span>
+                <h2 id={`${categoryId(category)}-title`}>{category}</h2>
+              </header>
+
+              <div className="data-status-services">
+                {services.map((service) => (
+                  <article className={`data-status-card is-${service.state}`} key={service.id}>
+                    <div className="data-status-card__topline">
+                      <span>{service.kind}</span>
+                      <strong>{labelForState(service.state)}</strong>
+                    </div>
+                    <h3>{service.name}</h3>
+                    <p>{service.summary}</p>
+                    <dl>
+                      <div>
+                        <dt>Última verificação</dt>
+                        <dd>{formatCheckedAt(service.checkedAt)}</dd>
                       </div>
-                      <p className="data-status-service__detail">{service.detail}</p>
-                      <footer>
-                        <span>Verificado em {formatCheckedAt(service.checkedAt)}</span>
-                        {service.sourceUrl ? (
-                          <a href={service.sourceUrl} target="_blank" rel="noopener noreferrer">
-                            Fonte
-                          </a>
-                        ) : null}
-                      </footer>
-                    </article>
-                  ))}
-                </div>
-              </section>
-            );
-          })}
-        </div>
+                      <div>
+                        <dt>Disponibilidade 24 h</dt>
+                        <dd>{formatAvailability(service.availability24h)}</dd>
+                      </div>
+                    </dl>
+                    {service.detail ? <small>{service.detail}</small> : null}
+                  </article>
+                ))}
+              </div>
+            </section>
+          );
+        })}
 
-        <section className="data-status-history" aria-labelledby="data-status-history-title">
-          <header className="data-status-history__header">
-            <div>
-              <span className="data-status-eyebrow">Histórico operacional</span>
-              <h2 id="data-status-history-title">Incidentes e disponibilidade</h2>
-            </div>
+        <section className="data-status-history" id="historico-incidentes" aria-labelledby="historico-title">
+          <header>
+            <span>Histórico operacional</span>
+            <h2 id="historico-title">Incidentes e manutenções recentes</h2>
             <p>
-              O monitor automático registra uma amostra aproximadamente a cada 10 minutos. O horário de
-              um incidente representa quando a alteração foi detectada pelo monitor, não necessariamente o
-              instante exato em que o serviço externo mudou de estado.
+              Registros do monitoramento do próprio Tempo Pelotas. O histórico informa falhas e recuperações
+              observadas pelo portal; ele não representa necessariamente um incidente oficial da instituição fonte.
             </p>
           </header>
 
-          {data.history.available ? (
-            <>
-              <div className="data-status-availability-summary" aria-label="Disponibilidade recente">
-                <article>
-                  <span>Últimas 24 horas</span>
-                  <strong>{formatAvailability(data.history.summary24h.availabilityPercent)}</strong>
-                  <p>{data.history.summary24h.measuredChecks} verificações válidas</p>
-                </article>
-                <article>
-                  <span>Até 7 dias</span>
-                  <strong>{formatAvailability(data.history.summary7d.availabilityPercent)}</strong>
-                  <p>{data.history.summary7d.measuredChecks} verificações válidas</p>
-                </article>
-                <article>
-                  <span>Incidentes em andamento</span>
-                  <strong>{data.history.incidents.filter((incident) => incident.status === "open").length}</strong>
-                  <p>
-                    {data.history.startedAt
-                      ? `Histórico desde ${formatCheckedAt(data.history.startedAt)}`
-                      : "Aguardando a primeira amostra"}
-                  </p>
-                </article>
+          <div className="data-status-history__grid">
+            <section aria-labelledby="incidentes-ativos-title">
+              <header>
+                <h3 id="incidentes-ativos-title">Incidentes em andamento</h3>
+                <span>{data.history.activeIncidents.length}</span>
+              </header>
+              {data.history.activeIncidents.length ? (
+                <div className="data-status-history__list">
+                  {data.history.activeIncidents.map((incident) => (
+                    <article key={incident.id} className={`is-${incident.severity}`}>
+                      <strong>{incident.title}</strong>
+                      <p>{incident.summary}</p>
+                      <small>Aberto em {formatCheckedAt(incident.startedAt)}</small>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="data-status-history__empty">Nenhum incidente em andamento registrado.</p>
+              )}
+            </section>
+
+            <section aria-labelledby="manutencoes-title">
+              <header>
+                <h3 id="manutencoes-title">Manutenções</h3>
+                <span>{data.history.maintenance.length}</span>
+              </header>
+              {data.history.maintenance.length ? (
+                <div className="data-status-history__list">
+                  {data.history.maintenance.map((maintenance) => (
+                    <article key={maintenance.id}>
+                      <strong>{maintenance.title}</strong>
+                      <p>{maintenance.summary}</p>
+                      <small>
+                        {formatCheckedAt(maintenance.startedAt)} — {formatCheckedAt(maintenance.endedAt)}
+                      </small>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="data-status-history__empty">Nenhuma manutenção recente registrada.</p>
+              )}
+            </section>
+          </div>
+
+          <section className="data-status-resolved" aria-labelledby="resolvidos-title">
+            <header>
+              <h3 id="resolvidos-title">Incidentes resolvidos</h3>
+              <span>{data.history.resolvedIncidents.length}</span>
+            </header>
+            {data.history.resolvedIncidents.length ? (
+              <div className="data-status-resolved__table" role="region" aria-label="Incidentes resolvidos recentes">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Incidente</th>
+                      <th>Início</th>
+                      <th>Fim</th>
+                      <th>Duração</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data.history.resolvedIncidents.map((incident) => (
+                      <tr key={incident.id}>
+                        <td>
+                          <strong>{incident.title}</strong>
+                          <span>{incident.summary}</span>
+                        </td>
+                        <td>{formatCheckedAt(incident.startedAt)}</td>
+                        <td>{formatCheckedAt(incident.endedAt)}</td>
+                        <td>{formatDuration(incident.startedAt, incident.endedAt)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-
-              {data.history.maintenance.length > 0 ? (
-                <section className="data-status-maintenance" aria-labelledby="data-status-maintenance-title">
-                  <header>
-                    <h3 id="data-status-maintenance-title">Manutenções programadas</h3>
-                    <span>{data.history.maintenance.length} janela(s)</span>
-                  </header>
-                  <div>
-                    {data.history.maintenance.map((maintenance) => (
-                      <article key={maintenance.id}>
-                        <strong>{maintenance.title}</strong>
-                        <p>{maintenance.message}</p>
-                        <span>
-                          {formatCheckedAt(maintenance.startsAt)} → {formatCheckedAt(maintenance.endsAt)}
-                        </span>
-                      </article>
-                    ))}
-                  </div>
-                </section>
-              ) : null}
-
-              <section className="data-status-incidents" aria-labelledby="data-status-incidents-title">
-                <header>
-                  <div>
-                    <h3 id="data-status-incidents-title">Incidentes recentes</h3>
-                    <p>Falhas, atrasos relevantes e restabelecimentos registrados pelo monitor.</p>
-                  </div>
-                </header>
-
-                {data.history.incidents.length > 0 ? (
-                  <div className="data-status-incident-list">
-                    {data.history.incidents.map((incident) => {
-                      const incidentEnd = incident.resolvedAt ?? incident.lastSeenAt;
-                      return (
-                        <article
-                          className={`data-status-incident is-${incident.status} is-${incident.worstState}`}
-                          key={incident.id}
-                        >
-                          <span className="data-status-incident__marker" aria-hidden="true" />
-                          <div className="data-status-incident__content">
-                            <div className="data-status-incident__heading">
-                              <div>
-                                <span>{incident.provider}</span>
-                                <h4>{incident.title}</h4>
-                              </div>
-                              <strong>{incident.status === "open" ? "Em andamento" : "Resolvido"}</strong>
-                            </div>
-                            <p>{incident.detail}</p>
-                            <dl>
-                              <div>
-                                <dt>Detectado</dt>
-                                <dd>{formatCheckedAt(incident.openedAt)}</dd>
-                              </div>
-                              <div>
-                                <dt>{incident.status === "open" ? "Última confirmação" : "Restabelecido"}</dt>
-                                <dd>{formatCheckedAt(incidentEnd)}</dd>
-                              </div>
-                              <div>
-                                <dt>Duração monitorada</dt>
-                                <dd>{formatDuration(incident.openedAt, incidentEnd)}</dd>
-                              </div>
-                              <div>
-                                <dt>Pior estado</dt>
-                                <dd>{labelForState(incident.worstState)}</dd>
-                              </div>
-                            </dl>
-                          </div>
-                        </article>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="data-status-history-empty">
-                    <strong>Nenhum incidente registrado até agora.</strong>
-                    <p>O histórico será preenchido automaticamente quando o monitor detectar uma alteração.</p>
-                  </div>
-                )}
-              </section>
-
-              {data.history.availability7d.length > 0 ? (
-                <section className="data-status-availability" aria-labelledby="data-status-availability-title">
-                  <header>
-                    <h3 id="data-status-availability-title">Disponibilidade por integração</h3>
-                    <span>Janela de até 7 dias</span>
-                  </header>
-                  <div className="data-status-availability__table" role="table" aria-label="Disponibilidade por integração">
-                    <div className="data-status-availability__row data-status-availability__row--header" role="row">
-                      <span role="columnheader">Integração</span>
-                      <span role="columnheader">Disponibilidade</span>
-                      <span role="columnheader">Parcial</span>
-                      <span role="columnheader">Offline</span>
-                    </div>
-                    {data.history.availability7d.map((service) => (
-                      <div className="data-status-availability__row" role="row" key={service.serviceId}>
-                        <span role="cell">
-                          <strong>{service.serviceName}</strong>
-                          <small>{service.provider}</small>
-                        </span>
-                        <span role="cell">{formatAvailability(service.availabilityPercent)}</span>
-                        <span role="cell">{service.partialChecks}</span>
-                        <span role="cell">{service.offlineChecks}</span>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              ) : null}
-            </>
-          ) : (
-            <div className="data-status-history-empty">
-              <strong>O histórico está sendo preparado.</strong>
-              <p>
-                {data.history.error ??
-                  "Assim que a primeira coleta automática for persistida, incidentes e disponibilidade aparecerão aqui."}
-              </p>
-            </div>
-          )}
+            ) : (
+              <p className="data-status-history__empty">Nenhum incidente resolvido registrado neste período.</p>
+            )}
+          </section>
         </section>
 
-        <section className="data-status-explainer" aria-labelledby="data-status-explainer-title">
+        <section className="data-status-method" aria-labelledby="status-method-title">
           <div>
-            <span className="data-status-eyebrow">Como interpretar</span>
-            <h2 id="data-status-explainer-title">Uma fonte offline não significa que todo o portal parou</h2>
+            <span>Como interpretar</span>
+            <h2 id="status-method-title">Status da fonte não é status do tempo</h2>
           </div>
-          <div>
-            <p>
-              O Tempo Pelotas combina fontes independentes. Quando uma delas falha, outras áreas podem
-              continuar funcionando normalmente. “Atualização parcial” indica atraso ou perda de apenas
-              parte do conteúdo; “offline” indica que a consulta daquela integração não respondeu na
-              última verificação.
-            </p>
-            <p>
-              Manutenções programadas são registradas separadamente. Integrações em implantação, como
-              ANA/RHN, não são contabilizadas como falha operacional nem entram no cálculo de
-              disponibilidade.
-            </p>
-            <Link to="/metodologia">Entenda como cada fonte é utilizada</Link>
-          </div>
+          <p>
+            Uma integração indisponível significa apenas que o Tempo Pelotas não conseguiu obter ou validar aquele
+            dado no momento. Isso não significa ausência de chuva, vento forte, risco hidrológico ou alerta oficial.
+          </p>
+          <Link to="/metodologia">Entenda a metodologia do portal</Link>
         </section>
       </main>
 
-      <SiteFooter source={footerSource} />
+      <SiteFooter dataSource={footerSource} />
     </div>
   );
 }
