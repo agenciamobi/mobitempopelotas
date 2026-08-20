@@ -172,6 +172,7 @@ export function ProductionHome({
           weather={weather}
           advisoryLevel={headerLevel}
           officialAlertCount={pelotasOfficialAlerts.length}
+          officialAlertSeverity={primaryOfficialSeverity}
           cppmetForecast={
             cppmetToday ? { item: cppmetToday, sourceUrl: "https://wp.ufpel.edu.br/cppmet/" } : null
           }
