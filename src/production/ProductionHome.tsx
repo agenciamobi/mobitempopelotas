@@ -133,6 +133,7 @@ export function ProductionHome({
   const pelotasOfficialAlerts = inmetAlerts.alerts.filter((alert) => alert.relevance === "pelotas");
   const verifiedPelotasAlerts = pelotasOfficialAlerts.filter(hasVerifiedInmetAlertSemantics);
   const hasPelotasOfficialAlerts = pelotasOfficialAlerts.length > 0;
+  const hasHomeInmetAlert = inmetAlerts.status === "live" && inmetAlerts.alerts.length > 0;
   const officialLevel: AdvisoryLevel = verifiedPelotasAlerts.some(
     (alert) => alert.severity === "danger" || alert.severity === "great-danger",
   )
@@ -184,10 +185,14 @@ export function ProductionHome({
       </div>
 
       <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
-        <div className="tp-home-alert-index-shell">
-          <InmetAlertsPanel data={inmetAlerts} variant="home" advisoryLevel={headerLevel} />
+        {hasHomeInmetAlert ? (
+          <div className="tp-home-alert-index-shell">
+            <InmetAlertsPanel data={inmetAlerts} variant="home" advisoryLevel={headerLevel} />
+            <HomeSectionNavigation />
+          </div>
+        ) : (
           <HomeSectionNavigation />
-        </div>
+        )}
         <HomeForecastEditorial weather={weather} />
         <InmetOfficialForecastPanel
           periods={recoveredData.weather.inmetForecast}
