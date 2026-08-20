@@ -8,6 +8,8 @@
   --tp-home-canvas: #f8faf9;
   --tp-home-text: #071e2f;
   --tp-home-focus: #18bdcd;
+  --tp-home-content-width: 1220px;
+  --tp-home-content-space: 48px;
   min-width: 0;
   background: var(--tp-home-canvas);
   color: var(--tp-home-text);
@@ -18,6 +20,21 @@
   min-width: 0;
   padding-bottom: 1px;
   background: var(--tp-home-canvas);
+}
+
+/*
+ * Contrato horizontal da Home.
+ * Hero e capítulos principais compartilham a mesma coluna editorial, mesmo
+ * quando o componente isolado admite uma largura maior por conta própria.
+ */
+.site-shell--home-editorial > .tp-home-hero-shell,
+.site-shell--home-editorial #conteudo-principal > * {
+  box-sizing: border-box;
+  width: min(
+    var(--tp-home-content-width),
+    calc(100% - var(--tp-home-content-space))
+  );
+  margin-inline: auto;
 }
 
 .site-shell--home-editorial #previsao-hoje,
@@ -42,7 +59,17 @@
   outline-offset: 3px;
 }
 
+@media (max-width: 1240px) {
+  .site-shell--home-editorial {
+    --tp-home-content-space: 32px;
+  }
+}
+
 @media (max-width: 720px) {
+  .site-shell--home-editorial {
+    --tp-home-content-space: 24px;
+  }
+
   .site-shell--home-editorial #previsao-hoje,
   .site-shell--home-editorial #regiao,
   .site-shell--home-editorial #observacao-embrapa,
