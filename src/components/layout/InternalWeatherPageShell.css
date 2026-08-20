@@ -1,29 +1,49 @@
-/* Shared visual contract for internal weather pages, based on /tempo-hoje-pelotas. */
+/*
+ * Contrato visual das páginas meteorológicas internas.
+ * A Home é a fonte da geometria, superfícies e ritmo editorial do portal.
+ */
 .internal-weather-shell {
-  --internal-weather-frame-max: var(--portal-frame-max, 1760px);
-  --internal-weather-frame-gutter: var(
-    --portal-content-gutter,
-    clamp(22px, 2.4vw, 42px)
-  );
+  --internal-weather-frame-max: var(--tp-home-container-max, 1440px);
+  --internal-weather-frame-gutter: var(--tp-home-container-gutter, 48px);
+  --internal-weather-line: rgb(7 30 47 / 10%);
+  --internal-weather-surface: #fff;
+  --internal-weather-canvas: var(--tp-home-canvas, #f8faf9);
+  --internal-weather-radius: 16px;
+  --internal-weather-radius-mobile: 12px;
+  --internal-weather-section-padding: clamp(24px, 3vw, 34px);
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 4% 12%, rgb(24 189 205 / 5%), transparent 30rem),
-    radial-gradient(circle at 96% 18%, rgb(94 44 237 / 4%), transparent 28rem),
-    #f5f8f8;
+  background: var(--internal-weather-canvas);
+  color: var(--tp-home-text, #071e2f);
 }
 
-/*
- * O conteúdo usa exatamente a mesma geometria dos containers do header:
- * 100% até --portal-frame-max e gutter interno compartilhado.
- */
 .site-shell--home-editorial.internal-weather-shell .internal-weather-main {
   width: 100%;
-  max-width: var(--internal-weather-frame-max);
+  max-width: none;
   margin-inline: auto;
-  padding-top: clamp(24px, 3vw, 44px);
-  padding-right: var(--internal-weather-frame-gutter);
-  padding-left: var(--internal-weather-frame-gutter);
+  padding: clamp(18px, 2.4vw, 30px) 0 1px;
+  background: var(--internal-weather-canvas);
   box-sizing: border-box;
+}
+
+.internal-weather-hero-frame {
+  box-sizing: border-box;
+  width: min(
+    var(--tp-home-container-max, 1440px),
+    calc(100% - var(--tp-home-container-gutter, 48px))
+  );
+  margin: clamp(20px, 2.4vw, 32px) auto 0;
+  overflow: hidden;
+  border: 1px solid var(--internal-weather-line);
+  border-radius: var(--internal-weather-radius);
+  background: var(--internal-weather-surface);
+}
+
+.internal-weather-hero-frame > * {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border-radius: inherit;
+  box-shadow: none;
 }
 
 /* Heroes retail compartilham o mesmo eixo do masthead e das seções abaixo. */
@@ -32,10 +52,10 @@
 .internal-weather-shell--seven-day .seven-day-retail-hero__inner,
 .internal-weather-shell--rain .rain-retail-hero__inner {
   width: 100%;
-  max-width: var(--internal-weather-frame-max);
+  max-width: none;
   margin-inline: auto;
-  padding-right: var(--internal-weather-frame-gutter);
-  padding-left: var(--internal-weather-frame-gutter);
+  padding-right: var(--internal-weather-section-padding);
+  padding-left: var(--internal-weather-section-padding);
   box-sizing: border-box;
 }
 
@@ -45,9 +65,14 @@
 .internal-weather-main > .condition-page,
 .internal-weather-main > .alerts-page,
 .internal-weather-main > .editorial-answer-section {
-  width: 100%;
+  width: min(
+    var(--tp-home-container-max, 1440px),
+    calc(100% - var(--tp-home-container-gutter, 48px))
+  );
   max-width: none;
+  margin-inline: auto;
   justify-self: stretch;
+  box-sizing: border-box;
 }
 
 .internal-weather-main > .daily-page,
@@ -60,49 +85,28 @@
 .internal-weather-main > .seven-day-v2-page,
 .internal-weather-main > .rain-v2-page,
 .internal-weather-main > .editorial-answer-section {
-  margin-inline: 0;
-}
-
-/* Cada página retail ocupa integralmente o rail do header. */
-.internal-weather-shell--today .today-v5-page,
-.internal-weather-shell--today .today-v5-page > *,
-.internal-weather-shell--today .home-inmet-alerts,
-.internal-weather-shell--today .editorial-answer-section,
-.internal-weather-shell--tomorrow .tomorrow-v3-page,
-.internal-weather-shell--tomorrow .tomorrow-v3-page > *,
-.internal-weather-shell--tomorrow .home-inmet-alerts,
-.internal-weather-shell--seven-day .seven-day-v2-page,
-.internal-weather-shell--seven-day .seven-day-v2-page > *,
-.internal-weather-shell--seven-day .home-inmet-alerts,
-.internal-weather-shell--seven-day .editorial-answer-section,
-.internal-weather-shell--rain .rain-v2-page,
-.internal-weather-shell--rain .rain-v2-page > *,
-.internal-weather-shell--rain .home-inmet-alerts,
-.internal-weather-shell--rain .editorial-answer-section {
-  width: 100%;
-  max-width: none;
-  justify-self: stretch;
+  margin-inline: auto;
 }
 
 .internal-weather-main .daily-page,
 .internal-weather-main .forecast-page,
 .internal-weather-main .condition-page,
 .internal-weather-main .alerts-page {
-  --internal-retail-border: rgb(7 30 47 / 8%);
-  --internal-retail-surface: rgb(255 255 255 / 94%);
+  --internal-retail-border: var(--internal-weather-line);
+  --internal-retail-surface: var(--internal-weather-surface);
 }
 
+/* Superfícies principais: mesma regra do Radar, INMET e utilidade pública da Home. */
 .internal-weather-main .daily-hero,
 .internal-weather-main .forecast-page-header,
 .internal-weather-main .condition-page-header,
-.internal-weather-main .alerts-editorial-hero {
-  border: 1px solid var(--internal-retail-border);
-  border-radius: 1.35rem;
-  background:
-    radial-gradient(circle at 7% 8%, rgb(24 189 205 / 9%), transparent 22rem),
-    radial-gradient(circle at 94% 5%, rgb(94 44 237 / 7%), transparent 20rem),
-    var(--internal-retail-surface);
-  box-shadow: 0 13px 34px rgb(7 30 47 / 4.5%);
+.internal-weather-main .alerts-editorial-hero,
+.internal-weather-main .editorial-answer-section,
+.internal-weather-main .official-data-access-notice {
+  border: 1px solid var(--internal-weather-line);
+  border-radius: var(--internal-weather-radius);
+  background: var(--internal-weather-surface);
+  box-shadow: none;
 }
 
 .internal-weather-main .daily-condition-card,
@@ -116,19 +120,21 @@
 .internal-weather-main .alerts-featured,
 .internal-weather-main .alerts-card,
 .internal-weather-main .alerts-overview article {
-  border-color: var(--internal-retail-border);
+  border-color: var(--internal-weather-line);
+  border-radius: 14px;
   box-shadow: none;
 }
 
 .internal-weather-main .daily-chapters,
 .internal-weather-main .forecast-today-navigation {
-  border-radius: 0.8rem;
-  background: rgb(255 255 255 / 88%);
+  border: 1px solid var(--internal-weather-line);
+  border-radius: 14px;
+  background: var(--internal-weather-surface);
   box-shadow: none;
 }
 
 .internal-weather-main .editorial-answer-section {
-  margin-inline: 0;
+  padding: clamp(28px, 3.5vw, 46px);
 }
 
 .internal-weather-main .editorial-answer-section > * {
@@ -140,24 +146,74 @@
   max-width: 78ch;
 }
 
-@media (max-width: 680px) {
+@media (max-width: 1240px) {
+  .internal-weather-hero-frame,
+  .internal-weather-main > *,
+  .internal-weather-main > .daily-page,
+  .internal-weather-main > .forecast-page,
+  .internal-weather-main > .condition-page,
+  .internal-weather-main > .alerts-page,
+  .internal-weather-main > .editorial-answer-section {
+    width: min(
+      calc(100% - var(--tp-home-container-compact-gutter, 32px)),
+      var(--tp-home-container-compact-max, 1180px)
+    );
+  }
+}
+
+@media (max-width: 720px) {
   .site-shell--home-editorial.internal-weather-shell .internal-weather-main {
-    padding-top: 1rem;
+    padding-top: 14px;
   }
 
+  .internal-weather-hero-frame,
+  .internal-weather-main > *,
+  .internal-weather-main > .daily-page,
+  .internal-weather-main > .forecast-page,
+  .internal-weather-main > .condition-page,
+  .internal-weather-main > .alerts-page,
+  .internal-weather-main > .editorial-answer-section {
+    width: calc(100% - var(--tp-home-container-mobile-gutter, 20px));
+  }
+
+  .internal-weather-hero-frame,
   .internal-weather-main .daily-hero,
   .internal-weather-main .forecast-page-header,
   .internal-weather-main .condition-page-header,
-  .internal-weather-main .alerts-editorial-hero {
-    border-radius: 1rem;
+  .internal-weather-main .alerts-editorial-hero,
+  .internal-weather-main .editorial-answer-section,
+  .internal-weather-main .official-data-access-notice {
+    border-radius: var(--internal-weather-radius-mobile);
+  }
+
+  .internal-weather-main .daily-condition-card,
+  .internal-weather-main .forecast-week-summary article,
+  .internal-weather-main .forecast-content-section,
+  .internal-weather-main .daily-section,
+  .internal-weather-main .daily-metrics article,
+  .internal-weather-main .condition-highlight,
+  .internal-weather-main .condition-section,
+  .internal-weather-main .condition-summary-grid article,
+  .internal-weather-main .alerts-featured,
+  .internal-weather-main .alerts-card,
+  .internal-weather-main .alerts-overview article,
+  .internal-weather-main .daily-chapters,
+  .internal-weather-main .forecast-today-navigation {
+    border-radius: 12px;
+  }
+
+  .internal-weather-main .editorial-answer-section {
+    padding: 24px 18px;
   }
 }
 
 @media (forced-colors: active) {
+  .internal-weather-hero-frame,
   .internal-weather-main .daily-hero,
   .internal-weather-main .forecast-page-header,
   .internal-weather-main .condition-page-header,
-  .internal-weather-main .alerts-editorial-hero {
+  .internal-weather-main .alerts-editorial-hero,
+  .internal-weather-main .editorial-answer-section {
     border: 1px solid CanvasText;
     background: Canvas;
     color: CanvasText;
