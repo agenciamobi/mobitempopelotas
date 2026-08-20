@@ -2,7 +2,7 @@ import { fetchCppmetForecast } from "./cppmet.server";
 import { getCentralEmbrapaObservation } from "./embrapa-central.server";
 import { fetchInmetForecast } from "./inmet-forecast.server";
 import { fetchInmetStationReference } from "./inmet-station.server";
-import { fetchInmetAlerts } from "./inmet.server";
+import { fetchStableInmetAlerts } from "./inmet-stable.server";
 import type {
   CppmetForecast,
   EmbrapaObservation,
@@ -15,7 +15,7 @@ import type {
 import { OFFICIAL_SOURCE_DEADLINE_MS } from "./source-policy.ts";
 
 const EMBRAPA_URL = "https://agromet.cpact.embrapa.br/online/Current_Monitor.htm";
-const INMET_ALERTS_URL = "https://apiprevmet3.inmet.gov.br/avisos/getByGeocode/4314407";
+const INMET_ALERTS_URL = "https://apiprevmet3.inmet.gov.br/avisos/rss";
 const INMET_FORECAST_URL = "https://apiprevmet3.inmet.gov.br/previsao/4314407";
 const INMET_STATION_URL = "https://apiprevmet3.inmet.gov.br/estacao/proxima/4314407";
 const INMET_PORTAL_URL = "https://avisos.inmet.gov.br/";
@@ -144,7 +144,12 @@ export async function fetchOfficialWeatherSources(): Promise<OfficialWeatherSour
       OFFICIAL_SOURCE_DEADLINE_MS.embrapa,
       unavailableEmbrapa,
     ),
-    settleWithin(fetchInmetAlerts(), "INMET", OFFICIAL_SOURCE_DEADLINE_MS.inmet, unavailableInmet),
+    settleWithin(
+      fetchStableInmetAlerts(),
+      "INMET",
+      OFFICIAL_SOURCE_DEADLINE_MS.inmet,
+      unavailableInmet,
+    ),
     settleWithin(
       fetchInmetForecast(),
       "Previsão do INMET",
