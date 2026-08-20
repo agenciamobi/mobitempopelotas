@@ -1,6 +1,6 @@
 # Política de fontes oficiais e disseminação — Tempo Pelotas
 
-Última consolidação: 19/08/2026.
+Última consolidação: 20/08/2026.
 
 Este documento define como o Tempo Pelotas deve comunicar publicamente integrações com órgãos e redes oficiais. A regra central é separar com clareza **fonte oficial**, **acesso técnico** e **papel do portal**.
 
@@ -58,6 +58,16 @@ Não usar:
 ## INMET
 
 Os avisos oficiais do INMET podem ser usados como conteúdo de serviço e disseminação, preservando integralmente a identificação do órgão emissor, a severidade, a validade, a abrangência e o link oficial quando disponível.
+
+A integração de avisos deve preservar a classificação cromática informada pelo INMET:
+
+- **Amarelo — Perigo potencial**;
+- **Laranja — Perigo**;
+- **Vermelho — Grande perigo**.
+
+A cor de um aviso oficial nunca pode ser inferida a partir da previsão, de um advisory produzido pelo Tempo Pelotas ou da condição meteorológica observada. Quando a classificação oficial não puder ser confirmada, o aviso deve permanecer com apresentação neutra até que a severidade seja validada.
+
+O endpoint municipal por geocódigo pode ser usado para identificar diretamente avisos que incluem Pelotas. O RSS oficial `https://apiprevmet3.inmet.gov.br/avisos/rss` e os respectivos documentos CAP podem complementar essa consulta para estabilizar severidade, validade, abrangência e identificação do aviso. Falha no enriquecimento por RSS não autoriza o portal a elevar a classificação do aviso.
 
 Enquanto não houver documento específico de autorização institucional, não usar linguagem que indique homologação, credenciamento ou parceria formal com o INMET.
 
