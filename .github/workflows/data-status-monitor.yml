@@ -1,0 +1,96 @@
+name: Data source status monitor
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/data-status-monitor.yml
+      - src/lib/github-actions-oidc.server.ts
+      - src/lib/status/**
+      - src/routes/api/cron/data-status.ts
+      - supabase/migrations/*data_source_status_history.sql
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: data-source-status-monitor
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    name: Collect and persist source status
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Request GitHub OIDC token and call status collector
+        env:
+          OIDC_AUDIENCE: tempo-pelotas-data-status
+          STATUS_URL: https://tempopelotas.com.br/api/cron/data-status
+        run: |
+          set -euo pipefail
+
+          test -n "$ACTIONS_ID_TOKEN_REQUEST_URL"
+          test -n "$ACTIONS_ID_TOKEN_REQUEST_TOKEN"
+
+          oidc_response="$(curl \
+            --fail-with-body \
+            --silent \
+            --show-error \
+            --max-time 30 \
+            --header "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=$OIDC_AUDIENCE")"
+
+          oidc_token="$(OIDC_RESPONSE="$oidc_response" python - <<'PY'
+          import json
+          import os
+
+          payload = json.loads(os.environ["OIDC_RESPONSE"])
+          token = payload.get("value", "").strip()
+          if not token:
+              raise SystemExit("GitHub OIDC não devolveu um token.")
+          print(token)
+          PY
+          )"
+
+          echo "::add-mask::$oidc_token"
+
+          for attempt in $(seq 1 24); do
+            response_file="$(mktemp)"
+            status="$(curl \
+              --silent \
+              --show-error \
+              --max-time 90 \
+              --output "$response_file" \
+              --write-out "%{http_code}" \
+              --header "Authorization: Bearer $oidc_token" \
+              --header "Accept: application/json" \
+              "$STATUS_URL" || true)"
+
+            if [[ "$status" =~ ^2[0-9][0-9]$ ]]; then
+              cat "$response_file"
+              rm -f "$response_file"
+              exit 0
+            fi
+
+            # Em pushes na main, o workflow pode iniciar antes do deploy da nova rota.
+            if [[ ( "$status" == "404" || "$status" == "503" ) && "$attempt" -lt 24 ]]; then
+              echo "Produção ainda não publicou o coletor (HTTP $status); tentativa $attempt/24."
+              rm -f "$response_file"
+              sleep 10
+              continue
+            fi
+
+            echo "Coletor de status respondeu HTTP $status." >&2
+            cat "$response_file" >&2 || true
+            rm -f "$response_file"
+            exit 1
+          done
+
+          echo "O deploy não publicou o coletor dentro da janela de espera." >&2
+          exit 1
