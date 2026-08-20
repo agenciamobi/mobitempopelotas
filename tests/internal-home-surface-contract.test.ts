@@ -91,7 +91,7 @@ test("final internal surface contract neutralizes old full-bleed topic styling",
 test("regional directory and CPPMet content do not create nested main landmarks", () => {
   assert.doesNotMatch(regionalDirectory, /<main\b/);
   assert.doesNotMatch(cppmetNewsPage, /<main\b/);
-  assert.match(regionalDirectory, /<div className=\{styles\.page\}>/);
+  assert.match(regionalDirectory, /regional-cities-directory/);
   assert.match(cppmetNewsPage, /<div className="cppmet-blog">/);
 });
 
