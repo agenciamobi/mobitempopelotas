@@ -11,6 +11,7 @@ const storage = readFileSync("src/lib/status/data-status-storage.server.ts", "ut
 const cronRoute = readFileSync("src/routes/api/cron/data-status.ts", "utf8");
 const workflow = readFileSync(".github/workflows/data-status-monitor.yml", "utf8");
 const oidc = readFileSync("src/lib/github-actions-oidc.server.ts", "utf8");
+const publicRoutes = readFileSync("src/lib/public-routes.ts", "utf8");
 
 test("o histórico persiste amostras, incidentes e manutenções com RLS privada", () => {
   assert.match(migration, /create table if not exists public\.data_source_status_checks/);
@@ -40,6 +41,7 @@ test("a página de status mostra disponibilidade e histórico de incidentes", ()
   assert.match(route, /Duração monitorada/);
   assert.match(route, /Manutenções programadas/);
   assert.match(route, /aproximadamente a cada 10 minutos/);
+  assert.match(publicRoutes, /path: "\/status-dos-dados"/);
 });
 
 test("o coletor automático usa OIDC restrito ao workflow de status", () => {
