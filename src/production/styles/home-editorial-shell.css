@@ -8,8 +8,11 @@
   --tp-home-canvas: #f8faf9;
   --tp-home-text: #071e2f;
   --tp-home-focus: #18bdcd;
-  --tp-home-content-width: 1220px;
-  --tp-home-content-space: 48px;
+  --tp-home-container-max: 1440px;
+  --tp-home-container-gutter: 48px;
+  --tp-home-container-compact-max: 1180px;
+  --tp-home-container-compact-gutter: 32px;
+  --tp-home-container-mobile-gutter: 20px;
   min-width: 0;
   background: var(--tp-home-canvas);
   color: var(--tp-home-text);
@@ -24,15 +27,16 @@
 
 /*
  * Contrato horizontal da Home.
- * O bloco visual logo após o header é o Hero; os filhos diretos do main são
- * os capítulos editoriais. Todos compartilham a mesma coluna principal.
+ * O header é a referência de largura. Hero, capítulos do main e footer devem
+ * compartilhar exatamente os mesmos limites e gutters para manter uma única
+ * linha editorial do topo ao fechamento da página.
  */
 .site-shell--home-editorial > header + div,
 .site-shell--home-editorial #conteudo-principal > * {
   box-sizing: border-box;
   width: min(
-    var(--tp-home-content-width),
-    calc(100% - var(--tp-home-content-space))
+    var(--tp-home-container-max),
+    calc(100% - var(--tp-home-container-gutter))
   );
   margin-inline: auto;
 }
@@ -60,14 +64,19 @@
 }
 
 @media (max-width: 1240px) {
-  .site-shell--home-editorial {
-    --tp-home-content-space: 32px;
+  .site-shell--home-editorial > header + div,
+  .site-shell--home-editorial #conteudo-principal > * {
+    width: min(
+      calc(100% - var(--tp-home-container-compact-gutter)),
+      var(--tp-home-container-compact-max)
+    );
   }
 }
 
 @media (max-width: 720px) {
-  .site-shell--home-editorial {
-    --tp-home-content-space: 24px;
+  .site-shell--home-editorial > header + div,
+  .site-shell--home-editorial #conteudo-principal > * {
+    width: calc(100% - var(--tp-home-container-mobile-gutter));
   }
 
   .site-shell--home-editorial #previsao-hoje,
