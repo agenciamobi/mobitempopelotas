@@ -18,6 +18,10 @@
   width: 100%;
 }
 
+.tp-home-radar__frame {
+  box-shadow: none;
+}
+
 .tp-home-radar__guide {
   padding-bottom: 2px;
 }
@@ -49,47 +53,71 @@
   background: #fff;
 }
 
-/* Laranjal: o nível principal passa a carregar a cor da tendência. */
-.tp-home-water__level {
+/* Laranjal: nível e tendência formam uma única leitura cromática. */
+.tp-home-water__level-card {
+  display: grid;
   width: fit-content;
   min-width: clamp(220px, 20vw, 300px);
-  min-height: 0;
+  gap: 12px;
   padding: 24px 26px 20px;
   border-radius: 10px;
   background: #788b94;
   color: #fff;
 }
 
-.tp-home-water__level.is-rising {
+.tp-home-water__level-card.is-rising {
   background: #9b5260;
 }
 
-.tp-home-water__level.is-falling {
+.tp-home-water__level-card.is-falling {
   background: #237286;
 }
 
-.tp-home-water__level.is-stable {
+.tp-home-water__level-card.is-stable {
   background: #667b86;
 }
 
-.tp-home-water__level.is-unknown {
+.tp-home-water__level-card.is-unknown {
   background: #788b94;
 }
 
-.tp-home-water__level strong,
-.tp-home-water__level span {
+.tp-home-water__level-card .tp-home-water__level {
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
   color: #fff;
 }
 
-/* Atualidade da leitura: texto e estado caminham juntos, sem duplicar badge no topo. */
+.tp-home-water__level-card .tp-home-water__level strong,
+.tp-home-water__level-card .tp-home-water__level span,
+.tp-home-water__level-card .tp-home-water__trend,
+.tp-home-water__level-card .tp-home-water__trend b {
+  color: #fff;
+}
+
+.tp-home-water__level-card .tp-home-water__trend {
+  gap: 10px;
+  font-size: 0.82rem;
+}
+
+.tp-home-water__level-card .tp-home-water__trend b {
+  font-size: 1.15rem;
+}
+
+/* Atualidade aparece no topo e colore somente o rótulo 'Última leitura' na métrica. */
+.tp-home-water__focus-topline b.is-live,
 .tp-home-water__reading.is-live dt {
   color: #087f91;
 }
 
+.tp-home-water__focus-topline b.is-stale,
 .tp-home-water__reading.is-stale dt {
   color: #b66b1f;
 }
 
+.tp-home-water__focus-topline b.is-unavailable,
 .tp-home-water__reading.is-unavailable dt {
   color: #9b5260;
 }
@@ -155,7 +183,7 @@
     padding-inline: 16px;
   }
 
-  .tp-home-water__level {
+  .tp-home-water__level-card {
     width: 100%;
     max-width: 320px;
     padding: 22px 20px 18px;
