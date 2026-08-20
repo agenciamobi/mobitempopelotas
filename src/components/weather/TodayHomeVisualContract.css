@@ -1,0 +1,449 @@
+/*
+ * Contrato visual final da rota /tempo-hoje-pelotas.
+ *
+ * Esta folha entra depois dos estilos herdados da Home e dos refinamentos V5/V6
+ * para impedir que chrome antigo (gradientes, sombras, cards aninhados e
+ * proporções promocionais) volte a aparecer nos capítulos da página.
+ * A referência é o sistema editorial atual da Home: canvas claro, superfície
+ * branca, borda discreta, radius contido e hierarquia tipográfica objetiva.
+ */
+
+.internal-weather-shell--today {
+  --today-home-line: rgb(7 30 47 / 10%);
+  --today-home-soft: #fbfcfc;
+  --today-home-muted: #58717d;
+  --today-home-radius: 16px;
+  --today-home-inner-radius: 14px;
+  --today-home-pad: clamp(26px, 3.2vw, 42px);
+}
+
+.internal-weather-shell--today .today-v5-page {
+  gap: clamp(16px, 2vw, 24px);
+}
+
+/* Navegação e capítulos principais: mesma superfície sóbria da Home. */
+.internal-weather-shell--today .internal-page-chapters,
+.internal-weather-shell--today .internal-forecast-widget,
+.internal-weather-shell--today .today-resources,
+.internal-weather-shell--today .internal-observation-widget,
+.internal-weather-shell--today .today-atmosphere,
+.internal-weather-shell--today .internal-practical-widget,
+.internal-weather-shell--today .today-v5-unavailable,
+.internal-weather-shell--today .editorial-answer-section {
+  border: 1px solid var(--today-home-line) !important;
+  border-radius: var(--today-home-radius) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+.internal-weather-shell--today .internal-page-chapters {
+  border-radius: var(--today-home-inner-radius) !important;
+}
+
+.internal-weather-shell--today .internal-forecast-widget::before,
+.internal-weather-shell--today .internal-observation-widget::before,
+.internal-weather-shell--today .internal-practical-widget::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Remove movimentos e chrome de card antigo dentro dos capítulos. */
+.internal-weather-shell--today :is(
+    .internal-forecast-widget .home-hourly-cards article,
+    .today-resources__signals article,
+    .today-resources__periods article,
+    .today-resources__links a,
+    .today-atmosphere__signals article,
+    .today-atmosphere__clouds,
+    .today-atmosphere__cloud-grid article,
+    .today-atmosphere__footer,
+    .internal-practical-widget__cards article
+  ) {
+  border-color: var(--today-home-line);
+  border-radius: var(--today-home-inner-radius);
+  background-color: var(--today-home-soft);
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.internal-weather-shell--today :is(
+    .internal-forecast-widget .home-hourly-cards article,
+    .today-resources__periods article,
+    .today-resources__links a,
+    .internal-practical-widget__cards article
+  ):hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/*
+ * Condição atual.
+ * O componente reaproveita a marcação da Home, mas deixa de herdar o bloco
+ * promocional antigo. A seção vira uma única superfície dividida em informação
+ * editorial e leitura, sem um card branco gigante dentro de outro card.
+ */
+.internal-weather-shell--today .internal-observation-widget {
+  display: grid !important;
+  grid-template-columns: minmax(280px, 0.76fr) minmax(0, 1.24fr) !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-story__intro {
+  display: grid;
+  max-width: none !important;
+  align-content: center;
+  gap: 0;
+  padding: clamp(32px, 3.6vw, 48px) var(--today-home-pad);
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-story__intro
+  .eyebrow {
+  color: #087f91;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-story__intro
+  h2 {
+  max-width: 14ch !important;
+  margin: 10px 0 0 !important;
+  color: #071e2f !important;
+  font-size: clamp(2.25rem, 3.4vw, 3.65rem) !important;
+  font-weight: 790 !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.055em !important;
+  text-wrap: balance;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-story__intro
+  > p {
+  max-width: 48ch !important;
+  margin: 18px 0 0 !important;
+  color: var(--today-home-muted) !important;
+  line-height: 1.65 !important;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-story__intro
+  > a {
+  width: fit-content;
+  min-height: 0 !important;
+  margin: 20px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #071e2f !important;
+  box-shadow: none !important;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-story__reading {
+  display: grid !important;
+  grid-template-columns: minmax(190px, 0.66fr) minmax(0, 1.34fr) !important;
+  min-width: 0;
+  min-height: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 0 !important;
+  border-left: 1px solid var(--today-home-line) !important;
+  border-radius: 0 !important;
+  background: var(--today-home-soft) !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-temperature {
+  display: grid;
+  min-height: 0 !important;
+  align-content: center;
+  gap: 10px !important;
+  padding: clamp(26px, 3vw, 40px) !important;
+  border-right: 1px solid var(--today-home-line) !important;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-temperature
+  .internal-observation-status {
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #087f91 !important;
+  font-weight: 760;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-temperature
+  > strong {
+  margin: 8px 0 0 !important;
+  color: #071e2f !important;
+  font-size: clamp(4.3rem, 5.8vw, 6.2rem) !important;
+  font-weight: 790 !important;
+  line-height: 0.84 !important;
+  letter-spacing: -0.085em !important;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-temperature
+  > span {
+  color: var(--today-home-muted) !important;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .internal-observation-updated {
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 4px 0 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: #718792 !important;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-story__reading
+  dl {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-story__reading
+  dl
+  > div {
+  min-height: 116px !important;
+  align-content: center;
+  gap: 6px !important;
+  padding: clamp(18px, 2.2vw, 26px) !important;
+  border-right: 1px solid var(--today-home-line) !important;
+  border-bottom: 1px solid var(--today-home-line) !important;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-story__reading
+  dl
+  > div:nth-child(2n) {
+  border-right: 0 !important;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-story__reading
+  dl
+  > div:nth-last-child(-n + 2) {
+  border-bottom: 0 !important;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-story__reading
+  dt {
+  color: #637b87 !important;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-story__reading
+  dd {
+  margin: 0;
+}
+
+.internal-weather-shell--today
+  .internal-observation-widget
+  .home-observation-story__reading
+  dd
+  > span {
+  color: #071e2f !important;
+  font-size: clamp(1.05rem, 1.5vw, 1.35rem) !important;
+  font-weight: 820 !important;
+}
+
+/* Demais capítulos deixam de carregar fundos decorativos antigos. */
+.internal-weather-shell--today .internal-forecast-widget,
+.internal-weather-shell--today .today-resources,
+.internal-weather-shell--today .today-atmosphere,
+.internal-weather-shell--today .internal-practical-widget,
+.internal-weather-shell--today .today-v5-unavailable {
+  background-image: none !important;
+}
+
+.internal-weather-shell--today .internal-forecast-widget,
+.internal-weather-shell--today .today-resources,
+.internal-weather-shell--today .today-atmosphere,
+.internal-weather-shell--today .internal-practical-widget {
+  padding: var(--today-home-pad);
+}
+
+.internal-weather-shell--today .today-resources__heading,
+.internal-weather-shell--today .today-atmosphere__heading {
+  gap: clamp(24px, 3vw, 48px);
+}
+
+.internal-weather-shell--today .today-resources__heading h2,
+.internal-weather-shell--today .today-atmosphere__heading h2,
+.internal-weather-shell--today .internal-practical-widget__intro h2 {
+  color: #071e2f;
+  font-weight: 790;
+  letter-spacing: -0.05em;
+}
+
+.internal-weather-shell--today .today-resources__heading > p,
+.internal-weather-shell--today .today-atmosphere__heading > p,
+.internal-weather-shell--today .internal-practical-widget__intro > p {
+  color: var(--today-home-muted);
+}
+
+/* O bloco de nuvens é subestrutura, não uma segunda superfície promocional. */
+.internal-weather-shell--today .today-atmosphere__clouds {
+  background: var(--today-home-soft) !important;
+}
+
+/* Estado indisponível segue a mesma linguagem, sem glow e sem megacard. */
+.internal-weather-shell--today .today-v5-unavailable {
+  min-height: 20rem;
+  padding: var(--today-home-pad);
+}
+
+@media (max-width: 1040px) {
+  .internal-weather-shell--today .internal-observation-widget {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .internal-weather-shell--today
+    .internal-observation-widget
+    .home-observation-story__intro {
+    max-width: 760px !important;
+  }
+
+  .internal-weather-shell--today
+    .internal-observation-widget
+    .home-observation-story__reading {
+    border-left: 0 !important;
+    border-top: 1px solid var(--today-home-line) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .internal-weather-shell--today {
+    --today-home-pad: 20px;
+    --today-home-radius: 12px;
+    --today-home-inner-radius: 12px;
+  }
+
+  .internal-weather-shell--today
+    .internal-observation-widget
+    .home-observation-story__intro {
+    padding: 28px var(--today-home-pad);
+  }
+
+  .internal-weather-shell--today
+    .internal-observation-widget
+    .home-observation-story__intro
+    h2 {
+    font-size: clamp(2.2rem, 10vw, 3.15rem) !important;
+  }
+
+  .internal-weather-shell--today
+    .internal-observation-widget
+    .home-observation-story__reading {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .internal-weather-shell--today
+    .internal-observation-widget
+    .home-observation-temperature {
+    padding: 28px 20px !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--today-home-line) !important;
+  }
+
+  .internal-weather-shell--today
+    .internal-observation-widget
+    .home-observation-temperature
+    > strong {
+    font-size: clamp(4.4rem, 20vw, 6rem) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .internal-weather-shell--today
+    .internal-observation-widget
+    .home-observation-story__reading
+    dl {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .internal-weather-shell--today
+    .internal-observation-widget
+    .home-observation-story__reading
+    dl
+    > div,
+  .internal-weather-shell--today
+    .internal-observation-widget
+    .home-observation-story__reading
+    dl
+    > div:nth-child(2n),
+  .internal-weather-shell--today
+    .internal-observation-widget
+    .home-observation-story__reading
+    dl
+    > div:nth-last-child(-n + 2) {
+    min-height: 92px !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--today-home-line) !important;
+  }
+
+  .internal-weather-shell--today
+    .internal-observation-widget
+    .home-observation-story__reading
+    dl
+    > div:last-child {
+    border-bottom: 0 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .internal-weather-shell--today :is(
+      .internal-forecast-widget .home-hourly-cards article,
+      .today-resources__periods article,
+      .today-resources__links a,
+      .internal-practical-widget__cards article
+    ) {
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .internal-weather-shell--today .internal-observation-widget,
+  .internal-weather-shell--today .internal-observation-widget * {
+    border-color: CanvasText !important;
+  }
+}
