@@ -1,3 +1,5 @@
+@import "./TodayHomeVisualContract.css";
+
 /* Tempo Hoje v5 — composed from reusable homepage-derived widgets. */
 .today-v5-page {
   display: grid;
