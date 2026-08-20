@@ -84,10 +84,14 @@ function normalizeProvider(value: string | undefined) {
 
 export async function fetchWeatherCameras(): Promise<WeatherCameraData> {
   const fetchedAt = new Date().toISOString();
-  const latestLaranjalStream = await getLatestLaranjalStream();
+  const configuredLaranjalEmbedUrl = normalizeUrl(process.env.CAMERA_LARANJAL_EMBED_URL);
+  const latestLaranjalStream = configuredLaranjalEmbedUrl ? null : await getLatestLaranjalStream();
 
   const cameras = CAMERA_DEFINITIONS.map((camera): WeatherCamera => {
-    const configuredEmbedUrl = normalizeUrl(process.env[camera.embedEnv]);
+    const configuredEmbedUrl =
+      camera.id === "laranjal"
+        ? configuredLaranjalEmbedUrl
+        : normalizeUrl(process.env[camera.embedEnv]);
     const configuredPublicUrl = normalizeUrl(process.env[camera.publicEnv]);
     const configuredProvider = normalizeProvider(process.env[camera.providerEnv]);
     const isLaranjal = camera.id === "laranjal";
