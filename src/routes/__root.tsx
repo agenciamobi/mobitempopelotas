@@ -109,13 +109,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "icon",
         href: "/brand/tempo-pelotas-icon.png",
         type: "image/png",
-        sizes: "192x192",
+        sizes: "512x512",
       },
-      { rel: "icon", href: "/brand/tempo-pelotas-icon.svg", type: "image/svg+xml" },
       {
         rel: "apple-touch-icon",
         href: "/brand/tempo-pelotas-icon.png",
-        sizes: "192x192",
+        sizes: "512x512",
       },
       {
         rel: "alternate",
