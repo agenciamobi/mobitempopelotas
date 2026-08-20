@@ -1,12 +1,14 @@
 # REDEMET / DECEA — operação atual do Tempo Pelotas
 
-Última consolidação: 18/08/2026.
+Última consolidação: 19/08/2026.
 
 Este documento é a fonte de verdade operacional para radar, satélite e trovoadas da REDEMET no Tempo Pelotas. Ele substitui, para a implementação nativa em `src/`, referências antigas que ainda possam existir em `_legacy/`.
 
 ## Resumo do estado atual
 
 - A integração REDEMET é server-side e depende de `REDEMET_API_KEY`.
+- O Tempo Pelotas possui acesso autorizado à API da REDEMET/DECEA para coleta automatizada de produtos meteorológicos oficiais.
+- Essa autorização permite a conexão técnica entre sistemas; não deve ser descrita como chancela editorial, certificação ou endosso da REDEMET/DECEA ao Tempo Pelotas.
 - A credencial nunca deve usar prefixo `VITE_`, nunca deve ser enviada ao browser e nunca deve aparecer em logs, screenshots, HARs versionados ou mensagens de diagnóstico.
 - O radar operacional para Pelotas é selecionado pela disponibilidade real e pela cobertura geográfica da imagem.
 - Em 18/08/2026, os HARs oficiais analisados mostraram Canguçu (`cn`) cadastrado, porém sem `path` e sem timestamp de imagem recente, enquanto Santiago (`sg`) entregava imagem válida.
@@ -17,7 +19,7 @@ Este documento é a fonte de verdade operacional para radar, satélite e trovoad
 ## Arquivos ativos
 
 - `src/lib/redemet/redemet-radar.server.ts`: seleção resiliente do radar e parsing da resposta oficial.
-- `src/lib/redemet/redemet-stsc.server.ts`: contrato atual do STSC/trovoadas.
+- `src/lib/redemet/redemet-stsc.server.ts`: contrato atual do STSC/trovoadas e requisição da janela de animação.
 - `src/lib/redemet/redemet.server.ts`: integração de satélite e compatibilidade histórica; não é a fonte de verdade do radar novo.
 - `src/lib/redemet/redemet-last-good.server.ts`: último quadro válido durante indisponibilidades curtas.
 - `src/routes/api/redemet/radar.ts`: endpoint público sanitizado do radar.
@@ -26,6 +28,7 @@ Este documento é a fonte de verdade operacional para radar, satélite e trovoad
 - `src/routes/api/redemet/image.ts`: proxy controlado das imagens oficiais.
 - `src/production/components/weather-map.tsx`: renderização MapLibre na Home.
 - `src/components/redemet/RedemetOverview.tsx`: visão editorial da página de radar/satélite.
+- `src/components/content/OfficialDataAccessNotice.tsx`: identificação pública do acesso institucional autorizado.
 - `tests/redemet-performance.test.ts`: contratos de regressão extraídos dos formatos observados.
 
 ## Radar
@@ -94,7 +97,31 @@ A resposta relevante pode trazer `data` como lista de quadros, com campos como:
 - `ultima_ocorrencia`;
 - `pontos`, com coordenadas `la` e `lo`.
 
-O Tempo Pelotas normaliza esses quadros e mantém apenas pontos em um raio regional de até 450 km de Pelotas. STSC representa ocorrências detectadas e não deve ser apresentado como alerta meteorológico oficial.
+### Janela temporal
+
+Para obter uma sequência de quadros, a chamada upstream precisa enviar `anima=<quantidade>`. Omitir esse parâmetro pode resultar em apenas um quadro, o que faz a timeline aparentar uma sequência mesmo quando início e fim têm o mesmo horário.
+
+O contrato do Tempo Pelotas foi consolidado em **12 quadros no máximo** para a camada pública de trovoadas:
+
+- `src/routes/api/redemet/storms.ts` limita a resposta pública a 12 quadros;
+- `src/lib/redemet/redemet-stsc.server.ts` aplica o mesmo limite antes da consulta externa;
+- a quantidade validada é enviada à REDEMET em `anima`;
+- só depois da resposta o parser normaliza, ordena e recorta a janela pedida.
+
+Não voltar ao comportamento de consultar um único quadro upstream e executar apenas `slice()` localmente. Isso não produz histórico real.
+
+### Filtro regional e zero ocorrências
+
+O Tempo Pelotas normaliza os quadros e mantém apenas pontos em um raio regional de até 450 km de Pelotas.
+
+Um quadro com **zero pontos dentro desse raio pode ser um resultado válido**. Nesse caso:
+
+- a camada continua disponível;
+- zero não deve ser apresentado como falha de integração;
+- a interface deve explicar que nenhuma ocorrência STSC foi detectada naquele quadro dentro da área monitorada;
+- zero ocorrências STSC não significa ausência de risco meteorológico e não substitui avisos oficiais.
+
+STSC representa ocorrências detectadas de atividade elétrica e não deve ser apresentado como alerta meteorológico oficial.
 
 Toda chamada nova da página e do overview deve usar `redemet-stsc.server.ts`; o parser antigo não é a fonte de verdade.
 
@@ -112,6 +139,14 @@ Regras obrigatórias:
 
 O fato de o portal oficial poder usar uma credencial em query string não autoriza expor a chave do Tempo Pelotas. Quando o contrato externo exigir esse formato, a query autenticada é construída exclusivamente no servidor.
 
+## Comunicação institucional
+
+A formulação pública recomendada é:
+
+> O Tempo Pelotas possui acesso autorizado à API da REDEMET/DECEA para coleta automatizada de produtos meteorológicos oficiais por conexão entre sistemas. As informações mantêm a identificação da fonte, do produto e do horário recebido.
+
+Evitar formulações como “homologado pela REDEMET”, “certificado pela Aeronáutica” ou equivalentes, pois a autorização técnica de acesso não implica endosso institucional ao conteúdo editorial do portal.
+
 ## Cache e contingência
 
 - Radar disponível: pode usar cache curto e `stale-while-revalidate` para reduzir carga.
@@ -128,6 +163,8 @@ Quando uma camada falhar, registrar somente dados sanitizados, por exemplo:
 - quantidade de registros correspondentes;
 - quantidade de registros com `path` utilizável;
 - quantidade de quadros cujos bounds cobrem Pelotas;
+- quantidade de quadros STSC retornados;
+- quantidade de pontos STSC após filtro regional;
 - código HTTP ou motivo normalizado da falha.
 
 Nunca registrar headers de autenticação, valor da chave, cookies ou a URL autenticada completa.
@@ -141,6 +178,9 @@ Os seguintes contratos devem continuar protegidos por testes e smoke de produç�
 - Santiago/MAXCAPPI só é usado se os bounds cobrirem Pelotas;
 - a rota pública não expõe segredo;
 - STSC aceita o formato observado em HAR e filtra a área regional;
+- STSC envia a quantidade validada de quadros em `anima` para a API externa;
+- o limite server-side do STSC permanece alinhado em 12 quadros;
+- um quadro STSC válido com zero pontos regionais não é tratado como indisponibilidade;
 - satélite continua disponível independentemente do radar;
 - proxy de imagens bloqueia hosts não autorizados;
 - respostas negativas de radar não ficam presas em cache longo.
@@ -149,4 +189,5 @@ Veja também:
 
 - `docs/RUNTIME_READINESS.md`;
 - `docs/CPTEC_SIGMA_RESEARCH.md`;
+- `docs/ANA_RHN_INTEGRATION.md`;
 - `MIGRATION_MATRIX.md`.
