@@ -148,7 +148,8 @@ test("radar editorial section skips offscreen rendering in its isolated componen
 });
 
 test("radar isolated layer preserves map gestures and compact operational controls", () => {
-  assert.match(radarCss, /\.tp-home-radar \.map-canvas\s*\{[\s\S]*cursor:\s*grab/);
+  assert.match(radarCss, /\.tp-home-radar \.map-canvas\s*\{[^}]*cursor:\s*default/);
+  assert.doesNotMatch(radarCss, /\.tp-home-radar \.map-canvas\s*\{[^}]*pointer-events:\s*none/);
   assert.match(radarCss, /\.tp-home-radar \.radar-player\s*\{[\s\S]*pointer-events:\s*none/);
   assert.match(radarCss, /map-canvas--satellite[\s\S]*width:\s*min\(680px/);
   assert.match(radarCss, /maplibregl-ctrl-bottom-right[\s\S]*top:\s*80px/);
