@@ -8,6 +8,7 @@ import {
 } from "@/production/components/inmet-alerts-panel";
 import { SiteFooter } from "@/production/components/site-footer";
 import { SiteHeader } from "@/production/components/site-header";
+import type { InmetAlertSeverity } from "@/production/lib/inmet-alerts";
 import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-browser-recovery";
 import type { WeatherData } from "@/production/lib/weather-data";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/production/lib/weather-insights";
@@ -18,6 +19,13 @@ const advisoryRank: Record<AdvisoryLevel, number> = {
   normal: 0,
   attention: 1,
   warning: 2,
+};
+
+const officialSeverityRank: Record<InmetAlertSeverity, number> = {
+  unknown: 0,
+  potential: 1,
+  danger: 2,
+  "great-danger": 3,
 };
 
 export type InternalWeatherShellContext = {
@@ -49,6 +57,13 @@ export function InternalWeatherPageShell({
     (alert) => alert.relevance === "pelotas",
   );
   const verifiedPelotasAlerts = pelotasOfficialAlerts.filter(hasVerifiedInmetAlertSemantics);
+  const primaryOfficialSeverity = verifiedPelotasAlerts.reduce<InmetAlertSeverity>(
+    (highest, alert) =>
+      officialSeverityRank[alert.severity] > officialSeverityRank[highest]
+        ? alert.severity
+        : highest,
+    "unknown",
+  );
   const officialLevel: AdvisoryLevel = verifiedPelotasAlerts.some(
     (alert) => alert.severity === "danger" || alert.severity === "great-danger",
   )
@@ -79,15 +94,20 @@ export function InternalWeatherPageShell({
   ]
     .filter(Boolean)
     .join(" ");
+  const shellContext: InternalWeatherShellContext = {
+    weather: productionWeather,
+    advisoryLevel,
+    officialAlertCount: pelotasOfficialAlerts.length,
+  };
 
   return (
-    <div className={shellClassName} data-internal-weather-style="tempo-hoje-retail">
-      <SiteHeader advisoryLevel={advisoryLevel} />
-      {hero?.({
-        weather: productionWeather,
-        advisoryLevel,
-        officialAlertCount: pelotasOfficialAlerts.length,
-      })}
+    <div className={shellClassName} data-internal-weather-style="home-editorial">
+      <SiteHeader
+        advisoryLevel={advisoryLevel}
+        officialAlertSeverity={primaryOfficialSeverity}
+        variant="hero"
+      />
+      {hero ? <div className="internal-weather-hero-frame">{hero(shellContext)}</div> : null}
 
       <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
         {showOfficialAlerts ? (
