@@ -124,20 +124,19 @@ export function HomeWaterEditorial({
               <span>Praia do Laranjal</span>
               <small>Pelotas / RS · {laranjal.source.station}</small>
             </div>
+            <b className={`is-${laranjalReading.state}`}>{laranjalReading.label}</b>
           </div>
 
-          <div
-            className={`tp-home-water__level is-${laranjalTrend.direction}`}
-            aria-label="Nível atual da Lagoa no Laranjal"
-          >
-            <strong>{laranjalAvailable ? formatNumber(laranjal.currentLevel, 2) : "Sem leitura"}</strong>
-            {laranjalAvailable ? <span>m</span> : null}
+          <div className={`tp-home-water__level-card is-${laranjalTrend.direction}`}>
+            <div className="tp-home-water__level" aria-label="Nível atual da Lagoa no Laranjal">
+              <strong>{laranjalAvailable ? formatNumber(laranjal.currentLevel, 2) : "Sem leitura"}</strong>
+              {laranjalAvailable ? <span>m</span> : null}
+            </div>
+            <p className="tp-home-water__trend">
+              <b aria-hidden="true">{laranjalTrend.symbol}</b>
+              {laranjalTrend.label}
+            </p>
           </div>
-
-          <p className={`tp-home-water__trend is-${laranjalTrend.direction}`}>
-            <b aria-hidden="true">{laranjalTrend.symbol}</b>
-            {laranjalTrend.label}
-          </p>
 
           <dl className="tp-home-water__focus-metrics">
             <div>
@@ -149,7 +148,7 @@ export function HomeWaterEditorial({
               <dd>{formatSignedCentimeters(laranjal.change24hCm)}</dd>
             </div>
             <div className={`tp-home-water__reading is-${laranjalReading.state}`}>
-              <dt>{laranjalReading.label}</dt>
+              <dt>Última leitura</dt>
               <dd>{formatUpdatedAt(laranjal.updatedAt)}</dd>
             </div>
           </dl>
