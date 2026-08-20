@@ -1,6 +1,5 @@
 "use client";
 
-import { Header } from "@/components/layout/Header";
 import { HomeEditorialHeader } from "@/production/components/home-editorial-header";
 import type { InmetAlertSeverity } from "@/production/lib/inmet-alerts";
 import type { AdvisoryLevel } from "@/production/lib/weather-insights";
@@ -12,22 +11,21 @@ type SiteHeaderProps = {
 };
 
 /**
- * Mantém o header global nas páginas internas e usa uma composição editorial
- * mais compacta na Home, onde a informação meteorológica deve dominar a dobra.
+ * Header público único do Tempo Pelotas.
+ *
+ * A Home passou a ser a fonte visual do cabeçalho do portal; páginas internas,
+ * dedicadas e institucionais reutilizam exatamente a mesma composição para
+ * evitar duas identidades de navegação concorrentes. `variant` é preservado
+ * apenas por compatibilidade com chamadas existentes.
  */
 export function SiteHeader({
   advisoryLevel = "normal",
   officialAlertSeverity = "unknown",
-  variant = "default",
 }: SiteHeaderProps) {
-  if (variant === "hero") {
-    return (
-      <HomeEditorialHeader
-        advisoryLevel={advisoryLevel}
-        officialAlertSeverity={officialAlertSeverity}
-      />
-    );
-  }
-
-  return <Header advisoryLevel={advisoryLevel} />;
+  return (
+    <HomeEditorialHeader
+      advisoryLevel={advisoryLevel}
+      officialAlertSeverity={officialAlertSeverity}
+    />
+  );
 }
