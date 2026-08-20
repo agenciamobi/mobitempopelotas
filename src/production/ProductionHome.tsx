@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { HomeExplorePortal } from "@/components/weather/HomeExplorePortal";
+import { getWeatherCameras } from "@/lib/cameras/cameras.functions";
 import type { WeatherCameraData } from "@/lib/cameras/cameras.types";
 import type { GuaibaObservationData } from "@/lib/hydrology/guaiba.server";
 import type { LagoonMonitoringNetworkData } from "@/lib/hydrology/lagoon-network.server";
@@ -86,20 +87,40 @@ export function ProductionHome({
   laranjal,
   guaiba,
   lagoon,
-  cameraData,
 }: {
   data: WeatherIntelligenceData;
   laranjal: LaranjalLevelData;
   guaiba: GuaibaObservationData;
   lagoon: LagoonMonitoringNetworkData;
-  cameraData: WeatherCameraData;
 }) {
   const recoveredData = useOpenMeteoIntelligenceRecovery(data);
   const weather = useMemo(
     () => toProductionWeatherData(recoveredData.weather),
     [recoveredData.weather],
   );
-  const liveLaranjalCamera = useMemo(() => getLiveLaranjalCamera(cameraData), [cameraData]);
+  const [cameraData, setCameraData] = useState<WeatherCameraData | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    void getWeatherCameras()
+      .then((nextCameraData) => {
+        if (mounted) setCameraData(nextCameraData);
+      })
+      .catch(() => {
+        // A câmera é um aprimoramento progressivo do hero e nunca deve bloquear
+        // ou degradar a leitura meteorológica principal da Home.
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const liveLaranjalCamera = useMemo(
+    () => (cameraData ? getLiveLaranjalCamera(cameraData) : null),
+    [cameraData],
+  );
   const hasUsableWeather = Boolean(
     weather.current.available || weather.hourly.length > 0 || weather.daily.length > 0,
   );
