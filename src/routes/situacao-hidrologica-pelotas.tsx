@@ -78,6 +78,11 @@ const HYDROLOGY_PAGE_CONTENT = {
       description: "Veja a página detalhada da Estação Laranjal e sua evolução recente.",
     },
     {
+      label: "Enchente de 2024 em Pelotas",
+      href: "/enchente-2024-pelotas-laranjal" as const,
+      description: "Veja a linha do tempo da cheia e como a água avançou do Guaíba até Pelotas e o Laranjal.",
+    },
+    {
       label: "Tempo hoje em Pelotas",
       href: "/tempo-hoje-pelotas" as const,
       description: "Consulte chuva, vento e rajadas previstos para as próximas horas.",
