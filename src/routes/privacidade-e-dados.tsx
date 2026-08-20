@@ -40,7 +40,7 @@ export const Route = createFileRoute("/privacidade-e-dados")({
 
 function PrivacyDataPage() {
   return (
-    <div className="site-shell">
+    <div className="site-shell site-shell--home-editorial privacy-data-shell">
       <SiteHeader advisoryLevel="normal" />
 
       <main className="privacy-page" id="conteudo-principal" tabIndex={-1}>
@@ -93,20 +93,11 @@ function PrivacyDataPage() {
             <span className="eyebrow">Retenção</span>
             <h2>Por quanto tempo os dados permanecem</h2>
             <ul>
-              <li>
-                perfil, preferências e histórico de consentimentos permanecem enquanto a conta
-                estiver ativa;
-              </li>
+              <li>perfil, preferências e histórico de consentimentos permanecem enquanto a conta estiver ativa;</li>
               <li>ao excluir a conta, esses registros são removidos em cascata;</li>
               <li>inscrições push vinculadas à conta também são removidas com a exclusão;</li>
-              <li>
-                inscrições push anônimas ficam registradas no servidor com endpoint, chaves de
-                entrega, tópicos escolhidos e identificação técnica do navegador;
-              </li>
-              <li>
-                esse registro anônimo não possui prazo fixo: ele é removido quando o visitante
-                desativa os avisos com sucesso ou quando o provedor informa que a inscrição expirou;
-              </li>
+              <li>inscrições push anônimas ficam registradas no servidor com endpoint, chaves de entrega, tópicos escolhidos e identificação técnica do navegador;</li>
+              <li>esse registro anônimo não possui prazo fixo: ele é removido quando o visitante desativa os avisos com sucesso ou quando o provedor informa que a inscrição expirou;</li>
               <li>métricas agregadas de disparo não guardam identificação do visitante.</li>
             </ul>
           </section>
