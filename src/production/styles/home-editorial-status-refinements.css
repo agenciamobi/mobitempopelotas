@@ -53,6 +53,43 @@
   background: #fff;
 }
 
+/* A chamada de aviso no Hero repete somente a classificação oficial do INMET. */
+.tp-home-hero__alert.severity-unknown {
+  color: rgb(255 255 255 / 78%);
+}
+
+.tp-home-hero__alert.severity-unknown .tp-home-hero__alert-dot {
+  background: #91a0a8;
+  box-shadow: 0 0 0 4px rgb(145 160 168 / 14%);
+}
+
+.tp-home-hero__alert.severity-potential {
+  color: #ffe38a;
+}
+
+.tp-home-hero__alert.severity-potential .tp-home-hero__alert-dot {
+  background: #d6ae00;
+  box-shadow: 0 0 0 4px rgb(214 174 0 / 18%);
+}
+
+.tp-home-hero__alert.severity-danger {
+  color: #ffd3b5;
+}
+
+.tp-home-hero__alert.severity-danger .tp-home-hero__alert-dot {
+  background: #ef7d2f;
+  box-shadow: 0 0 0 4px rgb(239 125 47 / 18%);
+}
+
+.tp-home-hero__alert.severity-great-danger {
+  color: #ffc8c8;
+}
+
+.tp-home-hero__alert.severity-great-danger .tp-home-hero__alert-dot {
+  background: #d93636;
+  box-shadow: 0 0 0 4px rgb(217 54 54 / 18%);
+}
+
 /* Laranjal: nível e tendência formam uma única leitura cromática. */
 .tp-home-water__level-card {
   display: grid;
