@@ -24,10 +24,10 @@
 
 /*
  * Contrato horizontal da Home.
- * Hero e capítulos principais compartilham a mesma coluna editorial, mesmo
- * quando o componente isolado admite uma largura maior por conta própria.
+ * O bloco visual logo após o header é o Hero; os filhos diretos do main são
+ * os capítulos editoriais. Todos compartilham a mesma coluna principal.
  */
-.site-shell--home-editorial > .tp-home-hero-shell,
+.site-shell--home-editorial > header + div,
 .site-shell--home-editorial #conteudo-principal > * {
   box-sizing: border-box;
   width: min(
