@@ -55,6 +55,12 @@ function trendLabel(value: number | null) {
   };
 }
 
+function readingStatus(status: LaranjalLevelData["status"]) {
+  if (status === "live") return { label: "Leitura atualizada", state: "live" };
+  if (status === "stale") return { label: "Leitura atrasada", state: "stale" };
+  return { label: "Sem leitura", state: "unavailable" };
+}
+
 function stationState(observation: LagoonMonitoringObservation) {
   if (observation.status === "unavailable") return "Sem dados";
   if (observation.status === "stale") return "Dados atrasados";
@@ -86,8 +92,8 @@ export function HomeWaterEditorial({
   const stations = summarizeLagoon(lagoon);
   const laranjalTrend = trendLabel(laranjal.trendCmPerHour);
   const guaibaTrend = trendLabel(guaiba.trendCmPerHour);
+  const laranjalReading = readingStatus(laranjal.status);
   const laranjalAvailable = laranjal.status !== "unavailable" && laranjal.currentLevel !== null;
-  const visibleStationCount = stations.length;
 
   return (
     <section
@@ -118,16 +124,12 @@ export function HomeWaterEditorial({
               <span>Praia do Laranjal</span>
               <small>Pelotas / RS · {laranjal.source.station}</small>
             </div>
-            <b>
-              {laranjal.status === "live"
-                ? "Leitura atualizada"
-                : laranjal.status === "stale"
-                  ? "Leitura atrasada"
-                  : "Sem leitura"}
-            </b>
           </div>
 
-          <div className="tp-home-water__level" aria-label="Nível atual da Lagoa no Laranjal">
+          <div
+            className={`tp-home-water__level is-${laranjalTrend.direction}`}
+            aria-label="Nível atual da Lagoa no Laranjal"
+          >
             <strong>{laranjalAvailable ? formatNumber(laranjal.currentLevel, 2) : "Sem leitura"}</strong>
             {laranjalAvailable ? <span>m</span> : null}
           </div>
@@ -146,8 +148,8 @@ export function HomeWaterEditorial({
               <dt>Mudança em 24 h</dt>
               <dd>{formatSignedCentimeters(laranjal.change24hCm)}</dd>
             </div>
-            <div>
-              <dt>Última leitura</dt>
+            <div className={`tp-home-water__reading is-${laranjalReading.state}`}>
+              <dt>{laranjalReading.label}</dt>
               <dd>{formatUpdatedAt(laranjal.updatedAt)}</dd>
             </div>
           </dl>
@@ -168,9 +170,6 @@ export function HomeWaterEditorial({
               <span>Rede regional</span>
               <strong>Três referências para entender a Lagoa</strong>
             </div>
-            <small>
-              {visibleStationCount} pontos exibidos · {lagoon.available} de {lagoon.total} disponíveis
-            </small>
           </div>
 
           <p className="tp-home-water__network-note">
@@ -199,12 +198,18 @@ export function HomeWaterEditorial({
                         : `${formatNumber(station.currentLevelCm)} cm`}
                     </b>
                   </div>
-                  <div className="tp-home-water__station-state">
-                    <strong>{stationState(station)}</strong>
-                    <span className={`is-${trend.direction}`}>
-                      {trend.symbol} {trend.label}
+                  <div className="tp-home-water__station-state-wrap">
+                    <span
+                      className={`tp-home-water__trend-mark is-${trend.direction}`}
+                      aria-hidden="true"
+                    >
+                      {trend.symbol}
                     </span>
-                    <small>{formatUpdatedAt(station.updatedAt)}</small>
+                    <div className="tp-home-water__station-state">
+                      <strong>{stationState(station)}</strong>
+                      <span className={`is-${trend.direction}`}>{trend.label}</span>
+                      <small>{formatUpdatedAt(station.updatedAt)}</small>
+                    </div>
                   </div>
                 </article>
               );
@@ -221,12 +226,18 @@ export function HomeWaterEditorial({
               <span>Nível</span>
               <b>{guaiba.currentLevel === null ? "Sem leitura" : `${formatNumber(guaiba.currentLevel, 2)} m`}</b>
             </div>
-            <div>
-              <strong>Referência do Guaíba</strong>
-              <span className={`is-${guaibaTrend.direction}`}>
-                {guaibaTrend.symbol} {guaibaTrend.label}
+            <div className="tp-home-water__station-state-wrap">
+              <span
+                className={`tp-home-water__trend-mark is-${guaibaTrend.direction}`}
+                aria-hidden="true"
+              >
+                {guaibaTrend.symbol}
               </span>
-              <small>{formatUpdatedAt(guaiba.updatedAt)}</small>
+              <div className="tp-home-water__station-state tp-home-water__guaiba-state">
+                <strong>Referência do Guaíba</strong>
+                <span className={`is-${guaibaTrend.direction}`}>{guaibaTrend.label}</span>
+                <small>{formatUpdatedAt(guaiba.updatedAt)}</small>
+              </div>
             </div>
           </div>
         </div>
