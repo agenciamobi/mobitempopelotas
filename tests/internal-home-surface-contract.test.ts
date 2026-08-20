@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const siteHeader = readFileSync("src/production/components/site-header.tsx", "utf8");
+const siteFooter = readFileSync("src/production/components/site-footer.tsx", "utf8");
 const internalShell = readFileSync("src/components/layout/InternalWeatherPageShell.tsx", "utf8");
 const internalShellCss = readFileSync("src/components/layout/InternalWeatherPageShell.css", "utf8");
 const siteLayout = readFileSync("src/components/layout/SiteLayout.tsx", "utf8");
@@ -24,10 +25,12 @@ test("public pages reuse the Home editorial header instead of the legacy header"
   assert.match(internalShell, /variant="hero"/);
 });
 
-test("flood history is standalone and cannot receive a duplicate global header/footer", () => {
+test("flood history is standalone and shared chrome cannot be duplicated", () => {
   assert.match(siteLayout, /"\/enchente-2024-pelotas-laranjal"/);
   assert.match(siteLayout, /<SiteHeader advisoryLevel="normal" variant="hero" \/>/);
-  assert.match(siteLayout, /<Footer variant="home" \/>/);
+  assert.match(siteLayout, /<SiteFooter \/>/);
+  assert.match(siteFooter, /variant="home"/);
+  assert.match(siteFooter, /site-footer-home\.css/);
 });
 
 test("internal weather shell uses the same 1440px rail and soft surfaces as the Home", () => {
