@@ -8,12 +8,15 @@ import type { LaranjalLevelData } from "@/production/lib/laranjal-level";
 
 import "./home-water-editorial.css";
 
+// Ordem geográfica/hidrológica da porção norte da Lagoa dos Patos em direção
+// ao estuário e à saída no oceano. As duas referências do Guaíba são renderizadas
+// antes desta lista, em Gasômetro -> Cais Mauá.
 const HOME_LAGOON_STATION_PRIORITY = [
-  "sao-lourenco-do-sul",
-  "furg-ccmar",
-  "arambare",
-  "sao-jose-do-norte",
   "itapua",
+  "arambare",
+  "sao-lourenco-do-sul",
+  "sao-jose-do-norte",
+  "furg-ccmar",
 ] as const;
 
 function formatNumber(value: number | null, maximumFractionDigits = 1) {
@@ -83,6 +86,12 @@ function guaibaReferenceState(reference: GuaibaReference) {
   if (reference.currentLevel >= reference.floodReference) return "Acima da cota local";
   if (reference.currentLevel >= reference.floodReference * 0.85) return "Próximo da cota local";
   return "Abaixo da cota local";
+}
+
+function guaibaReferenceTitle(reference: GuaibaReference) {
+  if (reference.id === "cais-maua") return "Porto Alegre / RS — Cais Mauá";
+  if (reference.id === "gasometro") return "Porto Alegre / RS — Usina do Gasômetro";
+  return reference.label;
 }
 
 function guaibaReferences(guaiba: GuaibaObservationData): GuaibaReference[] {
@@ -236,9 +245,7 @@ export function HomeWaterEditorial({
                   key={`guaiba-${reference.id}`}
                 >
                   <div className="tp-home-water__station-place">
-                    <strong>
-                      {isCaisMaua ? "Cais Mauá / RS" : "Nível do Guaíba — Porto Alegre / RS"}
-                    </strong>
+                    <strong>{guaibaReferenceTitle(reference)}</strong>
                     <span>{reference.station}</span>
                     <small>
                       {isCaisMaua
