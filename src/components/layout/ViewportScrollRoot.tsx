@@ -1,5 +1,5 @@
 import { useRouterState } from "@tanstack/react-router";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, type ReactNode } from "react";
 
 type ViewportScrollRootProps = {
   children: ReactNode;
@@ -79,6 +79,9 @@ export function ViewportScrollRoot({ children }: ViewportScrollRootProps) {
     const root = rootRef.current;
     if (!root) return;
 
+    const previousScrollRestoration = window.history.scrollRestoration;
+    window.history.scrollRestoration = "manual";
+
     const handleWheel = (event: WheelEvent) => {
       if (event.ctrlKey || event.metaKey || isModalOpen()) return;
 
@@ -134,15 +137,36 @@ export function ViewportScrollRoot({ children }: ViewportScrollRootProps) {
     window.addEventListener("keydown", handleKeyDown, { capture: true });
 
     return () => {
+      window.history.scrollRestoration = previousScrollRestoration;
       window.removeEventListener("wheel", handleWheel, true);
       window.removeEventListener("keydown", handleKeyDown, true);
     };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = rootRef.current;
     if (!root) return;
-    root.scrollTo({ top: 0, left: 0, behavior: "auto" });
+
+    const resetViewport = () => {
+      root.scrollTop = 0;
+      root.scrollLeft = 0;
+    };
+
+    // O scroll real pertence a este elemento, não a window/html/body. O reset
+    // imediato evita carregar a rota nova na posição anterior; os dois frames
+    // seguintes neutralizam scroll anchoring/restauração tardia após o commit.
+    resetViewport();
+
+    let secondFrame = 0;
+    const firstFrame = window.requestAnimationFrame(() => {
+      resetViewport();
+      secondFrame = window.requestAnimationFrame(resetViewport);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      if (secondFrame) window.cancelAnimationFrame(secondFrame);
+    };
   }, [pathname]);
 
   return (
