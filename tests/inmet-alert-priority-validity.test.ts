@@ -48,7 +48,7 @@ test("INMET municipal parser accepts current date and severity field variants", 
   assert.match(severitySource, /ff8c00/);
   assert.match(severitySource, /ffff00/);
   assert.ok(
-    severitySource.indexOf("perigo potencial") < severitySource.indexOf("(?:^|\\\\b)perigo"),
+    severitySource.indexOf('compact === "1"') < severitySource.indexOf('compact === "2"'),
     "Perigo potencial precisa ser classificado antes do termo genérico perigo",
   );
 });
