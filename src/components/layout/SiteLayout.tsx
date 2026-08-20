@@ -1,11 +1,11 @@
 import { useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
+import { SiteFooter } from "@/production/components/site-footer";
 import { SiteHeader } from "@/production/components/site-header";
 
 import "./accessibility.css";
 import "./route-navigation.css";
-import { Footer } from "./Footer";
 
 type SiteLayoutProps = {
   children: ReactNode;
@@ -132,7 +132,7 @@ export function SiteLayout({ children, forceShell = false }: SiteLayoutProps) {
           {children}
         </div>
       </main>
-      <Footer variant="home" />
+      <SiteFooter />
     </div>
   );
 }
