@@ -290,6 +290,18 @@ function severityFromText(value: string): { severity: InmetAlertSeverity; label:
   ) {
     return { severity: "great-danger", label: "Grande perigo" };
   }
+
+  // "Perigo Potencial" contém a palavra "Perigo". O nível amarelo precisa ser
+  // resolvido antes da regra genérica de perigo para não ser promovido a laranja.
+  if (
+    compact === "1" ||
+    /perigo potencial|potential|potencial|moderate|moderado|amarel|fffe00|ffff00|ffcc00|facc15|rgb\(?255,?(?:204|254|255),?0/.test(
+      normalized,
+    )
+  ) {
+    return { severity: "potential", label: "Perigo potencial" };
+  }
+
   if (
     compact === "2" ||
     /(?:^|\b)perigo(?:\b|$)|severe|severo|laranja|ff9900|ffa500|ff8c00|rgb\(?255,?(?:140|153|165),?0/.test(
@@ -298,14 +310,7 @@ function severityFromText(value: string): { severity: InmetAlertSeverity; label:
   ) {
     return { severity: "danger", label: "Perigo" };
   }
-  if (
-    compact === "1" ||
-    /potencial|moderate|moderado|amarel|fffe00|ffff00|ffcc00|facc15|rgb\(?255,?(?:204|254|255),?0/.test(
-      normalized,
-    )
-  ) {
-    return { severity: "potential", label: "Perigo potencial" };
-  }
+
   return { severity: "unknown", label: "Aviso meteorológico" };
 }
 
