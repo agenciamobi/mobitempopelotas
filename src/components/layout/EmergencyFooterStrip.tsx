@@ -9,8 +9,7 @@ const emergencyPhones = [
 ] as const;
 
 const DEFESA_CIVIL_URL = "https://defesacivil.rs.gov.br/";
-const DEFESA_CIVIL_LOGO_URL =
-  "https://defesacivil.rs.gov.br/themes/defesacivil/images/logos/logo.png";
+const DEFESA_CIVIL_LOGO_URL = "/defesa-civil-rs.png";
 
 export function EmergencyFooterStrip() {
   return (
@@ -45,12 +44,11 @@ export function EmergencyFooterStrip() {
           <div className="tp-public-service-civil-defense__identity">
             <img
               src={DEFESA_CIVIL_LOGO_URL}
-              alt="Símbolo da Defesa Civil do Rio Grande do Sul"
+              alt="Defesa Civil do Rio Grande do Sul"
               width={82}
               height={82}
               loading="lazy"
               decoding="async"
-              referrerPolicy="no-referrer"
             />
             <div>
               <span>Defesa Civil RS</span>
