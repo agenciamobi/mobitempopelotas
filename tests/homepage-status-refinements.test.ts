@@ -9,38 +9,45 @@ const refinements = readFileSync(
   "utf8",
 );
 
-test("the INMET home alert and page index share one bounded surface", () => {
+test("the INMET home alert and page index share one bounded surface only while an alert is visible", () => {
+  assert.match(home, /const hasHomeInmetAlert = inmetAlerts\.status === "live" && inmetAlerts\.alerts\.length > 0/);
+  assert.match(home, /hasHomeInmetAlert \? \(/);
   assert.match(home, /className="tp-home-alert-index-shell"/);
   assert.match(
     home,
     /tp-home-alert-index-shell[\s\S]*<InmetAlertsPanel[\s\S]*<HomeSectionNavigation/,
   );
+  assert.match(home, /\) : \(\s*<HomeSectionNavigation \/>/);
   assert.match(refinements, /\.tp-home-alert-index-shell\s*\{[\s\S]*border-radius:\s*16px/);
   assert.match(refinements, /\.tp-home-alert-index-shell\s*\{[\s\S]*background:\s*#fff/);
 });
 
-test("the radar chapter uses the same soft bounded editorial surface", () => {
+test("the radar chapter uses a soft bounded editorial surface without nested shadow", () => {
   assert.match(refinements, /\.tp-home-radar\s*\{[\s\S]*border:\s*1px solid/);
   assert.match(refinements, /\.tp-home-radar\s*\{[\s\S]*border-radius:\s*16px/);
   assert.match(refinements, /\.tp-home-radar\s*\{[\s\S]*background:\s*#fff/);
+  assert.match(refinements, /\.tp-home-radar__frame\s*\{[\s\S]*box-shadow:\s*none/);
 });
 
 test("the Laranjal level and regional rows expose trend semantics visually and textually", () => {
-  assert.match(water, /tp-home-water__level is-\$\{laranjalTrend\.direction\}/);
+  assert.match(water, /tp-home-water__level-card is-\$\{laranjalTrend\.direction\}/);
   assert.match(water, /tp-home-water__trend-mark is-\$\{trend\.direction\}/);
   assert.match(water, /tp-home-water__trend-mark is-\$\{guaibaTrend\.direction\}/);
-  assert.match(refinements, /\.tp-home-water__level\.is-rising\s*\{[\s\S]*background:/);
-  assert.match(refinements, /\.tp-home-water__level\.is-falling\s*\{[\s\S]*background:/);
-  assert.match(refinements, /\.tp-home-water__level\.is-stable\s*\{[\s\S]*background:/);
-  assert.match(refinements, /\.tp-home-water__level strong,[\s\S]*color:\s*#fff/);
+  assert.match(refinements, /\.tp-home-water__level-card\.is-rising\s*\{[\s\S]*background:/);
+  assert.match(refinements, /\.tp-home-water__level-card\.is-falling\s*\{[\s\S]*background:/);
+  assert.match(refinements, /\.tp-home-water__level-card\.is-stable\s*\{[\s\S]*background:/);
+  assert.match(refinements, /\.tp-home-water__level-card \.tp-home-water__trend[\s\S]*color:\s*#fff/);
 });
 
-test("the Laranjal last-reading metric communicates freshness without the old availability counter", () => {
+test("the Laranjal freshness keeps the public label and colors the last-reading metric", () => {
+  assert.match(water, /<b className=\{`is-\$\{laranjalReading\.state\}`\}>\{laranjalReading\.label\}<\/b>/);
+  assert.match(water, /<dt>Última leitura<\/dt>/);
   assert.match(water, /Leitura atualizada/);
   assert.match(water, /Leitura atrasada/);
   assert.match(water, /tp-home-water__reading is-\$\{laranjalReading\.state\}/);
   assert.doesNotMatch(water, /pontos exibidos/);
   assert.doesNotMatch(water, /de \{lagoon\.total\} disponíveis/);
+  assert.match(refinements, /\.tp-home-water__focus-topline b\.is-live,/);
   assert.match(refinements, /\.tp-home-water__reading\.is-live dt/);
   assert.match(refinements, /\.tp-home-water__reading\.is-stale dt/);
 });
