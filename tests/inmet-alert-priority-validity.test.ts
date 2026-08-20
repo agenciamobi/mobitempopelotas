@@ -4,6 +4,7 @@ import test from "node:test";
 
 const panel = readFileSync("src/production/components/inmet-alerts-panel.tsx", "utf8");
 const source = readFileSync("src/lib/weather/inmet.server.ts", "utf8");
+const severitySource = readFileSync("src/lib/weather/inmet-severity.ts", "utf8");
 const homeStyles = readFileSync("src/production/components/inmet-alerts-home.css", "utf8");
 
 test("home INMET panel prioritizes active Pelotas alerts by severity", () => {
@@ -40,12 +41,16 @@ test("INMET municipal parser accepts current date and severity field variants", 
 
   assert.match(source, /\^\\d\{10\}\$/);
   assert.match(source, /\^\\d\{13\}\$/);
-  assert.match(source, /compact === "3"/);
-  assert.match(source, /compact === "2"/);
-  assert.match(source, /compact === "1"/);
-  assert.match(source, /ff0000/);
-  assert.match(source, /ff8c00/);
-  assert.match(source, /ffff00/);
+  assert.match(severitySource, /compact === "3"/);
+  assert.match(severitySource, /compact === "2"/);
+  assert.match(severitySource, /compact === "1"/);
+  assert.match(severitySource, /ff0000/);
+  assert.match(severitySource, /ff8c00/);
+  assert.match(severitySource, /ffff00/);
+  assert.ok(
+    severitySource.indexOf("perigo potencial") < severitySource.indexOf("(?:^|\\\\b)perigo"),
+    "Perigo potencial precisa ser classificado antes do termo genérico perigo",
+  );
 });
 
 test("normalized alert list keeps active severe notices first inside each area", () => {
@@ -55,9 +60,10 @@ test("normalized alert list keeps active severe notices first inside each area",
   assert.match(source, /severityDifference = severityRank\[second\.severity\] - severityRank\[first\.severity\]/);
 });
 
-test("home alert semantic colors remain tied to verified severity", () => {
-  assert.match(homeStyles, /\.tp-home-alert\.is-officially-classified\.severity-potential[\s\S]*--risk:\s*#d6ae00/);
-  assert.match(homeStyles, /\.tp-home-alert\.is-officially-classified\.severity-danger[\s\S]*--risk:\s*#ef7d2f/);
-  assert.match(homeStyles, /\.tp-home-alert\.is-officially-classified\.severity-great-danger[\s\S]*--risk:\s*#d93636/);
+test("home alert semantic colors remain tied to official INMET severity", () => {
+  assert.match(homeStyles, /\.tp-home-alert\.severity-potential[\s\S]*--risk:\s*var\(--inmet-yellow\)/);
+  assert.match(homeStyles, /\.tp-home-alert\.severity-danger[\s\S]*--risk:\s*var\(--inmet-orange\)/);
+  assert.match(homeStyles, /\.tp-home-alert\.severity-great-danger[\s\S]*--risk:\s*var\(--inmet-red\)/);
+  assert.match(homeStyles, /\.tp-home-alert\.severity-unknown,[\s\S]*--risk:\s*#6f818a/);
   assert.match(homeStyles, /\.tp-home-alert__topline span[\s\S]*var\(--risk\)/);
 });
