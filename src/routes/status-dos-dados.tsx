@@ -112,6 +112,12 @@ function overallState(services: ServiceStatus[]): Exclude<ServiceState, "mainten
   return "operational";
 }
 
+function categoryId(category: ServiceCategory) {
+  if (category === "Meteorologia e avisos") return "status-meteorologia";
+  if (category === "Radar e satélite") return "status-radar-satelite";
+  return "status-hidrologia";
+}
+
 function formatCheckedAt(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "horário indisponível";
@@ -369,23 +375,25 @@ function DataStatusPage() {
         </section>
 
         <div className="data-status-groups">
-          {categories.map((category) => (
-            <section className="data-status-group" key={category} aria-labelledby={`status-${category}`}>
-              <header>
-                <span>{category}</span>
-                <strong>{data.services.filter((service) => service.category === category).length} integrações</strong>
-              </header>
+          {categories.map((category) => {
+            const headingId = categoryId(category);
+            const categoryServices = data.services.filter((service) => service.category === category);
 
-              <div className="data-status-services">
-                {data.services
-                  .filter((service) => service.category === category)
-                  .map((service) => (
+            return (
+              <section className="data-status-group" key={category} aria-labelledby={headingId}>
+                <header>
+                  <h2 id={headingId}>{category}</h2>
+                  <strong>{categoryServices.length} integrações</strong>
+                </header>
+
+                <div className="data-status-services">
+                  {categoryServices.map((service) => (
                     <article className={`data-status-service is-${service.state}`} key={service.id}>
                       <div className="data-status-service__heading">
                         <span className="data-status-service__dot" aria-hidden="true" />
                         <div>
                           <p>{service.provider}</p>
-                          <h2>{service.name}</h2>
+                          <h3>{service.name}</h3>
                         </div>
                         <strong>{labelForState(service.state)}</strong>
                       </div>
@@ -400,9 +408,10 @@ function DataStatusPage() {
                       </footer>
                     </article>
                   ))}
-              </div>
-            </section>
-          ))}
+                </div>
+              </section>
+            );
+          })}
         </div>
 
         <section className="data-status-explainer" aria-labelledby="data-status-explainer-title">
