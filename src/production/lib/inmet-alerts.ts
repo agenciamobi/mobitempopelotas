@@ -25,6 +25,7 @@ export type InmetAlertsData = {
   status: "live" | "unavailable";
   alerts: InmetAlert[];
   counts: { total: number; pelotas: number; regional: number; state: number };
+  sourceUrl: string;
   source: { name: string; feedUrl: string; portalUrl: string; fetchedAt: string };
   error: string | null;
 };
