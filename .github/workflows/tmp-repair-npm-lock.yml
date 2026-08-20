@@ -1,9 +1,9 @@
 name: Temporary project state repair
 
 on:
-  pull_request:
+  push:
     branches:
-      - main
+      - agent/defesa-civil-hidrometeorologia
 
 permissions:
   contents: write
