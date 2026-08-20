@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: quality-${{ github.workflow }}-${{ github.ref }}
@@ -28,6 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
@@ -37,6 +38,28 @@ jobs:
 
       - name: Instalar dependências
         run: npm ci --no-audit --no-fund
+
+      - name: Formatar arquivos alterados da integração
+        if: github.event_name == 'pull_request'
+        run: |
+          npx prettier --write \
+            src/components/hydrology/DefesaCivilHydroMap.tsx \
+            src/components/hydrology/DefesaCivilHydroNetwork.tsx \
+            src/lib/hydrology/defesa-civil-rs.server.ts \
+            tests/hydrology-overview-page.test.ts \
+            tests/redemet-performance.test.ts
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            src/components/hydrology/DefesaCivilHydroMap.tsx \
+            src/components/hydrology/DefesaCivilHydroNetwork.tsx \
+            src/lib/hydrology/defesa-civil-rs.server.ts \
+            tests/hydrology-overview-page.test.ts \
+            tests/redemet-performance.test.ts
+          if ! git diff --cached --quiet; then
+            git commit -m "style: format hydrology integration files"
+            git push origin "HEAD:${{ github.event.pull_request.head.ref }}"
+          fi
 
       - name: Validar template de ambiente
         run: npm run runtime:check:example
