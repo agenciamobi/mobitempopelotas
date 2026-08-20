@@ -18,7 +18,10 @@
 }
 
 .tp-flood-hero__copy > span,
-.tp-flood-history section > div:first-child > span,
+.tp-flood-history__lead > div:first-child > span,
+.tp-flood-explanation > div:first-child > span,
+.tp-flood-lessons > div:first-child > span,
+.tp-flood-sources > div:first-child > span,
 .tp-flood-timeline > header > span,
 .tp-flood-route > header > span,
 .tp-flood-related > div:first-child > span {
