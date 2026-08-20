@@ -21,20 +21,24 @@ import { HomeObservationEditorial } from "@/production/components/home-observati
 import { HomeRadarEditorial } from "@/production/components/home-radar-editorial";
 import { HomeSectionNavigation } from "@/production/components/home-section-navigation";
 import { HomeWaterEditorial } from "@/production/components/home-water-editorial";
-import {
-  hasVerifiedInmetAlertSemantics,
-  InmetAlertsPanel,
-} from "@/production/components/inmet-alerts-panel";
+import { InmetAlertsPanel } from "@/production/components/inmet-alerts-panel";
 import { InmetOfficialForecastPanel } from "@/production/components/inmet-official-forecast-panel";
 import { SiteFooter } from "@/production/components/site-footer";
 import { SiteHeader } from "@/production/components/site-header";
 import { WeatherHero } from "@/production/components/weather-hero";
+import type { InmetAlertSeverity } from "@/production/lib/inmet-alerts";
 import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-browser-recovery";
 import type { WeatherData } from "@/production/lib/weather-data";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/production/lib/weather-insights";
 import "@/production/styles/home-editorial-status-refinements.css";
 
 const advisoryRank: Record<AdvisoryLevel, number> = { normal: 0, attention: 1, warning: 2 };
+const officialSeverityRank: Record<InmetAlertSeverity, number> = {
+  unknown: 0,
+  potential: 1,
+  danger: 2,
+  "great-danger": 3,
+};
 
 const unavailableSource = {
   name: "MOBI Tempo Pelotas",
@@ -131,17 +135,23 @@ export function ProductionHome({
   const inmetAlerts = toProductionAlerts(recoveredData.weather);
   const advisory = getWeatherAdvisory(weather);
   const pelotasOfficialAlerts = inmetAlerts.alerts.filter((alert) => alert.relevance === "pelotas");
-  const verifiedPelotasAlerts = pelotasOfficialAlerts.filter(hasVerifiedInmetAlertSemantics);
   const hasPelotasOfficialAlerts = pelotasOfficialAlerts.length > 0;
   const hasHomeInmetAlert = inmetAlerts.status === "live" && inmetAlerts.alerts.length > 0;
-  const officialLevel: AdvisoryLevel = verifiedPelotasAlerts.some(
-    (alert) => alert.severity === "danger" || alert.severity === "great-danger",
-  )
-    ? "warning"
-    : verifiedPelotasAlerts.some((alert) => alert.severity === "potential") ||
-        hasPelotasOfficialAlerts
-      ? "attention"
-      : "normal";
+  const primaryOfficialSeverity = pelotasOfficialAlerts.reduce<InmetAlertSeverity>(
+    (highest, alert) =>
+      officialSeverityRank[alert.severity] > officialSeverityRank[highest] ? alert.severity : highest,
+    "unknown",
+  );
+
+  // A cor oficial do INMET é tratada separadamente do advisory meteorológico local.
+  // Somente "Grande perigo" exige o nível genérico warning; amarelo/laranja continuam
+  // identificados pela sua própria classe oficial no header e no painel do INMET.
+  const officialLevel: AdvisoryLevel =
+    primaryOfficialSeverity === "great-danger"
+      ? "warning"
+      : hasPelotasOfficialAlerts
+        ? "attention"
+        : "normal";
   const headerLevel =
     advisoryRank[officialLevel] > advisoryRank[advisory.level] ? officialLevel : advisory.level;
   const cppmetToday = recoveredData.weather.officialForecast[0] ?? null;
@@ -152,7 +162,11 @@ export function ProductionHome({
 
   return (
     <div className="site-shell site-shell--home site-shell--home-editorial">
-      <SiteHeader advisoryLevel={headerLevel} variant="hero" />
+      <SiteHeader
+        advisoryLevel={headerLevel}
+        officialAlertSeverity={primaryOfficialSeverity}
+        variant="hero"
+      />
       <div className={`tp-home-hero-shell${liveLaranjalCamera ? " has-live-camera" : ""}`}>
         <WeatherHero
           weather={weather}
