@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import type { WeatherData } from "@/production/lib/weather-data";
 
 import "./Footer.css";
+import "./FooterStatusLink.css";
 import { EmergencyFooterStrip } from "./EmergencyFooterStrip";
 import { getFooterLead } from "./footer-content";
 
@@ -191,11 +192,9 @@ function isActivePath(pathname: string, to: string) {
 
 export function Footer({ source, variant = "default" }: FooterProps) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const sourceStatus = source
-    ? source.isFallback
-      ? "Operação em contingência"
-      : "Fontes identificadas"
-    : "Fontes e método publicados";
+  const sourceStatus = source?.isFallback
+    ? "Algumas informações estão com atualização parcial"
+    : "Dados e fontes monitorados";
 
   if (variant === "home") {
     return (
@@ -230,8 +229,16 @@ export function Footer({ source, variant = "default" }: FooterProps) {
               >
                 <span aria-hidden="true" />
                 <div>
-                  <small>Estado dos dados</small>
+                  <small>Disponibilidade dos dados</small>
                   <strong>{sourceStatus}</strong>
+                  <Link
+                    className="tp-home-footer-status__link"
+                    to="/status-dos-dados"
+                    aria-label="Consultar o status das fontes e integrações do Tempo Pelotas"
+                  >
+                    Confira o status dos dados
+                    <ArrowRight aria-hidden="true" />
+                  </Link>
                 </div>
               </div>
             </section>
@@ -287,6 +294,13 @@ export function Footer({ source, variant = "default" }: FooterProps) {
                   aria-current={isActivePath(pathname, "/metodologia") ? "page" : undefined}
                 >
                   Metodologia
+                </Link>
+                <Link
+                  to="/status-dos-dados"
+                  aria-label="Consultar o status das fontes e integrações do Tempo Pelotas"
+                  aria-current={isActivePath(pathname, "/status-dos-dados") ? "page" : undefined}
+                >
+                  Status dos dados
                 </Link>
                 <Link
                   to="/privacidade-e-dados"
@@ -361,8 +375,16 @@ export function Footer({ source, variant = "default" }: FooterProps) {
               >
                 <span aria-hidden="true" />
                 <div>
-                  <small>Estado dos dados</small>
+                  <small>Disponibilidade dos dados</small>
                   <strong>{sourceStatus}</strong>
+                  <Link
+                    className="editorial-footer-status__link"
+                    to="/status-dos-dados"
+                    aria-label="Consultar o status das fontes e integrações do Tempo Pelotas"
+                  >
+                    Confira o status dos dados
+                    <ArrowRight aria-hidden="true" />
+                  </Link>
                 </div>
               </div>
 
@@ -439,6 +461,13 @@ export function Footer({ source, variant = "default" }: FooterProps) {
                 aria-current={isActivePath(pathname, "/metodologia") ? "page" : undefined}
               >
                 Metodologia
+              </Link>
+              <Link
+                to="/status-dos-dados"
+                aria-label="Consultar o status das fontes e integrações do Tempo Pelotas"
+                aria-current={isActivePath(pathname, "/status-dos-dados") ? "page" : undefined}
+              >
+                Status dos dados
               </Link>
               <Link
                 to="/privacidade-e-dados"
