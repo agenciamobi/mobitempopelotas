@@ -36,10 +36,11 @@ test("route loading uses a lightweight progress indicator instead of another she
   assert.match(navigationCss, /@media \(prefers-reduced-motion: reduce\)/);
 });
 
-test("router preloads intended destinations and keeps the result fresh for the click", () => {
+test("router preloads intended destinations immediately and keeps the result fresh for the click", () => {
   assert.match(router, /defaultPreload:\s*"intent"/);
-  assert.match(router, /defaultPreloadDelay:\s*40/);
+  assert.match(router, /defaultPreloadDelay:\s*0/);
   assert.match(router, /defaultPreloadStaleTime:\s*60 \* 1_000/);
   assert.match(router, /defaultStaleTime:\s*60 \* 1_000/);
+  assert.match(router, /scrollRestoration:\s*false/);
   assert.doesNotMatch(router, /defaultPreloadStaleTime:\s*0/);
 });
