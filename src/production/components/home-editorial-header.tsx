@@ -3,6 +3,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 
 import { AuthAccountAction } from "@/components/auth/AuthAccountAction";
+import type { InmetAlertSeverity } from "@/production/lib/inmet-alerts";
 import type { AdvisoryLevel } from "@/production/lib/weather-insights";
 
 import "./home-editorial-header.css";
@@ -43,7 +44,10 @@ function isActivePath(pathname: string, to: string) {
   return pathname === to || pathname.startsWith(`${to}/`);
 }
 
-function alertLabel(level: AdvisoryLevel) {
+function alertLabel(level: AdvisoryLevel, officialSeverity: InmetAlertSeverity) {
+  if (officialSeverity === "great-danger") return "Alerta vermelho";
+  if (officialSeverity === "danger") return "Alerta laranja";
+  if (officialSeverity === "potential") return "Alerta amarelo";
   if (level === "warning") return "Alerta ativo";
   if (level === "attention") return "Atenção";
   return "Avisos";
@@ -51,18 +55,26 @@ function alertLabel(level: AdvisoryLevel) {
 
 export function HomeEditorialHeader({
   advisoryLevel = "normal",
+  officialAlertSeverity = "unknown",
 }: {
   advisoryLevel?: AdvisoryLevel;
+  officialAlertSeverity?: InmetAlertSeverity;
 }) {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const alertsActive = isActivePath(pathname, "/alertas");
+  const officialSeverityClass =
+    officialAlertSeverity === "unknown" ? "" : ` severity-${officialAlertSeverity}`;
 
   return (
     <>
       <a className="skip-link" href="#conteudo-principal">
         Pular para o conteúdo principal
       </a>
-      <header className="tp-home-header" data-advisory-level={advisoryLevel}>
+      <header
+        className="tp-home-header"
+        data-advisory-level={advisoryLevel}
+        data-official-alert-severity={officialAlertSeverity}
+      >
         <div className="tp-home-header__inner">
           <Link
             className="tp-home-header__brand"
@@ -101,7 +113,7 @@ export function HomeEditorialHeader({
           <div className="tp-home-header__actions">
             <AuthAccountAction />
             <Link
-              className={`tp-home-header__alert is-${advisoryLevel}${alertsActive ? " is-active" : ""}`}
+              className={`tp-home-header__alert is-${advisoryLevel}${officialSeverityClass}${alertsActive ? " is-active" : ""}`}
               to="/alertas"
               aria-label="Consultar avisos meteorológicos oficiais para Pelotas"
               aria-current={alertsActive ? "page" : undefined}
@@ -110,7 +122,7 @@ export function HomeEditorialHeader({
                 <path d="M12 3 3.6 19h16.8L12 3Z" />
                 <path d="M12 9v4.5M12 17h.01" />
               </svg>
-              <span>{alertLabel(advisoryLevel)}</span>
+              <span>{alertLabel(advisoryLevel, officialAlertSeverity)}</span>
             </Link>
           </div>
         </div>
