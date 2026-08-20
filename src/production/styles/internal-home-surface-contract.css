@@ -26,16 +26,27 @@
 }
 
 .site-shell--topic .site-container--topic {
+  width: min(
+    var(--tp-home-container-max, 1440px),
+    calc(100% - var(--tp-home-container-gutter, 48px))
+  );
+  max-width: none;
   margin-inline: auto;
   padding: 0;
 }
 
+.site-shell--topic .site-container--topic > * {
+  min-width: 0;
+}
+
 .site-shell--topic .site-container--topic > [class*="-page"],
 .site-shell--topic .site-container--topic > .hydrology-editorial-route,
-.site-shell--topic .site-container--topic > .radar-satellite-page {
+.site-shell--topic .site-container--topic > .radar-satellite-page,
+.site-shell--topic .site-container--topic > .official-data-access,
+.site-shell--topic .site-container--topic > .forecast-accuracy {
   width: 100%;
   max-width: none;
-  margin: 0;
+  margin-inline: 0;
 }
 
 /* Neutraliza a antiga primeira dobra fullwidth com painel escuro lateral. */
@@ -138,6 +149,16 @@
   background: var(--internal-surface);
   box-shadow: none;
   scroll-margin-top: 92px;
+}
+
+.site-shell--topic .methodology-chapter-nav {
+  width: 100%;
+  max-width: none;
+  margin: 0 0 clamp(16px, 2vw, 24px);
+  border-color: var(--internal-line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: none;
 }
 
 .site-shell--topic .redemet-page {
@@ -248,6 +269,13 @@
   .site-shell--topic {
     --internal-pad: clamp(24px, 3vw, 34px);
   }
+
+  .site-shell--topic .site-container--topic {
+    width: min(
+      calc(100% - var(--tp-home-container-compact-gutter, 32px)),
+      var(--tp-home-container-compact-max, 1180px)
+    );
+  }
 }
 
 @media (max-width: 720px) {
@@ -258,6 +286,10 @@
 
   .site-shell--topic .site-main--topic {
     padding-top: 14px;
+  }
+
+  .site-shell--topic .site-container--topic {
+    width: calc(100% - var(--tp-home-container-mobile-gutter, 20px));
   }
 
   .site-shell--topic .site-container--topic > [class*="-page"] > header,
@@ -272,6 +304,7 @@
   .site-shell--topic .redemet-page > section,
   .site-shell--topic .redemet-page > article,
   .site-shell--topic .redemet-page > nav,
+  .site-shell--topic .methodology-chapter-nav,
   .internal-weather-shell--flood-history .tp-flood-history__index,
   .internal-weather-shell--flood-history .tp-flood-history > section {
     border-radius: var(--internal-radius-mobile);

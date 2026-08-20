@@ -15,6 +15,32 @@ const standaloneCss = readFileSync(
   "src/production/styles/standalone-home-surface-contract.css",
   "utf8",
 );
+const regionalDirectory = readFileSync(
+  "src/components/regional/RegionalCitiesDirectory.tsx",
+  "utf8",
+);
+const regionalDirectoryCss = readFileSync(
+  "src/components/regional/RegionalCitiesDirectory.module.css",
+  "utf8",
+);
+const cppmetNewsPage = readFileSync("src/components/blog/CppmetNewsPage.tsx", "utf8");
+const cppmetNewsCss = readFileSync("src/components/blog/CppmetNewsPage.css", "utf8");
+const officialDataCss = readFileSync(
+  "src/components/content/OfficialDataAccessNotice.css",
+  "utf8",
+);
+const forecastAccuracyCss = readFileSync(
+  "src/components/methodology/ForecastAccuracyPanel.css",
+  "utf8",
+);
+const iconRoute = readFileSync(
+  "src/routes/brand/tempo-pelotas-icon[.]png.ts",
+  "utf8",
+);
+const rootRoute = readFileSync("src/routes/__root.tsx", "utf8");
+const manifest = readFileSync("public/manifest.webmanifest", "utf8");
+const serviceWorker = readFileSync("public/sw.js", "utf8");
+const offlinePage = readFileSync("public/offline.html", "utf8");
 const cssEntry = readFileSync("src/production/production-styles.css", "utf8");
 const tsEntry = readFileSync("src/production/production-styles.ts", "utf8");
 
@@ -42,6 +68,15 @@ test("internal weather shell uses the same 1440px rail and soft surfaces as the 
   assert.doesNotMatch(internalShellCss, /radial-gradient/);
 });
 
+test("topic pages use the same responsive rail contract as the Home", () => {
+  assert.match(surfaceCss, /--tp-home-container-max, 1440px/);
+  assert.match(surfaceCss, /--tp-home-container-gutter, 48px/);
+  assert.match(surfaceCss, /--tp-home-container-compact-max, 1180px/);
+  assert.match(surfaceCss, /--tp-home-container-compact-gutter, 32px/);
+  assert.match(surfaceCss, /--tp-home-container-mobile-gutter, 20px/);
+  assert.match(surfaceCss, /\.methodology-chapter-nav/);
+});
+
 test("final internal surface contract neutralizes old full-bleed topic styling", () => {
   assert.match(surfaceCss, /canvas claro, rail de 1440px/);
   assert.match(surfaceCss, /border:\s*1px solid var\(--internal-line\)/);
@@ -51,6 +86,34 @@ test("final internal surface contract neutralizes old full-bleed topic styling",
   assert.match(surfaceCss, /internal-weather-shell--flood-history/);
   assert.match(surfaceCss, /\.tp-flood-hero h1/);
   assert.match(surfaceCss, /@media \(max-width: 720px\)/);
+});
+
+test("regional directory and CPPMet content do not create nested main landmarks", () => {
+  assert.doesNotMatch(regionalDirectory, /<main\b/);
+  assert.doesNotMatch(cppmetNewsPage, /<main\b/);
+  assert.match(regionalDirectory, /<div className=\{styles\.page\}>/);
+  assert.match(cppmetNewsPage, /<div className="cppmet-blog">/);
+});
+
+test("dedicated regional, blog and methodology support surfaces follow the Home visual language", () => {
+  for (const css of [regionalDirectoryCss, cppmetNewsCss, officialDataCss, forecastAccuracyCss]) {
+    assert.doesNotMatch(css, /radial-gradient|linear-gradient/);
+    assert.match(css, /box-shadow:\s*none/);
+    assert.match(css, /border-radius:\s*(?:var\([^)]*\)|16px|14px|12px)/);
+  }
+  assert.match(regionalDirectoryCss, /width:\s*100%/);
+  assert.match(cppmetNewsCss, /width:\s*100%/);
+  assert.match(officialDataCss, /width:\s*100%/);
+  assert.match(forecastAccuracyCss, /width:\s*100%/);
+});
+
+test("canonical PNG icon is served by the app and reused by favicon, PWA, offline and push", () => {
+  assert.match(iconRoute, /createFileRoute\("\/brand\/tempo-pelotas-icon\.png"\)/);
+  assert.match(iconRoute, /"Content-Type":\s*"image\/png"/);
+  assert.match(iconRoute, /"X-Content-Type-Options":\s*"nosniff"/);
+  for (const source of [rootRoute, manifest, serviceWorker, offlinePage]) {
+    assert.match(source, /\/brand\/tempo-pelotas-icon\.png/);
+  }
 });
 
 test("standalone status and privacy pages share Home containers and radii", () => {
