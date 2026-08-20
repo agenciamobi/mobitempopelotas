@@ -42,7 +42,7 @@
 .site-shell--topic .site-container--topic > [class*="-page"] > header,
 .site-shell--topic .topic-hero,
 .site-shell--topic .hydrology-editorial-hero,
-.site-shell--topic .radar-satellite-page > :first-child {
+.site-shell--topic .redemet-hero {
   position: relative;
   isolation: auto;
   display: grid;
@@ -75,7 +75,8 @@
 
 .site-shell--topic .site-container--topic > [class*="-page"] > header h1,
 .site-shell--topic .topic-hero h1,
-.site-shell--topic .hydrology-editorial-hero h1 {
+.site-shell--topic .hydrology-editorial-hero h1,
+.site-shell--topic .redemet-hero h1 {
   max-width: 940px;
   margin-top: 10px;
   color: #071e2f;
@@ -89,7 +90,9 @@
 .site-shell--topic :is(
     .topic-hero p,
     .site-container--topic > [class*="-page"] > header p,
-    .hydrology-editorial-hero p
+    .hydrology-editorial-hero p,
+    .redemet-hero p,
+    .redemet-hero__copy > span
   ) {
   max-width: 76ch;
   color: var(--internal-muted);
@@ -103,7 +106,8 @@
   > header
   > :last-child:not(:first-child),
 .site-shell--topic .topic-hero > :last-child:not(:first-child),
-.site-shell--topic .topic-hero-status {
+.site-shell--topic .topic-hero-status,
+.site-shell--topic .redemet-hero > aside {
   width: min(100%, 430px);
   min-width: 0;
   padding: clamp(18px, 2.2vw, 26px);
@@ -120,7 +124,10 @@
 .site-shell--topic .related-weather,
 .site-shell--topic .hydrology-editorial-route > section,
 .site-shell--topic .radar-satellite-page > section,
-.site-shell--topic .radar-satellite-page > .editorial-answer-section {
+.site-shell--topic .radar-satellite-page > .editorial-answer-section,
+.site-shell--topic .redemet-page > section,
+.site-shell--topic .redemet-page > article,
+.site-shell--topic .redemet-page > nav {
   width: 100%;
   max-width: none;
   margin: 0 0 clamp(16px, 2vw, 24px);
@@ -131,6 +138,12 @@
   background: var(--internal-surface);
   box-shadow: none;
   scroll-margin-top: 92px;
+}
+
+.site-shell--topic .redemet-page {
+  display: grid;
+  gap: 0;
+  width: 100%;
 }
 
 .site-shell--topic
@@ -250,12 +263,15 @@
   .site-shell--topic .site-container--topic > [class*="-page"] > header,
   .site-shell--topic .topic-hero,
   .site-shell--topic .hydrology-editorial-hero,
-  .site-shell--topic .radar-satellite-page > :first-child,
+  .site-shell--topic .redemet-hero,
   .site-shell--topic .site-container--topic > [class*="-page"] > section,
   .site-shell--topic .topic-section,
   .site-shell--topic .related-weather,
   .site-shell--topic .hydrology-editorial-route > section,
   .site-shell--topic .radar-satellite-page > section,
+  .site-shell--topic .redemet-page > section,
+  .site-shell--topic .redemet-page > article,
+  .site-shell--topic .redemet-page > nav,
   .internal-weather-shell--flood-history .tp-flood-history__index,
   .internal-weather-shell--flood-history .tp-flood-history > section {
     border-radius: var(--internal-radius-mobile);
@@ -263,7 +279,8 @@
 
   .site-shell--topic .site-container--topic > [class*="-page"] > header h1,
   .site-shell--topic .topic-hero h1,
-  .site-shell--topic .hydrology-editorial-hero h1 {
+  .site-shell--topic .hydrology-editorial-hero h1,
+  .site-shell--topic .redemet-hero h1 {
     font-size: clamp(2.25rem, 11vw, 3.5rem);
   }
 
@@ -285,6 +302,7 @@
 @media (forced-colors: active) {
   .site-shell--topic .site-container--topic > [class*="-page"] > header,
   .site-shell--topic .topic-hero,
+  .site-shell--topic .redemet-hero,
   .site-shell--topic .site-container--topic > [class*="-page"] > section,
   .internal-weather-shell--flood-history .tp-flood-history > section {
     border: 1px solid CanvasText;
