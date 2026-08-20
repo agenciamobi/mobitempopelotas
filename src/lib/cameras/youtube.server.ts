@@ -3,7 +3,7 @@ import type { YouTubeBroadcastStatus, YouTubeCameraStream } from "./cameras.type
 const YOUTUBE_API = "https://www.googleapis.com/youtube/v3";
 const YOUTUBE_ORIGIN = "https://www.youtube.com";
 const YOUTUBE_EMBED_ORIGIN = "https://www.youtube-nocookie.com";
-const REQUEST_TIMEOUT_MS = 8_000;
+const REQUEST_TIMEOUT_MS = 5_000;
 const DEFAULT_CHANNEL_HANDLE = "@praiadolaranjal";
 const DEFAULT_CHANNEL_ID = "UCqvFgdUJ7kuChDA7hbnz1ZA";
 
@@ -127,6 +127,7 @@ async function youtubeRequest<T>(
   resource: string,
   parameters: Record<string, string>,
   apiKey: string,
+  signal: AbortSignal,
 ): Promise<T> {
   const url = new URL(`${YOUTUBE_API}/${resource}`);
   for (const [name, value] of Object.entries(parameters)) {
@@ -136,7 +137,7 @@ async function youtubeRequest<T>(
 
   const response = await fetch(url, {
     headers: { Accept: "application/json" },
-    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    signal,
   });
 
   if (!response.ok) {
@@ -147,10 +148,14 @@ async function youtubeRequest<T>(
 }
 
 async function fetchStreamFromApi(apiKey: string, handle: string) {
+  // Um único orçamento cobre toda a sequência channels -> playlist -> videos.
+  // Assim uma API degradada não pode acumular três timeouts consecutivos.
+  const signal = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
   const channels = await youtubeRequest<ChannelResponse>(
     "channels",
     { part: "id,contentDetails", forHandle: handle.replace(/^@/, "") },
     apiKey,
+    signal,
   );
   const uploadsPlaylist = channels.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
   if (!uploadsPlaylist) return null;
@@ -163,6 +168,7 @@ async function fetchStreamFromApi(apiKey: string, handle: string) {
       maxResults: "15",
     },
     apiKey,
+    signal,
   );
   const videoIds = (playlist.items ?? [])
     .map((item) => item.contentDetails?.videoId)
@@ -176,6 +182,7 @@ async function fetchStreamFromApi(apiKey: string, handle: string) {
       id: videoIds.join(","),
     },
     apiKey,
+    signal,
   );
   const streams = (videos.items ?? [])
     .filter(
@@ -386,34 +393,40 @@ export async function getLatestLaranjalStream() {
     });
   }
 
-  if (apiKey) {
-    try {
-      const apiStream = await fetchStreamFromApi(apiKey, handle);
-      if (apiStream?.status === "live") return apiStream;
-    } catch (error) {
-      console.warn("[cameras/youtube] API indisponível; tentando página pública", {
-        message: error instanceof Error ? error.message : String(error),
-      });
-    }
-  }
+  // API, página pública e RSS são alternativas da mesma descoberta. Executá-las
+  // em paralelo impede que a indisponibilidade de uma fonte some vários timeouts
+  // antes de liberar o estado da câmera.
+  const apiStreamPromise: Promise<YouTubeCameraStream | null> = apiKey
+    ? fetchStreamFromApi(apiKey, handle).catch((error) => {
+        console.warn("[cameras/youtube] API indisponível", {
+          message: error instanceof Error ? error.message : String(error),
+        });
+        return null;
+      })
+    : Promise.resolve(null);
 
-  try {
-    const publicStream = await fetchPublicLiveStream(handle);
-    if (publicStream) return publicStream;
-  } catch (error) {
+  const publicStreamPromise = fetchPublicLiveStream(handle).catch((error) => {
     console.warn("[cameras/youtube] Página pública indisponível", {
       message: error instanceof Error ? error.message : String(error),
     });
-  }
+    return null;
+  });
 
-  try {
-    const latestReplay = await fetchLatestReplay(channelId);
-    if (latestReplay) return latestReplay;
-  } catch (error) {
+  const latestReplayPromise = fetchLatestReplay(channelId).catch((error) => {
     console.warn("[cameras/youtube] Feed público indisponível", {
       message: error instanceof Error ? error.message : String(error),
     });
-  }
+    return null;
+  });
 
+  const [apiStream, publicStream, latestReplay] = await Promise.all([
+    apiStreamPromise,
+    publicStreamPromise,
+    latestReplayPromise,
+  ]);
+
+  if (apiStream?.status === "live") return apiStream;
+  if (publicStream) return publicStream;
+  if (latestReplay) return latestReplay;
   return manualReplayFallback;
 }
