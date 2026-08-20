@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { getWeatherCameras } from "@/lib/cameras/cameras.functions";
 import { HOME_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
 import { getLagoonMonitoringNetwork } from "@/lib/hydrology/lagoon-network.functions";
@@ -34,29 +33,27 @@ export const Route = createFileRoute("/")({
       createFaqPageJsonLd(PAGE_PATH, HOME_EDITORIAL_CONTENT.faqs),
     ]),
   loader: async () => {
-    const [weather, laranjal, guaiba, lagoon, cameraData] = await Promise.all([
+    const [weather, laranjal, guaiba, lagoon] = await Promise.all([
       getWeatherIntelligence(),
       getLaranjalLevelData(),
       getGuaibaObservation(),
       getLagoonMonitoringNetwork(),
-      getWeatherCameras(),
     ]);
 
-    return { weather, laranjal, guaiba, lagoon, cameraData };
+    return { weather, laranjal, guaiba, lagoon };
   },
   staleTime: 60 * 1_000,
   component: HomePage,
 });
 
 function HomePage() {
-  const { weather, laranjal, guaiba, lagoon, cameraData } = Route.useLoaderData();
+  const { weather, laranjal, guaiba, lagoon } = Route.useLoaderData();
   return (
     <ProductionHome
       data={weather}
       laranjal={laranjal}
       guaiba={guaiba}
       lagoon={lagoon}
-      cameraData={cameraData}
     />
   );
 }
