@@ -5,6 +5,8 @@ import test from "node:test";
 const route = readFileSync("src/routes/cameras-ao-vivo-pelotas.tsx", "utf8");
 const page = readFileSync("src/components/cameras/CameraPageV2.tsx", "utf8");
 const styles = readFileSync("src/components/cameras/CameraPageV2.css", "utf8");
+const cameraServer = readFileSync("src/lib/cameras/cameras.server.ts", "utf8");
+const youtubeServer = readFileSync("src/lib/cameras/youtube.server.ts", "utf8");
 
 const cameraSource = `${route}\n${page}`;
 
@@ -20,6 +22,23 @@ test("camera route uses the shared shell and parallel real data loaders", () => 
   assert.match(route, /showOfficialAlerts=\{false\}/);
   assert.match(route, /staleTime: 3 \* 60 \* 1_000/);
   assert.match(route, /createFaqPageJsonLd\(PAGE_PATH, CAMERAS_PAGE_CONTENT\.faqs\)/);
+});
+
+test("camera discovery is bounded and does not stack YouTube fallback timeouts", () => {
+  assert.match(cameraServer, /configuredLaranjalEmbedUrl/);
+  assert.match(
+    cameraServer,
+    /configuredLaranjalEmbedUrl \? null : await getLatestLaranjalStream\(\)/,
+  );
+  assert.match(youtubeServer, /const REQUEST_TIMEOUT_MS = 5_000/);
+  assert.match(youtubeServer, /const signal = AbortSignal\.timeout\(REQUEST_TIMEOUT_MS\)/);
+  assert.match(youtubeServer, /const apiStreamPromise/);
+  assert.match(youtubeServer, /const publicStreamPromise/);
+  assert.match(youtubeServer, /const latestReplayPromise/);
+  assert.match(
+    youtubeServer,
+    /Promise\.all\(\[[\s\S]*apiStreamPromise,[\s\S]*publicStreamPromise,[\s\S]*latestReplayPromise,[\s\S]*\]\)/,
+  );
 });
 
 test("camera states distinguish live, replay, configured and preparing", () => {
