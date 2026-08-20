@@ -28,6 +28,7 @@ O Tempo Pelotas é um portal meteorológico regional focado em Pelotas e Zona Su
 | Domínio | Estado atual | Observação |
 | --- | --- | --- |
 | Portal público | Ativo | Produção em `tempopelotas.com.br` |
+| Interface pública | Ativo | Home, páginas internas/dedicadas e páginas institucionais compartilham o mesmo header/footer editorial, rail de conteúdo e contrato de superfícies da Home; a rota histórica de 2024 foi corrigida para não duplicar o chrome global |
 | Home meteorológica | Ativo | Header e hero editoriais; próximas horas e tendência semanal em capítulos separados; tendência posicionada imediatamente antes da central de radar/satélite; alertas e blocos locais autocontidos |
 | Previsão hoje/amanhã/7 dias | Ativo | Páginas dedicadas e conteúdo indexável |
 | Chuva, vento e meteograma | Ativo | Visões temáticas e hora a hora |
@@ -38,6 +39,7 @@ O Tempo Pelotas é um portal meteorológico regional focado em Pelotas e Zona Su
 | Trovoadas STSC | Ativo | Contrato atual da API REDEMET e filtro regional |
 | Mapa regional MapLibre | Ativo | Camadas de radar, satélite e trovoadas |
 | Hidrologia | Ativo | Laranjal, Lagoa dos Patos, Guaíba e rede regional |
+| Rede Hidrometeorológica Defesa Civil RS | Pesquisa / inventário | API GraphQL e contratos técnicos identificados; ainda não é fonte ativa do runtime público. Próximo passo é inventariar códigos, bacias e capacidades das estações e revisar condições de uso |
 | Histórico climático | Ativo | Janela de 30 dias com fonte/fallback documentados |
 | Registro histórico da enchente de 2024 | Ativo | Rota pública `/enchente-2024-pelotas-laranjal` registra a linha do tempo da cheia, a propagação Guaíba → Lagoa dos Patos → Pelotas/Laranjal → estuário e a fase de reconstrução |
 | Câmeras | Ativo com dependência externa | YouTube, live/replay e contingências |
@@ -284,6 +286,21 @@ A situação hidrológica também agrega estações e referências da Lagoa dos 
 - demais fontes regionais normalizadas pelos módulos de hidrologia.
 
 A página `/situacao-hidrologica-pelotas` deve funcionar mesmo quando uma ou mais fontes externas estiverem indisponíveis.
+
+### Rede Hidrometeorológica da Defesa Civil RS — pesquisa
+
+Documentação de planejamento: `docs/DEFESA_CIVIL_RS_HYDROMET_PLAN.md`.
+
+A API GraphQL e os contratos de consulta/histórico/nowcasting foram identificados tecnicamente, mas a rede **ainda não é consumida pelo runtime público**. O próximo passo é obter o inventário completo de estações `DCRS-xxxxx`, associar código, nome, coordenadas, bacia e capacidades e somente então selecionar os pontos de produção.
+
+A regra de seleção já foi definida:
+
+- para meteorologia, interessa a rede regional ao sul de Porto Alegre e no entorno da Lagoa dos Patos quando houver sensores válidos e leitura recente;
+- para hidrologia, entram somente estações ligadas fisicamente ao Guaíba/Lagoa dos Patos, afluentes relevantes da Bacia do Camaquã, sistema Mirim–São Gonçalo, orla da Lagoa e estuário de Rio Grande;
+- proximidade geográfica isolada não transforma uma estação em contexto hidrológico;
+- as cores dos produtos de chuva da rede não devem ser interpretadas como limiares de alerta.
+
+As condições de uso devem ser revisadas antes da ativação pública/comercial da nova fonte.
 
 ### Registro histórico da enchente de 2024
 
@@ -604,6 +621,7 @@ A suíte de contratos cobre, entre outros domínios:
 - reconciliação de temperatura;
 - REDEMET e contratos HAR;
 - coerência editorial da Home;
+- coesão visual entre Home e páginas internas/dedicadas;
 - páginas Hoje/Amanhã/7 dias/Chuva/Vento;
 - radar/satélite;
 - inteligência atmosférica;
@@ -625,6 +643,8 @@ A regra atual de lint é incremental para impedir nova dívida sem misturar uma 
 ## 21. Deploy, Lovable e disciplina de Git
 
 O projeto é conectado ao Lovable. Commits enviados à branch conectada sincronizam para o editor.
+
+A interface pública usa a Home como fonte de verdade visual: `HomeEditorialHeader`, footer editorial com faixa de utilidade pública, rail de 1440 px no desktop e superfícies brancas de borda discreta/radius suave são compartilhados pelas páginas públicas, preservando componentes e conteúdo específicos de cada rota.
 
 Regras:
 
@@ -674,6 +694,7 @@ A integração pública com CPTEC/SIGMA foi deliberadamente adiada para revisão
 | `MIGRATION_MATRIX.md` | Matriz histórica de migração, paridade e critérios de aceite |
 | `MIGRATION.md` | Estratégia e histórico da migração |
 | `docs/REDEMET_OPERATIONS.md` | Fonte operacional da integração REDEMET |
+| `docs/DEFESA_CIVIL_RS_HYDROMET_PLAN.md` | Pesquisa e plano de integração meteorológica/hidrológica da Rede da Defesa Civil RS; ainda sem consumo produtivo |
 | `docs/CPTEC_SIGMA_RESEARCH.md` | Pesquisa futura CPTEC/SIGMA, sem integração produtiva |
 | `docs/RUNTIME_READINESS.md` | Preflight e requisitos do runtime |
 | `docs/PRODUCTION_CUTOVER.md` | Runbook de corte/produção |
@@ -698,7 +719,8 @@ Estas são pendências de produto/operação, não funcionalidades inexistentes 
 4. formalizar rollback de aplicação, banco, DNS e caches;
 5. continuar monitorando a disponibilidade das fontes externas, principalmente radar REDEMET e hidrologia regional;
 6. retomar avaliação CPTEC/SIGMA em novembro/dezembro de 2026, sem assumir previamente autorização ou integração;
-7. manter a limpeza de dívida histórica de lint/formatação separada de mudanças funcionais.
+7. concluir o inventário de estações da Rede Hidrometeorológica da Defesa Civil RS, revisar condições de uso e validar bacias/unidades antes de qualquer ativação pública;
+8. manter a limpeza de dívida histórica de lint/formatação separada de mudanças funcionais.
 
 ## 25. Regra de manutenção deste arquivo
 
