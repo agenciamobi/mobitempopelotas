@@ -7,7 +7,8 @@ const EXPECTED_REPOSITORY_ID = "1306185236";
 const EXPECTED_REPOSITORY_OWNER = "agenciamobi";
 const EXPECTED_REPOSITORY_OWNER_ID = "157939955";
 const EXPECTED_REF = "refs/heads/main";
-const EXPECTED_WORKFLOW_REF = `${EXPECTED_REPOSITORY}/.github/workflows/weather-ai-snapshots.yml@${EXPECTED_REF}`;
+const WEATHER_AI_EXPECTED_WORKFLOW_REF = `${EXPECTED_REPOSITORY}/.github/workflows/weather-ai-snapshots.yml@${EXPECTED_REF}`;
+const DATA_STATUS_EXPECTED_WORKFLOW_REF = `${EXPECTED_REPOSITORY}/.github/workflows/data-status-monitor.yml@${EXPECTED_REF}`;
 const EXPECTED_SUBJECTS = new Set([
   `repo:${EXPECTED_REPOSITORY}:ref:${EXPECTED_REF}`,
   `repo:${EXPECTED_REPOSITORY_OWNER}@${EXPECTED_REPOSITORY_OWNER_ID}/mobitempopelotas@${EXPECTED_REPOSITORY_ID}:ref:${EXPECTED_REF}`,
@@ -17,6 +18,7 @@ const CLOCK_TOLERANCE_SECONDS = 30;
 const JWKS_TIMEOUT_MS = 10_000;
 
 export const WEATHER_AI_GITHUB_OIDC_AUDIENCE = "tempo-pelotas-weather-ai";
+export const DATA_STATUS_GITHUB_OIDC_AUDIENCE = "tempo-pelotas-data-status";
 
 const jwtHeaderSchema = z.object({
   alg: z.literal("RS256"),
@@ -85,6 +87,8 @@ type GithubOidcVerification =
 type VerificationOptions = {
   fetchImpl?: OidcFetch;
   now?: number;
+  expectedAudience?: string;
+  expectedWorkflowRef?: string;
 };
 
 function decodeBase64Url(value: string) {
@@ -102,9 +106,9 @@ function decodeJwtSegment(segment: string) {
   return JSON.parse(new TextDecoder().decode(decodeBase64Url(segment))) as unknown;
 }
 
-function audienceMatches(audience: string | string[]) {
+function audienceMatches(audience: string | string[], expectedAudience: string) {
   const audiences = Array.isArray(audience) ? audience : [audience];
-  return audiences.includes(WEATHER_AI_GITHUB_OIDC_AUDIENCE);
+  return audiences.includes(expectedAudience);
 }
 
 function safeFailure(reason: string): GithubOidcVerification {
@@ -226,8 +230,10 @@ export async function verifyWeatherAiGithubActionsToken(
 
   const claims = parsedClaims.data;
   const nowSeconds = Math.floor((options.now ?? Date.now()) / 1_000);
+  const expectedAudience = options.expectedAudience ?? WEATHER_AI_GITHUB_OIDC_AUDIENCE;
+  const expectedWorkflowRef = options.expectedWorkflowRef ?? WEATHER_AI_EXPECTED_WORKFLOW_REF;
 
-  if (!audienceMatches(claims.aud)) return safeFailure("invalid-audience");
+  if (!audienceMatches(claims.aud, expectedAudience)) return safeFailure("invalid-audience");
   if (claims.exp <= nowSeconds - CLOCK_TOLERANCE_SECONDS) return safeFailure("token-expired");
   if (claims.iat > nowSeconds + CLOCK_TOLERANCE_SECONDS) return safeFailure("issued-in-future");
   if (claims.nbf !== undefined && claims.nbf > nowSeconds + CLOCK_TOLERANCE_SECONDS) {
@@ -240,7 +246,7 @@ export async function verifyWeatherAiGithubActionsToken(
     return safeFailure("invalid-owner-id");
   }
   if (!EXPECTED_SUBJECTS.has(claims.sub)) return safeFailure("invalid-subject");
-  if (claims.workflow_ref !== EXPECTED_WORKFLOW_REF) return safeFailure("invalid-workflow-ref");
+  if (claims.workflow_ref !== expectedWorkflowRef) return safeFailure("invalid-workflow-ref");
   if (!ALLOWED_EVENTS.has(claims.event_name)) return safeFailure("invalid-event");
   if (claims.runner_environment && claims.runner_environment !== "github-hosted") {
     return safeFailure("invalid-runner-environment");
@@ -249,12 +255,29 @@ export async function verifyWeatherAiGithubActionsToken(
   return { valid: true };
 }
 
+function bearerToken(request: Request) {
+  const authorization = request.headers.get("authorization")?.trim() ?? "";
+  return authorization.match(/^Bearer\s+(.+)$/i)?.[1] ?? null;
+}
+
 export async function verifyWeatherAiGithubActionsRequest(
   request: Request,
   options: VerificationOptions = {},
 ) {
-  const authorization = request.headers.get("authorization")?.trim() ?? "";
-  const match = authorization.match(/^Bearer\s+(.+)$/i);
-  if (!match) return safeFailure("bearer-missing");
-  return verifyWeatherAiGithubActionsToken(match[1], options);
+  const token = bearerToken(request);
+  if (!token) return safeFailure("bearer-missing");
+  return verifyWeatherAiGithubActionsToken(token, options);
+}
+
+export async function verifyDataStatusGithubActionsRequest(
+  request: Request,
+  options: Omit<VerificationOptions, "expectedAudience" | "expectedWorkflowRef"> = {},
+) {
+  const token = bearerToken(request);
+  if (!token) return safeFailure("bearer-missing");
+  return verifyWeatherAiGithubActionsToken(token, {
+    ...options,
+    expectedAudience: DATA_STATUS_GITHUB_OIDC_AUDIENCE,
+    expectedWorkflowRef: DATA_STATUS_EXPECTED_WORKFLOW_REF,
+  });
 }
