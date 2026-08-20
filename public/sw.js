@@ -1,13 +1,12 @@
 /* global self, caches, fetch, Response, URL */
 
-const CACHE_VERSION = "tempo-pelotas-v6";
+const CACHE_VERSION = "tempo-pelotas-v7";
 const APP_SHELL_CACHE = `${CACHE_VERSION}-app-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_FALLBACK_URL = "/offline.html";
 const OPTIONAL_APP_SHELL_URLS = [
   "/manifest.webmanifest",
   "/brand/tempo-pelotas-icon.png",
-  "/brand/tempo-pelotas-maskable.png",
 ];
 
 self.addEventListener("install", (event) => {
