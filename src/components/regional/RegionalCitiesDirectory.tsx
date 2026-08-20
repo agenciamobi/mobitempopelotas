@@ -6,7 +6,7 @@ import styles from "./RegionalCitiesDirectory.module.css";
 
 export function RegionalCitiesDirectory() {
   return (
-    <main className={styles.page} id="conteudo-principal">
+    <div className={`${styles.page} regional-cities-directory`}>
       <section className={styles.hero}>
         <span>Tempo Pelotas · Central regional</span>
         <h1>Previsão do tempo por cidade na Zona Sul do RS</h1>
@@ -61,6 +61,6 @@ export function RegionalCitiesDirectory() {
           <li>Links entre cidades da mesma área regional.</li>
         </ul>
       </section>
-    </main>
+    </div>
   );
 }
