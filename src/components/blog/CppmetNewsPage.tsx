@@ -32,7 +32,7 @@ function formatFetchedAt(value: string) {
 
 export function CppmetNewsPage({ feed }: CppmetNewsPageProps) {
   return (
-    <main className="cppmet-blog" id="conteudo-principal">
+    <div className="cppmet-blog">
       <section className="cppmet-blog__hero" aria-labelledby="cppmet-blog-title">
         <div className="cppmet-blog__hero-copy">
           <p className="cppmet-blog__eyebrow">
@@ -110,6 +110,6 @@ export function CppmetNewsPage({ feed }: CppmetNewsPageProps) {
           </a>
         </section>
       )}
-    </main>
+    </div>
   );
 }
