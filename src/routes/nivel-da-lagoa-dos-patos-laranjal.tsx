@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
+import { OfficialDataAccessNotice } from "@/components/content/OfficialDataAccessNotice";
 import { LaranjalEmbedGuide } from "@/components/embed/LaranjalEmbedGuide";
 import { HydrologyEditorialHero } from "@/components/hydrology/HydrologyEditorialHero";
 import "@/components/hydrology/HydrologyEditorialRefinements.css";
@@ -24,11 +25,18 @@ const LARANJAL_PAGE_CONTENT = {
   answer:
     "O número mostra o nível registrado no horário informado e na referência própria da Estação Laranjal. A evolução das últimas horas ajuda a acompanhar a mudança local, mas não confirma sozinha alagamento ou inundação.",
   facts: [
+    "O Tempo Pelotas possui acesso autorizado à plataforma integrada da ANA para incorporar, de forma gradual, informações da Rede Hidrometeorológica Nacional ao acompanhamento regional.",
+    "Dados da ANA/RHN só devem ser apresentados como leitura de uma estação depois de validar sua unidade, referência, horário e estado de atualização; valores de referências diferentes não são convertidos automaticamente para o Laranjal.",
     "A estação pode ficar sem nova medição ou sofrer interrupções; sempre confira o horário e o aviso de atualização.",
     "Uma mudança curta pode resultar de vento, oscilação local ou ruído. A sequência de medições é mais útil do que um único ponto.",
     "Em condição de risco, siga a Defesa Civil, as autoridades municipais e os comunicados oficiais.",
   ],
   faqs: [
+    {
+      question: "A medição exibida no Laranjal já vem da ANA/RHN?",
+      answer:
+        "Não necessariamente. A página identifica a fonte usada para cada leitura. O acesso à plataforma integrada da ANA/RHN está autorizado e a integração está em implantação, mas uma estação só entra como fonte pública depois de validarmos unidade, referência, horário e disponibilidade.",
+    },
     {
       question: "O que representa o número exibido para o Laranjal?",
       answer:
@@ -80,6 +88,8 @@ export const Route = createFileRoute("/nivel-da-lagoa-dos-patos-laranjal")({
           "Nível da Lagoa dos Patos",
           "Estação Laranjal",
           "Praia do Laranjal",
+          "Rede Hidrometeorológica Nacional",
+          "Agência Nacional de Águas e Saneamento Básico",
           "Medição automática do nível em Pelotas",
           "Tendência do nível da água no Laranjal",
         ],
@@ -101,6 +111,7 @@ function NivelLagoaPage() {
     <div className="hydrology-editorial-route">
       <HydrologyEditorialHero level={data.level} variant="detail" />
       <LaranjalLevelPage weather={data.weather} level={data.level} />
+      <OfficialDataAccessNotice scope="hydrology" />
       <LaranjalEmbedGuide />
       <EditorialContentSection id="como-interpretar-nivel-laranjal" content={LARANJAL_PAGE_CONTENT} />
     </div>
