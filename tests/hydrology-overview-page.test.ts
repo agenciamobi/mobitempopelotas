@@ -62,14 +62,15 @@ test("Defesa Civil RS adapter preserves observation identity, timestamp and miss
   assert.match(defesaCivilServer, /windAverageKmh/);
   assert.match(defesaCivilServer, /REGIONAL_RADIUS_KM = 320/);
   assert.match(defesaCivilServer, /distanceFromPelotasKm/);
-  assert.match(defesaCivilServer, /value !== null/);
+  assert.match(defesaCivilServer, /Number\.isFinite\(parsed\) \? parsed : null/);
+  assert.match(defesaCivilServer, /if \(!normalized\) return null/);
   assert.doesNotMatch(defesaCivilServer, /\?\?\s*0\b/);
 });
 
 test("Defesa Civil RS area keeps observed data separate from alert and risk classification", () => {
   assert.match(defesaCivilArea, /Rede oficial · Defesa Civil RS/);
   assert.match(defesaCivilArea, /não transforma essas medições em alerta ou previsão de cheia/);
-  assert.match(defesaCivilArea, /não representa estado operacional, nível de atenção ou classificação oficial de risco/);
+  assert.match(defesaCivilArea, /não\s+representa estado operacional, nível de atenção ou classificação oficial de risco/);
   assert.match(defesaCivilArea, /não substitui os canais oficiais de alerta e orientação da Defesa Civil/);
   assert.match(defesaCivilArea, /Fonte e responsabilidade dos dados/);
   assert.match(defesaCivilArea, /Abrir mapa oficial/);
