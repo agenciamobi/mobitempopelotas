@@ -20,16 +20,18 @@ export function OfficialDataAccessNotice({
       <div className="official-data-access__intro">
         <span>Integrações institucionais</span>
         <h2 id={`official-data-access-title-${scope}`}>
-          Acesso autorizado a fontes oficiais por conexão entre sistemas
+          Integração e disseminação de informações oficiais
         </h2>
         <p>
-          O Tempo Pelotas mantém acessos institucionais autorizados para consultar e integrar
-          informações oficiais sem expor credenciais no navegador. Cada dado continua identificado
-          pela instituição de origem, horário de observação e estado de disponibilidade.
+          O Tempo Pelotas atua como plataforma local de integração, organização e disseminação de
+          informações oficiais. REDEMET/DECEA e ANA/SNIRH/RHN permanecem identificados como as
+          fontes institucionais dos dados; o portal faz a conexão entre sistemas, contextualiza a
+          informação para Pelotas e preserva origem, horário e estado de disponibilidade.
         </p>
         <small>
-          A autorização de acesso às plataformas e APIs não representa chancela editorial das
-          instituições sobre análises, sínteses ou textos produzidos pelo Tempo Pelotas.
+          O acesso técnico às plataformas e APIs não significa homologação, certificação, parceria
+          formal ou chancela editorial dessas instituições sobre análises, sínteses ou textos
+          produzidos pelo Tempo Pelotas.
         </small>
       </div>
 
@@ -45,10 +47,11 @@ export function OfficialDataAccessNotice({
             <p>REDEMET / DECEA</p>
             <h3>Rede de Meteorologia do Comando da Aeronáutica</h3>
             <div>
-              O portal possui acesso autorizado à API da REDEMET para coleta automatizada de
-              produtos meteorológicos oficiais. A integração é feita no servidor e alimenta
-              recursos como radar, imagens de satélite e ocorrências de trovoadas do produto STSC,
-              sempre preservando a origem e o horário do quadro recebido.
+              O Tempo Pelotas possui credenciais de acesso à API da REDEMET/DECEA para integração
+              automatizada de produtos meteorológicos oficiais. A consulta acontece no servidor e
+              alimenta recursos como radar, imagens de satélite e ocorrências de trovoadas do
+              produto STSC, sempre preservando a identificação da REDEMET, do produto e do horário
+              recebido.
             </div>
             <a
               href="https://redemet.decea.mil.br/"
@@ -74,13 +77,13 @@ export function OfficialDataAccessNotice({
             <p>ANA / SNIRH / RHN</p>
             <h3>Rede Hidrometeorológica Nacional</h3>
             <div>
-              O Tempo Pelotas possui acesso autorizado à plataforma integrada da Agência Nacional
-              de Águas e Saneamento Básico para coleta e exibição de informações
-              hidrometeorológicas da Rede Hidrometeorológica Nacional. A RHN integra o Sistema
-              Nacional de Informações sobre Recursos Hídricos e reúne registros como níveis,
+              O responsável pelo Tempo Pelotas teve acesso concedido à plataforma integrada da
+              Agência Nacional de Águas e Saneamento Básico para consulta e futura integração de
+              informações hidrometeorológicas da Rede Hidrometeorológica Nacional. A RHN integra o
+              Sistema Nacional de Informações sobre Recursos Hídricos e reúne registros como níveis,
               vazões, chuvas e outras variáveis observadas por estações hidrometeorológicas. A
-              incorporação desses dados ao portal está sendo feita de forma gradual, com validação
-              de unidade, referência, horário e situação de cada estação antes da publicação.
+              incorporação ao portal está sendo feita gradualmente, com validação de unidade,
+              referência, horário, estação operadora e situação do dado antes de qualquer publicação.
             </div>
             <div className="official-data-access__links">
               <a
