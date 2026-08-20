@@ -8,6 +8,7 @@ import {
   resolveHeroWeatherIcon,
   weatherConditionLabels,
 } from "@/production/lib/hero-weather-presentation";
+import type { InmetAlertSeverity } from "@/production/lib/inmet-alerts";
 import type { WeatherData, WeatherIconName } from "@/production/lib/weather-data";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/production/lib/weather-insights";
 
@@ -17,6 +18,7 @@ type WeatherHeroProps = {
   weather: WeatherData;
   advisoryLevel?: AdvisoryLevel;
   officialAlertCount?: number;
+  officialAlertSeverity?: InmetAlertSeverity;
   cppmetForecast?: {
     item: CppmetForecastItem;
     sourceUrl: string;
@@ -35,7 +37,11 @@ function getCurrentUpdateMeta(current: WeatherData["current"]) {
   return "Leitura recente";
 }
 
-function getOfficialAlertActionLabel(count: number) {
+function getOfficialAlertActionLabel(count: number, severity: InmetAlertSeverity) {
+  const countLabel = count === 1 ? "1 alerta oficial" : `${count} alertas oficiais`;
+  if (severity === "great-danger") return `${countLabel} · vermelho`;
+  if (severity === "danger") return `${countLabel} · laranja`;
+  if (severity === "potential") return `${countLabel} · amarelo`;
   return count === 1 ? "Alerta oficial ativo" : `${count} alertas oficiais ativos`;
 }
 
@@ -63,6 +69,7 @@ export function WeatherHero({
   weather,
   advisoryLevel,
   officialAlertCount = 0,
+  officialAlertSeverity = "unknown",
   cppmetForecast = null,
   liveCameraBackground = null,
 }: WeatherHeroProps) {
@@ -94,6 +101,8 @@ export function WeatherHero({
     officialAlertCount > 0
       ? { href: "/alertas", label: "Ver aviso oficial" }
       : { href: "/previsao-7-dias-pelotas", label: "Ver próximos 7 dias" };
+  const officialSeverityClass =
+    officialAlertSeverity === "unknown" ? " severity-unknown" : ` severity-${officialAlertSeverity}`;
 
   return (
     <section
@@ -101,6 +110,7 @@ export function WeatherHero({
       data-condition={displayIcon}
       data-photo-kind={heroPhoto.kind}
       data-official-alerts={officialAlertCount > 0 ? "true" : "false"}
+      data-official-alert-severity={officialAlertSeverity}
       aria-labelledby="weather-hero-title"
     >
       <div
@@ -165,9 +175,9 @@ export function WeatherHero({
             <p className="tp-home-hero__description">{description}</p>
 
             {officialAlertCount > 0 ? (
-              <Link className="tp-home-hero__alert" href="/alertas">
+              <Link className={`tp-home-hero__alert${officialSeverityClass}`} href="/alertas">
                 <span className="tp-home-hero__alert-dot" aria-hidden="true" />
-                <strong>{getOfficialAlertActionLabel(officialAlertCount)}</strong>
+                <strong>{getOfficialAlertActionLabel(officialAlertCount, officialAlertSeverity)}</strong>
                 <i aria-hidden="true">→</i>
               </Link>
             ) : forecastReason ? (
