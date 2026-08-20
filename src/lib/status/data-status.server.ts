@@ -1,4 +1,5 @@
 import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
+import { getLagoonMonitoringNetwork } from "@/lib/hydrology/lagoon-network.functions";
 import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
 import { getRedemetOverview } from "@/lib/redemet/redemet.functions";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
@@ -68,6 +69,12 @@ function stateFromHydrology(status: "live" | "stale" | "unavailable"): ServiceSt
   return "operational";
 }
 
+function stateFromRegionalHydrology(status: "live" | "partial" | "stale" | "unavailable"): ServiceState {
+  if (status === "unavailable") return "offline";
+  if (status === "partial" || status === "stale") return "partial";
+  return "operational";
+}
+
 function stateFromLayer(configured: boolean, available: boolean): ServiceState {
   return configured && available ? "operational" : "offline";
 }
@@ -130,11 +137,12 @@ function applyMaintenanceWindows(services: ServiceStatus[], maintenance: Awaited
 
 export async function collectDataStatus(): Promise<DataStatusOverview> {
   const checkedAt = new Date().toISOString();
-  const [weatherResult, redemetResult, laranjalResult, guaibaResult] = await Promise.allSettled([
+  const [weatherResult, redemetResult, laranjalResult, guaibaResult, lagoonResult] = await Promise.allSettled([
     getWeatherIntelligence(),
     getRedemetOverview(),
     getLaranjalLevelData(),
     getGuaibaObservation(),
+    getLagoonMonitoringNetwork(),
   ]);
 
   const services: ServiceStatus[] = [];
@@ -247,6 +255,34 @@ export async function collectDataStatus(): Promise<DataStatusOverview> {
       state: "offline",
       detail: detailForState("offline"),
       checkedAt,
+    });
+  }
+
+  if (lagoonResult.status === "fulfilled") {
+    const state = stateFromRegionalHydrology(lagoonResult.value.status);
+    services.push({
+      id: "lagoon-regional-network",
+      name: "Rede regional da Lagoa dos Patos",
+      provider: lagoonResult.value.source.organizations,
+      category: "Hidrologia",
+      state,
+      detail:
+        state === "operational"
+          ? `${lagoonResult.value.available} de ${lagoonResult.value.total} estações com leitura disponível.`
+          : lagoonResult.value.error || detailForState(state),
+      checkedAt: lagoonResult.value.source.fetchedAt || checkedAt,
+      sourceUrl: lagoonResult.value.source.url,
+    });
+  } else {
+    services.push({
+      id: "lagoon-regional-network",
+      name: "Rede regional da Lagoa dos Patos",
+      provider: "FURG & Portos RS",
+      category: "Hidrologia",
+      state: "offline",
+      detail: detailForState("offline"),
+      checkedAt,
+      sourceUrl: "https://monitoramentolagoadospatos.com.br/",
     });
   }
 
