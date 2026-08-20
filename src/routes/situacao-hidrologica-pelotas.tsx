@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
+import { OfficialDataAccessNotice } from "@/components/content/OfficialDataAccessNotice";
 import {
   HydrologyOverviewHero,
   HydrologyOverviewV2,
@@ -27,6 +28,8 @@ const HYDROLOGY_PAGE_CONTENT = {
   answer:
     "A Estação Laranjal é a leitura local apresentada para Pelotas. Os demais pontos da Lagoa dos Patos, do Guaíba e dos rios acompanhados pelo SACE ajudam a entender a situação regional, mas cada estação usa seu próprio local, horário e referência de medição. Por isso, os números não devem ser comparados por simples subtração.",
   facts: [
+    "O Tempo Pelotas possui acesso autorizado à plataforma integrada da ANA para coleta e exibição de informações hidrometeorológicas da Rede Hidrometeorológica Nacional; a integração dessas estações está sendo implantada gradualmente.",
+    "A Rede Hidrometeorológica Nacional integra o SNIRH e reúne dados observados como níveis, vazões e chuvas, mantendo identificação própria de cada estação.",
     "A Estação Laranjal é a referência local do portal e não recebe automaticamente as cotas de outras estações.",
     "Uma leitura atrasada aparece como último valor conhecido e não como nível atual.",
     "Itapuã, Arambaré, São Lourenço do Sul e Rio Grande ajudam a acompanhar diferentes partes da Lagoa dos Patos.",
@@ -37,6 +40,11 @@ const HYDROLOGY_PAGE_CONTENT = {
   ],
   faqs: [
     ...HYDROLOGY_EDITORIAL_CONTENT.faqs,
+    {
+      question: "Como o Tempo Pelotas pretende usar os dados da ANA e da RHN?",
+      answer:
+        "O portal possui acesso autorizado à plataforma integrada da ANA para coleta e exibição de informações hidrometeorológicas da Rede Hidrometeorológica Nacional. A integração está sendo implantada de forma gradual, validando unidade, referência, horário e situação de cada estação antes de incorporá-la às páginas públicas.",
+    },
     {
       question: "Uma estação elevada no SACE significa que o Laranjal vai subir?",
       answer:
@@ -101,6 +109,10 @@ export const Route = createFileRoute("/situacao-hidrologica-pelotas")({
         about: [
           "Nível da Lagoa dos Patos",
           "Estação Laranjal",
+          "Rede Hidrometeorológica Nacional",
+          "Agência Nacional de Águas e Saneamento Básico",
+          "Sistema Nacional de Informações sobre Recursos Hídricos",
+          "Portal HidroWeb e Hidrotelemetria",
           "Medições de nível na região",
           "Situação das águas em Pelotas",
           "Medições automáticas da Lagoa dos Patos",
@@ -151,6 +163,7 @@ function SituacaoHidrologicaPage() {
         lagoon={data.lagoon}
         sace={data.sace}
       />
+      <OfficialDataAccessNotice scope="hydrology" />
       <EditorialContentSection
         id="como-interpretar-situacao-das-aguas"
         content={HYDROLOGY_PAGE_CONTENT}
