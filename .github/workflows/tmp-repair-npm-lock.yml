@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - agent/defesa-civil-hidrometeorologia
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
@@ -13,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout branch
+      - name: Checkout feature branch
         uses: actions/checkout@v4
         with:
           ref: agent/defesa-civil-hidrometeorologia
