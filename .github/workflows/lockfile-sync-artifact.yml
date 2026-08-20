@@ -1,6 +1,9 @@
-name: Temporary lockfile sync artifact
+name: Temporary lockfile repair
 
 on:
+  push:
+    branches:
+      - agent/defesa-civil-hidrometeorologia
   pull_request:
     branches:
       - main
@@ -10,14 +13,13 @@ permissions:
 
 jobs:
   sync-lockfile:
-    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout da branch do PR
+      - name: Checkout da branch
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.head_ref || github.ref_name }}
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
@@ -79,7 +81,7 @@ Documentação específica: `docs/DEFESA_CIVIL_RS_HYDRO_INTEGRATION.md`.
 
       - name: Commitar manutenção gerada
         env:
-          BRANCH_NAME: ${{ github.head_ref }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
