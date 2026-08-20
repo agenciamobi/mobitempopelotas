@@ -104,7 +104,7 @@ function parameterValues(infoXml: string, includes: string) {
 }
 
 function numericIds(...values: string[]) {
-  return unique(values.flatMap((value) => value.match(/\b\d{4,8}\b/g) ?? []));
+  return unique(values.flatMap((value) => value.match(/\b\d{5,8}\b/g) ?? []));
 }
 
 function relevanceFromCap(info: string, municipalityCodes: string[]): InmetAlertRelevance | null {
@@ -145,11 +145,11 @@ async function fetchText(url: string) {
 function extractDetailUrls(feedXml: string) {
   const ids = unique([
     ...Array.from(
-      feedXml.matchAll(/apiprevmet3\.inmet\.gov\.br\/avisos\/rss\/(\d{4,8})/gi),
+      feedXml.matchAll(/apiprevmet3\.inmet\.gov\.br\/avisos\/rss\/(\d{5,8})/gi),
       (match) => match[1],
     ),
     ...Array.from(
-      feedXml.matchAll(/avisos\.inmet\.gov\.br\/(\d{4,8})(?:\b|[/?#])/gi),
+      feedXml.matchAll(/avisos\.inmet\.gov\.br\/(\d{5,8})(?:\b|[/?#])/gi),
       (match) => match[1],
     ),
   ]).slice(0, MAX_RSS_DETAIL_REQUESTS);
