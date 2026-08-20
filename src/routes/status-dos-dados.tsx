@@ -1,10 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
-import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
 import { createPageHead } from "@/lib/page-meta";
-import { getRedemetOverview } from "@/lib/redemet/redemet.functions";
-import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
+import { getDataStatusPageData } from "@/lib/status/data-status.functions";
+import type { ServiceCategory, ServiceState } from "@/lib/status/data-status.types";
 import { SiteFooter } from "@/production/components/site-footer";
 import { SiteHeader } from "@/production/components/site-header";
 import type { WeatherData } from "@/production/lib/weather-data";
@@ -13,84 +11,8 @@ import "./status-dos-dados.css";
 
 const PAGE_TITLE = "Status dos dados e integrações — Tempo Pelotas";
 const PAGE_DESCRIPTION =
-  "Acompanhe a disponibilidade das principais fontes meteorológicas e hidrológicas usadas pelo Tempo Pelotas, incluindo INMET, REDEMET, Embrapa, Open-Meteo e medições de nível.";
+  "Acompanhe a disponibilidade, o histórico de incidentes e as principais fontes meteorológicas e hidrológicas usadas pelo Tempo Pelotas.";
 const PAGE_PATH = "/status-dos-dados";
-
-type ServiceState = "operational" | "partial" | "maintenance" | "offline" | "implementation";
-
-type ServiceCategory = "Meteorologia e avisos" | "Radar e satélite" | "Hidrologia";
-
-type ServiceStatus = {
-  id: string;
-  name: string;
-  provider: string;
-  category: ServiceCategory;
-  state: ServiceState;
-  detail: string;
-  checkedAt: string;
-  sourceUrl?: string;
-};
-
-const weatherSourceMeta = [
-  {
-    key: "embrapa",
-    name: "Observação meteorológica local",
-    provider: "Embrapa Clima Temperado",
-    category: "Meteorologia e avisos" as const,
-  },
-  {
-    key: "inmet",
-    name: "Avisos meteorológicos oficiais",
-    provider: "INMET",
-    category: "Meteorologia e avisos" as const,
-  },
-  {
-    key: "cppmet",
-    name: "Previsão e contexto regional",
-    provider: "CPPMet / UFPel",
-    category: "Meteorologia e avisos" as const,
-  },
-  {
-    key: "open-meteo",
-    name: "Previsão numérica principal",
-    provider: "Open-Meteo",
-    category: "Meteorologia e avisos" as const,
-  },
-  {
-    key: "met-norway",
-    name: "Previsão numérica complementar",
-    provider: "MET Norway",
-    category: "Meteorologia e avisos" as const,
-  },
-] as const;
-
-function stateFromHealth(status: "live" | "partial" | "unavailable" | "stale", usable: boolean): ServiceState {
-  if (status === "unavailable" || !usable) return "offline";
-  if (status === "partial" || status === "stale") return "partial";
-  return "operational";
-}
-
-function stateFromHydrology(status: "live" | "stale" | "unavailable"): ServiceState {
-  if (status === "unavailable") return "offline";
-  if (status === "stale") return "partial";
-  return "operational";
-}
-
-function stateFromLayer(configured: boolean, available: boolean): ServiceState {
-  return configured && available ? "operational" : "offline";
-}
-
-function detailForState(state: ServiceState) {
-  if (state === "operational") return "A fonte respondeu normalmente na última verificação.";
-  if (state === "partial") {
-    return "A fonte respondeu, mas há atraso ou parte das informações não está atualizada.";
-  }
-  if (state === "maintenance") return "Serviço em manutenção programada pelo Tempo Pelotas.";
-  if (state === "implementation") {
-    return "Acesso concedido; integração pública ainda em implantação e validação.";
-  }
-  return "Não foi possível obter dados desta fonte na última verificação.";
-}
 
 function labelForState(state: ServiceState) {
   if (state === "operational") return "Ativo";
@@ -98,18 +20,6 @@ function labelForState(state: ServiceState) {
   if (state === "maintenance") return "Manutenção";
   if (state === "implementation") return "Em implantação";
   return "Offline";
-}
-
-function overallState(services: ServiceStatus[]): Exclude<ServiceState, "maintenance" | "implementation"> {
-  const runtimeServices = services.filter(
-    (service) => service.state !== "implementation" && service.state !== "maintenance",
-  );
-  const offline = runtimeServices.filter((service) => service.state === "offline").length;
-  const partial = runtimeServices.filter((service) => service.state === "partial").length;
-
-  if (runtimeServices.length > 0 && offline === runtimeServices.length) return "offline";
-  if (offline > 0 || partial > 0) return "partial";
-  return "operational";
 }
 
 function categoryId(category: ServiceCategory) {
@@ -129,172 +39,31 @@ function formatCheckedAt(value: string) {
   }).format(date);
 }
 
+function formatAvailability(value: number | null) {
+  if (value === null) return "—";
+  return `${new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 }).format(value)}%`;
+}
+
+function formatDuration(start: string, end: string) {
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) return "duração indisponível";
+
+  const minutes = Math.max(0, Math.round((endDate.getTime() - startDate.getTime()) / 60_000));
+  if (minutes < 60) return `${minutes} min`;
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  if (hours < 24) return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}min` : `${hours}h`;
+
+  const days = Math.floor(hours / 24);
+  const remainingHours = hours % 24;
+  return remainingHours > 0 ? `${days}d ${remainingHours}h` : `${days}d`;
+}
+
 export const Route = createFileRoute("/status-dos-dados")({
   head: () => createPageHead(PAGE_TITLE, PAGE_DESCRIPTION, PAGE_PATH),
-  loader: async () => {
-    const checkedAt = new Date().toISOString();
-    const [weatherResult, redemetResult, laranjalResult, guaibaResult] = await Promise.allSettled([
-      getWeatherIntelligence(),
-      getRedemetOverview(),
-      getLaranjalLevelData(),
-      getGuaibaObservation(),
-    ]);
-
-    const services: ServiceStatus[] = [];
-
-    if (weatherResult.status === "fulfilled") {
-      for (const meta of weatherSourceMeta) {
-        const health = weatherResult.value.weather.sources[meta.key];
-        const state = stateFromHealth(health.status, health.usable);
-        services.push({
-          id: `weather-${meta.key}`,
-          name: meta.name,
-          provider: meta.provider,
-          category: meta.category,
-          state,
-          detail: detailForState(state),
-          checkedAt: health.fetchedAt || checkedAt,
-        });
-      }
-    } else {
-      for (const meta of weatherSourceMeta) {
-        services.push({
-          id: `weather-${meta.key}`,
-          name: meta.name,
-          provider: meta.provider,
-          category: meta.category,
-          state: "offline",
-          detail: detailForState("offline"),
-          checkedAt,
-        });
-      }
-    }
-
-    if (redemetResult.status === "fulfilled") {
-      const layers = [
-        {
-          id: "redemet-radar",
-          name: "Radar meteorológico",
-          provider: redemetResult.value.radar.provider,
-          layer: redemetResult.value.radar,
-        },
-        {
-          id: "redemet-satellite",
-          name: "Imagem de satélite",
-          provider: redemetResult.value.satellite.provider,
-          layer: redemetResult.value.satellite,
-        },
-        {
-          id: "redemet-stsc",
-          name: "Ocorrências de trovoadas — STSC",
-          provider: redemetResult.value.storms.provider,
-          layer: redemetResult.value.storms,
-        },
-        {
-          id: "inmet-satellite",
-          name: "Satélite meteorológico complementar",
-          provider: redemetResult.value.inmetSatellite.provider,
-          layer: redemetResult.value.inmetSatellite,
-        },
-      ];
-
-      for (const item of layers) {
-        const state = stateFromLayer(item.layer.configured, item.layer.available);
-        services.push({
-          id: item.id,
-          name: item.name,
-          provider: item.provider,
-          category: "Radar e satélite",
-          state,
-          detail: detailForState(state),
-          checkedAt: item.layer.updatedAt || checkedAt,
-          sourceUrl: "officialUrl" in item.layer ? item.layer.officialUrl : undefined,
-        });
-      }
-    } else {
-      for (const item of [
-        ["redemet-radar", "Radar meteorológico", "REDEMET / DECEA"],
-        ["redemet-satellite", "Imagem de satélite", "REDEMET / DECEA"],
-        ["redemet-stsc", "Ocorrências de trovoadas — STSC", "REDEMET / DECEA"],
-        ["inmet-satellite", "Satélite meteorológico complementar", "INMET"],
-      ] as const) {
-        services.push({
-          id: item[0],
-          name: item[1],
-          provider: item[2],
-          category: "Radar e satélite",
-          state: "offline",
-          detail: detailForState("offline"),
-          checkedAt,
-        });
-      }
-    }
-
-    if (laranjalResult.status === "fulfilled") {
-      const state = stateFromHydrology(laranjalResult.value.status);
-      services.push({
-        id: "laranjal-level",
-        name: "Nível da Lagoa dos Patos no Laranjal",
-        provider: laranjalResult.value.source.name,
-        category: "Hidrologia",
-        state,
-        detail: detailForState(state),
-        checkedAt: laranjalResult.value.source.fetchedAt || checkedAt,
-        sourceUrl: laranjalResult.value.source.url,
-      });
-    } else {
-      services.push({
-        id: "laranjal-level",
-        name: "Nível da Lagoa dos Patos no Laranjal",
-        provider: "LabHidroSens / UFPel",
-        category: "Hidrologia",
-        state: "offline",
-        detail: detailForState("offline"),
-        checkedAt,
-      });
-    }
-
-    if (guaibaResult.status === "fulfilled") {
-      const state = stateFromHydrology(guaibaResult.value.status);
-      services.push({
-        id: "guaiba-level",
-        name: "Nível do Guaíba",
-        provider: guaibaResult.value.source.name,
-        category: "Hidrologia",
-        state,
-        detail: detailForState(state),
-        checkedAt: guaibaResult.value.source.fetchedAt || checkedAt,
-        sourceUrl: guaibaResult.value.source.url,
-      });
-    } else {
-      services.push({
-        id: "guaiba-level",
-        name: "Nível do Guaíba",
-        provider: "MetSul / TideSat Global",
-        category: "Hidrologia",
-        state: "offline",
-        detail: detailForState("offline"),
-        checkedAt,
-      });
-    }
-
-    services.push({
-      id: "ana-rhn",
-      name: "Rede Hidrometeorológica Nacional",
-      provider: "ANA / SNIRH / RHN",
-      category: "Hidrologia",
-      state: "implementation",
-      detail: detailForState("implementation"),
-      checkedAt,
-      sourceUrl: "https://www.snirh.gov.br/hidroweb/",
-    });
-
-    return {
-      checkedAt,
-      overall: overallState(services),
-      services,
-    };
-  },
+  loader: () => getDataStatusPageData(),
   staleTime: 60 * 1_000,
   component: DataStatusPage,
 });
@@ -336,8 +105,8 @@ function DataStatusPage() {
             <span className="data-status-eyebrow">Transparência operacional</span>
             <h1>Status dos dados e integrações</h1>
             <p>
-              Esta página mostra se as principais fontes usadas pelo Tempo Pelotas estão respondendo,
-              com atraso, em implantação ou temporariamente indisponíveis.
+              Veja quais fontes estão respondendo agora e acompanhe o histórico de indisponibilidades,
+              atualizações parciais e manutenções detectadas pelo Tempo Pelotas.
             </p>
           </div>
 
@@ -414,6 +183,160 @@ function DataStatusPage() {
           })}
         </div>
 
+        <section className="data-status-history" aria-labelledby="data-status-history-title">
+          <header className="data-status-history__header">
+            <div>
+              <span className="data-status-eyebrow">Histórico operacional</span>
+              <h2 id="data-status-history-title">Incidentes e disponibilidade</h2>
+            </div>
+            <p>
+              O monitor automático registra uma amostra aproximadamente a cada 10 minutos. O horário de
+              um incidente representa quando a alteração foi detectada pelo monitor, não necessariamente o
+              instante exato em que o serviço externo mudou de estado.
+            </p>
+          </header>
+
+          {data.history.available ? (
+            <>
+              <div className="data-status-availability-summary" aria-label="Disponibilidade recente">
+                <article>
+                  <span>Últimas 24 horas</span>
+                  <strong>{formatAvailability(data.history.summary24h.availabilityPercent)}</strong>
+                  <p>{data.history.summary24h.measuredChecks} verificações válidas</p>
+                </article>
+                <article>
+                  <span>Até 7 dias</span>
+                  <strong>{formatAvailability(data.history.summary7d.availabilityPercent)}</strong>
+                  <p>{data.history.summary7d.measuredChecks} verificações válidas</p>
+                </article>
+                <article>
+                  <span>Incidentes em andamento</span>
+                  <strong>{data.history.incidents.filter((incident) => incident.status === "open").length}</strong>
+                  <p>
+                    {data.history.startedAt
+                      ? `Histórico desde ${formatCheckedAt(data.history.startedAt)}`
+                      : "Aguardando a primeira amostra"}
+                  </p>
+                </article>
+              </div>
+
+              {data.history.maintenance.length > 0 ? (
+                <section className="data-status-maintenance" aria-labelledby="data-status-maintenance-title">
+                  <header>
+                    <h3 id="data-status-maintenance-title">Manutenções programadas</h3>
+                    <span>{data.history.maintenance.length} janela(s)</span>
+                  </header>
+                  <div>
+                    {data.history.maintenance.map((maintenance) => (
+                      <article key={maintenance.id}>
+                        <strong>{maintenance.title}</strong>
+                        <p>{maintenance.message}</p>
+                        <span>
+                          {formatCheckedAt(maintenance.startsAt)} → {formatCheckedAt(maintenance.endsAt)}
+                        </span>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+
+              <section className="data-status-incidents" aria-labelledby="data-status-incidents-title">
+                <header>
+                  <div>
+                    <h3 id="data-status-incidents-title">Incidentes recentes</h3>
+                    <p>Falhas, atrasos relevantes e restabelecimentos registrados pelo monitor.</p>
+                  </div>
+                </header>
+
+                {data.history.incidents.length > 0 ? (
+                  <div className="data-status-incident-list">
+                    {data.history.incidents.map((incident) => {
+                      const incidentEnd = incident.resolvedAt ?? incident.lastSeenAt;
+                      return (
+                        <article
+                          className={`data-status-incident is-${incident.status} is-${incident.worstState}`}
+                          key={incident.id}
+                        >
+                          <span className="data-status-incident__marker" aria-hidden="true" />
+                          <div className="data-status-incident__content">
+                            <div className="data-status-incident__heading">
+                              <div>
+                                <span>{incident.provider}</span>
+                                <h4>{incident.title}</h4>
+                              </div>
+                              <strong>{incident.status === "open" ? "Em andamento" : "Resolvido"}</strong>
+                            </div>
+                            <p>{incident.detail}</p>
+                            <dl>
+                              <div>
+                                <dt>Detectado</dt>
+                                <dd>{formatCheckedAt(incident.openedAt)}</dd>
+                              </div>
+                              <div>
+                                <dt>{incident.status === "open" ? "Última confirmação" : "Restabelecido"}</dt>
+                                <dd>{formatCheckedAt(incidentEnd)}</dd>
+                              </div>
+                              <div>
+                                <dt>Duração monitorada</dt>
+                                <dd>{formatDuration(incident.openedAt, incidentEnd)}</dd>
+                              </div>
+                              <div>
+                                <dt>Pior estado</dt>
+                                <dd>{labelForState(incident.worstState)}</dd>
+                              </div>
+                            </dl>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="data-status-history-empty">
+                    <strong>Nenhum incidente registrado até agora.</strong>
+                    <p>O histórico será preenchido automaticamente quando o monitor detectar uma alteração.</p>
+                  </div>
+                )}
+              </section>
+
+              {data.history.availability7d.length > 0 ? (
+                <section className="data-status-availability" aria-labelledby="data-status-availability-title">
+                  <header>
+                    <h3 id="data-status-availability-title">Disponibilidade por integração</h3>
+                    <span>Janela de até 7 dias</span>
+                  </header>
+                  <div className="data-status-availability__table" role="table" aria-label="Disponibilidade por integração">
+                    <div className="data-status-availability__row data-status-availability__row--header" role="row">
+                      <span role="columnheader">Integração</span>
+                      <span role="columnheader">Disponibilidade</span>
+                      <span role="columnheader">Parcial</span>
+                      <span role="columnheader">Offline</span>
+                    </div>
+                    {data.history.availability7d.map((service) => (
+                      <div className="data-status-availability__row" role="row" key={service.serviceId}>
+                        <span role="cell">
+                          <strong>{service.serviceName}</strong>
+                          <small>{service.provider}</small>
+                        </span>
+                        <span role="cell">{formatAvailability(service.availabilityPercent)}</span>
+                        <span role="cell">{service.partialChecks}</span>
+                        <span role="cell">{service.offlineChecks}</span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
+            </>
+          ) : (
+            <div className="data-status-history-empty">
+              <strong>O histórico está sendo preparado.</strong>
+              <p>
+                {data.history.error ??
+                  "Assim que a primeira coleta automática for persistida, incidentes e disponibilidade aparecerão aqui."}
+              </p>
+            </div>
+          )}
+        </section>
+
         <section className="data-status-explainer" aria-labelledby="data-status-explainer-title">
           <div>
             <span className="data-status-eyebrow">Como interpretar</span>
@@ -427,8 +350,9 @@ function DataStatusPage() {
               última verificação.
             </p>
             <p>
-              Manutenções programadas serão sinalizadas nesta página quando ocorrerem. Integrações em
-              implantação, como ANA/RHN, não são contabilizadas como falha operacional.
+              Manutenções programadas são registradas separadamente. Integrações em implantação, como
+              ANA/RHN, não são contabilizadas como falha operacional nem entram no cálculo de
+              disponibilidade.
             </p>
             <Link to="/metodologia">Entenda como cada fonte é utilizada</Link>
           </div>
