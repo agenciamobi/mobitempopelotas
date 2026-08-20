@@ -32,6 +32,7 @@ import { WeatherHero } from "@/production/components/weather-hero";
 import { useOpenMeteoIntelligenceRecovery } from "@/production/lib/open-meteo-browser-recovery";
 import type { WeatherData } from "@/production/lib/weather-data";
 import { getWeatherAdvisory, type AdvisoryLevel } from "@/production/lib/weather-insights";
+import "@/production/styles/home-editorial-status-refinements.css";
 
 const advisoryRank: Record<AdvisoryLevel, number> = { normal: 0, attention: 1, warning: 2 };
 
@@ -183,8 +184,10 @@ export function ProductionHome({
       </div>
 
       <main className={mainClassName} id="conteudo-principal" tabIndex={-1}>
-        <InmetAlertsPanel data={inmetAlerts} variant="home" advisoryLevel={headerLevel} />
-        <HomeSectionNavigation />
+        <div className="tp-home-alert-index-shell">
+          <InmetAlertsPanel data={inmetAlerts} variant="home" advisoryLevel={headerLevel} />
+          <HomeSectionNavigation />
+        </div>
         <HomeForecastEditorial weather={weather} />
         <InmetOfficialForecastPanel
           periods={recoveredData.weather.inmetForecast}
