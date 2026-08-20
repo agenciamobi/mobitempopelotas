@@ -1,0 +1,309 @@
+/*
+ * Faixa de utilidade pública global.
+ * Fica imediatamente antes da borda do footer em todas as páginas e preserva
+ * a identidade visual de serviço da Defesa Civil do Rio Grande do Sul.
+ */
+
+.tp-public-service-strip {
+  --tp-public-service-blue: #00167b;
+  --tp-public-service-orange: #ef6213;
+  --tp-public-service-phone: #2f7ff0;
+  --tp-public-service-ink: #071e2f;
+  --tp-public-service-line: rgb(7 30 47 / 10%);
+  width: 100%;
+  padding: clamp(24px, 3vw, 38px) 0;
+  background: #f8faf9;
+  color: var(--tp-public-service-ink);
+}
+
+.tp-public-service-strip__inner {
+  display: grid;
+  width: min(1440px, calc(100% - 48px));
+  margin-inline: auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(24px, 3vw, 36px);
+  align-items: stretch;
+}
+
+.tp-public-service-phones,
+.tp-public-service-civil-defense {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--tp-public-service-line);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.tp-public-service-phones h2 {
+  margin: 0;
+  padding: 14px 18px 13px;
+  background: var(--tp-public-service-orange);
+  color: #fff;
+  font-size: clamp(1.05rem, 1.5vw, 1.28rem);
+  font-weight: 720;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+
+.tp-public-service-phones__grid {
+  display: grid;
+  padding: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.tp-public-service-phones__grid a {
+  display: grid;
+  min-width: 0;
+  min-height: 78px;
+  padding: 8px 8px 9px;
+  place-items: center;
+  align-content: center;
+  gap: 7px;
+  border: 1px solid rgb(7 30 47 / 10%);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--tp-public-service-ink);
+  text-align: center;
+  text-decoration: none;
+  transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.tp-public-service-phones__grid a:hover,
+.tp-public-service-phones__grid a:focus-visible {
+  border-color: rgb(47 127 240 / 42%);
+  transform: translateY(-1px);
+}
+
+.tp-public-service-phones__grid strong {
+  display: inline-flex;
+  width: 100%;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 8px;
+  background: var(--tp-public-service-phone);
+  color: #fff;
+  font-size: clamp(1rem, 1.35vw, 1.15rem);
+  font-weight: 780;
+  font-variant-numeric: tabular-nums;
+}
+
+.tp-public-service-phones__grid strong svg {
+  width: 18px;
+  height: 18px;
+}
+
+.tp-public-service-phones__grid span {
+  color: #253743;
+  font-size: 0.74rem;
+  font-weight: 650;
+  line-height: 1.25;
+}
+
+.tp-public-service-civil-defense {
+  display: grid;
+  grid-template-rows: minmax(94px, auto) auto;
+  border-color: transparent;
+  background: var(--tp-public-service-blue);
+}
+
+.tp-public-service-civil-defense__identity {
+  display: grid;
+  min-width: 0;
+  padding: 11px 18px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  background: var(--tp-public-service-blue);
+  color: #fff;
+}
+
+.tp-public-service-civil-defense__identity img {
+  display: block;
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.tp-public-service-civil-defense__identity > div {
+  min-width: 0;
+}
+
+.tp-public-service-civil-defense__identity span {
+  display: block;
+  margin-bottom: 4px;
+  color: rgb(255 255 255 / 72%);
+  font-size: 0.6rem;
+  font-weight: 820;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tp-public-service-civil-defense__identity h2 {
+  max-width: 24ch;
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.12rem, 1.65vw, 1.42rem);
+  font-weight: 760;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.tp-public-service-civil-defense__identity > a {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 720;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tp-public-service-civil-defense__identity > a:hover,
+.tp-public-service-civil-defense__identity > a:focus-visible {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.tp-public-service-civil-defense__identity > a svg {
+  width: 13px;
+  height: 13px;
+}
+
+.tp-public-service-civil-defense__signup {
+  display: flex;
+  min-width: 0;
+  min-height: 58px;
+  padding: 12px 18px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  background: var(--tp-public-service-orange);
+  color: #fff;
+}
+
+.tp-public-service-civil-defense__signup p {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(0.76rem, 1vw, 0.88rem);
+  line-height: 1.45;
+}
+
+.tp-public-service-civil-defense__signup strong {
+  color: #fff;
+  font-weight: 850;
+}
+
+.tp-public-service-civil-defense__signup a {
+  display: inline-flex;
+  min-height: 34px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border: 1px solid rgb(255 255 255 / 52%);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 780;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tp-public-service-civil-defense__signup a:hover,
+.tp-public-service-civil-defense__signup a:focus-visible {
+  border-color: #fff;
+  background: rgb(255 255 255 / 10%);
+}
+
+.tp-public-service-strip a:focus-visible {
+  outline: 2px solid #18bdcd;
+  outline-offset: 3px;
+}
+
+@media (max-width: 1240px) {
+  .tp-public-service-strip__inner {
+    width: min(calc(100% - 32px), 1180px);
+  }
+}
+
+@media (max-width: 940px) {
+  .tp-public-service-strip__inner {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .tp-public-service-strip {
+    padding: 20px 0 24px;
+  }
+
+  .tp-public-service-strip__inner {
+    width: calc(100% - 20px);
+    gap: 14px;
+  }
+
+  .tp-public-service-phones,
+  .tp-public-service-civil-defense {
+    border-radius: 12px;
+  }
+
+  .tp-public-service-phones__grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .tp-public-service-phones__grid a {
+    min-height: 62px;
+    grid-template-columns: minmax(112px, 0.42fr) minmax(0, 1fr);
+    place-items: center stretch;
+    gap: 10px;
+  }
+
+  .tp-public-service-phones__grid strong {
+    min-height: 40px;
+  }
+
+  .tp-public-service-phones__grid span {
+    text-align: left;
+  }
+
+  .tp-public-service-civil-defense__identity {
+    padding: 12px;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .tp-public-service-civil-defense__identity img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .tp-public-service-civil-defense__identity > a {
+    grid-column: 2;
+    width: fit-content;
+    min-height: 28px;
+  }
+
+  .tp-public-service-civil-defense__signup {
+    display: grid;
+    padding: 13px 12px 14px;
+    gap: 10px;
+  }
+
+  .tp-public-service-civil-defense__signup a {
+    width: fit-content;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-public-service-phones__grid a {
+    transition: none;
+  }
+}
