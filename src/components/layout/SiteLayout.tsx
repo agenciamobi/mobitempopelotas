@@ -1,10 +1,11 @@
 import { useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 
+import { SiteHeader } from "@/production/components/site-header";
+
 import "./accessibility.css";
 import "./route-navigation.css";
 import { Footer } from "./Footer";
-import { Header } from "./Header";
 
 type SiteLayoutProps = {
   children: ReactNode;
@@ -25,6 +26,7 @@ const internalWeatherStandaloneRoutes = [
   "/historico-climatico-pelotas",
   "/situacao-hidrologica-pelotas",
   "/mapa-de-geadas-rio-grande-do-sul",
+  "/enchente-2024-pelotas-laranjal",
 ] as const;
 
 const standaloneRoutes = new Set([
@@ -106,7 +108,11 @@ export function SiteLayout({ children, forceShell = false }: SiteLayoutProps) {
 
   return (
     <div
-      className={isTopicRoute ? "site-shell site-shell--topic" : "site-shell"}
+      className={
+        isTopicRoute
+          ? "site-shell site-shell--home-editorial site-shell--topic"
+          : "site-shell site-shell--home-editorial"
+      }
       data-topic={topicKey}
       data-route-loading={isLoading ? "true" : "false"}
     >
@@ -114,7 +120,7 @@ export function SiteLayout({ children, forceShell = false }: SiteLayoutProps) {
       <div className="visually-hidden" aria-live="polite" aria-atomic="true">
         {announcement}
       </div>
-      <Header />
+      <SiteHeader advisoryLevel="normal" variant="hero" />
       <main
         ref={mainRef}
         id="conteudo-principal"
@@ -126,7 +132,7 @@ export function SiteLayout({ children, forceShell = false }: SiteLayoutProps) {
           {children}
         </div>
       </main>
-      <Footer />
+      <Footer variant="home" />
     </div>
   );
 }
