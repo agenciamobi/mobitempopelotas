@@ -170,6 +170,31 @@
   color: #ae3029;
 }
 
+/* Quando o INMET informou a classificação, ela prevalece sobre o advisory local. */
+.tp-home-header__alert.severity-potential,
+.tp-home-header__alert.severity-potential:hover,
+.tp-home-header__alert.severity-potential:focus-visible,
+.tp-home-header__alert.severity-potential.is-active {
+  color: #8a6b00;
+  text-decoration-color: rgb(214 174 0 / 55%);
+}
+
+.tp-home-header__alert.severity-danger,
+.tp-home-header__alert.severity-danger:hover,
+.tp-home-header__alert.severity-danger:focus-visible,
+.tp-home-header__alert.severity-danger.is-active {
+  color: #b85417;
+  text-decoration-color: rgb(239 125 47 / 58%);
+}
+
+.tp-home-header__alert.severity-great-danger,
+.tp-home-header__alert.severity-great-danger:hover,
+.tp-home-header__alert.severity-great-danger:focus-visible,
+.tp-home-header__alert.severity-great-danger.is-active {
+  color: #ae3029;
+  text-decoration-color: rgb(217 54 54 / 58%);
+}
+
 .tp-home-header a:focus-visible,
 .tp-home-header button:focus-visible {
   outline: 2px solid #18bdcd;
