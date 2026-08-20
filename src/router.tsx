@@ -8,9 +8,11 @@ export const getRouter = () => {
   const router = createRouter({
     routeTree,
     context: { queryClient },
-    scrollRestoration: true,
+    // O documento não rola em window/html/body: ViewportScrollRoot é o único
+    // viewport vertical e faz o reset de rota de forma determinística.
+    scrollRestoration: false,
     defaultPreload: "intent",
-    defaultPreloadDelay: 40,
+    defaultPreloadDelay: 0,
     defaultPreloadStaleTime: 60 * 1_000,
     defaultStaleTime: 60 * 1_000,
   });
