@@ -14,10 +14,15 @@ const liveBackground = readFileSync(
   "utf8",
 );
 
-test("homepage loads camera data together with weather and hydrology", () => {
-  assert.match(homeRoute, /getWeatherCameras/);
-  assert.match(homeRoute, /weather, laranjal, guaiba, lagoon, cameraData/);
-  assert.match(homeRoute, /cameraData=\{cameraData\}/);
+test("homepage does not block SSR on camera discovery", () => {
+  assert.doesNotMatch(homeRoute, /getWeatherCameras/);
+  assert.doesNotMatch(homeRoute, /cameraData/);
+  assert.match(homeRoute, /weather, laranjal, guaiba, lagoon/);
+  assert.match(productionHome, /getWeatherCameras/);
+  assert.match(productionHome, /useEffect/);
+  assert.match(productionHome, /useState<WeatherCameraData \| null>\(null\)/);
+  assert.match(productionHome, /getWeatherCameras\(\)/);
+  assert.match(productionHome, /setCameraData\(nextCameraData\)/);
 });
 
 test("a secure live Laranjal embed reaches the hero without requiring a thumbnail", () => {
@@ -30,6 +35,13 @@ test("a secure live Laranjal embed reaches the hero without requiring a thumbnai
   assert.doesNotMatch(productionHome, /--home-live-camera-image/);
   assert.match(productionHome, /HomeLiveCameraBackground/);
   assert.match(productionHome, /embedUrl=\{liveLaranjalCamera\.embedUrl\}/);
+});
+
+test("camera discovery failure preserves the normal weather hero", () => {
+  assert.match(productionHome, /\.catch\(\(\) => \{/);
+  assert.match(productionHome, /cameraData \? getLiveLaranjalCamera\(cameraData\) : null/);
+  assert.match(productionHome, /liveCameraBackground=/);
+  assert.match(productionHome, /liveLaranjalCamera \? \(/);
 });
 
 test("live player is silent, immediate, retryable and non-interactive", () => {
