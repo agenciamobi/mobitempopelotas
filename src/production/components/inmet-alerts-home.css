@@ -5,7 +5,10 @@
  */
 
 .tp-home-alert {
-  --risk: #18bdcd;
+  --risk: #6f818a;
+  --inmet-yellow: #d6ae00;
+  --inmet-orange: #ef7d2f;
+  --inmet-red: #d93636;
   display: grid;
   width: min(1220px, calc(100% - 48px));
   margin: 16px auto 0;
@@ -21,28 +24,22 @@
   box-shadow: none;
 }
 
-.tp-home-alert.is-unverified.advisory-normal {
-  --risk: #5e2ced;
+/* Classificação desconhecida nunca herda vermelho/laranja da síntese meteorológica local. */
+.tp-home-alert.severity-unknown,
+.tp-home-alert.is-unverified {
+  --risk: #6f818a;
 }
 
-.tp-home-alert.is-unverified.advisory-attention {
-  --risk: #e7652f;
+.tp-home-alert.severity-potential {
+  --risk: var(--inmet-yellow);
 }
 
-.tp-home-alert.is-unverified.advisory-warning {
-  --risk: #cf342c;
+.tp-home-alert.severity-danger {
+  --risk: var(--inmet-orange);
 }
 
-.tp-home-alert.is-officially-classified.severity-potential {
-  --risk: #d6ae00;
-}
-
-.tp-home-alert.is-officially-classified.severity-danger {
-  --risk: #ef7d2f;
-}
-
-.tp-home-alert.is-officially-classified.severity-great-danger {
-  --risk: #d93636;
+.tp-home-alert.severity-great-danger {
+  --risk: var(--inmet-red);
 }
 
 .tp-home-alert__main {
@@ -125,6 +122,62 @@
   font-weight: 650;
 }
 
+.tp-home-alert__levels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 5px;
+}
+
+.tp-home-alert__levels > span {
+  --level-color: #6f818a;
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid color-mix(in srgb, var(--level-color) 20%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--level-color) 7%, white);
+  color: #294553;
+}
+
+.tp-home-alert__levels > span.severity-potential {
+  --level-color: var(--inmet-yellow);
+}
+
+.tp-home-alert__levels > span.severity-danger {
+  --level-color: var(--inmet-orange);
+}
+
+.tp-home-alert__levels > span.severity-great-danger {
+  --level-color: var(--inmet-red);
+}
+
+.tp-home-alert__levels i {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--level-color);
+}
+
+.tp-home-alert__levels strong,
+.tp-home-alert__levels small {
+  font-size: 0.61rem;
+  line-height: 1.15;
+}
+
+.tp-home-alert__levels strong {
+  color: color-mix(in srgb, var(--level-color) 82%, #071e2f);
+  font-weight: 820;
+}
+
+.tp-home-alert__levels small {
+  color: #536b76;
+  font-weight: 650;
+}
+
 .tp-home-alert__aside {
   display: flex;
   min-width: max-content;
@@ -179,6 +232,15 @@
   .tp-home-alert__meta {
     display: grid;
     gap: 0.35rem;
+  }
+
+  .tp-home-alert__levels {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .tp-home-alert__levels > span {
+    width: fit-content;
   }
 
   .tp-home-alert__aside {
