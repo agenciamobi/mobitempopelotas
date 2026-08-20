@@ -29,10 +29,10 @@ const severityRank: Record<InmetAlert["severity"], number> = {
 };
 
 const alertColorLabels: Record<InmetAlert["severity"], string> = {
-  potential: "Alerta amarelo",
-  danger: "Alerta laranja",
-  "great-danger": "Alerta vermelho",
-  unknown: "Aviso meteorológico",
+  potential: "Amarelo",
+  danger: "Laranja",
+  "great-danger": "Vermelho",
+  unknown: "Classificação não informada",
 };
 
 const relevanceRank: Record<InmetAlert["relevance"], number> = {
@@ -57,6 +57,15 @@ export function hasVerifiedInmetAlertSemantics(alert: InmetAlert) {
     validDate(alert.startsAt) &&
     validDate(alert.expiresAt)
   );
+}
+
+function hasOfficialInmetClassification(alert: InmetAlert) {
+  return alert.severity !== "unknown";
+}
+
+function severityDisplayLabel(alert: InmetAlert) {
+  if (!hasOfficialInmetClassification(alert)) return alert.severityLabel;
+  return `${alertColorLabels[alert.severity]} · ${alert.severityLabel}`;
 }
 
 function formatDateTime(value: string | null) {
@@ -114,10 +123,10 @@ function displayHeadline(alert: InmetAlert) {
   return headline;
 }
 
-function homepageAlertTitle(alert: InmetAlert, verified: boolean) {
+function homepageAlertTitle(alert: InmetAlert, classified: boolean) {
   const event = displayHeadline(alert).replace(/^Aviso de\s+/i, "");
-  return verified
-    ? `${alertColorLabels[alert.severity]}: ${event}`
+  return classified
+    ? `Alerta ${alertColorLabels[alert.severity].toLowerCase()}: ${event}`
     : `Aviso meteorológico: ${event}`;
 }
 
@@ -156,6 +165,22 @@ function primaryHomeAlert(data: InmetAlertsData) {
   return [...data.alerts].sort(compareHomeAlerts)[0] ?? null;
 }
 
+function homeSeverityAlerts(data: InmetAlertsData, primary: InmetAlert) {
+  const scope = data.alerts.filter((alert) => alert.relevance === primary.relevance);
+  const uniqueKeys = new Set<string>();
+
+  return [...scope]
+    .sort(compareHomeAlerts)
+    .filter((alert) => hasOfficialInmetClassification(alert))
+    .filter((alert) => {
+      const key = `${alert.severity}:${alert.event.toLowerCase()}`;
+      if (uniqueKeys.has(key)) return false;
+      uniqueKeys.add(key);
+      return true;
+    })
+    .slice(0, 3);
+}
+
 function AlertRow({ alert }: { alert: InmetAlert }) {
   const areaText =
     alert.areas[0] ||
@@ -166,7 +191,7 @@ function AlertRow({ alert }: { alert: InmetAlert }) {
   return (
     <article className={`inmet-alert-card severity-${alert.severity} relevance-${alert.relevance}`}>
       <div className="inmet-alert-card__topline">
-        <span className="inmet-alert-severity">{alert.severityLabel}</span>
+        <span className="inmet-alert-severity">{severityDisplayLabel(alert)}</span>
         <span className="inmet-alert-relevance">{relevanceLabels[alert.relevance]}</span>
       </div>
       <div className="inmet-alert-card__heading">
@@ -195,7 +220,6 @@ function AlertRow({ alert }: { alert: InmetAlert }) {
 
 function HomePanel({
   data,
-  advisoryLevel,
 }: {
   data: InmetAlertsData;
   advisoryLevel: AdvisoryLevel;
@@ -204,17 +228,19 @@ function HomePanel({
 
   const primary = primaryHomeAlert(data);
   if (!primary) return null;
+  const classified = hasOfficialInmetClassification(primary);
   const verified = hasVerifiedInmetAlertSemantics(primary);
-  const title = homepageAlertTitle(primary, verified);
-  const colorClass = verified ? `severity-${primary.severity}` : `advisory-${advisoryLevel}`;
-  const statusLabel = verified ? primary.severityLabel : "Classificação em validação";
+  const title = homepageAlertTitle(primary, classified);
+  const colorClass = classified ? `severity-${primary.severity}` : "severity-unknown";
+  const statusLabel = classified ? severityDisplayLabel(primary) : "Classificação não informada";
+  const severityAlerts = homeSeverityAlerts(data, primary);
 
   return (
     <section
-      className={`tp-home-alert ${colorClass}${verified ? " is-officially-classified" : " is-unverified"}`}
+      className={`tp-home-alert ${colorClass}${classified ? " is-officially-classified" : " is-unverified"}`}
       data-alert-period={primary.period}
       data-alert-severity={primary.severity}
-      data-alert-official-semantics={verified ? "verified" : "unverified"}
+      data-alert-official-semantics={verified ? "verified" : "partial"}
       aria-label={`${title}. ${periodLabel(primary)}`}
       aria-labelledby="home-inmet-title"
     >
@@ -239,6 +265,17 @@ function HomePanel({
               <strong>{periodLabel(primary)}</strong>
             </span>
           </div>
+          {severityAlerts.length > 0 ? (
+            <div className="tp-home-alert__levels" aria-label="Classificações dos avisos oficiais em destaque">
+              {severityAlerts.map((alert) => (
+                <span className={`severity-${alert.severity}`} key={`${alert.id}-${alert.severity}`}>
+                  <i aria-hidden="true" />
+                  <strong>{alertColorLabels[alert.severity]}</strong>
+                  <small>{alert.event}</small>
+                </span>
+              ))}
+            </div>
+          ) : null}
         </div>
       </div>
       <div className="tp-home-alert__aside">
