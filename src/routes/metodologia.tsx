@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { OfficialDataAccessNotice } from "@/components/content/OfficialDataAccessNotice";
 import { ForecastAccuracyPanel } from "@/components/methodology/ForecastAccuracyPanel";
 import { MethodologyPage } from "@/components/methodology/MethodologyPage";
 import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
@@ -37,6 +38,11 @@ export const Route = createFileRoute("/metodologia")({
           "Precisão das previsões meteorológicas",
           "Erro de temperatura e chuva prevista",
           "REDEMET/DECEA",
+          "API REDEMET",
+          "Agência Nacional de Águas e Saneamento Básico",
+          "Sistema Nacional de Informações sobre Recursos Hídricos",
+          "Rede Hidrometeorológica Nacional",
+          "Portal HidroWeb e Hidrotelemetria",
           "LabHidroSens/UFPel",
           "Régua do Cais Mauá",
           "MetSul e TideSat Global",
@@ -73,6 +79,7 @@ function MetodologiaPage() {
         guaiba={data.guaiba}
         lagoon={data.lagoon}
       />
+      <OfficialDataAccessNotice scope="all" />
       <ForecastAccuracyPanel summary={data.accuracy} />
     </>
   );
