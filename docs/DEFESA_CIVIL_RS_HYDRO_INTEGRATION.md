@@ -12,6 +12,7 @@ Este documento registra a integração técnica do Tempo Pelotas com a API públ
 - O adapter server-side e a área visual do Tempo Pelotas estão implementados.
 - A publicação das leituras permanece protegida pela variável server-only `DEFESA_CIVIL_HYDRO_ENABLED`.
 - O default seguro é `false`.
+- A branch da integração foi sincronizada com a `main` no commit-base `48290ae0`, preservando o ajuste visual do painel INMET realizado em paralelo.
 - A documentação oficial orienta consultar a equipe responsável sobre as condições de uso antes de utilizar os dados em produções públicas ou comerciais. Por esse motivo, o recurso não deve ser habilitado em produção até a validação institucional dessa condição.
 
 ## Objetivo no Tempo Pelotas
