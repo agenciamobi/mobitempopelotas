@@ -30,6 +30,7 @@ export const PUBLIC_ROUTES: PublicRouteEntry[] = [
     changeFrequency: "hourly" as const,
     priority: 0.72,
   })),
+  { path: "/status-dos-dados", changeFrequency: "hourly", priority: 0.58 },
   { path: "/metodologia", changeFrequency: "monthly", priority: 0.6 },
   { path: "/privacidade-e-dados", changeFrequency: "monthly", priority: 0.5 },
 ];
