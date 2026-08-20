@@ -10,8 +10,8 @@
   width: min(1220px, calc(100% - 48px));
   margin: 0 auto clamp(58px, 7vw, 88px);
   overflow: hidden;
-  border-top: 1px solid var(--tp-inmet-line);
-  border-bottom: 1px solid var(--tp-inmet-line);
+  border: 1px solid var(--tp-inmet-line);
+  border-radius: 16px;
   background: #fff;
   color: #071e2f;
 }
@@ -352,6 +352,7 @@
 @media (max-width: 760px) {
   .tp-home-inmet {
     width: calc(100% - 32px);
+    border-radius: 12px;
   }
 
   .tp-home-inmet__header {
