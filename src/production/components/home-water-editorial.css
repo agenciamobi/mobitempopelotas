@@ -259,7 +259,7 @@
 /* Rede: contexto comparável, não segunda área protagonista. */
 .tp-home-water__network {
   min-width: 0;
-  padding: 32px 0 0 clamp(34px, 4vw, 54px);
+  padding: 32px 0 28px clamp(34px, 4vw, 54px);
 }
 
 .tp-home-water__network-heading {
@@ -395,7 +395,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 28px;
-  padding-top: 20px;
+  padding-top: 26px;
 }
 
 .tp-home-water__footer > div {
@@ -446,7 +446,7 @@
   }
 
   .tp-home-water__network {
-    padding: 32px 0 0;
+    padding: 32px 0 28px;
   }
 
   .tp-home-water__level strong {
@@ -507,6 +507,10 @@
 
   .tp-home-water__focus-metrics dd {
     font-size: 0.72rem;
+  }
+
+  .tp-home-water__network {
+    padding-bottom: 24px;
   }
 
   .tp-home-water__network-heading {
