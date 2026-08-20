@@ -40,7 +40,7 @@
   padding: 15px 18px 13px;
   border-bottom: 1px solid rgb(95 45 237 / 12%);
   background: #fff;
-  color: var(--tp-public-service-phone);
+  color: var(--tp-public-service-ink);
   font-size: clamp(1.05rem, 1.5vw, 1.28rem);
   font-weight: 720;
   line-height: 1.15;
