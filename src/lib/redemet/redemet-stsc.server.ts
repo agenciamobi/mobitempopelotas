@@ -10,6 +10,8 @@ const PRODUCT = "STSC — ocorrências de trovoada" as const;
 const TIMEZONE = "America/Sao_Paulo";
 const STORM_RADIUS_KM = 450;
 const REQUEST_TIMEOUT_MS = 12_000;
+const DEFAULT_FRAMES = 12;
+const MAX_FRAMES = 12;
 const PELOTAS_COORDINATES = { latitude: -31.7654, longitude: -52.3376 };
 
 const ALLOWED_API_HOSTS = new Set([
@@ -162,9 +164,7 @@ export function parseRedemetStscPayload(payload: unknown): RedemetStormFrame[] {
       .map<RedemetStormFrame>((rawFrame, frameIndex) => {
         const frame = asRecord(rawFrame);
         const rawDate = frame
-          ? asString(
-              frame.ultima_ocorrencia ?? frame.horario ?? frame.stop ?? frame.start,
-            )
+          ? asString(frame.ultima_ocorrencia ?? frame.horario ?? frame.stop ?? frame.start)
           : null;
 
         return {
@@ -209,11 +209,12 @@ function emptyStormLayer(error: string): RedemetStormLayerResponse {
   };
 }
 
-async function requestOfficialStsc() {
+async function requestOfficialStsc(frameCount: number) {
   const key = apiKey();
   if (!key) throw new Error("REDEMET_API_KEY não configurada");
 
   const url = new URL("produtos/stsc/0", apiBaseUrl());
+  url.searchParams.set("anima", String(frameCount));
   url.searchParams.set("api_key", key);
 
   const response = await fetch(url, {
@@ -238,16 +239,16 @@ async function requestOfficialStsc() {
 }
 
 export async function fetchRedemetStorms(
-  frameCount = 20,
+  frameCount = DEFAULT_FRAMES,
 ): Promise<RedemetStormLayerResponse> {
-  const framesRequested = clampFrameCount(frameCount, 60, 20);
+  const framesRequested = clampFrameCount(frameCount, MAX_FRAMES, DEFAULT_FRAMES);
 
   if (!apiKey()) {
     return emptyStormLayer("Integração REDEMET aguardando configuração da chave.");
   }
 
   try {
-    const payload = await requestOfficialStsc();
+    const payload = await requestOfficialStsc(framesRequested);
     const frames = parseRedemetStscPayload(payload).slice(-framesRequested);
 
     if (!frames.length) {
