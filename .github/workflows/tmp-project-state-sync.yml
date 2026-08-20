@@ -1,9 +1,9 @@
 name: Temporary project state sync
 
 on:
-  push:
+  pull_request:
     branches:
-      - agent/defesa-civil-hidrometeorologia
+      - main
 
 permissions:
   contents: write
