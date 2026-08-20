@@ -67,6 +67,18 @@ export function PwaManager() {
   const [message, setMessage] = useState<string | null>(null);
   const hasUpdate = Boolean(waitingWorker);
   const canInstall = Boolean(installPrompt) || isIos;
+  const shouldLockBodyScroll = isOpen && (hasUpdate || canInstall);
+
+  useEffect(() => {
+    if (!shouldLockBodyScroll) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [shouldLockBodyScroll]);
 
   useEffect(() => {
     const standaloneQuery = window.matchMedia("(display-mode: standalone)");
