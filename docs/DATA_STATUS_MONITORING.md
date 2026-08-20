@@ -87,6 +87,7 @@ A página pública acessa o histórico exclusivamente pelo servidor do Tempo Pel
 - INMET — satélite complementar;
 - LabHidroSens/UFPel — nível no Laranjal;
 - fonte operacional do nível do Guaíba;
+- rede regional da Lagoa dos Patos — FURG/Portos RS e demais organizações identificadas pela integração;
 - ANA/SNIRH/RHN aparece como `implementation` enquanto a ingestão pública estiver em implantação.
 
 ## Evoluções previstas
