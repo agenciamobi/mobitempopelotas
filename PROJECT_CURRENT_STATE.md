@@ -1,6 +1,6 @@
 # Tempo Pelotas — estado atual do projeto
 
-Última atualização: 19/08/2026  
+Última atualização: 20/08/2026  
 Branch operacional: `main`  
 Domínio canônico: `https://tempopelotas.com.br`
 
@@ -39,6 +39,7 @@ O Tempo Pelotas é um portal meteorológico regional focado em Pelotas e Zona Su
 | Mapa regional MapLibre | Ativo | Camadas de radar, satélite e trovoadas |
 | Hidrologia | Ativo | Laranjal, Lagoa dos Patos, Guaíba e rede regional |
 | Histórico climático | Ativo | Janela de 30 dias com fonte/fallback documentados |
+| Registro histórico da enchente de 2024 | Ativo | Rota pública `/enchente-2024-pelotas-laranjal` registra a linha do tempo da cheia, a propagação Guaíba → Lagoa dos Patos → Pelotas/Laranjal → estuário e a fase de reconstrução |
 | Câmeras | Ativo com dependência externa | YouTube, live/replay e contingências |
 | Páginas regionais | Ativo | 23 cidades além de Pelotas |
 | Blog | Ativo | Rota pública e indexável |
@@ -83,7 +84,7 @@ Scripts principais em `package.json`:
 
 `src/lib/public-routes.ts` é a fonte programática das URLs destinadas a sitemap/indexação.
 
-O inventário atual possui **43 rotas públicas indexáveis**: 20 rotas fixas, contando Home e institucionais, mais 23 páginas regionais de cidades.
+O inventário atual possui **45 rotas públicas indexáveis**: 22 rotas fixas, contando Home e institucionais/editoriais, mais 23 páginas regionais de cidades.
 
 ### Pelotas e conteúdo principal
 
@@ -102,9 +103,11 @@ O inventário atual possui **43 rotas públicas indexáveis**: 20 rotas fixas, c
 - `/estacao-embrapa-pelotas`
 - `/clima-em-pelotas`
 - `/historico-climatico-pelotas`
+- `/enchente-2024-pelotas-laranjal`
 - `/cameras-ao-vivo-pelotas`
 - `/tempo-na-regiao-sul-rs`
 - `/blog`
+- `/status-dos-dados`
 - `/metodologia`
 - `/privacidade-e-dados`
 
@@ -281,6 +284,12 @@ A situação hidrológica também agrega estações e referências da Lagoa dos 
 - demais fontes regionais normalizadas pelos módulos de hidrologia.
 
 A página `/situacao-hidrologica-pelotas` deve funcionar mesmo quando uma ou mais fontes externas estiverem indisponíveis.
+
+### Registro histórico da enchente de 2024
+
+A rota pública e indexável `/enchente-2024-pelotas-laranjal` funciona como registro histórico permanente da enchente de 2024 em Pelotas e no Laranjal. A página é organizada como linha do tempo e adiciona uma segunda camada visual indicando em que trecho do sistema hidrológico estava o problema: Centro/Norte do RS → rios da Bacia do Guaíba → Guaíba → Lagoa dos Patos → Pelotas/Laranjal e Canal São Gonçalo → estuário de Rio Grande → retorno/reconstrução.
+
+Os valores históricos preservam a referência das fontes e réguas utilizadas à época. Valores absolutos de estações diferentes não devem ser comparados diretamente quando datum, referência altimétrica ou método de medição forem distintos.
 
 ## 9. Radar, satélite, trovoadas e MapLibre
 
@@ -601,6 +610,7 @@ A suíte de contratos cobre, entre outros domínios:
 - meteograma;
 - clima;
 - histórico;
+- registro histórico da enchente de 2024;
 - estação Embrapa;
 - câmeras;
 - geadas;
