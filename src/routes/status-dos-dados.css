@@ -142,7 +142,8 @@
   border-bottom: 1px solid rgb(7 30 47 / 11%);
 }
 
-.data-status-group > header span {
+.data-status-group > header h2 {
+  margin: 0;
   font-size: clamp(1.45rem, 2.2vw, 2.1rem);
   font-weight: 760;
   letter-spacing: -0.04em;
@@ -217,7 +218,7 @@
   text-transform: uppercase;
 }
 
-.data-status-service__heading h2 {
+.data-status-service__heading h3 {
   margin: 4px 0 0;
   font-size: 1rem;
   font-weight: 760;
