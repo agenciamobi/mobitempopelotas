@@ -58,7 +58,7 @@
   display: grid;
   width: fit-content;
   min-width: clamp(220px, 20vw, 300px);
-  gap: 12px;
+  gap: 14px;
   padding: 24px 26px 20px;
   border-radius: 10px;
   background: #788b94;
@@ -93,36 +93,84 @@
 .tp-home-water__level-card .tp-home-water__level strong,
 .tp-home-water__level-card .tp-home-water__level span,
 .tp-home-water__level-card .tp-home-water__trend,
-.tp-home-water__level-card .tp-home-water__trend b {
+.tp-home-water__level-card .tp-home-water__trend b,
+.tp-home-water__level-card .tp-home-water__trend span {
   color: #fff;
 }
 
 .tp-home-water__level-card .tp-home-water__trend {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  align-items: center;
   gap: 10px;
   font-size: 0.82rem;
+  line-height: 1.35;
 }
 
 .tp-home-water__level-card .tp-home-water__trend b {
-  font-size: 1.15rem;
+  display: grid;
+  width: 44px;
+  height: 48px;
+  place-items: center;
+  font-size: 2.45rem;
+  font-weight: 820;
+  line-height: 1;
 }
 
-/* Atualidade aparece no topo e colore somente o rótulo 'Última leitura' na métrica. */
-.tp-home-water__focus-topline b.is-live,
+.tp-home-water__level-card .tp-home-water__trend span {
+  font-weight: 780;
+}
+
+/* Atualidade fica concentrada em "Última leitura"; não há badge redundante no topo. */
 .tp-home-water__reading.is-live dt {
   color: #087f91;
 }
 
-.tp-home-water__focus-topline b.is-stale,
 .tp-home-water__reading.is-stale dt {
   color: #b66b1f;
 }
 
-.tp-home-water__focus-topline b.is-unavailable,
 .tp-home-water__reading.is-unavailable dt {
   color: #9b5260;
 }
 
-/* Rede regional: seta grande reforça tendência sem depender apenas da cor. */
+/* Rede regional: cada linha carrega a cor da tendência com baixa opacidade. */
+.tp-home-water__rows {
+  display: grid;
+  gap: 5px;
+  border-top: 0;
+}
+
+.tp-home-water__rows article {
+  padding: 14px 16px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+}
+
+.tp-home-water__rows .tp-home-water__station::before {
+  display: none;
+}
+
+.tp-home-water__rows article.is-trend-rising {
+  border-color: rgb(155 82 96 / 16%);
+  background: rgb(155 82 96 / 10%);
+}
+
+.tp-home-water__rows article.is-trend-falling {
+  border-color: rgb(35 114 134 / 16%);
+  background: rgb(35 114 134 / 10%);
+}
+
+.tp-home-water__rows article.is-trend-stable {
+  border-color: rgb(102 123 134 / 14%);
+  background: rgb(102 123 134 / 9%);
+}
+
+.tp-home-water__rows article.is-trend-unknown {
+  border-color: rgb(120 139 148 / 12%);
+  background: rgb(120 139 148 / 6%);
+}
+
 .tp-home-water__station-state-wrap {
   display: grid;
   min-width: 0;
@@ -147,8 +195,8 @@
   gap: 4px;
 }
 
-.tp-home-water__guaiba > .tp-home-water__station-state-wrap {
-  display: grid;
+.tp-home-water__guaiba-reference .tp-home-water__station-place strong {
+  max-width: 30ch;
 }
 
 @media (max-width: 1240px) {
@@ -189,8 +237,26 @@
     padding: 22px 20px 18px;
   }
 
-  .tp-home-water__station-state-wrap,
-  .tp-home-water__guaiba > .tp-home-water__station-state-wrap {
+  .tp-home-water__level-card .tp-home-water__trend {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+
+  .tp-home-water__level-card .tp-home-water__trend b {
+    width: 38px;
+    height: 44px;
+    font-size: 2.1rem;
+  }
+
+  .tp-home-water__rows {
+    gap: 8px;
+  }
+
+  .tp-home-water__rows article {
+    padding: 16px 14px;
+    border-radius: 12px;
+  }
+
+  .tp-home-water__station-state-wrap {
     grid-column: 1 / -1;
     width: 100%;
     grid-template-columns: 42px minmax(0, 1fr);
