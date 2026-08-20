@@ -6,7 +6,8 @@ const FALLBACK_GUAIBA_SERIES_URL = "https://nivelguaiba.com.br/portoalegre.json"
 const FALLBACK_GUAIBA_PUBLIC_PAGE_URL = "https://nivelguaiba.com.br/";
 const FALLBACK_GUAIBA_METHODOLOGY_URL = "https://nivelguaiba.com.br/metodologia";
 
-const FLOOD_REFERENCE_METERS = 3;
+const CAIS_MAUA_FLOOD_REFERENCE_METERS = 3;
+const GASOMETRO_FLOOD_REFERENCE_METERS = 2.6;
 const REQUEST_TIMEOUT_MS = 8_000;
 const STALE_AFTER_MINUTES = 120;
 
@@ -15,6 +16,26 @@ export type GuaibaObservationStatus = "live" | "stale" | "unavailable";
 export type GuaibaSeriesPoint = {
   timestamp: string;
   level: number;
+};
+
+export type GuaibaReferenceObservation = {
+  id: "gasometro" | "cais-maua";
+  label: string;
+  status: GuaibaObservationStatus;
+  currentLevel: number | null;
+  updatedAt: string | null;
+  ageMinutes: number | null;
+  trendCmPerHour: number | null;
+  variation24hCm: number | null;
+  floodReference: number;
+  station: string;
+  location: string;
+  source: {
+    name: string;
+    url: string;
+    originalInstitutions: string;
+  };
+  error: string | null;
 };
 
 export type GuaibaObservationData = {
@@ -32,6 +53,7 @@ export type GuaibaObservationData = {
   station: string;
   location: string;
   series: GuaibaSeriesPoint[];
+  references?: GuaibaReferenceObservation[];
   source: {
     name: string;
     url: string;
@@ -53,6 +75,7 @@ type ObservationSource = {
   originalInstitutions: string;
   station: string;
   location: string;
+  floodReference: number;
 };
 
 type MetsulGuaibaRow = {
@@ -72,6 +95,7 @@ const METSUL_SOURCE: ObservationSource = {
   originalInstitutions: "TideSat Global",
   station: "Régua do Cais Mauá",
   location: "Porto Alegre / RS",
+  floodReference: CAIS_MAUA_FLOOD_REFERENCE_METERS,
 };
 
 const FALLBACK_SOURCE: ObservationSource = {
@@ -81,6 +105,7 @@ const FALLBACK_SOURCE: ObservationSource = {
   originalInstitutions: "ANA / SGB",
   station: "Usina do Gasômetro",
   location: "Porto Alegre / RS",
+  floodReference: GASOMETRO_FLOOD_REFERENCE_METERS,
 };
 
 function round(value: number, digits = 2) {
@@ -104,7 +129,7 @@ function unavailableObservation(
     periodMinimum: null,
     periodMaximum: null,
     distanceToFloodReference: null,
-    floodReference: FLOOD_REFERENCE_METERS,
+    floodReference: source.floodReference,
     station: source.station,
     location: source.location,
     series: [],
@@ -228,8 +253,8 @@ function buildObservation(
     periodAverage: round(values.reduce((sum, value) => sum + value, 0) / values.length),
     periodMinimum: round(Math.min(...values)),
     periodMaximum: round(Math.max(...values)),
-    distanceToFloodReference: round(FLOOD_REFERENCE_METERS - current.level),
-    floodReference: FLOOD_REFERENCE_METERS,
+    distanceToFloodReference: round(source.floodReference - current.level),
+    floodReference: source.floodReference,
     station: source.station,
     location: source.location,
     series: chartSeries,
@@ -242,6 +267,46 @@ function buildObservation(
     },
     error: stale ? "A última leitura disponível está atrasada." : null,
   };
+}
+
+function toReference(
+  id: GuaibaReferenceObservation["id"],
+  label: string,
+  observation: GuaibaObservationData,
+): GuaibaReferenceObservation {
+  return {
+    id,
+    label,
+    status: observation.status,
+    currentLevel: observation.currentLevel,
+    updatedAt: observation.updatedAt,
+    ageMinutes: observation.ageMinutes,
+    trendCmPerHour: observation.trendCmPerHour,
+    variation24hCm: observation.variation24hCm,
+    floodReference: observation.floodReference,
+    station: observation.station,
+    location: observation.location,
+    source: {
+      name: observation.source.name,
+      url: observation.source.url,
+      originalInstitutions: observation.source.originalInstitutions,
+    },
+    error: observation.error,
+  };
+}
+
+function withReferences(
+  selected: GuaibaObservationData,
+  gasometro: GuaibaObservationData,
+  caisMaua: GuaibaObservationData,
+) {
+  return {
+    ...selected,
+    references: [
+      toReference("gasometro", "Nível do Guaíba", gasometro),
+      toReference("cais-maua", "Cais Mauá", caisMaua),
+    ],
+  } satisfies GuaibaObservationData;
 }
 
 export function normalizeGuaibaSeries(
@@ -331,42 +396,66 @@ async function fetchFallbackObservation(fetchedAt: Date) {
 
 export async function fetchGuaibaObservation(): Promise<GuaibaObservationData> {
   const fetchedAt = new Date();
-  const errors: string[] = [];
-  let metsulObservation: GuaibaObservationData | null = null;
+  const [metsulResult, fallbackResult] = await Promise.allSettled([
+    fetchMetsulObservation(fetchedAt),
+    fetchFallbackObservation(fetchedAt),
+  ]);
 
-  try {
-    metsulObservation = await fetchMetsulObservation(fetchedAt);
-    if (metsulObservation.status === "live") return metsulObservation;
-    if (metsulObservation.error) errors.push(`Cais Mauá: ${metsulObservation.error}`);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    errors.push(`Cais Mauá: ${message}`);
-    console.error("[hydrology/guaiba] Falha ao consultar MetSul/TideSat", { message });
+  const metsulObservation =
+    metsulResult.status === "fulfilled"
+      ? metsulResult.value
+      : unavailableObservation(
+          `A leitura do Cais Mauá não respondeu: ${metsulResult.reason instanceof Error ? metsulResult.reason.message : String(metsulResult.reason)}`,
+          fetchedAt,
+          METSUL_SOURCE,
+        );
+  const fallbackObservation =
+    fallbackResult.status === "fulfilled"
+      ? fallbackResult.value
+      : unavailableObservation(
+          `A leitura da Usina do Gasômetro não respondeu: ${fallbackResult.reason instanceof Error ? fallbackResult.reason.message : String(fallbackResult.reason)}`,
+          fetchedAt,
+          FALLBACK_SOURCE,
+        );
+
+  if (metsulResult.status === "rejected") {
+    console.error("[hydrology/guaiba] Falha ao consultar MetSul/TideSat", {
+      message:
+        metsulResult.reason instanceof Error
+          ? metsulResult.reason.message
+          : String(metsulResult.reason),
+    });
+  }
+  if (fallbackResult.status === "rejected") {
+    console.error("[hydrology/guaiba] Falha ao consultar Nível Guaíba", {
+      message:
+        fallbackResult.reason instanceof Error
+          ? fallbackResult.reason.message
+          : String(fallbackResult.reason),
+    });
   }
 
-  try {
-    const fallbackObservation = await fetchFallbackObservation(fetchedAt);
-    if (fallbackObservation.status === "live") return fallbackObservation;
-    if (metsulObservation?.status === "stale") return metsulObservation;
-    if (fallbackObservation.status === "stale") return fallbackObservation;
-    if (fallbackObservation.error) errors.push(`Gasômetro: ${fallbackObservation.error}`);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    errors.push(`Gasômetro: ${message}`);
-    console.error("[hydrology/guaiba] Falha ao consultar fonte de contingência", { message });
-  }
+  const selected =
+    metsulObservation.status === "live"
+      ? metsulObservation
+      : fallbackObservation.status === "live"
+        ? fallbackObservation
+        : metsulObservation.status === "stale"
+          ? metsulObservation
+          : fallbackObservation.status === "stale"
+            ? fallbackObservation
+            : unavailableObservation(
+                "As réguas do Guaíba em Porto Alegre estão temporariamente indisponíveis.",
+                fetchedAt,
+                METSUL_SOURCE,
+              );
 
-  if (metsulObservation?.status === "stale") return metsulObservation;
-
-  return unavailableObservation(
-    errors.join(" ") || "O nível do Guaíba está temporariamente indisponível.",
-    fetchedAt,
-    METSUL_SOURCE,
-  );
+  return withReferences(selected, fallbackObservation, metsulObservation);
 }
 
 export const GUAIBA_CONFIG = {
-  floodReferenceMeters: FLOOD_REFERENCE_METERS,
+  floodReferenceMeters: CAIS_MAUA_FLOOD_REFERENCE_METERS,
+  gasometroFloodReferenceMeters: GASOMETRO_FLOOD_REFERENCE_METERS,
   methodologyUrl: TIDESAT_PUBLIC_URL,
   sourceUrl: METSUL_GUAIBA_PUBLIC_PAGE_URL,
   fallbackSourceUrl: FALLBACK_GUAIBA_PUBLIC_PAGE_URL,
