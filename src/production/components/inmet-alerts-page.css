@@ -27,6 +27,27 @@
   font-size: 0.71rem;
 }
 
+/* Paleta única de classificação oficial do INMET em todo o portal. */
+.inmet-alert-card.severity-potential {
+  --risk: #d6ae00;
+  background: #fffdf4;
+}
+
+.inmet-alert-card.severity-danger {
+  --risk: #ef7d2f;
+  background: #fff9f4;
+}
+
+.inmet-alert-card.severity-great-danger {
+  --risk: #d93636;
+  background: #fff7f7;
+}
+
+.inmet-alert-card.severity-unknown {
+  --risk: #6f818a;
+  background: #fbfcfc;
+}
+
 .inmet-alert-card {
   gap: 17px;
   padding: 24px 26px 24px 30px;
