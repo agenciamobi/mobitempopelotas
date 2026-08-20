@@ -59,11 +59,504 @@
   box-shadow: none;
 }
 
+/*
+ * Contrato final das páginas dedicadas que possuem shell próprio.
+ * A Home define canvas, largura, radius, borda, padding e ausência de sombras
+ * decorativas. Visualizações reais (mapas, vídeo e gráficos) permanecem livres
+ * para usar contraste funcional dentro dessas superfícies.
+ */
+.internal-weather-shell:is(
+    .internal-weather-shell--cameras,
+    .internal-weather-shell--frost,
+    .internal-weather-shell--meteogram,
+    .internal-weather-shell--embrapa,
+    .internal-weather-shell--history
+  ) {
+  --dedicated-line: rgb(7 30 47 / 10%);
+  --dedicated-muted: #58717d;
+  --dedicated-surface: #fff;
+  --dedicated-soft: #fbfcfc;
+  --dedicated-radius: 16px;
+  --dedicated-inner-radius: 14px;
+  --dedicated-pad: clamp(26px, 3.2vw, 42px);
+}
+
+.internal-weather-shell:is(
+    .internal-weather-shell--cameras,
+    .internal-weather-shell--frost,
+    .internal-weather-shell--meteogram,
+    .internal-weather-shell--embrapa,
+    .internal-weather-shell--history
+  ) .internal-weather-hero-frame {
+  background: var(--dedicated-surface);
+  box-shadow: none;
+}
+
+/* Hero: uma única superfície, sem dois cards flutuantes dentro do frame. */
+.internal-weather-shell--cameras .camera-v2-hero,
+.internal-weather-shell--frost .frost-v2-hero,
+.internal-weather-shell--meteogram .meteogram-hero,
+.internal-weather-shell--embrapa .embrapa-v2-hero,
+.internal-weather-shell--history .history-hero--retail {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.66fr);
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: var(--dedicated-surface);
+  box-shadow: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-hero__content,
+.internal-weather-shell--cameras .camera-v2-featured,
+.internal-weather-shell--frost .frost-v2-hero__content,
+.internal-weather-shell--frost .frost-v2-hero__summary,
+.internal-weather-shell--meteogram .meteogram-hero__content,
+.internal-weather-shell--meteogram .meteogram-hero__panel,
+.internal-weather-shell--embrapa .embrapa-v2-hero__content,
+.internal-weather-shell--embrapa .embrapa-v2-reading,
+.internal-weather-shell--history .history-hero__content,
+.internal-weather-shell--history .history-period-card {
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-hero__content,
+.internal-weather-shell--frost .frost-v2-hero__content,
+.internal-weather-shell--meteogram .meteogram-hero__content,
+.internal-weather-shell--embrapa .embrapa-v2-hero__content,
+.internal-weather-shell--history .history-hero__content {
+  display: grid;
+  align-content: center;
+  padding: clamp(36px, 4.2vw, 60px) var(--dedicated-pad);
+  color: #071e2f;
+  background: #fff;
+}
+
+.internal-weather-shell--cameras .camera-v2-featured,
+.internal-weather-shell--frost .frost-v2-hero__summary,
+.internal-weather-shell--meteogram .meteogram-hero__panel,
+.internal-weather-shell--embrapa .embrapa-v2-reading,
+.internal-weather-shell--history .history-period-card {
+  padding: clamp(28px, 3.2vw, 42px);
+  border-left: 1px solid var(--dedicated-line);
+  background: var(--dedicated-soft);
+  color: #071e2f;
+}
+
+.internal-weather-shell--cameras .camera-v2-hero__content .camera-v2-eyebrow,
+.internal-weather-shell--frost .frost-v2-hero__content .frost-v2-eyebrow,
+.internal-weather-shell--meteogram .meteogram-hero__content .eyebrow,
+.internal-weather-shell--embrapa .embrapa-v2-hero__content .embrapa-v2-eyebrow,
+.internal-weather-shell--history .history-hero__content .history-kicker {
+  color: #087f91;
+}
+
+.internal-weather-shell--cameras .camera-v2-hero__content h1,
+.internal-weather-shell--frost .frost-v2-hero__content h1,
+.internal-weather-shell--meteogram .meteogram-hero__content h1,
+.internal-weather-shell--embrapa .embrapa-v2-hero__content h1,
+.internal-weather-shell--history .history-hero__content h1 {
+  max-width: 940px;
+  margin-top: 10px;
+  color: #071e2f;
+  font-size: clamp(2.55rem, 4.6vw, 5rem);
+  font-weight: 790;
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+  text-wrap: balance;
+}
+
+.internal-weather-shell--cameras .camera-v2-hero__content > p,
+.internal-weather-shell--frost .frost-v2-hero__content > p,
+.internal-weather-shell--meteogram .meteogram-hero__content > p,
+.internal-weather-shell--embrapa .embrapa-v2-hero__content > p,
+.internal-weather-shell--history .history-hero__content .history-lead {
+  max-width: 76ch;
+  color: var(--dedicated-muted);
+  line-height: 1.65;
+}
+
+/* CTAs do hero deixam o antigo contraste de painel escuro e usam o mesmo
+ * padrão sóbrio dos links/botões da Home. */
+.internal-weather-shell--cameras .camera-v2-hero__actions a,
+.internal-weather-shell--frost .frost-v2-hero__actions a,
+.internal-weather-shell--meteogram .meteogram-hero__actions a,
+.internal-weather-shell--embrapa .embrapa-v2-hero__actions a,
+.internal-weather-shell--history .history-hero__actions a {
+  min-height: 44px;
+  border-color: var(--dedicated-line);
+  color: #071e2f;
+  background: #fff;
+  box-shadow: none;
+  transform: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-hero__actions a:first-child,
+.internal-weather-shell--frost .frost-v2-hero__actions a:first-child,
+.internal-weather-shell--meteogram .meteogram-hero__actions a:first-child,
+.internal-weather-shell--embrapa .embrapa-v2-hero__actions a:first-child,
+.internal-weather-shell--history .history-hero__actions a:first-child {
+  border-color: #071e2f;
+  color: #fff;
+  background: #071e2f;
+}
+
+.internal-weather-shell--cameras .camera-v2-hero__actions a:hover,
+.internal-weather-shell--frost .frost-v2-hero__actions a:hover,
+.internal-weather-shell--meteogram .meteogram-hero__actions a:hover,
+.internal-weather-shell--embrapa .embrapa-v2-hero__actions a:hover,
+.internal-weather-shell--history .history-hero__actions a:hover {
+  transform: none;
+  border-color: rgb(24 189 205 / 32%);
+}
+
+.internal-weather-shell:is(
+    .internal-weather-shell--cameras,
+    .internal-weather-shell--frost,
+    .internal-weather-shell--meteogram,
+    .internal-weather-shell--embrapa,
+    .internal-weather-shell--history
+  ) :is(
+    .camera-v2-chapters,
+    .frost-v2-chapters,
+    .meteogram-chapters,
+    .embrapa-v2-chapters,
+    .history-chapters
+  ) {
+  overflow: hidden;
+  border: 1px solid var(--dedicated-line);
+  border-radius: var(--dedicated-inner-radius);
+  background: #fff;
+  box-shadow: none;
+}
+
+/* Câmeras: o player mantém fundo escuro por função; o restante deixa de parecer
+ * um dashboard de cards flutuantes. */
+.internal-weather-shell--cameras :is(
+    .camera-v2-status,
+    .camera-v2-explorer,
+    .camera-v2-weather,
+    .camera-v2-guidance,
+    .camera-v2-responsibility,
+    .camera-v2-actions,
+    .camera-v2-empty
+  ) {
+  border: 1px solid var(--dedicated-line);
+  border-radius: var(--dedicated-radius);
+  background: #fff;
+  box-shadow: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-status {
+  background: #fff;
+}
+
+.internal-weather-shell--cameras :is(
+    .camera-v2-selector button,
+    .camera-v2-details,
+    .camera-v2-guidance article,
+    .camera-v2-weather article
+  ) {
+  border-color: var(--dedicated-line);
+  border-radius: var(--dedicated-inner-radius);
+  background: var(--dedicated-soft);
+  box-shadow: none;
+  transform: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-selector button:hover {
+  transform: none;
+  border-color: rgb(24 189 205 / 28%);
+}
+
+.internal-weather-shell--cameras .camera-v2-frame {
+  overflow: hidden;
+  border-radius: var(--dedicated-inner-radius);
+  box-shadow: none;
+}
+
+/* Geadas: o mapa continua sendo a visualização central; seus capítulos viram
+ * superfícies brancas com o mesmo radius e padding editorial da Home. */
+.internal-weather-shell--frost :is(
+    .frost-v2-source,
+    .frost-v2-map-section,
+    .frost-v2-summary,
+    .frost-v2-table-section,
+    .frost-v2-limits,
+    .frost-v2-actions
+  ) {
+  border: 1px solid var(--dedicated-line);
+  border-radius: var(--dedicated-radius);
+  box-shadow: none;
+}
+
+.internal-weather-shell--frost :is(
+    .frost-v2-map-section,
+    .frost-v2-summary,
+    .frost-v2-table-section,
+    .frost-v2-limits,
+    .frost-v2-actions
+  ) {
+  background: #fff;
+}
+
+.internal-weather-shell--frost :is(
+    .frost-v2-filters,
+    .frost-v2-summary article,
+    .frost-v2-table-wrap,
+    .frost-v2-source dl > div
+  ) {
+  border-color: var(--dedicated-line);
+  border-radius: var(--dedicated-inner-radius);
+  box-shadow: none;
+}
+
+/* Meteograma: elimina o hero escuro e as sombras decorativas sem reduzir o
+ * contraste dos gráficos e dos estados selecionados. */
+.internal-weather-shell--meteogram :is(
+    .meteogram-overview,
+    .meteogram-chart-card,
+    .meteogram-volume,
+    .meteogram-method,
+    .meteogram-related,
+    .meteogram-unavailable
+  ) {
+  border: 1px solid var(--dedicated-line);
+  border-radius: var(--dedicated-radius);
+  background: #fff;
+  box-shadow: none;
+}
+
+.internal-weather-shell--meteogram :is(
+    .meteogram-timeline button,
+    .meteogram-selected,
+    .meteogram-selected-grid article,
+    .meteogram-insights article
+  ) {
+  border-color: var(--dedicated-line);
+  border-radius: var(--dedicated-inner-radius);
+  box-shadow: none;
+}
+
+.internal-weather-shell--meteogram .meteogram-overview {
+  background: #fff;
+}
+
+.internal-weather-shell--meteogram .meteogram-hero__panel article {
+  border-color: var(--dedicated-line);
+  border-radius: var(--dedicated-inner-radius);
+  background: #fff;
+  box-shadow: none;
+}
+
+/* Embrapa: preserva cores de saúde da fonte, mas remove o chrome promocional
+ * dos capítulos e das medições. */
+.internal-weather-shell--embrapa :is(
+    .embrapa-v2-source,
+    .embrapa-v2-section,
+    .embrapa-v2-water,
+    .embrapa-v2-unavailable,
+    .embrapa-v2-provenance,
+    .embrapa-v2-actions
+  ) {
+  border: 1px solid var(--dedicated-line);
+  border-radius: var(--dedicated-radius);
+  box-shadow: none;
+}
+
+.internal-weather-shell--embrapa :is(
+    .embrapa-v2-section,
+    .embrapa-v2-water,
+    .embrapa-v2-provenance,
+    .embrapa-v2-actions
+  ) {
+  background: #fff;
+}
+
+.internal-weather-shell--embrapa :is(
+    .embrapa-v2-metric,
+    .embrapa-v2-water-columns article,
+    .embrapa-v2-extremes-grid article,
+    .embrapa-v2-provenance-grid article,
+    .embrapa-v2-reading__quick > span
+  ) {
+  border-color: var(--dedicated-line);
+  border-radius: var(--dedicated-inner-radius);
+  background-color: var(--dedicated-soft);
+  box-shadow: none;
+}
+
+/* Histórico: gráfico é o dado; o chrome ao redor segue o mesmo sistema de
+ * superfícies leves da Home. */
+.internal-weather-shell--history :is(
+    .history-summary-section,
+    .history-chart,
+    .history-section,
+    .history-methodology,
+    .history-actions,
+    .history-unavailable
+  ) {
+  border: 1px solid var(--dedicated-line);
+  border-radius: var(--dedicated-radius);
+  background: #fff;
+  box-shadow: none;
+}
+
+.internal-weather-shell--history :is(
+    .history-summary article,
+    .history-records article,
+    .history-chart-canvas,
+    .history-days button
+  ) {
+  border-color: var(--dedicated-line);
+  border-radius: var(--dedicated-inner-radius);
+  background-color: var(--dedicated-soft);
+  box-shadow: none;
+}
+
+.internal-weather-shell--history .history-period-card::before {
+  width: 36px;
+  height: 3px;
+}
+
+/* Foco consistente em páginas dedicadas. */
+.internal-weather-shell:is(
+    .internal-weather-shell--cameras,
+    .internal-weather-shell--frost,
+    .internal-weather-shell--meteogram,
+    .internal-weather-shell--embrapa,
+    .internal-weather-shell--history
+  ) :is(a, button):focus-visible {
+  outline: 2px solid rgb(24 189 205 / 48%);
+  outline-offset: 3px;
+}
+
 @media (max-width: 720px) {
   .site-shell--topic .redemet-source-summary,
   .site-shell--topic .redemet-explainer article,
   .site-shell--topic .redemet-related > a {
     border-radius: 11px;
+  }
+
+  .internal-weather-shell:is(
+      .internal-weather-shell--cameras,
+      .internal-weather-shell--frost,
+      .internal-weather-shell--meteogram,
+      .internal-weather-shell--embrapa,
+      .internal-weather-shell--history
+    ) {
+    --dedicated-radius: 12px;
+    --dedicated-inner-radius: 11px;
+    --dedicated-pad: 20px;
+  }
+
+  .internal-weather-shell--cameras .camera-v2-hero,
+  .internal-weather-shell--frost .frost-v2-hero,
+  .internal-weather-shell--meteogram .meteogram-hero,
+  .internal-weather-shell--embrapa .embrapa-v2-hero,
+  .internal-weather-shell--history .history-hero--retail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .internal-weather-shell--cameras .camera-v2-hero__content,
+  .internal-weather-shell--frost .frost-v2-hero__content,
+  .internal-weather-shell--meteogram .meteogram-hero__content,
+  .internal-weather-shell--embrapa .embrapa-v2-hero__content,
+  .internal-weather-shell--history .history-hero__content {
+    padding: 30px 20px;
+  }
+
+  .internal-weather-shell--cameras .camera-v2-featured,
+  .internal-weather-shell--frost .frost-v2-hero__summary,
+  .internal-weather-shell--meteogram .meteogram-hero__panel,
+  .internal-weather-shell--embrapa .embrapa-v2-reading,
+  .internal-weather-shell--history .history-period-card {
+    padding: 24px 20px;
+    border-top: 1px solid var(--dedicated-line);
+    border-left: 0;
+  }
+
+  .internal-weather-shell--cameras .camera-v2-hero__content h1,
+  .internal-weather-shell--frost .frost-v2-hero__content h1,
+  .internal-weather-shell--meteogram .meteogram-hero__content h1,
+  .internal-weather-shell--embrapa .embrapa-v2-hero__content h1,
+  .internal-weather-shell--history .history-hero__content h1 {
+    font-size: clamp(2.25rem, 11vw, 3.5rem);
+  }
+
+  .internal-weather-shell:is(
+      .internal-weather-shell--cameras,
+      .internal-weather-shell--frost,
+      .internal-weather-shell--meteogram,
+      .internal-weather-shell--embrapa,
+      .internal-weather-shell--history
+    ) :is(
+      .camera-v2-chapters,
+      .frost-v2-chapters,
+      .meteogram-chapters,
+      .embrapa-v2-chapters,
+      .history-chapters
+    ) {
+    border-radius: var(--dedicated-radius);
+  }
+
+  .internal-weather-shell--cameras :is(
+      .camera-v2-status,
+      .camera-v2-explorer,
+      .camera-v2-weather,
+      .camera-v2-guidance,
+      .camera-v2-responsibility,
+      .camera-v2-actions,
+      .camera-v2-empty,
+      .camera-v2-frame,
+      .camera-v2-details
+    ),
+  .internal-weather-shell--frost :is(
+      .frost-v2-source,
+      .frost-v2-map-section,
+      .frost-v2-summary,
+      .frost-v2-table-section,
+      .frost-v2-limits,
+      .frost-v2-actions
+    ),
+  .internal-weather-shell--meteogram :is(
+      .meteogram-overview,
+      .meteogram-chart-card,
+      .meteogram-volume,
+      .meteogram-method,
+      .meteogram-related,
+      .meteogram-unavailable
+    ),
+  .internal-weather-shell--embrapa :is(
+      .embrapa-v2-source,
+      .embrapa-v2-section,
+      .embrapa-v2-water,
+      .embrapa-v2-unavailable,
+      .embrapa-v2-provenance,
+      .embrapa-v2-actions
+    ),
+  .internal-weather-shell--history :is(
+      .history-summary-section,
+      .history-chart,
+      .history-section,
+      .history-methodology,
+      .history-actions,
+      .history-unavailable
+    ) {
+    border-radius: var(--dedicated-radius);
   }
 }
 
@@ -71,7 +564,14 @@
   .site-shell--topic .redemet-hero .redemet-freshness,
   .site-shell--topic .redemet-source-summary,
   .site-shell--topic .redemet-explainer article,
-  .site-shell--topic .redemet-related > a {
+  .site-shell--topic .redemet-related > a,
+  .internal-weather-shell:is(
+      .internal-weather-shell--cameras,
+      .internal-weather-shell--frost,
+      .internal-weather-shell--meteogram,
+      .internal-weather-shell--embrapa,
+      .internal-weather-shell--history
+    ) :is(section, article, nav, aside) {
     border-color: CanvasText;
     background: Canvas;
     color: CanvasText;
