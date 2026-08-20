@@ -6,15 +6,18 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   sync-lockfile:
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout
+      - name: Checkout da branch do PR
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Configurar Node.js
         uses: actions/setup-node@v4
@@ -25,13 +28,65 @@ jobs:
       - name: Sincronizar package-lock
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
 
+      - name: Atualizar estado do projeto
+        shell: python
+        run: |
+          from pathlib import Path
+          path = Path("PROJECT_CURRENT_STATE.md")
+          text = path.read_text(encoding="utf-8")
+          text = text.replace("Última atualização: 18/08/2026", "Última atualização: 20/08/2026")
+          text = text.replace("Última atualização: 19/08/2026", "Última atualização: 20/08/2026")
+          marker = "## 46. Defesa Civil RS — Rede de Monitoramento Hidrometeorológico"
+          if marker not in text:
+              text = text.rstrip() + """
+
+## 46. Defesa Civil RS — Rede de Monitoramento Hidrometeorológico
+
+Estado em 20/08/2026: **integração técnica preparada; publicação pública bloqueada por feature flag até validação institucional das condições de uso**.
+
+A Defesa Civil do Estado do Rio Grande do Sul possui API GraphQL pública documentada para a Rede de Monitoramento Hidrometeorológico. O Tempo Pelotas passou a ter adapter exclusivamente server-side para esse contrato, sem expor credenciais, sem consulta direta do navegador e sem substituir as fontes hidrológicas que já existem.
+
+Arquitetura implementada:
+
+- endpoint GraphQL da Rede consultado somente pelo runtime do servidor;
+- validação e normalização por Zod;
+- recorte regional por distância de Pelotas;
+- preservação de código da estação, localização, bacia, timestamp e unidade;
+- suporte, quando entregues pela estação, a nível de rio, chuva, temperatura, umidade, pressão, radiação e vento;
+- cálculo editorial de idade da leitura apenas para transparência de atualização;
+- mapa MapLibre e cards por estação dentro de `/situacao-hidrologica-pelotas`;
+- cache, timeout, retry transitório e falha isolada da página principal;
+- atribuição explícita à Defesa Civil RS e links para mapa/documentação oficiais.
+
+A nova área fica atrás da variável server-only `DEFESA_CIVIL_HYDRO_ENABLED=false`. Enquanto a variável estiver ausente ou `false`, a API não é chamada por esse fluxo e a área não é renderizada. A flag só deve ser habilitada após a Defesa Civil orientar sobre as condições de uso em produção pública/comercial, conforme ressalva existente na própria documentação da API.
+
+A interface não transforma medição observada em alerta, previsão de cheia ou classificação de risco. A recência calculada pelo Tempo Pelotas (`recent`, `delayed`, `old`) serve somente para indicar a idade da leitura e não representa estado operacional oficial.
+
+Premissas que ainda precisam ser confirmadas antes da ativação pública:
+
+- contrato recomendado para descoberta/listagem das estações do RS;
+- timezone dos timestamps quando o payload vier sem offset;
+- semântica e referência vertical de `rio_nivel` em cada estação;
+- limites de requisição e regras de cache/redistribuição;
+- estações efetivamente disponíveis na Zona Sul e variáveis entregues por cada uma.
+
+Documentação específica: `docs/DEFESA_CIVIL_RS_HYDRO_INTEGRATION.md`.
+"""
+          path.write_text(text, encoding="utf-8")
+
       - name: Validar npm ci
         run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: Publicar package-lock sincronizado
-        uses: actions/upload-artifact@v4
-        with:
-          name: synced-package-lock
-          path: package-lock.json
-          if-no-files-found: error
-          retention-days: 1
+      - name: Commitar manutenção gerada
+        env:
+          BRANCH_NAME: ${{ github.head_ref }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json PROJECT_CURRENT_STATE.md
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração de manutenção necessária."
+            exit 0
+          fi
+          git commit -m "chore: sync npm lockfile and project state"
+          git push origin "HEAD:${BRANCH_NAME}"
