@@ -8,6 +8,7 @@ const route = readFileSync("src/routes/meteograma-pelotas.tsx", "utf8");
 const page = readFileSync("src/components/weather/MeteogramPage.tsx", "utf8");
 const styles = readFileSync("src/components/weather/MeteogramPage.css", "utf8");
 const refinement = readFileSync("src/components/weather/MeteogramRefinement.css", "utf8");
+const homeContract = readFileSync("src/components/weather/MeteogramHomeContract.css", "utf8");
 const functionSource = readFileSync("src/lib/weather/meteogram.functions.ts", "utf8");
 const publicRoutes = readFileSync("src/lib/public-routes.ts", "utf8");
 const todayAtmosphere = readFileSync("src/components/weather/TodayAtmosphericSignals.tsx", "utf8");
@@ -110,6 +111,8 @@ test("meteogram normalizer preserves hourly volume and atmospheric variables", a
 test("meteogram route exposes SEO, FAQ and separate forecast loading", () => {
   assert.match(route, /createFileRoute\("\/meteograma-pelotas"\)/);
   assert.match(route, /MeteogramRefinement\.css/);
+  assert.match(route, /MeteogramHomeContract\.css/);
+  assert.ok(route.indexOf("MeteogramHomeContract.css") > route.indexOf("MeteogramRefinement.css"));
   assert.match(route, /getWeatherIntelligence\(\)/);
   assert.match(route, /getPelotasMeteogram\(\)/);
   assert.match(route, /Promise\.all/);
@@ -164,6 +167,16 @@ test("meteogram layout protects retail rail, scrolling charts and responsive sta
   assert.match(refinement, /grid-auto-flow:\s*column/);
   assert.match(refinement, /grid-template-columns:\s*none/);
   assert.match(refinement, /grid-auto-columns:\s*minmax\(32px, 1fr\)/);
+});
+
+test("meteogram hero uses color as a technical reading aid, not promotional chrome", () => {
+  assert.match(homeContract, /acento técnico controlado/i);
+  assert.match(homeContract, /\.meteogram-hero__panel[\s\S]*radial-gradient[\s\S]*linear-gradient/);
+  assert.match(homeContract, /\.meteogram-hero__panel article:nth-child\(1\)/);
+  assert.match(homeContract, /\.meteogram-hero__panel article:nth-child\(4\)/);
+  assert.match(homeContract, /\.meteogram-hero__actions a:first-child[\s\S]*linear-gradient/);
+  assert.match(homeContract, /@media \(forced-colors: active\)/);
+  assert.doesNotMatch(homeContract, /!important/);
 });
 
 test("meteogram is discoverable and cached as an operational page", () => {
