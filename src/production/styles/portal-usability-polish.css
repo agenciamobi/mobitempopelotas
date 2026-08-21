@@ -34,18 +34,34 @@
   align-items: center;
 }
 
+.tp-home-footer :is(
+  .tp-home-footer-status small,
+  .tp-home-footer-sources span,
+  .tp-home-footer-group > strong
+) {
+  font-size: max(0.62rem, 10px);
+}
+
 /* Utilidade pública: os telefones já têm cards amplos; links auxiliares também precisam 44 px. */
 .tp-public-service-strip .tp-public-service-civil-defense__identity > a,
 .tp-public-service-strip .tp-public-service-civil-defense__signup a {
   min-height: 44px;
 }
 
-/* Alertas: acesso à fonte oficial é ação; validade continua pequena, mas legível. */
+.tp-public-service-strip .tp-public-service-civil-defense__identity span {
+  font-size: max(0.62rem, 10px);
+}
+
+/* Alertas: acesso à fonte oficial é ação; metadados continuam compactos, mas legíveis. */
 .internal-weather-shell--alerts .alerts-official-link {
   min-height: 44px;
 }
 
-.internal-weather-shell--alerts .alerts-period dt {
+.internal-weather-shell--alerts :is(
+  .alerts-period dt,
+  .alerts-card-meta span,
+  .alerts-featured-period dt
+) {
   font-size: max(0.62rem, 10px);
 }
 
