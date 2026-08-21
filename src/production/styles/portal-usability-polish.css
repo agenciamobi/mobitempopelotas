@@ -9,6 +9,20 @@
   min-height: 44px;
 }
 
+/* Header sticky: 44 px reais e offset de âncora compatível com as duas faixas mobile. */
+.tp-home-header .header-account-link,
+.tp-home-header__alert {
+  min-height: 44px;
+}
+
+.tp-home-header .header-account-link.is-loading {
+  min-width: 44px;
+}
+
+.page-scroll-root {
+  scroll-padding-top: 84px;
+}
+
 /* HomeForecastStory aparece na Home, Tempo Hoje e páginas regionais. */
 .home-forecast-story :is(
   .home-tomorrow-spotlight > a,
@@ -55,6 +69,37 @@
   outline-offset: 3px;
 }
 
+@media (max-width: 1040px) {
+  .tp-home-header__nav,
+  .tp-home-header__nav a {
+    min-height: 44px;
+  }
+
+  .page-scroll-root {
+    scroll-padding-top: 116px;
+  }
+}
+
+@media (max-width: 720px) {
+  .tp-home-header__brand img {
+    width: clamp(144px, 42vw, 170px);
+  }
+
+  .tp-home-header__nav a,
+  .tp-home-header .header-account-link,
+  .tp-home-header__alert {
+    min-height: 44px;
+  }
+
+  .tp-home-header__alert {
+    width: 44px;
+  }
+
+  .page-scroll-root {
+    scroll-padding-top: 112px;
+  }
+}
+
 @media (max-width: 480px) {
   .home-forecast-story .home-forecast-links > a:last-child {
     justify-content: center;
@@ -63,6 +108,19 @@
 }
 
 @media (max-width: 360px) {
+  .tp-home-header__inner {
+    gap: 6px;
+  }
+
+  .tp-home-header__brand img {
+    width: 140px;
+  }
+
+  .tp-home-header .header-account-link {
+    padding-inline: 2px;
+    font-size: 0.62rem;
+  }
+
   .home-forecast-story .home-forecast-facts {
     column-gap: 0.65rem;
   }
