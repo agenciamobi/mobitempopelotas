@@ -49,6 +49,7 @@ export type HourlyForecast = {
   precipitationMm?: number | null;
   windSpeed: number;
   windGust: number | null;
+  windDirectionDegrees?: number | null;
   icon: WeatherIconName;
   relativeHumidity?: number | null;
   dewPoint?: number | null;
