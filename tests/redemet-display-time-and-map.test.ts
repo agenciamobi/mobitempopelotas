@@ -58,7 +58,8 @@ test("radar frames are georeferenced over the existing MapLibre base", () => {
   assert.match(radarMap, /"raster-opacity":\s*0\.58/);
   assert.match(radarMap, /PELOTAS_COORDINATES/);
   assert.match(radarMap, /failed \? \([\s\S]*className=\{styles\.rawFallback\}/);
-  assert.match(radarMap, /role="img"/);
+  assert.match(radarMap, /role="region"/);
+  assert.doesNotMatch(radarMap, /role="img"/);
   assert.match(radarMapStyles, /\.rawFallback/);
   assert.match(radarMap, /Base cartográfica indisponível/);
 });
