@@ -1,0 +1,99 @@
+/*
+ * Clima de Pelotas — acento sazonal editorial.
+ * O contrato global mantém a geometria clara; estes overlays devolvem cor sem
+ * reativar o antigo hero escuro nem interferir no histórico e nas fontes.
+ */
+
+.internal-weather-shell--climate .climate-hero__content,
+.internal-weather-shell--climate .climate-hero__panel {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.internal-weather-shell--climate .climate-hero__content::before,
+.internal-weather-shell--climate .climate-hero__panel::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+}
+
+.internal-weather-shell--climate .climate-hero__content::before {
+  background:
+    radial-gradient(circle at 4% 100%, rgb(24 189 205 / 11%), transparent 24rem),
+    radial-gradient(circle at 96% 4%, rgb(242 112 53 / 10%), transparent 23rem),
+    linear-gradient(145deg, #fbfdfc 0%, #ffffff 58%, #fff8f3 100%);
+}
+
+.internal-weather-shell--climate .climate-hero__panel::before {
+  background:
+    radial-gradient(circle at 100% 0, rgb(94 44 237 / 9%), transparent 20rem),
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 10%), transparent 18rem),
+    linear-gradient(145deg, #f1fafb 0%, #ffffff 55%, #f8f6ff 100%);
+}
+
+.internal-weather-shell--climate .climate-hero__content > *,
+.internal-weather-shell--climate .climate-hero__panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.internal-weather-shell--climate .climate-hero__actions a:first-child {
+  border-color: #087f91;
+  color: #fff;
+  background: linear-gradient(135deg, #087f91 0%, #2d8d59 100%);
+}
+
+.internal-weather-shell--climate .climate-hero__actions a:first-child:hover {
+  border-color: #087f91;
+}
+
+.internal-weather-shell--climate .climate-hero__recent {
+  border-color: rgb(7 30 47 / 9%);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 76%);
+  box-shadow: none;
+}
+
+.internal-weather-shell--climate .climate-hero__season:has(.lucide-snowflake) > svg {
+  color: #168fa3;
+}
+
+.internal-weather-shell--climate .climate-hero__season:has(.lucide-sun) > svg {
+  color: #f27035;
+}
+
+.internal-weather-shell--climate .climate-hero__season:has(.lucide-leaf) > svg {
+  color: #2d8d59;
+}
+
+.internal-weather-shell--climate .climate-chapters {
+  box-shadow: none;
+}
+
+@media (max-width: 720px) {
+  .internal-weather-shell--climate .climate-hero__content::before {
+    background:
+      radial-gradient(circle at 0 100%, rgb(24 189 205 / 9%), transparent 17rem),
+      linear-gradient(145deg, #fbfdfc, #fff 64%, #fff8f4);
+  }
+
+  .internal-weather-shell--climate .climate-hero__panel::before {
+    background:
+      radial-gradient(circle at 100% 0, rgb(94 44 237 / 7%), transparent 15rem),
+      linear-gradient(145deg, #f3fafb, #fff 62%, #f8f6ff);
+  }
+
+  .internal-weather-shell--climate .climate-hero__recent {
+    border-radius: 12px;
+  }
+}
+
+@media (forced-colors: active) {
+  .internal-weather-shell--climate .climate-hero__content::before,
+  .internal-weather-shell--climate .climate-hero__panel::before {
+    background: Canvas;
+  }
+}
