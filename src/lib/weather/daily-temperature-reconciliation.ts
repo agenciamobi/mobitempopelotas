@@ -3,6 +3,7 @@ import type { InmetForecastPeriod } from "./official-sources.types";
 type DailyTemperatureRange = {
   min: number;
   max: number;
+  dateIso?: string;
 };
 
 type OfficialTemperatureRange = {
@@ -39,8 +40,9 @@ function officialRanges(periods: InmetForecastPeriod[]) {
   const ranges = new Map<string, OfficialTemperatureRange>();
 
   for (const period of periods) {
-    if (!period.date) continue;
-    const current = ranges.get(period.date) ?? { minimum: null, maximum: null };
+    const date = period.date?.slice(0, 10);
+    if (!date) continue;
+    const current = ranges.get(date) ?? { minimum: null, maximum: null };
     const minimum =
       period.minimum === null || period.minimum === undefined
         ? current.minimum
@@ -54,7 +56,7 @@ function officialRanges(periods: InmetForecastPeriod[]) {
           ? period.maximum
           : Math.max(current.maximum, period.maximum);
 
-    ranges.set(period.date, { minimum, maximum });
+    ranges.set(date, { minimum, maximum });
   }
 
   return ranges;
@@ -70,7 +72,8 @@ export function reconcileDailyTemperatures<T extends DailyTemperatureRange>(
   const ranges = officialRanges(periods);
 
   return daily.map((day, index) => {
-    const official = ranges.get(localForecastDateKey(index, now));
+    const dateKey = day.dateIso?.slice(0, 10) || localForecastDateKey(index, now);
+    const official = ranges.get(dateKey);
     if (!official) return day;
 
     const minimum = official.minimum ?? day.min;
