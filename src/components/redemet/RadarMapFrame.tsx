@@ -180,7 +180,7 @@ export function RadarMapFrame({
       <div
         ref={containerRef}
         className={`${styles.map}${failed ? ` ${styles.hidden}` : ""}`}
-        role="img"
+        role="region"
         aria-label={`${alt}. Radar georreferenciado sobre mapa regional, com Pelotas marcada.`}
       />
 
