@@ -74,10 +74,9 @@ function mostFrequentDirection(hours: MeteogramHour[]) {
 
 function peakGustHour(hours: MeteogramHour[]) {
   return hours.reduce<MeteogramHour | null>((selected, hour) => {
-    const value = hour.windGust ?? hour.windSpeed;
-    if (value === null) return selected;
-    const selectedValue = selected ? (selected.windGust ?? selected.windSpeed) : null;
-    return selectedValue === null || value > selectedValue ? hour : selected;
+    if (hour.windGust === null) return selected;
+    const selectedValue = selected?.windGust ?? null;
+    return selectedValue === null || hour.windGust > selectedValue ? hour : selected;
   }, null);
 }
 
@@ -130,7 +129,7 @@ export function WindDirectionContext({ meteogram }: { meteogram: MeteogramData }
           <TrendingUp aria-hidden="true" />
           <span>Na maior rajada</span>
           <strong>{directionLabel(peak?.windDirectionDegrees)}</strong>
-          <small>{peak ? `${formatHour(peak.timestamp)} · rajada ${formatSpeed(peak.windGust)}` : "—"}</small>
+          <small>{peak ? `${formatHour(peak.timestamp)} · rajada ${formatSpeed(peak.windGust)}` : "Rajada não informada no período"}</small>
         </article>
         <article>
           <Wind aria-hidden="true" />
