@@ -49,6 +49,12 @@ function formatValue(value: number | null, suffix = "") {
   return value === null ? "—" : `${value}${suffix}`;
 }
 
+function formatGust(value: number | null) {
+  if (value === null) return "—";
+  if (value <= 0) return "Sem rajadas";
+  return `${value} km/h`;
+}
+
 function formatWind(value: number | null, direction: string | null) {
   const speed = formatValue(value, " km/h");
   return value !== null && direction ? `${speed} · ${direction}` : speed;
@@ -95,7 +101,7 @@ function buildCurrentMetrics(weather: WeatherData): RetailMetric[] {
       },
       {
         label: "Rajada",
-        value: formatValue(nextHour.windGust, " km/h"),
+        value: formatGust(nextHour.windGust),
         detail: "máxima prevista",
         icon: Gauge,
       },
@@ -314,7 +320,7 @@ export function TodayRetailHero({
               <span>
                 <Wind aria-hidden="true" /> Rajadas
               </span>
-              <strong>{!today || today.windGust === null ? "—" : `${today.windGust} km/h`}</strong>
+              <strong>{today ? formatGust(today.windGust) : "—"}</strong>
               <small>Máxima prevista hoje</small>
             </article>
 
