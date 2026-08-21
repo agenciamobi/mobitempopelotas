@@ -33,12 +33,18 @@ function formatNumber(value: number, maximumFractionDigits = 1) {
   }).format(value);
 }
 
+function gustDescription(value: number | null) {
+  if (value === null) return "Rajada máxima não informada.";
+  if (value <= 0) return "Sem rajada prevista.";
+  return `Rajadas de até ${formatNumber(value)} km/h.`;
+}
+
 function buildDaySummary(day: DailyForecast): ForecastNarrative {
   const rain =
     day.rainChance === null
       ? `${formatNumber(day.precipitation)} mm previstos.`
       : `${day.rainChance}% de chance de chuva e ${formatNumber(day.precipitation)} mm previstos.`;
-  const wind = day.windGust === null ? "" : ` Rajadas de até ${day.windGust} km/h.`;
+  const wind = day.windGust === null ? "" : ` ${gustDescription(day.windGust)}`;
 
   return {
     headline: conditionHeadlines[day.icon],
@@ -69,15 +75,14 @@ function buildTomorrowFallback(weather: WeatherData): ForecastNarrative | null {
         ? `Chance alta de chuva, com ${formatNumber(tomorrow.precipitation)} mm previstos.`
         : tomorrow.rainChance >= 35
           ? `Possibilidade de chuva, com ${formatNumber(tomorrow.precipitation)} mm previstos.`
-          : "Chance baixa de chuva, sem volume relevante indicado.";
-  const gustDescription =
-    tomorrow.windGust === null
-      ? "Rajada máxima não informada."
-      : `Rajadas de até ${tomorrow.windGust} km/h.`;
+          : tomorrow.precipitation > 0
+            ? `Chance baixa de chuva, com ${formatNumber(tomorrow.precipitation)} mm previstos.`
+            : "Chance baixa de chuva, sem volume relevante indicado.";
+  const gust = gustDescription(tomorrow.windGust);
 
   return {
     headline,
-    summary: `${rainDescription} Temperaturas entre ${tomorrow.min}° e ${tomorrow.max}°. ${gustDescription}`,
+    summary: `${rainDescription} Temperaturas entre ${tomorrow.min}° e ${tomorrow.max}°. ${gust}`,
   };
 }
 
