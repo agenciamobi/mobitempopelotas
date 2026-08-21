@@ -114,6 +114,46 @@
 }
 
 /*
+ * Heroes retail de previsão ainda recebem CSS lazy próprio. O frame compartilhado
+ * já define a superfície da Home; aqui impedimos que o chunk da rota restaure
+ * gradientes, sombra externa, borda inferior ou círculos decorativos antigos.
+ * A foto, os dados meteorológicos e os estados internos permanecem intactos.
+ */
+.internal-weather-shell:is(
+    .internal-weather-shell--today,
+    .internal-weather-shell--tomorrow,
+    .internal-weather-shell--seven-day,
+    .internal-weather-shell--rain
+  )
+  :is(.today-retail-hero, .tomorrow-retail-hero, .seven-day-retail-hero, .rain-retail-hero) {
+  border: 0 !important;
+  border-radius: inherit !important;
+  background-color: var(--route-editorial-surface) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.internal-weather-shell:is(
+    .internal-weather-shell--today,
+    .internal-weather-shell--tomorrow,
+    .internal-weather-shell--seven-day,
+    .internal-weather-shell--rain
+  )
+  :is(.today-retail-hero, .tomorrow-retail-hero, .seven-day-retail-hero, .rain-retail-hero)::before,
+.internal-weather-shell:is(
+    .internal-weather-shell--today,
+    .internal-weather-shell--tomorrow,
+    .internal-weather-shell--seven-day,
+    .internal-weather-shell--rain
+  )
+  :is(.today-retail-hero, .tomorrow-retail-hero, .seven-day-retail-hero, .rain-retail-hero)::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/*
  * Heroes dedicados que ainda possuem CSS legado próprio. O conteúdo visual
  * funcional do lado direito continua intacto; removemos apenas o chrome antigo.
  */
