@@ -24,6 +24,7 @@ import "./RainForecastPageV2.css";
 const chapters = [
   { href: "#panorama-da-chuva", label: "Chuva em resumo", detail: "Chance, horário e volume" },
   { href: "#chuva-por-hora", label: "Próximas horas", detail: "Chance nas próximas 12 horas" },
+  { href: "#volume-de-chuva-por-hora", label: "Volume por hora", detail: "Milímetros nas próximas 12 horas" },
   { href: "#chuva-na-semana", label: "Próximos 7 dias", detail: "Chance e volume diário" },
   { href: "#planejamento-da-chuva", label: "Melhores horários", detail: "Menor e maior chance" },
   { href: "#contexto-oficial-da-chuva", label: "Avisos do INMET", detail: "Alertas e previsão oficial" },
