@@ -25,10 +25,20 @@ const DIRECTION_LABELS = [
   "NNO",
 ] as const;
 
+type DirectionFrequency = {
+  label: string;
+  detail: string;
+  hasDominantDirection: boolean;
+};
+
 function directionLabel(degrees: number | null | undefined) {
   if (degrees === null || degrees === undefined) return "—";
   const normalized = ((degrees % 360) + 360) % 360;
   return DIRECTION_LABELS[Math.round(normalized / 22.5) % DIRECTION_LABELS.length] ?? "—";
+}
+
+function formatDirectionDegrees(value: number | null | undefined) {
+  return value === null || value === undefined ? "—" : `${Math.round(value)}°`;
 }
 
 function formatHour(value: string) {
@@ -59,22 +69,47 @@ function formatSpeed(value: number | null | undefined) {
   return `${new Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 }).format(value)} km/h`;
 }
 
+function formatGust(value: number | null | undefined) {
+  if (value === null || value === undefined) return "Não informada";
+  if (value <= 0) return "Sem rajada prevista";
+  return formatSpeed(value);
+}
+
 function directionHours(hours: MeteogramHour[]) {
   return hours.filter((hour) => hour.windDirectionDegrees !== null);
 }
 
-function mostFrequentDirection(hours: MeteogramHour[]) {
+function directionFrequency(hours: MeteogramHour[]): DirectionFrequency | null {
+  const withDirection = directionHours(hours);
   const counts = new Map<string, number>();
-  for (const hour of directionHours(hours)) {
+  for (const hour of withDirection) {
     const label = directionLabel(hour.windDirectionDegrees);
     counts.set(label, (counts.get(label) ?? 0) + 1);
   }
-  return [...counts.entries()].sort((left, right) => right[1] - left[1])[0] ?? null;
+
+  const ranked = [...counts.entries()].sort((left, right) => right[1] - left[1]);
+  const highestCount = ranked[0]?.[1] ?? null;
+  if (highestCount === null) return null;
+
+  const leaders = ranked.filter(([, count]) => count === highestCount).map(([label]) => label);
+  if (leaders.length > 1) {
+    return {
+      label: "Sem direção dominante",
+      detail: `Empate entre ${leaders.join(", ")} · ${highestCount} horários cada`,
+      hasDominantDirection: false,
+    };
+  }
+
+  return {
+    label: leaders[0] ?? "—",
+    detail: `${highestCount} dos ${withDirection.length} horários com direção`,
+    hasDominantDirection: true,
+  };
 }
 
 function peakGustHour(hours: MeteogramHour[]) {
   return hours.reduce<MeteogramHour | null>((selected, hour) => {
-    if (hour.windGust === null) return selected;
+    if (hour.windGust === null || hour.windGust <= 0) return selected;
     const selectedValue = selected?.windGust ?? null;
     return selectedValue === null || hour.windGust > selectedValue ? hour : selected;
   }, null);
@@ -89,9 +124,15 @@ export function WindDirectionContext({ meteogram }: { meteogram: MeteogramData }
 
   const first = withDirection[0] ?? null;
   const last = withDirection.at(-1) ?? null;
-  const frequent = mostFrequentDirection(hours);
+  const frequent = directionFrequency(hours);
+  const publishedGustHours = hours.filter((hour) => hour.windGust !== null);
   const peak = peakGustHour(hours);
   const visible = withDirection.slice(0, VISIBLE_HOURS);
+  const peakGustDetail = peak
+    ? `${formatHour(peak.timestamp)} · rajada ${formatSpeed(peak.windGust)}`
+    : publishedGustHours.length
+      ? "Sem rajada positiva prevista no período"
+      : "Rajada não informada no período";
 
   return (
     <section
@@ -119,21 +160,21 @@ export function WindDirectionContext({ meteogram }: { meteogram: MeteogramData }
           <strong>{directionLabel(first?.windDirectionDegrees)}</strong>
           <small>{first ? `${formatHour(first.timestamp)} · ${formatSpeed(first.windSpeed)}` : "—"}</small>
         </article>
-        <article>
+        <article className={frequent?.hasDominantDirection === false ? "is-tied" : undefined}>
           <Compass aria-hidden="true" />
           <span>Mais frequente em 24h</span>
-          <strong>{frequent?.[0] ?? "—"}</strong>
-          <small>{frequent ? `${frequent[1]} dos ${withDirection.length} horários com direção` : "Sem cálculo"}</small>
+          <strong>{frequent?.label ?? "—"}</strong>
+          <small>{frequent?.detail ?? "Sem cálculo"}</small>
         </article>
         <article>
           <TrendingUp aria-hidden="true" />
           <span>Na maior rajada</span>
-          <strong>{directionLabel(peak?.windDirectionDegrees)}</strong>
-          <small>{peak ? `${formatHour(peak.timestamp)} · rajada ${formatSpeed(peak.windGust)}` : "Rajada não informada no período"}</small>
+          <strong>{peak ? directionLabel(peak.windDirectionDegrees) : "Sem destaque"}</strong>
+          <small>{peakGustDetail}</small>
         </article>
         <article>
           <Wind aria-hidden="true" />
-          <span>Fim da janela de 24h</span>
+          <span>Última direção disponível</span>
           <strong>{directionLabel(last?.windDirectionDegrees)}</strong>
           <small>{last ? `${formatHour(last.timestamp)} · ${formatSpeed(last.windSpeed)}` : "—"}</small>
         </article>
@@ -144,7 +185,7 @@ export function WindDirectionContext({ meteogram }: { meteogram: MeteogramData }
           <article key={hour.timestamp}>
             <header>
               <strong>{formatHour(hour.timestamp)}</strong>
-              <span>{Math.round(hour.windDirectionDegrees ?? 0)}°</span>
+              <span>{formatDirectionDegrees(hour.windDirectionDegrees)}</span>
             </header>
             <div className="wind-direction-context__direction">
               <Compass aria-hidden="true" />
@@ -153,7 +194,7 @@ export function WindDirectionContext({ meteogram }: { meteogram: MeteogramData }
             </div>
             <dl>
               <div><dt>Vento</dt><dd>{formatSpeed(hour.windSpeed)}</dd></div>
-              <div><dt>Rajada</dt><dd>{formatSpeed(hour.windGust)}</dd></div>
+              <div><dt>Rajada</dt><dd>{formatGust(hour.windGust)}</dd></div>
             </dl>
           </article>
         ))}
