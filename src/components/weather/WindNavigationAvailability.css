@@ -1,0 +1,18 @@
+/* Keep the wind chapter index aligned with sections that actually exist in the current data state. */
+.internal-weather-shell--wind:not(:has(#vento-por-hora))
+  .wind-v3-chapters
+  a[href="#vento-por-hora"],
+.internal-weather-shell--wind:not(:has(#vento-na-semana))
+  .wind-v3-chapters
+  a[href="#vento-na-semana"],
+.internal-weather-shell--wind:not(:has(#direcao-do-vento-por-hora))
+  .wind-v3-chapters
+  a[href="#direcao-do-vento-por-hora"] {
+  display: none;
+}
+
+@media (forced-colors: active) {
+  .internal-weather-shell--wind .wind-v3-chapters a {
+    forced-color-adjust: auto;
+  }
+}
