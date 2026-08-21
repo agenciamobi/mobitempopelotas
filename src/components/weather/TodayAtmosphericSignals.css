@@ -178,6 +178,10 @@
   background: #9d7bf4;
 }
 
+.today-atmosphere__legend .is-unknown {
+  background: #8798a1;
+}
+
 .today-atmosphere__cloud-grid {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -208,9 +212,18 @@
 
 .today-atmosphere__cloud-grid article > div > span {
   display: block;
-  min-width: 2px;
+  min-width: 0;
   height: 100%;
   border-radius: inherit;
+}
+
+.today-atmosphere__cloud-grid article > div > span.is-unknown {
+  width: 100%;
+  background: repeating-linear-gradient(
+    135deg,
+    rgb(123 142 151 / 68%) 0 3px,
+    rgb(214 223 226 / 82%) 3px 6px
+  );
 }
 
 .today-atmosphere__cloud-grid article > small {
@@ -306,5 +319,10 @@
   .today-atmosphere__cloud-grid article,
   .today-atmosphere__footer {
     border: 1px solid CanvasText;
+  }
+
+  .today-atmosphere__legend .is-unknown,
+  .today-atmosphere__cloud-grid article > div > span.is-unknown {
+    background: CanvasText;
   }
 }
