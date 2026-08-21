@@ -7,6 +7,10 @@ const tomorrowHero = readFileSync("src/components/weather/TomorrowRetailHero.tsx
 const sevenDayHero = readFileSync("src/components/weather/SevenDayRetailHero.tsx", "utf8");
 const rainHero = readFileSync("src/components/weather/RainRetailHero.tsx", "utf8");
 const sharedForecastStory = readFileSync("src/components/weather/HomeForecastStory.tsx", "utf8");
+const sharedForecastUnknownStyles = readFileSync(
+  "src/components/weather/HomeForecastUnknownState.css",
+  "utf8",
+);
 
 test("today hero does not link to hourly anchors when hourly forecast is absent", () => {
   assert.match(todayHero, /const hasHourlyForecast = weather\.hourly\.length > 0/);
@@ -69,4 +73,18 @@ test("shared forecast story never relabels sustained wind as a gust", () => {
   assert.match(sharedForecastStory, /const hourlyGusts = visibleHours/);
   assert.doesNotMatch(sharedForecastStory, /function windValue/);
   assert.doesNotMatch(sharedForecastStory, /windGust \?\? windSpeed/);
+});
+
+test("shared forecast story keeps unknown rain separate from a published zero", () => {
+  assert.match(sharedForecastStory, /type RainLevel = "unknown" \| "none"/);
+  assert.match(sharedForecastStory, /value === null \|\| !Number\.isFinite\(value\)/);
+  assert.match(sharedForecastStory, /chance: null, level: "unknown", label: "Chance em atualização"/);
+  assert.match(sharedForecastStory, /if \(chance === 0\).*Sem chuva indicada/);
+  assert.match(sharedForecastStory, /const chanceHours = visibleHours\.filter/);
+  assert.match(sharedForecastStory, /const hasPositiveRainChance = \(highestRainChance \?\? 0\) > 0/);
+  assert.match(sharedForecastStory, /sem horário de destaque/);
+  assert.match(sharedForecastStory, /Chance de chuva de amanhã em atualização/);
+  assert.match(sharedForecastStory, /rain\.chance \?\? 0/);
+  assert.match(sharedForecastUnknownStyles, /rain-unknown/);
+  assert.doesNotMatch(sharedForecastUnknownStyles, /!important/);
 });
