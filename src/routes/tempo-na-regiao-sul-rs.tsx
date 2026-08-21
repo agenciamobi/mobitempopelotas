@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { RegionalCitiesDirectory } from "@/components/regional/RegionalCitiesDirectory";
+import "@/components/regional/RegionalCitiesAccentContract.css";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd } from "@/lib/structured-data";
 
