@@ -1,11 +1,18 @@
 /* Contrato visual estável da página de vento com a linguagem editorial da Home. */
 
+.internal-weather-shell--wind {
+  --wind-home-line: rgb(7 30 47 / 10%);
+  --wind-home-soft: #fbfcfc;
+  --wind-home-ink: #071e2f;
+  --wind-home-muted: #58717d;
+}
+
 .internal-weather-shell--wind .wind-v3-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.66fr);
   gap: 0;
   overflow: hidden;
-  border: 1px solid rgb(7 30 47 / 10%);
+  border: 1px solid var(--wind-home-line);
   border-radius: 16px;
   background: #fff;
   box-shadow: none;
@@ -24,13 +31,13 @@
   display: grid;
   align-content: center;
   padding: clamp(36px, 4.2vw, 60px) clamp(26px, 3.2vw, 42px);
-  color: #071e2f;
+  color: var(--wind-home-ink);
   background-color: #fff;
 }
 
 .internal-weather-shell--wind .wind-v3-back {
   margin-bottom: clamp(18px, 2.2vw, 28px);
-  color: #58717d;
+  color: var(--wind-home-muted);
 }
 
 .internal-weather-shell--wind .wind-v3-hero-copy .wind-v3-eyebrow {
@@ -40,7 +47,7 @@
 .internal-weather-shell--wind .wind-v3-hero-copy h1 {
   max-width: 940px;
   margin-top: 10px;
-  color: #071e2f;
+  color: var(--wind-home-ink);
   font-size: clamp(2.55rem, 4.6vw, 5rem);
   font-weight: 790;
   line-height: 0.98;
@@ -50,23 +57,23 @@
 .internal-weather-shell--wind .wind-v3-hero-copy > p {
   max-width: 76ch;
   margin-top: 16px;
-  color: #58717d;
+  color: var(--wind-home-muted);
   line-height: 1.65;
 }
 
 .internal-weather-shell--wind .wind-v3-actions a {
   min-height: 44px;
-  border-color: rgb(7 30 47 / 10%);
-  color: #071e2f;
+  border-color: var(--wind-home-line);
+  color: var(--wind-home-ink);
   background: #fff;
   box-shadow: none;
   transform: none;
 }
 
 .internal-weather-shell--wind .wind-v3-actions a:first-child {
-  border-color: #071e2f;
+  border-color: var(--wind-home-ink);
   color: #fff;
-  background: #071e2f;
+  background: var(--wind-home-ink);
 }
 
 .internal-weather-shell--wind .wind-v3-actions a:hover {
@@ -78,9 +85,9 @@
 .internal-weather-shell--wind .wind-v3-hero-card.is-elevated,
 .internal-weather-shell--wind .wind-v3-hero-card.is-strong {
   padding: clamp(28px, 3.2vw, 42px);
-  border-left: 1px solid rgb(7 30 47 / 10%);
-  color: #071e2f;
-  background: #fbfcfc;
+  border-left: 1px solid var(--wind-home-line);
+  color: var(--wind-home-ink);
+  background: var(--wind-home-soft);
 }
 
 .internal-weather-shell--wind :is(
@@ -91,19 +98,63 @@
   .wind-v3-note,
   .wind-v3-empty
 ) {
-  border-color: rgb(7 30 47 / 10%);
+  border-color: var(--wind-home-line);
   border-radius: 16px;
   background-color: #fff;
   background-image: none;
   box-shadow: none;
 }
 
+.internal-weather-shell--wind .wind-v3-chapters {
+  box-shadow: none;
+}
+
+.internal-weather-shell--wind .wind-v3-chapters a {
+  border-color: var(--wind-home-line);
+}
+
 .internal-weather-shell--wind .wind-v3-source {
   background: #fff;
 }
 
+.internal-weather-shell--wind :is(
+  .wind-v3-peak,
+  .wind-v3-hero-card dl > div,
+  .wind-v3-source dl > div,
+  .wind-v3-summary-grid article,
+  .wind-v3-hourly-list article,
+  .wind-v3-peaks-grid article,
+  .wind-v3-peaks-grid dl > div,
+  .wind-v3-week-list article
+) {
+  border-color: var(--wind-home-line);
+  border-radius: 14px;
+  background-color: var(--wind-home-soft);
+  background-image: none;
+  box-shadow: none;
+}
+
+.internal-weather-shell--wind .wind-v3-summary-grid article {
+  min-height: 0;
+  border-top-width: 1px;
+}
+
+.internal-weather-shell--wind .wind-v3-summary-grid article:nth-child(n) {
+  border-top-color: var(--wind-home-line);
+}
+
+.internal-weather-shell--wind .wind-v3-hourly-list article,
+.internal-weather-shell--wind .wind-v3-week-list article {
+  background: #fff;
+}
+
+/* As barras continuam coloridas porque codificam vento e rajada. */
+.internal-weather-shell--wind :is(.wind-v3-bars i, .wind-v3-week-track) {
+  box-shadow: none;
+}
+
 .internal-weather-shell--wind .wind-v3-interpretation {
-  color: #071e2f;
+  color: var(--wind-home-ink);
   background: #fff;
 }
 
@@ -112,19 +163,23 @@
 }
 
 .internal-weather-shell--wind .wind-v3-interpretation h2 {
-  color: #071e2f;
+  color: var(--wind-home-ink);
 }
 
 .internal-weather-shell--wind .wind-v3-interpretation p {
-  color: #58717d;
+  color: var(--wind-home-muted);
 }
 
 .internal-weather-shell--wind .wind-v3-interpretation a {
-  border-color: rgb(7 30 47 / 10%);
-  color: #071e2f;
-  background: #fbfcfc;
+  border-color: var(--wind-home-line);
+  color: var(--wind-home-ink);
+  background: var(--wind-home-soft);
   box-shadow: none;
   transform: none;
+}
+
+.internal-weather-shell--wind .wind-v3-note {
+  background: var(--wind-home-soft);
 }
 
 .internal-weather-shell--wind .wind-v3-alert {
@@ -151,7 +206,7 @@
   .internal-weather-shell--wind .wind-v3-hero-card.is-elevated,
   .internal-weather-shell--wind .wind-v3-hero-card.is-strong {
     padding: 24px 20px;
-    border-top: 1px solid rgb(7 30 47 / 10%);
+    border-top: 1px solid var(--wind-home-line);
     border-left: 0;
   }
 
