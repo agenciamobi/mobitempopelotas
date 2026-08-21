@@ -78,6 +78,8 @@ test("recupera previsão completa no navegador sem substituir a observação atu
   assert.equal(recovered.hourly[0]?.cape, 40);
   assert.equal(recovered.hourly[0]?.boundaryLayerHeight, 680);
   assert.equal(recovered.daily.length, 7);
+  assert.equal(recovered.daily[0]?.dateIso, "2026-07-24");
+  assert.equal(recovered.daily[1]?.dateIso, "2026-07-25");
   assert.equal(recovered.daily[0]?.rainChance, 70);
   assert.equal(recovered.daily[0]?.windGust, 35);
   assert.equal(recovered.source.forecastName, "Open-Meteo");
@@ -170,6 +172,8 @@ test("propaga a recuperação rica para o agregado e corrige sua rastreabilidade
   assert.equal(recovered.weather.hourly[0]?.windDirectionDegrees, 100);
   assert.equal(recovered.weather.hourly[0]?.dewPoint, 12.2);
   assert.equal(recovered.weather.hourly[0]?.cloudCoverLow, 35);
+  assert.equal(recovered.weather.daily[0]?.dateIso, "2026-07-24");
+  assert.equal(recovered.weather.daily[1]?.dateIso, "2026-07-25");
   assert.equal(recovered.weather.daily[0]?.windGust, 35);
   assert.equal(recovered.weather.message, null);
   assert.match(recovered.brief.summary, /Embrapa registra 16 °C/);
