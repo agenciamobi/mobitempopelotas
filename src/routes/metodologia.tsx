@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { OfficialDataAccessNotice } from "@/components/content/OfficialDataAccessNotice";
 import { ForecastAccuracyPanel } from "@/components/methodology/ForecastAccuracyPanel";
 import { MethodologyPage } from "@/components/methodology/MethodologyPage";
+import "@/components/methodology/MethodologyHomeContract.css";
 import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
 import { getLagoonMonitoringNetwork } from "@/lib/hydrology/lagoon-network.functions";
 import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
