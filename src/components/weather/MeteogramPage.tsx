@@ -69,6 +69,17 @@ function formatNumber(value: NumericValue, unit = "", digits = 0) {
   }).format(value)}${unit}`;
 }
 
+function formatRainChance(value: NumericValue) {
+  if (value === null || value === undefined) return "Não informada";
+  return `${Math.round(value)}%`;
+}
+
+function formatGust(value: NumericValue) {
+  if (value === null || value === undefined) return "Não informada";
+  if (value <= 0) return "Sem rajada prevista";
+  return formatNumber(value, " km/h", 1);
+}
+
 function directionLabel(degrees: NumericValue) {
   if (degrees === null || degrees === undefined) return "—";
   const labels = ["N", "NNE", "NE", "ENE", "L", "ESE", "SE", "SSE", "S", "SSO", "SO", "OSO", "O", "ONO", "NO", "NNO"];
@@ -118,6 +129,21 @@ function minimumHour(
       ? hour
       : selected;
   }, null);
+}
+
+function positiveMaximumHour(
+  hours: MeteogramHour[],
+  read: (hour: MeteogramHour) => NumericValue,
+) {
+  return maximumHour(
+    hours.filter((hour) => (read(hour) ?? 0) > 0),
+    read,
+  );
+}
+
+function maximumValue(hours: MeteogramHour[], read: (hour: MeteogramHour) => NumericValue) {
+  const values = numericHours(hours, read).map((hour) => read(hour) as number);
+  return values.length ? Math.max(...values) : null;
 }
 
 function fallbackHours(data: WeatherIntelligenceData): MeteogramHour[] {
@@ -171,6 +197,20 @@ function temperatureSpread(hour: MeteogramHour) {
     : Math.max(0, hour.temperature - hour.dewPoint);
 }
 
+function fogSupportDetail(hour: MeteogramHour, spread: number) {
+  const parts = [`temperatura e ponto de orvalho separados por ${formatNumber(spread, " °C", 1)}`];
+  if (hour.relativeHumidity !== null) {
+    parts.push(`${formatNumber(hour.relativeHumidity, "%")} de umidade`);
+  }
+  if (hour.cloudCoverLow !== null) {
+    parts.push(`${formatNumber(hour.cloudCoverLow, "%")} de nuvens baixas`);
+  }
+  if (hour.visibilityKm !== null) {
+    parts.push(`visibilidade de ${formatNumber(hour.visibilityKm, " km", 1)}`);
+  }
+  return parts.join(", ");
+}
+
 function fogAssessment(hours: MeteogramHour[]) {
   const candidate = minimumHour(
     hours.filter((hour) => temperatureSpread(hour) !== null),
@@ -183,28 +223,56 @@ function fogAssessment(hours: MeteogramHour[]) {
       detail: "A previsão não informou ponto de orvalho suficiente para avaliar a possibilidade de neblina.",
     };
   }
-  const spread = temperatureSpread(candidate) ?? 99;
-  const visibility = candidate.visibilityKm ?? 99;
-  const lowCloud = candidate.cloudCoverLow ?? 0;
-  const humidity = candidate.relativeHumidity ?? 0;
-  if (spread <= 1.5 && (visibility <= 3 || lowCloud >= 85 || humidity >= 95)) {
+
+  const spread = temperatureSpread(candidate);
+  if (spread === null) {
+    return {
+      tone: "unknown",
+      title: "Ainda sem dados suficientes",
+      detail: "A previsão não informou ponto de orvalho suficiente para avaliar a possibilidade de neblina.",
+    };
+  }
+
+  const visibility = candidate.visibilityKm;
+  const lowCloud = candidate.cloudCoverLow;
+  const humidity = candidate.relativeHumidity;
+  const hasSupportingSignal = [visibility, lowCloud, humidity].some((value) => value !== null);
+  const hasStrongSupportingSignal =
+    (visibility !== null && visibility <= 3) ||
+    (lowCloud !== null && lowCloud >= 85) ||
+    (humidity !== null && humidity >= 95);
+  const hasModerateSupportingSignal =
+    (visibility !== null && visibility <= 8) ||
+    (lowCloud !== null && lowCloud >= 65) ||
+    (humidity !== null && humidity >= 90);
+
+  if (spread <= 1.5 && hasStrongSupportingSignal) {
     return {
       tone: "high",
       title: `Maior possibilidade por volta de ${formatHour(candidate.timestamp)}`,
-      detail: `Temperatura e ponto de orvalho ficam a ${formatNumber(spread, " °C", 1)} de diferença, com ${formatNumber(lowCloud, "%")} de nuvens baixas e visibilidade de ${formatNumber(visibility, " km", 1)}.`,
+      detail: `${fogSupportDetail(candidate, spread)}. Esses sinais aumentam a possibilidade de neblina, sem confirmar ocorrência em todos os bairros.`,
     };
   }
-  if (spread <= 3 && (visibility <= 8 || lowCloud >= 65 || humidity >= 90)) {
+  if (spread <= 3 && hasModerateSupportingSignal) {
     return {
       tone: "attention",
       title: `Vale acompanhar por volta de ${formatHour(candidate.timestamp)}`,
-      detail: "Umidade alta, ponto de orvalho próximo, nuvens baixas e visibilidade menor podem favorecer neblina, sem confirmar ocorrência em todos os bairros.",
+      detail: `${fogSupportDetail(candidate, spread)}. Os sinais disponíveis podem favorecer neblina, sem confirmar ocorrência em todos os bairros.`,
+    };
+  }
+  if (spread <= 3 && !hasSupportingSignal) {
+    return {
+      tone: "unknown",
+      title: "Ponto de orvalho próximo, mas faltam dados complementares",
+      detail: `${fogSupportDetail(candidate, spread)}. Umidade, nuvens baixas e visibilidade não foram informadas para completar a avaliação.`,
     };
   }
   return {
     tone: "low",
-    title: "Menor possibilidade no período",
-    detail: "A previsão não combina forte umidade com baixa visibilidade e grande quantidade de nuvens baixas.",
+    title: "Baixa possibilidade no período",
+    detail: hasSupportingSignal
+      ? `${fogSupportDetail(candidate, spread)}. Os dados disponíveis não reúnem os principais sinais de neblina ao mesmo tempo.`
+      : `${fogSupportDetail(candidate, spread)}. Os sinais complementares ainda não foram informados.`,
   };
 }
 
@@ -386,7 +454,27 @@ function MeteogramLineChart({
 }
 
 function PrecipitationVolume({ hours, selectedIndex }: { hours: MeteogramHour[]; selectedIndex: number }) {
-  const maximum = Math.max(0.1, ...hours.map((hour) => hour.precipitationMm ?? 0));
+  const availableHours = hours.filter((hour) => hour.precipitationMm !== null);
+  const values = availableHours.map((hour) => hour.precipitationMm as number);
+  const complete = availableHours.length === hours.length;
+
+  if (!availableHours.length) {
+    return (
+      <section className="meteogram-volume is-unavailable" aria-labelledby="meteogram-volume-title">
+        <header>
+          <div>
+            <h3 id="meteogram-volume-title">Chuva prevista por hora</h3>
+            <p>Milímetros estimados em cada horário. Valores futuros não são chuva já medida.</p>
+          </div>
+          <span>Volume não informado no período</span>
+        </header>
+      </section>
+    );
+  }
+
+  const maximum = Math.max(0.1, ...values);
+  const total = values.reduce((sum, value) => sum + value, 0);
+
   return (
     <section className="meteogram-volume" aria-labelledby="meteogram-volume-title">
       <header>
@@ -394,16 +482,32 @@ function PrecipitationVolume({ hours, selectedIndex }: { hours: MeteogramHour[];
           <h3 id="meteogram-volume-title">Chuva prevista por hora</h3>
           <p>Milímetros estimados em cada horário. Valores futuros não são chuva já medida.</p>
         </div>
-        <span>{formatNumber(hours.reduce((total, hour) => total + (hour.precipitationMm ?? 0), 0), " mm", 1)} no período</span>
+        <span>
+          {complete
+            ? `${formatNumber(total, " mm", 1)} no período`
+            : `${formatNumber(total, " mm", 1)} em ${availableHours.length} de ${hours.length} horários`}
+        </span>
       </header>
       <div className="meteogram-volume-grid">
-        {hours.map((hour, index) => (
-          <article key={hour.timestamp} className={index === selectedIndex ? "is-selected" : ""}>
-            <span style={{ height: `${Math.max(3, ((hour.precipitationMm ?? 0) / maximum) * 100)}%` }} />
-            <strong>{formatNumber(hour.precipitationMm, "", 1)}</strong>
-            <small>{formatHour(hour.timestamp)}</small>
-          </article>
-        ))}
+        {hours.map((hour, index) => {
+          const volumeKnown = hour.precipitationMm !== null;
+          const height = volumeKnown
+            ? Math.max(0, ((hour.precipitationMm as number) / maximum) * 100)
+            : 0;
+
+          return (
+            <article
+              key={hour.timestamp}
+              className={`${index === selectedIndex ? "is-selected" : ""}${volumeKnown ? "" : " is-unknown"}`.trim()}
+            >
+              <span style={{ height: `${height}%` }} />
+              <strong>{formatNumber(hour.precipitationMm, " mm", 1)}</strong>
+              <small>
+                {formatHour(hour.timestamp)}{volumeKnown ? "" : " · volume não informado"}
+              </small>
+            </article>
+          );
+        })}
       </div>
     </section>
   );
@@ -419,6 +523,30 @@ function selectedMetric(label: string, value: string, detail?: string) {
   );
 }
 
+function selectedRainDetail(hour: MeteogramHour) {
+  return hour.precipitationMm === null
+    ? "Volume horário não informado"
+    : `${formatNumber(hour.precipitationMm, " mm", 1)} previstos na hora`;
+}
+
+function selectedWindDetail(hour: MeteogramHour) {
+  const direction = directionLabel(hour.windDirectionDegrees);
+  const directionText = direction === "—" ? "Direção não informada" : `Vento vindo de ${direction}`;
+  return `${directionText} · Rajada: ${formatGust(hour.windGust)}`;
+}
+
+function selectedCloudDetail(hour: MeteogramHour) {
+  return hour.cloudCover === null
+    ? "Cobertura total não informada"
+    : `Cobertura total: ${formatNumber(hour.cloudCover, "%")}`;
+}
+
+function selectedBoundaryLayerDetail(hour: MeteogramHour) {
+  return hour.boundaryLayerHeight === null
+    ? "Altura da camada próxima ao solo não informada"
+    : `Altura estimada da camada próxima ao solo: ${formatNumber(hour.boundaryLayerHeight, " m")}`;
+}
+
 export function MeteogramHero({
   weather,
   meteogram,
@@ -429,8 +557,10 @@ export function MeteogramHero({
   const hours = usableHours(weather, meteogram).slice(0, 24);
   const minimumTemperature = minimumHour(hours, (hour) => hour.temperature);
   const maximumTemperature = maximumHour(hours, (hour) => hour.temperature);
-  const maximumRain = maximumHour(hours, (hour) => hour.precipitationProbability);
-  const maximumGust = maximumHour(hours, (hour) => hour.windGust);
+  const maximumRainValue = maximumValue(hours, (hour) => hour.precipitationProbability);
+  const maximumRain = positiveMaximumHour(hours, (hour) => hour.precipitationProbability);
+  const maximumGustValue = maximumValue(hours, (hour) => hour.windGust);
+  const maximumGust = positiveMaximumHour(hours, (hour) => hour.windGust);
   const minimumVisibility = minimumHour(hours, (hour) => hour.visibilityKm);
 
   return (
@@ -464,13 +594,25 @@ export function MeteogramHero({
           </article>
           <article>
             <span>Maior chance de chuva</span>
-            <strong>{formatNumber(maximumRain?.precipitationProbability, "%")}</strong>
-            <small>{maximumRain ? `Por volta de ${formatHour(maximumRain.timestamp)}` : "Não informada"}</small>
+            <strong>{formatRainChance(maximumRainValue)}</strong>
+            <small>
+              {maximumRain
+                ? `Por volta de ${formatHour(maximumRain.timestamp)}`
+                : maximumRainValue === 0
+                  ? "Sem horário de destaque"
+                  : "Não informada"}
+            </small>
           </article>
           <article>
             <span>Maior rajada</span>
-            <strong>{formatNumber(maximumGust?.windGust, " km/h")}</strong>
-            <small>{maximumGust ? `Por volta de ${formatHour(maximumGust.timestamp)}` : "Não informada"}</small>
+            <strong>{formatGust(maximumGustValue)}</strong>
+            <small>
+              {maximumGust
+                ? `Por volta de ${formatHour(maximumGust.timestamp)}`
+                : maximumGustValue === 0
+                  ? "Sem horário de destaque"
+                  : "Não informada"}
+            </small>
           </article>
           <article>
             <span>Menor visibilidade</span>
@@ -518,14 +660,22 @@ export function MeteogramPage({
     );
   }
 
-  const maximumRain = maximumHour(hours, (hour) => hour.precipitationProbability);
-  const maximumGust = maximumHour(hours, (hour) => hour.windGust);
+  const maximumRainValue = maximumValue(hours, (hour) => hour.precipitationProbability);
+  const maximumRain = positiveMaximumHour(hours, (hour) => hour.precipitationProbability);
+  const maximumGustValue = maximumValue(hours, (hour) => hour.windGust);
+  const maximumGust = positiveMaximumHour(hours, (hour) => hour.windGust);
   const minimumVisibility = minimumHour(hours, (hour) => hour.visibilityKm);
   const maximumCape = maximumHour(hours, (hour) => hour.cape);
+  const maximumCapeAction = (maximumCape?.cape ?? 0) > 0 ? maximumCape : null;
   const fog = fogAssessment(hours);
   const pressure = pressureAssessment(hours);
   const cape = capeAssessment(hours);
-  const totalPrecipitation = hours.reduce((total, hour) => total + (hour.precipitationMm ?? 0), 0);
+  const precipitationHours = hours.filter((hour) => hour.precipitationMm !== null);
+  const totalPrecipitation = precipitationHours.reduce(
+    (total, hour) => total + (hour.precipitationMm as number),
+    0,
+  );
+  const hasCompletePrecipitationWindow = precipitationHours.length === hours.length;
   const sourceIsFallback = meteogram.status !== "live";
 
   function selectHour(hour: MeteogramHour | null) {
@@ -557,10 +707,10 @@ export function MeteogramPage({
         </header>
 
         <div className="meteogram-quick-actions" aria-label="Atalhos para horários importantes">
-          <button type="button" onClick={() => selectHour(maximumRain)}><CloudRain aria-hidden="true" /> Maior chance de chuva</button>
-          <button type="button" onClick={() => selectHour(maximumGust)}><Wind aria-hidden="true" /> Maior rajada</button>
-          <button type="button" onClick={() => selectHour(minimumVisibility)}><Eye aria-hidden="true" /> Menor visibilidade</button>
-          <button type="button" onClick={() => selectHour(maximumCape)}><Activity aria-hidden="true" /> Maior possibilidade de tempestade</button>
+          <button type="button" disabled={!maximumRain} onClick={() => selectHour(maximumRain)}><CloudRain aria-hidden="true" /> {maximumRain ? "Maior chance de chuva" : maximumRainValue === 0 ? "Sem pico de chuva" : "Chuva sem horário de pico"}</button>
+          <button type="button" disabled={!maximumGust} onClick={() => selectHour(maximumGust)}><Wind aria-hidden="true" /> {maximumGust ? "Maior rajada" : maximumGustValue === 0 ? "Sem rajada prevista" : "Rajada não informada"}</button>
+          <button type="button" disabled={!minimumVisibility} onClick={() => selectHour(minimumVisibility)}><Eye aria-hidden="true" /> {minimumVisibility ? "Menor visibilidade" : "Visibilidade não informada"}</button>
+          <button type="button" disabled={!maximumCapeAction} onClick={() => selectHour(maximumCapeAction)}><Activity aria-hidden="true" /> {maximumCapeAction ? "Maior possibilidade de tempestade" : maximumCape?.cape === 0 ? "Sem pico de instabilidade" : "Instabilidade não informada"}</button>
           <button type="button" onClick={() => setSelectedIndex(0)}><TimerReset aria-hidden="true" /> Início da previsão</button>
         </div>
 
@@ -576,7 +726,7 @@ export function MeteogramPage({
             >
               <span>{index === 0 ? "Próximo horário" : formatHour(hour.timestamp, true)}</span>
               <strong>{formatNumber(hour.temperature, " °C")}</strong>
-              <small>{formatNumber(hour.precipitationProbability, "% chuva")} · {formatNumber(hour.windGust, " km/h")}</small>
+              <small>{formatRainChance(hour.precipitationProbability)} chuva · {formatGust(hour.windGust)}</small>
             </button>
           ))}
         </div>
@@ -591,15 +741,15 @@ export function MeteogramPage({
               <strong>{weatherLabel(selected.weatherCode, selected.isDay)}</strong>
             </header>
             <div className="meteogram-selected-grid">
-              {selectedMetric("Temperatura", formatNumber(selected.temperature, " °C", 1), `Sensação ${formatNumber(selected.feelsLike, " °C", 1)}`)}
-              {selectedMetric("Ponto de orvalho", formatNumber(selected.dewPoint, " °C", 1), `Diferença para a temperatura: ${formatNumber(temperatureSpread(selected), " °C", 1)}`)}
-              {selectedMetric("Chuva", formatNumber(selected.precipitationProbability, "%"), `${formatNumber(selected.precipitationMm, " mm", 1)} previstos na hora`)}
+              {selectedMetric("Temperatura", formatNumber(selected.temperature, " °C", 1), selected.feelsLike === null ? "Sensação não informada" : `Sensação ${formatNumber(selected.feelsLike, " °C", 1)}`)}
+              {selectedMetric("Ponto de orvalho", formatNumber(selected.dewPoint, " °C", 1), temperatureSpread(selected) === null ? "Diferença para a temperatura não informada" : `Diferença para a temperatura: ${formatNumber(temperatureSpread(selected), " °C", 1)}`)}
+              {selectedMetric("Chuva", formatRainChance(selected.precipitationProbability), selectedRainDetail(selected))}
               {selectedMetric("Umidade do ar", formatNumber(selected.relativeHumidity, "%"))}
-              {selectedMetric("Vento", formatNumber(selected.windSpeed, " km/h", 1), `${directionLabel(selected.windDirectionDegrees)} · rajada de ${formatNumber(selected.windGust, " km/h", 1)}`)}
+              {selectedMetric("Vento", formatNumber(selected.windSpeed, " km/h", 1), selectedWindDetail(selected))}
               {selectedMetric("Pressão", formatNumber(selected.pressure, " hPa", 1))}
               {selectedMetric("Visibilidade", formatNumber(selected.visibilityKm, " km", 1))}
-              {selectedMetric("Nuvens baixas", formatNumber(selected.cloudCoverLow, "%"), `Cobertura total: ${formatNumber(selected.cloudCover, "%")}`)}
-              {selectedMetric("Índice de instabilidade (CAPE)", formatNumber(selected.cape, " J/kg"), `Altura estimada da camada próxima ao solo: ${formatNumber(selected.boundaryLayerHeight, " m")}`)}
+              {selectedMetric("Nuvens baixas", formatNumber(selected.cloudCoverLow, "%"), selectedCloudDetail(selected))}
+              {selectedMetric("Índice de instabilidade (CAPE)", formatNumber(selected.cape, " J/kg"), selectedBoundaryLayerDetail(selected))}
             </div>
           </div>
         ) : null}
@@ -626,9 +776,17 @@ export function MeteogramPage({
         </article>
         <article>
           <CloudRain aria-hidden="true" />
-          <span>Chuva prevista no período</span>
-          <strong>{formatNumber(totalPrecipitation, " mm", 1)}</strong>
-          <p>Soma dos volumes previstos por hora. Não representa chuva já medida.</p>
+          <span>{hasCompletePrecipitationWindow ? "Chuva prevista no período" : "Chuva nos horários informados"}</span>
+          <strong>
+            {precipitationHours.length ? formatNumber(totalPrecipitation, " mm", 1) : "Não informada"}
+          </strong>
+          <p>
+            {hasCompletePrecipitationWindow
+              ? "Soma dos volumes previstos por hora. Não representa chuva já medida."
+              : precipitationHours.length
+                ? `Soma parcial: ${precipitationHours.length} de ${hours.length} horários têm volume publicado. Não representa chuva já medida.`
+                : "O modelo não publicou volume horário nesta atualização."}
+          </p>
         </article>
       </section>
 
