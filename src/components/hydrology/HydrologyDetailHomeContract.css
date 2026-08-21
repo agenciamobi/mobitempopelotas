@@ -164,13 +164,57 @@
   background: #fbfcfc;
 }
 
-/* Avisos e estados da fonte permanecem semânticos. */
+.site-shell--topic .hydrology-editorial-route :is(
+  .hydrology-level-heading,
+  .hydrology-section-heading
+) {
+  gap: clamp(16px, 2vw, 28px);
+}
+
 .site-shell--topic .hydrology-editorial-route :is(
   .hydrology-source-status,
   .hydrology-interpretation-warning,
   .hydrology-safety-note,
   .hydrology-method
 ) {
+  box-shadow: none;
+}
+
+/* O guia de incorporação é conteúdo editorial; apenas o bloco de código fica escuro. */
+.site-shell--topic .laranjal-embed-guide {
+  padding: clamp(26px, 3vw, 42px);
+  gap: clamp(24px, 4vw, 56px);
+  border-color: rgb(7 30 47 / 10%);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.site-shell--topic .laranjal-embed-guide h2 {
+  color: #071e2f;
+  font-weight: 790;
+  letter-spacing: -0.055em;
+}
+
+.site-shell--topic .laranjal-embed-guide li::before,
+.site-shell--topic .laranjal-embed-guide-copy > a {
+  box-shadow: none;
+}
+
+.site-shell--topic .laranjal-embed-guide-copy > a {
+  border-color: rgb(7 30 47 / 10%);
+  border-radius: 14px;
+  transform: none;
+}
+
+.site-shell--topic .laranjal-embed-guide-copy > a:hover {
+  border-color: rgb(24 189 205 / 30%);
+  transform: none;
+  box-shadow: none;
+}
+
+.site-shell--topic .laranjal-embed-guide-code {
+  border-radius: 14px;
   box-shadow: none;
 }
 
@@ -206,7 +250,12 @@
     .hydrology-flow,
     .hydrology-sources,
     .hydrology-level-main
-  ) {
+  ),
+  .site-shell--topic .laranjal-embed-guide {
     border-radius: 12px;
+  }
+
+  .site-shell--topic .laranjal-embed-guide {
+    padding: 22px 18px;
   }
 }
