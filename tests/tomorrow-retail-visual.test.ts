@@ -45,6 +45,12 @@ test("tomorrow hero uses a useful search-oriented headline and concise metrics",
   assert.doesNotMatch(hero, /weather\.current\.temperature/);
 });
 
+test("tomorrow hero formats the calendar badge from the ISO identity", () => {
+  assert.match(hero, /day\.dateIso/);
+  assert.match(hero, /new Date\(`\$\{day\.dateIso\}T12:00:00-03:00`\)/);
+  assert.doesNotMatch(hero, /day\.date\.slice\(0, 10\)/);
+});
+
 test("retail photography is shared without breaking the today export", () => {
   assert.match(photoMap, /getRetailWeatherPhoto/);
   assert.match(photoMap, /getTodayRetailHeroPhoto = getRetailWeatherPhoto/);
