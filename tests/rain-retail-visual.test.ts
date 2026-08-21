@@ -30,7 +30,7 @@ test("rain hero separates chance, volume and timing in direct language", () => {
   assert.match(hero, /Volume previsto hoje/);
   assert.match(hero, /Total previsto em 7 dias/);
   assert.match(hero, /Horários com 30% ou mais/);
-  assert.match(hero, /Horário com maior chance/);
+  assert.match(hero, /Maior chance nas próximas horas/);
   assert.match(hero, /Dia com maior volume/);
   assert.match(hero, /Rajada em período com chuva/);
   assert.match(hero, /Fonte da previsão/);
@@ -49,6 +49,14 @@ test("rain zero-volume state does not invent a rainiest day", () => {
   assert.match(hero, /Sem volume previsto/);
   assert.match(page, /hasPositiveRainVolume/);
   assert.match(page, /Sem volume previsto/);
+});
+
+test("rain zero-chance state keeps zero percent without inventing a peak hour", () => {
+  assert.match(hero, /const highestRainChance = peakCandidate\?\.precipitation \?\? null/);
+  assert.match(hero, /const hasPositiveRainChance = \(highestRainChance \?\? 0\) > 0/);
+  assert.match(hero, /Sem chance de chuva destacada nas próximas 12 horas/);
+  assert.match(hero, /Sem horário de destaque/);
+  assert.match(hero, /formatChance\(highestRainChance\)/);
 });
 
 test("rain page answers when, how much and which period in direct language", () => {
