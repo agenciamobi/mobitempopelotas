@@ -1,0 +1,79 @@
+/* Estados vazios da página Radar e Satélite.
+ * Mantém viewers altos apenas quando há conteúdo visual real. */
+
+.redemet-satellite-section .redemet-layers {
+  align-items: start;
+}
+
+.redemet-layer-card.is-unavailable-state {
+  align-self: start;
+  grid-template-rows: auto auto auto;
+  background:
+    radial-gradient(circle at 100% 0, rgb(24 189 205 / 7%), transparent 20rem),
+    #fff;
+}
+
+.redemet-satellite-section
+  .redemet-layer-card.is-unavailable-state
+  .redemet-layer-unavailable,
+.redemet-layer-card.is-unavailable-state .redemet-layer-unavailable {
+  min-height: clamp(190px, 20vw, 250px);
+  padding: clamp(2rem, 4vw, 3.2rem) clamp(1.25rem, 3vw, 2rem);
+  background:
+    linear-gradient(rgb(255 255 255 / 92%), rgb(255 255 255 / 92%)),
+    repeating-linear-gradient(135deg, transparent 0 16px, rgb(24 189 205 / 6%) 16px 32px);
+}
+
+.redemet-layer-card.is-unavailable-state .redemet-layer-unavailable svg {
+  width: 34px;
+  height: 34px;
+  margin-bottom: 0.8rem;
+}
+
+.redemet-layer-card.is-unavailable-state .redemet-layer-unavailable strong {
+  max-width: 34ch;
+  font-size: clamp(0.94rem, 1.1vw, 1.02rem);
+}
+
+.redemet-layer-card.is-unavailable-state .redemet-layer-unavailable p {
+  max-width: 44ch;
+}
+
+.redemet-storm-card.is-zero-detections {
+  background:
+    radial-gradient(circle at 92% 0, rgb(24 189 205 / 8%), transparent 18rem),
+    #fff;
+}
+
+.redemet-storm-card.is-zero-detections .redemet-storm-reading {
+  border-color: rgb(24 189 205 / 18%);
+  background: #f5fbfc;
+}
+
+.redemet-storm-card.is-zero-detections .redemet-storm-reading > strong {
+  color: #087f91;
+}
+
+.redemet-storm-card.is-zero-detections .redemet-storm-warning {
+  border-color: rgb(7 30 47 / 10%);
+  background: #f8fafb;
+}
+
+@media (max-width: 700px) {
+  .redemet-satellite-section
+    .redemet-layer-card.is-unavailable-state
+    .redemet-layer-unavailable,
+  .redemet-layer-card.is-unavailable-state .redemet-layer-unavailable {
+    min-height: 170px;
+    padding: 1.6rem 1rem;
+  }
+}
+
+@media (forced-colors: active) {
+  .redemet-layer-card.is-unavailable-state,
+  .redemet-storm-card.is-zero-detections,
+  .redemet-storm-card.is-zero-detections .redemet-storm-reading,
+  .redemet-storm-card.is-zero-detections .redemet-storm-warning {
+    background: Canvas;
+  }
+}
