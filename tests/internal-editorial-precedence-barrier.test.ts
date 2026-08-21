@@ -45,6 +45,35 @@ test("lazy internal weather sections cannot restore legacy gradients or shadows"
   assert.match(barrier, /border-radius:\s*var\(--route-editorial-radius\) !important/);
 });
 
+test("retail forecast heroes keep the Home surface after lazy route CSS loads", () => {
+  for (const namespace of [
+    "internal-weather-shell--today",
+    "internal-weather-shell--tomorrow",
+    "internal-weather-shell--seven-day",
+    "internal-weather-shell--rain",
+  ]) {
+    assert.match(barrier, new RegExp(`\\.${namespace}`));
+  }
+
+  for (const hero of [
+    "today-retail-hero",
+    "tomorrow-retail-hero",
+    "seven-day-retail-hero",
+    "rain-retail-hero",
+  ]) {
+    assert.match(barrier, new RegExp(`\\.${hero}`));
+  }
+
+  assert.match(
+    barrier,
+    /:is\(\.today-retail-hero, \.tomorrow-retail-hero, \.seven-day-retail-hero, \.rain-retail-hero\)[\s\S]*?background-image:\s*none !important[\s\S]*?box-shadow:\s*none !important/,
+  );
+  assert.match(
+    barrier,
+    /:is\(\.today-retail-hero, \.tomorrow-retail-hero, \.seven-day-retail-hero, \.rain-retail-hero\)::before,[\s\S]*?::after[\s\S]*?display:\s*none !important/,
+  );
+});
+
 test("topic and dedicated pages receive the same Home surface protection", () => {
   assert.match(barrier, /\.site-shell--topic/);
   assert.match(barrier, /\.hydrology-editorial-route > section/);
