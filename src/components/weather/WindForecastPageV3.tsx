@@ -179,7 +179,7 @@ export function WindForecastPageV3({ data }: { data: WeatherIntelligenceData }) 
 
       {hours.length ? (
         <section className="wind-v3-section" id="vento-por-hora" aria-labelledby="wind-v3-hourly-title">
-          <header className="wind-v3-heading"><div><span className="wind-v3-eyebrow">Próximas 24 horas</span><h2 id="wind-v3-hourly-title">Vento e rajadas por horário</h2></div><p>A fonte não informa a direção futura em cada horário. Por isso, a direção atual não é repetida como previsão.</p></header>
+          <header className="wind-v3-heading"><div><span className="wind-v3-eyebrow">Próximas 24 horas</span><h2 id="wind-v3-hourly-title">Vento e rajadas por horário</h2></div><p>Esta série-base compara velocidade e rajada. A direção prevista por horário aparece em uma camada detalhada separada, sem reutilizar a direção observada como se ela permanecesse constante.</p></header>
           <div className="wind-v3-hourly-head" aria-hidden="true"><span>Hora</span><span>Vento</span><span>Rajada</span><span>Aumento</span><span>Comparação</span></div>
           <div className="wind-v3-hourly-list">
             {hours.map((hour, index) => {
