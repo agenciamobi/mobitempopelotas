@@ -1,0 +1,74 @@
+/*
+ * Acabamento fino transversal do portal.
+ * Apenas alvos de toque, legibilidade miúda e ergonomia de rolagem; nenhuma
+ * semântica meteorológica/hidrológica é alterada aqui.
+ */
+
+/* HomeForecastStory aparece na Home, Tempo Hoje e páginas regionais. */
+.home-forecast-story :is(
+  .home-tomorrow-spotlight > a,
+  .home-forecast-links > a
+) {
+  min-height: 44px;
+}
+
+.home-forecast-story .home-forecast-links > a:last-child {
+  display: inline-flex;
+  align-items: center;
+}
+
+.home-forecast-story .home-forecast-facts dt,
+.home-forecast-story .home-forecast-window :is(small, span),
+.home-forecast-story .home-hourly-topline > span,
+.home-forecast-story .home-next-day-topline span,
+.home-forecast-story .home-hourly-rain :is(span, small),
+.home-forecast-story .home-next-day-rain :is(span, small),
+.home-forecast-story .home-hourly-wind,
+.home-forecast-story .home-next-day-condition span {
+  font-size: max(0.6rem, 10px);
+}
+
+.home-forecast-story :is(
+  .home-hourly-topline b,
+  .home-next-day-topline b,
+  .home-next-day-temperatures small
+) {
+  font-size: max(0.58rem, 9.5px);
+}
+
+.home-forecast-story :is(
+  .home-hourly-cards,
+  .home-next-day-cards,
+  .home-forecast-window
+) {
+  overscroll-behavior-inline: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.home-forecast-story a:focus-visible {
+  outline: 3px solid rgb(24 189 205 / 42%);
+  outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .home-forecast-story .home-forecast-links > a:last-child {
+    justify-content: center;
+    padding: 0.65rem 0.8rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .home-forecast-story .home-forecast-facts {
+    column-gap: 0.65rem;
+  }
+
+  .home-forecast-story .home-forecast-facts > div {
+    padding-right: 0.45rem;
+  }
+}
+
+@media (forced-colors: active) {
+  .home-forecast-story a:focus-visible {
+    outline: 2px solid Highlight;
+  }
+}
