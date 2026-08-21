@@ -1,5 +1,10 @@
 import { CloudFog, CloudRain, Eye, Gauge, Wind } from "lucide-react";
 
+import {
+  formatRedemetDateTime,
+  isUsableRedemetObservedAt,
+  redemetFrameDisplayLabel,
+} from "@/lib/redemet/redemet-display-time";
 import type { RedemetImageLayerResponse } from "@/lib/redemet/redemet.types";
 import type { HourlyForecast } from "@/lib/weather/types";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
@@ -7,7 +12,7 @@ import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence
 import "./RadarForecastContext.css";
 
 function parseObservedTime(value: string | null | undefined) {
-  if (!value) return null;
+  if (!value || !isUsableRedemetObservedAt(value)) return null;
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? null : date;
 }
@@ -23,15 +28,7 @@ function parseForecastTime(value: string | null | undefined) {
 }
 
 function formatDateTime(value: string | null | undefined) {
-  const date = parseObservedTime(value);
-  if (!date) return "Horário não informado";
-  return new Intl.DateTimeFormat("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
+  return formatRedemetDateTime(value ?? null);
 }
 
 function formatFetchedAt(value: string | null | undefined) {
@@ -106,7 +103,7 @@ export function RadarForecastContext({
         <article>
           <small>Horário da imagem</small>
           <strong>{formatDateTime(frame.observedAt)}</strong>
-          <span>REDEMET/DECEA · {frame.label}</span>
+          <span>REDEMET/DECEA · {redemetFrameDisplayLabel(frame)}</span>
         </article>
         <article>
           <small>Horário da previsão</small>
