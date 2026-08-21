@@ -145,7 +145,8 @@ test("Today cloud layers distinguish unknown values from a published zero", () =
   assert.match(todayAtmosphere, /if \(value === null \|\| value === undefined\) return null/);
   assert.match(todayAtmosphere, /function cloudBarStyle/);
   assert.match(todayAtmosphere, /normalized === null \? undefined/);
-  assert.match(todayAtmosphere, /Nuvens baixas: não informada/);
+  assert.match(todayAtmosphere, /`\$\{label\}: não informada`/);
+  assert.match(todayAtmosphere, /cloudLayerLabel\("Nuvens baixas", hour\.cloudCoverLow\)/);
   assert.match(todayAtmosphere, /Cobertura total não informada/);
   assert.doesNotMatch(todayAtmosphere, /Math\.max\(cloudValue\(hour\.cloudCoverLow\)/);
   assert.match(todayAtmosphereStyles, /\.today-atmosphere__legend \.is-unknown/);
