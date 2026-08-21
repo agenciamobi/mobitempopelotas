@@ -2,7 +2,12 @@
 .internal-weather-shell--alerts .inmet-alert-coverage-details {
   display: grid;
   gap: 1rem;
+  margin-top: clamp(16px, 2vw, 24px);
   padding: clamp(1.25rem, 2.6vw, 2rem);
+  border: 1px solid rgb(7 30 47 / 10%);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: none;
 }
 
 .internal-weather-shell--alerts .inmet-alert-coverage-details > header {
@@ -241,6 +246,7 @@
 @media (max-width: 560px) {
   .internal-weather-shell--alerts .inmet-alert-coverage-details {
     padding: 1rem;
+    border-radius: 12px;
   }
 
   .internal-weather-shell--alerts .inmet-alert-coverage-details summary {
@@ -259,6 +265,7 @@
 
 @media (forced-colors: active) {
   .internal-weather-shell--alerts .inmet-alert-coverage-details :is(
+    .inmet-alert-coverage-details,
     summary,
     .inmet-alert-coverage-details__body > dl > div,
     .inmet-alert-coverage-details__places
