@@ -155,6 +155,7 @@ export function WindForecastPageV3({ data }: { data: WeatherIntelligenceData }) 
         <a href="#vento-por-hora"><span>03</span><strong>24 horas</strong><small>Vento e rajadas</small></a>
         <a href="#maiores-valores"><span>04</span><strong>Horários mais fortes</strong><small>Maiores rajadas</small></a>
         <a href="#vento-na-semana"><span>05</span><strong>7 dias</strong><small>Rajada por dia</small></a>
+        <a href="#direcao-do-vento-por-hora"><span>06</span><strong>Direção prevista</strong><small>Direção por horário</small></a>
       </nav>
 
       <section className="wind-v3-source" id="procedencia" aria-labelledby="wind-v3-source-title">
