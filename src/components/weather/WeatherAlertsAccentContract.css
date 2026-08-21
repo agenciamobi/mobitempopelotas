@@ -1,0 +1,73 @@
+/*
+ * Alertas — camada cromática semântica sobre o contrato-base neutro.
+ * A severidade pode influenciar hero, painel e CTA; conteúdo, mapa, períodos e
+ * instruções oficiais permanecem responsáveis pela informação principal.
+ */
+
+.internal-weather-shell--alerts .alerts-editorial-copy {
+  background:
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 9%), transparent 24rem),
+    radial-gradient(circle at 100% 0, color-mix(in srgb, var(--alerts-accent) 8%, transparent), transparent 24rem),
+    linear-gradient(145deg, #fff 0%, #f8fcfc 62%, #fff 100%);
+}
+
+.internal-weather-shell--alerts .alerts-editorial-back,
+.internal-weather-shell--alerts .alerts-editorial-panel > a {
+  min-height: 44px;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-actions a:first-child {
+  border-color: #315f70;
+  background: #315f70;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-hero-potential .alerts-editorial-actions a:first-child {
+  border-color: #8b6500;
+  background: #8b6500;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-hero-danger .alerts-editorial-actions a:first-child {
+  border-color: #a94d1d;
+  background: #a94d1d;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-hero-great-danger .alerts-editorial-actions a:first-child {
+  border-color: #8f1d1d;
+  background: #8f1d1d;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-panel {
+  background:
+    radial-gradient(circle at 100% 0, color-mix(in srgb, var(--alerts-accent) 12%, transparent), transparent 20rem),
+    linear-gradient(145deg, color-mix(in srgb, var(--alerts-accent) 5%, #f8faf9), #fff 66%);
+}
+
+.internal-weather-shell--alerts .alerts-editorial-panel-status {
+  border-color: color-mix(in srgb, var(--alerts-accent) 20%, rgb(7 30 47 / 10%));
+  background: color-mix(in srgb, var(--alerts-accent) 8%, #fff);
+}
+
+@media (max-width: 720px) {
+  .internal-weather-shell--alerts .alerts-editorial-copy {
+    background:
+      radial-gradient(circle at 0 100%, rgb(24 189 205 / 8%), transparent 16rem),
+      linear-gradient(145deg, #fff, #f8fcfc 68%, #fff);
+  }
+
+  .internal-weather-shell--alerts .alerts-editorial-panel {
+    background:
+      radial-gradient(circle at 100% 0, color-mix(in srgb, var(--alerts-accent) 10%, transparent), transparent 15rem),
+      linear-gradient(145deg, color-mix(in srgb, var(--alerts-accent) 4%, #f8faf9), #fff 68%);
+  }
+}
+
+@media (forced-colors: active) {
+  .internal-weather-shell--alerts :is(
+    .alerts-editorial-copy,
+    .alerts-editorial-panel,
+    .alerts-editorial-panel-status
+  ) {
+    background: Canvas;
+    color: CanvasText;
+  }
+}
