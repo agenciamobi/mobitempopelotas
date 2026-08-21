@@ -117,30 +117,20 @@
 }
 
 /*
- * Heroes retail de previsão recebem CSS lazy próprio. Hoje e 7 dias podem usar
- * acento cromático deliberado para separar a abertura das superfícies seguintes;
- * a barreira continua retirando apenas sombra externa e ornamentos antigos.
- * Amanhã e Chuva permanecem no contrato plano atual.
+ * Heroes retail de previsão recebem CSS lazy próprio. Os quatro podem usar
+ * acento cromático deliberado quando a cor separa a abertura das superfícies
+ * seguintes. A barreira retira apenas sombra externa e ornamentos antigos;
+ * os fundos do próprio hero permanecem sob responsabilidade do componente.
  */
 .internal-weather-shell:is(
     .internal-weather-shell--today,
-    .internal-weather-shell--seven-day
-  )
-  :is(.today-retail-hero, .seven-day-retail-hero) {
-  border: 0 !important;
-  border-radius: inherit !important;
-  box-shadow: none !important;
-}
-
-.internal-weather-shell:is(
     .internal-weather-shell--tomorrow,
+    .internal-weather-shell--seven-day,
     .internal-weather-shell--rain
   )
-  :is(.tomorrow-retail-hero, .rain-retail-hero) {
+  :is(.today-retail-hero, .tomorrow-retail-hero, .seven-day-retail-hero, .rain-retail-hero) {
   border: 0 !important;
   border-radius: inherit !important;
-  background-color: var(--route-editorial-surface) !important;
-  background-image: none !important;
   box-shadow: none !important;
 }
 
