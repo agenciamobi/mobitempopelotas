@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Activity, ArrowRight, CloudFog, Eye, Gauge, Layers3, Waves } from "lucide-react";
+import type { CSSProperties } from "react";
 
 import type { HourlyForecast } from "@/lib/weather/types";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
@@ -139,7 +140,18 @@ function capeLabel(value: number | null | undefined) {
 }
 
 function cloudValue(value: number | null | undefined) {
-  return Math.max(0, Math.min(100, value ?? 0));
+  if (value === null || value === undefined) return null;
+  return Math.max(0, Math.min(100, value));
+}
+
+function cloudBarStyle(value: number | null | undefined): CSSProperties | undefined {
+  const normalized = cloudValue(value);
+  return normalized === null ? undefined : { width: `${normalized}%` };
+}
+
+function cloudLayerLabel(label: string, value: number | null | undefined) {
+  const normalized = cloudValue(value);
+  return normalized === null ? `${label}: não informada` : `${label}: ${Math.round(normalized)}%`;
 }
 
 export function TodayAtmosphericSignals({ data }: { data: WeatherIntelligenceData }) {
@@ -259,25 +271,52 @@ export function TodayAtmosphericSignals({ data }: { data: WeatherIntelligenceDat
               <span className="is-low">Baixas</span>
               <span className="is-mid">Médias</span>
               <span className="is-high">Altas</span>
+              <span className="is-unknown">Não informado</span>
             </div>
           </header>
 
           <div className="today-atmosphere__cloud-grid">
-            {cloudHours.map((hour) => (
-              <article key={hour.timestamp ?? hour.time}>
-                <strong>{hour.time}</strong>
-                <div>
-                  <span className="is-low" style={{ width: `${cloudValue(hour.cloudCoverLow)}%` }} />
-                </div>
-                <div>
-                  <span className="is-mid" style={{ width: `${cloudValue(hour.cloudCoverMid)}%` }} />
-                </div>
-                <div>
-                  <span className="is-high" style={{ width: `${cloudValue(hour.cloudCoverHigh)}%` }} />
-                </div>
-                <small>{Math.round(hour.cloudCover ?? Math.max(cloudValue(hour.cloudCoverLow), cloudValue(hour.cloudCoverMid), cloudValue(hour.cloudCoverHigh)))}% de cobertura total</small>
-              </article>
-            ))}
+            {cloudHours.map((hour) => {
+              const totalCloudCover = cloudValue(hour.cloudCover);
+              const lowCloudCover = cloudValue(hour.cloudCoverLow);
+              const midCloudCover = cloudValue(hour.cloudCoverMid);
+              const highCloudCover = cloudValue(hour.cloudCoverHigh);
+
+              return (
+                <article key={hour.timestamp ?? hour.time}>
+                  <strong>{hour.time}</strong>
+                  <div>
+                    <span
+                      className={`is-low${lowCloudCover === null ? " is-unknown" : ""}`}
+                      style={cloudBarStyle(hour.cloudCoverLow)}
+                      role="img"
+                      aria-label={cloudLayerLabel("Nuvens baixas", hour.cloudCoverLow)}
+                    />
+                  </div>
+                  <div>
+                    <span
+                      className={`is-mid${midCloudCover === null ? " is-unknown" : ""}`}
+                      style={cloudBarStyle(hour.cloudCoverMid)}
+                      role="img"
+                      aria-label={cloudLayerLabel("Nuvens médias", hour.cloudCoverMid)}
+                    />
+                  </div>
+                  <div>
+                    <span
+                      className={`is-high${highCloudCover === null ? " is-unknown" : ""}`}
+                      style={cloudBarStyle(hour.cloudCoverHigh)}
+                      role="img"
+                      aria-label={cloudLayerLabel("Nuvens altas", hour.cloudCoverHigh)}
+                    />
+                  </div>
+                  <small>
+                    {totalCloudCover === null
+                      ? "Cobertura total não informada"
+                      : `${Math.round(totalCloudCover)}% de cobertura total`}
+                  </small>
+                </article>
+              );
+            })}
           </div>
         </div>
       ) : null}
