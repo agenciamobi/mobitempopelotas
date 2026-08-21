@@ -305,6 +305,7 @@ function normalizeDaily(points: MetPoint[]): DailyForecast[] {
     return {
       weekday: formatDay(group.date, index),
       date: formatDate(group.date),
+      dateIso: group.date,
       min: Math.round(Math.min(...group.temperatures)),
       max: Math.round(Math.max(...group.temperatures)),
       rainChance: group.probabilities.length > 0 ? Math.max(...group.probabilities) : null,
