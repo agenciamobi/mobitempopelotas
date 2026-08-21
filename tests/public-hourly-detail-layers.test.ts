@@ -55,6 +55,13 @@ test("hourly wind direction stays a forecast distinct from current observation",
   assert.match(windPageStyles, /grid-template-columns: repeat\(6, minmax\(0, 1fr\)\)/);
 });
 
+test("hourly wind direction never substitutes wind speed for an unavailable gust", () => {
+  assert.match(windDetail, /if \(hour\.windGust === null\) return selected/);
+  assert.match(windDetail, /const selectedValue = selected\?\.windGust \?\? null/);
+  assert.match(windDetail, /Rajada não informada no período/);
+  assert.doesNotMatch(windDetail, /hour\.windGust \?\? hour\.windSpeed/);
+});
+
 test("dedicated Open-Meteo profile explicitly requests rain volume and wind direction", () => {
   assert.match(meteogram, /"precipitation"/);
   assert.match(meteogram, /"wind_direction_10m"/);
