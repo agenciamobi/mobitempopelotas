@@ -137,6 +137,7 @@ export function TodayRetailHero({
   const { current } = weather;
   const today = weather.daily[0] ?? null;
   const nextHour = weather.hourly[0] ?? null;
+  const hasHourlyForecast = weather.hourly.length > 0;
   const hasForecastSignal = current.available || nextHour !== null;
   const iconName = resolveHeroWeatherIcon(weather);
   const condition = hasForecastSignal
@@ -199,12 +200,25 @@ export function TodayRetailHero({
           </div>
 
           <div className="today-retail-hero__actions">
-            <a className="today-retail-hero__primary" href={primaryHref}>
-              Ver previsão por hora <ArrowRight aria-hidden="true" />
-            </a>
-            <a className="today-retail-hero__secondary" href={secondaryHref}>
-              {secondaryLabel}
-            </a>
+            {hasHourlyForecast ? (
+              <>
+                <a className="today-retail-hero__primary" href={primaryHref}>
+                  Ver previsão por hora <ArrowRight aria-hidden="true" />
+                </a>
+                <a className="today-retail-hero__secondary" href={secondaryHref}>
+                  {secondaryLabel}
+                </a>
+              </>
+            ) : (
+              <>
+                <a className="today-retail-hero__primary" href="/previsao-7-dias-pelotas">
+                  Ver previsão de 7 dias <ArrowRight aria-hidden="true" />
+                </a>
+                <a className="today-retail-hero__secondary" href={alertHref}>
+                  Ver avisos oficiais
+                </a>
+              </>
+            )}
           </div>
         </div>
 
