@@ -11,6 +11,7 @@ const sharedForecastUnknownStyles = readFileSync(
   "src/components/weather/HomeForecastUnknownState.css",
   "utf8",
 );
+const todayResources = readFileSync("src/components/weather/TodayWeatherResources.tsx", "utf8");
 const homeForecast = readFileSync(
   "src/production/components/home-forecast-editorial.tsx",
   "utf8",
@@ -93,6 +94,20 @@ test("shared forecast story keeps unknown rain separate from a published zero", 
   assert.match(sharedForecastStory, /rain\.chance \?\? 0/);
   assert.match(sharedForecastUnknownStyles, /rain-unknown/);
   assert.doesNotMatch(sharedForecastUnknownStyles, /!important/);
+});
+
+test("Today planning never rewards missing rain data or displays zero as a gust", () => {
+  assert.match(todayResources, /const comparablePeriods = periods\.filter\(\(period\) => period\.peakRain !== null\)/);
+  assert.match(todayResources, /comparableScores\.length > 1/);
+  assert.match(todayResources, /Chance de chuva em atualização/);
+  assert.match(todayResources, /Ainda não há períodos suficientes com chance de chuva publicada para comparar/);
+  assert.match(todayResources, /chance de chuva ainda não foi informada nos períodos comparados/);
+  assert.match(todayResources, /function formatGust/);
+  assert.match(todayResources, /if \(value <= 0\) return "Sem rajada prevista"/);
+  assert.match(todayResources, /sem rajada prevista/);
+  assert.match(todayResources, /chance de chuva não informada/);
+  assert.match(todayResources, /return "Condições estáveis"/);
+  assert.doesNotMatch(todayResources, /É o período com menor combinação de chuva e vento/);
 });
 
 test("main Home hourly summary does not invent a zero-percent peak or a zero gust", () => {
