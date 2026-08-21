@@ -79,6 +79,7 @@ export function WeatherHero({
   const today = weather.daily[0] ?? null;
   const nextHourForecast = weather.hourly[0] ?? null;
   const hourlyPreview = weather.hourly.slice(0, 4);
+  const hasHourlyForecast = hourlyPreview.length > 0;
   const resolvedIcon = resolveHeroWeatherIcon(weather, cppmetForecast?.item.summary);
   const displayIcon = current.available ? resolvedIcon : (nextHourForecast?.icon ?? resolvedIcon);
   const heroPhoto = resolveHeroPhoto({
@@ -86,7 +87,10 @@ export function WeatherHero({
     icon: displayIcon,
     officialSummary: cppmetForecast?.item.summary,
   });
-  const displayCondition = getCurrentConditionLabel(displayIcon);
+  const displayCondition =
+    current.available || nextHourForecast
+      ? getCurrentConditionLabel(displayIcon)
+      : "Dados meteorológicos em atualização";
   const displayTemperature = current.available
     ? current.temperature
     : (nextHourForecast?.temperature ?? null);
@@ -94,7 +98,9 @@ export function WeatherHero({
     cppmetForecast?.item.summary ??
     (current.available
       ? "Condição observada e sinais mais importantes para as próximas horas em Pelotas."
-      : "A medição atual está indisponível. A próxima hora permanece identificada como previsão.");
+      : nextHourForecast
+        ? "A medição atual está indisponível. A próxima hora permanece identificada como previsão."
+        : "A medição atual e a previsão horária estão em atualização. Nenhum valor de próxima hora foi preenchido manualmente.");
   const currentUpdateMeta = getCurrentUpdateMeta(current);
   const forecastReason = advisory.level === "normal" ? null : (advisory.reasons[0] ?? null);
   const secondaryAction =
@@ -103,6 +109,19 @@ export function WeatherHero({
       : { href: "/previsao-7-dias-pelotas", label: "Ver próximos 7 dias" };
   const officialSeverityClass =
     officialAlertSeverity === "unknown" ? " severity-unknown" : ` severity-${officialAlertSeverity}`;
+  const heroStatus = current.available ? "Agora" : nextHourForecast ? "Previsão" : "Atualizando";
+  const temperatureLabel = current.available
+    ? "Temperatura agora"
+    : nextHourForecast
+      ? "Temperatura prevista para a próxima hora"
+      : "Temperatura em atualização";
+  const conditionDetail = current.available
+    ? current.feelsLike === null
+      ? "Sensação não informada"
+      : `Sensação de ${current.feelsLike}°`
+    : nextHourForecast
+      ? "Previsão da próxima hora"
+      : "Sem previsão horária disponível";
 
   return (
     <section
@@ -133,7 +152,7 @@ export function WeatherHero({
                 className={`tp-home-hero__status${current.available ? " is-live" : " is-unavailable"}`}
               >
                 <i aria-hidden="true" />
-                {current.available ? "Agora" : "Previsão"}
+                {heroStatus}
               </span>
               <span className="tp-home-hero__update">{currentUpdateMeta}</span>
             </div>
@@ -145,14 +164,7 @@ export function WeatherHero({
             </h1>
 
             <div className="tp-home-hero__reading">
-              <div
-                className="tp-home-hero__temperature"
-                aria-label={
-                  current.available
-                    ? "Temperatura agora"
-                    : "Temperatura prevista para a próxima hora"
-                }
-              >
+              <div className="tp-home-hero__temperature" aria-label={temperatureLabel}>
                 <strong>{formatMetric(displayTemperature, "°")}</strong>
               </div>
               <div className="tp-home-hero__condition">
@@ -161,13 +173,7 @@ export function WeatherHero({
                 </div>
                 <div>
                   <p>{displayCondition}</p>
-                  <span>
-                    {current.available
-                      ? current.feelsLike === null
-                        ? "Sensação não informada"
-                        : `Sensação de ${current.feelsLike}°`
-                      : "Previsão da próxima hora"}
-                  </span>
+                  <span>{conditionDetail}</span>
                 </div>
               </div>
             </div>
@@ -186,7 +192,7 @@ export function WeatherHero({
 
             <div className="tp-home-hero__actions">
               <Link className="tp-home-hero__primary" href="/tempo-hoje-pelotas">
-                Ver previsão por hora <span aria-hidden="true">→</span>
+                {hasHourlyForecast ? "Ver previsão por hora" : "Consultar previsão de hoje"} <span aria-hidden="true">→</span>
               </Link>
               <Link className="tp-home-hero__secondary" href={secondaryAction.href}>
                 {secondaryAction.label} <span aria-hidden="true">→</span>
@@ -254,9 +260,9 @@ export function WeatherHero({
           <Link
             className="tp-home-hero__hourly-more"
             href="/tempo-hoje-pelotas"
-            aria-label="Ver a previsão completa por hora"
+            aria-label={hasHourlyForecast ? "Ver a previsão completa por hora" : "Consultar a página de previsão de hoje"}
           >
-            Ver todas <span aria-hidden="true">→</span>
+            {hasHourlyForecast ? "Ver todas" : "Abrir previsão de hoje"} <span aria-hidden="true">→</span>
           </Link>
         </div>
       </div>
