@@ -192,10 +192,32 @@
   box-shadow: none;
 }
 
+/* Altura útil sem transformar radar/satélite em um bloco excessivamente alto. */
+.site-shell--topic .redemet-layer-card.is-featured :is(.redemet-image-frame, .redemet-layer-unavailable) {
+  min-height: clamp(380px, 42vw, 560px);
+}
+
+.site-shell--topic .redemet-layer-card.is-featured .redemet-image-frame img {
+  min-height: clamp(320px, 36vw, 500px);
+}
+
 .site-shell--topic .redemet-frame-controls,
 .site-shell--topic .redemet-storm-controls {
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
   border-color: var(--redemet-home-line);
   background: #fff;
+}
+
+/* WCAG 2.2: controles de reprodução e navegação mantêm alvo mínimo de 44 px. */
+.site-shell--topic .redemet-frame-controls > button,
+.site-shell--topic .redemet-storm-controls > button {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+}
+
+.site-shell--topic .redemet-frame-tools :is(button, a) {
+  min-height: 44px;
 }
 
 .site-shell--topic .redemet-frame-tools :is(button, a):hover,
@@ -210,6 +232,7 @@
 }
 
 .site-shell--topic .redemet-method-note > a {
+  min-height: 44px;
   box-shadow: none;
 }
 
@@ -277,5 +300,27 @@
 
   .site-shell--topic .redemet-explainer article:last-child {
     border-bottom: 0;
+  }
+
+  .site-shell--topic :is(
+    .redemet-layer-card.is-featured .redemet-image-frame,
+    .redemet-layer-card.is-featured .redemet-layer-unavailable,
+    .redemet-satellite-section .redemet-image-frame,
+    .redemet-satellite-section .redemet-layer-unavailable
+  ) {
+    min-height: 300px;
+  }
+
+  .site-shell--topic :is(
+    .redemet-layer-card.is-featured .redemet-image-frame img,
+    .redemet-satellite-section .redemet-image-frame img
+  ) {
+    min-height: 260px;
+  }
+
+  .site-shell--topic .redemet-frame-controls,
+  .site-shell--topic .redemet-storm-controls {
+    grid-template-columns: 44px minmax(0, 1fr) 44px;
+    padding-inline: 0.75rem;
   }
 }
