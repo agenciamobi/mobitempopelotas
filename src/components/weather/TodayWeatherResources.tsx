@@ -24,7 +24,6 @@ type PeriodSummary = {
   range: string;
   peakRain: number | null;
   maxGust: number | null;
-  windRisk: number;
   minTemperature: number;
   maxTemperature: number;
   score: number;
@@ -99,7 +98,6 @@ function summarizePeriod(hours: HourlyForecast[], index: number): PeriodSummary 
     range: firstHour.time === lastHour.time ? firstHour.time : `${firstHour.time}–${lastHour.time}`,
     peakRain,
     maxGust,
-    windRisk,
     minTemperature: Math.min(...temperatures),
     maxTemperature: Math.max(...temperatures),
     score: periodScore(peakRain, windRisk),
@@ -219,7 +217,7 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
       </header>
 
       <div className="today-resources__signals" aria-label="Principais períodos para planejar o dia">
-        <article className="is-best">
+        <article className={hasPeriodContrast ? "is-best" : undefined}>
           <span>
             <CheckCircle2 aria-hidden="true" /> {hasPeriodContrast ? "Período mais favorável" : "Comparação entre períodos"}
           </span>
@@ -231,7 +229,7 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
           </small>
         </article>
 
-        <article className="is-attention">
+        <article className={hasHourContrast ? "is-attention" : undefined}>
           <span>
             <TriangleAlert aria-hidden="true" /> {hasHourContrast ? "Horário de maior atenção" : "Comparação por horário"}
           </span>
