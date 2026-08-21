@@ -10,15 +10,31 @@ const productionCss = readFileSync("src/production/production-styles.css", "utf8
 const productionManifest = readFileSync("src/production/production-styles.ts", "utf8");
 
 test("editorial precedence barrier is the final production style layer", () => {
-  const cssBarrier = productionCss.indexOf("internal-editorial-precedence-barrier.css");
-  const cssPrevious = productionCss.indexOf("internal-dedicated-page-stabilization.css");
-  const tsBarrier = productionManifest.indexOf("internal-editorial-precedence-barrier.css");
-  const tsPrevious = productionManifest.indexOf("internal-dedicated-page-stabilization.css");
+  const cssImports = productionCss
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("@import "));
+  const tsImports = productionManifest
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith("import "));
 
-  assert.ok(cssBarrier > cssPrevious);
-  assert.ok(tsBarrier > tsPrevious);
-  assert.equal(productionCss.slice(cssBarrier).includes("@import"), true);
-  assert.equal(productionManifest.slice(tsBarrier).includes("import"), true);
+  assert.equal(
+    cssImports.at(-2),
+    '@import "./styles/internal-dedicated-page-stabilization.css";',
+  );
+  assert.equal(
+    cssImports.at(-1),
+    '@import "./styles/internal-editorial-precedence-barrier.css";',
+  );
+  assert.equal(
+    tsImports.at(-2),
+    'import "./styles/internal-dedicated-page-stabilization.css";',
+  );
+  assert.equal(
+    tsImports.at(-1),
+    'import "./styles/internal-editorial-precedence-barrier.css";',
+  );
 });
 
 test("lazy internal weather sections cannot restore legacy gradients or shadows", () => {
