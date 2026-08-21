@@ -124,6 +124,28 @@
   background: #fff8f3;
 }
 
+/* Navegação e links operacionais deixam a composição antiga de bloco acoplado. */
+.regional-city-page > .internal-page-chapters {
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.regional-city-page .regional-city-official-alert .home-inmet-alerts__aside > a,
+.regional-city-page .regional-city-related > header > a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.regional-city-page .regional-city-related > div > a {
+  transform: none;
+}
+
+.regional-city-page .regional-city-related > div > a:hover,
+.regional-city-page .regional-city-related > div > a:focus-visible {
+  transform: none;
+}
+
 @media (max-width: 980px) {
   .regional-city-page .regional-city-split-hero {
     grid-template-columns: minmax(0, 1fr);
@@ -153,6 +175,10 @@
 
   .regional-city-page .regional-city-split-hero .weather-split-hero__card {
     padding: 24px 20px;
+  }
+
+  .regional-city-page > .internal-page-chapters {
+    border-radius: 12px;
   }
 }
 
