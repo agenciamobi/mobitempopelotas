@@ -143,6 +143,11 @@
   box-shadow: none;
 }
 
+/* Mantém uma área de vídeo útil sem ocupar quase uma tela inteira em dispositivos menores. */
+.internal-weather-shell--cameras :is(.camera-v2-frame, .camera-v2-placeholder) {
+  min-height: clamp(360px, 44vw, 560px);
+}
+
 .internal-weather-shell--cameras .camera-v2-details {
   background: #fff;
 }
@@ -152,6 +157,11 @@
 .internal-weather-shell--cameras .camera-v2-details__title {
   border-color: var(--camera-home-line);
   box-shadow: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-details > a {
+  min-height: 44px;
+  align-items: center;
 }
 
 .internal-weather-shell--cameras .camera-v2-responsibility {
@@ -165,6 +175,7 @@
 }
 
 .internal-weather-shell--cameras .camera-v2-actions a {
+  min-height: 44px;
   border-color: var(--camera-home-line);
   color: var(--camera-home-ink);
   background: var(--camera-home-soft);
@@ -231,5 +242,50 @@
     .camera-v2-empty
   ) {
     padding: 22px 18px;
+  }
+
+  .internal-weather-shell--cameras :is(.camera-v2-frame, .camera-v2-placeholder) {
+    min-height: clamp(300px, 72vw, 390px);
+  }
+
+  /* Evita perder nomes úteis por ellipsis justamente na seleção mobile. */
+  .internal-weather-shell--cameras .camera-v2-selector :is(strong, small) {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  /* Quatro contadores em uma única coluna alongavam excessivamente o topo. */
+  .internal-weather-shell--cameras :is(.camera-v2-featured dl, .camera-v2-status dl) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .internal-weather-shell--cameras .camera-v2-frame__status {
+    right: 0.7rem;
+    bottom: 0.7rem;
+    left: 0.7rem;
+    align-items: center;
+    flex-direction: row;
+    gap: 0.55rem;
+    padding: 0.6rem 0.7rem;
+  }
+
+  .internal-weather-shell--cameras .camera-v2-frame__status small {
+    max-width: 48%;
+    text-align: right;
+  }
+}
+
+@media (max-width: 420px) {
+  .internal-weather-shell--cameras .camera-v2-frame__status {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.55rem 0.65rem;
+  }
+
+  .internal-weather-shell--cameras .camera-v2-frame__status small {
+    max-width: none;
+    text-align: left;
   }
 }
