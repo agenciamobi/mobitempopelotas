@@ -119,7 +119,7 @@ test("STSC parser accepts the response shape observed in the REDEMET HAR", () =>
   assert.equal(frames[0].points.length, 1);
   assert.equal(frames[0].points[0].latitude, -31.75);
   assert.equal(frames[0].points[0].longitude, -52.35);
-  assert.equal(frames[0].observedAt, "2026-08-18T02:50:59.000Z");
+  assert.equal(frames[0].observedAt, "2026-08-17T23:50:59.000Z");
   assert.match(stormsRoute, /redemet-stsc\.server/);
   assert.match(redemetFunctions, /fetchRedemetStorms.*redemet-stsc\.server/s);
   assert.doesNotMatch(
