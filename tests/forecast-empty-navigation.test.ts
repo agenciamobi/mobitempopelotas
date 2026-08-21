@@ -11,7 +11,12 @@ const sharedForecastUnknownStyles = readFileSync(
   "src/components/weather/HomeForecastUnknownState.css",
   "utf8",
 );
+const todayPage = readFileSync("src/components/weather/TodayForecastPageV5.tsx", "utf8");
 const todayResources = readFileSync("src/components/weather/TodayWeatherResources.tsx", "utf8");
+const todayNavigationStyles = readFileSync(
+  "src/components/weather/TodayNavigationAvailability.css",
+  "utf8",
+);
 const homeForecast = readFileSync(
   "src/production/components/home-forecast-editorial.tsx",
   "utf8",
@@ -108,6 +113,17 @@ test("Today planning never rewards missing rain data or displays zero as a gust"
   assert.match(todayResources, /chance de chuva não informada/);
   assert.match(todayResources, /return "Condições estáveis"/);
   assert.doesNotMatch(todayResources, /É o período com menor combinação de chuva e vento/);
+});
+
+test("Today chapter index hides forecast sections that did not render", () => {
+  assert.match(todayPage, /import "\.\/TodayNavigationAvailability\.css"/);
+  assert.match(todayNavigationStyles, /:not\(:has\(#previsao-hoje\)\)/);
+  assert.match(todayNavigationStyles, /a\[href="#previsao-hoje"\]/);
+  assert.match(todayNavigationStyles, /:not\(:has\(#recursos-hoje\)\)/);
+  assert.match(todayNavigationStyles, /a\[href="#recursos-hoje"\]/);
+  assert.match(todayNavigationStyles, /:not\(:has\(#atmosfera-hoje\)\)/);
+  assert.match(todayNavigationStyles, /a\[href="#atmosfera-hoje"\]/);
+  assert.doesNotMatch(todayNavigationStyles, /!important/);
 });
 
 test("main Home hourly summary does not invent a zero-percent peak or a zero gust", () => {
