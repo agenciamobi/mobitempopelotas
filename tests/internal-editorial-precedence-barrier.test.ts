@@ -74,6 +74,31 @@ test("retail forecast heroes keep the Home surface after lazy route CSS loads", 
   );
 });
 
+test("climate and hydrology custom heroes follow the Home split-surface contract", () => {
+  assert.match(barrier, /\.internal-weather-shell--climate \.climate-hero/);
+  assert.match(barrier, /\.internal-weather-shell--hydrology \.hydrology-v2-hero/);
+  assert.match(
+    barrier,
+    /grid-template-columns:\s*minmax\(0, 1\.12fr\) minmax\(320px, 0\.66fr\) !important/,
+  );
+  assert.match(
+    barrier,
+    /\.climate-hero__content,[\s\S]*?\.hydrology-v2-hero__content[\s\S]*?background-color:\s*var\(--route-editorial-surface\) !important/,
+  );
+  assert.match(
+    barrier,
+    /\.climate-hero__panel,[\s\S]*?\.hydrology-v2-hero__reading[\s\S]*?border-left:\s*1px solid var\(--route-editorial-line\) !important/,
+  );
+  assert.match(
+    barrier,
+    /\.climate-hero__content h1,[\s\S]*?\.hydrology-v2-hero__content h1[\s\S]*?color:\s*var\(--route-editorial-ink\) !important/,
+  );
+  assert.match(
+    barrier,
+    /@media \(max-width: 720px\)[\s\S]*?\.internal-weather-shell--climate \.climate-hero,[\s\S]*?grid-template-columns:\s*minmax\(0, 1fr\) !important/,
+  );
+});
+
 test("standalone status and privacy pages keep Home geometry after route CSS loads", () => {
   assert.match(barrier, /\.data-status-shell/);
   assert.match(barrier, /\.privacy-data-shell/);
