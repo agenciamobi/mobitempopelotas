@@ -8,6 +8,9 @@ import { fetchRedemetSatellite } from "./redemet.server";
 import { fetchRedemetStorms } from "./redemet-stsc.server";
 import type { RedemetOverview } from "./redemet.types";
 
+const IMAGE_FRAME_WINDOW = 8;
+const STORM_FRAME_WINDOW = 12;
+
 export const getRedemetOverview = createServerFn({ method: "GET" }).handler(
   async (): Promise<RedemetOverview> => {
     setResponseHeaders(
@@ -18,10 +21,18 @@ export const getRedemetOverview = createServerFn({ method: "GET" }).handler(
     );
 
     const [radar, satellite, inmetSatellite, storms] = await Promise.all([
-      withRedemetLastGood("radar:10", () => fetchRedemetRadarResilient(10)),
-      withRedemetLastGood("satellite:realcada:10", () => fetchRedemetSatellite("realcada", 10)),
-      withRedemetLastGood("satellite:inmet:goes:s:iv:10", () => fetchInmetSatellite(10)),
-      withRedemetLastGood("storms:20", () => fetchRedemetStorms(20)),
+      withRedemetLastGood(`radar:${IMAGE_FRAME_WINDOW}`, () =>
+        fetchRedemetRadarResilient(IMAGE_FRAME_WINDOW),
+      ),
+      withRedemetLastGood(`satellite:realcada:${IMAGE_FRAME_WINDOW}`, () =>
+        fetchRedemetSatellite("realcada", IMAGE_FRAME_WINDOW),
+      ),
+      withRedemetLastGood(`satellite:inmet:goes:s:iv:${IMAGE_FRAME_WINDOW}`, () =>
+        fetchInmetSatellite(IMAGE_FRAME_WINDOW),
+      ),
+      withRedemetLastGood(`storms:${STORM_FRAME_WINDOW}`, () =>
+        fetchRedemetStorms(STORM_FRAME_WINDOW),
+      ),
     ]);
 
     return { radar, satellite, inmetSatellite, storms };
