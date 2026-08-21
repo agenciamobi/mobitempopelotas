@@ -147,6 +147,11 @@
   scroll-snap-align: start;
 }
 
+.internal-weather-shell--rain .rain-hourly-volume-context__timeline article.is-unknown {
+  border-color: rgb(96 121 132 / 18%);
+  background: #f7f9fa;
+}
+
 .internal-weather-shell--rain .rain-hourly-volume-context__timeline article > header,
 .internal-weather-shell--rain .rain-hourly-volume-context__timeline article > div {
   display: grid;
@@ -184,6 +189,15 @@
   min-width: 0;
   border-radius: inherit;
   background: linear-gradient(90deg, #18bdcd, #5e2ced);
+}
+
+.internal-weather-shell--rain .rain-hourly-volume-context__timeline article.is-unknown i span {
+  width: 100%;
+  background: repeating-linear-gradient(
+    135deg,
+    rgb(96 121 132 / 55%) 0 3px,
+    rgb(220 228 231 / 85%) 3px 6px
+  );
 }
 
 .internal-weather-shell--rain .rain-hourly-volume-context > footer {
@@ -258,5 +272,9 @@
   ) {
     border: 1px solid CanvasText;
     background: Canvas;
+  }
+
+  .internal-weather-shell--rain .rain-hourly-volume-context__timeline article.is-unknown i span {
+    background: CanvasText;
   }
 }
