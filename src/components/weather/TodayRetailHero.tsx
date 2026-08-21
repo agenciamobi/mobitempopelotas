@@ -137,25 +137,33 @@ export function TodayRetailHero({
   const { current } = weather;
   const today = weather.daily[0] ?? null;
   const nextHour = weather.hourly[0] ?? null;
+  const hasForecastSignal = current.available || nextHour !== null;
   const iconName = resolveHeroWeatherIcon(weather);
-  const condition = weatherConditionLabels[iconName];
+  const condition = hasForecastSignal
+    ? weatherConditionLabels[iconName]
+    : "Dados meteorológicos em atualização";
   const currentTemperature = current.available ? current.temperature : (nextHour?.temperature ?? null);
   const metrics = buildCurrentMetrics(weather);
   const sunrise = extractClock(current.sunrise ?? weather.astronomy?.sunrise);
   const sunset = extractClock(current.sunset ?? weather.astronomy?.sunset);
   const hasAlert = officialAlertCount > 0;
   const isObserved = currentIsObserved ?? current.available;
-  const conditionMoment = current.available ? "agora" : "na próxima hora";
+  const conditionMoment = current.available ? "agora" : nextHour ? "na próxima hora" : null;
   const statusDetail = isObserved
     ? "Observado agora"
     : current.available
       ? "Estimativa para agora"
-      : "Próxima hora";
+      : nextHour
+        ? "Próxima hora"
+        : "Dados em atualização";
   const photo = getTodayRetailHeroPhoto(iconName, advisoryLevel);
   const photoStyle = {
     "--today-retail-hero-photo": `url("${photo.src}")`,
     "--today-retail-hero-position": photo.position,
   } as CSSProperties;
+  const defaultDescription = conditionMoment
+    ? `${condition} ${conditionMoment}. Acompanhe a previsão por hora, chuva e vento nas próximas horas para organizar o seu dia.`
+    : `Os dados meteorológicos de ${locationName} estão em atualização. Consulte novamente em alguns instantes para ver condição, chuva e vento.`;
 
   return (
     <section
@@ -176,8 +184,7 @@ export function TodayRetailHero({
           </h1>
 
           <p id="today-retail-hero-description">
-            {description ??
-              `${condition} ${conditionMoment}. Acompanhe a previsão por hora, chuva e vento nas próximas horas para organizar o seu dia.`}
+            {description ?? defaultDescription}
           </p>
 
           <div className="today-retail-hero__badges" aria-label="Situação da previsão">
@@ -210,7 +217,9 @@ export function TodayRetailHero({
                 ? `Condição observada agora em ${locationName}`
                 : current.available
                   ? `Condição estimada agora em ${locationName}`
-                  : `Condição prevista para a próxima hora em ${locationName}`
+                  : nextHour
+                    ? `Condição prevista para a próxima hora em ${locationName}`
+                    : `Dados meteorológicos em atualização em ${locationName}`
             }
           >
             <div
@@ -226,7 +235,7 @@ export function TodayRetailHero({
                   <small>{statusDetail}</small>
                 </div>
                 <b>
-                  <i aria-hidden="true" /> {isObserved ? "Agora" : "Previsão"}
+                  <i aria-hidden="true" /> {isObserved ? "Agora" : hasForecastSignal ? "Previsão" : "Atualizando"}
                 </b>
               </header>
 
