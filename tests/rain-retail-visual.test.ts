@@ -44,6 +44,13 @@ test("rain hero separates chance, volume and timing in direct language", () => {
   assert.doesNotMatch(hero, /Dia mais chuvoso/);
 });
 
+test("rain zero-volume state does not invent a rainiest day", () => {
+  assert.match(hero, /hasPositiveRainVolume/);
+  assert.match(hero, /Sem volume previsto/);
+  assert.match(page, /hasPositiveRainVolume/);
+  assert.match(page, /Sem volume previsto/);
+});
+
 test("rain page answers when, how much and which period in direct language", () => {
   assert.match(page, /InternalPageChapters/);
   assert.match(page, /buildWindows/);
