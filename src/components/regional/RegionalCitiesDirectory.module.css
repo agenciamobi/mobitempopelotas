@@ -24,6 +24,10 @@
 
 .hero {
   padding: clamp(34px, 4vw, 58px) var(--regional-pad);
+  background:
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 12%), transparent 24rem),
+    radial-gradient(circle at 100% 0, rgb(94 44 237 / 8%), transparent 26rem),
+    linear-gradient(145deg, #f7fcfc 0%, #fff 58%, #f8f6ff 100%);
 }
 
 .hero > span,
@@ -59,12 +63,13 @@
   min-width: 190px;
   margin-top: 28px;
   padding: 16px 18px;
-  border: 1px solid var(--regional-line);
+  border: 1px solid rgb(24 189 205 / 14%);
   border-radius: 14px;
-  background: #fbfcfc;
+  background: rgb(241 251 252 / 88%);
 }
 
 .hero > div strong {
+  color: #087d8a;
   font-size: 2.25rem;
   line-height: 1;
   letter-spacing: -0.05em;
@@ -85,6 +90,27 @@
 .directory article {
   min-width: 0;
   padding: var(--regional-pad);
+  border-top-width: 3px;
+}
+
+.directory article:nth-child(1) {
+  border-top-color: #18bdcd;
+  background: #fbfefe;
+}
+
+.directory article:nth-child(2) {
+  border-top-color: #5e2ced;
+  background: #fdfcff;
+}
+
+.directory article:nth-child(3) {
+  border-top-color: #e70b85;
+  background: #fffdfE;
+}
+
+.directory article:nth-child(4) {
+  border-top-color: #f27035;
+  background: #fffdfb;
 }
 
 .directory article > header {
@@ -101,6 +127,21 @@
   border-radius: 10px;
   background: rgb(24 189 205 / 10%);
   color: #087d8a;
+}
+
+.directory article:nth-child(2) header > svg {
+  background: rgb(94 44 237 / 8%);
+  color: #5e2ced;
+}
+
+.directory article:nth-child(3) header > svg {
+  background: rgb(231 11 133 / 7%);
+  color: #b71b72;
+}
+
+.directory article:nth-child(4) header > svg {
+  background: rgb(242 112 53 / 9%);
+  color: #b65325;
 }
 
 .directory h2 {
@@ -166,6 +207,9 @@
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.72fr);
   gap: clamp(28px, 4vw, 58px);
   padding: var(--regional-pad);
+  background:
+    radial-gradient(circle at 100% 0, rgb(24 189 205 / 8%), transparent 22rem),
+    linear-gradient(145deg, #fff 0%, #f7fbfb 100%);
 }
 
 .method h2 {
@@ -193,10 +237,11 @@
 }
 
 .method li {
+  min-height: 44px;
   padding: 13px 15px;
   border: 1px solid rgb(7 30 47 / 8%);
   border-radius: 12px;
-  background: #fbfcfc;
+  background: rgb(255 255 255 / 76%);
   color: #405e6d;
   font-size: 0.76rem;
   line-height: 1.5;
@@ -223,6 +268,9 @@
 
   .hero {
     padding-block: 28px;
+    background:
+      radial-gradient(circle at 0 100%, rgb(24 189 205 / 9%), transparent 17rem),
+      linear-gradient(145deg, #f8fcfc, #fff 64%, #f9f7ff);
   }
 
   .hero h1 {
@@ -249,5 +297,16 @@
 
   .method {
     gap: 24px;
+  }
+}
+
+@media (forced-colors: active) {
+  .hero,
+  .directory article,
+  .method,
+  .hero > div,
+  .method li {
+    background: Canvas;
+    color: CanvasText;
   }
 }
