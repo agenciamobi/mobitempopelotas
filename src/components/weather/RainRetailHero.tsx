@@ -94,6 +94,7 @@ export function RainRetailHero({
     (selected, day) => (!selected || day.precipitation > selected.precipitation ? day : selected),
     null,
   );
+  const hasPositiveRainVolume = (highestVolumeDay?.precipitation ?? 0) > 0;
   const wetHours = hours.filter((hour) => (hour.precipitation ?? 0) >= 30).length;
   const totalRain = days.reduce((total, day) => total + day.precipitation, 0);
   const wetGusts = hours
@@ -236,8 +237,8 @@ export function RainRetailHero({
             </article>
             <article>
               <span><Umbrella aria-hidden="true" /> Dia com maior volume</span>
-              <strong>{highestVolumeDay?.weekday ?? "—"}</strong>
-              <small>{formatMillimeters(highestVolumeDay?.precipitation)}</small>
+              <strong>{hasPositiveRainVolume ? highestVolumeDay?.weekday : "Sem volume previsto"}</strong>
+              <small>{hasPositiveRainVolume ? formatMillimeters(highestVolumeDay?.precipitation) : "Nos próximos 7 dias"}</small>
             </article>
             <article className="is-wind">
               <span><Wind aria-hidden="true" /> Rajada em período com chuva</span>
