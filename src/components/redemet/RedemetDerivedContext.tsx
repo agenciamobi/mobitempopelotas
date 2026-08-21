@@ -1,5 +1,6 @@
-import { Clock3, CloudLightning, Radar, Satellite } from "lucide-react";
+import { Clock3, CloudLightning, Radar, Satellite, type LucideIcon } from "lucide-react";
 
+import { isUsableRedemetObservedAt } from "@/lib/redemet/redemet-display-time";
 import type {
   RedemetImageLayerResponse,
   RedemetOverview,
@@ -32,7 +33,7 @@ function distanceFromPelotas(point: RedemetStormPoint) {
 function usableTimes(layer: FrameLayer) {
   return layer.frames
     .map((frame) => frame.observedAt)
-    .filter((value): value is string => Boolean(value))
+    .filter((value): value is string => isUsableRedemetObservedAt(value))
     .map((value) => new Date(value).getTime())
     .filter(Number.isFinite)
     .sort((a, b) => a - b);
@@ -77,16 +78,18 @@ function LayerReading({
   label,
   layer,
 }: {
-  icon: typeof Radar;
+  icon: LucideIcon;
   label: string;
   layer: FrameLayer;
 }) {
+  const usableCount = layer.frames.filter((frame) => isUsableRedemetObservedAt(frame.observedAt)).length;
+
   return (
     <article>
       <Icon aria-hidden="true" />
       <div>
         <span>{label}</span>
-        <strong>{layer.frames.length} quadros</strong>
+        <strong>{usableCount} quadros com horário utilizável</strong>
         <dl>
           <div>
             <dt>Janela</dt>
@@ -103,7 +106,7 @@ function LayerReading({
 }
 
 function StormDistanceReading({ layer }: { layer: RedemetStormLayerResponse }) {
-  const frame = layer.frames[layer.currentIndex] ?? layer.frames.at(-1) ?? null;
+  const frame = layer.frames.filter((item) => isUsableRedemetObservedAt(item.observedAt)).at(-1) ?? null;
   const distances = (frame?.points ?? []).map(distanceFromPelotas).sort((a, b) => a - b);
   const nearest = distances[0] ?? null;
   const near = distances.filter((distance) => distance <= 50).length;
@@ -116,7 +119,7 @@ function StormDistanceReading({ layer }: { layer: RedemetStormLayerResponse }) {
         <span>Referência local de atividade elétrica</span>
         <h3>
           {nearest === null
-            ? "Sem descarga STSC no quadro mais recente"
+            ? "Sem descarga STSC em quadro com horário utilizável"
             : `Descarga detectada mais próxima a aproximadamente ${Math.round(nearest)} km de Pelotas`}
         </h3>
         <p>
@@ -170,8 +173,8 @@ export function RedemetDerivedContext({ data }: { data: RedemetOverview }) {
       <footer>
         <Clock3 aria-hidden="true" />
         <span>
-          Janela e cadência são derivadas dos horários disponíveis nesta consulta. Quadros ausentes,
-          atrasados ou irregulares podem alterar esses números.
+          Janela e cadência usam apenas horários considerados utilizáveis pelo mesmo contrato temporal da
+          página. Quadros ausentes, atrasados ou irregulares podem alterar esses números.
         </span>
       </footer>
     </section>
