@@ -74,10 +74,18 @@ test("tomorrow content answers planning questions in direct language", () => {
   assert.doesNotMatch(page, /não publicaram contexto/);
 });
 
+test("tomorrow content matches official sources by stable ISO date", () => {
+  assert.match(page, /localForecastDateKey/);
+  assert.match(page, /day\.dateIso \?\? localForecastDateKey/);
+  assert.match(page, /tomorrow\.dateIso \?\? localForecastDateKey\(1\)/);
+  assert.match(page, /period\.date\?\.slice\(0, 10\) === tomorrowDate/);
+  assert.doesNotMatch(page, /tomorrow\.date\.slice\(0, 10\)/);
+  assert.doesNotMatch(page, /day\.date\.slice\(0, 10\)/);
+});
+
 test("tomorrow content remains comparative and source-aware", () => {
   assert.match(page, /buildPlanningCards/);
   assert.match(page, /forecastWeekdayKey/);
-  assert.match(page, /period\.date\?\.slice\(0, 10\) === tomorrowDate/);
   assert.match(page, /CPPMet \/ UFPel/);
   assert.match(page, /INMET · \{period\.period\}/);
   assert.match(page, /FAQPage/);
