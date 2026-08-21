@@ -35,6 +35,17 @@ export function formatRedemetDateTime(value: string | null, now = Date.now()) {
   }).format(date);
 }
 
+export function latestReportedRedemetFrameTime(frames: readonly ObservedFrame[]) {
+  const values = frames
+    .map((frame) => frame.observedAt)
+    .filter((value): value is string => Boolean(value))
+    .map((value) => new Date(value))
+    .filter((value) => !Number.isNaN(value.getTime()))
+    .sort((first, second) => second.getTime() - first.getTime());
+
+  return values[0]?.toISOString() ?? null;
+}
+
 export function latestUsableRedemetFrameTime(
   frames: readonly ObservedFrame[],
   now = Date.now(),
