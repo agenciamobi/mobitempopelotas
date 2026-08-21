@@ -5,6 +5,7 @@ import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPag
 import { MeteogramHero, MeteogramPage } from "@/components/weather/MeteogramPage";
 import "@/components/weather/MeteogramRefinement.css";
 import "@/components/weather/MeteogramHomeContract.css";
+import "@/components/weather/MeteogramStateContract.css";
 import { SimagroModelProducts } from "@/components/weather/SimagroModelProducts";
 import { getPelotasMeteogram } from "@/lib/weather/meteogram.functions";
 import { createPageHead } from "@/lib/page-meta";
