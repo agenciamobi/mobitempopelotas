@@ -21,12 +21,19 @@ import {
 import { useEffect, useState } from "react";
 
 import { InternalPageChapters } from "@/components/weather/InternalWeatherWidgets";
+import {
+  formatRedemetDateTime,
+  getRedemetFreshness,
+  latestUsableRedemetFrameTime,
+  redemetFrameDisplayLabel,
+} from "@/lib/redemet/redemet-display-time";
 import type {
   RedemetImageLayerResponse,
   RedemetOverview as RedemetOverviewData,
   RedemetStormLayerResponse,
 } from "@/lib/redemet/redemet.types";
 
+import { RadarMapFrame } from "./RadarMapFrame";
 import "./RedemetOverview.css";
 import "./RedemetOverview.sources.css";
 import "./RedemetRetail.css";
@@ -48,31 +55,13 @@ type ObservedFrame = {
 };
 
 type SourceLayer = RedemetImageLayerResponse | RedemetStormLayerResponse;
-type FreshnessTone = "recent" | "attention" | "stale" | "unknown";
 
 function formatDateTime(value: string | null) {
-  if (!value) return "Horário não informado";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Horário não informado";
-
-  return new Intl.DateTimeFormat("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
+  return formatRedemetDateTime(value);
 }
 
 function latestFrameTime(frames: readonly ObservedFrame[]) {
-  const values = frames
-    .map((frame) => frame.observedAt)
-    .filter((value): value is string => Boolean(value))
-    .map((value) => new Date(value))
-    .filter((value) => !Number.isNaN(value.getTime()))
-    .sort((a, b) => b.getTime() - a.getTime());
-
-  return values[0]?.toISOString() ?? null;
+  return latestUsableRedemetFrameTime(frames);
 }
 
 function latestObservedAt(data: RedemetOverviewData) {
@@ -84,33 +73,8 @@ function latestObservedAt(data: RedemetOverviewData) {
   ]);
 }
 
-function getFreshness(value: string | null): {
-  tone: FreshnessTone;
-  label: string;
-  relative: string;
-} {
-  if (!value) {
-    return { tone: "unknown", label: "Horário não informado", relative: "Sem horário disponível" };
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return { tone: "unknown", label: "Horário não informado", relative: "Sem horário disponível" };
-  }
-
-  const ageMinutes = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60_000));
-  const relative =
-    ageMinutes < 1
-      ? "Atualizado agora"
-      : ageMinutes < 60
-        ? `Atualizado há ${ageMinutes} min`
-        : ageMinutes < 1_440
-          ? `Atualizado há ${Math.floor(ageMinutes / 60)} h`
-          : "Atualizado há mais de 1 dia";
-
-  if (ageMinutes <= 30) return { tone: "recent", label: "Imagem recente", relative };
-  if (ageMinutes <= 120) return { tone: "attention", label: "Confira o horário", relative };
-  return { tone: "stale", label: "Imagem com mais de 2 h", relative };
+function getFreshness(value: string | null) {
+  return getRedemetFreshness(value);
 }
 
 function sourceCountLabel(count: number) {
@@ -280,16 +244,22 @@ function ImageLayerPanel({
       {layer.available && selectedFrame ? (
         <>
           <figure className="redemet-image-frame" data-freshness={freshness.tone}>
-            <img
-              src={selectedFrame.imageUrl}
-              alt={`${title}, imagem registrada em ${formatDateTime(selectedFrame.observedAt)}`}
-              loading={kind === "radar" ? "eager" : "lazy"}
-              decoding="async"
-              fetchPriority={kind === "radar" ? "high" : "auto"}
-            />
+            {kind === "radar" ? (
+              <RadarMapFrame
+                frame={selectedFrame}
+                alt={`${title}, imagem registrada em ${formatDateTime(selectedFrame.observedAt)}`}
+              />
+            ) : (
+              <img
+                src={selectedFrame.imageUrl}
+                alt={`${title}, imagem registrada em ${formatDateTime(selectedFrame.observedAt)}`}
+                loading="lazy"
+                decoding="async"
+              />
+            )}
             <figcaption>
               <div>
-                <span>{selectedFrame.label}</span>
+                <span>{redemetFrameDisplayLabel(selectedFrame)}</span>
                 <FreshnessBadge value={selectedFrame.observedAt} />
               </div>
               <strong>Registrada em {formatDateTime(selectedFrame.observedAt)}</strong>
