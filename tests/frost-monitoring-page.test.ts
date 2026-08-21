@@ -5,6 +5,7 @@ import test from "node:test";
 const route = readFileSync("src/routes/mapa-de-geadas-rio-grande-do-sul.tsx", "utf8");
 const page = readFileSync("src/components/inmet/FrostMapPageV2.tsx", "utf8");
 const styles = readFileSync("src/components/inmet/FrostMapPageV2.css", "utf8");
+const homeContract = readFileSync("src/components/inmet/FrostMapHomeContract.css", "utf8");
 
 const frostSource = `${route}\n${page}`;
 
@@ -16,6 +17,7 @@ test("frost route uses shared shell and parallel official data loaders", () => {
   assert.match(route, /InternalWeatherPageShell/);
   assert.match(route, /FrostMapHero/);
   assert.match(route, /FrostMapPageV2/);
+  assert.match(route, /FrostMapHomeContract\.css/);
   assert.match(route, /pageClassName="internal-weather-shell--frost"/);
   assert.match(route, /showOfficialAlerts=\{false\}/);
   assert.match(route, /staleTime: 15 \* 60 \* 1_000/);
@@ -105,4 +107,15 @@ test("frost page follows responsive retail and accessibility contracts", () => {
   assert.match(styles, /@media \(forced-colors: active\)/);
   assert.match(styles, /:focus-visible/);
   assert.doesNotMatch(styles, /font-size:\s*0\.[0-6][0-9]rem/);
+});
+
+test("frost hero uses a restrained cold accent without flattening status semantics", () => {
+  assert.match(homeContract, /acento frio e técnico/i);
+  assert.match(homeContract, /\.frost-v2-hero__content[\s\S]*radial-gradient[\s\S]*linear-gradient/);
+  assert.match(homeContract, /\.frost-v2-hero__summary[\s\S]*radial-gradient[\s\S]*linear-gradient/);
+  assert.match(homeContract, /\.frost-v2-hero__summary dl > div:first-child/);
+  assert.match(homeContract, /\.frost-v2-hero__summary dl > div:last-child/);
+  assert.match(homeContract, /\.frost-v2-hero__actions a:first-child[\s\S]*linear-gradient/);
+  assert.match(homeContract, /@media \(forced-colors: active\)/);
+  assert.doesNotMatch(homeContract, /!important/);
 });
