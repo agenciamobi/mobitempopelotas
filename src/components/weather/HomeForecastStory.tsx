@@ -89,14 +89,23 @@ function formatMetric(value: number | null, suffix = "") {
   return value === null || !Number.isFinite(value) ? "—" : `${formatNumber(value)}${suffix}`;
 }
 
+function formatGust(value: number | null) {
+  if (value === null || !Number.isFinite(value)) return "Não informada";
+  if (value <= 0) return "Sem rajadas";
+  return `${formatNumber(value)} km/h`;
+}
+
+function hourlyWindDescription(windGust: number | null, windSpeed: number | null) {
+  const wind = formatMetric(windSpeed, " km/h");
+  if (windGust === null) return `Rajada não informada · vento ${wind}`;
+  if (windGust <= 0) return `Sem rajada prevista · vento ${wind}`;
+  return `Rajada de até ${formatNumber(windGust)} km/h`;
+}
+
 function hourlyVolumeLabel(value: number | null | undefined) {
   if (value === null || value === undefined) return <small>Volume indisponível</small>;
   if (value <= 0) return <small>Sem volume relevante</small>;
   return <small>{formatNumber(value)} mm previstos</small>;
-}
-
-function windValue(windGust: number | null, windSpeed: number | null) {
-  return windGust ?? windSpeed ?? 0;
 }
 
 function timeReference(value: string | null | undefined) {
@@ -128,7 +137,12 @@ function tomorrowDescription(
       : chance === null
         ? `${formatNumber(precipitation)} mm previstos pelo modelo`
         : `${chance}% de chance de chuva e ${formatNumber(precipitation)} mm previstos`;
-  const windText = windGust === null ? "rajadas em atualização" : `rajadas de até ${windGust} km/h`;
+  const windText =
+    windGust === null
+      ? "rajadas em atualização"
+      : windGust <= 0
+        ? "sem rajada prevista"
+        : `rajadas de até ${formatNumber(windGust)} km/h`;
 
   return `${rainText}, com ${windText}.`;
 }
@@ -139,7 +153,7 @@ export function HomeForecastStory({
   locationName = "Pelotas",
   showLinks = true,
 }: HomeForecastStoryProps) {
-  const { hourly, daily, current } = data.weather;
+  const { hourly, daily } = data.weather;
   const isDetailedPage = context !== "home";
   const visibleHours = hourly.slice(0, 7);
   const today = daily[0];
@@ -150,10 +164,10 @@ export function HomeForecastStory({
     const highestChance = highest?.precipitationProbability ?? 0;
     return !highest || currentChance > highestChance ? hour : highest;
   }, null);
-  const strongestHourlyGust = visibleHours.reduce(
-    (highest, hour) => Math.max(highest, windValue(hour.windGust, hour.windSpeed)),
-    windValue(current?.windGust ?? null, current?.windSpeed ?? null),
-  );
+  const hourlyGusts = visibleHours
+    .map((hour) => hour.windGust)
+    .filter((value): value is number => value !== null && Number.isFinite(value));
+  const strongestHourlyGust = hourlyGusts.length ? Math.max(...hourlyGusts) : null;
   const forecastWindow =
     visibleHours.length > 1
       ? `${visibleHours[0].time} até ${visibleHours[visibleHours.length - 1].time}`
@@ -193,8 +207,8 @@ export function HomeForecastStory({
             <dd>{formatMetric(today.rainChance, "%")}</dd>
           </div>
           <div>
-            <dt>{isDetailedPage ? "Rajada máxima" : "Vento mais forte"}</dt>
-            <dd>{formatMetric(today.windGust, " km/h")}</dd>
+            <dt>{isDetailedPage ? "Rajada máxima" : "Rajada prevista"}</dt>
+            <dd>{formatGust(today.windGust)}</dd>
           </div>
         </dl>
       </header>
@@ -216,8 +230,14 @@ export function HomeForecastStory({
             </div>
             <div>
               <small>{isDetailedPage ? "Rajada máxima" : "Rajada mais forte"}</small>
-              <strong>{strongestHourlyGust} km/h</strong>
-              <span>nas próximas horas</span>
+              <strong>{formatGust(strongestHourlyGust)}</strong>
+              <span>
+                {strongestHourlyGust === null
+                  ? "fonte não informou rajadas"
+                  : strongestHourlyGust <= 0
+                    ? "sem rajada prevista nas próximas horas"
+                    : "nas próximas horas"}
+              </span>
             </div>
           </div>
 
@@ -225,13 +245,13 @@ export function HomeForecastStory({
             {visibleHours.map((hour, index) => {
               const rain = rainReading(hour.precipitationProbability);
               const isPeak = peakHour === hour && rain.chance > 0;
-              const gust = windValue(hour.windGust, hour.windSpeed);
+              const windDescription = hourlyWindDescription(hour.windGust, hour.windSpeed);
 
               return (
                 <article
                   className={`rain-${rain.level}${index === 0 ? " is-current" : ""}${isPeak ? " is-rain-peak" : ""}`}
                   key={`${hour.timestamp ?? hour.time}-${index}`}
-                  aria-label={`${hour.time}: ${formatMetric(hour.temperature, " graus")}, ${rain.chance}% de chance de chuva e rajadas de até ${gust} quilômetros por hora`}
+                  aria-label={`${hour.time}: ${formatMetric(hour.temperature, " graus")}, ${rain.chance}% de chance de chuva; ${windDescription}`}
                 >
                   <div className="home-hourly-topline">
                     <span>{hour.time}</span>
@@ -255,7 +275,7 @@ export function HomeForecastStory({
                     </i>
                     {hourlyVolumeLabel(hour.precipitationMm)}
                   </div>
-                  <span className="home-hourly-wind">Rajada de até {gust} km/h</span>
+                  <span className="home-hourly-wind">{windDescription}</span>
                 </article>
               );
             })}
