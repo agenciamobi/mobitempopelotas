@@ -1,4 +1,8 @@
-/* Contrato visual estável da página de alertas com a linguagem editorial da Home. */
+/*
+ * Alertas — cor semântica controlada sobre a linguagem editorial da Home.
+ * A severidade pode aparecer no hero e no painel de situação; o restante da
+ * página continua claro e sóbrio para não transformar aviso oficial em campanha.
+ */
 
 .internal-weather-shell--alerts .alerts-editorial-hero {
   display: grid;
@@ -21,7 +25,10 @@
 
 .internal-weather-shell--alerts .alerts-editorial-copy {
   padding: clamp(36px, 4.2vw, 60px) clamp(26px, 3.2vw, 42px);
-  background: #fff;
+  background:
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 9%), transparent 24rem),
+    radial-gradient(circle at 100% 0, color-mix(in srgb, var(--alerts-accent) 8%, transparent), transparent 24rem),
+    linear-gradient(145deg, #fff 0%, #f8fcfc 62%, #fff 100%);
 }
 
 .internal-weather-shell--alerts .alerts-editorial-copy::before {
@@ -30,6 +37,7 @@
 }
 
 .internal-weather-shell--alerts .alerts-editorial-back {
+  min-height: 44px;
   margin-bottom: clamp(18px, 2.2vw, 28px);
   color: #58717d;
 }
@@ -52,7 +60,24 @@
 }
 
 .internal-weather-shell--alerts .alerts-editorial-actions a:first-child {
+  border-color: #315f70;
+  background: #315f70;
   box-shadow: none;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-hero-potential .alerts-editorial-actions a:first-child {
+  border-color: #8b6500;
+  background: #8b6500;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-hero-danger .alerts-editorial-actions a:first-child {
+  border-color: #a94d1d;
+  background: #a94d1d;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-hero-great-danger .alerts-editorial-actions a:first-child {
+  border-color: #8f1d1d;
+  background: #8f1d1d;
 }
 
 .internal-weather-shell--alerts .alerts-editorial-panel {
@@ -60,7 +85,9 @@
   padding: clamp(28px, 3.2vw, 42px);
   border-left: 1px solid rgb(7 30 47 / 10%);
   color: #071e2f;
-  background: #fbfcfc;
+  background:
+    radial-gradient(circle at 100% 0, color-mix(in srgb, var(--alerts-accent) 12%, transparent), transparent 20rem),
+    linear-gradient(145deg, color-mix(in srgb, var(--alerts-accent) 5%, #f8faf9), #fff 66%);
 }
 
 .internal-weather-shell--alerts .alerts-editorial-panel-line {
@@ -71,9 +98,9 @@
 }
 
 .internal-weather-shell--alerts .alerts-editorial-panel-status {
-  border-color: rgb(7 30 47 / 10%);
+  border-color: color-mix(in srgb, var(--alerts-accent) 20%, rgb(7 30 47 / 10%));
   color: #071e2f;
-  background: #fff;
+  background: color-mix(in srgb, var(--alerts-accent) 8%, #fff);
 }
 
 .internal-weather-shell--alerts .alerts-editorial-panel-status svg {
@@ -106,6 +133,7 @@
 }
 
 .internal-weather-shell--alerts .alerts-editorial-panel > a {
+  min-height: 44px;
   border: 1px solid #071e2f;
   color: #fff;
   background: #071e2f;
@@ -131,6 +159,9 @@
 
   .internal-weather-shell--alerts .alerts-editorial-copy {
     padding: 30px 20px;
+    background:
+      radial-gradient(circle at 0 100%, rgb(24 189 205 / 8%), transparent 16rem),
+      linear-gradient(145deg, #fff, #f8fcfc 68%, #fff);
   }
 
   .internal-weather-shell--alerts .alerts-editorial-copy h1 {
@@ -142,6 +173,9 @@
     padding: 24px 20px;
     border-top: 1px solid rgb(7 30 47 / 10%);
     border-left: 0;
+    background:
+      radial-gradient(circle at 100% 0, color-mix(in srgb, var(--alerts-accent) 10%, transparent), transparent 15rem),
+      linear-gradient(145deg, color-mix(in srgb, var(--alerts-accent) 4%, #f8faf9), #fff 68%);
   }
 
   .internal-weather-shell--alerts .alerts-editorial-panel dl {
@@ -156,5 +190,16 @@
 
   .internal-weather-shell--alerts .alerts-editorial-panel dl div:last-child {
     border-bottom: 0;
+  }
+}
+
+@media (forced-colors: active) {
+  .internal-weather-shell--alerts :is(
+    .alerts-editorial-copy,
+    .alerts-editorial-panel,
+    .alerts-editorial-panel-status
+  ) {
+    background: Canvas;
+    color: CanvasText;
   }
 }
