@@ -8,6 +8,18 @@ const barrier = readFileSync(
 );
 const productionCss = readFileSync("src/production/production-styles.css", "utf8");
 const productionManifest = readFileSync("src/production/production-styles.ts", "utf8");
+const todayHeroRefinement = readFileSync(
+  "src/components/weather/TodayRetailHeroRefinement.css",
+  "utf8",
+);
+const sevenDayHeroCss = readFileSync(
+  "src/components/weather/SevenDayRetailHero.css",
+  "utf8",
+);
+const sevenDayHero = readFileSync(
+  "src/components/weather/SevenDayRetailHero.tsx",
+  "utf8",
+);
 
 test("editorial precedence barrier is the final production style layer", () => {
   const cssImports = productionCss
@@ -45,33 +57,46 @@ test("lazy internal weather sections cannot restore legacy gradients or shadows"
   assert.match(barrier, /border-radius:\s*var\(--route-editorial-radius\) !important/);
 });
 
-test("retail forecast heroes keep the Home surface after lazy route CSS loads", () => {
-  for (const namespace of [
-    "internal-weather-shell--today",
-    "internal-weather-shell--tomorrow",
-    "internal-weather-shell--seven-day",
-    "internal-weather-shell--rain",
-  ]) {
-    assert.match(barrier, new RegExp(`\\.${namespace}`));
-  }
-
-  for (const hero of [
-    "today-retail-hero",
-    "tomorrow-retail-hero",
-    "seven-day-retail-hero",
-    "rain-retail-hero",
-  ]) {
-    assert.match(barrier, new RegExp(`\\.${hero}`));
-  }
-
+test("Today and 7-day heroes may use deliberate color while Tomorrow and Rain stay flat", () => {
   assert.match(
     barrier,
-    /:is\(\.today-retail-hero, \.tomorrow-retail-hero, \.seven-day-retail-hero, \.rain-retail-hero\)[\s\S]*?background-image:\s*none !important[\s\S]*?box-shadow:\s*none !important/,
+    /\.internal-weather-shell--today,[\s\S]*?\.internal-weather-shell--seven-day[\s\S]*?:is\(\.today-retail-hero, \.seven-day-retail-hero\)[\s\S]*?box-shadow:\s*none !important/,
+  );
+  assert.match(
+    barrier,
+    /\.internal-weather-shell--tomorrow,[\s\S]*?\.internal-weather-shell--rain[\s\S]*?:is\(\.tomorrow-retail-hero, \.rain-retail-hero\)[\s\S]*?background-image:\s*none !important/,
   );
   assert.match(
     barrier,
     /:is\(\.today-retail-hero, \.tomorrow-retail-hero, \.seven-day-retail-hero, \.rain-retail-hero\)::before,[\s\S]*?::after[\s\S]*?display:\s*none !important/,
   );
+});
+
+test("Today hero uses a controlled chromatic break and differentiated summary tiles", () => {
+  assert.match(
+    todayHeroRefinement,
+    /\.internal-weather-shell--today \.today-retail-hero[\s\S]*?radial-gradient[\s\S]*?linear-gradient/,
+  );
+  assert.match(todayHeroRefinement, /\.today-retail-hero__current[\s\S]*?min-height:\s*21rem/);
+  assert.match(todayHeroRefinement, /\.today-retail-hero__tiles article\.is-rain/);
+  assert.match(todayHeroRefinement, /\.today-retail-hero__tiles article\.is-wind/);
+  assert.match(todayHeroRefinement, /\.today-retail-hero__tiles article\.is-sun/);
+});
+
+test("7-day hero has a concise weekly hierarchy and semantic color accents", () => {
+  assert.match(sevenDayHero, /Previsão de <span>7 dias<\/span> para Pelotas/);
+  assert.match(sevenDayHero, /className="is-maximum"/);
+  assert.match(sevenDayHero, /className="is-cold"/);
+  assert.match(sevenDayHero, /className="is-source"/);
+  assert.match(sevenDayHeroCss, /\.seven-day-retail-hero[\s\S]*?radial-gradient[\s\S]*?linear-gradient/);
+  assert.match(
+    sevenDayHeroCss,
+    /\.today-retail-hero__primary[\s\S]*?linear-gradient\(135deg, #5e2ced 0%, #e70b85 100%\)/,
+  );
+  assert.match(sevenDayHeroCss, /\.seven-day-retail-hero__tiles article\.is-maximum/);
+  assert.match(sevenDayHeroCss, /\.seven-day-retail-hero__tiles article\.is-rain/);
+  assert.match(sevenDayHeroCss, /\.seven-day-retail-hero__tiles article\.is-cold/);
+  assert.match(sevenDayHeroCss, /\.seven-day-retail-hero__tiles article\.is-source/);
 });
 
 test("climate and hydrology custom heroes follow the Home split-surface contract", () => {
