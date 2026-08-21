@@ -1,0 +1,66 @@
+/*
+ * Geadas observadas — acento frio e técnico.
+ * O mapa e os estados de disponibilidade continuam funcionais; o gradiente
+ * aparece apenas na abertura para diferenciar observação agrometeorológica.
+ */
+
+.internal-weather-shell--frost .frost-v2-hero__content {
+  background:
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 8%), transparent 22rem),
+    linear-gradient(145deg, #f8fcfd 0%, #ffffff 58%, #f8f6ff 100%);
+}
+
+.internal-weather-shell--frost .frost-v2-hero__summary {
+  background:
+    radial-gradient(circle at 100% 0, rgb(94 44 237 / 8%), transparent 20rem),
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 11%), transparent 18rem),
+    linear-gradient(145deg, #eef9fb 0%, #ffffff 55%, #f6f4ff 100%);
+}
+
+.internal-weather-shell--frost .frost-v2-hero__summary dl > div {
+  border-color: rgb(7 30 47 / 9%);
+  background: rgb(255 255 255 / 74%);
+  box-shadow: none;
+}
+
+.internal-weather-shell--frost .frost-v2-hero__summary dl > div:first-child {
+  border-color: rgb(24 189 205 / 14%);
+  background: #f2fbfc;
+}
+
+.internal-weather-shell--frost .frost-v2-hero__summary dl > div:last-child {
+  border-color: rgb(94 44 237 / 12%);
+  background: #f7f4ff;
+}
+
+.internal-weather-shell--frost .frost-v2-hero__actions a:first-child {
+  border-color: #087f91;
+  color: #fff;
+  background: linear-gradient(135deg, #087f91 0%, #5e2ced 100%);
+}
+
+.internal-weather-shell--frost .frost-v2-hero__actions a:first-child:hover {
+  border-color: #087f91;
+}
+
+@media (max-width: 720px) {
+  .internal-weather-shell--frost .frost-v2-hero__content {
+    background: linear-gradient(145deg, #f7fcfd, #fff 65%, #f9f7ff);
+  }
+
+  .internal-weather-shell--frost .frost-v2-hero__summary {
+    background:
+      radial-gradient(circle at 100% 0, rgb(94 44 237 / 7%), transparent 15rem),
+      linear-gradient(145deg, #f0fafb, #fff 62%, #f8f6ff);
+  }
+}
+
+@media (forced-colors: active) {
+  .internal-weather-shell--frost :is(
+    .frost-v2-hero__content,
+    .frost-v2-hero__summary,
+    .frost-v2-hero__summary dl > div
+  ) {
+    background: Canvas;
+  }
+}
