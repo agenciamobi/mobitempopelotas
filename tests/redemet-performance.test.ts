@@ -34,6 +34,16 @@ test("REDEMET limits animation payloads", () => {
   assert.match(stormsServer, /const MAX_FRAMES = 12;/);
 });
 
+test("REDEMET overview requests the same compact windows used by public contracts", () => {
+  assert.match(redemetFunctions, /const IMAGE_FRAME_WINDOW = 8;/);
+  assert.match(redemetFunctions, /const STORM_FRAME_WINDOW = 12;/);
+  assert.match(redemetFunctions, /fetchRedemetRadarResilient\(IMAGE_FRAME_WINDOW\)/);
+  assert.match(redemetFunctions, /fetchRedemetSatellite\("realcada", IMAGE_FRAME_WINDOW\)/);
+  assert.match(redemetFunctions, /fetchInmetSatellite\(IMAGE_FRAME_WINDOW\)/);
+  assert.match(redemetFunctions, /fetchRedemetStorms\(STORM_FRAME_WINDOW\)/);
+  assert.doesNotMatch(redemetFunctions, /storms:20/);
+});
+
 test("radar parser keeps only the requested station from the official response shape", () => {
   const payload = {
     status: true,
