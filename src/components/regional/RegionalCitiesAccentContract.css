@@ -1,0 +1,90 @@
+/*
+ * Central regional — acento geográfico sobre o contrato-base neutro.
+ * A base continua branca e sem sombra; a cor serve apenas para separar o hero,
+ * as quatro áreas regionais e o bloco metodológico que aparecem muito próximos.
+ */
+
+.regional-cities-directory > section:first-child {
+  background:
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 12%), transparent 24rem),
+    radial-gradient(circle at 100% 0, rgb(94 44 237 / 8%), transparent 26rem),
+    linear-gradient(145deg, #f7fcfc 0%, #fff 58%, #f8f6ff 100%);
+}
+
+.regional-cities-directory > section:first-child > div {
+  border-color: rgb(24 189 205 / 14%);
+  background: rgb(241 251 252 / 88%);
+}
+
+.regional-cities-directory > section:first-child > div strong {
+  color: #087d8a;
+}
+
+.regional-cities-directory > section:nth-child(2) > article {
+  border-top-width: 3px;
+}
+
+.regional-cities-directory > section:nth-child(2) > article:nth-child(1) {
+  border-top-color: #18bdcd;
+  background: #fbfefe;
+}
+
+.regional-cities-directory > section:nth-child(2) > article:nth-child(2) {
+  border-top-color: #5e2ced;
+  background: #fdfcff;
+}
+
+.regional-cities-directory > section:nth-child(2) > article:nth-child(3) {
+  border-top-color: #e70b85;
+  background: #fffdfd;
+}
+
+.regional-cities-directory > section:nth-child(2) > article:nth-child(4) {
+  border-top-color: #f27035;
+  background: #fffdfb;
+}
+
+.regional-cities-directory > section:nth-child(2) > article:nth-child(2) header > svg {
+  background: rgb(94 44 237 / 8%);
+  color: #5e2ced;
+}
+
+.regional-cities-directory > section:nth-child(2) > article:nth-child(3) header > svg {
+  background: rgb(231 11 133 / 7%);
+  color: #b71b72;
+}
+
+.regional-cities-directory > section:nth-child(2) > article:nth-child(4) header > svg {
+  background: rgb(242 112 53 / 9%);
+  color: #b65325;
+}
+
+.regional-cities-directory > section:nth-child(3) {
+  background:
+    radial-gradient(circle at 100% 0, rgb(24 189 205 / 8%), transparent 22rem),
+    linear-gradient(145deg, #fff 0%, #f7fbfb 100%);
+}
+
+.regional-cities-directory > section:nth-child(3) li {
+  min-height: 44px;
+  background: rgb(255 255 255 / 76%);
+}
+
+@media (max-width: 720px) {
+  .regional-cities-directory > section:first-child {
+    background:
+      radial-gradient(circle at 0 100%, rgb(24 189 205 / 9%), transparent 17rem),
+      linear-gradient(145deg, #f8fcfc, #fff 64%, #f9f7ff);
+  }
+}
+
+@media (forced-colors: active) {
+  .regional-cities-directory > section:first-child,
+  .regional-cities-directory > section:nth-child(2) > article,
+  .regional-cities-directory > section:nth-child(3),
+  .regional-cities-directory > section:first-child > div,
+  .regional-cities-directory > section:nth-child(3) li {
+    background: Canvas;
+    color: CanvasText;
+  }
+}
