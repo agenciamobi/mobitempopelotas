@@ -33,7 +33,7 @@ function point(time: string, temperature: number, direction: number, rain: numbe
   };
 }
 
-test("MET Norway fallback preserves atmospheric and directional hourly fields", async () => {
+test("MET Norway fallback preserves atmospheric, directional and daily identity fields", async () => {
   const originalFetch = globalThis.fetch;
   let userAgent = "";
 
@@ -72,6 +72,7 @@ test("MET Norway fallback preserves atmospheric and directional hourly fields", 
     assert.equal(result.hourly[0]?.cloudCoverLow, 62);
     assert.equal(result.hourly[0]?.cloudCoverMid, 35);
     assert.equal(result.hourly[0]?.cloudCoverHigh, 18);
+    assert.equal(result.daily[0]?.dateIso, "2026-08-21");
   } finally {
     globalThis.fetch = originalFetch;
   }
