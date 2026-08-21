@@ -12,12 +12,20 @@ const todayHeroRefinement = readFileSync(
   "src/components/weather/TodayRetailHeroRefinement.css",
   "utf8",
 );
+const tomorrowHeroCss = readFileSync(
+  "src/components/weather/TomorrowRetailHero.css",
+  "utf8",
+);
 const sevenDayHeroCss = readFileSync(
   "src/components/weather/SevenDayRetailHero.css",
   "utf8",
 );
 const sevenDayHero = readFileSync(
   "src/components/weather/SevenDayRetailHero.tsx",
+  "utf8",
+);
+const rainHeroCss = readFileSync(
+  "src/components/weather/RainRetailHero.css",
   "utf8",
 );
 
@@ -57,14 +65,23 @@ test("lazy internal weather sections cannot restore legacy gradients or shadows"
   assert.match(barrier, /border-radius:\s*var\(--route-editorial-radius\) !important/);
 });
 
-test("Today and 7-day heroes may use deliberate color while Tomorrow and Rain stay flat", () => {
+test("retail forecast heroes may use deliberate color without restoring old outer chrome", () => {
+  for (const namespace of [
+    "internal-weather-shell--today",
+    "internal-weather-shell--tomorrow",
+    "internal-weather-shell--seven-day",
+    "internal-weather-shell--rain",
+  ]) {
+    assert.match(barrier, new RegExp(`\\.${namespace}`));
+  }
+
   assert.match(
     barrier,
-    /\.internal-weather-shell--today,[\s\S]*?\.internal-weather-shell--seven-day[\s\S]*?:is\(\.today-retail-hero, \.seven-day-retail-hero\)[\s\S]*?box-shadow:\s*none !important/,
+    /:is\(\.today-retail-hero, \.tomorrow-retail-hero, \.seven-day-retail-hero, \.rain-retail-hero\)[\s\S]*?border:\s*0 !important[\s\S]*?box-shadow:\s*none !important/,
   );
-  assert.match(
+  assert.doesNotMatch(
     barrier,
-    /\.internal-weather-shell--tomorrow,[\s\S]*?\.internal-weather-shell--rain[\s\S]*?:is\(\.tomorrow-retail-hero, \.rain-retail-hero\)[\s\S]*?background-image:\s*none !important/,
+    /:is\(\.tomorrow-retail-hero, \.rain-retail-hero\)[\s\S]*?background-image:\s*none !important/,
   );
   assert.match(
     barrier,
@@ -83,6 +100,16 @@ test("Today hero uses a controlled chromatic break and differentiated summary ti
   assert.match(todayHeroRefinement, /\.today-retail-hero__tiles article\.is-sun/);
 });
 
+test("Tomorrow hero keeps warm planning accents without returning to a promotional megacard", () => {
+  assert.match(tomorrowHeroCss, /warmer planning accent/);
+  assert.match(tomorrowHeroCss, /\.tomorrow-retail-hero[\s\S]*?radial-gradient[\s\S]*?linear-gradient/);
+  assert.match(tomorrowHeroCss, /\.tomorrow-retail-hero__current[\s\S]*?min-height:\s*21\.5rem/);
+  assert.match(tomorrowHeroCss, /\.tomorrow-retail-hero__tiles article:first-child/);
+  assert.match(tomorrowHeroCss, /\.tomorrow-retail-hero__tiles article\.is-rain/);
+  assert.match(tomorrowHeroCss, /\.tomorrow-retail-hero__tiles article\.is-wind/);
+  assert.match(tomorrowHeroCss, /\.tomorrow-retail-hero__tiles article\.is-sun/);
+});
+
 test("7-day hero has a concise weekly hierarchy and semantic color accents", () => {
   assert.match(sevenDayHero, /Previsão de <span>7 dias<\/span> para Pelotas/);
   assert.match(sevenDayHero, /className="is-maximum"/);
@@ -97,6 +124,20 @@ test("7-day hero has a concise weekly hierarchy and semantic color accents", () 
   assert.match(sevenDayHeroCss, /\.seven-day-retail-hero__tiles article\.is-rain/);
   assert.match(sevenDayHeroCss, /\.seven-day-retail-hero__tiles article\.is-cold/);
   assert.match(sevenDayHeroCss, /\.seven-day-retail-hero__tiles article\.is-source/);
+});
+
+test("Rain hero uses a cool monitoring palette and keeps adjacent readings distinct", () => {
+  assert.match(rainHeroCss, /cool monitoring accent/);
+  assert.match(rainHeroCss, /\.rain-retail-hero[\s\S]*?radial-gradient[\s\S]*?linear-gradient/);
+  assert.match(
+    rainHeroCss,
+    /\.today-retail-hero__primary[\s\S]*?linear-gradient\(135deg, #168fa3 0%, #5e2ced 100%\)/,
+  );
+  assert.match(rainHeroCss, /\.rain-retail-hero__current[\s\S]*?min-height:\s*21\.5rem/);
+  assert.match(rainHeroCss, /\.rain-retail-hero__tiles article\.is-rain/);
+  assert.match(rainHeroCss, /\.rain-retail-hero__tiles article:nth-child\(2\)/);
+  assert.match(rainHeroCss, /\.rain-retail-hero__tiles article\.is-wind/);
+  assert.match(rainHeroCss, /\.rain-retail-hero__tiles article\.is-sun/);
 });
 
 test("climate and hydrology custom heroes follow the Home split-surface contract", () => {
