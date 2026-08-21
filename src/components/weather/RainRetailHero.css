@@ -1,9 +1,34 @@
-/* Chuva em Pelotas — retail hero variation. */
+/* Chuva em Pelotas — retail hero variation with a cool monitoring accent. */
 .rain-retail-hero {
+  padding: clamp(1.7rem, 3vw, 2.8rem) 0;
   background:
-    radial-gradient(circle at 7% 10%, rgb(24 189 205 / 10%), transparent 28rem),
-    radial-gradient(circle at 96% 8%, rgb(94 44 237 / 9%), transparent 30rem),
-    linear-gradient(180deg, #f8fbfb 0%, #f3f7f8 100%);
+    radial-gradient(circle at 7% 8%, rgb(24 189 205 / 20%), transparent 25rem),
+    radial-gradient(circle at 96% 6%, rgb(94 44 237 / 14%), transparent 29rem),
+    radial-gradient(circle at 72% 100%, rgb(22 143 163 / 9%), transparent 30rem),
+    linear-gradient(135deg, #eefafb 0%, #ffffff 48%, #f4f3ff 100%);
+}
+
+.rain-retail-hero__inner {
+  grid-template-columns: minmax(0, 0.92fr) minmax(500px, 1.08fr);
+  gap: clamp(1.8rem, 3.2vw, 3.3rem);
+}
+
+.rain-retail-hero .today-retail-hero__eyebrow {
+  color: #087f91;
+}
+
+.rain-retail-hero .today-retail-hero__eyebrow i {
+  background: linear-gradient(135deg, #18bdcd, #5e2ced);
+  box-shadow: 0 0 0 0.28rem rgb(24 189 205 / 12%);
+}
+
+.rain-retail-hero__copy h1 {
+  max-width: 10.8ch;
+  font-size: clamp(2.85rem, 4.7vw, 4.75rem);
+  font-weight: 720;
+  line-height: 0.94;
+  letter-spacing: -0.065em;
+  text-wrap: balance;
 }
 
 .rain-retail-hero__copy h1 span {
@@ -11,41 +36,94 @@
 }
 
 .rain-retail-hero__copy > p {
-  max-width: 44rem;
+  max-width: 40rem;
+  color: #496471;
+  font-size: clamp(0.92rem, 1.05vw, 1.04rem);
+  line-height: 1.62;
+  text-wrap: pretty;
+}
+
+.rain-retail-hero .today-retail-hero__badges > span,
+.rain-retail-hero .today-retail-hero__badges > a {
+  min-height: 2.1rem;
+  font-size: 0.64rem;
+}
+
+.rain-retail-hero .today-retail-hero__primary {
+  background: linear-gradient(135deg, #168fa3 0%, #5e2ced 100%);
+  box-shadow: 0 12px 26px rgb(22 143 163 / 20%);
+}
+
+.rain-retail-hero__showcase {
+  gap: 0.8rem;
 }
 
 .rain-retail-hero__current {
-  min-height: 25rem;
+  min-height: 21.5rem;
+  border-radius: 1.2rem;
+  background: linear-gradient(145deg, #07384a 0%, #075f6a 46%, #351d78 100%);
+  box-shadow: 0 16px 34px rgb(7 95 106 / 16%);
 }
 
 .rain-retail-hero__current .today-retail-hero__current-photo {
   background:
-    linear-gradient(180deg, rgb(6 26 44 / 14%), rgb(6 24 42 / 58%)),
-    linear-gradient(145deg, rgb(28 92 132 / 30%), rgb(72 34 200 / 42%)),
+    linear-gradient(180deg, rgb(6 26 44 / 10%), rgb(6 24 42 / 56%)),
+    linear-gradient(145deg, rgb(28 92 132 / 25%), rgb(72 34 200 / 34%)),
     var(--today-retail-hero-photo) var(--today-retail-hero-position, center) / cover no-repeat;
 }
 
-.rain-retail-hero__current .today-retail-hero__weather-icon {
+.rain-retail-hero__current .today-retail-hero__weather-icon,
+.rain-retail-hero__current .today-retail-hero__weather-icon svg,
+.rain-retail-hero__current .today-retail-hero__current-metrics svg {
   color: #76f3eb;
 }
 
 .rain-retail-hero__current-main > div:last-child > strong {
-  font-size: clamp(4.2rem, 6.5vw, 7rem);
+  font-size: clamp(3.8rem, 6vw, 5.8rem);
 }
 
 .rain-retail-hero__current-main > div:last-child > small {
   display: block;
   margin-top: 0.28rem;
   color: rgb(255 255 255 / 66%);
-  font-size: clamp(0.76rem, 0.72rem + 0.08vw, 0.84rem);
+  font-size: clamp(0.74rem, 0.7rem + 0.08vw, 0.82rem);
 }
 
+/* Chance, volume, vento e fonte são leituras distintas e ficam lado a lado. */
 .rain-retail-hero__tiles article {
-  min-height: 8.3rem;
+  min-height: 6.6rem;
+  padding: 0.82rem;
+  border-color: rgb(7 30 47 / 8%);
+  box-shadow: none;
+}
+
+.rain-retail-hero__tiles article.is-rain {
+  border-color: rgb(94 44 237 / 12%);
+  background: #f7f4ff;
+}
+
+.rain-retail-hero__tiles article:nth-child(2) {
+  border-color: rgb(24 189 205 / 14%);
+  background: #f1fbfc;
+}
+
+.rain-retail-hero__tiles article.is-wind {
+  border-color: rgb(231 11 133 / 11%);
+  background: #fff4f9;
+}
+
+.rain-retail-hero__tiles article.is-sun {
+  border-color: rgb(7 30 47 / 9%);
+  background: #f7f9fa;
 }
 
 .rain-retail-hero__tiles article > strong {
-  font-size: clamp(1rem, 1.35vw, 1.35rem);
+  font-size: clamp(0.95rem, 1.2vw, 1.22rem);
+}
+
+.rain-retail-hero__tiles article.is-sun > strong {
+  font-size: clamp(0.68rem, 0.9vw, 0.84rem);
+  line-height: 1.25;
 }
 
 .internal-weather-shell--rain .rain-retail-hero__inner {
@@ -57,19 +135,68 @@
   box-sizing: border-box;
 }
 
+.rain-retail-hero.today-retail-hero--attention .today-retail-hero__primary,
+.rain-retail-hero.today-retail-hero--warning .today-retail-hero__primary {
+  background: linear-gradient(135deg, #ef5b4d, #cf342c);
+  box-shadow: 0 12px 26px rgb(207 52 44 / 20%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rain-retail-hero .today-retail-hero__primary:hover {
+    box-shadow: 0 15px 30px rgb(22 143 163 / 26%);
+  }
+}
+
+@media (max-width: 1160px) {
+  .rain-retail-hero__inner {
+    grid-template-columns: minmax(0, 0.84fr) minmax(460px, 1.16fr);
+    gap: 1.7rem;
+  }
+}
+
 @media (max-width: 920px) {
+  .rain-retail-hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .rain-retail-hero__current {
-    min-height: 22rem;
+    min-height: 20rem;
   }
 }
 
 @media (max-width: 700px) {
+  .rain-retail-hero {
+    padding: 1.2rem 0;
+    background:
+      radial-gradient(circle at 0 0, rgb(24 189 205 / 18%), transparent 18rem),
+      radial-gradient(circle at 100% 8%, rgb(94 44 237 / 12%), transparent 20rem),
+      linear-gradient(150deg, #effafb, #fff 58%, #f5f4ff);
+  }
+
+  .rain-retail-hero__copy h1 {
+    max-width: 11ch;
+    font-size: clamp(2.35rem, 11.6vw, 3.45rem);
+    line-height: 0.97;
+  }
+
+  .rain-retail-hero__current {
+    min-height: 0;
+    padding: 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 12px 26px rgb(7 95 106 / 13%);
+  }
+
   .rain-retail-hero__current-main > div:last-child > strong {
-    font-size: clamp(3.6rem, 18vw, 5.2rem);
+    font-size: clamp(3.4rem, 16vw, 4.8rem);
   }
 }
 
 @media (forced-colors: active) {
+  .rain-retail-hero,
+  .rain-retail-hero__tiles article {
+    background: Canvas;
+  }
+
   .rain-retail-hero__current .today-retail-hero__current-photo {
     display: none;
   }
