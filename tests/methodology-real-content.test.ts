@@ -8,6 +8,10 @@ const refinement = readFileSync(
   "src/components/methodology/MethodologyPageRefinement.css",
   "utf8",
 );
+const homeContract = readFileSync(
+  "src/components/methodology/MethodologyHomeContract.css",
+  "utf8",
+);
 
 test("a rota de metodologia consulta todas as integrações meteorológicas e hidrológicas ativas", () => {
   assert.match(route, /getWeatherIntelligence\(\)/);
@@ -79,4 +83,15 @@ test("a camada visual remove blur e segue a composição editorial responsiva", 
   assert.match(refinement, /content-visibility:\s*auto/);
   assert.match(refinement, /@media \(max-width: 680px\)/);
   assert.match(refinement, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
+test("metodologia preserva cor com geometria editorial mais contida", () => {
+  assert.match(route, /MethodologyHomeContract\.css/);
+  assert.match(homeContract, /\.methodology-hero[\s\S]*radial-gradient[\s\S]*linear-gradient/);
+  assert.match(homeContract, /border-radius:\s*16px/);
+  assert.match(homeContract, /\.methodology-hero[\s\S]*box-shadow:\s*none/);
+  assert.match(homeContract, /\.methodology-source-card[\s\S]*border-top:\s*3px solid #18bdcd/);
+  assert.match(homeContract, /data-category="hydrology"[\s\S]*border-top-color:\s*#5e2ced/);
+  assert.match(homeContract, /\.methodology-pipeline[\s\S]*border-radius:\s*16px/);
+  assert.doesNotMatch(homeContract, /!important/);
 });
