@@ -6,6 +6,7 @@ import {
   HydrologyOverviewHero,
   HydrologyOverviewV2,
 } from "@/components/hydrology/HydrologyOverviewV2";
+import "@/components/hydrology/HydrologyOverviewHomeContract.css";
 import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
 import { HYDROLOGY_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
