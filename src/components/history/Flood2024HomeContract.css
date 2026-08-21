@@ -1,0 +1,101 @@
+/*
+ * Enchente de 2024 — registro histórico com acento hidrológico documental.
+ * A cor diferencia contexto histórico de monitoramento atual sem transformar
+ * o evento em linguagem promocional ou sugerir que estes são níveis presentes.
+ */
+
+.internal-weather-shell--flood-history .tp-flood-hero {
+  background:
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 10%), transparent 26rem),
+    radial-gradient(circle at 100% 0, rgb(94 44 237 / 7%), transparent 28rem),
+    linear-gradient(145deg, #f6fbfc 0%, #fff 57%, #f7f6ff 100%);
+}
+
+.internal-weather-shell--flood-history .tp-flood-hero__copy > span {
+  color: #087f91;
+}
+
+.internal-weather-shell--flood-history .tp-flood-hero__summary {
+  gap: 8px;
+  border-top: 0;
+}
+
+.internal-weather-shell--flood-history .tp-flood-hero__summary > div {
+  padding: 16px 18px;
+  border: 1px solid rgb(7 30 47 / 9%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 72%);
+}
+
+.internal-weather-shell--flood-history .tp-flood-hero__summary > div:nth-child(1) {
+  border-color: rgb(24 189 205 / 15%);
+  background: #f1fbfc;
+}
+
+.internal-weather-shell--flood-history .tp-flood-hero__summary > div:nth-child(2) {
+  border-color: rgb(94 44 237 / 11%);
+  background: #f8f6ff;
+}
+
+.internal-weather-shell--flood-history .tp-flood-hero__summary > div:nth-child(3) {
+  border-color: rgb(49 95 112 / 11%);
+  background: #f5f8f9;
+}
+
+.internal-weather-shell--flood-history .tp-flood-history__index a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.internal-weather-shell--flood-history .tp-flood-history__chain {
+  border-color: rgb(8 127 145 / 16%);
+  background:
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 7%), transparent 22rem),
+    linear-gradient(145deg, #f5fbfc, #fff 68%);
+  box-shadow: none;
+}
+
+.internal-weather-shell--flood-history .tp-flood-path__step {
+  background: #fff;
+}
+
+.internal-weather-shell--flood-history .tp-flood-path__step:nth-child(3),
+.internal-weather-shell--flood-history .tp-flood-path__step:nth-child(4) {
+  background: #f8f6ff;
+}
+
+.internal-weather-shell--flood-history .tp-flood-path__step:nth-child(5),
+.internal-weather-shell--flood-history .tp-flood-path__step:nth-child(6),
+.internal-weather-shell--flood-history .tp-flood-path__step:nth-child(7),
+.internal-weather-shell--flood-history .tp-flood-path__step:nth-child(8) {
+  background: #f2fbfc;
+}
+
+.internal-weather-shell--flood-history .tp-flood-related__links a {
+  min-height: 44px;
+}
+
+@media (max-width: 720px) {
+  .internal-weather-shell--flood-history .tp-flood-hero {
+    background:
+      radial-gradient(circle at 0 100%, rgb(24 189 205 / 8%), transparent 18rem),
+      linear-gradient(145deg, #f6fbfc, #fff 64%, #f8f7ff);
+  }
+
+  .internal-weather-shell--flood-history .tp-flood-hero__summary > div {
+    border-radius: 11px;
+  }
+}
+
+@media (forced-colors: active) {
+  .internal-weather-shell--flood-history :is(
+    .tp-flood-hero,
+    .tp-flood-hero__summary > div,
+    .tp-flood-history__chain,
+    .tp-flood-path__step
+  ) {
+    background: Canvas;
+    color: CanvasText;
+  }
+}
