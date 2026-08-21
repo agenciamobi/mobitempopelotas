@@ -20,6 +20,12 @@ function metric(value: number | null, suffix = "") {
     : `${regionalNumberFormat.format(value)}${suffix}`;
 }
 
+function gustMetric(value: number | null) {
+  if (value === null || !Number.isFinite(value)) return "Não informada";
+  if (value <= 0) return "Sem rajadas";
+  return `${regionalNumberFormat.format(value)} km/h`;
+}
+
 function maximum(values: Array<number | null>) {
   const usable = values.filter((value): value is number => value !== null && Number.isFinite(value));
   return usable.length > 0 ? Math.max(...usable) : null;
@@ -42,9 +48,11 @@ export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
   const city = data.city;
   const current = data.current;
   const today = data.daily[0] ?? null;
+  const hasHourlyForecast = Boolean(today && data.hourly.length > 0);
+  const hasDailyTrend = data.daily.length > 1;
   const priorityAlert = selectPriorityRegionalAlert(data.alerts.items);
   const condition = current?.condition ?? "Condição em atualização";
-  const peakRain = data.hourly.slice(0, 24).reduce<(typeof data.hourly)[number] | null>(
+  const peakRainCandidate = data.hourly.slice(0, 24).reduce<(typeof data.hourly)[number] | null>(
     (selected, hour) => {
       if (hour.rainChance === null) return selected;
       if (!selected || (hour.rainChance ?? -1) > (selected.rainChance ?? -1)) return hour;
@@ -52,15 +60,45 @@ export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
     },
     null,
   );
+  const highestRainChance = peakRainCandidate?.rainChance ?? null;
+  const hasPositiveRainChance = (highestRainChance ?? 0) > 0;
+  const peakRain = hasPositiveRainChance ? peakRainCandidate : null;
   const strongestGust = maximum(data.hourly.slice(0, 24).map((hour) => hour.windGust));
   const currentIcon = regionalWeatherIcon(condition, current?.observedAt ?? null);
-  const peakRainDetail = peakRain
-    ? `por volta de ${formatRegionalHour(peakRain.time)}${
-        peakRain.precipitationMm === null
-          ? ""
-          : ` · ${metric(peakRain.precipitationMm, " mm")}`
-      }`
-    : "Horário de maior chance ainda não informado";
+  const peakRainDetail =
+    highestRainChance === null
+      ? "Chance horária em atualização"
+      : hasPositiveRainChance && peakRain
+        ? `por volta de ${formatRegionalHour(peakRain.time)}${
+            peakRain.precipitationMm === null
+              ? ""
+              : ` · ${metric(peakRain.precipitationMm, " mm")}`
+          }`
+        : "Sem horário de destaque";
+  const currentDetail = current
+    ? current.feelsLike === null
+      ? `${condition} · sensação não informada`
+      : `${condition} · sensação de ${metric(current.feelsLike, "°")}`
+    : "Estimativa atual em atualização";
+  const description = current && hasHourlyForecast
+    ? "Compare a condição estimada agora com temperatura, chuva e vento previstos para as próximas horas e veja a tendência dos próximos dias no município."
+    : hasHourlyForecast || hasDailyTrend
+      ? "A estimativa atual pode estar em atualização. Consulte a previsão disponível para as próximas horas ou dias do município."
+      : "Os dados meteorológicos deste município estão em atualização. Nenhum valor foi preenchido manualmente.";
+
+  const primaryAction = hasHourlyForecast ? (
+    <a href="#previsao-hoje">
+      Ver as próximas horas <ArrowRight aria-hidden="true" />
+    </a>
+  ) : hasDailyTrend ? (
+    <a href="#tendencia">
+      Ver próximos dias <ArrowRight aria-hidden="true" />
+    </a>
+  ) : (
+    <Link to="/tempo-na-regiao-sul-rs">
+      Ver central regional <ArrowRight aria-hidden="true" />
+    </Link>
+  );
 
   return (
     <WeatherSplitHero
@@ -73,12 +111,10 @@ export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
       }
       eyebrow={`Previsão local · ${city.group}`}
       title={`Como o tempo deve mudar em ${city.name}.`}
-      description="Compare a condição estimada agora com temperatura, chuva e vento previstos para as próximas horas e veja a tendência dos próximos dias no município."
+      description={description}
       actions={
         <>
-          <a href="#previsao-hoje">
-            Ver as próximas horas <ArrowRight aria-hidden="true" />
-          </a>
+          {primaryAction}
           <a href="#avisos-municipais">Avisos oficiais</a>
         </>
       }
@@ -86,12 +122,12 @@ export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
       badgeIcon={<WeatherIcon name={currentIcon} title={`Condição estimada: ${condition}`} />}
       badgeLabel={priorityAlert ? `Aviso oficial para ${city.name}` : condition}
       updatedLabel={formatRegionalDateTime(data.source.fetchedAt)}
-      currentLabel="Temperatura agora"
+      currentLabel={current ? "Temperatura agora" : "Estimativa atual"}
       currentValue={metric(current?.temperature ?? null, "°")}
-      currentDetail={`${condition} · sensação de ${metric(current?.feelsLike ?? null, "°")}`}
+      currentDetail={currentDetail}
       highlightIcon={<CloudRain aria-hidden="true" />}
       highlightLabel="Maior chance de chuva nas próximas 24h"
-      highlightValue={metric(peakRain?.rainChance ?? null, "%")}
+      highlightValue={metric(highestRainChance, "%")}
       highlightDetail={peakRainDetail}
       facts={[
         {
@@ -102,7 +138,7 @@ export function RegionalCityHero({ data }: { data: RegionalCityWeatherData }) {
         },
         {
           label: "Rajada mais forte",
-          value: metric(strongestGust, " km/h"),
+          value: gustMetric(strongestGust),
         },
       ]}
       footer="Estimativa do modelo para as coordenadas centrais do município. Avisos oficiais têm prioridade."
