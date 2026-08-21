@@ -99,6 +99,81 @@
   box-shadow: none;
 }
 
+/* Corpo da leitura: a medição continua sendo o dado principal, sem painel escuro. */
+.site-shell--topic .hydrology-editorial-route :is(
+  .hydrology-level-card,
+  .hydrology-weather-context,
+  .hydrology-flow,
+  .hydrology-sources
+) {
+  border-color: rgb(7 30 47 / 10%);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.site-shell--topic .hydrology-editorial-route .hydrology-level-main {
+  border: 1px solid rgb(7 30 47 / 10%);
+  border-radius: 14px;
+  color: #071e2f;
+  background: #fbfcfc;
+}
+
+.site-shell--topic .hydrology-editorial-route .hydrology-level-value > svg {
+  color: #087f91;
+}
+
+.site-shell--topic .hydrology-editorial-route .hydrology-level-value strong {
+  color: #071e2f;
+}
+
+.site-shell--topic .hydrology-editorial-route .hydrology-level-value span,
+.site-shell--topic .hydrology-editorial-route .hydrology-trend span {
+  color: #58717d;
+}
+
+.site-shell--topic .hydrology-editorial-route .hydrology-trend {
+  border-color: rgb(7 30 47 / 10%);
+  color: #071e2f;
+  background: #fff;
+}
+
+.site-shell--topic .hydrology-editorial-route .hydrology-trend > svg {
+  color: #087f91;
+}
+
+.site-shell--topic .hydrology-editorial-route :is(
+  .hydrology-chart,
+  .hydrology-chart-empty,
+  .hydrology-level-metrics article,
+  .hydrology-weather-grid article,
+  .hydrology-flow-grid article,
+  .hydrology-sources-grid article
+) {
+  border-color: rgb(7 30 47 / 10%);
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.site-shell--topic .hydrology-editorial-route :is(
+  .hydrology-level-metrics article,
+  .hydrology-weather-grid article,
+  .hydrology-flow-grid article,
+  .hydrology-sources-grid article
+) {
+  background: #fbfcfc;
+}
+
+/* Avisos e estados da fonte permanecem semânticos. */
+.site-shell--topic .hydrology-editorial-route :is(
+  .hydrology-source-status,
+  .hydrology-interpretation-warning,
+  .hydrology-safety-note,
+  .hydrology-method
+) {
+  box-shadow: none;
+}
+
 @media (max-width: 720px) {
   .site-shell--topic .hydrology-editorial-hero {
     grid-template-columns: minmax(0, 1fr);
@@ -123,5 +198,15 @@
   .site-shell--topic .hydrology-editorial-card {
     padding: 0;
     border-radius: 0;
+  }
+
+  .site-shell--topic .hydrology-editorial-route :is(
+    .hydrology-level-card,
+    .hydrology-weather-context,
+    .hydrology-flow,
+    .hydrology-sources,
+    .hydrology-level-main
+  ) {
+    border-radius: 12px;
   }
 }
