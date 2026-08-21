@@ -12,6 +12,7 @@ import { fallbackWeatherData } from "./weather-data.ts";
 
 const OPEN_METEO_URL = "https://open-meteo.com/";
 const REQUEST_TIMEOUT_MS = 12_000;
+const HOURLY_RECOVERY_LIMIT = 24;
 const sourceLabels = {
   embrapa: "Embrapa",
   inmet: "INMET",
@@ -35,6 +36,12 @@ function numberArray(value: unknown): Array<number | null> | null {
     value.every((item) => item === null || (typeof item === "number" && Number.isFinite(item)))
     ? value
     : null;
+}
+
+function arrayNumber(values: Array<number | null> | null, index: number, digits = 0) {
+  const value = values?.[index];
+  if (value === null || value === undefined) return null;
+  return digits === 0 ? Math.round(value) : Number(value.toFixed(digits));
 }
 
 function presentation(code: number | null, isDay = true): WeatherIconName {
@@ -79,15 +86,28 @@ function normalizeHourly(payload: OpenMeteoPayload): HourlyForecast[] | null {
 
   const times = stringArray(hourly.time);
   const temperatures = numberArray(hourly.temperature_2m);
-  const precipitation = numberArray(hourly.precipitation_probability);
+  const precipitationProbability = numberArray(hourly.precipitation_probability);
+  const precipitationMm = numberArray(hourly.precipitation);
   const windSpeed = numberArray(hourly.wind_speed_10m);
   const windGusts = numberArray(hourly.wind_gusts_10m);
+  const windDirection = numberArray(hourly.wind_direction_10m);
   const weatherCodes = numberArray(hourly.weather_code);
   const isDay = numberArray(hourly.is_day);
+  const relativeHumidity = numberArray(hourly.relative_humidity_2m);
+  const dewPoint = numberArray(hourly.dew_point_2m);
+  const pressure = numberArray(hourly.pressure_msl);
+  const visibility = numberArray(hourly.visibility);
+  const cloudCover = numberArray(hourly.cloud_cover);
+  const cloudCoverLow = numberArray(hourly.cloud_cover_low);
+  const cloudCoverMid = numberArray(hourly.cloud_cover_mid);
+  const cloudCoverHigh = numberArray(hourly.cloud_cover_high);
+  const cape = numberArray(hourly.cape);
+  const boundaryLayerHeight = numberArray(hourly.boundary_layer_height);
+
   if (
     !times ||
     !temperatures ||
-    !precipitation ||
+    !precipitationProbability ||
     !windSpeed ||
     !windGusts ||
     !weatherCodes ||
@@ -102,25 +122,43 @@ function normalizeHourly(payload: OpenMeteoPayload): HourlyForecast[] | null {
   );
   const result: HourlyForecast[] = [];
 
-  for (let offset = 0; offset < 7; offset += 1) {
+  for (let offset = 0; offset < HOURLY_RECOVERY_LIMIT; offset += 1) {
     const index = start + offset;
     const time = times[index];
     const temperature = temperatures[index];
     const speed = windSpeed[index];
-    if (!time || temperature === null || speed === null) return null;
+    if (!time || temperature === null || speed === null) break;
 
     result.push({
       time: clockLabel(time, offset),
+      timestamp: time,
       temperature: Math.round(temperature),
       precipitation:
-        precipitation[index] === null ? null : Math.round(precipitation[index] as number),
+        precipitationProbability[index] === null
+          ? null
+          : Math.round(precipitationProbability[index] as number),
+      precipitationMm: arrayNumber(precipitationMm, index, 1),
       windSpeed: Math.round(speed),
       windGust: windGusts[index] === null ? null : Math.round(windGusts[index] as number),
+      windDirectionDegrees: arrayNumber(windDirection, index),
       icon: presentation(weatherCodes[index] ?? null, isDay[index] !== 0),
+      relativeHumidity: arrayNumber(relativeHumidity, index),
+      dewPoint: arrayNumber(dewPoint, index, 1),
+      pressure: arrayNumber(pressure, index),
+      visibilityKm:
+        visibility?.[index] === null || visibility?.[index] === undefined
+          ? null
+          : Number(((visibility[index] as number) / 1_000).toFixed(1)),
+      cloudCover: arrayNumber(cloudCover, index),
+      cloudCoverLow: arrayNumber(cloudCoverLow, index),
+      cloudCoverMid: arrayNumber(cloudCoverMid, index),
+      cloudCoverHigh: arrayNumber(cloudCoverHigh, index),
+      cape: arrayNumber(cape, index),
+      boundaryLayerHeight: arrayNumber(boundaryLayerHeight, index),
     });
   }
 
-  return result;
+  return result.length ? result : null;
 }
 
 function normalizeDaily(payload: OpenMeteoPayload): DailyForecast[] | null {
@@ -212,8 +250,26 @@ function createForecastUrl() {
     precipitation_unit: "mm",
     cell_selection: "land",
     current: "temperature_2m",
-    hourly:
-      "temperature_2m,precipitation_probability,wind_speed_10m,wind_gusts_10m,weather_code,is_day",
+    hourly: [
+      "temperature_2m",
+      "relative_humidity_2m",
+      "dew_point_2m",
+      "precipitation_probability",
+      "precipitation",
+      "pressure_msl",
+      "visibility",
+      "cloud_cover",
+      "cloud_cover_low",
+      "cloud_cover_mid",
+      "cloud_cover_high",
+      "cape",
+      "boundary_layer_height",
+      "wind_speed_10m",
+      "wind_gusts_10m",
+      "wind_direction_10m",
+      "weather_code",
+      "is_day",
+    ].join(","),
     daily:
       "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_gusts_10m_max",
   });
@@ -304,11 +360,24 @@ export function recoverWeatherIntelligenceFromOpenMeteo(
   );
   const hourly = production.hourly.map((hour) => ({
     time: hour.time === "Próxima hora" ? "Agora" : hour.time,
+    timestamp: hour.timestamp,
     temperature: hour.temperature,
     precipitationProbability: hour.precipitation,
+    precipitationMm: hour.precipitationMm,
     windSpeed: hour.windSpeed,
     windGust: hour.windGust,
+    windDirectionDegrees: hour.windDirectionDegrees,
     icon: hour.icon,
+    relativeHumidity: hour.relativeHumidity,
+    dewPoint: hour.dewPoint,
+    pressure: hour.pressure,
+    visibilityKm: hour.visibilityKm,
+    cloudCover: hour.cloudCover,
+    cloudCoverLow: hour.cloudCoverLow,
+    cloudCoverMid: hour.cloudCoverMid,
+    cloudCoverHigh: hour.cloudCoverHigh,
+    cape: hour.cape,
+    boundaryLayerHeight: hour.boundaryLayerHeight,
   }));
   const daily = reconciledDaily.map((day) => ({
     weekday: day.weekday,
