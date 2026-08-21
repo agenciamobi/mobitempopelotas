@@ -144,6 +144,54 @@ test("meteogram page provides coordinated controls and practical readings", () =
   assert.match(page, /Esta página mostra previsão, não medição/);
 });
 
+test("meteogram fog assessment does not fabricate humidity cloud or visibility defaults", () => {
+  assert.match(page, /function fogSupportDetail/);
+  assert.match(page, /const hasSupportingSignal =/);
+  assert.match(page, /Ponto de orvalho próximo, mas faltam dados complementares/);
+  assert.match(page, /Umidade, nuvens baixas e visibilidade não foram informadas para completar a avaliação/);
+  assert.doesNotMatch(page, /candidate\.visibilityKm \?\? 99/);
+  assert.doesNotMatch(page, /candidate\.cloudCoverLow \?\? 0/);
+  assert.doesNotMatch(page, /candidate\.relativeHumidity \?\? 0/);
+});
+
+test("meteogram precipitation totals distinguish complete partial and unavailable hours", () => {
+  assert.match(page, /const availableHours = hours\.filter\(\(hour\) => hour\.precipitationMm !== null\)/);
+  assert.match(page, /const complete = availableHours\.length === hours\.length/);
+  assert.match(page, /Volume não informado no período/);
+  assert.match(page, /em \$\{availableHours\.length\} de \$\{hours\.length\} horários/);
+  assert.match(page, /volume não informado/);
+  assert.match(page, /const precipitationHours = hours\.filter\(\(hour\) => hour\.precipitationMm !== null\)/);
+  assert.match(page, /const hasCompletePrecipitationWindow = precipitationHours\.length === hours\.length/);
+  assert.match(page, /Soma parcial:/);
+  assert.doesNotMatch(page, /total \+ \(hour\.precipitationMm \?\? 0\)/);
+  assert.doesNotMatch(page, /Math\.max\(3, \(\(hour\.precipitationMm \?\? 0\)/);
+});
+
+test("meteogram zero rain and zero gust do not create fake peak actions", () => {
+  assert.match(page, /function positiveMaximumHour/);
+  assert.match(page, /const maximumRain = positiveMaximumHour/);
+  assert.match(page, /const maximumGust = positiveMaximumHour/);
+  assert.match(page, /maximumRainValue === 0[\s\S]*Sem horário de destaque/);
+  assert.match(page, /maximumGustValue === 0[\s\S]*Sem horário de destaque/);
+  assert.match(page, /disabled=\{!maximumRain\}/);
+  assert.match(page, /Sem pico de chuva/);
+  assert.match(page, /disabled=\{!maximumGust\}/);
+  assert.match(page, /Sem rajada prevista/);
+  assert.match(page, /function formatGust/);
+});
+
+test("meteogram selected hour labels missing detail instead of printing dash as published data", () => {
+  assert.match(page, /function selectedRainDetail/);
+  assert.match(page, /Volume horário não informado/);
+  assert.match(page, /function selectedWindDetail/);
+  assert.match(page, /Direção não informada/);
+  assert.match(page, /Rajada: \$\{formatGust\(hour\.windGust\)\}/);
+  assert.match(page, /function selectedCloudDetail/);
+  assert.match(page, /Cobertura total não informada/);
+  assert.match(page, /function selectedBoundaryLayerDetail/);
+  assert.match(page, /Altura da camada próxima ao solo não informada/);
+});
+
 test("meteogram keeps atmospheric forecast separate from observation and hydrology", () => {
   assert.match(page, /As medições da[\s\S]*Embrapa aparecem separadamente/);
   assert.match(page, /Valores futuros não são chuva já medida/);
