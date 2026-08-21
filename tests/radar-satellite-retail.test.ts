@@ -11,7 +11,11 @@ const refinementStyles = readFileSync(
   "src/components/redemet/RedemetRetailRefinement.css",
   "utf8",
 );
-const styles = `${baseStyles}\n${refinementStyles}\n${contextStyles}`;
+const emptyStateStyles = readFileSync(
+  "src/components/redemet/RedemetEmptyStatePolish.css",
+  "utf8",
+);
+const styles = `${baseStyles}\n${refinementStyles}\n${emptyStateStyles}\n${contextStyles}`;
 const visibleCopy = `${route}\n${page}\n${context}`;
 
 const remValues = [...styles.matchAll(/font-size:\s*(0\.\d+)rem/g)].map((match) =>
@@ -20,7 +24,7 @@ const remValues = [...styles.matchAll(/font-size:\s*(0\.\d+)rem/g)].map((match) 
 
 test("radar route uses direct SEO copy and page-specific editorial content", () => {
   assert.match(route, /Radar e satélite em Pelotas/);
-  assert.match(route, /horário, sequência de imagens e comparação com a previsão por hora/);
+  assert.match(route, /horário, sequência, janela temporal, cadência observada/);
   assert.match(route, /RADAR_PAGE_CONTENT/);
   assert.match(route, /Acompanhe chuva, nuvens e trovoadas na região de Pelotas/);
   assert.match(route, /Como usar a reprodução automática das imagens/);
@@ -30,6 +34,7 @@ test("radar route uses direct SEO copy and page-specific editorial content", () 
   assert.match(route, /createFaqPageJsonLd\(PAGE_PATH, RADAR_PAGE_CONTENT\.faqs\)/);
   assert.match(route, /className="radar-satellite-page"/);
   assert.match(route, /Sequência de imagens de radar/);
+  assert.match(route, /RedemetEmptyStatePolish\.css/);
 });
 
 test("radar page provides image times and actionable guidance", () => {
@@ -55,7 +60,7 @@ test("radar page provides image times and actionable guidance", () => {
   assert.doesNotMatch(visibleCopy, /grade de previsão/i);
 });
 
-test("image and storm timelines include playback and recovery controls", () => {
+test("image and storm timelines use the correct vocabulary", () => {
   assert.match(page, /useFramePlayback/);
   assert.match(page, /FRAME_INTERVAL_MS/);
   assert.match(page, /window\.setInterval/);
@@ -67,7 +72,30 @@ test("image and storm timelines include playback and recovery controls", () => {
   assert.match(page, /playback\.showLatest/);
   assert.match(page, /playback\.selectFrame/);
   assert.match(page, /redemet-storm-controls/);
-  assert.match(page, /Registrada em \{formatDateTime\(selectedFrame\.observedAt\)\}/);
+  assert.match(page, /Horário \{playback\.selectedIndex \+ 1\} de \{layer\.frames\.length\}/);
+  assert.match(page, /Horário mais recente/);
+  assert.match(page, /Horário consultado:/);
+  assert.match(page, /subject="reading"/);
+});
+
+test("unavailable imagery is compact and does not impersonate a viewer", () => {
+  assert.match(page, /is-unavailable-state/);
+  assert.match(page, /Não há uma imagem utilizável nesta atualização/);
+  assert.match(page, /não entregou um quadro utilizável nesta consulta/);
+  assert.match(emptyStateStyles, /\.redemet-layer-card\.is-unavailable-state/);
+  assert.match(emptyStateStyles, /min-height:\s*clamp\(190px, 20vw, 250px\)/);
+  assert.match(emptyStateStyles, /\.redemet-satellite-section \.redemet-layers[\s\S]*align-items:\s*start/);
+});
+
+test("storm zero state means no detections, not no data", () => {
+  assert.match(page, /mode="sequence"/);
+  assert.match(page, /Sequência disponível/);
+  assert.match(page, /Nenhuma descarga detectada no horário selecionado/);
+  assert.match(page, /nenhuma descarga detectada/);
+  assert.match(page, /is-zero-detections/);
+  assert.match(page, /Isso não equivale a ausência de risco/);
+  assert.match(emptyStateStyles, /\.redemet-storm-card\.is-zero-detections/);
+  assert.doesNotMatch(page, /Trovoadas registradas no horário selecionado/);
 });
 
 test("radar, satellite and storms remain explicitly distinct", () => {
@@ -75,8 +103,8 @@ test("radar, satellite and storms remain explicitly distinct", () => {
   assert.match(page, /Áreas de chuva na região de Pelotas/);
   assert.match(page, /Nuvens sobre a Região Sul/);
   assert.match(page, /Nuvens no satélite não significam necessariamente chuva/);
-  assert.match(page, /Trovoadas registradas no horário selecionado/);
-  assert.match(page, /Uma trovoada detectada não é um aviso meteorológico/);
+  assert.match(page, /Descargas elétricas detectadas no horário selecionado/);
+  assert.match(page, /Uma descarga elétrica detectada não é um aviso meteorológico/);
   assert.match(page, /não confirma chuva em um endereço específico/);
   assert.match(page, /As imagens ajudam a acompanhar o tempo, mas não definem o risco sozinhas/);
 });
