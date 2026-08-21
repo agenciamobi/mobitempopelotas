@@ -62,11 +62,12 @@ test("páginas regionais reutilizam os componentes aprovados das páginas intern
 
 test("primeira dobra regional segue a composição dividida da página de vento", () => {
   assert.match(heroSource, /title={`Como o tempo deve mudar em \$\{city\.name\}\.\`}/);
-  assert.match(heroSource, /currentLabel="Temperatura agora"/);
+  assert.match(heroSource, /currentLabel=\{current \? "Temperatura agora" : "Estimativa atual"\}/);
   assert.match(heroSource, /highlightLabel="Maior chance de chuva nas próximas 24h"/);
   assert.match(heroSource, /label: "Faixa prevista hoje"/);
   assert.match(heroSource, /label: "Rajada mais forte"/);
   assert.match(heroSource, /href="#previsao-hoje"/);
+  assert.match(heroSource, /href="#tendencia"/);
   assert.match(heroSource, /href="#avisos-municipais"/);
   assert.match(splitHeroSource, /weather-split-hero__copy/);
   assert.match(splitHeroSource, /weather-split-hero__card/);
@@ -75,6 +76,28 @@ test("primeira dobra regional segue a composição dividida da página de vento"
   assert.match(splitHeroCss, /linear-gradient\(145deg, #102437, #18334f 58%, #25375c\)/);
   assert.match(splitHeroCss, /@media \(max-width: 980px\)/);
   assert.match(heroCss, /\.regional-city-split-hero/);
+});
+
+test("hero regional não inventa pico de chuva, rajada ou leitura atual", () => {
+  assert.match(heroSource, /const highestRainChance = peakRainCandidate\?\.rainChance \?\? null/);
+  assert.match(heroSource, /const hasPositiveRainChance = \(highestRainChance \?\? 0\) > 0/);
+  assert.match(heroSource, /const peakRain = hasPositiveRainChance \? peakRainCandidate : null/);
+  assert.match(heroSource, /Sem horário de destaque/);
+  assert.match(heroSource, /function gustMetric/);
+  assert.match(heroSource, /if \(value <= 0\) return "Sem rajadas"/);
+  assert.match(heroSource, /Estimativa atual em atualização/);
+  assert.match(heroSource, /Nenhum valor foi preenchido manualmente/);
+});
+
+test("hero regional escolhe CTA conforme a série realmente disponível", () => {
+  assert.match(heroSource, /const hasHourlyForecast = Boolean\(today && data\.hourly\.length > 0\)/);
+  assert.match(heroSource, /const hasDailyTrend = data\.daily\.length > 1/);
+  assert.match(heroSource, /hasHourlyForecast \? \(/);
+  assert.match(heroSource, /Ver as próximas horas/);
+  assert.match(heroSource, /hasDailyTrend \? \(/);
+  assert.match(heroSource, /Ver próximos dias/);
+  assert.match(heroSource, /to="\/tempo-na-regiao-sul-rs"/);
+  assert.match(heroSource, /Ver central regional/);
 });
 
 test("camada local regional clareia o hero sem alterar WeatherSplitHero compartilhado", () => {
@@ -106,6 +129,14 @@ test("navegação regional usa os mesmos capítulos da previsão de hoje", () =>
   assert.match(pageSource, /label=\{`Navegação da previsão para \$\{city\.name\}`\}/);
 });
 
+test("índice regional esconde capítulos cujo alvo não foi renderizado", () => {
+  assert.match(accentCss, /not\(:has\(#previsao-hoje\)\)/);
+  assert.match(accentCss, /a\[href="#previsao-hoje"\]/);
+  assert.match(accentCss, /not\(:has\(#tendencia\)\)/);
+  assert.match(accentCss, /a\[href="#tendencia"\]/);
+  assert.doesNotMatch(accentCss, /!important/);
+});
+
 test("aviso municipal segue o mesmo contrato visual do painel INMET interno", () => {
   assert.match(pageSource, /home-inmet-alerts/);
   assert.match(pageSource, /home-inmet-alerts__main/);
@@ -118,6 +149,10 @@ test("previsão regional é adaptada sem duplicar a grade meteorológica", () =>
   assert.match(adapterSource, /ForecastStoryData/);
   assert.match(adapterSource, /formatRegionalHour\(hour\.time\)/);
   assert.match(adapterSource, /regionalWeatherIcon\(hour\.condition, hour\.time\)/);
+  assert.match(adapterSource, /precipitationProbability: hour\.rainChance/);
+  assert.match(adapterSource, /precipitationMm: hour\.precipitationMm/);
+  assert.match(adapterSource, /windGust: hour\.windGust/);
+  assert.match(adapterSource, /dateIso: day\.date/);
   assert.match(forecastStorySource, /context\?: "home" \| "today-page" \| "regional-page"/);
   assert.match(forecastStorySource, /locationName\?: string/);
   assert.match(forecastStorySource, /hour\.precipitationMm/);
