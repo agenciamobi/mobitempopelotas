@@ -12,7 +12,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-import { HourlyRainVolume } from "@/components/weather/HourlyRainVolume";
 import type { WeatherIconName } from "@/lib/weather/types";
 
 import "./HomeForecastStory.css";
@@ -90,9 +89,8 @@ function formatMetric(value: number | null, suffix = "") {
   return value === null || !Number.isFinite(value) ? "—" : `${formatNumber(value)}${suffix}`;
 }
 
-function hourlyVolumeLabel(value: number | null | undefined, index: number) {
-  if (value === undefined) return <HourlyRainVolume index={index} />;
-  if (value === null) return <small>Volume indisponível</small>;
+function hourlyVolumeLabel(value: number | null | undefined) {
+  if (value === null || value === undefined) return <small>Volume indisponível</small>;
   if (value <= 0) return <small>Sem volume relevante</small>;
   return <small>{formatNumber(value)} mm previstos</small>;
 }
@@ -255,7 +253,7 @@ export function HomeForecastStory({
                     <i aria-hidden="true">
                       <b style={{ width: `${rain.chance}%` }} />
                     </i>
-                    {hourlyVolumeLabel(hour.precipitationMm, index)}
+                    {hourlyVolumeLabel(hour.precipitationMm)}
                   </div>
                   <span className="home-hourly-wind">Rajada de até {gust} km/h</span>
                 </article>
