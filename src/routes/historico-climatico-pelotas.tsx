@@ -5,6 +5,7 @@ import {
   WeatherHistoryHero,
   WeatherHistoryPage,
 } from "@/components/history/WeatherHistoryPage";
+import "@/components/history/WeatherHistoryHomeContract.css";
 import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
 import { HISTORY_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
