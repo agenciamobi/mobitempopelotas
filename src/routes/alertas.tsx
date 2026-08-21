@@ -5,6 +5,7 @@ import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPag
 import { WeatherAlertsPage } from "@/components/weather/WeatherAlertsPage";
 import "@/components/weather/WeatherAlertsRefinements.css";
 import "@/components/weather/WeatherAlertsHomeContract.css";
+import "@/components/weather/WeatherAlertsAccentContract.css";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
