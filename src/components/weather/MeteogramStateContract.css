@@ -1,0 +1,31 @@
+/* Degraded-state affordances for meteogram controls. */
+.internal-weather-shell--meteogram .meteogram-quick-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+  color: #6f838d;
+  background: #f6f8f9;
+}
+
+.internal-weather-shell--meteogram .meteogram-quick-actions button:disabled svg {
+  color: #82949d;
+}
+
+.internal-weather-shell--meteogram .meteogram-volume.is-unavailable {
+  border-color: rgb(96 121 132 / 14%);
+  background: #f8fafb;
+}
+
+.internal-weather-shell--meteogram .meteogram-volume-grid article.is-unknown {
+  border-color: rgb(96 121 132 / 16%);
+  background: #f7f9fa;
+}
+
+@media (forced-colors: active) {
+  .internal-weather-shell--meteogram .meteogram-quick-actions button:disabled,
+  .internal-weather-shell--meteogram .meteogram-volume.is-unavailable,
+  .internal-weather-shell--meteogram .meteogram-volume-grid article.is-unknown {
+    border-color: GrayText;
+    color: GrayText;
+    background: Canvas;
+  }
+}
