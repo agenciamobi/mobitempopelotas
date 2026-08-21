@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
+import { InmetAlertCoverageDetails } from "@/components/weather/InmetAlertCoverageDetails";
 import { WeatherAlertsPage } from "@/components/weather/WeatherAlertsPage";
 import "@/components/weather/WeatherAlertsRefinements.css";
 import "@/components/weather/WeatherAlertsHomeContract.css";
@@ -12,7 +13,7 @@ import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.funct
 
 const PAGE_TITLE = "Alertas meteorológicos em Pelotas e região";
 const PAGE_DESCRIPTION =
-  "Consulte alertas meteorológicos oficiais do INMET para Pelotas e região, com nível de perigo, validade, municípios afetados e orientações de segurança.";
+  "Consulte alertas meteorológicos oficiais do INMET para Pelotas e região, com nível de perigo, validade, publicação, municípios afetados e orientações de segurança.";
 const PAGE_PATH = "/alertas";
 
 const ALERTS_PAGE_CONTENT = {
@@ -24,6 +25,7 @@ const ALERTS_PAGE_CONTENT = {
     "O alerta amarelo indica perigo potencial; o laranja indica perigo; e o vermelho indica grande perigo.",
     "Confira sempre os horários de início e término, porque um aviso programado ainda pode não estar em vigor.",
     "Um alerta regional ou estadual não significa, necessariamente, que todos os bairros de Pelotas terão o mesmo impacto.",
+    "A página preserva o horário de publicação, a validade e a lista territorial recebida do aviso oficial quando esses campos estão disponíveis no CAP/RSS do INMET.",
     "A ausência de alerta não elimina mudanças rápidas no tempo nem substitui o acompanhamento de radar e previsão.",
     "Quando a consulta ao INMET estiver indisponível, a página informa a falha em vez de interpretar a ausência de dados como ausência de risco.",
     "Em situação de risco, siga prioritariamente as orientações do INMET, da Defesa Civil e das autoridades locais.",
@@ -48,6 +50,11 @@ const ALERTS_PAGE_CONTENT = {
       question: "Um alerta para o Rio Grande do Sul inclui Pelotas?",
       answer:
         "Nem sempre. A página informa quando o aviso cita Pelotas diretamente e identifica separadamente avisos regionais ou estaduais relevantes para acompanhamento.",
+    },
+    {
+      question: "Onde vejo todos os municípios citados em um aviso?",
+      answer:
+        "Quando o aviso do INMET fornece a lista territorial, a seção de abrangência oficial detalhada permite expandir cada publicação e conferir os municípios e descrições de área recebidos da fonte, além do horário de publicação, início e término.",
     },
     {
       question: "O que fazer quando os dados do INMET estiverem indisponíveis?",
@@ -98,7 +105,9 @@ export const Route = createFileRoute("/alertas")({
           "Alerta vermelho do INMET",
           "Perigo potencial, perigo e grande perigo",
           "Validade de avisos meteorológicos",
+          "Horário de publicação de avisos",
           "Municípios afetados por alertas",
+          "Abrangência territorial de alertas do INMET",
           "Segurança meteorológica em Pelotas",
           "Defesa Civil e prevenção de riscos",
         ],
@@ -120,6 +129,7 @@ function AlertasPage() {
       showOfficialAlerts={false}
     >
       <WeatherAlertsPage data={weather} />
+      <InmetAlertCoverageDetails data={weather} />
       <EditorialContentSection id="como-interpretar-alertas" content={ALERTS_PAGE_CONTENT} />
     </InternalWeatherPageShell>
   );
