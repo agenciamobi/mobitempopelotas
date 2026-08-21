@@ -148,7 +148,7 @@ export function SevenDayRetailHero({
           </span>
 
           <h1 id="seven-day-retail-hero-title">
-            Previsão de 7 dias para Pelotas: <span>temperatura, chuva e vento.</span>
+            Previsão de <span>7 dias</span> para Pelotas
           </h1>
 
           <p>
