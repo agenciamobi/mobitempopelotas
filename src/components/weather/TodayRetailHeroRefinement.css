@@ -1,7 +1,15 @@
 /* Refinamento de hierarquia, legibilidade e densidade do hero de Tempo Hoje. */
+.internal-weather-shell--today .today-retail-hero {
+  padding: clamp(1.7rem, 3vw, 2.8rem) 0;
+  background:
+    radial-gradient(circle at 6% 0%, rgb(24 189 205 / 19%), transparent 24rem),
+    radial-gradient(circle at 96% 8%, rgb(94 44 237 / 16%), transparent 27rem),
+    linear-gradient(135deg, #f1fbfb 0%, #ffffff 49%, #f8f3ff 100%);
+}
+
 .today-retail-hero__inner {
-  grid-template-columns: minmax(0, 0.92fr) minmax(500px, 1.08fr);
-  gap: clamp(2.2rem, 4vw, 4.5rem);
+  grid-template-columns: minmax(0, 0.9fr) minmax(500px, 1.1fr);
+  gap: clamp(1.8rem, 3.2vw, 3.3rem);
 }
 
 .today-retail-hero__copy {
@@ -9,9 +17,9 @@
 }
 
 .today-retail-hero__copy h1 {
-  max-width: 10ch;
-  font-size: clamp(2.85rem, 5vw, 5.25rem);
-  font-weight: 700;
+  max-width: 10.2ch;
+  font-size: clamp(2.85rem, 4.8vw, 4.9rem);
+  font-weight: 720;
   letter-spacing: -0.065em;
   line-height: 0.94;
   text-wrap: balance;
@@ -36,8 +44,14 @@
   font-size: 0.78rem;
 }
 
+.today-retail-hero__showcase {
+  gap: 0.8rem;
+}
+
 .today-retail-hero__current {
-  min-height: 23rem;
+  min-height: 21rem;
+  border-radius: 1.2rem;
+  box-shadow: 0 16px 34px rgb(52 28 142 / 15%);
 }
 
 .today-retail-hero__current-metrics small {
@@ -48,6 +62,32 @@
   font-size: 0.76rem;
 }
 
+/*
+ * Cor é usada aqui como sinal de leitura, não como decoração espalhada.
+ * Os quatro resumos ficam próximos; tons discretos ajudam a separá-los.
+ */
+.today-retail-hero__tiles article {
+  min-height: 6.5rem;
+  border-color: rgb(7 30 47 / 8%);
+  background: #f3fbfc;
+  box-shadow: none;
+}
+
+.today-retail-hero__tiles article.is-rain {
+  border-color: rgb(94 44 237 / 12%);
+  background: #f7f4ff;
+}
+
+.today-retail-hero__tiles article.is-wind {
+  border-color: rgb(231 11 133 / 11%);
+  background: #fff4f9;
+}
+
+.today-retail-hero__tiles article.is-sun {
+  border-color: rgb(242 112 53 / 13%);
+  background: #fff8f3;
+}
+
 .today-retail-hero__tiles article > span,
 .today-retail-hero__tiles article > small {
   font-size: 0.54rem;
@@ -55,8 +95,8 @@
 
 @media (max-width: 1160px) {
   .today-retail-hero__inner {
-    grid-template-columns: minmax(0, 0.8fr) minmax(470px, 1.2fr);
-    gap: 2rem;
+    grid-template-columns: minmax(0, 0.82fr) minmax(460px, 1.18fr);
+    gap: 1.7rem;
   }
 }
 
@@ -72,15 +112,23 @@
   .today-retail-hero__copy h1 {
     max-width: 11ch;
   }
+
+  .today-retail-hero__current {
+    min-height: 20rem;
+  }
 }
 
 @media (max-width: 700px) {
-  .today-retail-hero {
-    padding: 1.25rem 0 1.2rem;
+  .internal-weather-shell--today .today-retail-hero {
+    padding: 1.2rem 0;
+    background:
+      radial-gradient(circle at 0 0, rgb(24 189 205 / 16%), transparent 18rem),
+      radial-gradient(circle at 100% 8%, rgb(94 44 237 / 13%), transparent 20rem),
+      linear-gradient(150deg, #f3fbfb, #fff 58%, #f8f4ff);
   }
 
   .today-retail-hero__inner {
-    gap: 1.1rem;
+    gap: 1rem;
   }
 
   .today-retail-hero__copy {
@@ -128,6 +176,8 @@
   .today-retail-hero__current {
     min-height: 0;
     padding: 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 12px 26px rgb(52 28 142 / 13%);
   }
 
   .today-retail-hero__current-content {
@@ -188,7 +238,7 @@
   }
 
   .today-retail-hero__tiles article {
-    min-height: 6.25rem;
+    min-height: 6rem;
     padding: 0.72rem;
   }
 }
