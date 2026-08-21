@@ -1,8 +1,11 @@
+import { isUsableRedemetObservedAt } from "./redemet-display-time";
+
 type RedemetCacheable = {
   configured: boolean;
   available: boolean;
   sourceLabel: string;
   error: string | null;
+  frames?: Array<{ observedAt: string | null }>;
 };
 
 type CacheEntry<T> = {
@@ -22,6 +25,12 @@ globalCache.__tempoPelotasRedemetLastGood = cache;
 
 const MAX_LAST_GOOD_AGE_MS = 2 * 60 * 60 * 1_000;
 
+function canPromoteToLastGood(value: RedemetCacheable) {
+  if (!value.available) return false;
+  if (!value.frames) return true;
+  return value.frames.some((frame) => isUsableRedemetObservedAt(frame.observedAt));
+}
+
 export async function withRedemetLastGood<T extends RedemetCacheable>(
   key: string,
   loader: () => Promise<T>,
@@ -29,7 +38,9 @@ export async function withRedemetLastGood<T extends RedemetCacheable>(
   const result = await loader();
 
   if (result.available) {
-    cache.set(key, { value: result, storedAt: Date.now() });
+    if (canPromoteToLastGood(result)) {
+      cache.set(key, { value: result, storedAt: Date.now() });
+    }
     return result;
   }
 
