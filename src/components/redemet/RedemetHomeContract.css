@@ -1,0 +1,281 @@
+/* Contrato visual final de Radar e Satélite com a linguagem editorial da Home. */
+
+.site-shell--topic .redemet-page {
+  --redemet-home-line: rgb(7 30 47 / 10%);
+  --redemet-home-soft: #fbfcfc;
+  --redemet-home-ink: #071e2f;
+  --redemet-home-muted: #58717d;
+}
+
+.site-shell--topic .redemet-hero {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.66fr);
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--redemet-home-line);
+  border-radius: 16px;
+  color: var(--redemet-home-ink);
+  background: #fff;
+  box-shadow: none;
+}
+
+.site-shell--topic .redemet-hero__copy {
+  display: grid;
+  align-content: center;
+  max-width: none;
+  padding: clamp(36px, 4.2vw, 60px) clamp(26px, 3.2vw, 42px);
+  background: #fff;
+}
+
+.site-shell--topic .redemet-hero > .redemet-hero__copy > p {
+  color: #087f91;
+}
+
+.site-shell--topic .redemet-hero h1,
+.site-shell--topic .redemet-hero h1 span {
+  max-width: 940px;
+  color: var(--redemet-home-ink);
+  font-size: clamp(2.55rem, 4.6vw, 5rem);
+  font-weight: 790;
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+}
+
+.site-shell--topic .redemet-hero > .redemet-hero__copy > span {
+  max-width: 76ch;
+  color: var(--redemet-home-muted);
+  font-size: clamp(0.94rem, 1.05vw, 1.04rem);
+  line-height: 1.65;
+}
+
+.site-shell--topic .redemet-hero__actions a {
+  min-height: 44px;
+  border-color: var(--redemet-home-line);
+  color: var(--redemet-home-ink);
+  background: #fff;
+  box-shadow: none;
+  transform: none;
+}
+
+.site-shell--topic .redemet-hero__actions a:first-child {
+  border-color: var(--redemet-home-ink);
+  color: #fff;
+  background: var(--redemet-home-ink);
+}
+
+.site-shell--topic .redemet-hero__actions a:hover {
+  border-color: rgb(24 189 205 / 32%);
+  transform: none;
+}
+
+.site-shell--topic .redemet-hero aside {
+  min-height: 0;
+  padding: clamp(28px, 3.2vw, 42px);
+  border: 0;
+  border-top: 0;
+  border-left: 1px solid var(--redemet-home-line);
+  border-radius: 0;
+  color: var(--redemet-home-ink);
+  background: var(--redemet-home-soft);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.site-shell--topic .redemet-hero aside svg {
+  color: #087f91;
+}
+
+.site-shell--topic .redemet-hero aside > span,
+.site-shell--topic .redemet-hero aside small {
+  color: var(--redemet-home-muted);
+}
+
+.site-shell--topic .redemet-hero aside strong {
+  max-width: none;
+  color: var(--redemet-home-ink);
+}
+
+.site-shell--topic .redemet-hero .redemet-freshness,
+.site-shell--topic .redemet-image-frame figcaption .redemet-freshness {
+  border-color: currentColor;
+  color: #17633b;
+  background: #eaf7ef;
+}
+
+.site-shell--topic .redemet-hero .redemet-freshness.is-attention,
+.site-shell--topic .redemet-image-frame[data-freshness="attention"] figcaption .redemet-freshness {
+  color: #8b5d00;
+  background: #fff8e5;
+}
+
+.site-shell--topic .redemet-hero .redemet-freshness.is-stale,
+.site-shell--topic .redemet-image-frame[data-freshness="stale"] figcaption .redemet-freshness {
+  color: #a3412d;
+  background: #fff1ed;
+}
+
+.site-shell--topic .redemet-hero .redemet-freshness.is-unknown {
+  color: #5d6d75;
+  background: #f3f6f7;
+}
+
+.site-shell--topic :is(
+  .redemet-page .internal-page-chapters,
+  .redemet-source-overview,
+  .redemet-layer-card,
+  .redemet-section-heading,
+  .redemet-storm-card,
+  .redemet-method-note,
+  .redemet-related > a
+) {
+  border-color: var(--redemet-home-line);
+  border-radius: 16px;
+  background-color: #fff;
+  background-image: none;
+  box-shadow: none;
+}
+
+.site-shell--topic .redemet-source-overview,
+.site-shell--topic .redemet-section-heading,
+.site-shell--topic .redemet-storm-card,
+.site-shell--topic .redemet-method-note {
+  padding: clamp(24px, 2.8vw, 38px);
+}
+
+.site-shell--topic .redemet-source-summary,
+.site-shell--topic .redemet-explainer article,
+.site-shell--topic .redemet-storm-reading,
+.site-shell--topic .redemet-frame-tools :is(button, a),
+.site-shell--topic .redemet-storm-controls > button {
+  border-color: var(--redemet-home-line);
+  border-radius: 14px;
+  background: var(--redemet-home-soft);
+  box-shadow: none;
+}
+
+.site-shell--topic .redemet-source-summary {
+  min-height: 0;
+}
+
+.site-shell--topic .redemet-explainer {
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--redemet-home-line);
+  border-radius: 16px;
+  background: #fff;
+}
+
+.site-shell--topic .redemet-explainer article {
+  min-height: 0;
+  border: 0;
+  border-right: 1px solid var(--redemet-home-line);
+  border-radius: 0;
+  background: #fff;
+}
+
+.site-shell--topic .redemet-explainer article:last-child {
+  border-right: 0;
+}
+
+.site-shell--topic .redemet-layer-card.is-featured > header,
+.site-shell--topic .redemet-layer-card.is-featured .redemet-frame-controls {
+  border-right-color: var(--redemet-home-line);
+}
+
+/* Imagens meteorológicas permanecem escuras: é área funcional de visualização. */
+.site-shell--topic .redemet-image-frame,
+.site-shell--topic .redemet-image-frame img,
+.site-shell--topic .redemet-image-frame figcaption {
+  box-shadow: none;
+}
+
+.site-shell--topic .redemet-frame-controls,
+.site-shell--topic .redemet-storm-controls {
+  border-color: var(--redemet-home-line);
+  background: #fff;
+}
+
+.site-shell--topic .redemet-frame-tools :is(button, a):hover,
+.site-shell--topic .redemet-related > a:hover {
+  border-color: rgb(24 189 205 / 28%);
+  box-shadow: none;
+  transform: none;
+}
+
+.site-shell--topic .redemet-method-note {
+  grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1fr) auto;
+}
+
+.site-shell--topic .redemet-method-note > a {
+  box-shadow: none;
+}
+
+@media (max-width: 920px) {
+  .site-shell--topic .redemet-hero,
+  .site-shell--topic .redemet-method-note {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .site-shell--topic .redemet-hero aside {
+    border-top: 1px solid var(--redemet-home-line);
+    border-left: 0;
+  }
+
+  .site-shell--topic .redemet-explainer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .site-shell--topic .redemet-explainer article:nth-child(2) {
+    border-right: 0;
+  }
+
+  .site-shell--topic .redemet-explainer article:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--redemet-home-line);
+  }
+}
+
+@media (max-width: 700px) {
+  .site-shell--topic .redemet-hero,
+  .site-shell--topic :is(
+    .redemet-page .internal-page-chapters,
+    .redemet-source-overview,
+    .redemet-layer-card,
+    .redemet-section-heading,
+    .redemet-storm-card,
+    .redemet-method-note,
+    .redemet-related > a
+  ),
+  .site-shell--topic .redemet-explainer {
+    border-radius: 12px;
+  }
+
+  .site-shell--topic .redemet-hero__copy,
+  .site-shell--topic .redemet-hero aside,
+  .site-shell--topic .redemet-source-overview,
+  .site-shell--topic .redemet-section-heading,
+  .site-shell--topic .redemet-storm-card,
+  .site-shell--topic .redemet-method-note {
+    padding: 22px 18px;
+  }
+
+  .site-shell--topic .redemet-hero h1 {
+    font-size: clamp(2.25rem, 11vw, 3.5rem);
+  }
+
+  .site-shell--topic .redemet-explainer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .site-shell--topic .redemet-explainer article,
+  .site-shell--topic .redemet-explainer article:nth-child(2) {
+    border-right: 0;
+    border-bottom: 1px solid var(--redemet-home-line);
+  }
+
+  .site-shell--topic .redemet-explainer article:last-child {
+    border-bottom: 0;
+  }
+}
