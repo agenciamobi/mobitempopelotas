@@ -5,6 +5,7 @@ import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPag
 import { MeteogramHero, MeteogramPage } from "@/components/weather/MeteogramPage";
 import "@/components/weather/MeteogramRefinement.css";
 import "@/components/weather/MeteogramHomeContract.css";
+import { SimagroModelProducts } from "@/components/weather/SimagroModelProducts";
 import { getPelotasMeteogram } from "@/lib/weather/meteogram.functions";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
@@ -12,7 +13,7 @@ import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.funct
 
 const PAGE_TITLE = "Previsão hora a hora em Pelotas";
 const PAGE_DESCRIPTION =
-  "Acompanhe temperatura, chuva, nuvens, visibilidade, pressão, vento, rajadas e possibilidade de tempestade nas próximas 24 ou 48 horas em Pelotas.";
+  "Acompanhe temperatura, chuva, nuvens, visibilidade, pressão, vento e tempestade nas próximas 24 ou 48 horas e compare produtos WRF/GFS do SIMAGRO RS para Pelotas.";
 const PAGE_PATH = "/meteograma-pelotas";
 
 const METEOGRAM_CONTENT = {
@@ -27,6 +28,7 @@ const METEOGRAM_CONTENT = {
     "A velocidade do vento representa o valor médio previsto; a rajada é um aumento breve e normalmente mais forte.",
     "O índice CAPE ajuda a avaliar a possibilidade de desenvolvimento de nuvens de tempestade. Um valor alto, sozinho, não confirma temporal.",
     "A previsão de 48 horas pode mudar conforme entram novas observações. Para decisões imediatas, confira os horários mais próximos e os avisos oficiais.",
+    "Os meteogramas WRF e GFS do SIMAGRO RS aparecem como produtos gráficos complementares. O Tempo Pelotas não extrai números dessas imagens nem mistura seus valores com a série estruturada da página.",
   ],
   faqs: [
     {
@@ -53,6 +55,11 @@ const METEOGRAM_CONTENT = {
       question: "Por que a previsão de 48 horas pode mudar?",
       answer:
         "Os modelos são recalculados quando recebem novas observações. Chuva, neblina, rajadas e tempestades podem mudar de horário ou intensidade conforme o momento se aproxima.",
+    },
+    {
+      question: "Por que o Tempo Pelotas mostra também meteogramas WRF e GFS do SIMAGRO RS?",
+      answer:
+        "Eles oferecem uma segunda leitura visual de modelagem para Pelotas. São exibidos como imagens oficiais da fonte, com identificação clara, e não substituem nem alteram os valores horários estruturados usados pelo Tempo Pelotas.",
     },
   ],
   relatedLinks: [
@@ -100,6 +107,10 @@ export const Route = createFileRoute("/meteograma-pelotas")({
           "Vento e rajadas por hora",
           "CAPE e possibilidade de tempestade",
           "Open-Meteo Best Match",
+          "SIMAGRO RS",
+          "Meteograma WRF para Pelotas",
+          "Meteograma GFS para Pelotas",
+          "Agrometeograma GFS para Pelotas",
         ],
       }),
       createFaqPageJsonLd(PAGE_PATH, METEOGRAM_CONTENT.faqs),
@@ -126,6 +137,7 @@ function MeteogramaPelotasPage() {
       hero={() => <MeteogramHero weather={weather} meteogram={meteogram} />}
     >
       <MeteogramPage weather={weather} meteogram={meteogram} />
+      <SimagroModelProducts />
       <EditorialContentSection id="como-interpretar-meteograma" content={METEOGRAM_CONTENT} />
     </InternalWeatherPageShell>
   );
