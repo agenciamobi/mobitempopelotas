@@ -21,6 +21,7 @@ import {
   deriveEmbrapaCurrent,
   getObservationAgeMinutes,
 } from "./current-observation";
+import { localForecastDateKey } from "./daily-temperature-reconciliation";
 
 const TIMEZONE = "America/Sao_Paulo";
 
@@ -222,12 +223,15 @@ function compareInmetForecasts(
   referenceKey: ForecastSourceKey,
 ) {
   const discrepancies: WeatherDiscrepancy[] = [];
-  const dailyByDate = new Map(daily.map((day) => [day.date.slice(0, 10), day]));
+  const dailyByDate = new Map(
+    daily.map((day, index) => [day.dateIso ?? localForecastDateKey(index), day]),
+  );
   const officialByDate = new Map<string, { minimum: number | null; maximum: number | null }>();
 
   for (const period of periods) {
-    if (!period.date) continue;
-    const current = officialByDate.get(period.date) ?? { minimum: null, maximum: null };
+    const date = period.date?.slice(0, 10);
+    if (!date) continue;
+    const current = officialByDate.get(date) ?? { minimum: null, maximum: null };
     const minimum =
       period.minimum === null
         ? current.minimum
@@ -240,7 +244,7 @@ function compareInmetForecasts(
         : current.maximum === null
           ? period.maximum
           : Math.max(current.maximum, period.maximum);
-    officialByDate.set(period.date, { minimum, maximum });
+    officialByDate.set(date, { minimum, maximum });
   }
 
   for (const [date, officialDay] of officialByDate) {
