@@ -75,12 +75,20 @@ function buildMetrics(days: DailyForecast[]): RetailMetric[] {
   }
 
   const minimum = Math.min(...days.map((day) => day.min));
-  const rainiest = days.reduce((current, day) =>
-    getRainScore(day) > getRainScore(current) ? day : current,
-  );
-  const windiest = days.reduce((current, day) =>
-    (day.windGust ?? -1) > (current.windGust ?? -1) ? day : current,
-  );
+  const rainChanceDays = days.filter((day) => day.rainChance !== null);
+  const rainiest = rainChanceDays.length
+    ? rainChanceDays.reduce((current, day) =>
+        (day.rainChance ?? -1) > (current.rainChance ?? -1) ? day : current,
+      )
+    : null;
+  const gustDays = days.filter((day) => day.windGust !== null);
+  const windiest = gustDays.length
+    ? gustDays.reduce((current, day) =>
+        (day.windGust ?? -1) > (current.windGust ?? -1) ? day : current,
+      )
+    : null;
+  const highestRainChance = rainiest?.rainChance ?? null;
+  const strongestGust = windiest?.windGust ?? null;
 
   return [
     {
@@ -91,14 +99,29 @@ function buildMetrics(days: DailyForecast[]): RetailMetric[] {
     },
     {
       label: "Maior chance de chuva",
-      value: formatValue(rainiest.rainChance, "%"),
-      detail: rainiest.weekday,
+      value: formatValue(highestRainChance, "%"),
+      detail:
+        highestRainChance === null
+          ? "chance não informada"
+          : highestRainChance === 0
+            ? "sem destaque de chuva"
+            : rainiest?.weekday ?? "na semana",
       icon: CloudRain,
     },
     {
       label: "Rajada mais forte",
-      value: formatValue(windiest.windGust, " km/h"),
-      detail: windiest.weekday,
+      value:
+        strongestGust === null
+          ? "—"
+          : strongestGust > 0
+            ? `${strongestGust} km/h`
+            : "Sem rajadas",
+      detail:
+        strongestGust === null
+          ? "não informadas"
+          : strongestGust > 0
+            ? windiest?.weekday ?? "na semana"
+            : "nos próximos dias",
       icon: Wind,
     },
   ];
@@ -110,6 +133,7 @@ export function SevenDayRetailHero({
   officialAlertCount = 0,
 }: SevenDayRetailHeroProps) {
   const days = weather.daily.slice(0, 7);
+  const hasDailyForecast = days.length > 0;
   const hasAlert = officialAlertCount > 0;
   const minimum = days.length ? Math.min(...days.map((day) => day.min)) : null;
   const maximum = days.length ? Math.max(...days.map((day) => day.max)) : null;
@@ -119,14 +143,19 @@ export function SevenDayRetailHero({
   const coldest = days.length
     ? days.reduce((current, day) => (day.min < current.min ? day : current))
     : null;
-  const rainiest = days.length
-    ? days.reduce((current, day) => (getRainScore(day) > getRainScore(current) ? day : current))
+  const highestVolumeDay = days.length
+    ? days.reduce((current, day) =>
+        day.precipitation > current.precipitation ? day : current,
+      )
     : null;
+  const hasPositiveRainVolume = (highestVolumeDay?.precipitation ?? 0) > 0;
   const rainyDays = days.filter(
     (day) => (day.rainChance ?? 0) >= 30 || day.precipitation >= 1,
   ).length;
   const iconName = choosePhotoIcon(days);
-  const condition = weatherConditionLabels[iconName];
+  const condition = hasDailyForecast
+    ? weatherConditionLabels[iconName]
+    : "Previsão semanal em atualização";
   const metrics = buildMetrics(days);
   const photo = getRetailWeatherPhoto(iconName, advisoryLevel);
   const photoStyle = {
@@ -152,8 +181,9 @@ export function SevenDayRetailHero({
           </h1>
 
           <p>
-            Compare mínima e máxima, chance e volume de chuva e rajadas previstos para cada dia.
-            Confirme novamente os dias mais distantes conforme eles se aproximarem.
+            {hasDailyForecast
+              ? "Compare mínima e máxima, chance e volume de chuva e rajadas previstos para cada dia. Confirme novamente os dias mais distantes conforme eles se aproximarem."
+              : "A previsão dos próximos dias está em atualização. Consulte novamente em alguns instantes para comparar temperatura, chuva e rajadas."}
           </p>
 
           <div className="today-retail-hero__badges" aria-label="Situação da previsão semanal">
@@ -188,7 +218,11 @@ export function SevenDayRetailHero({
             <div
               className="today-retail-hero__current-photo"
               role="img"
-              aria-label={photo.alt}
+              aria-label={
+                hasDailyForecast
+                  ? photo.alt
+                  : "Imagem ilustrativa da previsão meteorológica de Pelotas"
+              }
             />
 
             <div className="today-retail-hero__current-content">
@@ -204,7 +238,14 @@ export function SevenDayRetailHero({
 
               <div className="today-retail-hero__current-main">
                 <div className="today-retail-hero__weather-icon">
-                  <WeatherIcon name={iconName} title={`Condição de maior destaque da semana: ${condition}`} />
+                  <WeatherIcon
+                    name={iconName}
+                    title={
+                      hasDailyForecast
+                        ? `Condição de maior destaque da semana: ${condition}`
+                        : condition
+                    }
+                  />
                 </div>
                 <div>
                   <strong>
@@ -212,9 +253,11 @@ export function SevenDayRetailHero({
                   </strong>
                   <span>Faixa de temperatura dos próximos 7 dias</span>
                   <small>
-                    {rainyDays === 0
-                      ? "Sem dia com chuva relevante nesta atualização"
-                      : `${rainyDays} ${rainyDays === 1 ? "dia" : "dias"} com chance ou volume de chuva`}
+                    {!hasDailyForecast
+                      ? "Dados da semana em atualização"
+                      : rainyDays === 0
+                        ? "Sem dia com chuva relevante nesta atualização"
+                        : `${rainyDays} ${rainyDays === 1 ? "dia" : "dias"} com chance ou volume de chuva`}
                   </small>
                 </div>
               </div>
@@ -259,8 +302,20 @@ export function SevenDayRetailHero({
               <span>
                 <CloudRain aria-hidden="true" /> Maior volume de chuva
               </span>
-              <strong>{rainiest ? `${rainiest.precipitation} mm` : "—"}</strong>
-              <small>{rainiest?.weekday ?? "Em atualização"}</small>
+              <strong>
+                {!highestVolumeDay
+                  ? "—"
+                  : hasPositiveRainVolume
+                    ? `${highestVolumeDay.precipitation} mm`
+                    : "Sem volume previsto"}
+              </strong>
+              <small>
+                {!highestVolumeDay
+                  ? "Em atualização"
+                  : hasPositiveRainVolume
+                    ? highestVolumeDay.weekday
+                    : "nos próximos 7 dias"}
+              </small>
             </article>
 
             <article className="is-cold">
