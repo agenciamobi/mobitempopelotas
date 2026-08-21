@@ -1,6 +1,6 @@
 # Tempo Pelotas — estado atual do projeto
 
-Última atualização: 20/08/2026  
+Última atualização: 21/08/2026  
 Branch operacional: `main`  
 Domínio canônico: `https://tempopelotas.com.br`
 
@@ -31,12 +31,13 @@ O Tempo Pelotas é um portal meteorológico regional focado em Pelotas e Zona Su
 | Interface pública | Ativo | Home, páginas internas/dedicadas e páginas institucionais compartilham o mesmo header/footer editorial, rail de conteúdo e contrato de superfícies da Home; a rota histórica de 2024 foi corrigida para não duplicar o chrome global |
 | Home meteorológica | Ativo | Header e hero editoriais; próximas horas e tendência semanal em capítulos separados; tendência posicionada imediatamente antes da central de radar/satélite; alertas e blocos locais autocontidos |
 | Previsão hoje/amanhã/7 dias | Ativo | Páginas dedicadas e conteúdo indexável |
-| Chuva, vento e meteograma | Ativo | Visões temáticas e hora a hora |
-| Alertas oficiais | Ativo | INMET e conteúdo preventivo claramente separado |
+| Chuva, vento e meteograma | Ativo | Visões temáticas e hora a hora; `/meteograma-pelotas` também oferece comparação visual complementar com produtos WRF/GFS do SIMAGRO RS |
+| SIMAGRO RS | Ativo complementar / visual only | Meteogramas WRF, GFS e GFS Agro para Pelotas exibidos como PNG oficial da fonte; não há OCR, leitura de pixels ou incorporação desses gráficos ao feed numérico do portal |
+| Alertas oficiais | Ativo | INMET e conteúdo preventivo claramente separado; a rota `/alertas` preserva publicação, validade e abrangência territorial completa do CAP/RSS em detalhe progressivo quando disponível |
 | Estação Embrapa | Ativo | Observação local, timestamp e estado de atualidade |
-| Radar REDEMET | Ativo com dependência externa | Santiago (`sg`) é a estação operacional preferencial; Canguçu (`cn`) é fallback quando voltar a fornecer imagem |
+| Radar REDEMET | Ativo com dependência externa | Santiago (`sg`) é a estação operacional preferencial; Canguçu (`cn`) é fallback quando voltar a fornecer imagem; a página pública deriva janela temporal e cadência observada apenas de quadros com horário utilizável |
 | Satélite REDEMET | Ativo | Realçada, infravermelho e visível |
-| Trovoadas STSC | Ativo | Contrato atual da API REDEMET e filtro regional |
+| Trovoadas STSC | Ativo | Contrato atual da API REDEMET, filtro regional e contexto derivado de distância aproximada das ocorrências até Pelotas; nunca tratado como alerta oficial |
 | Mapa regional MapLibre | Ativo | Camadas de radar, satélite e trovoadas |
 | Hidrologia | Ativo | Laranjal, Lagoa dos Patos, Guaíba e rede regional |
 | Rede Hidrometeorológica Defesa Civil RS | Pesquisa / inventário | API GraphQL e contratos técnicos identificados; ainda não é fonte ativa do runtime público. Próximo passo é inventariar códigos, bacias e capacidades das estações e revisar condições de uso |
@@ -177,6 +178,7 @@ O núcleo meteorológico combina múltiplas fontes e regras de reconciliação, 
 - MET Norway: fonte complementar no domínio de previsão;
 - lógica centralizada para condição atual, hora a hora e dias seguintes;
 - páginas dedicadas para hoje, amanhã, sete dias, chuva, vento e meteograma;
+- `/meteograma-pelotas` mantém a série horária estruturada e acrescenta produtos WRF/GFS do SIMAGRO RS apenas como comparação visual identificada;
 - normalização de timezone para `America/Sao_Paulo` quando aplicável;
 - contratos para integridade de temperatura, precipitação, vento, rastreabilidade e disponibilidade.
 
@@ -198,6 +200,27 @@ O projeto possui:
 
 O texto meteorológico do CPPMet/UFPel é integrado como contexto editorial/local, com atribuição e fallback seguro.
 
+### SIMAGRO RS
+
+Documentação: `docs/SIMAGRO_RS_HAR_REVIEW.md` e `docs/HAR_PUBLIC_ENRICHMENT_2026-08-21.md`.
+
+O HAR analisado do SIMAGRO RS não revelou endpoint estruturado de séries numéricas para Pelotas, mas confirmou três produtos gráficos públicos:
+
+- meteograma WRF;
+- meteograma GFS;
+- agrometeograma GFS.
+
+Desde 21/08/2026 esses produtos são exibidos em `/meteograma-pelotas` como **visualização complementar de modelagem**.
+
+Regras permanentes desta camada:
+
+- somente o produto selecionado é renderizado no viewer;
+- os PNGs permanecem identificados como produtos do SIMAGRO RS;
+- o Tempo Pelotas não usa OCR, leitura de pixels ou inferência visual para transformar o gráfico em temperatura, chuva, vento, pressão, umidade ou qualquer outro valor numérico;
+- os dados horários estruturados da página continuam independentes;
+- indisponibilidade do PNG não torna o meteograma principal indisponível;
+- um futuro endpoint estruturado do SIMAGRO deverá entrar como integração separada, com proveniência, timeout, fallback e testes próprios.
+
 ### INMET
 
 O projeto usa INMET para:
@@ -206,6 +229,8 @@ O projeto usa INMET para:
 - produtos/fontes meteorológicas oficiais complementares;
 - mapa/registros de geadas;
 - satélite oficial complementar onde o fluxo específico utiliza essa fonte.
+
+O parser CAP/RSS preserva, quando fornecidos pela fonte, evento, headline, descrição, instruções, severidade, horário de publicação, início, término, áreas, municípios e códigos municipais. A rota `/alertas` mantém a leitura prioritária enxuta e oferece uma camada progressiva em que o visitante pode expandir cada publicação para conferir horários e a abrangência territorial completa recebida do INMET.
 
 Avisos oficiais são mantidos semanticamente separados de previsão e monitoramento informal.
 
@@ -227,7 +252,10 @@ Estado operacional consolidado em 18/08/2026:
 - um quadro só é aceito para o portal se os bounds cobrem Pelotas;
 - Canguçu com `path: null` não pode ser confundido com uma imagem válida de outra estação;
 - respostas indisponíveis usam cache curto para nova tentativa rápida;
-- último quadro válido pode ser usado por janela controlada para oscilações temporárias.
+- último quadro válido pode ser usado por janela controlada para oscilações temporárias;
+- a rota pública calcula quantidade de quadros com horário utilizável, janela temporal coberta e cadência mediana observada a partir dos timestamps da própria sequência.
+
+A cadência mostrada é uma leitura derivada da sequência disponível naquela consulta; não é tratada como SLA ou frequência garantida pela REDEMET. Timestamps futuros/incompatíveis são excluídos desses cálculos pelo mesmo contrato temporal usado no restante da página.
 
 HARs da REDEMET e evidência independente do SIGMA mostraram Canguçu sem imagem recente enquanto Santiago estava operacional no período analisado.
 
@@ -239,13 +267,15 @@ Produtos suportados:
 - infravermelho;
 - visível.
 
-A camada mantém timeline, timestamp, bounds e atribuição de origem.
+A camada mantém timeline, timestamp, bounds e atribuição de origem. A página pública também calcula janela e cadência observada dos quadros com horário utilizável, sem reinterpretar esses valores como compromisso de frequência da fonte.
 
 ### STSC / trovoadas
 
 O contrato atual usa o endpoint `produtos/stsc/0` observado no portal oficial, interpretando `data[]` com timestamps e `pontos` de latitude/longitude.
 
 O Tempo Pelotas filtra ocorrências em uma área regional de até 450 km de Pelotas. STSC é apresentado como monitoramento de atividade elétrica, nunca como alerta meteorológico oficial.
+
+A página pública usa as coordenadas já recebidas para calcular distância aproximada em linha reta até um ponto de referência de Pelotas e distribuir as ocorrências do quadro válido mais recente em três faixas: até 50 km, 50–150 km e 150–450 km. Essa distância serve apenas para localização contextual; não mede intensidade, não projeta trajetória e não substitui orientação ou aviso oficial.
 
 ### Proxy e segurança
 
@@ -323,10 +353,12 @@ Características atuais:
 - timeline/reprodução de quadros;
 - opacidade e legenda;
 - comparação contextual com previsão por hora;
+- janela temporal e cadência observada derivadas apenas de timestamps utilizáveis da sequência;
+- distância aproximada da atividade STSC até Pelotas, com faixas regionais derivadas das coordenadas da própria REDEMET;
 - proteção contra SSR/hidratação;
 - layout responsivo e controles de mapa.
 
-Na Home, o monitoramento é apresentado como uma **central Civic Tech / Scientific autocontida**. A tendência semanal encerra a leitura de previsão imediatamente antes do radar. A central usa barra plana de camadas para Radar, Satélite e Trovoadas, mapa como protagonista, timeline técnica clara separada visualmente da imagem, fonte/estado de disponibilidade visíveis e um guia editorial de interpretação. A rota `/radar-e-satelite-pelotas` continua sendo o aprofundamento público do tema.
+Na Home, o monitoramento é apresentado como uma **central Civic Tech / Scientific autocontida**. A tendência semanal encerra a leitura de previsão imediatamente antes do radar. A central usa barra plana de camadas para Radar, Satélite e Trovoadas, mapa como protagonista, timeline técnica clara separada visualmente da imagem, fonte/estado de disponibilidade visíveis e um guia editorial de interpretação. A rota `/radar-e-satelite-pelotas` continua sendo o aprofundamento público do tema e concentra as leituras derivadas adicionais sem transformar monitoramento em alerta ou previsão.
 
 ## 10. Câmeras
 
@@ -620,6 +652,7 @@ A suíte de contratos cobre, entre outros domínios:
 - fontes INMET;
 - reconciliação de temperatura;
 - REDEMET e contratos HAR;
+- enriquecimento público derivado dos HARs, incluindo SIMAGRO visual-only, profundidade temporal/atividade elétrica REDEMET e abrangência territorial detalhada do INMET;
 - coerência editorial da Home;
 - coesão visual entre Home e páginas internas/dedicadas;
 - páginas Hoje/Amanhã/7 dias/Chuva/Vento;
@@ -694,6 +727,8 @@ A integração pública com CPTEC/SIGMA foi deliberadamente adiada para revisão
 | `MIGRATION_MATRIX.md` | Matriz histórica de migração, paridade e critérios de aceite |
 | `MIGRATION.md` | Estratégia e histórico da migração |
 | `docs/REDEMET_OPERATIONS.md` | Fonte operacional da integração REDEMET |
+| `docs/HAR_PUBLIC_ENRICHMENT_2026-08-21.md` | Revisão sanitizada dos HARs recentes, oportunidades de conteúdo público, decisões de uso e fontes deliberadamente não ativadas |
+| `docs/SIMAGRO_RS_HAR_REVIEW.md` | Contrato da camada visual complementar WRF/GFS do SIMAGRO RS, sem uso numérico dos PNGs |
 | `docs/DEFESA_CIVIL_RS_HYDROMET_PLAN.md` | Pesquisa e plano de integração meteorológica/hidrológica da Rede da Defesa Civil RS; ainda sem consumo produtivo |
 | `docs/CPTEC_SIGMA_RESEARCH.md` | Pesquisa futura CPTEC/SIGMA, sem integração produtiva |
 | `docs/RUNTIME_READINESS.md` | Preflight e requisitos do runtime |
@@ -717,10 +752,11 @@ Estas são pendências de produto/operação, não funcionalidades inexistentes 
 2. reativar PWA/Web Push somente após validação controlada de navegador e rolagem;
 3. executar auditoria final WCAG 2.2 AA, Core Web Vitals e responsividade ampla;
 4. formalizar rollback de aplicação, banco, DNS e caches;
-5. continuar monitorando a disponibilidade das fontes externas, principalmente radar REDEMET e hidrologia regional;
+5. continuar monitorando a disponibilidade das fontes externas, principalmente radar REDEMET, produtos gráficos do SIMAGRO RS e hidrologia regional;
 6. retomar avaliação CPTEC/SIGMA em novembro/dezembro de 2026, sem assumir previamente autorização ou integração;
 7. concluir o inventário de estações da Rede Hidrometeorológica da Defesa Civil RS, revisar condições de uso e validar bacias/unidades antes de qualquer ativação pública;
-8. manter a limpeza de dívida histórica de lint/formatação separada de mudanças funcionais.
+8. concluir a validação operacional/semântica da ANA/RHN antes de qualquer promoção dessa fonte a leitura pública ativa;
+9. manter a limpeza de dívida histórica de lint/formatação separada de mudanças funcionais.
 
 ## 25. Regra de manutenção deste arquivo
 
@@ -1097,7 +1133,7 @@ A primeira versão paga deve ser forte o suficiente para justificar assinatura, 
 | Alertas oficiais | sempre públicos | públicos + contexto e personalização, sem substituir fonte oficial |
 | Lagoa/águas | nível e tendência principal | histórico, comparação, filtros e análise |
 | Histórico | visão pública limitada | histórico ampliado e comparação |
-| Modelos/fontes | fonte editorial consolidada | comparação explícita e divergências |
+| Modelos/fontes | fonte editorial consolidada + visualização complementar SIMAGRO quando aplicável | comparação explícita e divergências entre fontes estruturadas aprovadas |
 | IA | somente mecanismo público já existente e controlado | análises refinadas, quotas por utilidade e recursos personalizados |
 | Exportação | apenas direitos LGPD da conta | dados/relatórios do produto quando permitido |
 | Personalização | preferências básicas | dashboard, favoritos, alertas e configurações avançadas |
@@ -1129,6 +1165,7 @@ Princípios:
 - cobrar pela experiência, processamento, organização, histórico, comparação e interpretação desenvolvidos pelo Tempo Pelotas;
 - não extrair números por OCR de imagens para transformá-los em feed operacional sem endpoint estruturado e validação;
 - preservar atribuição visível;
+- a camada pública atual do SIMAGRO RS é `VIEW_ONLY`: produto gráfico complementar, sem incorporação ao feed numérico e sem pressupor autorização automática para uso como diferencial comercial do PRO;
 - manter CPTEC/SIGMA fora do runtime até a revisão institucional já planejada;
 - revisar qualquer nova camada REDEMET, INMET, ANA, SIMAGRO ou outra fonte antes de torná-la diferencial comercial.
 
