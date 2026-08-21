@@ -9,6 +9,10 @@ const refinement = readFileSync(
   "src/components/embrapa/EmbrapaStationPageV2Refinement.css",
   "utf8",
 );
+const homeContract = readFileSync(
+  "src/components/embrapa/EmbrapaStationHomeContract.css",
+  "utf8",
+);
 
 const stationSource = `${route}\n${page}`;
 
@@ -19,6 +23,8 @@ test("Embrapa route uses the shared shell and source-aware page", () => {
   assert.match(route, /EmbrapaStationHero/);
   assert.match(route, /EmbrapaStationPageV2/);
   assert.match(route, /EmbrapaStationPageV2Refinement\.css/);
+  assert.match(route, /EmbrapaStationHomeContract\.css/);
+  assert.ok(route.indexOf("EmbrapaStationHomeContract.css") > route.indexOf("EmbrapaStationPageV2Refinement.css"));
   assert.match(route, /pageClassName="internal-weather-shell--embrapa"/);
   assert.match(route, /showOfficialAlerts=\{false\}/);
   assert.match(route, /staleTime: 60 \* 1_000/);
@@ -123,4 +129,16 @@ test("Embrapa page follows the current responsive retail system", () => {
   assert.match(styles, /@media \(forced-colors: active\)/);
   assert.match(styles, /:focus-visible/);
   assert.doesNotMatch(styles, /font-size:\s*0\.[0-6][0-9]rem/);
+});
+
+test("Embrapa hero uses a local observation accent without overriding source health states", () => {
+  assert.match(homeContract, /identidade de observação local/i);
+  assert.match(homeContract, /\.embrapa-v2-hero__content[\s\S]*radial-gradient[\s\S]*linear-gradient/);
+  assert.match(homeContract, /\.embrapa-v2-reading[\s\S]*radial-gradient[\s\S]*linear-gradient/);
+  assert.match(homeContract, /\.embrapa-v2-reading__quick > span:nth-child\(1\)/);
+  assert.match(homeContract, /\.embrapa-v2-reading__quick > span:nth-child\(4\)/);
+  assert.match(homeContract, /\.embrapa-v2-hero__actions a:first-child[\s\S]*linear-gradient/);
+  assert.doesNotMatch(homeContract, /is-partial|is-stale|is-unavailable/);
+  assert.match(homeContract, /@media \(forced-colors: active\)/);
+  assert.doesNotMatch(homeContract, /!important/);
 });
