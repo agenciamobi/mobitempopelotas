@@ -5,10 +5,7 @@
   padding: clamp(1.35rem, 3vw, 2.5rem);
   border: 1px solid var(--internal-weather-line, rgb(7 30 47 / 10%));
   border-radius: var(--internal-weather-radius, 16px);
-  background:
-    radial-gradient(circle at 0 0, rgb(24 189 205 / 8%), transparent 20rem),
-    radial-gradient(circle at 100% 100%, rgb(231 11 133 / 5%), transparent 22rem),
-    #fff;
+  background: #fff;
   box-shadow: none;
 }
 
@@ -69,19 +66,8 @@
   padding: 1rem;
   border: 1px solid rgb(7 30 47 / 8%);
   border-radius: 13px;
-  background: #f2fbfc;
-}
-
-.internal-weather-shell--wind .wind-direction-context__summary article:nth-child(2) {
-  background: #f7f4ff;
-}
-
-.internal-weather-shell--wind .wind-direction-context__summary article:nth-child(3) {
-  background: #fff8f3;
-}
-
-.internal-weather-shell--wind .wind-direction-context__summary article:nth-child(4) {
-  background: #fff4f9;
+  background: #fbfcfc;
+  box-shadow: none;
 }
 
 .internal-weather-shell--wind .wind-direction-context__summary svg {
@@ -144,6 +130,7 @@
   border: 1px solid rgb(7 30 47 / 8%);
   border-radius: 12px;
   background: #fbfcfc;
+  box-shadow: none;
   scroll-snap-align: start;
 }
 
@@ -197,11 +184,12 @@
 
 .internal-weather-shell--wind .wind-direction-context__timeline dl > div {
   display: grid;
-  gap: 0.12rem;
   min-width: 0;
+  gap: 0.12rem;
   padding: 0.48rem;
+  border: 1px solid rgb(7 30 47 / 7%);
   border-radius: 9px;
-  background: #f3f7f8;
+  background: #fff;
 }
 
 .internal-weather-shell--wind .wind-direction-context__timeline dt {
@@ -221,6 +209,8 @@
   display: flex;
   align-items: flex-start;
   gap: 0.55rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgb(7 30 47 / 8%);
   color: #607984;
 }
 
