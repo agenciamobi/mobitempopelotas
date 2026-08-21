@@ -65,6 +65,16 @@ const hydrologyDetailHomeContract = readFileSync(
   "src/components/hydrology/HydrologyDetailHomeContract.css",
   "utf8",
 );
+const radarRoute = readFileSync("src/routes/radar-e-satelite-pelotas.tsx", "utf8");
+const redemetHomeContract = readFileSync(
+  "src/components/redemet/RedemetHomeContract.css",
+  "utf8",
+);
+const camerasRoute = readFileSync("src/routes/cameras-ao-vivo-pelotas.tsx", "utf8");
+const camerasHomeContract = readFileSync(
+  "src/components/cameras/CameraPageHomeContract.css",
+  "utf8",
+);
 
 test("homepage has left the old global override architecture", () => {
   const removedLayers = [
@@ -234,6 +244,8 @@ test("wind loads a route-local Home contract without flattening semantic alert s
   assert.match(windHomeContract, /\.wind-v3-hero-card\.is-strong/);
   assert.match(windHomeContract, /\.wind-v3-alert[\s\S]*rgb\(242 112 53 \/ 22%\)/);
   assert.match(windHomeContract, /\.wind-v3-interpretation[\s\S]*background:\s*#fff/);
+  assert.match(windHomeContract, /\.wind-v3-summary-grid article[\s\S]*border-top-width:\s*1px/);
+  assert.match(windHomeContract, /\.wind-v3-hourly-list article/);
   assert.doesNotMatch(windHomeContract, /radial-gradient|linear-gradient/);
   assert.doesNotMatch(windHomeContract, /!important/);
 });
@@ -250,7 +262,32 @@ test("Laranjal detail loads its Home contract last and removes the floating dark
   assert.match(hydrologyDetailHomeContract, /\.hydrology-editorial-card[\s\S]*box-shadow:\s*none/);
   assert.match(hydrologyDetailHomeContract, /\.hydrology-level-main[\s\S]*background:\s*#fbfcfc/);
   assert.match(hydrologyDetailHomeContract, /\.hydrology-source-status/);
+  assert.match(hydrologyDetailHomeContract, /\.laranjal-embed-guide[\s\S]*background:\s*#fff/);
+  assert.match(hydrologyDetailHomeContract, /\.laranjal-embed-guide-code[\s\S]*box-shadow:\s*none/);
   assert.match(hydrologyDetailHomeContract, /@media \(max-width: 720px\)/);
   assert.doesNotMatch(hydrologyDetailHomeContract, /radial-gradient|linear-gradient/);
   assert.doesNotMatch(hydrologyDetailHomeContract, /!important/);
+});
+
+test("radar route uses a local Home contract while preserving the dark image viewer", () => {
+  assert.match(radarRoute, /RedemetHomeContract\.css/);
+  assert.match(redemetHomeContract, /\.site-shell--topic \.redemet-hero/);
+  assert.match(redemetHomeContract, /grid-template-columns:\s*minmax\(0, 1\.12fr\) minmax\(320px, 0\.66fr\)/);
+  assert.match(redemetHomeContract, /\.redemet-hero aside[\s\S]*background:\s*var\(--redemet-home-soft\)/);
+  assert.match(redemetHomeContract, /\.redemet-explainer[\s\S]*box-shadow:\s*none/);
+  assert.match(redemetHomeContract, /Imagens meteorológicas permanecem escuras/);
+  assert.match(redemetHomeContract, /\.redemet-frame-tools :is\(button, a\):hover[\s\S]*transform:\s*none/);
+  assert.doesNotMatch(redemetHomeContract, /!important/);
+});
+
+test("cameras route uses a local Home contract without flattening the video player", () => {
+  assert.match(camerasRoute, /CameraPageHomeContract\.css/);
+  assert.match(camerasHomeContract, /\.internal-weather-shell--cameras \.camera-v2-hero/);
+  assert.match(camerasHomeContract, /grid-template-columns:\s*minmax\(0, 1\.12fr\) minmax\(320px, 0\.66fr\)/);
+  assert.match(camerasHomeContract, /\.camera-v2-featured[\s\S]*background:\s*var\(--camera-home-soft\)/);
+  assert.match(camerasHomeContract, /O player e a miniatura permanecem com fundo escuro/);
+  assert.match(camerasHomeContract, /\.camera-v2-responsibility[\s\S]*rgb\(242 112 53 \/ 22%\)/);
+  assert.match(camerasHomeContract, /\.camera-v2-actions a:first-child[\s\S]*background:\s*var\(--camera-home-ink\)/);
+  assert.doesNotMatch(camerasHomeContract, /radial-gradient|linear-gradient/);
+  assert.doesNotMatch(camerasHomeContract, /!important/);
 });
