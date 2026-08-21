@@ -118,7 +118,7 @@ function buildPeriods(hours: HourlyForecast[]) {
 }
 
 function statusLabel(status: PeriodStatus) {
-  if (status === "stable") return "Condições mais estáveis";
+  if (status === "stable") return "Condições estáveis";
   if (status === "moderate") return "Mudanças possíveis";
   if (status === "attention") return "Acompanhe antes de sair";
   return "Atenção reforçada";
@@ -126,7 +126,7 @@ function statusLabel(status: PeriodStatus) {
 
 function statusAdvice(status: PeriodStatus) {
   if (status === "stable")
-    return "É o período com menor combinação de chuva e vento na previsão atual.";
+    return "A chance de chuva é baixa e o vento fica abaixo dos limiares de atenção usados nesta página.";
   if (status === "moderate")
     return "As condições podem mudar; confira chuva e vento perto do horário de saída.";
   if (status === "attention")
@@ -136,7 +136,7 @@ function statusAdvice(status: PeriodStatus) {
 
 function hourRisk(hour: HourlyForecast) {
   return (
-    (hour.precipitationProbability ?? 25) +
+    (hour.precipitationProbability ?? 0) +
     Math.max(0, (hour.windGust ?? hour.windSpeed) - 25) * 2
   );
 }
@@ -168,14 +168,23 @@ function formatRain(value: number | null) {
   return value === null ? "—" : `${Math.round(value)}%`;
 }
 
+function formatGust(value: number | null) {
+  if (value === null) return "Não informada";
+  if (value <= 0) return "Sem rajada prevista";
+  return `${value} km/h`;
+}
+
 export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData }) {
   const periods = buildPeriods(data.weather.hourly);
   if (!periods.length) return null;
 
-  const periodScores = periods.map((period) => period.score);
-  const hasPeriodContrast = Math.max(...periodScores) > Math.min(...periodScores);
-  const bestPeriod = periods.reduce((best, period) =>
-    period.score < best.score ? period : best,
+  const comparablePeriods = periods.filter((period) => period.peakRain !== null);
+  const comparableScores = comparablePeriods.map((period) => period.score);
+  const hasPeriodContrast =
+    comparableScores.length > 1 && Math.max(...comparableScores) > Math.min(...comparableScores);
+  const bestPeriod = comparablePeriods.reduce<PeriodSummary | null>(
+    (best, period) => (!best || period.score < best.score ? period : best),
+    null,
   );
   const visibleHours = data.weather.hourly.slice(0, 12);
   const hourRisks = visibleHours.map((hour) => hourRisk(hour));
@@ -186,10 +195,17 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
         null,
       )
     : null;
+  const attentionRain = attentionHour
+    ? attentionHour.precipitationProbability === null
+      ? "chance de chuva não informada"
+      : `${formatRain(attentionHour.precipitationProbability)} de chance de chuva`
+    : null;
   const attentionWind = attentionHour
     ? attentionHour.windGust === null
       ? `vento de ${attentionHour.windSpeed} km/h; rajada não informada`
-      : `rajadas de até ${attentionHour.windGust} km/h`
+      : attentionHour.windGust <= 0
+        ? `vento de ${attentionHour.windSpeed} km/h; sem rajada prevista`
+        : `rajadas de até ${attentionHour.windGust} km/h`
     : null;
   const sunrise = extractClock(
     data.weather.current?.sunrise ?? data.weather.inmetForecast[0]?.sunrise,
@@ -217,15 +233,25 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
       </header>
 
       <div className="today-resources__signals" aria-label="Principais períodos para planejar o dia">
-        <article className={hasPeriodContrast ? "is-best" : undefined}>
+        <article className={hasPeriodContrast && bestPeriod ? "is-best" : undefined}>
           <span>
             <CheckCircle2 aria-hidden="true" /> {hasPeriodContrast ? "Período mais favorável" : "Comparação entre períodos"}
           </span>
-          <strong>{hasPeriodContrast ? bestPeriod.range : "Sem diferença relevante"}</strong>
+          <strong>
+            {hasPeriodContrast && bestPeriod
+              ? bestPeriod.range
+              : comparablePeriods.length
+                ? "Sem diferença relevante"
+                : "Chance de chuva em atualização"}
+          </strong>
           <small>
-            {hasPeriodContrast
+            {hasPeriodContrast && bestPeriod
               ? statusAdvice(bestPeriod.status)
-              : "Os períodos têm pontuações semelhantes de chuva e vento nesta atualização."}
+              : comparablePeriods.length > 1
+                ? "Os períodos têm pontuações semelhantes de chuva e vento nesta atualização."
+                : comparablePeriods.length === 1
+                  ? "Ainda não há períodos suficientes com chance de chuva publicada para comparar."
+                  : "A chance de chuva ainda não foi informada nos períodos comparados."}
           </small>
         </article>
 
@@ -235,8 +261,8 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
           </span>
           <strong>{hasHourContrast ? attentionHour?.time ?? "Em atualização" : "Sem um único horário"}</strong>
           <small>
-            {attentionHour && attentionWind
-              ? `${formatRain(attentionHour.precipitationProbability)} de chuva e ${attentionWind}.`
+            {attentionHour && attentionRain && attentionWind
+              ? `${attentionRain} e ${attentionWind}.`
               : "Os horários têm valores semelhantes; nenhum se destaca como o de maior atenção."}
           </small>
         </article>
@@ -256,7 +282,7 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
 
       <div className="today-resources__periods" aria-label="Planejamento das próximas 12 horas">
         {periods.map((period) => {
-          const isBest = hasPeriodContrast && period === bestPeriod;
+          const isBest = hasPeriodContrast && bestPeriod !== null && period === bestPeriod;
 
           return (
             <article
@@ -283,7 +309,7 @@ export function TodayWeatherResources({ data }: { data: WeatherIntelligenceData 
                 </div>
                 <div>
                   <dt>Rajada máxima</dt>
-                  <dd>{period.maxGust === null ? "Não informada" : `${period.maxGust} km/h`}</dd>
+                  <dd>{formatGust(period.maxGust)}</dd>
                 </div>
               </dl>
               <p>{statusAdvice(period.status)}</p>
