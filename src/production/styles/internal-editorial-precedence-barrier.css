@@ -117,18 +117,26 @@
 }
 
 /*
- * Heroes retail de previsão ainda recebem CSS lazy próprio. O frame compartilhado
- * já define a superfície da Home; aqui impedimos que o chunk da rota restaure
- * gradientes, sombra externa, borda inferior ou círculos decorativos antigos.
- * A foto, os dados meteorológicos e os estados internos permanecem intactos.
+ * Heroes retail de previsão recebem CSS lazy próprio. Hoje e 7 dias podem usar
+ * acento cromático deliberado para separar a abertura das superfícies seguintes;
+ * a barreira continua retirando apenas sombra externa e ornamentos antigos.
+ * Amanhã e Chuva permanecem no contrato plano atual.
  */
 .internal-weather-shell:is(
     .internal-weather-shell--today,
+    .internal-weather-shell--seven-day
+  )
+  :is(.today-retail-hero, .seven-day-retail-hero) {
+  border: 0 !important;
+  border-radius: inherit !important;
+  box-shadow: none !important;
+}
+
+.internal-weather-shell:is(
     .internal-weather-shell--tomorrow,
-    .internal-weather-shell--seven-day,
     .internal-weather-shell--rain
   )
-  :is(.today-retail-hero, .tomorrow-retail-hero, .seven-day-retail-hero, .rain-retail-hero) {
+  :is(.tomorrow-retail-hero, .rain-retail-hero) {
   border: 0 !important;
   border-radius: inherit !important;
   background-color: var(--route-editorial-surface) !important;
