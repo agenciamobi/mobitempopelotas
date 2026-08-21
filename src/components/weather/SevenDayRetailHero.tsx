@@ -200,12 +200,25 @@ export function SevenDayRetailHero({
           </div>
 
           <div className="today-retail-hero__actions">
-            <a className="today-retail-hero__primary" href="#semana-dia-a-dia">
-              Ver previsão dia a dia <ArrowRight aria-hidden="true" />
-            </a>
-            <a className="today-retail-hero__secondary" href="#riscos-da-semana">
-              Ver maiores chances de chuva
-            </a>
+            {hasDailyForecast ? (
+              <>
+                <a className="today-retail-hero__primary" href="#semana-dia-a-dia">
+                  Ver previsão dia a dia <ArrowRight aria-hidden="true" />
+                </a>
+                <a className="today-retail-hero__secondary" href="#riscos-da-semana">
+                  Ver maiores chances de chuva
+                </a>
+              </>
+            ) : (
+              <>
+                <Link className="today-retail-hero__primary" to="/tempo-hoje-pelotas">
+                  Ver tempo de hoje <ArrowRight aria-hidden="true" />
+                </Link>
+                <Link className="today-retail-hero__secondary" to="/chuva-em-pelotas">
+                  Consultar chuva em Pelotas
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
