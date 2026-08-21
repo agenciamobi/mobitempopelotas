@@ -63,3 +63,10 @@ test("radar frames are georeferenced over the existing MapLibre base", () => {
   assert.match(radarMapStyles, /\.rawFallback/);
   assert.match(radarMap, /Base cartográfica indisponível/);
 });
+
+test("radar caption stays clear of controls and only appears when the overlay is ready", () => {
+  assert.match(radarMap, /mapLoaded && overlayLoaded \? \([\s\S]*className=\{styles\.caption\}/);
+  assert.match(radarMapStyles, /\.caption\s*\{[\s\S]*top:\s*12px[\s\S]*right:\s*12px/);
+  assert.match(radarMapStyles, /\.fallbackNote\s*\{[\s\S]*bottom:\s*12px[\s\S]*left:\s*12px/);
+  assert.match(radarMapStyles, /@media \(max-width: 480px\)[\s\S]*\.caption span\s*\{[\s\S]*display:\s*none/);
+});
