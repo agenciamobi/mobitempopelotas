@@ -5,11 +5,16 @@ import test from "node:test";
 const route = readFileSync("src/routes/vento-em-pelotas.tsx", "utf8");
 const page = readFileSync("src/components/weather/WindForecastPageV3.tsx", "utf8");
 const styles = readFileSync("src/components/weather/WindForecastPageV3.css", "utf8");
+const navigationAvailabilityStyles = readFileSync(
+  "src/components/weather/WindNavigationAvailability.css",
+  "utf8",
+);
 
 const windSource = `${route}\n${page}`;
 
 test("wind route uses the deeper source-aware page", () => {
   assert.match(route, /WindForecastPageV3/);
+  assert.match(route, /WindNavigationAvailability\.css/);
   assert.match(route, /pageClassName="internal-weather-shell--wind"/);
   assert.match(route, /Veja o vento agora, direção observada, direção prevista por hora/);
   assert.match(route, /WIND_PAGE_CONTENT/);
@@ -83,6 +88,16 @@ test("wind hourly CTA never points to an absent hourly section", () => {
   assert.match(page, /href="#vento-por-hora"/);
   assert.match(page, /to="\/previsao-7-dias-pelotas"/);
   assert.match(page, /Ver previsão de 7 dias/);
+});
+
+test("wind chapter index hides links to conditional sections that are not rendered", () => {
+  assert.match(navigationAvailabilityStyles, /not\(:has\(#vento-por-hora\)\)/);
+  assert.match(navigationAvailabilityStyles, /a\[href="#vento-por-hora"\]/);
+  assert.match(navigationAvailabilityStyles, /not\(:has\(#vento-na-semana\)\)/);
+  assert.match(navigationAvailabilityStyles, /a\[href="#vento-na-semana"\]/);
+  assert.match(navigationAvailabilityStyles, /not\(:has\(#direcao-do-vento-por-hora\)\)/);
+  assert.match(navigationAvailabilityStyles, /a\[href="#direcao-do-vento-por-hora"\]/);
+  assert.doesNotMatch(navigationAvailabilityStyles, /!important/);
 });
 
 test("wind alerts come only from active official alert records", () => {
