@@ -4,6 +4,11 @@
  * semântica meteorológica/hidrológica é alterada aqui.
  */
 
+/* Chips que viram links também precisam manter alvo táctil de controle. */
+.today-retail-hero .today-retail-hero__badges > a {
+  min-height: 44px;
+}
+
 /* HomeForecastStory aparece na Home, Tempo Hoje e páginas regionais. */
 .home-forecast-story :is(
   .home-tomorrow-spotlight > a,
