@@ -40,6 +40,15 @@
   min-height: 44px;
 }
 
+/* Alertas: acesso à fonte oficial é ação; validade continua pequena, mas legível. */
+.internal-weather-shell--alerts .alerts-official-link {
+  min-height: 44px;
+}
+
+.internal-weather-shell--alerts .alerts-period dt {
+  font-size: max(0.62rem, 10px);
+}
+
 /* SACE: filtros são botões; cards de sistema ficam estáveis em vez de saltar no hover. */
 .internal-weather-shell--hydrology .sace-filter-buttons button {
   min-height: 44px;
