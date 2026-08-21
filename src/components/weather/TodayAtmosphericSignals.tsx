@@ -54,12 +54,32 @@ function fogScore(hour: HourlyForecast) {
 
   const spread = Math.max(0, hour.temperature - hour.dewPoint);
   let score = Math.max(0, 6 - spread) * 12;
-  score += Math.max(0, (hour.relativeHumidity ?? 70) - 80) * 1.5;
-  score += Math.max(0, (hour.cloudCoverLow ?? 0) - 50) * 0.8;
+  if (hour.relativeHumidity !== null && hour.relativeHumidity !== undefined) {
+    score += Math.max(0, hour.relativeHumidity - 80) * 1.5;
+  }
+  if (hour.cloudCoverLow !== null && hour.cloudCoverLow !== undefined) {
+    score += Math.max(0, hour.cloudCoverLow - 50) * 0.8;
+  }
   if (hour.visibilityKm !== null && hour.visibilityKm !== undefined) {
     score += Math.max(0, 10 - hour.visibilityKm) * 6;
   }
   return score;
+}
+
+function fogSupportDetail(hour: HourlyForecast, spread: number) {
+  const parts = [`temperatura e ponto de orvalho separados por ${formatNumber(spread, " °C")}`];
+
+  if (hour.relativeHumidity !== null && hour.relativeHumidity !== undefined) {
+    parts.push(`${Math.round(hour.relativeHumidity)}% de umidade`);
+  }
+  if (hour.cloudCoverLow !== null && hour.cloudCoverLow !== undefined) {
+    parts.push(`${Math.round(hour.cloudCoverLow)}% de nuvens baixas`);
+  }
+  if (hour.visibilityKm !== null && hour.visibilityKm !== undefined) {
+    parts.push(`visibilidade prevista de ${formatNumber(hour.visibilityKm, " km")}`);
+  }
+
+  return parts.join(", ");
 }
 
 function buildFogSignal(hours: HourlyForecast[]): FogSignal {
@@ -78,25 +98,45 @@ function buildFogSignal(hours: HourlyForecast[]): FogSignal {
   }
 
   const spread = Math.max(0, hour.temperature - hour.dewPoint);
-  const lowCloud = hour.cloudCoverLow ?? 0;
-  const humidity = hour.relativeHumidity ?? 0;
-  const visibility = hour.visibilityKm ?? 99;
+  const lowCloud = hour.cloudCoverLow;
+  const humidity = hour.relativeHumidity;
+  const visibility = hour.visibilityKm;
+  const hasSupportingSignal = [lowCloud, humidity, visibility].some(
+    (value) => value !== null && value !== undefined,
+  );
+  const hasStrongSupportingSignal =
+    (visibility !== null && visibility !== undefined && visibility <= 3) ||
+    (lowCloud !== null && lowCloud !== undefined && lowCloud >= 85) ||
+    (humidity !== null && humidity !== undefined && humidity >= 95);
+  const hasModerateSupportingSignal =
+    (visibility !== null && visibility !== undefined && visibility <= 8) ||
+    (lowCloud !== null && lowCloud !== undefined && lowCloud >= 65) ||
+    (humidity !== null && humidity !== undefined && humidity >= 90);
 
-  if (spread <= 1.5 && (visibility <= 3 || lowCloud >= 85 || humidity >= 95)) {
+  if (spread <= 1.5 && hasStrongSupportingSignal) {
     return {
       tone: "high",
       hour,
       title: `Maior possibilidade por volta de ${hour.time}`,
-      detail: `Temperatura e ponto de orvalho ficam separados por ${formatNumber(spread, " °C")}, com ${Math.round(lowCloud)}% de nuvens baixas e visibilidade prevista de ${formatNumber(visibility, " km")}.`,
+      detail: `${fogSupportDetail(hour, spread)}. Esses sinais aumentam a possibilidade de neblina, mas não confirmam ocorrência em toda a cidade.`,
     };
   }
 
-  if (spread <= 3 && (visibility <= 8 || lowCloud >= 65 || humidity >= 90)) {
+  if (spread <= 3 && hasModerateSupportingSignal) {
     return {
       tone: "attention",
       hour,
       title: `Vale acompanhar perto de ${hour.time}`,
-      detail: "Umidade, nuvens baixas e visibilidade indicam possibilidade de neblina, mas não confirmam que ela ocorrerá em todos os pontos da cidade.",
+      detail: `${fogSupportDetail(hour, spread)}. Os sinais disponíveis indicam possibilidade de neblina, sem confirmar ocorrência em todos os pontos da cidade.`,
+    };
+  }
+
+  if (spread <= 3 && !hasSupportingSignal) {
+    return {
+      tone: "unknown",
+      hour,
+      title: "Ponto de orvalho próximo, mas faltam dados complementares",
+      detail: `${fogSupportDetail(hour, spread)}. Umidade, nuvens baixas e visibilidade não foram informadas para confirmar a leitura de neblina.`,
     };
   }
 
@@ -104,7 +144,9 @@ function buildFogSignal(hours: HourlyForecast[]): FogSignal {
     tone: "low",
     hour,
     title: "Baixa possibilidade nas próximas horas",
-    detail: "A previsão não reúne, neste momento, umidade alta, baixa visibilidade e muitas nuvens baixas ao mesmo tempo.",
+    detail: hasSupportingSignal
+      ? `${fogSupportDetail(hour, spread)}. Os dados disponíveis não reúnem os principais sinais de neblina ao mesmo tempo.`
+      : `${fogSupportDetail(hour, spread)}. A diferença entre temperatura e ponto de orvalho não indica saturação próxima; os demais sinais ainda não foram informados.`,
   };
 }
 
