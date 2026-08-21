@@ -3,15 +3,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
 import { RainForecastPageV2 } from "@/components/weather/RainForecastPageV2";
+import { RainHourlyVolumeContext } from "@/components/weather/RainHourlyVolumeContext";
 import { RainRetailHero } from "@/components/weather/RainRetailHero";
 import { RAIN_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
+import { getPelotasMeteogram } from "@/lib/weather/meteogram.functions";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 const PAGE_TITLE = "Chuva em Pelotas";
 const PAGE_DESCRIPTION =
-  "Veja a chance de chuva em Pelotas por horário, o volume previsto para hoje e os próximos 7 dias, rajadas, radar e avisos oficiais do INMET.";
+  "Veja chance e volume de chuva em Pelotas por horário, acumulados previstos para hoje e os próximos 7 dias, rajadas, radar e avisos oficiais do INMET.";
 const PAGE_PATH = "/chuva-em-pelotas";
 
 const RAIN_PAGE_CONTENT = {
@@ -19,9 +21,10 @@ const RAIN_PAGE_CONTENT = {
   eyebrow: "Entenda a previsão de chuva",
   title: "Como ler chance e volume de chuva em Pelotas",
   answer:
-    "A chance percentual indica a possibilidade de chover no horário ou dia informado. O volume em milímetros estima quanto pode acumular. Um valor alto de chance não significa necessariamente o maior volume de chuva.",
+    "A chance percentual indica a possibilidade de chover no horário ou dia informado. O volume em milímetros estima quanto pode acumular. A página mostra também o volume previsto por hora nas próximas horas, sem tratar previsão como chuva já medida.",
   facts: [
     "Chance de chuva responde se a precipitação pode ocorrer; milímetros estimam quanto pode acumular no período.",
+    "O detalhamento horário usa um perfil estruturado do Open-Meteo e mantém chance percentual e volume em milímetros como informações separadas.",
     "Os valores futuros são previsões. Chuva já registrada deve aparecer identificada como medição de estação ou pluviômetro.",
     "Em risco de temporal, alagamento ou inundação, consulte os avisos oficiais e acompanhe radar e situação hidrológica.",
   ],
@@ -35,6 +38,11 @@ const RAIN_PAGE_CONTENT = {
       question: "Chance de chuva alta significa muito volume?",
       answer:
         "Não necessariamente. A chance indica a possibilidade de ocorrência; o volume em milímetros estima a quantidade. Compare os dois valores antes de avaliar o possível impacto.",
+    },
+    {
+      question: "O volume mostrado por hora já foi medido?",
+      answer:
+        "Não. O volume por hora desta página é uma previsão do modelo para cada intervalo futuro. Chuva observada só é apresentada como medição quando há uma fonte de estação ou pluviômetro identificada com horário.",
     },
     {
       question: "A chuva mostrada nesta página já foi medida?",
@@ -75,21 +83,28 @@ export const Route = createFileRoute("/chuva-em-pelotas")({
         about: [
           "Previsão de chuva em Pelotas",
           "Probabilidade de chuva em Pelotas",
-          "Volume de precipitação em Pelotas",
+          "Volume de precipitação por hora em Pelotas",
           "Chuva por hora em Pelotas",
+          "Acumulado previsto de chuva em Pelotas",
           "Melhores horários sem chuva em Pelotas",
           "Alertas oficiais de chuva em Pelotas",
         ],
       }),
       createFaqPageJsonLd(PAGE_PATH, RAIN_PAGE_CONTENT.faqs),
     ]),
-  loader: () => getWeatherIntelligence(),
+  loader: async () => {
+    const [weather, meteogram] = await Promise.all([
+      getWeatherIntelligence(),
+      getPelotasMeteogram(),
+    ]);
+    return { weather, meteogram };
+  },
   staleTime: 5 * 60 * 1_000,
   component: ChuvaPage,
 });
 
 function ChuvaPage() {
-  const weather = Route.useLoaderData();
+  const { weather, meteogram } = Route.useLoaderData();
 
   return (
     <InternalWeatherPageShell
@@ -104,6 +119,7 @@ function ChuvaPage() {
       )}
     >
       <RainForecastPageV2 data={weather} />
+      <RainHourlyVolumeContext meteogram={meteogram} />
       <EditorialContentSection
         id="como-interpretar-a-previsao-de-chuva"
         content={RAIN_PAGE_CONTENT}
