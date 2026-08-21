@@ -48,6 +48,21 @@ test("INMET substitui somente a mínima e a máxima da data correspondente", () 
   ]);
 });
 
+test("dateIso prevalece sobre a posição quando a série diária começa depois de hoje", () => {
+  const daily = [
+    { min: 12, max: 20, dateIso: "2026-07-26", label: "Domingo" },
+  ];
+  const periods = [
+    period("2026-07-25", "Dia", 8, 16),
+    period("2026-07-26T00:00:00-03:00", "Dia", 11, 18),
+  ];
+
+  assert.deepEqual(
+    reconcileDailyTemperatures(daily, periods, new Date("2026-07-25T12:00:00-03:00")),
+    [{ min: 11, max: 18, dateIso: "2026-07-26", label: "Domingo" }],
+  );
+});
+
 test("valores incompletos do INMET preservam o lado disponível do modelo", () => {
   const daily = [{ min: 10, max: 21 }];
   const periods = [period("2026-07-25", "Tarde", null, 19)];
