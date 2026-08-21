@@ -20,7 +20,6 @@ const ALLOWED_API_HOSTS = new Set([
 ]);
 
 type JsonRecord = Record<string, unknown>;
-
 type RuntimeWithProcess = typeof globalThis & {
   process?: {
     env?: Record<string, string | undefined>;
@@ -77,9 +76,12 @@ function clampFrameCount(value: number, maximum: number, fallback: number) {
 function parseDate(value: string | null) {
   if (!value) return null;
   const normalized = value.trim().replace(" ", "T");
+  // A REDEMET/TSC usa referência UTC (o portal oficial identifica horários como UTC/Z).
+  // O payload pode omitir o sufixo de zona; nesse caso preservamos a referência UTC
+  // em vez de reinterpretar o valor como horário civil de Brasília.
   const withZone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(normalized)
     ? normalized
-    : `${normalized}-03:00`;
+    : `${normalized}Z`;
   const parsed = new Date(withZone);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
@@ -267,8 +269,8 @@ export async function fetchRedemetStorms(
       error: null,
     };
   } catch (error) {
-    console.error("[redemet/storms] Consulta indisponível", {
-      message: error instanceof Error ? error.message : "Falha desconhecida",
+    console.warn("[redemet/storms] Consulta indisponível", {
+      reason: error instanceof Error ? error.message : "falha-desconhecida",
     });
     return emptyStormLayer("Monitoramento de trovoadas REDEMET temporariamente indisponível.");
   }
