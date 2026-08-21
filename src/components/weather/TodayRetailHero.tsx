@@ -147,7 +147,7 @@ export function TodayRetailHero({
   const sunrise = extractClock(current.sunrise ?? weather.astronomy?.sunrise);
   const sunset = extractClock(current.sunset ?? weather.astronomy?.sunset);
   const hasAlert = officialAlertCount > 0;
-  const isObserved = currentIsObserved ?? current.available;
+  const isObserved = current.available && (currentIsObserved ?? true);
   const conditionMoment = current.available ? "agora" : nextHour ? "na próxima hora" : null;
   const statusDetail = isObserved
     ? "Observado agora"
