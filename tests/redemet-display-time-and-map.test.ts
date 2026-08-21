@@ -13,6 +13,7 @@ const radarMap = readFileSync("src/components/redemet/RadarMapFrame.tsx", "utf8"
 const radarMapStyles = readFileSync("src/components/redemet/RadarMapFrame.module.css", "utf8");
 const overview = readFileSync("src/components/redemet/RedemetOverview.tsx", "utf8");
 const stscServer = readFileSync("src/lib/redemet/redemet-stsc.server.ts", "utf8");
+const lastGood = readFileSync("src/lib/redemet/redemet-last-good.server.ts", "utf8");
 
 test("future REDEMET timestamps cannot become the overview latest image", () => {
   const now = Date.parse("2026-08-21T07:20:00Z");
@@ -43,6 +44,15 @@ test("STSC no-zone timestamps keep the REDEMET UTC reference", () => {
   assert.match(stscServer, /A REDEMET\/TSC usa referência UTC/);
   assert.match(stscServer, /`\$\{normalized\}Z`/);
   assert.doesNotMatch(stscServer, /`\$\{normalized\}-03:00`/);
+});
+
+test("anomalous REDEMET frames are returned but not promoted to last-good", () => {
+  assert.match(lastGood, /import \{ isUsableRedemetObservedAt \}/);
+  assert.match(lastGood, /frames\?: Array<\{ observedAt: string \| null \}>/);
+  assert.match(lastGood, /function canPromoteToLastGood/);
+  assert.match(lastGood, /value\.frames\.some\(\(frame\) => isUsableRedemetObservedAt\(frame\.observedAt\)\)/);
+  assert.match(lastGood, /if \(canPromoteToLastGood\(result\)\) \{[\s\S]*cache\.set/);
+  assert.match(lastGood, /if \(result\.available\) \{[\s\S]*return result;/);
 });
 
 test("radar frames are georeferenced over the existing MapLibre base", () => {
