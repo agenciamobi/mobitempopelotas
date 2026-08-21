@@ -1,0 +1,169 @@
+/* Contrato visual estável da página de vento com a linguagem editorial da Home. */
+
+.internal-weather-shell--wind .wind-v3-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.66fr);
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid rgb(7 30 47 / 10%);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.internal-weather-shell--wind :is(.wind-v3-hero-copy, .wind-v3-hero-card) {
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background-image: none;
+  box-shadow: none;
+}
+
+.internal-weather-shell--wind .wind-v3-hero-copy {
+  display: grid;
+  align-content: center;
+  padding: clamp(36px, 4.2vw, 60px) clamp(26px, 3.2vw, 42px);
+  color: #071e2f;
+  background-color: #fff;
+}
+
+.internal-weather-shell--wind .wind-v3-back {
+  margin-bottom: clamp(18px, 2.2vw, 28px);
+  color: #58717d;
+}
+
+.internal-weather-shell--wind .wind-v3-hero-copy .wind-v3-eyebrow {
+  color: #087f91;
+}
+
+.internal-weather-shell--wind .wind-v3-hero-copy h1 {
+  max-width: 940px;
+  margin-top: 10px;
+  color: #071e2f;
+  font-size: clamp(2.55rem, 4.6vw, 5rem);
+  font-weight: 790;
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+}
+
+.internal-weather-shell--wind .wind-v3-hero-copy > p {
+  max-width: 76ch;
+  margin-top: 16px;
+  color: #58717d;
+  line-height: 1.65;
+}
+
+.internal-weather-shell--wind .wind-v3-actions a {
+  min-height: 44px;
+  border-color: rgb(7 30 47 / 10%);
+  color: #071e2f;
+  background: #fff;
+  box-shadow: none;
+  transform: none;
+}
+
+.internal-weather-shell--wind .wind-v3-actions a:first-child {
+  border-color: #071e2f;
+  color: #fff;
+  background: #071e2f;
+}
+
+.internal-weather-shell--wind .wind-v3-actions a:hover {
+  transform: none;
+  border-color: rgb(24 189 205 / 32%);
+}
+
+.internal-weather-shell--wind .wind-v3-hero-card,
+.internal-weather-shell--wind .wind-v3-hero-card.is-elevated,
+.internal-weather-shell--wind .wind-v3-hero-card.is-strong {
+  padding: clamp(28px, 3.2vw, 42px);
+  border-left: 1px solid rgb(7 30 47 / 10%);
+  color: #071e2f;
+  background: #fbfcfc;
+}
+
+.internal-weather-shell--wind :is(
+  .wind-v3-chapters,
+  .wind-v3-source,
+  .wind-v3-section,
+  .wind-v3-interpretation,
+  .wind-v3-note,
+  .wind-v3-empty
+) {
+  border-color: rgb(7 30 47 / 10%);
+  border-radius: 16px;
+  background-color: #fff;
+  background-image: none;
+  box-shadow: none;
+}
+
+.internal-weather-shell--wind .wind-v3-source {
+  background: #fff;
+}
+
+.internal-weather-shell--wind .wind-v3-interpretation {
+  color: #071e2f;
+  background: #fff;
+}
+
+.internal-weather-shell--wind .wind-v3-interpretation > svg {
+  color: #087f91;
+}
+
+.internal-weather-shell--wind .wind-v3-interpretation h2 {
+  color: #071e2f;
+}
+
+.internal-weather-shell--wind .wind-v3-interpretation p {
+  color: #58717d;
+}
+
+.internal-weather-shell--wind .wind-v3-interpretation a {
+  border-color: rgb(7 30 47 / 10%);
+  color: #071e2f;
+  background: #fbfcfc;
+  box-shadow: none;
+  transform: none;
+}
+
+.internal-weather-shell--wind .wind-v3-alert {
+  border-color: rgb(242 112 53 / 22%);
+  border-radius: 16px;
+  box-shadow: none;
+}
+
+@media (max-width: 720px) {
+  .internal-weather-shell--wind .wind-v3-hero {
+    grid-template-columns: minmax(0, 1fr);
+    border-radius: 12px;
+  }
+
+  .internal-weather-shell--wind .wind-v3-hero-copy {
+    padding: 30px 20px;
+  }
+
+  .internal-weather-shell--wind .wind-v3-hero-copy h1 {
+    font-size: clamp(2.25rem, 11vw, 3.5rem);
+  }
+
+  .internal-weather-shell--wind .wind-v3-hero-card,
+  .internal-weather-shell--wind .wind-v3-hero-card.is-elevated,
+  .internal-weather-shell--wind .wind-v3-hero-card.is-strong {
+    padding: 24px 20px;
+    border-top: 1px solid rgb(7 30 47 / 10%);
+    border-left: 0;
+  }
+
+  .internal-weather-shell--wind :is(
+    .wind-v3-chapters,
+    .wind-v3-source,
+    .wind-v3-section,
+    .wind-v3-alert,
+    .wind-v3-interpretation,
+    .wind-v3-note,
+    .wind-v3-empty
+  ) {
+    border-radius: 12px;
+  }
+}
