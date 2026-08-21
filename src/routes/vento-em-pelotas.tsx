@@ -2,16 +2,18 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
+import { WindDirectionContext } from "@/components/weather/WindDirectionContext";
 import { WindForecastPageV3 } from "@/components/weather/WindForecastPageV3";
 import "@/components/weather/WindForecastHomeContract.css";
 import { WIND_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
+import { getPelotasMeteogram } from "@/lib/weather/meteogram.functions";
 import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.functions";
 
 const PAGE_TITLE = "Vento em Pelotas";
 const PAGE_DESCRIPTION =
-  "Veja o vento agora, a direção atual, as rajadas previstas nas próximas 24 horas, os horários mais fortes, a previsão para 7 dias e os avisos oficiais em Pelotas.";
+  "Veja o vento agora, direção observada, direção prevista por hora, rajadas nas próximas 24 horas, horários mais fortes, previsão para 7 dias e avisos oficiais em Pelotas.";
 const PAGE_PATH = "/vento-em-pelotas";
 
 const WIND_PAGE_CONTENT = {
@@ -19,12 +21,12 @@ const WIND_PAGE_CONTENT = {
   eyebrow: "Entenda os dados de vento",
   title: "Como ler vento, direção e rajadas em Pelotas",
   answer:
-    "O vento atual, a direção e as rajadas futuras podem vir de fontes diferentes. A página identifica a origem de cada informação, explica quando a rajada deve ser mais forte e não repete a direção atual como previsão para horários em que a fonte não publica direção.",
+    "O vento atual e sua direção são tratados como observação quando vêm da estação. As próximas horas são previsão de modelo. A página mantém essas duas leituras separadas e agora também mostra a direção prevista por horário no perfil detalhado do Open-Meteo.",
   facts: [
     "Vento e rajada não representam a mesma medida: a rajada é um aumento rápido e normalmente mais forte.",
     "A direção informa de onde o vento vem. Vento sul sopra do sul em direção ao norte.",
-    "O vento atual e a direção podem ter origens diferentes, informadas na própria página.",
-    "As próximas 24 horas mostram vento e rajada por horário, sem inventar uma direção futura ausente.",
+    "O vento atual e a direção observada podem ter origens diferentes, informadas na própria página.",
+    "A direção prevista nas próximas horas vem do perfil horário do Open-Meteo e não é apresentada como medição da estação.",
     "O resumo do topo apenas organiza os valores previstos e não substitui alertas oficiais.",
     "Orla, áreas abertas, pontes e locais com árvores ou objetos soltos podem sentir vento diferente do ponto usado pela estação ou pelo modelo.",
   ],
@@ -42,12 +44,17 @@ const WIND_PAGE_CONTENT = {
     {
       question: "O vento mostrado agora foi medido?",
       answer:
-        "A página informa a origem específica do vento e da direção. Quando o dado vem da Estação Embrapa, ele é uma observação local; quando vem de um modelo, aparece como estimativa.",
+        "A página informa a origem específica do vento e da direção. Quando o dado vem da Estação Embrapa, ele é uma observação local; previsões de horários futuros aparecem separadamente como dados de modelo.",
     },
     {
-      question: "Por que a direção não aparece em cada horário futuro?",
+      question: "A direção futura é uma medição da estação?",
       answer:
-        "A série horária atualmente integrada fornece vento e rajada, mas não direção por hora. A página não reutiliza a direção atual como se ela permanecesse igual durante toda a previsão.",
+        "Não. A direção por horário é previsão do perfil detalhado do Open-Meteo. Ela é mantida separada da direção observada no momento atual e pode mudar conforme o modelo é atualizado.",
+    },
+    {
+      question: "Por que a direção prevista pode mudar ao longo do dia?",
+      answer:
+        "Mudanças na circulação e na passagem de sistemas meteorológicos podem alterar a direção do vento. O perfil horário mostra a direção prevista em cada intervalo disponível, sem assumir que a direção atual permanecerá igual.",
     },
     {
       question: "O resumo de intensidade do topo é um alerta oficial?",
@@ -105,6 +112,7 @@ export const Route = createFileRoute("/vento-em-pelotas")({
           "Origem da velocidade e direção do vento",
           "Rajadas de vento em Pelotas",
           "Direção do vento em Pelotas",
+          "Direção do vento por hora em Pelotas",
           "Previsão de vento por hora em Pelotas",
           "Maiores rajadas nas próximas 24 horas",
           "Previsão de rajadas para 7 dias",
@@ -114,13 +122,19 @@ export const Route = createFileRoute("/vento-em-pelotas")({
       }),
       createFaqPageJsonLd(PAGE_PATH, WIND_PAGE_CONTENT.faqs),
     ]),
-  loader: () => getWeatherIntelligence(),
+  loader: async () => {
+    const [weather, meteogram] = await Promise.all([
+      getWeatherIntelligence(),
+      getPelotasMeteogram(),
+    ]);
+    return { weather, meteogram };
+  },
   staleTime: 5 * 60 * 1_000,
   component: VentoPage,
 });
 
 function VentoPage() {
-  const weather = Route.useLoaderData();
+  const { weather, meteogram } = Route.useLoaderData();
 
   return (
     <InternalWeatherPageShell
@@ -129,6 +143,7 @@ function VentoPage() {
       showOfficialAlerts={false}
     >
       <WindForecastPageV3 data={weather} />
+      <WindDirectionContext meteogram={meteogram} />
       <EditorialContentSection
         id="como-interpretar-a-previsao-de-vento"
         content={WIND_PAGE_CONTENT}
