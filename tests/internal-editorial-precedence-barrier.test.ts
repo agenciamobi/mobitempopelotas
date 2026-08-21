@@ -74,6 +74,22 @@ test("retail forecast heroes keep the Home surface after lazy route CSS loads", 
   );
 });
 
+test("standalone status and privacy pages keep Home geometry after route CSS loads", () => {
+  assert.match(barrier, /\.data-status-shell/);
+  assert.match(barrier, /\.privacy-data-shell/);
+  assert.match(
+    barrier,
+    /\.data-status-page,[\s\S]*?\.privacy-page[\s\S]*?--tp-home-container-max, 1440px/,
+  );
+  assert.match(
+    barrier,
+    /\.data-status-hero,[\s\S]*?\.privacy-hero[\s\S]*?background-image:\s*none !important[\s\S]*?box-shadow:\s*none !important/,
+  );
+  assert.match(barrier, /\.data-status-groups[\s\S]*?margin-top:\s*0 !important/);
+  assert.match(barrier, /@media \(max-width: 1240px\)[\s\S]*?\.data-status-page/);
+  assert.match(barrier, /@media \(max-width: 720px\)[\s\S]*?\.privacy-page/);
+});
+
 test("topic and dedicated pages receive the same Home surface protection", () => {
   assert.match(barrier, /\.site-shell--topic/);
   assert.match(barrier, /\.hydrology-editorial-route > section/);
