@@ -35,7 +35,8 @@ type WindowSummary = {
   end: string;
   averageChance: number | null;
   maximumChance: number | null;
-  maximumGust: number;
+  maximumGust: number | null;
+  windRisk: number;
 };
 
 function formatFetchedAt(value: string) {
@@ -56,6 +57,12 @@ function formatChance(value: number | null | undefined) {
 
 function formatMillimeters(value: number) {
   return `${value.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} mm`;
+}
+
+function formatGust(value: number | null | undefined) {
+  if (value === null || value === undefined) return "não informada";
+  if (value <= 0) return "sem rajada prevista";
+  return `até ${value} km/h`;
 }
 
 function timeReference(value: string | null | undefined) {
@@ -95,6 +102,9 @@ function buildWindows(hours: HourlyForecast[]): WindowSummary[] {
     const knownChances = slice
       .map((hour) => hour.precipitationProbability)
       .filter((value): value is number => value !== null);
+    const gusts = slice
+      .map((hour) => hour.windGust)
+      .filter((value): value is number => value !== null);
     result.push({
       start: slice[0]?.time ?? "—",
       end: slice[slice.length - 1]?.time ?? "—",
@@ -102,7 +112,8 @@ function buildWindows(hours: HourlyForecast[]): WindowSummary[] {
         ? Math.round(knownChances.reduce((total, value) => total + value, 0) / knownChances.length)
         : null,
       maximumChance: knownChances.length ? Math.max(...knownChances) : null,
-      maximumGust: Math.max(...slice.map((hour) => hour.windGust ?? hour.windSpeed)),
+      maximumGust: gusts.length ? Math.max(...gusts) : null,
+      windRisk: Math.max(...slice.map((hour) => hour.windGust ?? hour.windSpeed)),
     });
   }
   return result;
@@ -157,7 +168,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
     const selectedChance = selected.averageChance ?? 101;
     const currentChance = window.averageChance ?? 101;
     if (currentChance !== selectedChance) return currentChance < selectedChance ? window : selected;
-    return window.maximumGust < selected.maximumGust ? window : selected;
+    return window.windRisk < selected.windRisk ? window : selected;
   }, null);
   const attentionWindow = windows.reduce<WindowSummary | null>((selected, window) => {
     if (!selected) return window;
@@ -264,7 +275,13 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
                   <span>{hour.temperature}°</span>
                 </div>
                 <i aria-hidden="true"><b /></i>
-                <small>Rajada de até {hour.windGust ?? hour.windSpeed} km/h</small>
+                <small>
+                  {hour.windGust === null
+                    ? `Rajada não informada · vento de ${hour.windSpeed} km/h`
+                    : hour.windGust <= 0
+                      ? "Sem rajada prevista"
+                      : `Rajada de até ${hour.windGust} km/h`}
+                </small>
               </article>
             );
           })}
@@ -296,7 +313,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
                 <div><dt>Chance de chuva</dt><dd>{formatChance(day.rainChance)}</dd></div>
                 <div><dt>Volume previsto</dt><dd>{formatMillimeters(day.precipitationMm)}</dd></div>
               </dl>
-              <small>Rajada: {day.windGust === null ? "não informada" : `até ${day.windGust} km/h`}</small>
+              <small>Rajada: {formatGust(day.windGust)}</small>
             </article>
           ))}
         </div>
@@ -326,7 +343,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
             <div>
               <span>Período com menor chance</span>
               <strong>{bestWindow ? `${bestWindow.start}–${bestWindow.end}` : "Em atualização"}</strong>
-              <p>É o período com menor chance média de chuva. Em caso de empate, aparece o período com menor rajada.</p>
+              <p>É o período com menor chance média de chuva. Em caso de empate, aparece o período com menor vento previsto.</p>
             </div>
           </article>
           <article className="is-attention">
@@ -337,7 +354,11 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
               <p>
                 {attentionWindow?.maximumChance === null || !attentionWindow
                   ? "A previsão ainda não informou a chance para esse período."
-                  : `A chance pode chegar a ${attentionWindow.maximumChance}%, com rajadas de até ${attentionWindow.maximumGust} km/h.`}
+                  : attentionWindow.maximumGust === null
+                    ? `A chance pode chegar a ${attentionWindow.maximumChance}%. A rajada não foi informada para esse período.`
+                    : attentionWindow.maximumGust <= 0
+                      ? `A chance pode chegar a ${attentionWindow.maximumChance}%, sem rajada prevista para esse período.`
+                      : `A chance pode chegar a ${attentionWindow.maximumChance}%, com rajadas de até ${attentionWindow.maximumGust} km/h.`}
               </p>
             </div>
           </article>
