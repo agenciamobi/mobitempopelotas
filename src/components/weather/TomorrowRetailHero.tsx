@@ -40,9 +40,9 @@ function formatValue(value: number | null | undefined, suffix = "") {
 
 function formatTomorrowDate(day: DailyForecast | null) {
   if (!day) return "Data em atualização";
+  if (!day.dateIso) return `${day.weekday} · ${day.date}`;
 
-  const isoDate = day.date.slice(0, 10);
-  const parsed = new Date(`${isoDate}T12:00:00-03:00`);
+  const parsed = new Date(`${day.dateIso}T12:00:00-03:00`);
   if (Number.isNaN(parsed.getTime())) return `${day.weekday} · ${day.date}`;
 
   const label = new Intl.DateTimeFormat("pt-BR", {
