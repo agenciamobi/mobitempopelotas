@@ -1,0 +1,160 @@
+/* Contrato visual estável da página de alertas com a linguagem editorial da Home. */
+
+.internal-weather-shell--alerts .alerts-editorial-hero {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.66fr);
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid rgb(7 30 47 / 10%);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-copy,
+.internal-weather-shell--alerts .alerts-editorial-panel {
+  min-width: 0;
+  min-height: 0;
+  box-shadow: none;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-copy {
+  padding: clamp(36px, 4.2vw, 60px) clamp(26px, 3.2vw, 42px);
+  background: #fff;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-copy::before {
+  display: none;
+  content: none;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-back {
+  margin-bottom: clamp(18px, 2.2vw, 28px);
+  color: #58717d;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-copy h1 {
+  max-width: 940px;
+  margin-top: 10px;
+  color: #071e2f;
+  font-size: clamp(2.55rem, 4.6vw, 5rem);
+  font-weight: 790;
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-copy > p {
+  max-width: 76ch;
+  margin-top: 16px;
+  color: #58717d;
+  line-height: 1.65;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-actions a:first-child {
+  box-shadow: none;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-panel {
+  justify-content: center;
+  padding: clamp(28px, 3.2vw, 42px);
+  border-left: 1px solid rgb(7 30 47 / 10%);
+  color: #071e2f;
+  background: #fbfcfc;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-panel-line {
+  right: 24px;
+  left: 24px;
+  height: 3px;
+  background: var(--alerts-accent);
+}
+
+.internal-weather-shell--alerts .alerts-editorial-panel-status {
+  border-color: rgb(7 30 47 / 10%);
+  color: #071e2f;
+  background: #fff;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-panel-status svg {
+  color: var(--alerts-accent);
+}
+
+.internal-weather-shell--alerts .alerts-editorial-panel > p,
+.internal-weather-shell--alerts .alerts-editorial-panel dt,
+.internal-weather-shell--alerts .alerts-editorial-panel-note,
+.internal-weather-shell--alerts .alerts-editorial-panel > small {
+  color: #58717d;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-panel h2 {
+  max-width: 15ch;
+  color: #071e2f;
+  font-size: clamp(2rem, 3.6vw, 3.8rem);
+}
+
+.internal-weather-shell--alerts .alerts-editorial-panel dl {
+  border-color: rgb(7 30 47 / 10%);
+}
+
+.internal-weather-shell--alerts .alerts-editorial-panel dl div {
+  border-color: rgb(7 30 47 / 10%);
+}
+
+.internal-weather-shell--alerts .alerts-editorial-panel dd {
+  color: #071e2f;
+}
+
+.internal-weather-shell--alerts .alerts-editorial-panel > a {
+  border: 1px solid #071e2f;
+  color: #fff;
+  background: #071e2f;
+}
+
+.internal-weather-shell--alerts :is(
+  .alerts-overview,
+  .alerts-featured,
+  .alerts-section,
+  .alerts-source-note,
+  .alerts-empty
+) {
+  border-color: rgb(7 30 47 / 10%);
+  border-radius: 16px;
+  box-shadow: none;
+}
+
+@media (max-width: 720px) {
+  .internal-weather-shell--alerts .alerts-editorial-hero {
+    grid-template-columns: minmax(0, 1fr);
+    border-radius: 12px;
+  }
+
+  .internal-weather-shell--alerts .alerts-editorial-copy {
+    padding: 30px 20px;
+  }
+
+  .internal-weather-shell--alerts .alerts-editorial-copy h1 {
+    font-size: clamp(2.25rem, 11vw, 3.5rem);
+  }
+
+  .internal-weather-shell--alerts .alerts-editorial-panel {
+    min-height: 0;
+    padding: 24px 20px;
+    border-top: 1px solid rgb(7 30 47 / 10%);
+    border-left: 0;
+  }
+
+  .internal-weather-shell--alerts .alerts-editorial-panel dl {
+    grid-template-columns: 1fr;
+  }
+
+  .internal-weather-shell--alerts .alerts-editorial-panel dl div {
+    grid-template-columns: 1fr auto;
+    border-right: 0;
+    border-bottom: 1px solid rgb(7 30 47 / 10%);
+  }
+
+  .internal-weather-shell--alerts .alerts-editorial-panel dl div:last-child {
+    border-bottom: 0;
+  }
+}
