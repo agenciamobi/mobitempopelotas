@@ -47,6 +47,24 @@ const homeFooterCss = readFileSync(
   "utf8",
 );
 const productionHome = readFileSync("src/production/ProductionHome.tsx", "utf8");
+const alertsRoute = readFileSync("src/routes/alertas.tsx", "utf8");
+const alertsHomeContract = readFileSync(
+  "src/components/weather/WeatherAlertsHomeContract.css",
+  "utf8",
+);
+const windRoute = readFileSync("src/routes/vento-em-pelotas.tsx", "utf8");
+const windHomeContract = readFileSync(
+  "src/components/weather/WindForecastHomeContract.css",
+  "utf8",
+);
+const laranjalRoute = readFileSync(
+  "src/routes/nivel-da-lagoa-dos-patos-laranjal.tsx",
+  "utf8",
+);
+const hydrologyDetailHomeContract = readFileSync(
+  "src/components/hydrology/HydrologyDetailHomeContract.css",
+  "utf8",
+);
 
 test("homepage has left the old global override architecture", () => {
   const removedLayers = [
@@ -194,4 +212,42 @@ test("stable homepage composition covers tablet, mobile, focus and reduced motio
   assert.match(homeExploreCss, /@media \(max-width: 640px\)/);
   assert.match(homeGuideCss, /@media \(max-width: 640px\)/);
   assert.match(homeFooterCss, /@media \(max-width: 720px\)/);
+});
+
+test("alerts loads a route-local Home contract after the legacy refinements", () => {
+  const refinementsIndex = alertsRoute.indexOf("WeatherAlertsRefinements.css");
+  const contractIndex = alertsRoute.indexOf("WeatherAlertsHomeContract.css");
+  assert.ok(refinementsIndex >= 0);
+  assert.ok(contractIndex > refinementsIndex);
+  assert.match(alertsHomeContract, /\.internal-weather-shell--alerts \.alerts-editorial-hero/);
+  assert.match(alertsHomeContract, /grid-template-columns:\s*minmax\(0, 1\.12fr\) minmax\(320px, 0\.66fr\)/);
+  assert.match(alertsHomeContract, /\.alerts-editorial-panel[\s\S]*background:\s*#fbfcfc/);
+  assert.match(alertsHomeContract, /\.alerts-editorial-copy h1[\s\S]*color:\s*#071e2f/);
+  assert.doesNotMatch(alertsHomeContract, /radial-gradient|linear-gradient/);
+  assert.doesNotMatch(alertsHomeContract, /!important/);
+});
+
+test("wind loads a route-local Home contract without flattening semantic alert states", () => {
+  assert.match(windRoute, /WindForecastHomeContract\.css/);
+  assert.match(windHomeContract, /\.internal-weather-shell--wind \.wind-v3-hero/);
+  assert.match(windHomeContract, /\.wind-v3-hero-card\.is-elevated/);
+  assert.match(windHomeContract, /\.wind-v3-hero-card\.is-strong/);
+  assert.match(windHomeContract, /\.wind-v3-alert[\s\S]*rgb\(242 112 53 \/ 22%\)/);
+  assert.match(windHomeContract, /\.wind-v3-interpretation[\s\S]*background:\s*#fff/);
+  assert.doesNotMatch(windHomeContract, /radial-gradient|linear-gradient/);
+  assert.doesNotMatch(windHomeContract, /!important/);
+});
+
+test("Laranjal detail removes the floating hydrology stage but keeps data status styling", () => {
+  const routeCssIndex = laranjalRoute.indexOf("HydrologyEditorialRoute.css");
+  const contractIndex = laranjalRoute.indexOf("HydrologyDetailHomeContract.css");
+  assert.ok(routeCssIndex >= 0);
+  assert.ok(contractIndex > routeCssIndex);
+  assert.match(hydrologyDetailHomeContract, /\.site-shell--topic \.hydrology-editorial-hero/);
+  assert.match(hydrologyDetailHomeContract, /\.hydrology-editorial-media[\s\S]*background:\s*#fbfcfc/);
+  assert.match(hydrologyDetailHomeContract, /\.hydrology-editorial-card[\s\S]*box-shadow:\s*none/);
+  assert.match(hydrologyDetailHomeContract, /\.hydrology-editorial-status/);
+  assert.match(hydrologyDetailHomeContract, /@media \(max-width: 720px\)/);
+  assert.doesNotMatch(hydrologyDetailHomeContract, /radial-gradient|linear-gradient/);
+  assert.doesNotMatch(hydrologyDetailHomeContract, /!important/);
 });
