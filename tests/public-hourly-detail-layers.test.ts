@@ -13,6 +13,7 @@ const windPageStyles = readFileSync("src/components/weather/WindForecastPageV3.c
 const rainPage = readFileSync("src/components/weather/RainForecastPageV2.tsx", "utf8");
 const todayPage = readFileSync("src/components/weather/TodayForecastPageV5.tsx", "utf8");
 const todayHero = readFileSync("src/components/weather/TodayRetailHero.tsx", "utf8");
+const todayResources = readFileSync("src/components/weather/TodayWeatherResources.tsx", "utf8");
 const meteogram = readFileSync("src/lib/weather/meteogram.server.ts", "utf8");
 
 test("rain and wind routes reuse the structured 48-hour meteogram in parallel", () => {
@@ -85,6 +86,23 @@ test("today empty state does not invent a next-hour condition or a gust", () => 
   assert.match(todayPage, /function strongestGust/);
   assert.match(todayPage, /if \(hour\.windGust === null\) return value/);
   assert.doesNotMatch(todayPage, /hour\.windGust \?\? hour\.windSpeed/);
+});
+
+test("today planning only uses sustained wind as a risk fallback, never as a displayed gust", () => {
+  assert.match(todayResources, /const maxGust = maximum\(hours\.map\(\(hour\) => hour\.windGust\)\)/);
+  assert.match(todayResources, /const windRisk = maxGust \?\? maxWindSpeed/);
+  assert.match(todayResources, /hour\.windGust \?\? hour\.windSpeed/);
+  assert.match(todayResources, /period\.maxGust === null \? "Não informada"/);
+  assert.match(todayResources, /attentionHour\.windGust === null/);
+});
+
+test("today planning does not color or name arbitrary winners when scores are tied", () => {
+  assert.match(todayResources, /const hasPeriodContrast = Math\.max\(\.\.\.periodScores\) > Math\.min\(\.\.\.periodScores\)/);
+  assert.match(todayResources, /const hasHourContrast = Math\.max\(\.\.\.hourRisks\) > Math\.min\(\.\.\.hourRisks\)/);
+  assert.match(todayResources, /className=\{hasPeriodContrast \? "is-best" : undefined\}/);
+  assert.match(todayResources, /className=\{hasHourContrast \? "is-attention" : undefined\}/);
+  assert.match(todayResources, /Sem diferença relevante/);
+  assert.match(todayResources, /Sem um único horário/);
 });
 
 test("new public detail layers follow the internal editorial rail and responsive contract", () => {
