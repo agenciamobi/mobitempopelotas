@@ -1,0 +1,74 @@
+/*
+ * Meteograma — acento técnico controlado.
+ * A base permanece editorial e clara; cor entra apenas para separar a leitura
+ * horária do texto introdutório e diferenciar os quatro sinais principais.
+ */
+
+.internal-weather-shell--meteogram .meteogram-hero__content {
+  background: linear-gradient(145deg, #ffffff 0%, #f8fcfc 100%);
+}
+
+.internal-weather-shell--meteogram .meteogram-hero__panel {
+  background:
+    radial-gradient(circle at 100% 0, rgb(94 44 237 / 8%), transparent 20rem),
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 10%), transparent 18rem),
+    linear-gradient(145deg, #f2fbfc 0%, #ffffff 54%, #f7f5ff 100%);
+}
+
+.internal-weather-shell--meteogram .meteogram-hero__panel article {
+  min-height: 132px;
+  border-top-width: 1px;
+  box-shadow: none;
+}
+
+.internal-weather-shell--meteogram .meteogram-hero__panel article:nth-child(1) {
+  border-color: rgb(24 189 205 / 15%);
+  background: #f1fbfc;
+}
+
+.internal-weather-shell--meteogram .meteogram-hero__panel article:nth-child(2) {
+  border-color: rgb(94 44 237 / 13%);
+  background: #f7f4ff;
+}
+
+.internal-weather-shell--meteogram .meteogram-hero__panel article:nth-child(3) {
+  border-color: rgb(242 112 53 / 14%);
+  background: #fff8f3;
+}
+
+.internal-weather-shell--meteogram .meteogram-hero__panel article:nth-child(4) {
+  border-color: rgb(231 11 133 / 12%);
+  background: #fff4f9;
+}
+
+.internal-weather-shell--meteogram .meteogram-hero__actions a:first-child {
+  border-color: #087f91;
+  color: #fff;
+  background: linear-gradient(135deg, #087f91 0%, #18bdcd 100%);
+}
+
+.internal-weather-shell--meteogram .meteogram-hero__actions a:first-child:hover {
+  border-color: #087f91;
+}
+
+@media (max-width: 720px) {
+  .internal-weather-shell--meteogram .meteogram-hero__panel {
+    background:
+      radial-gradient(circle at 100% 0, rgb(94 44 237 / 7%), transparent 15rem),
+      linear-gradient(145deg, #f3fbfc, #fff 62%, #f8f6ff);
+  }
+
+  .internal-weather-shell--meteogram .meteogram-hero__panel article {
+    min-height: 110px;
+  }
+}
+
+@media (forced-colors: active) {
+  .internal-weather-shell--meteogram :is(
+    .meteogram-hero__content,
+    .meteogram-hero__panel,
+    .meteogram-hero__panel article
+  ) {
+    background: Canvas;
+  }
+}
