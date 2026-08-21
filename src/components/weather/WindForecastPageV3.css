@@ -285,7 +285,7 @@
 
 .wind-v3-chapters {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   overflow: hidden;
   border: 1px solid rgb(7 30 47 / 8%);
   border-radius: 1.1rem;
