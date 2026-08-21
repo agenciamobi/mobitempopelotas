@@ -1,0 +1,268 @@
+/* Detalhe CAP/RSS: conteúdo completo sob demanda, sem competir com o aviso prioritário. */
+.internal-weather-shell--alerts .inmet-alert-coverage-details {
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1.25rem, 2.6vw, 2rem);
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details > header {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+  align-items: end;
+  gap: clamp(1.1rem, 2.8vw, 2.6rem);
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details > header span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #087f91;
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details > header span svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details h2 {
+  max-width: 15ch;
+  margin: 0.5rem 0 0;
+  color: #071e2f;
+  font-size: clamp(1.85rem, 3.2vw, 3rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details > header p {
+  max-width: 68ch;
+  margin: 0;
+  color: #58717d;
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details__list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details details {
+  overflow: hidden;
+  border: 1px solid rgb(7 30 47 / 10%);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details details.is-potential {
+  border-left: 4px solid #d39a29;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details details.is-danger {
+  border-left: 4px solid #e8792f;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details details.is-great-danger {
+  border-left: 4px solid #c8443a;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details summary {
+  display: grid;
+  min-height: 58px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.85rem 1rem;
+  color: #071e2f;
+  background: #fbfcfc;
+  cursor: pointer;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details summary > span {
+  padding: 0.28rem 0.45rem;
+  border: 1px solid rgb(7 30 47 / 10%);
+  border-radius: 999px;
+  background: #fff;
+  color: #58717d;
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details summary > strong {
+  min-width: 0;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details summary > small {
+  color: #607984;
+  font-size: 0.68rem;
+  text-align: right;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details summary:focus-visible,
+.internal-weather-shell--alerts .inmet-alert-coverage-details__body > a:focus-visible {
+  outline: 3px solid rgb(24 189 205 / 30%);
+  outline-offset: 2px;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details__body {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1rem;
+  border-top: 1px solid rgb(7 30 47 / 8%);
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details__body > dl {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details__body > dl > div {
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+  padding: 0.72rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 12px;
+  background: #f8fafb;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details__body dt {
+  color: #708690;
+  font-size: 0.65rem;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details__body dd {
+  margin: 0;
+  color: #071e2f;
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details__places {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid rgb(7 30 47 / 8%);
+  border-radius: 12px;
+  background: #f8fafb;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details__places h3 {
+  margin: 0;
+  color: #071e2f;
+  font-size: 0.78rem;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details__places p {
+  margin: 0;
+  color: #58717d;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details__places.is-empty {
+  grid-template-columns: 1rem minmax(0, 1fr);
+  align-items: start;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details__places.is-empty svg {
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.1rem;
+  color: #708690;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details__body > a {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  padding: 0 0.85rem;
+  border: 1px solid rgb(7 30 47 / 12%);
+  border-radius: 0.75rem;
+  background: #fff;
+  color: #071e2f;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details__body > a svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details > footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: #607984;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.internal-weather-shell--alerts .inmet-alert-coverage-details > footer svg {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  margin-top: 0.08rem;
+  color: #087f91;
+}
+
+@media (max-width: 900px) {
+  .internal-weather-shell--alerts .inmet-alert-coverage-details__body > dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .internal-weather-shell--alerts .inmet-alert-coverage-details > header {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .internal-weather-shell--alerts .inmet-alert-coverage-details h2 {
+    max-width: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .internal-weather-shell--alerts .inmet-alert-coverage-details {
+    padding: 1rem;
+  }
+
+  .internal-weather-shell--alerts .inmet-alert-coverage-details summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .internal-weather-shell--alerts .inmet-alert-coverage-details summary > span {
+    grid-column: 1 / -1;
+    width: fit-content;
+  }
+
+  .internal-weather-shell--alerts .inmet-alert-coverage-details__body > dl {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (forced-colors: active) {
+  .internal-weather-shell--alerts .inmet-alert-coverage-details :is(
+    summary,
+    .inmet-alert-coverage-details__body > dl > div,
+    .inmet-alert-coverage-details__places
+  ) {
+    background: Canvas;
+  }
+}
