@@ -31,7 +31,7 @@ O Tempo Pelotas é um portal meteorológico regional focado em Pelotas e Zona Su
 | Interface pública | Ativo | Home, páginas internas/dedicadas e páginas institucionais compartilham o mesmo header/footer editorial, rail de conteúdo e contrato de superfícies da Home; a rota histórica de 2024 foi corrigida para não duplicar o chrome global |
 | Home meteorológica | Ativo | Header e hero editoriais; próximas horas e tendência semanal em capítulos separados; tendência posicionada imediatamente antes da central de radar/satélite; alertas e blocos locais autocontidos |
 | Previsão hoje/amanhã/7 dias | Ativo | Páginas dedicadas e conteúdo indexável |
-| Chuva, vento e meteograma | Ativo | Visões temáticas e hora a hora; `/meteograma-pelotas` também oferece comparação visual complementar com produtos WRF/GFS do SIMAGRO RS |
+| Chuva, vento e meteograma | Ativo | Visões temáticas e hora a hora; `/chuva-em-pelotas` expõe volume previsto por hora e `/vento-em-pelotas` expõe direção prevista por hora reutilizando o meteograma estruturado Open-Meteo; `/meteograma-pelotas` também oferece comparação visual complementar com produtos WRF/GFS do SIMAGRO RS |
 | SIMAGRO RS | Ativo complementar / visual only | Meteogramas WRF, GFS e GFS Agro para Pelotas exibidos como PNG oficial da fonte; não há OCR, leitura de pixels ou incorporação desses gráficos ao feed numérico do portal |
 | Alertas oficiais | Ativo | INMET e conteúdo preventivo claramente separado; a rota `/alertas` preserva publicação, validade e abrangência territorial completa do CAP/RSS em detalhe progressivo quando disponível |
 | Estação Embrapa | Ativo | Observação local, timestamp e estado de atualidade |
@@ -175,9 +175,12 @@ O núcleo meteorológico combina múltiplas fontes e regras de reconciliação, 
 ### Previsão
 
 - Open-Meteo: previsão principal/fallback em vários fluxos e páginas;
-- MET Norway: fonte complementar no domínio de previsão;
+- a série principal do Open-Meteo preserva, quando fornecidos, volume de precipitação por hora, direção do vento em graus e perfil atmosférico com umidade, ponto de orvalho, pressão, visibilidade, nuvens por camada, CAPE e altura da camada limite;
+- MET Norway: fonte complementar no domínio de previsão e contingência, preservando campos horários compatíveis; somente `next_1_hours.precipitation_amount` pode ser tratado como volume horário, evitando rotular acumulados de 6h/12h como chuva de uma hora;
+- a recuperação Open-Meteo no navegador preserva até 24 horas dos campos horários ricos quando o SSR precisou usar contingência;
 - lógica centralizada para condição atual, hora a hora e dias seguintes;
 - páginas dedicadas para hoje, amanhã, sete dias, chuva, vento e meteograma;
+- `/chuva-em-pelotas` e `/vento-em-pelotas` reutilizam o meteograma estruturado de 48 horas para suas camadas públicas de volume por hora e direção prevista, mantendo previsão separada de observação;
 - `/meteograma-pelotas` mantém a série horária estruturada e acrescenta produtos WRF/GFS do SIMAGRO RS apenas como comparação visual identificada;
 - normalização de timezone para `America/Sao_Paulo` quando aplicável;
 - contratos para integridade de temperatura, precipitação, vento, rastreabilidade e disponibilidade.
@@ -646,6 +649,7 @@ A suíte de contratos cobre, entre outros domínios:
 - centralização Embrapa;
 - precisão de previsão;
 - resiliência Open-Meteo;
+- profundidade horária Open-Meteo/MET Norway, recuperação rica no navegador e camadas públicas de volume de chuva por hora/direção prevista do vento;
 - runtime/Lovable;
 - rolagem/PWA;
 - integridade meteorológica;
