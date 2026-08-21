@@ -2,7 +2,12 @@
 .internal-weather-shell--meteogram .simagro-model-products {
   display: grid;
   gap: clamp(1rem, 2vw, 1.35rem);
+  margin-top: clamp(16px, 2vw, 24px);
   padding: clamp(1.25rem, 2.6vw, 2rem);
+  border: 1px solid rgb(7 30 47 / 10%);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: none;
 }
 
 .internal-weather-shell--meteogram .simagro-model-products > header {
@@ -234,6 +239,7 @@
 @media (max-width: 620px) {
   .internal-weather-shell--meteogram .simagro-model-products {
     padding: 1rem;
+    border-radius: 12px;
   }
 
   .internal-weather-shell--meteogram .simagro-model-products__tabs {
@@ -258,6 +264,7 @@
 
 @media (forced-colors: active) {
   .internal-weather-shell--meteogram :is(
+    .simagro-model-products,
     .simagro-model-products__tabs button,
     .simagro-model-products__viewer-heading,
     .simagro-model-products__viewer figcaption
