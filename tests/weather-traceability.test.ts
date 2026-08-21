@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import { selectBaseline } from "../src/lib/weather/weather-baseline-select.ts";
@@ -12,6 +13,11 @@ import {
   createProviderHealth,
   deriveTraceability,
 } from "../src/lib/weather/weather-traceability.ts";
+
+const aggregatedWeatherServer = readFileSync(
+  "src/lib/weather/aggregated-weather.server.ts",
+  "utf8",
+);
 
 function makeProvider(key: ForecastSourceKey, live: boolean): WeatherHomeData {
   return {
@@ -40,7 +46,8 @@ function makeProvider(key: ForecastSourceKey, live: boolean): WeatherHomeData {
       ? [
           {
             weekday: "hoje",
-            date: "2026-07-24",
+            date: "24 jul",
+            dateIso: "2026-07-24",
             min: 10,
             max: 22,
             rainChance: 0,
@@ -229,4 +236,10 @@ test("Procedência da baseline Open-Meteo contém open-meteo e nunca met-norway"
   const values = Object.values(provenance);
   assert.ok(values.every((v) => v === "open-meteo"));
   assert.ok(!values.includes("met-norway"));
+});
+
+test("comparação diária com INMET usa identidade ISO, não o rótulo visual", () => {
+  assert.match(aggregatedWeatherServer, /day\.dateIso \?\? localForecastDateKey\(index\)/);
+  assert.match(aggregatedWeatherServer, /period\.date\?\.slice\(0, 10\)/);
+  assert.doesNotMatch(aggregatedWeatherServer, /day\.date\.slice\(0, 10\)/);
 });
