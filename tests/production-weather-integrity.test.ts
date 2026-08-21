@@ -37,6 +37,7 @@ function makeAggregatedWeather(overrides: Record<string, unknown> = {}) {
       {
         weekday: "Sexta-feira",
         date: "24/07",
+        dateIso: "2026-07-24",
         min: 14,
         max: 18,
         rainChance: null,
@@ -125,11 +126,13 @@ test("campos ausentes na previsão continuam ausentes e não viram zero", () => 
   assert.equal(result.daily[0]?.windGust, null);
 });
 
-test("adaptador de produção preserva a profundidade horária da previsão", () => {
+test("adaptador de produção preserva a profundidade horária e a identidade diária da previsão", () => {
   const result = toProductionWeatherData(makeAggregatedWeather());
   const hour = result.hourly[0];
+  const day = result.daily[0];
 
   assert.ok(hour);
+  assert.ok(day);
   assert.equal(hour.timestamp, "2026-07-24T18:00:00-03:00");
   assert.equal(hour.precipitationMm, 0.7);
   assert.equal(hour.windDirectionDegrees, 135);
@@ -143,6 +146,8 @@ test("adaptador de produção preserva a profundidade horária da previsão", ()
   assert.equal(hour.cloudCoverHigh, 18);
   assert.equal(hour.cape, 420);
   assert.equal(hour.boundaryLayerHeight, 380);
+  assert.equal(day.date, "24/07");
+  assert.equal(day.dateIso, "2026-07-24");
 });
 
 test("observação atual válida mantém apenas campos medidos pela Embrapa", () => {
