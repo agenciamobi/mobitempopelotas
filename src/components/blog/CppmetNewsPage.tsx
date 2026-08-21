@@ -3,6 +3,7 @@ import { ExternalLink, Newspaper, Radio, RefreshCw } from "lucide-react";
 import type { CppmetNewsFeed } from "@/lib/content/cppmet-news.server";
 
 import "./CppmetNewsPage.css";
+import "./CppmetNewsAccentContract.css";
 
 type CppmetNewsPageProps = {
   feed: CppmetNewsFeed;
