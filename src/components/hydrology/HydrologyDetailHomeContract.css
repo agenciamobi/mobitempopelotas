@@ -23,6 +23,8 @@
 }
 
 .site-shell--topic .hydrology-editorial-back {
+  min-height: 44px;
+  align-items: center;
   margin-bottom: clamp(18px, 2.2vw, 28px);
   color: #58717d;
 }
@@ -42,6 +44,11 @@
   margin-top: 16px;
   color: #58717d;
   line-height: 1.65;
+}
+
+.site-shell--topic .hydrology-editorial-actions > a {
+  min-height: 44px;
+  align-items: center;
 }
 
 .site-shell--topic .hydrology-editorial-actions > a:first-child {
@@ -172,6 +179,16 @@
 }
 
 .site-shell--topic .hydrology-editorial-route :is(
+  .hydrology-section-heading > a,
+  .hydrology-safety-note > a,
+  .hydrology-method > a
+) {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+}
+
+.site-shell--topic .hydrology-editorial-route :is(
   .hydrology-source-status,
   .hydrology-interpretation-warning,
   .hydrology-safety-note,
@@ -202,6 +219,7 @@
 }
 
 .site-shell--topic .laranjal-embed-guide-copy > a {
+  min-height: 44px;
   border-color: rgb(7 30 47 / 10%);
   border-radius: 14px;
   transform: none;
@@ -216,6 +234,10 @@
 .site-shell--topic .laranjal-embed-guide-code {
   border-radius: 14px;
   box-shadow: none;
+}
+
+.site-shell--topic .laranjal-embed-guide-code button {
+  min-height: 44px;
 }
 
 @media (max-width: 720px) {
@@ -257,5 +279,19 @@
 
   .site-shell--topic .laranjal-embed-guide {
     padding: 22px 18px;
+  }
+
+  /* Métricas curtas ficam em duas colunas para evitar uma página excessivamente longa. */
+  .site-shell--topic .hydrology-editorial-route :is(
+    .hydrology-level-metrics,
+    .hydrology-weather-grid
+  ) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 390px) {
+  .site-shell--topic .hydrology-editorial-route .hydrology-weather-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
