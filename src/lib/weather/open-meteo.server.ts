@@ -290,6 +290,7 @@ function normalizeDaily(response: OpenMeteoResponse): DailyForecast[] {
     items.push({
       weekday: formatDay(date, index),
       date: formatDate(date),
+      dateIso: date,
       min: Math.round(minimum),
       max: Math.round(maximum),
       rainChance: rainChance === null || rainChance === undefined ? null : Math.round(rainChance),
