@@ -17,6 +17,7 @@ import "./TodayAtmosphericSignalsLink.css";
 import "./TodayForecastPageV5.css";
 import "./TodayTypographyRefinement.css";
 import "./TodayForecastMobileRefinement.css";
+import "./TodayNavigationAvailability.css";
 
 const chapters = [
   { href: "#previsao-hoje", label: "Próximas horas", detail: "Temperatura, chuva e vento" },
