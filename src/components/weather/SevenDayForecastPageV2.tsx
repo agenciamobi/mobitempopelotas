@@ -53,6 +53,14 @@ function riskScore(day: DailyForecast) {
   return rainScore(day) + (day.windGust ?? 0) * 0.7;
 }
 
+function hasPositiveRain(day: DailyForecast) {
+  return (day.rainChance ?? 0) > 0 || day.precipitationMm > 0;
+}
+
+function hasPositiveGust(day: DailyForecast) {
+  return (day.windGust ?? 0) > 0;
+}
+
 function dayTone(day: DailyForecast): DayTone {
   if ((day.rainChance ?? 0) >= 70 || day.precipitationMm >= 15 || (day.windGust ?? 0) >= 60) {
     return "high";
@@ -74,7 +82,9 @@ function formatRainChance(day: DailyForecast) {
 }
 
 function formatGust(day: DailyForecast) {
-  return day.windGust === null ? "Não informada" : `${day.windGust} km/h`;
+  if (day.windGust === null) return "Não informada";
+  if (day.windGust <= 0) return "Sem rajada prevista";
+  return `${day.windGust} km/h`;
 }
 
 function rainSummary(day: DailyForecast) {
@@ -82,7 +92,9 @@ function rainSummary(day: DailyForecast) {
 }
 
 function gustSummary(day: DailyForecast) {
-  return day.windGust === null ? "rajadas não informadas" : `rajadas de até ${day.windGust} km/h`;
+  if (day.windGust === null) return "rajadas não informadas";
+  if (day.windGust <= 0) return "sem rajada prevista";
+  return `rajadas de até ${day.windGust} km/h`;
 }
 
 function planningHeadline(days: DailyForecast[]) {
@@ -93,7 +105,11 @@ function planningHeadline(days: DailyForecast[]) {
   );
   const minimum = Math.min(...days.map((day) => day.min));
   const maximum = Math.max(...days.map((day) => day.max));
+  const hasPositiveRiskSignal = days.some((day) => hasPositiveRain(day) || hasPositiveGust(day));
 
+  if (!hasPositiveRiskSignal) {
+    return "Não há valores positivos de chuva ou rajadas nesta atualização";
+  }
   if ((rainiest.rainChance ?? 0) >= 70 || rainiest.precipitationMm >= 15) {
     return `${rainiest.weekday} tem a maior combinação de chance e volume de chuva`;
   }
@@ -132,10 +148,11 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
   const temperatureSpan = Math.max(1, maximum - minimum);
   const warmest = days.reduce((current, day) => (day.max > current.max ? day : current));
   const coldest = days.reduce((current, day) => (day.min < current.min ? day : current));
-  const rainiest = days.reduce((current, day) => (rainScore(day) > rainScore(current) ? day : current));
-  const windiest = days.reduce((current, day) =>
-    (day.windGust ?? -1) > (current.windGust ?? -1) ? day : current,
-  );
+  const riskScores = days.map((day) => riskScore(day));
+  const minimumRisk = Math.min(...riskScores);
+  const maximumRisk = Math.max(...riskScores);
+  const hasPositiveRisk = maximumRisk > 0;
+  const hasRiskContrast = maximumRisk > minimumRisk;
   const bestDay = days.reduce((current, day) => (riskScore(day) < riskScore(current) ? day : current));
   const attentionDay = days.reduce((current, day) =>
     riskScore(day) > riskScore(current) ? day : current,
@@ -143,11 +160,15 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
   const rainyDays = days.filter(
     (day) => (day.rainChance ?? 0) >= 30 || day.precipitationMm >= 1,
   );
-  const rainRanking = [...days].sort((a, b) => rainScore(b) - rainScore(a)).slice(0, 3);
+  const rainRanking = [...days]
+    .filter(hasPositiveRain)
+    .sort((a, b) => rainScore(b) - rainScore(a))
+    .slice(0, 3);
   const windRanking = [...days]
-    .filter((day) => day.windGust !== null)
+    .filter(hasPositiveGust)
     .sort((a, b) => (b.windGust ?? 0) - (a.windGust ?? 0))
     .slice(0, 3);
+  const hasPublishedGust = days.some((day) => day.windGust !== null);
   const officialPeriods = weather.inmetForecast.slice(0, 5);
   const regionalDays = weather.officialForecast.slice(0, 5);
   const hasOfficialContext = officialPeriods.length > 0 || regionalDays.length > 0;
@@ -174,17 +195,31 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
           <article className="is-best">
             <CheckCircle2 aria-hidden="true" />
             <div>
-              <span>Menor chance de chuva e rajadas</span>
-              <strong>{bestDay.weekday}</strong>
-              <small>{rainSummary(bestDay)} · {gustSummary(bestDay)}</small>
+              <span>{hasRiskContrast ? "Menor chance de chuva e rajadas" : "Comparação de chuva e rajadas"}</span>
+              <strong>
+                {hasRiskContrast ? bestDay.weekday : hasPositiveRisk ? "Valores semelhantes" : "Sem destaque"}
+              </strong>
+              <small>
+                {hasRiskContrast
+                  ? `${rainSummary(bestDay)} · ${gustSummary(bestDay)}`
+                  : hasPositiveRisk
+                    ? "Os dias têm valores semelhantes nesta atualização."
+                    : "Não há valores positivos de chuva ou rajadas publicados."}
+              </small>
             </div>
           </article>
           <article className="is-attention">
             <TriangleAlert aria-hidden="true" />
             <div>
-              <span>Mais chuva ou rajadas</span>
-              <strong>{attentionDay.weekday}</strong>
-              <small>{rainSummary(attentionDay)} · {gustSummary(attentionDay)}</small>
+              <span>{hasRiskContrast ? "Mais chuva ou rajadas" : "Dia de maior atenção"}</span>
+              <strong>{hasRiskContrast ? attentionDay.weekday : "Sem um único dia"}</strong>
+              <small>
+                {hasRiskContrast
+                  ? `${rainSummary(attentionDay)} · ${gustSummary(attentionDay)}`
+                  : hasPositiveRisk
+                    ? "Nenhum dia se destaca dos demais pelos valores publicados."
+                    : "Sem valor positivo que justifique destacar um dia específico."}
+              </small>
             </div>
           </article>
           <article>
@@ -305,11 +340,13 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
         <div className="seven-day-v2-risks__grid">
           <article className="is-rain">
             <div className="seven-day-v2-risks__title"><CloudRain aria-hidden="true" /><span><small>Chuva</small><strong>Maiores chances e volumes</strong></span></div>
-            <ol>
-              {rainRanking.map((day) => (
-                <li key={`${day.weekday}-rain`}><span><strong>{day.weekday}</strong><small>{day.precipitationMm} mm estimados</small></span><b>{formatRainChance(day)}</b></li>
-              ))}
-            </ol>
+            {rainRanking.length ? (
+              <ol>
+                {rainRanking.map((day) => (
+                  <li key={`${day.weekday}-rain`}><span><strong>{day.weekday}</strong><small>{day.precipitationMm} mm estimados</small></span><b>{formatRainChance(day)}</b></li>
+                ))}
+              </ol>
+            ) : <p>Não há valores positivos de chance ou volume de chuva nesta atualização.</p>}
             <Link to="/chuva-em-pelotas">Ver chance e volume por horário <ArrowRight aria-hidden="true" /></Link>
           </article>
 
@@ -321,7 +358,13 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
                   <li key={`${day.weekday}-wind`}><span><strong>{day.weekday}</strong><small>Maior valor previsto para o dia</small></span><b>{formatGust(day)}</b></li>
                 ))}
               </ol>
-            ) : <p>A previsão ainda não informou rajadas para os próximos dias.</p>}
+            ) : (
+              <p>
+                {hasPublishedGust
+                  ? "Não há rajadas positivas previstas para os próximos dias."
+                  : "A previsão ainda não informou rajadas para os próximos dias."}
+              </p>
+            )}
             <Link to="/vento-em-pelotas">Ver velocidade e rajadas <ArrowRight aria-hidden="true" /></Link>
           </article>
         </div>
