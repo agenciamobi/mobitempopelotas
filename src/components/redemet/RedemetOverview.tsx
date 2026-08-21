@@ -55,6 +55,7 @@ type ObservedFrame = {
 };
 
 type SourceLayer = RedemetImageLayerResponse | RedemetStormLayerResponse;
+type SourceStateMode = "images" | "sequence";
 
 function formatDateTime(value: string | null) {
   return formatRedemetDateTime(value);
@@ -82,28 +83,51 @@ function sourceCountLabel(count: number) {
   return `${count} conjuntos de dados disponíveis`;
 }
 
-function frameCountLabel(count: number) {
+function frameCountLabel(count: number, mode: SourceStateMode = "images") {
+  if (mode === "sequence") {
+    if (count === 1) return "1 horário disponível";
+    return `${count} horários disponíveis`;
+  }
   if (count === 1) return "1 imagem disponível";
   return `${count} imagens disponíveis`;
 }
 
-function FreshnessBadge({ value }: { value: string | null }) {
+function FreshnessBadge({
+  value,
+  subject = "image",
+}: {
+  value: string | null;
+  subject?: "image" | "reading";
+}) {
   const freshness = getFreshness(value);
+  const label = subject === "reading" ? freshness.label.replace(/^Imagem\b/i, "Leitura") : freshness.label;
 
   return (
     <span className={`redemet-freshness is-${freshness.tone}`}>
       <i aria-hidden="true" />
-      {freshness.label}
+      {label}
     </span>
   );
 }
 
-function SourceState({ configured, available }: { configured: boolean; available: boolean }) {
+function SourceState({
+  configured,
+  available,
+  mode = "images",
+}: {
+  configured: boolean;
+  available: boolean;
+  mode?: SourceStateMode;
+}) {
   const label = !configured
     ? "Ainda não disponível"
     : available
-      ? "Imagens disponíveis"
-      : "Sem imagem nesta atualização";
+      ? mode === "sequence"
+        ? "Sequência disponível"
+        : "Imagens disponíveis"
+      : mode === "sequence"
+        ? "Sem leitura nesta atualização"
+        : "Sem imagem nesta atualização";
   const className = !configured ? "is-pending" : available ? "is-live" : "is-unavailable";
 
   return (
@@ -119,11 +143,13 @@ function SourceSummaryCard({
   title,
   description,
   layer,
+  mode = "images",
 }: {
   icon: LucideIcon;
   title: string;
   description: string;
   layer: SourceLayer;
+  mode?: SourceStateMode;
 }) {
   const latest = latestFrameTime(layer.frames);
   const freshness = getFreshness(latest);
@@ -137,15 +163,15 @@ function SourceSummaryCard({
           <span>{description}</span>
         </div>
       </div>
-      <SourceState configured={layer.configured} available={layer.available} />
+      <SourceState configured={layer.configured} available={layer.available} mode={mode} />
       <dl>
         <div>
-          <dt>Imagem mais recente</dt>
+          <dt>{mode === "sequence" ? "Leitura mais recente" : "Imagem mais recente"}</dt>
           <dd>{formatDateTime(latest)}</dd>
         </div>
         <div>
-          <dt>Imagens</dt>
-          <dd>{frameCountLabel(layer.frames.length)}</dd>
+          <dt>{mode === "sequence" ? "Horários" : "Imagens"}</dt>
+          <dd>{frameCountLabel(layer.frames.length, mode)}</dd>
         </div>
       </dl>
       <small>{freshness.relative}</small>
@@ -222,10 +248,11 @@ function ImageLayerPanel({
   const Icon = kind === "radar" ? Radar : Satellite;
   const sourceName = layer.provider === "INMET" ? "INMET" : "REDEMET";
   const freshness = getFreshness(selectedFrame?.observedAt ?? null);
+  const hasUsableFrame = layer.available && selectedFrame !== null;
 
   return (
     <article
-      className={`redemet-layer-card is-${kind}${featured ? " is-featured" : ""}`}
+      className={`redemet-layer-card is-${kind}${featured ? " is-featured" : ""}${hasUsableFrame ? "" : " is-unavailable-state"}`}
       id={id}
       aria-labelledby={`${id}-title`}
     >
@@ -238,10 +265,10 @@ function ImageLayerPanel({
             <p>{description}</p>
           </div>
         </div>
-        <SourceState configured={layer.configured} available={layer.available} />
+        <SourceState configured={layer.configured} available={hasUsableFrame} />
       </header>
 
-      {layer.available && selectedFrame ? (
+      {hasUsableFrame && selectedFrame ? (
         <>
           <figure className="redemet-image-frame" data-freshness={freshness.tone}>
             {kind === "radar" ? (
@@ -326,10 +353,14 @@ function ImageLayerPanel({
           <ImageIcon aria-hidden="true" />
           <strong>
             {layer.configured
-              ? "Não foi encontrada uma imagem utilizável nesta atualização."
+              ? "Não há uma imagem utilizável nesta atualização."
               : "Esta imagem ainda não está disponível no portal."}
           </strong>
-          <p>As demais imagens, a previsão por horário e os avisos oficiais continuam disponíveis.</p>
+          <p>
+            {layer.configured
+              ? `A fonte ${sourceName} não entregou um quadro utilizável nesta consulta. Tente novamente em alguns minutos ou confira a página oficial.`
+              : "Radar, demais satélites, previsão por horário e avisos oficiais continuam disponíveis na página."}
+          </p>
         </div>
       )}
 
@@ -354,11 +385,18 @@ function ImageLayerPanel({
 function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
   const playback = useFramePlayback(layer.frames.length, layer.currentIndex);
   const selectedFrame = layer.frames[playback.selectedIndex] ?? layer.frames.at(-1) ?? null;
+  const hasSelectedFrame = layer.available && selectedFrame !== null;
   const count = selectedFrame?.points.length ?? 0;
+  const hasDetections = hasSelectedFrame && count > 0;
+  const title = !hasSelectedFrame
+    ? "Leitura de atividade elétrica em atualização"
+    : hasDetections
+      ? "Descargas elétricas detectadas no horário selecionado"
+      : "Nenhuma descarga detectada no horário selecionado";
 
   return (
     <article
-      className="redemet-storm-card"
+      className={`redemet-storm-card${hasSelectedFrame && !hasDetections ? " is-zero-detections" : ""}`}
       id="trovoadas-regionais"
       aria-labelledby="trovoadas-regionais-title"
     >
@@ -367,44 +405,55 @@ function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
           <CloudLightning aria-hidden="true" />
           <span>Trovoadas na região</span>
         </div>
-        <SourceState configured={layer.configured} available={layer.available} />
+        <SourceState configured={layer.configured} available={hasSelectedFrame} mode="sequence" />
       </div>
 
       <div className="redemet-storm-content">
         <div>
-          <span>Descargas elétricas detectadas</span>
-          <h2 id="trovoadas-regionais-title">Trovoadas registradas no horário selecionado</h2>
+          <span>Leitura de atividade elétrica</span>
+          <h2 id="trovoadas-regionais-title">{title}</h2>
           <p>
-            Os pontos mostram descargas detectadas na região. Eles não confirmam, sozinhos, tempestade
-            ou risco em Pelotas; confira o horário, a mudança entre as imagens e os avisos oficiais.
+            {!hasSelectedFrame
+              ? "A sequência STSC não trouxe uma leitura utilizável nesta atualização. Os avisos oficiais e as demais camadas da página continuam disponíveis."
+              : hasDetections
+                ? "Os pontos mostram descargas elétricas detectadas na região. Eles não confirmam, sozinhos, tempestade ou risco em Pelotas; confira o horário, a mudança entre as leituras e os avisos oficiais."
+                : "O STSC retornou este horário sem descargas elétricas detectadas na área consultada. Isso não equivale a ausência de risco; confira os demais horários da sequência e os avisos oficiais."}
           </p>
         </div>
 
         <div className="redemet-storm-reading">
-          <strong>{layer.available && selectedFrame ? count : "—"}</strong>
-          <span>{count === 1 ? "registro encontrado" : "registros encontrados"}</span>
+          <strong>{hasSelectedFrame ? count : "—"}</strong>
+          <span>
+            {!hasSelectedFrame
+              ? "leitura em atualização"
+              : count === 0
+                ? "nenhuma descarga detectada"
+                : count === 1
+                  ? "descarga detectada"
+                  : "descargas detectadas"}
+          </span>
           <small>
             {selectedFrame
-              ? `Registrado em ${formatDateTime(selectedFrame.observedAt)}`
-              : "Dados em atualização"}
+              ? `Horário consultado: ${formatDateTime(selectedFrame.observedAt)}`
+              : "Horário em atualização"}
           </small>
-          <FreshnessBadge value={selectedFrame?.observedAt ?? null} />
+          <FreshnessBadge value={selectedFrame?.observedAt ?? null} subject="reading" />
         </div>
       </div>
 
-      {layer.available && layer.frames.length > 0 ? (
-        <div className="redemet-storm-controls" aria-label="Imagens de trovoadas disponíveis">
+      {hasSelectedFrame && layer.frames.length > 0 ? (
+        <div className="redemet-storm-controls" aria-label="Horários de atividade elétrica disponíveis">
           <button
             type="button"
             onClick={() => playback.selectFrame(playback.selectedIndex - 1)}
             disabled={playback.selectedIndex === 0}
-            aria-label="Ver imagem anterior de trovoadas"
+            aria-label="Ver horário anterior de atividade elétrica"
           >
             <ArrowLeft aria-hidden="true" />
           </button>
           <label className="redemet-storm-timeline">
             <span>
-              Imagem {playback.selectedIndex + 1} de {layer.frames.length}
+              Horário {playback.selectedIndex + 1} de {layer.frames.length}
             </span>
             <input
               type="range"
@@ -418,7 +467,7 @@ function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
             type="button"
             onClick={() => playback.selectFrame(playback.selectedIndex + 1)}
             disabled={playback.selectedIndex >= layer.frames.length - 1}
-            aria-label="Ver próxima imagem de trovoadas"
+            aria-label="Ver próximo horário de atividade elétrica"
           >
             <ArrowRight aria-hidden="true" />
           </button>
@@ -439,7 +488,7 @@ function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
               onClick={playback.showLatest}
               disabled={playback.isLatest}
             >
-              <RotateCcw aria-hidden="true" /> Imagem mais recente
+              <RotateCcw aria-hidden="true" /> Horário mais recente
             </button>
           </div>
         </div>
@@ -448,8 +497,8 @@ function StormLayerPanel({ layer }: { layer: RedemetStormLayerResponse }) {
       <div className="redemet-storm-warning">
         <AlertTriangle aria-hidden="true" />
         <p>
-          Uma trovoada detectada não é um aviso meteorológico. Para decisões de segurança, consulte os{" "}
-          <Link to="/alertas">avisos oficiais para Pelotas</Link>.
+          Uma descarga elétrica detectada não é um aviso meteorológico. Para decisões de segurança,
+          consulte os <Link to="/alertas">avisos oficiais para Pelotas</Link>.
         </p>
       </div>
     </article>
@@ -538,6 +587,7 @@ export function RedemetOverview({ data }: { data: RedemetOverviewData }) {
             title="Trovoadas"
             description="Atividade elétrica detectada"
             layer={data.storms}
+            mode="sequence"
           />
         </div>
       </section>
