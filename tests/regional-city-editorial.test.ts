@@ -40,6 +40,10 @@ const identityCss = readFileSync(
   new URL("../src/components/regional/RegionalCityIdentity.css", import.meta.url),
   "utf8",
 );
+const accentCss = readFileSync(
+  new URL("../src/components/regional/RegionalCityAccentContract.css", import.meta.url),
+  "utf8",
+);
 
 test("páginas regionais usam o main semântico fornecido pelo layout global", () => {
   assert.doesNotMatch(pageSource, /<main\b/);
@@ -71,6 +75,22 @@ test("primeira dobra regional segue a composição dividida da página de vento"
   assert.match(splitHeroCss, /linear-gradient\(145deg, #102437, #18334f 58%, #25375c\)/);
   assert.match(splitHeroCss, /@media \(max-width: 980px\)/);
   assert.match(heroCss, /\.regional-city-split-hero/);
+});
+
+test("camada local regional clareia o hero sem alterar WeatherSplitHero compartilhado", () => {
+  const identityIndex = pageSource.indexOf("RegionalCityIdentity.css");
+  const accentIndex = pageSource.indexOf("RegionalCityAccentContract.css");
+  assert.ok(identityIndex >= 0);
+  assert.ok(accentIndex > identityIndex);
+  assert.match(accentCss, /\.regional-city-page \.regional-city-split-hero/);
+  assert.match(accentCss, /\.weather-split-hero__copy[\s\S]*radial-gradient/);
+  assert.match(accentCss, /\.weather-split-hero__copy h1[\s\S]*color:\s*#071e2f/);
+  assert.match(accentCss, /\.weather-split-hero__card\.is-elevated/);
+  assert.match(accentCss, /\.weather-split-hero__card\.is-strong/);
+  assert.match(accentCss, /\.weather-split-hero__card\.is-unknown/);
+  assert.match(accentCss, /\.internal-page-chapters[\s\S]*box-shadow:\s*none/);
+  assert.match(accentCss, /min-height:\s*44px/);
+  assert.doesNotMatch(accentCss, /!important/);
 });
 
 test("navegação regional usa os mesmos capítulos da previsão de hoje", () => {
