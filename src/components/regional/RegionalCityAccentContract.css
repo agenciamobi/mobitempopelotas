@@ -130,6 +130,19 @@
   box-shadow: none;
 }
 
+/*
+ * HomeForecastStory pode omitir seus blocos quando uma cidade está em contingência.
+ * O índice nunca mantém um link para uma âncora que não existe no DOM atual.
+ */
+.regional-city-page:not(:has(#previsao-hoje))
+  > .internal-page-chapters
+  a[href="#previsao-hoje"],
+.regional-city-page:not(:has(#tendencia))
+  > .internal-page-chapters
+  a[href="#tendencia"] {
+  display: none;
+}
+
 .regional-city-page .regional-city-official-alert .home-inmet-alerts__aside > a,
 .regional-city-page .regional-city-related > header > a {
   min-height: 44px;
