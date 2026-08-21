@@ -37,6 +37,11 @@ test("hourly rain detail keeps probability and model volume separate from measur
   assert.doesNotMatch(`${rainDetail}\n${rainRoute}`, /OCR|extrair pixels|chuva medida pelo modelo/i);
 });
 
+test("hourly rain detail does not invent a peak when all forecast volumes are zero", () => {
+  assert.match(rainDetail, /const peak = total > 0 \? peakVolumeHour\(hours\) : null/);
+  assert.match(rainDetail, /Sem volume previsto no período/);
+});
+
 test("hourly wind direction stays a forecast distinct from current observation", () => {
   assert.match(windDetail, /windDirectionDegrees/);
   assert.match(windDetail, /Mais frequente em 24h/);
