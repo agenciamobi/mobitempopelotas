@@ -1,0 +1,163 @@
+/*
+ * Metodologia — transparência técnica com acento editorial controlado.
+ * Mantém os gradientes que ajudam a separar conceitos, mas remove o excesso
+ * de radius, sombras e aparência de cards flutuantes da fase anterior.
+ */
+
+.methodology-page {
+  --methodology-home-line: rgb(7 30 47 / 10%);
+  --methodology-home-soft: #fbfcfc;
+  --methodology-home-ink: #071e2f;
+  --methodology-home-muted: #58717d;
+}
+
+.methodology-hero {
+  overflow: hidden;
+  border: 1px solid var(--methodology-home-line);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at 8% 8%, rgb(24 189 205 / 14%), transparent 25rem),
+    radial-gradient(circle at 94% 96%, rgb(94 44 237 / 10%), transparent 28rem),
+    linear-gradient(145deg, #fff 0%, #f5fafb 58%, #f8f6ff 100%);
+  box-shadow: none;
+}
+
+.methodology-hero::before {
+  height: 3px;
+}
+
+.methodology-hero h1 {
+  max-width: 11ch;
+  font-size: clamp(2.7rem, 4.8vw, 4.8rem);
+  line-height: 0.96;
+  letter-spacing: -0.065em;
+  text-wrap: balance;
+}
+
+.methodology-lead {
+  color: var(--methodology-home-muted);
+  line-height: 1.65;
+  text-wrap: pretty;
+}
+
+.methodology-quality {
+  border: 1px solid var(--methodology-home-line);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 82%);
+  box-shadow: none;
+}
+
+.methodology-quality dl > div,
+.methodology-synthesis-state {
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.methodology-chapter-nav {
+  border-color: var(--methodology-home-line);
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.methodology-chapter-nav a {
+  min-height: 4rem;
+}
+
+.methodology-section,
+.methodology-warning,
+.methodology-actions {
+  border-radius: 16px;
+  box-shadow: none;
+}
+
+.methodology-section {
+  border-color: var(--methodology-home-line);
+  background: #fff;
+}
+
+.methodology-source-card,
+.methodology-source-card:last-child:nth-child(odd) {
+  min-height: 300px;
+  border: 1px solid var(--methodology-home-line);
+  border-top: 3px solid #18bdcd;
+  border-radius: 14px;
+  background: var(--methodology-home-soft);
+  box-shadow: none;
+}
+
+.methodology-source-card[data-category="hydrology"] {
+  border-top-color: #5e2ced;
+  background: #fbfaff;
+  box-shadow: none;
+}
+
+.methodology-source-detail,
+.methodology-hydrology-note,
+.methodology-synthesis-state {
+  border-radius: 12px;
+}
+
+.methodology-source-card > a,
+.methodology-back-link,
+.methodology-primary-action,
+.methodology-secondary-action {
+  min-height: 44px;
+}
+
+.methodology-pipeline {
+  border: 1px solid rgb(7 30 47 / 12%);
+  border-radius: 16px;
+  box-shadow: none;
+}
+
+.methodology-pipeline-grid li {
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.methodology-rules-grid article,
+.methodology-definition-grid article {
+  border-color: var(--methodology-home-line);
+  border-radius: 14px;
+  background: var(--methodology-home-soft);
+  box-shadow: none;
+}
+
+.methodology-actions {
+  border-color: var(--methodology-home-line);
+  background:
+    radial-gradient(circle at 5% 20%, rgb(24 189 205 / 11%), transparent 20rem),
+    linear-gradient(135deg, #f4fafb, #f8f6ff);
+}
+
+@media (max-width: 680px) {
+  .methodology-hero,
+  .methodology-section,
+  .methodology-warning,
+  .methodology-actions,
+  .methodology-pipeline {
+    border-radius: 12px;
+  }
+
+  .methodology-quality,
+  .methodology-chapter-nav,
+  .methodology-source-card,
+  .methodology-rules-grid article,
+  .methodology-definition-grid article {
+    border-radius: 12px;
+  }
+
+  .methodology-hero h1 {
+    max-width: 12ch;
+    font-size: clamp(2.35rem, 11vw, 3.45rem);
+  }
+}
+
+@media (forced-colors: active) {
+  .methodology-hero,
+  .methodology-quality,
+  .methodology-source-card,
+  .methodology-actions {
+    background: Canvas;
+  }
+}
