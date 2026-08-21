@@ -1,0 +1,76 @@
+/*
+ * Estação Embrapa — identidade de observação local.
+ * Verde/ciano entra de forma leve para separar medição observada de previsão,
+ * sem alterar os estados live/stale/partial/unavailable nem os gráficos de 24h.
+ */
+
+.internal-weather-shell--embrapa .embrapa-v2-hero__content {
+  background:
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 8%), transparent 22rem),
+    linear-gradient(145deg, #f7fcfa 0%, #ffffff 58%, #f3fbfc 100%);
+}
+
+.internal-weather-shell--embrapa .embrapa-v2-reading {
+  background:
+    radial-gradient(circle at 100% 0, rgb(24 189 205 / 10%), transparent 20rem),
+    radial-gradient(circle at 0 100%, rgb(45 141 89 / 8%), transparent 18rem),
+    linear-gradient(145deg, #eef9f5 0%, #ffffff 55%, #f2fbfc 100%);
+}
+
+.internal-weather-shell--embrapa .embrapa-v2-reading__quick > span {
+  border-color: rgb(7 30 47 / 9%);
+  background: rgb(255 255 255 / 74%);
+  box-shadow: none;
+}
+
+.internal-weather-shell--embrapa .embrapa-v2-reading__quick > span:nth-child(1) {
+  border-color: rgb(24 189 205 / 14%);
+  background: #f1fbfc;
+}
+
+.internal-weather-shell--embrapa .embrapa-v2-reading__quick > span:nth-child(2) {
+  border-color: rgb(45 141 89 / 13%);
+  background: #f2faf5;
+}
+
+.internal-weather-shell--embrapa .embrapa-v2-reading__quick > span:nth-child(3) {
+  border-color: rgb(94 44 237 / 11%);
+  background: #f8f6ff;
+}
+
+.internal-weather-shell--embrapa .embrapa-v2-reading__quick > span:nth-child(4) {
+  border-color: rgb(242 112 53 / 12%);
+  background: #fff8f3;
+}
+
+.internal-weather-shell--embrapa .embrapa-v2-hero__actions a:first-child {
+  border-color: #087f91;
+  color: #fff;
+  background: linear-gradient(135deg, #087f91 0%, #2d8d59 100%);
+}
+
+.internal-weather-shell--embrapa .embrapa-v2-hero__actions a:first-child:hover {
+  border-color: #087f91;
+}
+
+@media (max-width: 720px) {
+  .internal-weather-shell--embrapa .embrapa-v2-hero__content {
+    background: linear-gradient(145deg, #f7fcfa, #fff 65%, #f4fbfc);
+  }
+
+  .internal-weather-shell--embrapa .embrapa-v2-reading {
+    background:
+      radial-gradient(circle at 100% 0, rgb(24 189 205 / 8%), transparent 15rem),
+      linear-gradient(145deg, #eff9f5, #fff 64%, #f4fbfc);
+  }
+}
+
+@media (forced-colors: active) {
+  .internal-weather-shell--embrapa :is(
+    .embrapa-v2-hero__content,
+    .embrapa-v2-reading,
+    .embrapa-v2-reading__quick > span
+  ) {
+    background: Canvas;
+  }
+}
