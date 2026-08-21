@@ -15,6 +15,7 @@ import {
 import type { WeatherIconName } from "@/lib/weather/types";
 
 import "./HomeForecastStory.css";
+import "./HomeForecastUnknownState.css";
 
 const iconMap: Record<WeatherIconName, LucideIcon> = {
   sun: Sun,
@@ -27,7 +28,13 @@ const iconMap: Record<WeatherIconName, LucideIcon> = {
   wind: Wind,
 };
 
-type RainLevel = "none" | "low" | "moderate" | "high" | "very-high";
+type RainLevel = "unknown" | "none" | "low" | "moderate" | "high" | "very-high";
+
+type RainReading = {
+  chance: number | null;
+  level: RainLevel;
+  label: string;
+};
 
 export type ForecastStoryData = {
   weather: {
@@ -71,14 +78,18 @@ function ForecastIcon({ name, size = 25 }: { name: WeatherIconName; size?: numbe
   return <Icon aria-hidden="true" size={size} strokeWidth={1.7} />;
 }
 
-function rainReading(value: number | null) {
-  const chance = Math.max(0, Math.min(100, Math.round(value ?? 0)));
+function rainReading(value: number | null): RainReading {
+  if (value === null || !Number.isFinite(value)) {
+    return { chance: null, level: "unknown", label: "Chance em atualização" };
+  }
 
-  if (chance === 0) return { chance, level: "none" as RainLevel, label: "Sem chuva indicada" };
-  if (chance < 20) return { chance, level: "low" as RainLevel, label: "Chance baixa" };
-  if (chance < 50) return { chance, level: "moderate" as RainLevel, label: "Chance moderada" };
-  if (chance < 80) return { chance, level: "high" as RainLevel, label: "Chance alta" };
-  return { chance, level: "very-high" as RainLevel, label: "Chance muito alta" };
+  const chance = Math.max(0, Math.min(100, Math.round(value)));
+
+  if (chance === 0) return { chance, level: "none", label: "Sem chuva indicada" };
+  if (chance < 20) return { chance, level: "low", label: "Chance baixa" };
+  if (chance < 50) return { chance, level: "moderate", label: "Chance moderada" };
+  if (chance < 80) return { chance, level: "high", label: "Chance alta" };
+  return { chance, level: "very-high", label: "Chance muito alta" };
 }
 
 function formatNumber(value: number, maximumFractionDigits = 1) {
@@ -117,10 +128,9 @@ function timeReference(value: string | null | undefined) {
 }
 
 function tomorrowHeadline(chance: number | null) {
-  const normalizedChance = chance ?? 0;
-
-  if (normalizedChance >= 70) return "Chuva deve marcar o dia de amanhã";
-  if (normalizedChance >= 30) return "Amanhã pode ter períodos de chuva";
+  if (chance === null) return "Chance de chuva de amanhã em atualização";
+  if (chance >= 70) return "Chuva deve marcar o dia de amanhã";
+  if (chance >= 30) return "Amanhã pode ter períodos de chuva";
   return "Amanhã tende a ter menor chance de chuva";
 }
 
@@ -147,6 +157,10 @@ function tomorrowDescription(
   return `${rainText}, com ${windText}.`;
 }
 
+function formatChance(value: number | null) {
+  return value === null ? "—" : `${value}%`;
+}
+
 export function HomeForecastStory({
   data,
   context = "home",
@@ -159,11 +173,16 @@ export function HomeForecastStory({
   const today = daily[0];
   const tomorrow = daily[1];
   const nextDays = daily.slice(1, 6);
-  const peakHour = visibleHours.reduce<(typeof visibleHours)[number] | null>((highest, hour) => {
-    const currentChance = hour.precipitationProbability ?? 0;
-    const highestChance = highest?.precipitationProbability ?? 0;
+  const chanceHours = visibleHours.filter((hour) => hour.precipitationProbability !== null);
+  const peakCandidate = chanceHours.reduce<(typeof chanceHours)[number] | null>((highest, hour) => {
+    const currentChance = hour.precipitationProbability ?? -1;
+    const highestChance = highest?.precipitationProbability ?? -1;
     return !highest || currentChance > highestChance ? hour : highest;
   }, null);
+  const highestRainChance = peakCandidate?.precipitationProbability ?? null;
+  const hasPositiveRainChance = (highestRainChance ?? 0) > 0;
+  const peakHour = hasPositiveRainChance ? peakCandidate : null;
+  const peakRain = rainReading(highestRainChance);
   const hourlyGusts = visibleHours
     .map((hour) => hour.windGust)
     .filter((value): value is number => value !== null && Number.isFinite(value));
@@ -172,6 +191,12 @@ export function HomeForecastStory({
     visibleHours.length > 1
       ? `${visibleHours[0].time} até ${visibleHours[visibleHours.length - 1].time}`
       : (visibleHours[0]?.time ?? "Horários em atualização");
+  const peakRainDetail =
+    highestRainChance === null
+      ? "chance em atualização"
+      : hasPositiveRainChance
+        ? timeReference(peakHour?.time)
+        : "sem horário de destaque";
 
   if (!today || (visibleHours.length === 0 && nextDays.length === 0)) return null;
 
@@ -204,7 +229,7 @@ export function HomeForecastStory({
           </div>
           <div>
             <dt>{isDetailedPage ? "Maior chance de chuva" : "Chance de chuva"}</dt>
-            <dd>{formatMetric(today.rainChance, "%")}</dd>
+            <dd>{formatChance(today.rainChance)}</dd>
           </div>
           <div>
             <dt>{isDetailedPage ? "Rajada máxima" : "Rajada prevista"}</dt>
@@ -221,12 +246,10 @@ export function HomeForecastStory({
               <strong>{visibleHours.length} horários</strong>
               <span>{forecastWindow}</span>
             </div>
-            <div
-              className={`rain-${rainReading(peakHour?.precipitationProbability ?? null).level}`}
-            >
+            <div className={`rain-${peakRain.level}`}>
               <small>Maior chance de chuva</small>
-              <strong>{rainReading(peakHour?.precipitationProbability ?? null).chance}%</strong>
-              <span>{timeReference(peakHour?.time)}</span>
+              <strong>{formatChance(peakRain.chance)}</strong>
+              <span>{peakRainDetail}</span>
             </div>
             <div>
               <small>{isDetailedPage ? "Rajada máxima" : "Rajada mais forte"}</small>
@@ -244,14 +267,18 @@ export function HomeForecastStory({
           <div className="home-hourly-cards" aria-label={`Tempo nas próximas horas em ${locationName}`}>
             {visibleHours.map((hour, index) => {
               const rain = rainReading(hour.precipitationProbability);
-              const isPeak = peakHour === hour && rain.chance > 0;
+              const isPeak = peakHour === hour;
               const windDescription = hourlyWindDescription(hour.windGust, hour.windSpeed);
+              const rainAria =
+                rain.chance === null
+                  ? "chance de chuva não informada"
+                  : `${rain.chance}% de chance de chuva`;
 
               return (
                 <article
                   className={`rain-${rain.level}${index === 0 ? " is-current" : ""}${isPeak ? " is-rain-peak" : ""}`}
                   key={`${hour.timestamp ?? hour.time}-${index}`}
-                  aria-label={`${hour.time}: ${formatMetric(hour.temperature, " graus")}, ${rain.chance}% de chance de chuva; ${windDescription}`}
+                  aria-label={`${hour.time}: ${formatMetric(hour.temperature, " graus")}, ${rainAria}; ${windDescription}`}
                 >
                   <div className="home-hourly-topline">
                     <span>{hour.time}</span>
@@ -268,10 +295,10 @@ export function HomeForecastStory({
                   <div className="home-hourly-rain">
                     <div>
                       <span>{isDetailedPage ? "Chance de chuva" : "Chuva"}</span>
-                      <strong>{rain.chance}%</strong>
+                      <strong>{formatChance(rain.chance)}</strong>
                     </div>
                     <i aria-hidden="true">
-                      <b style={{ width: `${rain.chance}%` }} />
+                      <b style={{ width: `${rain.chance ?? 0}%` }} />
                     </i>
                     {hourlyVolumeLabel(hour.precipitationMm)}
                   </div>
@@ -293,12 +320,16 @@ export function HomeForecastStory({
           <div className="home-next-day-cards">
             {nextDays.map((day, index) => {
               const rain = rainReading(day.rainChance);
+              const rainAria =
+                rain.chance === null
+                  ? "chance de chuva não informada"
+                  : `${rain.chance}% de chance de chuva`;
 
               return (
                 <article
                   className={`rain-${rain.level}${index === 0 ? " is-tomorrow" : ""}`}
                   key={`${day.weekday}-${day.dateIso ?? day.date}`}
-                  aria-label={`${day.weekday}, ${day.date}: máxima de ${formatMetric(day.max, " graus")}, mínima de ${formatMetric(day.min, " graus")} e ${rain.chance}% de chance de chuva`}
+                  aria-label={`${day.weekday}, ${day.date}: máxima de ${formatMetric(day.max, " graus")}, mínima de ${formatMetric(day.min, " graus")} e ${rainAria}`}
                 >
                   <div className="home-next-day-topline">
                     <div>
@@ -314,10 +345,10 @@ export function HomeForecastStory({
                   <div className="home-next-day-rain">
                     <div>
                       <span>Chance de chuva</span>
-                      <strong>{rain.chance}%</strong>
+                      <strong>{formatChance(rain.chance)}</strong>
                     </div>
                     <i aria-hidden="true">
-                      <b style={{ width: `${rain.chance}%` }} />
+                      <b style={{ width: `${rain.chance ?? 0}%` }} />
                     </i>
                     <small>
                       {day.precipitationMm === null
