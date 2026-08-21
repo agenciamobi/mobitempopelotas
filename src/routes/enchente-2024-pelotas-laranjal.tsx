@@ -4,6 +4,7 @@ import {
   Flood2024Hero,
   Flood2024HistoricalPage,
 } from "@/components/history/Flood2024HistoricalPage";
+import "@/components/history/Flood2024HomeContract.css";
 import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd } from "@/lib/structured-data";
