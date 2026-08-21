@@ -6,6 +6,7 @@ const todayHero = readFileSync("src/components/weather/TodayRetailHero.tsx", "ut
 const tomorrowHero = readFileSync("src/components/weather/TomorrowRetailHero.tsx", "utf8");
 const sevenDayHero = readFileSync("src/components/weather/SevenDayRetailHero.tsx", "utf8");
 const rainHero = readFileSync("src/components/weather/RainRetailHero.tsx", "utf8");
+const sharedForecastStory = readFileSync("src/components/weather/HomeForecastStory.tsx", "utf8");
 
 test("today hero does not link to hourly anchors when hourly forecast is absent", () => {
   assert.match(todayHero, /const hasHourlyForecast = weather\.hourly\.length > 0/);
@@ -58,4 +59,14 @@ test("rain hero chooses only anchors backed by the available forecast series", (
   assert.match(rainHero, /to="\/previsao-7-dias-pelotas"/);
   assert.match(rainHero, /hour\.windGust !== null/);
   assert.doesNotMatch(rainHero, /hour\.windGust \?\? hour\.windSpeed/);
+});
+
+test("shared forecast story never relabels sustained wind as a gust", () => {
+  assert.match(sharedForecastStory, /function formatGust/);
+  assert.match(sharedForecastStory, /function hourlyWindDescription/);
+  assert.match(sharedForecastStory, /Rajada não informada · vento/);
+  assert.match(sharedForecastStory, /Sem rajada prevista · vento/);
+  assert.match(sharedForecastStory, /const hourlyGusts = visibleHours/);
+  assert.doesNotMatch(sharedForecastStory, /function windValue/);
+  assert.doesNotMatch(sharedForecastStory, /windGust \?\? windSpeed/);
 });
