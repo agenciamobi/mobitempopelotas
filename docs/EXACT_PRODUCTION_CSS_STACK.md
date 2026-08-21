@@ -41,7 +41,7 @@ A rodada de UX/UI posterior à consolidação adicionou melhorias transversais s
 
 ## Ordem final da Home
 
-No fim da pilha editorial, a ordem válida é:
+No trecho dedicado à composição da Home, a ordem válida continua sendo:
 
 1. `src/production/styles/home-first-fold-magazine-v69.css`;
 2. `src/production/styles/home-first-fold-editorial-v70.css`;
@@ -49,7 +49,31 @@ No fim da pilha editorial, a ordem válida é:
 4. `src/production/styles/home-editorial-current.css`;
 5. `src/production/styles/home-editorial-ux.css`.
 
-`home-editorial-current.css` é a fonte de verdade da composição visual. `home-editorial-ux.css` é a fonte de verdade das regras transversais de interação e usabilidade. Alterações futuras devem editar uma dessas duas camadas conforme a responsabilidade, em vez de adicionar novas versões numeradas.
+`home-editorial-current.css` é a fonte de verdade da composição visual. `home-editorial-ux.css` é a fonte de verdade das regras transversais de interação e usabilidade. Alterações futuras da Home devem editar uma dessas duas camadas conforme a responsabilidade, em vez de adicionar novas versões numeradas.
+
+## Camadas finais de coesão entre rotas
+
+A lista acima não representa mais o fim literal do arquivo de entrada. Depois das camadas históricas e editoriais da Home, a produção possui contratos transversais destinados a manter páginas internas, páginas standalone e chunks lazy coerentes com o sistema visual atual.
+
+No fim literal de `src/production/production-styles.css` e de `src/production/production-styles.ts`, a ordem obrigatória é:
+
+1. `src/production/styles/document-scroll.css`;
+2. `src/production/styles/home-editorial-shell.css`;
+3. `src/production/styles/internal-home-surface-contract.css`;
+4. `src/production/styles/standalone-home-surface-contract.css`;
+5. `src/production/styles/internal-dedicated-page-stabilization.css`;
+6. `src/production/styles/internal-editorial-precedence-barrier.css`.
+
+Responsabilidades:
+
+- `document-scroll.css` define o viewport de rolagem real da aplicação;
+- `home-editorial-shell.css` fornece o canvas e o chrome compartilhados da experiência editorial;
+- `internal-home-surface-contract.css` aplica rail, superfícies e geometria da Home às páginas internas e de tópico;
+- `standalone-home-surface-contract.css` faz o mesmo para páginas públicas que possuem shell próprio, como status e privacidade;
+- `internal-dedicated-page-stabilization.css` adapta componentes dedicados ainda apoiados em CSS histórico, sem achatar mapas, vídeos e gráficos funcionais;
+- `internal-editorial-precedence-barrier.css` é deliberadamente a última camada e reafirma somente o contrato estrutural que não pode ser restaurado por CSS lazy carregado depois da navegação.
+
+A barreira de precedência deve continuar sendo o último import da pilha de produção. Não adicionar novos imports depois dela. Quando uma rota lazy precisar de correção visual estrutural, primeiro avaliar se a solução pertence ao contrato existente; evitar criar uma nova cadeia de overrides versionados.
 
 ## Objetivo
 
