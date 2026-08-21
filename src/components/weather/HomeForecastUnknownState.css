@@ -1,0 +1,20 @@
+/* Unknown precipitation probability is not the same state as a published 0%. */
+.home-hourly-cards article.rain-unknown,
+.home-next-day-cards article.rain-unknown {
+  --rain-color: #8497a0;
+  border-color: rgba(79, 103, 114, 0.16);
+  background: rgba(249, 251, 251, 0.96);
+}
+
+.home-hourly-cards article.rain-unknown .home-hourly-rain > i > b,
+.home-next-day-cards article.rain-unknown .home-next-day-rain > i > b {
+  width: 0 !important;
+}
+
+@media (forced-colors: active) {
+  .home-hourly-cards article.rain-unknown,
+  .home-next-day-cards article.rain-unknown {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+}
