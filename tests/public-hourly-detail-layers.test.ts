@@ -9,6 +9,8 @@ const rainStyles = readFileSync("src/components/weather/RainHourlyVolumeContext.
 const windDetail = readFileSync("src/components/weather/WindDirectionContext.tsx", "utf8");
 const windStyles = readFileSync("src/components/weather/WindDirectionContext.css", "utf8");
 const windPage = readFileSync("src/components/weather/WindForecastPageV3.tsx", "utf8");
+const windPageStyles = readFileSync("src/components/weather/WindForecastPageV3.css", "utf8");
+const rainPage = readFileSync("src/components/weather/RainForecastPageV2.tsx", "utf8");
 const todayPage = readFileSync("src/components/weather/TodayForecastPageV5.tsx", "utf8");
 const meteogram = readFileSync("src/lib/weather/meteogram.server.ts", "utf8");
 
@@ -31,6 +33,7 @@ test("hourly rain detail keeps probability and model volume separate from measur
   assert.match(rainDetail, /Maior volume em uma hora/);
   assert.match(rainDetail, /São valores de previsão, não chuva já medida em Pelotas/);
   assert.match(rainRoute, /O volume por hora desta página é uma previsão do modelo/);
+  assert.match(rainPage, /href="#volume-de-chuva-por-hora"/);
   assert.doesNotMatch(`${rainDetail}\n${rainRoute}`, /OCR|extrair pixels|chuva medida pelo modelo/i);
 });
 
@@ -43,6 +46,8 @@ test("hourly wind direction stays a forecast distinct from current observation",
   assert.match(windRoute, /não é apresentada como medição da estação/i);
   assert.doesNotMatch(windPage, /A fonte não informa a direção futura em cada horário/);
   assert.match(windPage, /direção prevista por horário aparece em uma camada detalhada separada/);
+  assert.match(windPage, /href="#direcao-do-vento-por-hora"/);
+  assert.match(windPageStyles, /grid-template-columns: repeat\(6, minmax\(0, 1fr\)\)/);
 });
 
 test("dedicated Open-Meteo profile explicitly requests rain volume and wind direction", () => {
