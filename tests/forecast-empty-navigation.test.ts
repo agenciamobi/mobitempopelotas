@@ -11,6 +11,12 @@ const sharedForecastUnknownStyles = readFileSync(
   "src/components/weather/HomeForecastUnknownState.css",
   "utf8",
 );
+const homeForecast = readFileSync(
+  "src/production/components/home-forecast-editorial.tsx",
+  "utf8",
+);
+const homeTrend = readFileSync("src/production/components/home-forecast-trend.tsx", "utf8");
+const homeHero = readFileSync("src/production/components/weather-hero.tsx", "utf8");
 
 test("today hero does not link to hourly anchors when hourly forecast is absent", () => {
   assert.match(todayHero, /const hasHourlyForecast = weather\.hourly\.length > 0/);
@@ -87,4 +93,34 @@ test("shared forecast story keeps unknown rain separate from a published zero", 
   assert.match(sharedForecastStory, /rain\.chance \?\? 0/);
   assert.match(sharedForecastUnknownStyles, /rain-unknown/);
   assert.doesNotMatch(sharedForecastUnknownStyles, /!important/);
+});
+
+test("main Home hourly summary does not invent a zero-percent peak or a zero gust", () => {
+  assert.match(homeForecast, /const highestRainChance = peakCandidate\?\.precipitation \?\? null/);
+  assert.match(homeForecast, /const hasPositiveRainChance = \(highestRainChance \?\? 0\) > 0/);
+  assert.match(homeForecast, /const peakHour = hasPositiveRainChance \? peakCandidate : null/);
+  assert.match(homeForecast, /sem horário de destaque/);
+  assert.match(homeForecast, /function formatGust/);
+  assert.match(homeForecast, /if \(value <= 0\) return "Sem rajadas"/);
+  assert.match(homeForecast, /function hourlyGustLabel/);
+  assert.match(homeForecast, /Sem rajada prevista/);
+});
+
+test("main Home weekly trend preserves positive volume and normalizes zero gusts", () => {
+  assert.match(homeTrend, /function gustDescription/);
+  assert.match(homeTrend, /if \(value <= 0\) return "Sem rajada prevista\."/);
+  assert.match(homeTrend, /tomorrow\.precipitation > 0/);
+  assert.match(homeTrend, /Chance baixa de chuva, com/);
+  assert.match(homeTrend, /day\.rainChance >= 20/);
+});
+
+test("main Home hero distinguishes missing hourly forecast from a real next-hour forecast", () => {
+  assert.match(homeHero, /const hasHourlyForecast = hourlyPreview\.length > 0/);
+  assert.match(homeHero, /current\.available \|\| nextHourForecast/);
+  assert.match(homeHero, /Dados meteorológicos em atualização/);
+  assert.match(homeHero, /const heroStatus = current\.available \? "Agora" : nextHourForecast \? "Previsão" : "Atualizando"/);
+  assert.match(homeHero, /Temperatura em atualização/);
+  assert.match(homeHero, /Sem previsão horária disponível/);
+  assert.match(homeHero, /Nenhum valor de próxima hora foi preenchido manualmente/);
+  assert.match(homeHero, /hasHourlyForecast \? "Ver previsão por hora" : "Consultar previsão de hoje"/);
 });
