@@ -247,7 +247,7 @@ export function SevenDayRetailHero({
           </article>
 
           <div className="today-retail-hero__tiles seven-day-retail-hero__tiles" aria-label="Destaques da semana">
-            <article>
+            <article className="is-maximum">
               <span>
                 <Thermometer aria-hidden="true" /> Maior máxima
               </span>
@@ -263,7 +263,7 @@ export function SevenDayRetailHero({
               <small>{rainiest?.weekday ?? "Em atualização"}</small>
             </article>
 
-            <article className="is-wind">
+            <article className="is-cold">
               <span>
                 <Thermometer aria-hidden="true" /> Menor mínima
               </span>
@@ -271,7 +271,7 @@ export function SevenDayRetailHero({
               <small>{coldest?.weekday ?? "Em atualização"}</small>
             </article>
 
-            <article className="is-sun">
+            <article className="is-source">
               <span>
                 <Gauge aria-hidden="true" /> Fonte da previsão
               </span>
