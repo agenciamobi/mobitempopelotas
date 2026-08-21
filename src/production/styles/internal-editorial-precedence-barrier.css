@@ -157,6 +157,106 @@
 }
 
 /*
+ * Clima e hidrologia ainda possuem heroes próprios em dois cards com gradientes.
+ * Eles ficam fora de .internal-weather-main, portanto precisam de um contrato
+ * explícito para adotar a mesma superfície editorial dos demais heroes.
+ */
+.internal-weather-shell--climate .climate-hero,
+.internal-weather-shell--hydrology .hydrology-v2-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.66fr) !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: inherit !important;
+  background-color: var(--route-editorial-surface) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.internal-weather-shell--climate :is(.climate-hero__content, .climate-hero__panel),
+.internal-weather-shell--hydrology :is(.hydrology-v2-hero__content, .hydrology-v2-hero__reading) {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.internal-weather-shell--climate .climate-hero__content,
+.internal-weather-shell--hydrology .hydrology-v2-hero__content {
+  display: grid !important;
+  align-content: center !important;
+  padding: clamp(36px, 4.2vw, 60px) var(--route-editorial-pad) !important;
+  color: var(--route-editorial-ink) !important;
+  background-color: var(--route-editorial-surface) !important;
+}
+
+.internal-weather-shell--climate .climate-hero__panel,
+.internal-weather-shell--hydrology .hydrology-v2-hero__reading {
+  padding: clamp(28px, 3.2vw, 42px) !important;
+  border-left: 1px solid var(--route-editorial-line) !important;
+  color: var(--route-editorial-ink) !important;
+  background-color: var(--route-editorial-soft) !important;
+}
+
+.internal-weather-shell--climate .climate-hero__content .eyebrow,
+.internal-weather-shell--hydrology .hydrology-v2-hero__content .hydrology-v2-eyebrow {
+  color: #087f91 !important;
+}
+
+.internal-weather-shell--climate .climate-hero__content h1,
+.internal-weather-shell--hydrology .hydrology-v2-hero__content h1 {
+  max-width: 940px !important;
+  margin-top: 10px !important;
+  color: var(--route-editorial-ink) !important;
+  font-size: clamp(2.55rem, 4.6vw, 5rem) !important;
+  font-weight: 790 !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.06em !important;
+  text-wrap: balance;
+}
+
+.internal-weather-shell--climate .climate-hero__content > p,
+.internal-weather-shell--hydrology .hydrology-v2-hero__content > p {
+  max-width: 76ch !important;
+  color: var(--route-editorial-muted) !important;
+  line-height: 1.65 !important;
+}
+
+.internal-weather-shell--climate .climate-hero__actions a,
+.internal-weather-shell--hydrology .hydrology-v2-hero__actions a {
+  min-height: 44px !important;
+  border-color: var(--route-editorial-line) !important;
+  color: var(--route-editorial-ink) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.internal-weather-shell--climate .climate-hero__actions a:first-child,
+.internal-weather-shell--hydrology .hydrology-v2-hero__actions a:first-child {
+  border-color: var(--route-editorial-ink) !important;
+  color: #fff !important;
+  background: var(--route-editorial-ink) !important;
+}
+
+.internal-weather-shell--climate .climate-hero__actions a:hover,
+.internal-weather-shell--hydrology .hydrology-v2-hero__actions a:hover {
+  transform: none !important;
+  border-color: rgb(24 189 205 / 32%) !important;
+}
+
+/*
  * Heroes dedicados que ainda possuem CSS legado próprio. O conteúdo visual
  * funcional do lado direito continua intacto; removemos apenas o chrome antigo.
  */
@@ -365,6 +465,28 @@
     --route-editorial-pad: 20px;
   }
 
+  .internal-weather-shell--climate .climate-hero,
+  .internal-weather-shell--hydrology .hydrology-v2-hero {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .internal-weather-shell--climate .climate-hero__content,
+  .internal-weather-shell--hydrology .hydrology-v2-hero__content {
+    padding: 30px 20px !important;
+  }
+
+  .internal-weather-shell--climate .climate-hero__panel,
+  .internal-weather-shell--hydrology .hydrology-v2-hero__reading {
+    padding: 24px 20px !important;
+    border-top: 1px solid var(--route-editorial-line) !important;
+    border-left: 0 !important;
+  }
+
+  .internal-weather-shell--climate .climate-hero__content h1,
+  .internal-weather-shell--hydrology .hydrology-v2-hero__content h1 {
+    font-size: clamp(2.25rem, 11vw, 3.5rem) !important;
+  }
+
   .data-status-page,
   .privacy-page {
     width: calc(100% - var(--tp-home-container-mobile-gutter, 20px)) !important;
@@ -389,6 +511,8 @@
   .site-shell--home-editorial.internal-weather-shell
     .internal-weather-main
     > .editorial-answer-section,
+  .internal-weather-shell--climate :is(.climate-hero__content, .climate-hero__panel),
+  .internal-weather-shell--hydrology :is(.hydrology-v2-hero__content, .hydrology-v2-hero__reading),
   .data-status-hero,
   .privacy-hero,
   .data-status-summary,
