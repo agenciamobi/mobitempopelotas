@@ -5,6 +5,10 @@ import test from "node:test";
 const route = readFileSync("src/routes/clima-em-pelotas.tsx", "utf8");
 const page = readFileSync("src/components/climate/ClimatePelotasPage.tsx", "utf8");
 const styles = readFileSync("src/components/climate/ClimatePelotasPage.css", "utf8");
+const homeContract = readFileSync(
+  "src/components/climate/ClimatePelotasHomeContract.css",
+  "utf8",
+);
 const publicRoutes = readFileSync("src/lib/public-routes.ts", "utf8");
 const header = readFileSync("src/components/layout/Header.tsx", "utf8");
 
@@ -84,6 +88,18 @@ test("climate layout follows the shared retail rail and responsive contract", ()
   assert.match(styles, /@media \(forced-colors: active\)/);
   assert.match(styles, /:focus-visible/);
   assert.doesNotMatch(styles, /font-size:\s*0\.[0-6][0-9]rem/);
+});
+
+test("climate hero keeps a controlled seasonal accent over the editorial split", () => {
+  assert.match(route, /ClimatePelotasHomeContract\.css/);
+  assert.match(homeContract, /\.climate-hero__content::before/);
+  assert.match(homeContract, /\.climate-hero__panel::before/);
+  assert.match(homeContract, /radial-gradient[\s\S]*linear-gradient/);
+  assert.match(homeContract, /:has\(\.lucide-snowflake\)/);
+  assert.match(homeContract, /:has\(\.lucide-sun\)/);
+  assert.match(homeContract, /:has\(\.lucide-leaf\)/);
+  assert.match(homeContract, /\.climate-hero__recent[\s\S]*border-radius:\s*14px/);
+  assert.doesNotMatch(homeContract, /!important/);
 });
 
 test("climate route is discoverable through sitemap and monitoring navigation", () => {
