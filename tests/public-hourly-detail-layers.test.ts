@@ -80,6 +80,7 @@ test("today atmospheric signals use the same recovered data as the rest of the p
 
 test("today empty state does not invent a next-hour condition or a gust", () => {
   assert.match(todayHero, /const hasForecastSignal = current\.available \|\| nextHour !== null/);
+  assert.match(todayHero, /const isObserved = current\.available && \(currentIsObserved \?\? true\)/);
   assert.match(todayHero, /Dados meteorológicos em atualização/);
   assert.match(todayHero, /nextHour[\s\S]*Condição prevista para a próxima hora/);
   assert.match(todayHero, /hasForecastSignal \? "Previsão" : "Atualizando"/);
