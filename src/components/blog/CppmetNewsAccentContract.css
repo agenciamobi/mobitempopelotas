@@ -1,0 +1,71 @@
+/*
+ * CPPMet / UFPel — acento jornalístico sobre o contrato-base neutro.
+ * O RSS e a fonte original continuam protagonistas; cor apenas separa abertura,
+ * estado da fonte e a publicação mais recente do restante da listagem.
+ */
+
+.cppmet-blog .cppmet-blog__hero {
+  background:
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 11%), transparent 24rem),
+    radial-gradient(circle at 100% 0, rgb(49 95 112 / 8%), transparent 26rem),
+    linear-gradient(145deg, #f7fcfc 0%, #fff 60%, #f5f9fa 100%);
+}
+
+.cppmet-blog .cppmet-blog__source-link {
+  border-color: #0c5d80;
+  color: #fff;
+  background: linear-gradient(135deg, #0c5d80 0%, #087f91 100%);
+}
+
+.cppmet-blog .cppmet-blog__source-bar {
+  background:
+    linear-gradient(90deg, rgb(24 189 205 / 5%), transparent 34%),
+    #fff;
+}
+
+.cppmet-blog .cppmet-blog__card--featured {
+  position: relative;
+  overflow: hidden;
+  border-color: rgb(24 189 205 / 14%);
+  background:
+    radial-gradient(circle at 100% 0, rgb(24 189 205 / 8%), transparent 22rem),
+    linear-gradient(145deg, #f7fcfc 0%, #fff 68%);
+}
+
+.cppmet-blog .cppmet-blog__card--featured::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #18bdcd, #315f70);
+  content: "";
+}
+
+.cppmet-blog :is(.cppmet-blog__card a, .cppmet-blog__empty a) {
+  min-height: 44px;
+  align-items: center;
+}
+
+@media (max-width: 760px) {
+  .cppmet-blog .cppmet-blog__hero {
+    background:
+      radial-gradient(circle at 0 100%, rgb(24 189 205 / 9%), transparent 17rem),
+      linear-gradient(145deg, #f8fcfc, #fff 68%, #f6f9fa);
+  }
+}
+
+@media (forced-colors: active) {
+  .cppmet-blog :is(
+    .cppmet-blog__hero,
+    .cppmet-blog__source-bar,
+    .cppmet-blog__card--featured
+  ) {
+    background: Canvas;
+    color: CanvasText;
+  }
+
+  .cppmet-blog .cppmet-blog__card--featured::before {
+    background: CanvasText;
+  }
+}
