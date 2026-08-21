@@ -1,9 +1,16 @@
 /* Seven-day forecast uses the Tempo Hoje retail system with a weekly planning accent. */
 .seven-day-retail-hero {
+  padding: clamp(1.7rem, 3vw, 2.8rem) 0;
   background:
-    radial-gradient(circle at 7% 0%, rgb(24 189 205 / 13%), transparent 27rem),
-    radial-gradient(circle at 92% 4%, rgb(231 11 133 / 10%), transparent 29rem),
-    linear-gradient(135deg, #f5fbfb 0%, #ffffff 48%, #faf3f8 100%);
+    radial-gradient(circle at 7% 0%, rgb(24 189 205 / 18%), transparent 25rem),
+    radial-gradient(circle at 96% 8%, rgb(231 11 133 / 14%), transparent 29rem),
+    radial-gradient(circle at 78% 100%, rgb(94 44 237 / 10%), transparent 30rem),
+    linear-gradient(135deg, #f1fbfb 0%, #ffffff 47%, #fbf3f8 100%);
+}
+
+.seven-day-retail-hero__inner {
+  grid-template-columns: minmax(0, 0.92fr) minmax(500px, 1.08fr);
+  gap: clamp(1.8rem, 3.2vw, 3.3rem);
 }
 
 .seven-day-retail-hero .today-retail-hero__eyebrow {
@@ -11,33 +18,58 @@
   font-size: clamp(0.75rem, 0.72rem + 0.08vw, 0.82rem);
 }
 
+.seven-day-retail-hero .today-retail-hero__copy h1 {
+  max-width: 10.5ch;
+  font-size: clamp(2.85rem, 4.7vw, 4.75rem);
+  font-weight: 720;
+  line-height: 0.94;
+  letter-spacing: -0.065em;
+  text-wrap: balance;
+}
+
 .seven-day-retail-hero .today-retail-hero__copy h1 span {
   color: #e70b85;
 }
 
-.seven-day-retail-hero .today-retail-hero__copy > p,
-.seven-day-retail-hero .today-retail-hero__badges > span,
-.seven-day-retail-hero .today-retail-hero__badges > a,
-.seven-day-retail-hero .today-retail-hero__primary,
-.seven-day-retail-hero .today-retail-hero__secondary {
-  font-size: clamp(0.78rem, 0.75rem + 0.08vw, 0.88rem);
+.seven-day-retail-hero .today-retail-hero__copy > p {
+  max-width: 39rem;
+  color: #496471;
+  font-size: clamp(0.92rem, 1.05vw, 1.04rem);
+  line-height: 1.62;
+  text-wrap: pretty;
 }
 
-.seven-day-retail-hero .today-retail-hero__badges > span:first-child svg {
-  width: 0.9rem;
-  height: 0.9rem;
-  color: #078997;
+.seven-day-retail-hero .today-retail-hero__badges > span,
+.seven-day-retail-hero .today-retail-hero__badges > a {
+  min-height: 2.1rem;
+  font-size: 0.64rem;
+}
+
+.seven-day-retail-hero .today-retail-hero__primary,
+.seven-day-retail-hero .today-retail-hero__secondary {
+  font-size: 0.78rem;
+}
+
+.seven-day-retail-hero .today-retail-hero__primary {
+  background: linear-gradient(135deg, #5e2ced 0%, #e70b85 100%);
+  box-shadow: 0 12px 26px rgb(94 44 237 / 19%);
+}
+
+.seven-day-retail-hero__showcase {
+  gap: 0.8rem;
 }
 
 .seven-day-retail-hero__current {
-  min-height: 25rem;
+  min-height: 21.5rem;
+  border-radius: 1.2rem;
   background: linear-gradient(145deg, #07384a 0%, #075f6a 46%, #3d1d78 100%);
+  box-shadow: 0 16px 34px rgb(35 34 111 / 15%);
 }
 
 .seven-day-retail-hero .today-retail-hero__current-photo {
   background-image:
-    linear-gradient(180deg, rgb(3 22 34 / 12%), rgb(4 24 38 / 69%)),
-    linear-gradient(135deg, rgb(24 189 205 / 30%) 0%, rgb(94 44 237 / 31%) 60%, rgb(37 12 74 / 72%) 100%),
+    linear-gradient(180deg, rgb(3 22 34 / 8%), rgb(4 24 38 / 61%)),
+    linear-gradient(135deg, rgb(24 189 205 / 27%) 0%, rgb(94 44 237 / 24%) 58%, rgb(37 12 74 / 60%) 100%),
     var(--today-retail-hero-photo);
 }
 
@@ -52,7 +84,7 @@
 .seven-day-retail-hero .today-retail-hero__tiles article > span,
 .seven-day-retail-hero .today-retail-hero__tiles article > small,
 .seven-day-retail-hero .today-retail-hero__photo-credit {
-  font-size: clamp(0.72rem, 0.69rem + 0.07vw, 0.8rem);
+  font-size: clamp(0.69rem, 0.66rem + 0.06vw, 0.77rem);
   line-height: 1.35;
 }
 
@@ -66,95 +98,207 @@
 }
 
 .seven-day-retail-hero .today-retail-hero__current-main {
-  grid-template-columns: 6.8rem minmax(0, 1fr);
+  grid-template-columns: 6rem minmax(0, 1fr);
+  gap: 0.9rem;
 }
 
 .seven-day-retail-hero .today-retail-hero__weather-icon {
-  width: 6.8rem;
-  height: 6.8rem;
+  width: 6rem;
+  height: 6rem;
+  border-radius: 1.35rem;
 }
 
 .seven-day-retail-hero .today-retail-hero__weather-icon svg {
-  width: 4.6rem;
-  height: 4.6rem;
+  width: 4.1rem;
+  height: 4.1rem;
 }
 
 .seven-day-retail-hero .today-retail-hero__current-main strong {
-  font-size: clamp(3.6rem, 6vw, 5.8rem);
-  line-height: 0.86;
+  font-size: clamp(3.35rem, 5.2vw, 4.9rem);
+  line-height: 0.88;
   white-space: nowrap;
 }
 
 .seven-day-retail-hero .today-retail-hero__current-main span {
-  font-size: clamp(0.82rem, 0.78rem + 0.08vw, 0.9rem);
+  font-size: clamp(0.8rem, 0.76rem + 0.08vw, 0.88rem);
 }
 
 .seven-day-retail-hero .today-retail-hero__current-main > div:last-child > small {
   color: rgb(255 255 255 / 68%);
-  font-size: clamp(0.74rem, 0.7rem + 0.08vw, 0.82rem);
+  font-size: clamp(0.72rem, 0.69rem + 0.07vw, 0.8rem);
   font-weight: 700;
 }
 
 .seven-day-retail-hero .today-retail-hero__current-metrics > div {
-  min-height: 5.4rem;
-  padding: 0.95rem;
+  min-height: 4.8rem;
+  padding: 0.85rem;
 }
 
 .seven-day-retail-hero .today-retail-hero__current-metrics strong {
   overflow: visible;
-  font-size: 0.92rem;
+  font-size: 0.88rem;
   line-height: 1.25;
   text-overflow: clip;
   white-space: normal;
 }
 
+/*
+ * Os destaques ficam muito próximos. Cada cor representa uma família de leitura:
+ * calor, chuva, frio e origem da previsão.
+ */
 .seven-day-retail-hero__tiles article {
-  min-height: 8.1rem;
-  padding: 0.95rem;
+  min-height: 6.6rem;
+  padding: 0.82rem;
+  border-color: rgb(7 30 47 / 8%);
+  box-shadow: none;
 }
 
-.seven-day-retail-hero__tiles article:last-child strong {
-  font-size: clamp(0.72rem, 0.85vw, 0.88rem);
+.seven-day-retail-hero__tiles article.is-maximum {
+  border-color: rgb(242 112 53 / 13%);
+  background: #fff8f3;
+}
+
+.seven-day-retail-hero__tiles article.is-rain {
+  border-color: rgb(94 44 237 / 12%);
+  background: #f7f4ff;
+}
+
+.seven-day-retail-hero__tiles article.is-cold {
+  border-color: rgb(24 189 205 / 14%);
+  background: #f2fbfc;
+}
+
+.seven-day-retail-hero__tiles article.is-source {
+  border-color: rgb(7 30 47 / 9%);
+  background: #f7f9fa;
+}
+
+.seven-day-retail-hero__tiles article.is-maximum > span svg {
+  color: #f27035;
+}
+
+.seven-day-retail-hero__tiles article.is-rain > span svg {
+  color: #5e2ced;
+}
+
+.seven-day-retail-hero__tiles article.is-cold > span svg {
+  color: #087f91;
+}
+
+.seven-day-retail-hero__tiles article.is-source > span svg {
+  color: #5d6d75;
+}
+
+.seven-day-retail-hero__tiles article.is-source strong {
+  font-size: clamp(0.72rem, 0.85vw, 0.9rem);
   line-height: 1.3;
 }
 
 .seven-day-retail-hero--attention .today-retail-hero__primary,
 .seven-day-retail-hero--warning .today-retail-hero__primary {
   background: linear-gradient(135deg, #ef5b4d, #cf342c);
-  box-shadow: 0 12px 26px rgb(207 52 44 / 24%);
+  box-shadow: 0 12px 26px rgb(207 52 44 / 20%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .seven-day-retail-hero .today-retail-hero__primary:hover {
+    box-shadow: 0 15px 30px rgb(94 44 237 / 24%);
+  }
+}
+
+@media (max-width: 1160px) {
+  .seven-day-retail-hero__inner {
+    grid-template-columns: minmax(0, 0.84fr) minmax(460px, 1.16fr);
+    gap: 1.7rem;
+  }
 }
 
 @media (max-width: 920px) {
+  .seven-day-retail-hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .seven-day-retail-hero__copy {
+    max-width: 42rem;
+  }
+
+  .seven-day-retail-hero .today-retail-hero__copy h1 {
+    max-width: 11ch;
+  }
+
   .seven-day-retail-hero__current {
-    min-height: 23rem;
+    min-height: 20rem;
   }
 }
 
 @media (max-width: 700px) {
+  .seven-day-retail-hero {
+    padding: 1.2rem 0;
+    background:
+      radial-gradient(circle at 0 0, rgb(24 189 205 / 16%), transparent 18rem),
+      radial-gradient(circle at 100% 8%, rgb(231 11 133 / 12%), transparent 20rem),
+      linear-gradient(150deg, #f3fbfb, #fff 56%, #fbf4f8);
+  }
+
   .seven-day-retail-hero .today-retail-hero__copy h1 {
-    max-width: 12ch;
+    max-width: 11ch;
+    font-size: clamp(2.35rem, 11.6vw, 3.45rem);
+    line-height: 0.97;
   }
 
   .seven-day-retail-hero__current {
-    min-height: 22rem;
+    min-height: 0;
+    padding: 1rem;
+    border-radius: 1rem;
+    box-shadow: 0 12px 26px rgb(35 34 111 / 13%);
   }
 
   .seven-day-retail-hero .today-retail-hero__current-main {
-    grid-template-columns: 5.5rem minmax(0, 1fr);
+    grid-template-columns: 4.8rem minmax(0, 1fr);
   }
 
   .seven-day-retail-hero .today-retail-hero__weather-icon {
-    width: 5.5rem;
-    height: 5.5rem;
+    width: 4.8rem;
+    height: 4.8rem;
+    border-radius: 1.05rem;
   }
 
   .seven-day-retail-hero .today-retail-hero__weather-icon svg {
-    width: 3.8rem;
-    height: 3.8rem;
+    width: 3.3rem;
+    height: 3.3rem;
   }
 
   .seven-day-retail-hero .today-retail-hero__current-main strong {
-    font-size: clamp(3rem, 12vw, 4.8rem);
+    font-size: clamp(3rem, 12.5vw, 4.5rem);
+  }
+
+  .seven-day-retail-hero .today-retail-hero__current-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .seven-day-retail-hero .today-retail-hero__current-metrics > div {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.28rem;
+    padding: 0.7rem 0.58rem;
+    border-right: 1px solid rgb(255 255 255 / 13%);
+    border-bottom: 0;
+  }
+
+  .seven-day-retail-hero .today-retail-hero__current-metrics > div:last-child {
+    border-right: 0;
+  }
+
+  .seven-day-retail-hero .today-retail-hero__current-metrics strong,
+  .seven-day-retail-hero .today-retail-hero__current-metrics em {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .seven-day-retail-hero__tiles article {
+    min-height: 6rem;
   }
 }
 
@@ -164,8 +308,8 @@
   }
 
   .seven-day-retail-hero .today-retail-hero__weather-icon {
-    width: 4.7rem;
-    height: 4.7rem;
+    width: 4.4rem;
+    height: 4.4rem;
   }
 
   .seven-day-retail-hero .today-retail-hero__current-metrics {
@@ -173,7 +317,6 @@
   }
 
   .seven-day-retail-hero .today-retail-hero__current-metrics > div {
-    min-height: 0;
     border-right: 0;
     border-bottom: 1px solid rgb(255 255 255 / 13%);
   }
