@@ -10,11 +10,24 @@ export type WeatherIconName =
 
 export type HourlyForecast = {
   time: string;
+  timestamp?: string;
   temperature: number;
   precipitation: number | null;
+  precipitationMm?: number | null;
   windSpeed: number;
   windGust: number | null;
+  windDirectionDegrees?: number | null;
   icon: WeatherIconName;
+  relativeHumidity?: number | null;
+  dewPoint?: number | null;
+  pressure?: number | null;
+  visibilityKm?: number | null;
+  cloudCover?: number | null;
+  cloudCoverLow?: number | null;
+  cloudCoverMid?: number | null;
+  cloudCoverHigh?: number | null;
+  cape?: number | null;
+  boundaryLayerHeight?: number | null;
 };
 
 export type DailyForecast = {
