@@ -141,6 +141,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
     (selected, day) => (!selected || day.precipitationMm > selected.precipitationMm ? day : selected),
     null,
   );
+  const hasPositiveRainVolume = (highestVolumeDay?.precipitationMm ?? 0) > 0;
   const peakHour = hours.reduce<HourlyForecast | null>(
     (selected, hour) =>
       !selected || (hour.precipitationProbability ?? -1) > (selected.precipitationProbability ?? -1)
@@ -302,7 +303,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
 
         <div className="rain-v2-week__summary">
           <article><Droplets aria-hidden="true" /><span>Total previsto em 7 dias</span><strong>{formatMillimeters(totalRain)}</strong></article>
-          <article><Umbrella aria-hidden="true" /><span>Dia com maior volume</span><strong>{highestVolumeDay?.weekday ?? "—"}</strong></article>
+          <article><Umbrella aria-hidden="true" /><span>Dia com maior volume</span><strong>{hasPositiveRainVolume ? highestVolumeDay?.weekday : "Sem volume previsto"}</strong></article>
           <article><CloudRain aria-hidden="true" /><span>Dias com previsão de chuva</span><strong>{rainyDays.length} de {days.length}</strong></article>
         </div>
       </section>
