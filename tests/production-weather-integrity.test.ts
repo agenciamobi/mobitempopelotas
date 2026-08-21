@@ -13,11 +13,24 @@ function makeAggregatedWeather(overrides: Record<string, unknown> = {}) {
     hourly: [
       {
         time: "Agora",
+        timestamp: "2026-07-24T18:00:00-03:00",
         temperature: 18,
         precipitationProbability: null,
+        precipitationMm: 0.7,
         windSpeed: 0,
         windGust: null,
+        windDirectionDegrees: 135,
         icon: "rain",
+        relativeHumidity: 91,
+        dewPoint: 16.4,
+        pressure: 1013,
+        visibilityKm: 7.8,
+        cloudCover: 88,
+        cloudCoverLow: 72,
+        cloudCoverMid: 45,
+        cloudCoverHigh: 18,
+        cape: 420,
+        boundaryLayerHeight: 380,
       },
     ],
     daily: [
@@ -110,6 +123,26 @@ test("campos ausentes na previsão continuam ausentes e não viram zero", () => 
   assert.equal(result.hourly[0]?.windGust, null);
   assert.equal(result.daily[0]?.rainChance, null);
   assert.equal(result.daily[0]?.windGust, null);
+});
+
+test("adaptador de produção preserva a profundidade horária da previsão", () => {
+  const result = toProductionWeatherData(makeAggregatedWeather());
+  const hour = result.hourly[0];
+
+  assert.ok(hour);
+  assert.equal(hour.timestamp, "2026-07-24T18:00:00-03:00");
+  assert.equal(hour.precipitationMm, 0.7);
+  assert.equal(hour.windDirectionDegrees, 135);
+  assert.equal(hour.relativeHumidity, 91);
+  assert.equal(hour.dewPoint, 16.4);
+  assert.equal(hour.pressure, 1013);
+  assert.equal(hour.visibilityKm, 7.8);
+  assert.equal(hour.cloudCover, 88);
+  assert.equal(hour.cloudCoverLow, 72);
+  assert.equal(hour.cloudCoverMid, 45);
+  assert.equal(hour.cloudCoverHigh, 18);
+  assert.equal(hour.cape, 420);
+  assert.equal(hour.boundaryLayerHeight, 380);
 });
 
 test("observação atual válida mantém apenas campos medidos pela Embrapa", () => {
