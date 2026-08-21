@@ -64,6 +64,23 @@ test("weekly empty and zero states do not invent weather highlights", () => {
   assert.match(page, /Sem rajada prevista/);
 });
 
+test("weekly stable labels are absolute and temperature ties are explicit", () => {
+  assert.match(page, /if \(tone === "attention"\) return "Vale acompanhar"/);
+  assert.match(page, /return "Sem destaque"/);
+  assert.doesNotMatch(page, /return "Menores valores"/);
+  assert.match(page, /const warmestDays = days\.filter\(\(day\) => day\.max === maximum\)/);
+  assert.match(page, /const coldestDays = days\.filter\(\(day\) => day\.min === minimum\)/);
+  assert.match(page, /empate em \$\{warmestDays\.length\} dias/);
+  assert.match(page, /empate em \$\{coldestDays\.length\} dias/);
+});
+
+test("weekly headline can prioritize a large temperature range without inventing rain or gusts", () => {
+  const temperatureHeadlineIndex = page.indexOf('if (maximum - minimum >= 14) return "A temperatura deve variar bastante ao longo da semana"');
+  const noRiskIndex = page.indexOf('if (!hasPositiveRiskSignal)');
+  assert.ok(temperatureHeadlineIndex >= 0);
+  assert.ok(noRiskIndex > temperatureHeadlineIndex);
+});
+
 test("weekly risk colors only appear when the published values create a real contrast", () => {
   assert.match(page, /className=\{hasRiskContrast \? "is-best" : undefined\}/);
   assert.match(page, /className=\{hasRiskContrast \? "is-attention" : undefined\}/);
