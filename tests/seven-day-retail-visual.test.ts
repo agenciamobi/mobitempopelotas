@@ -31,7 +31,7 @@ test("weekly hero uses a useful search-oriented headline and clear metrics", () 
   assert.match(hero, /weather\.daily\.slice\(0, 7\)/);
   assert.match(hero, /getRetailWeatherPhoto/);
   assert.match(hero, /Previsão de 7 dias para Pelotas/);
-  assert.match(hero, /temperatura, chuva e vento/);
+  assert.match(hero, /chance e volume de chuva e rajadas previstos/);
   assert.match(hero, /Menor mínima/);
   assert.match(hero, /Maior chance de chuva/);
   assert.match(hero, /Rajada mais forte/);
@@ -62,6 +62,13 @@ test("weekly empty and zero states do not invent weather highlights", () => {
   assert.match(page, /Não há valores positivos de chance ou volume de chuva nesta atualização/);
   assert.match(page, /Não há rajadas positivas previstas para os próximos dias/);
   assert.match(page, /Sem rajada prevista/);
+});
+
+test("weekly risk colors only appear when the published values create a real contrast", () => {
+  assert.match(page, /className=\{hasRiskContrast \? "is-best" : undefined\}/);
+  assert.match(page, /className=\{hasRiskContrast \? "is-attention" : undefined\}/);
+  assert.match(page, /hasPositiveRisk[\s\S]*Não há valores positivos de chuva ou rajadas publicados/);
+  assert.match(page, /Sem um único dia/);
 });
 
 test("weekly page answers comparison and planning questions in direct language", () => {
