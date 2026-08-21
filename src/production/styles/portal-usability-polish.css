@@ -23,6 +23,37 @@
   scroll-padding-top: 84px;
 }
 
+/* Footer: links de diretório e legais são controles isolados, não links inline de parágrafo. */
+.tp-home-footer .tp-home-footer-group a,
+.tp-home-footer .tp-home-footer-legal a {
+  min-height: 44px;
+}
+
+.tp-home-footer .tp-home-footer-legal a {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* PWA é carregado de forma lazy; a especificidade garante o acabamento sem !important. */
+.pwa-launcher.pwa-launcher {
+  min-height: 44px;
+  transform: none;
+}
+
+.pwa-launcher.pwa-launcher:hover,
+.pwa-launcher.pwa-launcher:focus-visible {
+  transform: none;
+}
+
+.pwa-dialog .pwa-dialog-close {
+  width: 44px;
+  height: 44px;
+}
+
+.pwa-dialog .pwa-option-card > button {
+  min-height: 44px;
+}
+
 /* HomeForecastStory aparece na Home, Tempo Hoje e páginas regionais. */
 .home-forecast-story :is(
   .home-tomorrow-spotlight > a,
@@ -97,6 +128,12 @@
 
   .page-scroll-root {
     scroll-padding-top: 112px;
+  }
+}
+
+@media (max-width: 560px) {
+  .pwa-launcher.pwa-launcher {
+    min-width: 44px;
   }
 }
 
