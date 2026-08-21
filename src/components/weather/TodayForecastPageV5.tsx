@@ -27,10 +27,11 @@ const chapters = [
   { href: "#como-interpretar-hoje", label: "Entenda os dados", detail: "Medição, previsão e FAQ" },
 ];
 
-function strongestWind(data: WeatherIntelligenceData) {
-  return data.weather.hourly
-    .slice(1, 12)
-    .reduce((value, hour) => Math.max(value, hour.windGust ?? hour.windSpeed), 0);
+function strongestGust(data: WeatherIntelligenceData) {
+  return data.weather.hourly.slice(1, 12).reduce<number | null>((value, hour) => {
+    if (hour.windGust === null) return value;
+    return value === null ? hour.windGust : Math.max(value, hour.windGust);
+  }, null);
 }
 
 function highestRainChance(data: WeatherIntelligenceData) {
@@ -45,7 +46,7 @@ function highestRainChance(data: WeatherIntelligenceData) {
 function buildReadingTitle(data: WeatherIntelligenceData) {
   const today = data.weather.daily[0];
   const rainChance = highestRainChance(data) ?? today?.rainChance ?? null;
-  const wind = strongestWind(data);
+  const gust = strongestGust(data);
   const hasActiveAlert = data.weather.alerts.some(
     (alert) =>
       alert.period === "active" &&
@@ -55,7 +56,7 @@ function buildReadingTitle(data: WeatherIntelligenceData) {
 
   if (hasActiveAlert) return "Aviso oficial pede atenção durante o restante do dia";
   if ((rainChance ?? 0) >= 60) return "A chuva deve ser o principal ponto de atenção";
-  if (wind >= 40) return "Rajadas podem interferir nas atividades ao ar livre";
+  if ((gust ?? 0) >= 40) return "Rajadas podem interferir nas atividades ao ar livre";
   if (today && today.max <= 18) return "Temperaturas baixas devem persistir ao longo do dia";
   if ((rainChance ?? 100) <= 20) return "O restante do dia tende a ter pouca chuva";
   return "Temperatura, chuva e vento devem variar sem um único fator dominante";
