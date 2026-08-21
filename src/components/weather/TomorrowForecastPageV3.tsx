@@ -55,10 +55,20 @@ function rainValue(day: DailyForecast) {
   return day.rainChance === null ? "Chance não informada" : `${day.rainChance}% de chance`;
 }
 
+function gustPhrase(value: number | null) {
+  if (value === null) return "rajadas não informadas";
+  if (value <= 0) return "sem rajada prevista";
+  return `rajadas de até ${value} km/h`;
+}
+
+function gustTitle(value: number | null) {
+  if (value === null) return "Não informadas";
+  if (value <= 0) return "Sem rajadas";
+  return `${value} km/h`;
+}
+
 function dayWeatherSummary(day: DailyForecast) {
-  const gust =
-    day.windGust === null ? "rajadas não informadas" : `rajadas de até ${day.windGust} km/h`;
-  return `${rainValue(day)} · ${gust}`;
+  return `${rainValue(day)} · ${gustPhrase(day.windGust)}`;
 }
 
 function weekdayKey(value: string) {
@@ -106,6 +116,12 @@ function formatPercentDelta(value: number | null) {
   return `${value > 0 ? "+" : ""}${value} pontos`;
 }
 
+function formatWindDelta(value: number | null) {
+  if (value === null) return "Sem comparação";
+  if (value === 0) return "Sem mudança";
+  return `${value > 0 ? "+" : ""}${value} km/h`;
+}
+
 function tomorrowTitle(day: DailyForecast) {
   if ((day.rainChance ?? 0) >= 60 || day.precipitationMm >= 10) {
     return "A chuva deve ser o principal ponto de atenção amanhã";
@@ -122,10 +138,8 @@ function tomorrowSummary(day: DailyForecast) {
     day.rainChance === null
       ? `${day.precipitationMm} mm estimados, sem percentual de chance publicado`
       : `${day.rainChance}% de chance de chuva e ${day.precipitationMm} mm estimados`;
-  const wind =
-    day.windGust === null ? "rajadas ainda não informadas" : `rajadas de até ${day.windGust} km/h`;
 
-  return `A temperatura deve ficar entre ${day.min}° e ${day.max}°. Para chuva, a previsão indica ${rain}; para o vento, ${wind}.`;
+  return `A temperatura deve ficar entre ${day.min}° e ${day.max}°. Para chuva, a previsão indica ${rain}; para o vento, ${gustPhrase(day.windGust)}.`;
 }
 
 function buildPlanningCards(day: DailyForecast): PlanningCard[] {
@@ -146,16 +160,20 @@ function buildPlanningCards(day: DailyForecast): PlanningCard[] {
         ? `Com ${day.rainChance}% de chance e ${day.precipitationMm} mm previstos, leve proteção e confira a atualização antes de sair.`
         : day.rainChance >= 30
           ? `Há ${day.rainChance}% de chance. Mantenha uma alternativa coberta para compromissos sensíveis ao tempo.`
-          : `A chance máxima é de ${day.rainChance}%, com pouca chuva prevista neste momento.`;
+          : day.precipitationMm > 0
+            ? `A chance máxima é de ${day.rainChance}%, com ${day.precipitationMm} mm previstos neste momento.`
+            : `A chance máxima é de ${day.rainChance}%, sem volume relevante previsto neste momento.`;
 
   const windDescription =
     day.windGust === null
       ? "A previsão ainda não informou as rajadas para amanhã."
-      : day.windGust >= 50
-        ? `Rajadas de até ${day.windGust} km/h podem afetar estruturas leves e atividades ao ar livre.`
-        : day.windGust >= 35
-          ? `Rajadas de até ${day.windGust} km/h merecem atenção em áreas abertas e próximas à Lagoa.`
-          : `Rajadas de até ${day.windGust} km/h são previstas para o dia.`;
+      : day.windGust <= 0
+        ? "Não há rajada positiva prevista para amanhã nesta atualização."
+        : day.windGust >= 50
+          ? `Rajadas de até ${day.windGust} km/h podem afetar estruturas leves e atividades ao ar livre.`
+          : day.windGust >= 35
+            ? `Rajadas de até ${day.windGust} km/h merecem atenção em áreas abertas e próximas à Lagoa.`
+            : `Rajadas de até ${day.windGust} km/h são previstas para o dia.`;
 
   return [
     {
@@ -174,7 +192,7 @@ function buildPlanningCards(day: DailyForecast): PlanningCard[] {
     },
     {
       label: "Rajadas",
-      title: day.windGust === null ? "Não informadas" : `${day.windGust} km/h`,
+      title: gustTitle(day.windGust),
       description: windDescription,
       icon: Wind,
       tone: (day.windGust ?? 0) >= 35 ? "attention" : "normal",
@@ -248,7 +266,9 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
       answer:
         tomorrow.windGust === null
           ? "A previsão ainda não publicou a estimativa de rajadas para amanhã."
-          : `As rajadas podem chegar a ${tomorrow.windGust} km/h durante o dia.`,
+          : tomorrow.windGust <= 0
+            ? "Não há rajada positiva prevista para amanhã nesta atualização."
+            : `As rajadas podem chegar a ${tomorrow.windGust} km/h durante o dia.`,
     },
   ];
   const faqSchema = {
@@ -346,7 +366,7 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
           <div><dt>Temperatura máxima</dt><dd>{formatTemperatureDelta(maximumDelta)}</dd></div>
           <div><dt>Temperatura mínima</dt><dd>{formatTemperatureDelta(minimumDelta)}</dd></div>
           <div><dt>Chance de chuva</dt><dd>{formatPercentDelta(rainDelta)}</dd></div>
-          <div><dt>Rajada máxima</dt><dd>{gustDelta === null ? "Sem comparação" : `${gustDelta > 0 ? "+" : ""}${gustDelta} km/h`}</dd></div>
+          <div><dt>Rajada máxima</dt><dd>{formatWindDelta(gustDelta)}</dd></div>
         </dl>
       </section>
 
