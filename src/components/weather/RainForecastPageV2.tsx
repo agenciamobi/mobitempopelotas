@@ -153,28 +153,49 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
     null,
   );
   const hasPositiveRainVolume = (highestVolumeDay?.precipitationMm ?? 0) > 0;
-  const peakHour = hours.reduce<HourlyForecast | null>(
+  const knownChanceHours = hours.filter((hour) => hour.precipitationProbability !== null);
+  const peakCandidate = knownChanceHours.reduce<HourlyForecast | null>(
     (selected, hour) =>
       !selected || (hour.precipitationProbability ?? -1) > (selected.precipitationProbability ?? -1)
         ? hour
         : selected,
     null,
   );
+  const highestRainChance = peakCandidate?.precipitationProbability ?? null;
+  const hasPositiveRainChance = (highestRainChance ?? 0) > 0;
+  const peakHour = hasPositiveRainChance ? peakCandidate : null;
+  const peakHourDetail =
+    highestRainChance === null
+      ? "Chance ainda não informada"
+      : hasPositiveRainChance
+        ? timeReference(peakHour?.time)
+        : "Sem horário de destaque";
   const nextWetHour =
-    hours.find((hour) => (hour.precipitationProbability ?? 0) >= 40) ?? null;
+    knownChanceHours.find((hour) => (hour.precipitationProbability ?? 0) >= 40) ?? null;
   const windows = buildWindows(hours);
-  const bestWindow = windows.reduce<WindowSummary | null>((selected, window) => {
+  const bestCandidates = windows.filter((window) => window.averageChance !== null);
+  const bestCandidate = bestCandidates.reduce<WindowSummary | null>((selected, window) => {
     if (!selected) return window;
     const selectedChance = selected.averageChance ?? 101;
     const currentChance = window.averageChance ?? 101;
     if (currentChance !== selectedChance) return currentChance < selectedChance ? window : selected;
     return window.windRisk < selected.windRisk ? window : selected;
   }, null);
-  const attentionWindow = windows.reduce<WindowSummary | null>((selected, window) => {
+  const bestKeys = new Set(
+    bestCandidates.map((window) => `${window.averageChance ?? "unknown"}:${window.windRisk}`),
+  );
+  const hasBestContrast = bestKeys.size > 1;
+  const bestWindow = hasBestContrast ? bestCandidate : null;
+  const attentionCandidates = windows.filter((window) => window.maximumChance !== null);
+  const attentionCandidate = attentionCandidates.reduce<WindowSummary | null>((selected, window) => {
     if (!selected) return window;
     return (window.maximumChance ?? -1) > (selected.maximumChance ?? -1) ? window : selected;
   }, null);
-  const wetHours = hours.filter((hour) => (hour.precipitationProbability ?? 0) >= 30);
+  const attentionChances = attentionCandidates.map((window) => window.maximumChance as number);
+  const hasAttentionContrast =
+    attentionChances.length > 1 && Math.max(...attentionChances) > Math.min(...attentionChances);
+  const attentionWindow = hasAttentionContrast ? attentionCandidate : null;
+  const wetHours = knownChanceHours.filter((hour) => (hour.precipitationProbability ?? 0) >= 30);
   const activeRainAlerts = weather.alerts.filter(
     (alert) =>
       alert.period === "active" &&
@@ -185,6 +206,11 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
   const officialPeriods = weather.inmetForecast
     .filter((period) => /chuva|pancada|tempestade|granizo|precipita/i.test(period.summary))
     .slice(0, 4);
+  const overviewTitle = nextWetHour
+    ? `A chance de chuva chega a ${formatChance(nextWetHour.precipitationProbability)} ${timeReference(nextWetHour.time)}`
+    : knownChanceHours.length === 0
+      ? "A chance de chuva por horário ainda não foi informada"
+      : "Não há chance de chuva de 40% ou mais nas próximas 12 horas";
 
   return (
     <div className="rain-v2-page">
@@ -197,11 +223,7 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
       >
         <div className="rain-v2-overview__intro">
           <span className="eyebrow">Chuva em resumo</span>
-          <h2 id="rain-v2-overview-title">
-            {nextWetHour
-              ? `A chance de chuva chega a ${formatChance(nextWetHour.precipitationProbability)} ${timeReference(nextWetHour.time)}`
-              : "Não há chance de chuva de 40% ou mais nas próximas 12 horas"}
-          </h2>
+          <h2 id="rain-v2-overview-title">{overviewTitle}</h2>
           <p>
             A chance mostra a possibilidade de chover. O volume em milímetros indica quanto pode
             acumular; os dois valores respondem a perguntas diferentes.
@@ -209,12 +231,12 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
         </div>
 
         <div className="rain-v2-overview__cards">
-          <article className="is-attention">
+          <article className={(highestRainChance ?? 0) >= 35 ? "is-attention" : undefined}>
             <TriangleAlert aria-hidden="true" />
             <div>
               <span>Maior chance nas próximas horas</span>
-              <strong>{formatChance(peakHour?.precipitationProbability)}</strong>
-              <small>{timeReference(peakHour?.time)}</small>
+              <strong>{formatChance(highestRainChance)}</strong>
+              <small>{peakHourDetail}</small>
             </div>
           </article>
           <article>
@@ -225,15 +247,17 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
               <small>Total previsto para o dia</small>
             </div>
           </article>
-          <article className="is-best">
+          <article className={bestWindow ? "is-best" : undefined}>
             <CheckCircle2 aria-hidden="true" />
             <div>
               <span>Período com menor chance</span>
-              <strong>{bestWindow ? `${bestWindow.start}–${bestWindow.end}` : "—"}</strong>
+              <strong>{bestWindow ? `${bestWindow.start}–${bestWindow.end}` : bestCandidates.length ? "Sem período de destaque" : "—"}</strong>
               <small>
-                {bestWindow?.averageChance === null || !bestWindow
-                  ? "Chance ainda não informada"
-                  : `Chance média de ${bestWindow.averageChance}%`}
+                {bestWindow
+                  ? `Chance média de ${bestWindow.averageChance}%`
+                  : bestCandidates.length
+                    ? "As janelas têm valores semelhantes nesta atualização"
+                    : "Chance ainda não informada"}
               </small>
             </div>
           </article>
@@ -338,22 +362,30 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
         </header>
 
         <div className="rain-v2-planning__grid">
-          <article className="is-best">
+          <article className={bestWindow ? "is-best" : undefined}>
             <CheckCircle2 aria-hidden="true" />
             <div>
               <span>Período com menor chance</span>
-              <strong>{bestWindow ? `${bestWindow.start}–${bestWindow.end}` : "Em atualização"}</strong>
-              <p>É o período com menor chance média de chuva. Em caso de empate, aparece o período com menor vento previsto.</p>
+              <strong>{bestWindow ? `${bestWindow.start}–${bestWindow.end}` : windows.length ? "Sem período de destaque" : "Em atualização"}</strong>
+              <p>
+                {bestWindow
+                  ? "É o período com menor chance média de chuva. Em caso de empate, aparece o período com menor vento previsto."
+                  : bestCandidates.length
+                    ? "As janelas disponíveis têm chance e vento semelhantes nesta atualização."
+                    : "A previsão ainda não informou chance suficiente para comparar os períodos."}
+              </p>
             </div>
           </article>
-          <article className="is-attention">
+          <article className={attentionWindow ? "is-attention" : undefined}>
             <TriangleAlert aria-hidden="true" />
             <div>
               <span>Período com maior chance</span>
-              <strong>{attentionWindow ? `${attentionWindow.start}–${attentionWindow.end}` : "Em atualização"}</strong>
+              <strong>{attentionWindow ? `${attentionWindow.start}–${attentionWindow.end}` : windows.length ? "Sem período de destaque" : "Em atualização"}</strong>
               <p>
-                {attentionWindow?.maximumChance === null || !attentionWindow
-                  ? "A previsão ainda não informou a chance para esse período."
+                {!attentionWindow
+                  ? attentionCandidates.length
+                    ? "As janelas disponíveis têm máximas semelhantes nesta atualização."
+                    : "A previsão ainda não informou a chance para comparar os períodos."
                   : attentionWindow.maximumGust === null
                     ? `A chance pode chegar a ${attentionWindow.maximumChance}%. A rajada não foi informada para esse período.`
                     : attentionWindow.maximumGust <= 0
@@ -366,8 +398,12 @@ export function RainForecastPageV2({ data }: { data: WeatherIntelligenceData }) 
             <Umbrella aria-hidden="true" />
             <div>
               <span>Horários com 30% ou mais</span>
-              <strong>{wetHours.length} de {hours.length}</strong>
-              <p>Quantidade de horários com chance prevista de pelo menos 30% nas próximas 12 horas.</p>
+              <strong>{knownChanceHours.length ? `${wetHours.length} de ${knownChanceHours.length}` : "Em atualização"}</strong>
+              <p>
+                {knownChanceHours.length
+                  ? "Quantidade de horários conhecidos com chance prevista de pelo menos 30% nas próximas 12 horas."
+                  : "A fonte ainda não publicou probabilidades para os horários desta janela."}
+              </p>
             </div>
           </article>
         </div>
