@@ -118,6 +118,9 @@ export function RadarMapFrame({
             .addTo(map);
 
           setMapLoaded(true);
+          map.once("idle", () => {
+            if (!cancelled) setOverlayLoaded(true);
+          });
         });
 
         map.on("sourcedata", (event) => {
@@ -127,7 +130,7 @@ export function RadarMapFrame({
         });
 
         map.on("error", (event) => {
-          const sourceId = "sourceId" in event ? event.sourceId : undefined;
+          const sourceId = (event as { sourceId?: string }).sourceId;
           if (!styleLoaded || sourceId === RADAR_SOURCE_ID) setFailed(true);
         });
       })
@@ -145,7 +148,8 @@ export function RadarMapFrame({
   useEffect(() => {
     if (!mapLoaded || !mapRef.current || failed) return;
 
-    const source = mapRef.current.getSource(RADAR_SOURCE_ID) as ImageSource | undefined;
+    const map = mapRef.current;
+    const source = map.getSource(RADAR_SOURCE_ID) as ImageSource | undefined;
     if (!source) return;
 
     setOverlayLoaded(false);
@@ -153,11 +157,12 @@ export function RadarMapFrame({
       url: frame.imageUrl,
       coordinates: imageCoordinates(frame.bounds),
     });
+    map.once("idle", () => setOverlayLoaded(true));
 
     const nextBoundsKey = boundsKey(frame.bounds);
     if (nextBoundsKey !== boundsKeyRef.current) {
       boundsKeyRef.current = nextBoundsKey;
-      mapRef.current.fitBounds(
+      map.fitBounds(
         [
           [frame.bounds.west, frame.bounds.south],
           [frame.bounds.east, frame.bounds.north],
