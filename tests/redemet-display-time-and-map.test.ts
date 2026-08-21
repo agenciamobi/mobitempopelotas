@@ -5,6 +5,7 @@ import test from "node:test";
 import {
   formatRedemetDateTime,
   getRedemetFreshness,
+  latestReportedRedemetFrameTime,
   latestUsableRedemetFrameTime,
 } from "../src/lib/redemet/redemet-display-time.ts";
 
@@ -24,6 +25,10 @@ test("future REDEMET timestamps cannot become the overview latest image", () => 
       now,
     ),
     valid,
+  );
+  assert.equal(
+    latestReportedRedemetFrameTime([{ observedAt: valid }, { observedAt: impossibleFuture }]),
+    impossibleFuture,
   );
   assert.match(formatRedemetDateTime(valid, now), /21\/08.*04:06/);
   assert.equal(formatRedemetDateTime(impossibleFuture, now), "Horário da fonte em verificação");
@@ -52,7 +57,8 @@ test("radar frames are georeferenced over the existing MapLibre base", () => {
   assert.match(radarMap, /\[bounds\.west, bounds\.south\]/);
   assert.match(radarMap, /"raster-opacity":\s*0\.58/);
   assert.match(radarMap, /PELOTAS_COORDINATES/);
-  assert.match(radarMap, /className=\{styles\.rawFallback\}/);
+  assert.match(radarMap, /failed \? \([\s\S]*className=\{styles\.rawFallback\}/);
+  assert.match(radarMap, /role="img"/);
   assert.match(radarMapStyles, /\.rawFallback/);
   assert.match(radarMap, /Base cartográfica indisponível/);
 });
