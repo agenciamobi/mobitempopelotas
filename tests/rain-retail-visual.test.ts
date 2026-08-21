@@ -59,6 +59,29 @@ test("rain zero-chance state keeps zero percent without inventing a peak hour", 
   assert.match(hero, /formatChance\(highestRainChance\)/);
 });
 
+test("rain page keeps unknown probability separate from a published zero", () => {
+  assert.match(page, /const knownChanceHours = hours\.filter\(\(hour\) => hour\.precipitationProbability !== null\)/);
+  assert.match(page, /const highestRainChance = peakCandidate\?\.precipitationProbability \?\? null/);
+  assert.match(page, /const hasPositiveRainChance = \(highestRainChance \?\? 0\) > 0/);
+  assert.match(page, /Chance ainda não informada/);
+  assert.match(page, /Sem horário de destaque/);
+  assert.match(page, /A chance de chuva por horário ainda não foi informada/);
+  assert.match(page, /Não há chance de chuva de 40% ou mais nas próximas 12 horas/);
+});
+
+test("rain planning only highlights windows when there is real contrast", () => {
+  assert.match(page, /const bestCandidates = windows\.filter\(\(window\) => window\.averageChance !== null\)/);
+  assert.match(page, /const hasBestContrast = bestKeys\.size > 1/);
+  assert.match(page, /const bestWindow = hasBestContrast \? bestCandidate : null/);
+  assert.match(page, /const hasAttentionContrast =/);
+  assert.match(page, /Math\.max\(\.\.\.attentionChances\) > Math\.min\(\.\.\.attentionChances\)/);
+  assert.match(page, /const attentionWindow = hasAttentionContrast \? attentionCandidate : null/);
+  assert.match(page, /Sem período de destaque/);
+  assert.match(page, /As janelas têm valores semelhantes nesta atualização/);
+  assert.match(page, /className=\{bestWindow \? "is-best" : undefined\}/);
+  assert.match(page, /className=\{attentionWindow \? "is-attention" : undefined\}/);
+});
+
 test("rain page answers when, how much and which period in direct language", () => {
   assert.match(page, /InternalPageChapters/);
   assert.match(page, /buildWindows/);
