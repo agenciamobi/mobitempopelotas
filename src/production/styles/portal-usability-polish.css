@@ -57,6 +57,24 @@
   outline-offset: 3px;
 }
 
+/* Ferramentas técnicas: toggles e filtros interativos mantêm o mesmo alvo mínimo. */
+.internal-weather-shell--meteogram :is(
+  .meteogram-window-toggle button,
+  .meteogram-quick-actions button
+),
+.internal-weather-shell--frost .frost-v2-filters button {
+  min-height: 44px;
+}
+
+.internal-weather-shell--meteogram :is(
+  .meteogram-window-toggle button,
+  .meteogram-quick-actions button
+):focus-visible,
+.internal-weather-shell--frost .frost-v2-filters button:focus-visible {
+  outline: 3px solid rgb(24 189 205 / 42%);
+  outline-offset: 3px;
+}
+
 /* PWA é carregado de forma lazy; a especificidade garante o acabamento sem !important. */
 .pwa-launcher.pwa-launcher {
   min-height: 44px;
@@ -193,7 +211,12 @@
 @media (forced-colors: active) {
   .home-forecast-story a:focus-visible,
   .internal-weather-shell--hydrology .sace-system-grid button:focus-visible,
-  .internal-weather-shell--hydrology .sace-filter-buttons button:focus-visible {
+  .internal-weather-shell--hydrology .sace-filter-buttons button:focus-visible,
+  .internal-weather-shell--meteogram :is(
+    .meteogram-window-toggle button,
+    .meteogram-quick-actions button
+  ):focus-visible,
+  .internal-weather-shell--frost .frost-v2-filters button:focus-visible {
     outline: 2px solid Highlight;
   }
 }
