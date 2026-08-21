@@ -28,6 +28,12 @@ const regionalAccent = readFileSync(
   "src/components/regional/RegionalCitiesAccentContract.css",
   "utf8",
 );
+const cppmetPage = readFileSync("src/components/blog/CppmetNewsPage.tsx", "utf8");
+const cppmetBase = readFileSync("src/components/blog/CppmetNewsPage.css", "utf8");
+const cppmetAccent = readFileSync(
+  "src/components/blog/CppmetNewsAccentContract.css",
+  "utf8",
+);
 
 test("alerts keeps the neutral Home contract and loads semantic color afterwards", () => {
   const baseIndex = alertsRoute.indexOf("WeatherAlertsHomeContract.css");
@@ -67,4 +73,19 @@ test("regional directory keeps its base neutral and loads geographic accents sep
   assert.match(regionalAccent, /article:nth-child\(4\)[\s\S]*#f27035/);
   assert.match(regionalAccent, /min-height:\s*44px/);
   assert.doesNotMatch(regionalAccent, /!important/);
+});
+
+test("CPPMet keeps the feed layout neutral and adds color only as an editorial accent", () => {
+  const baseIndex = cppmetPage.indexOf("CppmetNewsPage.css");
+  const accentIndex = cppmetPage.indexOf("CppmetNewsAccentContract.css");
+
+  assert.ok(baseIndex >= 0);
+  assert.ok(accentIndex > baseIndex);
+  assert.doesNotMatch(cppmetBase, /radial-gradient|linear-gradient/);
+  assert.match(cppmetAccent, /CPPMet \/ UFPel — acento jornalístico/);
+  assert.match(cppmetAccent, /\.cppmet-blog__hero[\s\S]*radial-gradient/);
+  assert.match(cppmetAccent, /\.cppmet-blog__card--featured/);
+  assert.match(cppmetAccent, /linear-gradient\(90deg, #18bdcd, #315f70\)/);
+  assert.match(cppmetAccent, /min-height:\s*44px/);
+  assert.doesNotMatch(cppmetAccent, /!important/);
 });
