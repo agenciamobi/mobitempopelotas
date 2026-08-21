@@ -5,6 +5,7 @@ import test from "node:test";
 const route = readFileSync("src/routes/vento-em-pelotas.tsx", "utf8");
 const page = readFileSync("src/components/weather/WindForecastPageV3.tsx", "utf8");
 const styles = readFileSync("src/components/weather/WindForecastPageV3.css", "utf8");
+const directionStyles = readFileSync("src/components/weather/WindDirectionContext.css", "utf8");
 const navigationAvailabilityStyles = readFileSync(
   "src/components/weather/WindNavigationAvailability.css",
   "utf8",
@@ -98,6 +99,17 @@ test("wind chapter index hides links to conditional sections that are not render
   assert.match(navigationAvailabilityStyles, /not\(:has\(#direcao-do-vento-por-hora\)\)/);
   assert.match(navigationAvailabilityStyles, /a\[href="#direcao-do-vento-por-hora"\]/);
   assert.doesNotMatch(navigationAvailabilityStyles, /!important/);
+});
+
+test("wind direction detail follows the Home surface contract", () => {
+  assert.match(directionStyles, /\.internal-weather-shell--wind \.wind-direction-context \{/);
+  assert.match(directionStyles, /background:\s*#fff/);
+  assert.match(directionStyles, /\.wind-direction-context__summary article[\s\S]*background:\s*#fbfcfc/);
+  assert.match(directionStyles, /\.wind-direction-context__timeline > article[\s\S]*background:\s*#fbfcfc/);
+  assert.match(directionStyles, /box-shadow:\s*none/);
+  assert.match(directionStyles, /@media \(max-width: 520px\)/);
+  assert.match(directionStyles, /--internal-weather-radius-mobile, 12px/);
+  assert.doesNotMatch(directionStyles, /radial-gradient|linear-gradient/);
 });
 
 test("wind alerts come only from active official alert records", () => {
