@@ -9,7 +9,9 @@
  */
 
 .site-shell--topic,
-.site-shell--home-editorial.internal-weather-shell {
+.site-shell--home-editorial.internal-weather-shell,
+.data-status-shell,
+.privacy-data-shell {
   --route-editorial-line: rgb(7 30 47 / 10%);
   --route-editorial-surface: #fff;
   --route-editorial-soft: #fbfcfc;
@@ -17,6 +19,7 @@
   --route-editorial-muted: #58717d;
   --route-editorial-radius: 16px;
   --route-editorial-inner-radius: 14px;
+  --route-editorial-pad: clamp(26px, 3.2vw, 42px);
 }
 
 /* Páginas meteorológicas com shell compartilhado. */
@@ -178,6 +181,88 @@
   backdrop-filter: none !important;
 }
 
+/*
+ * Páginas standalone. /status-dos-dados importa CSS diretamente na rota e esse
+ * chunk pode ser anexado depois do bundle global. Reafirmamos somente geometria
+ * e superfície para evitar que o layout antigo reapareça após a navegação.
+ */
+.data-status-shell,
+.privacy-data-shell {
+  background-color: var(--tp-home-canvas, #f8faf9) !important;
+  background-image: none !important;
+}
+
+.data-status-page,
+.privacy-page {
+  width: min(
+    var(--tp-home-container-max, 1440px),
+    calc(100% - var(--tp-home-container-gutter, 48px))
+  ) !important;
+  max-width: none !important;
+  margin: clamp(20px, 2.5vw, 32px) auto 0 !important;
+  padding: 0 0 clamp(22px, 3vw, 36px) !important;
+  box-sizing: border-box;
+}
+
+.data-status-hero,
+.privacy-hero {
+  margin: 0 0 clamp(16px, 2vw, 24px) !important;
+  padding: clamp(34px, 4vw, 58px) var(--route-editorial-pad) !important;
+  border: 1px solid var(--route-editorial-line) !important;
+  border-radius: var(--route-editorial-radius) !important;
+  background-color: var(--route-editorial-surface) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.data-status-summary,
+.data-status-group,
+.data-status-history,
+.data-status-explainer,
+.privacy-card {
+  border: 1px solid var(--route-editorial-line) !important;
+  border-radius: var(--route-editorial-radius) !important;
+  background-color: var(--route-editorial-surface) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.data-status-summary,
+.data-status-history,
+.data-status-explainer {
+  margin: 0 0 clamp(16px, 2vw, 24px) !important;
+}
+
+.data-status-groups {
+  gap: clamp(16px, 2vw, 24px) !important;
+  margin-top: 0 !important;
+}
+
+.data-status-group,
+.data-status-history,
+.data-status-explainer,
+.privacy-card {
+  padding: var(--route-editorial-pad) !important;
+}
+
+.data-status-hero > aside,
+.privacy-summary,
+.data-status-service,
+.data-status-availability-summary article,
+.data-status-maintenance article,
+.data-status-incident,
+.data-status-history-empty {
+  border-color: var(--route-editorial-line) !important;
+  border-radius: var(--route-editorial-inner-radius) !important;
+  box-shadow: none !important;
+}
+
+.data-status-hero > aside,
+.privacy-summary {
+  background-color: var(--route-editorial-soft) !important;
+  background-image: none !important;
+}
+
 /* Páginas de tópico renderizadas pelo SiteLayout. */
 .site-shell--topic
   .site-container--topic
@@ -260,11 +345,39 @@
   background-image: initial;
 }
 
+@media (max-width: 1240px) {
+  .data-status-page,
+  .privacy-page {
+    width: min(
+      calc(100% - var(--tp-home-container-compact-gutter, 32px)),
+      var(--tp-home-container-compact-max, 1180px)
+    ) !important;
+  }
+}
+
 @media (max-width: 720px) {
   .site-shell--topic,
-  .site-shell--home-editorial.internal-weather-shell {
+  .site-shell--home-editorial.internal-weather-shell,
+  .data-status-shell,
+  .privacy-data-shell {
     --route-editorial-radius: 12px;
     --route-editorial-inner-radius: 12px;
+    --route-editorial-pad: 20px;
+  }
+
+  .data-status-page,
+  .privacy-page {
+    width: calc(100% - var(--tp-home-container-mobile-gutter, 20px)) !important;
+    margin-top: 14px !important;
+  }
+
+  .data-status-hero,
+  .privacy-hero,
+  .data-status-group,
+  .data-status-history,
+  .data-status-explainer,
+  .privacy-card {
+    padding: 22px 18px !important;
   }
 }
 
@@ -276,6 +389,13 @@
   .site-shell--home-editorial.internal-weather-shell
     .internal-weather-main
     > .editorial-answer-section,
+  .data-status-hero,
+  .privacy-hero,
+  .data-status-summary,
+  .data-status-group,
+  .data-status-history,
+  .data-status-explainer,
+  .privacy-card,
   .site-shell--topic
     .site-container--topic
     > [class*="-page"]
