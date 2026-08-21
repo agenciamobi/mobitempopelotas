@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { FrostMapHero, FrostMapPageV2 } from "@/components/inmet/FrostMapPageV2";
+import "@/components/inmet/FrostMapHomeContract.css";
 import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
 import { getInmetFrostOverview } from "@/lib/inmet/frost.functions";
 import { createPageHead } from "@/lib/page-meta";
