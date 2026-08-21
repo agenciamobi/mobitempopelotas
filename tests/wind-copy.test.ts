@@ -11,7 +11,7 @@ const windSource = `${route}\n${page}`;
 test("wind route uses the deeper source-aware page", () => {
   assert.match(route, /WindForecastPageV3/);
   assert.match(route, /pageClassName="internal-weather-shell--wind"/);
-  assert.match(route, /Veja o vento agora, a direção atual/);
+  assert.match(route, /Veja o vento agora, direção observada, direção prevista por hora/);
   assert.match(route, /WIND_PAGE_CONTENT/);
   assert.match(route, /Como ler vento, direção e rajadas em Pelotas/);
   assert.match(route, /createFaqPageJsonLd\(PAGE_PATH, WIND_PAGE_CONTENT\.faqs\)/);
@@ -28,7 +28,7 @@ test("wind page uses field-level provenance instead of a single current source",
   assert.match(page, /Última atualização/);
   assert.match(page, /current\?\.observedAt/);
   assert.doesNotMatch(page, /quality\.currentSource/);
-  assert.match(route, /O vento atual e a direção podem ter origens diferentes/);
+  assert.match(route, /O vento atual e a direção observada podem ter origens diferentes/);
 });
 
 test("wind page expands the hourly window to 24 hours", () => {
@@ -42,16 +42,19 @@ test("wind page expands the hourly window to 24 hours", () => {
   assert.doesNotMatch(page, /slice\(0, 12\)/);
 });
 
-test("future direction is not fabricated from the current reading", () => {
-  assert.match(page, /A fonte não informa a direção futura em cada horário/);
-  assert.match(page, /a direção atual não é repetida como previsão/);
-  assert.match(route, /sem inventar uma direção futura ausente/);
-  assert.match(route, /Por que a direção não aparece em cada horário futuro\?/);
+test("future direction is an explicit model forecast, never fabricated from the current reading", () => {
+  assert.match(route, /direção prevista por hora/i);
+  assert.match(route, /não é apresentada como medição da estação/i);
+  assert.match(page, /direção prevista por horário aparece em uma camada detalhada separada/);
+  assert.doesNotMatch(page, /A fonte não informa a direção futura em cada horário/);
   assert.doesNotMatch(page, /hour\.windDirection/);
+  assert.match(route, /A direção futura é uma medição da estação\?/);
+  assert.match(route, /Por que a direção prevista pode mudar ao longo do dia\?/);
 });
 
 test("top wind summary uses objective visitor-facing language", () => {
   assert.match(page, /Rajadas de até \$\{number\(maximum\)\} km\/h nas próximas 24h/);
+  assert.match(page, /Sem rajadas positivas previstas nas próximas 24h/);
   assert.match(page, /Vento agora/);
   assert.match(page, /Rajada mais forte nas próximas 24h/);
   assert.match(page, /Resumo da previsão\. Avisos oficiais têm prioridade/);
@@ -62,14 +65,24 @@ test("top wind summary uses objective visitor-facing language", () => {
   assert.doesNotMatch(windSource, /Procedência campo a campo/i);
 });
 
-test("peak hours and weekly gusts remain transparent forecasts", () => {
+test("peak rankings use only positive published gusts", () => {
   assert.match(page, /function peakHours/);
-  assert.match(page, /sort\(\(a, b\) => \(b\.windGust \?\? b\.windSpeed\)/);
+  assert.match(page, /\.filter\(\(hour\) => \(hour\.windGust \?\? 0\) > 0\)/);
+  assert.match(page, /\.sort\(\(a, b\) => \(b\.windGust \?\? 0\) - \(a\.windGust \?\? 0\)\)/);
   assert.match(page, /As rajadas mais fortes das próximas 24 horas/);
-  assert.match(page, /Quando a fonte não informa rajada/);
+  assert.match(page, /Velocidade sustentada não substitui rajada/);
+  assert.match(page, /Não há rajadas positivas previstas para as próximas 24 horas/);
+  assert.match(page, /Sem rajada prevista/);
   assert.match(page, /Próximos 7 dias/);
   assert.match(page, /Rajada mais forte prevista em cada dia/);
   assert.match(page, /weather\.daily\.slice\(0, 7\)/);
+});
+
+test("wind hourly CTA never points to an absent hourly section", () => {
+  assert.match(page, /hours\.length \? \(/);
+  assert.match(page, /href="#vento-por-hora"/);
+  assert.match(page, /to="\/previsao-7-dias-pelotas"/);
+  assert.match(page, /Ver previsão de 7 dias/);
 });
 
 test("wind alerts come only from active official alert records", () => {
@@ -89,7 +102,8 @@ test("wind FAQ covers interpretation and provenance", () => {
   assert.match(route, /Qual é a diferença entre vento e rajada\?/);
   assert.match(route, /O que significa a direção do vento\?/);
   assert.match(route, /O vento mostrado agora foi medido\?/);
-  assert.match(route, /Por que a direção não aparece em cada horário futuro\?/);
+  assert.match(route, /A direção futura é uma medição da estação\?/);
+  assert.match(route, /Por que a direção prevista pode mudar ao longo do dia\?/);
   assert.match(route, /Quando as rajadas exigem mais atenção\?/);
 });
 
