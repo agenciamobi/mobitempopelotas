@@ -8,6 +8,23 @@ type HomeForecastEditorialProps = {
   weather: WeatherData;
 };
 
+function formatNumber(value: number, maximumFractionDigits = 1) {
+  return new Intl.NumberFormat("pt-BR", { maximumFractionDigits }).format(value);
+}
+
+function hourlyRainReading(probability: number | null, precipitationMm: number | null | undefined) {
+  const chance = probability === null ? null : `${probability}%`;
+  const volume =
+    precipitationMm === null || precipitationMm === undefined
+      ? null
+      : `${formatNumber(precipitationMm)} mm`;
+
+  if (chance && volume) return { primary: chance, secondary: `chance · ${volume}` };
+  if (chance) return { primary: chance, secondary: "chance" };
+  if (volume) return { primary: volume, secondary: "volume previsto" };
+  return { primary: "—", secondary: "chuva em atualização" };
+}
+
 export function HomeForecastEditorial({ weather }: HomeForecastEditorialProps) {
   const hourly = weather.hourly.slice(0, 7);
   const hoursWithRainChance = hourly.filter((hour) => hour.precipitation !== null);
@@ -65,13 +82,14 @@ export function HomeForecastEditorial({ weather }: HomeForecastEditorialProps) {
           const isPeak = peakHour === hour && (hour.precipitation ?? 0) > 0;
           const condition = weatherConditionLabels[hour.icon];
           const timeLabel = index === 0 ? "Próxima hora" : hour.time;
+          const rain = hourlyRainReading(hour.precipitation, hour.precipitationMm);
 
           return (
             <article
               className={`tp-home-forecast-hour${isPeak ? " is-rain-peak" : ""}`}
-              key={`${hour.time}-${index}`}
+              key={`${hour.timestamp ?? hour.time}-${index}`}
               role="listitem"
-              aria-label={`${hour.time}: ${condition.toLocaleLowerCase("pt-BR")}, ${hour.temperature} graus, ${hour.precipitation === null ? "probabilidade de chuva não informada" : `${hour.precipitation}% de chance de chuva`} e ${hour.windGust === null ? "rajada não informada" : `rajadas de até ${hour.windGust} quilômetros por hora`}.`}
+              aria-label={`${hour.time}: ${condition.toLocaleLowerCase("pt-BR")}, ${hour.temperature} graus, ${rain.primary} ${rain.secondary} e ${hour.windGust === null ? "rajada não informada" : `rajadas de até ${hour.windGust} quilômetros por hora`}.`}
             >
               <div className="tp-home-forecast-hour__topline">
                 <strong>{timeLabel}</strong>
@@ -83,8 +101,8 @@ export function HomeForecastEditorial({ weather }: HomeForecastEditorialProps) {
               </div>
               <span className="tp-home-forecast-hour__condition">{condition}</span>
               <p className="tp-home-forecast-hour__rain">
-                <strong>{hour.precipitation === null ? "—" : `${hour.precipitation}%`}</strong>
-                <span> chuva</span>
+                <strong>{rain.primary}</strong>
+                <span> {rain.secondary}</span>
               </p>
               <small className="tp-home-forecast-hour__wind">
                 {hour.windGust === null ? "Rajada não informada" : `Rajada de até ${hour.windGust} km/h`}
