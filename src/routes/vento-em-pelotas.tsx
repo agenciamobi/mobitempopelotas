@@ -5,6 +5,7 @@ import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPag
 import { WindDirectionContext } from "@/components/weather/WindDirectionContext";
 import { WindForecastPageV3 } from "@/components/weather/WindForecastPageV3";
 import "@/components/weather/WindForecastHomeContract.css";
+import "@/components/weather/WindNavigationAvailability.css";
 import { WIND_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
 import { createEditorialPageJsonLd, createFaqPageJsonLd } from "@/lib/structured-data";
