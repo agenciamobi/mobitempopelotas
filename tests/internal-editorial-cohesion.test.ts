@@ -238,15 +238,18 @@ test("wind loads a route-local Home contract without flattening semantic alert s
   assert.doesNotMatch(windHomeContract, /!important/);
 });
 
-test("Laranjal detail removes the floating hydrology stage but keeps data status styling", () => {
+test("Laranjal detail loads its Home contract last and removes the floating dark reading stage", () => {
   const routeCssIndex = laranjalRoute.indexOf("HydrologyEditorialRoute.css");
+  const pagesIndex = laranjalRoute.indexOf("HydrologyPages");
   const contractIndex = laranjalRoute.indexOf("HydrologyDetailHomeContract.css");
   assert.ok(routeCssIndex >= 0);
-  assert.ok(contractIndex > routeCssIndex);
+  assert.ok(pagesIndex > routeCssIndex);
+  assert.ok(contractIndex > pagesIndex);
   assert.match(hydrologyDetailHomeContract, /\.site-shell--topic \.hydrology-editorial-hero/);
   assert.match(hydrologyDetailHomeContract, /\.hydrology-editorial-media[\s\S]*background:\s*#fbfcfc/);
   assert.match(hydrologyDetailHomeContract, /\.hydrology-editorial-card[\s\S]*box-shadow:\s*none/);
-  assert.match(hydrologyDetailHomeContract, /\.hydrology-editorial-status/);
+  assert.match(hydrologyDetailHomeContract, /\.hydrology-level-main[\s\S]*background:\s*#fbfcfc/);
+  assert.match(hydrologyDetailHomeContract, /\.hydrology-source-status/);
   assert.match(hydrologyDetailHomeContract, /@media \(max-width: 720px\)/);
   assert.doesNotMatch(hydrologyDetailHomeContract, /radial-gradient|linear-gradient/);
   assert.doesNotMatch(hydrologyDetailHomeContract, /!important/);
