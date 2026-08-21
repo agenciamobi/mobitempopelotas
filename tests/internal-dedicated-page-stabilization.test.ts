@@ -9,7 +9,7 @@ const stabilizationCss = readFileSync(
 const cssEntry = readFileSync("src/production/production-styles.css", "utf8");
 const tsEntry = readFileSync("src/production/production-styles.ts", "utf8");
 
-test("dedicated-page stabilization is the last production visual contract", () => {
+test("dedicated-page stabilization loads after the standalone Home contract", () => {
   for (const entry of [cssEntry, tsEntry]) {
     const standaloneIndex = entry.indexOf("standalone-home-surface-contract.css");
     const stabilizationIndex = entry.indexOf("internal-dedicated-page-stabilization.css");
