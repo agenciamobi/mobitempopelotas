@@ -72,9 +72,22 @@ test("hourly wind direction stays a forecast distinct from current observation",
   assert.match(windPageStyles, /grid-template-columns: repeat\(6, minmax\(0, 1fr\)\)/);
 });
 
-test("peak-gust direction never substitutes sustained wind for a missing gust", () => {
-  assert.match(windDetail, /if \(hour\.windGust === null\) return selected/);
+test("wind frequency does not invent a dominant direction when counts are tied", () => {
+  assert.match(windDetail, /function directionFrequency/);
+  assert.match(windDetail, /const leaders = ranked\.filter/);
+  assert.match(windDetail, /if \(leaders\.length > 1\)/);
+  assert.match(windDetail, /Sem direção dominante/);
+  assert.match(windDetail, /Empate entre \$\{leaders\.join\(", "\)\}/);
+  assert.match(windDetail, /hasDominantDirection: false/);
+});
+
+test("peak-gust direction requires a positive published gust and never substitutes sustained wind", () => {
+  assert.match(windDetail, /if \(hour\.windGust === null \|\| hour\.windGust <= 0\) return selected/);
   assert.match(windDetail, /selected\?\.windGust/);
+  assert.match(windDetail, /Sem rajada positiva prevista no período/);
+  assert.match(windDetail, /Rajada não informada no período/);
+  assert.match(windDetail, /function formatGust/);
+  assert.match(windDetail, /if \(value <= 0\) return "Sem rajada prevista"/);
   assert.doesNotMatch(windDetail, /hour\.windGust \?\? hour\.windSpeed/);
   assert.doesNotMatch(windDetail, /selected\.windGust \?\? selected\.windSpeed/);
 });
