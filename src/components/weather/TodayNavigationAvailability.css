@@ -1,0 +1,12 @@
+/* Keep Today chapter links aligned with sections that actually rendered. */
+.today-v5-page:not(:has(#previsao-hoje))
+  > .internal-page-chapters
+  a[href="#previsao-hoje"],
+.today-v5-page:not(:has(#recursos-hoje))
+  > .internal-page-chapters
+  a[href="#recursos-hoje"],
+.today-v5-page:not(:has(#atmosfera-hoje))
+  > .internal-page-chapters
+  a[href="#atmosfera-hoje"] {
+  display: none;
+}
