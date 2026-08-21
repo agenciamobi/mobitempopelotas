@@ -186,13 +186,14 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
           <span className="eyebrow">Resumo dos próximos 7 dias</span>
           <h2 id="seven-day-v2-overview-title">{planningHeadline(days)}</h2>
           <p>
-            A temperatura deve variar de {minimum}° a {maximum}°. Compare os dias com menos chuva e
-            rajadas e aqueles que concentram os maiores valores.
+            {hasPositiveRisk
+              ? `A temperatura deve variar de ${minimum}° a ${maximum}°. Compare os dias com menos chuva e rajadas e aqueles que concentram os maiores valores.`
+              : `A temperatura deve variar de ${minimum}° a ${maximum}°. Não há valores positivos de chuva ou rajadas publicados nesta atualização.`}
           </p>
         </div>
 
         <div className="seven-day-v2-overview__cards">
-          <article className="is-best">
+          <article className={hasRiskContrast ? "is-best" : undefined}>
             <CheckCircle2 aria-hidden="true" />
             <div>
               <span>{hasRiskContrast ? "Menor chance de chuva e rajadas" : "Comparação de chuva e rajadas"}</span>
@@ -208,7 +209,7 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
               </small>
             </div>
           </article>
-          <article className="is-attention">
+          <article className={hasRiskContrast ? "is-attention" : undefined}>
             <TriangleAlert aria-hidden="true" />
             <div>
               <span>{hasRiskContrast ? "Mais chuva ou rajadas" : "Dia de maior atenção"}</span>
