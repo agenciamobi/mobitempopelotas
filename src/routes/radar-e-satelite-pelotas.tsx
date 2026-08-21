@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { OfficialDataAccessNotice } from "@/components/content/OfficialDataAccessNotice";
 import { RadarForecastContext } from "@/components/redemet/RadarForecastContext";
+import { RedemetDerivedContext } from "@/components/redemet/RedemetDerivedContext";
 import { RedemetOverview } from "@/components/redemet/RedemetOverview";
 import "@/components/redemet/RedemetHomeContract.css";
 import { RADAR_EDITORIAL_CONTENT } from "@/lib/editorial-content";
@@ -13,7 +14,7 @@ import { getWeatherIntelligence } from "@/lib/weather/weather-intelligence.funct
 
 const PAGE_TITLE = "Radar e satélite em Pelotas";
 const PAGE_DESCRIPTION =
-  "Veja áreas de chuva, imagens de satélite e trovoadas na região de Pelotas, com horário, sequência de imagens e comparação com a previsão por hora.";
+  "Veja radar, satélite e trovoadas na região de Pelotas, com horário, sequência, janela temporal, cadência observada e distância aproximada da atividade elétrica.";
 const PAGE_PATH = "/radar-e-satelite-pelotas";
 
 const RADAR_PAGE_CONTENT = {
@@ -31,6 +32,8 @@ const RADAR_PAGE_CONTENT = {
     "Trovoada detectada indica atividade elétrica e não substitui um aviso oficial de risco.",
     "Cada imagem pode ter um horário diferente; compare registros feitos em momentos próximos.",
     "Temperatura, chance de chuva, vento, nuvens baixas e visibilidade são valores previstos e não são medidos pela imagem.",
+    "A janela temporal e a cadência mostradas na página são calculadas a partir dos timestamps dos quadros disponíveis naquela consulta; elas podem mudar se a fonte atrasar ou omitir um quadro.",
+    "A distância de uma trovoada até Pelotas é uma aproximação em linha reta a partir da coordenada detectada pelo STSC. Ela localiza atividade elétrica, mas não representa intensidade, direção de deslocamento nem nível de risco.",
   ],
   faqs: [
     {
@@ -62,6 +65,16 @@ const RADAR_PAGE_CONTENT = {
       question: "Por que as imagens podem mostrar horários diferentes?",
       answer:
         "Radar, satélite e trovoadas são atualizados em intervalos próprios. Por isso, confira o horário mostrado em cada bloco e evite comparar imagens de momentos muito diferentes como se fossem simultâneas.",
+    },
+    {
+      question: "O que significa a cadência observada da sequência?",
+      answer:
+        "É o intervalo mediano calculado entre os timestamps dos quadros disponíveis naquela consulta. Serve para entender a sequência exibida, mas não representa garantia de que a fonte publicará sempre no mesmo intervalo.",
+    },
+    {
+      question: "Como é calculada a distância das trovoadas até Pelotas?",
+      answer:
+        "O portal calcula a distância em linha reta entre a coordenada de cada ocorrência retornada pelo STSC e um ponto de referência de Pelotas. Essa distância ajuda a localizar a atividade elétrica, mas não substitui um aviso oficial nem indica a trajetória da tempestade.",
     },
     {
       question: "Os valores ao lado do radar foram medidos pela imagem?",
@@ -105,6 +118,9 @@ export const Route = createFileRoute("/radar-e-satelite-pelotas")({
           "API autorizada da REDEMET/DECEA",
           "Imagens de satélite sobre Pelotas",
           "Monitoramento regional de trovoadas",
+          "Distância de trovoadas até Pelotas",
+          "Cadência observada da sequência de radar",
+          "Janela temporal das imagens meteorológicas",
           "Precipitação na Zona Sul do Rio Grande do Sul",
           "REDEMET e INMET",
           "Horário das imagens meteorológicas",
@@ -131,6 +147,7 @@ function RedemetPage() {
   return (
     <div className="radar-satellite-page">
       <RedemetOverview data={data.redemet} />
+      <RedemetDerivedContext data={data.redemet} />
       <OfficialDataAccessNotice scope="meteorology" />
       <RadarForecastContext radar={data.redemet.radar} weather={data.weather} />
       <EditorialContentSection
