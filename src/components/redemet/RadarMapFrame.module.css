@@ -24,8 +24,11 @@
   pointer-events: none;
 }
 
-.rawFallback {
+.shell .rawFallback {
+  display: block;
   z-index: 1;
+  min-height: 0;
+  max-height: none;
   object-fit: contain;
   background: #0b1721;
 }
