@@ -94,11 +94,13 @@ export function RainRetailHero({
   const hasDailyForecast = days.length > 0;
   const hasRainData = hasHourlyForecast || hasDailyForecast;
   const today = days[0] ?? null;
-  const peakHour = hours.reduce<(typeof hours)[number] | null>(
+  const peakCandidate = hours.reduce<(typeof hours)[number] | null>(
     (selected, hour) =>
       !selected || (hour.precipitation ?? -1) > (selected.precipitation ?? -1) ? hour : selected,
     null,
   );
+  const highestRainChance = peakCandidate?.precipitation ?? null;
+  const hasPositiveRainChance = (highestRainChance ?? 0) > 0;
   const highestVolumeDay = days.reduce<DailyForecast | null>(
     (selected, day) => (!selected || day.precipitation > selected.precipitation ? day : selected),
     null,
@@ -142,6 +144,17 @@ export function RainRetailHero({
       : hasDailyForecast
         ? "A previsão diária está disponível; a chance de chuva por horário ainda está em atualização."
         : "A previsão de chuva está em atualização. Consulte novamente em alguns instantes.";
+
+  const hourlyChanceLabel = highestRainChance === null
+    ? "Chance horária em atualização"
+    : hasPositiveRainChance
+      ? "Maior chance nas próximas 12 horas"
+      : "Sem chance de chuva destacada nas próximas 12 horas";
+  const hourlyChanceDetail = highestRainChance === null
+    ? "Horário em atualização"
+    : hasPositiveRainChance
+      ? timeReference(peakCandidate?.time)
+      : "Sem horário de destaque";
 
   return (
     <section
@@ -231,13 +244,13 @@ export function RainRetailHero({
                 <div className="today-retail-hero__weather-icon">
                   <WeatherIcon
                     name={iconName}
-                    title={peakHour ? "Condição associada à maior chance de chuva" : "Previsão de chuva em atualização"}
+                    title={hasPositiveRainChance ? "Condição associada à maior chance de chuva" : "Previsão de chuva em Pelotas"}
                   />
                 </div>
                 <div>
-                  <strong>{formatChance(peakHour?.precipitation)}</strong>
-                  <span>{peakHour ? "Maior chance nas próximas 12 horas" : "Chance horária em atualização"}</span>
-                  <small>{timeReference(peakHour?.time)}</small>
+                  <strong>{formatChance(highestRainChance)}</strong>
+                  <span>{hourlyChanceLabel}</span>
+                  <small>{hourlyChanceDetail}</small>
                 </div>
               </div>
 
@@ -270,9 +283,9 @@ export function RainRetailHero({
 
           <div className="today-retail-hero__tiles rain-retail-hero__tiles" aria-label="Destaques da chuva">
             <article className="is-rain">
-              <span><CloudRain aria-hidden="true" /> Horário com maior chance</span>
-              <strong>{formatChance(peakHour?.precipitation)}</strong>
-              <small>{timeReference(peakHour?.time)}</small>
+              <span><CloudRain aria-hidden="true" /> Maior chance nas próximas horas</span>
+              <strong>{formatChance(highestRainChance)}</strong>
+              <small>{hourlyChanceDetail}</small>
             </article>
             <article>
               <span><Umbrella aria-hidden="true" /> Dia com maior volume</span>
