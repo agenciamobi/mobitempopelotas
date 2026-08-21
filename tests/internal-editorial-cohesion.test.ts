@@ -246,6 +246,9 @@ test("wind loads a route-local Home contract without flattening semantic alert s
   assert.match(windHomeContract, /\.wind-v3-interpretation[\s\S]*background:\s*#fff/);
   assert.match(windHomeContract, /\.wind-v3-summary-grid article[\s\S]*border-top-width:\s*1px/);
   assert.match(windHomeContract, /\.wind-v3-hourly-list article/);
+  assert.match(windHomeContract, /Links operacionais pequenos também precisam funcionar como alvos de toque/);
+  assert.match(windHomeContract, /min-height:\s*44px/);
+  assert.match(windHomeContract, /@media \(max-width: 720px\)[\s\S]*repeat\(2, minmax\(0, 1fr\)\)/);
   assert.doesNotMatch(windHomeContract, /radial-gradient|linear-gradient/);
   assert.doesNotMatch(windHomeContract, /!important/);
 });
@@ -264,7 +267,9 @@ test("Laranjal detail loads its Home contract last and removes the floating dark
   assert.match(hydrologyDetailHomeContract, /\.hydrology-source-status/);
   assert.match(hydrologyDetailHomeContract, /\.laranjal-embed-guide[\s\S]*background:\s*#fff/);
   assert.match(hydrologyDetailHomeContract, /\.laranjal-embed-guide-code[\s\S]*box-shadow:\s*none/);
-  assert.match(hydrologyDetailHomeContract, /@media \(max-width: 720px\)/);
+  assert.match(hydrologyDetailHomeContract, /\.laranjal-embed-guide-code button[\s\S]*min-height:\s*44px/);
+  assert.match(hydrologyDetailHomeContract, /@media \(max-width: 720px\)[\s\S]*\.hydrology-level-metrics/);
+  assert.match(hydrologyDetailHomeContract, /repeat\(2, minmax\(0, 1fr\)\)/);
   assert.doesNotMatch(hydrologyDetailHomeContract, /radial-gradient|linear-gradient/);
   assert.doesNotMatch(hydrologyDetailHomeContract, /!important/);
 });
@@ -276,6 +281,9 @@ test("radar route uses a local Home contract while preserving the dark image vie
   assert.match(redemetHomeContract, /\.redemet-hero aside[\s\S]*background:\s*var\(--redemet-home-soft\)/);
   assert.match(redemetHomeContract, /\.redemet-explainer[\s\S]*box-shadow:\s*none/);
   assert.match(redemetHomeContract, /Imagens meteorológicas permanecem escuras/);
+  assert.match(redemetHomeContract, /WCAG 2\.2: controles de reprodução e navegação mantêm alvo mínimo de 44 px/);
+  assert.match(redemetHomeContract, /\.redemet-frame-controls > button,[\s\S]*width:\s*44px[\s\S]*height:\s*44px/);
+  assert.match(redemetHomeContract, /@media \(max-width: 700px\)[\s\S]*min-height:\s*300px/);
   assert.match(redemetHomeContract, /\.redemet-frame-tools :is\(button, a\):hover[\s\S]*transform:\s*none/);
   assert.doesNotMatch(redemetHomeContract, /!important/);
 });
@@ -286,6 +294,10 @@ test("cameras route uses a local Home contract without flattening the video play
   assert.match(camerasHomeContract, /grid-template-columns:\s*minmax\(0, 1\.12fr\) minmax\(320px, 0\.66fr\)/);
   assert.match(camerasHomeContract, /\.camera-v2-featured[\s\S]*background:\s*var\(--camera-home-soft\)/);
   assert.match(camerasHomeContract, /O player e a miniatura permanecem com fundo escuro/);
+  assert.match(camerasHomeContract, /min-height:\s*clamp\(360px, 44vw, 560px\)/);
+  assert.match(camerasHomeContract, /Evita perder nomes úteis por ellipsis justamente na seleção mobile/);
+  assert.match(camerasHomeContract, /white-space:\s*normal/);
+  assert.match(camerasHomeContract, /\.camera-v2-featured dl, \.camera-v2-status dl[\s\S]*repeat\(2, minmax\(0, 1fr\)\)/);
   assert.match(camerasHomeContract, /\.camera-v2-responsibility[\s\S]*rgb\(242 112 53 \/ 22%\)/);
   assert.match(camerasHomeContract, /\.camera-v2-actions a:first-child[\s\S]*background:\s*var\(--camera-home-ink\)/);
   assert.doesNotMatch(camerasHomeContract, /radial-gradient|linear-gradient/);
