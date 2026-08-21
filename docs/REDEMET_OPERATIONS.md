@@ -1,6 +1,6 @@
 # REDEMET / DECEA — operação atual do Tempo Pelotas
 
-Última consolidação: 19/08/2026.
+Última consolidação: 21/08/2026.
 
 Este documento é a fonte de verdade operacional para radar, satélite e trovoadas da REDEMET no Tempo Pelotas. Ele substitui, para a implementação nativa em `src/`, referências antigas que ainda possam existir em `_legacy/`.
 
@@ -14,12 +14,16 @@ Este documento é a fonte de verdade operacional para radar, satélite e trovoad
 - Em 18/08/2026, os HARs oficiais analisados mostraram Canguçu (`cn`) cadastrado, porém sem `path` e sem timestamp de imagem recente, enquanto Santiago (`sg`) entregava imagem válida.
 - O MAXCAPPI de Santiago observado cobria Pelotas; produtos de alcance menor só podem ser usados quando os bounds efetivamente incluírem Pelotas.
 - Canguçu continua como alternativa automática quando voltar a entregar imagem oficial adequada.
+- Na rota `/radar-e-satelite-pelotas`, o PNG do radar é georreferenciado pelos bounds oficiais sobre a base MapLibre/OpenFreeMap, com Pelotas marcada; a imagem bruta permanece como fallback se a base cartográfica falhar.
+- A referência temporal dos produtos REDEMET/TSC é UTC/Z. Timestamps recebidos sem sufixo de zona são normalizados como UTC e só depois formatados para `America/Sao_Paulo` na interface.
+- A interface rejeita timestamps inválidos ou mais de cinco minutos no futuro para o cálculo de “imagem mais recente”; eles aparecem como horário da fonte em verificação e não como “Atualizado agora”.
 - Satélite e STSC continuam independentes da disponibilidade do radar.
 
 ## Arquivos ativos
 
 - `src/lib/redemet/redemet-radar.server.ts`: seleção resiliente do radar e parsing da resposta oficial.
 - `src/lib/redemet/redemet-stsc.server.ts`: contrato atual do STSC/trovoadas e requisição da janela de animação.
+- `src/lib/redemet/redemet-display-time.ts`: validação defensiva, frescor e apresentação dos timestamps REDEMET.
 - `src/lib/redemet/redemet.server.ts`: integração de satélite e compatibilidade histórica; não é a fonte de verdade do radar novo.
 - `src/lib/redemet/redemet-last-good.server.ts`: último quadro válido durante indisponibilidades curtas.
 - `src/routes/api/redemet/radar.ts`: endpoint público sanitizado do radar.
@@ -27,9 +31,11 @@ Este documento é a fonte de verdade operacional para radar, satélite e trovoad
 - `src/routes/api/redemet/storms.ts`: endpoint público sanitizado do STSC.
 - `src/routes/api/redemet/image.ts`: proxy controlado das imagens oficiais.
 - `src/production/components/weather-map.tsx`: renderização MapLibre na Home.
+- `src/components/redemet/RadarMapFrame.tsx`: georreferenciamento do frame do radar na página dedicada.
 - `src/components/redemet/RedemetOverview.tsx`: visão editorial da página de radar/satélite.
 - `src/components/content/OfficialDataAccessNotice.tsx`: identificação pública do acesso institucional autorizado.
 - `tests/redemet-performance.test.ts`: contratos de regressão extraídos dos formatos observados.
+- `tests/redemet-display-time-and-map.test.ts`: contrato de timezone, proteção contra timestamp futuro e georreferenciamento do radar dedicado.
 
 ## Radar
 
@@ -65,6 +71,23 @@ Ordem de produtos consultados:
 
 Um produto só pode ser exibido para Pelotas se os bounds do quadro incluírem as coordenadas de Pelotas. Isso evita mostrar um produto de Santiago com alcance insuficiente apenas porque a estação está operacional.
 
+### Renderização georreferenciada na página dedicada
+
+Na rota `/radar-e-satelite-pelotas`, o quadro selecionado não é mais mostrado como uma imagem escura isolada. O componente `RadarMapFrame` usa os bounds que já acompanham cada `RedemetImageFrame` para posicionar o PNG oficial como `image source` do MapLibre.
+
+As coordenadas são aplicadas na ordem esperada pelo MapLibre:
+
+1. oeste/norte;
+2. leste/norte;
+3. leste/sul;
+4. oeste/sul.
+
+A base cartográfica reutiliza o OpenFreeMap já adotado por outros mapas do projeto. O raster do radar é colocado abaixo das camadas de labels do mapa e usa opacidade controlada para que cidades, estradas e referências permaneçam visíveis através do fundo escuro do MAXCAPPI. Pelotas recebe um marcador discreto para orientação regional.
+
+Durante reprodução/timeline, a troca de quadro atualiza a mesma image source em vez de recriar o mapa. Se os bounds mudarem, a câmera é reajustada. Se MapLibre, a base cartográfica ou a camada raster falharem, a imagem oficial bruta continua visível como fallback; o botão `Abrir imagem` continua apontando para o PNG via proxy controlado.
+
+Essa composição aplica-se somente ao radar. As imagens de satélite permanecem apresentadas como imagens oficiais, sem georreferenciamento adicional na página dedicada.
+
 ### Evidência de agosto de 2026
 
 Nos HARs analisados em 18/08/2026:
@@ -96,6 +119,12 @@ A resposta relevante pode trazer `data` como lista de quadros, com campos como:
 - `horario`;
 - `ultima_ocorrencia`;
 - `pontos`, com coordenadas `la` e `lo`.
+
+### Referência temporal
+
+A interface oficial da REDEMET identifica o relógio TSC e a última ocorrência em UTC e publica o horário de atualização com sufixo `Z`. Por isso, timestamps do STSC que chegam sem timezone explícito são tratados como UTC no parser. Somente a apresentação ao usuário é convertida para `America/Sao_Paulo`.
+
+Não reinterpretar esses valores sem zona como `-03:00`: isso acrescenta três horas ao instante real e pode produzir um horário futuro na interface. A camada de apresentação também mantém uma segunda defesa: timestamps inválidos ou mais de cinco minutos no futuro são excluídos do cálculo global de “imagem mais recente” e exibidos como `Horário da fonte em verificação`.
 
 ### Janela temporal
 
@@ -153,6 +182,8 @@ Evitar formulações como “homologado pela REDEMET”, “certificado pela Aer
 - Radar indisponível: o TTL negativo deve permanecer curto para que uma estação que volte a operar seja detectada rapidamente.
 - `withRedemetLastGood` pode manter temporariamente o último quadro válido durante falhas curtas, sem transformar dado antigo em dado atual.
 - Toda interface deve mostrar horário/origem e estado explícito de indisponibilidade.
+- Timestamp futuro ou incompatível não pode ser promovido a quadro mais recente nem receber estado “Atualizado agora”.
+- A página dedicada mantém o PNG oficial como fallback quando a base MapLibre/OpenFreeMap não puder ser carregada.
 
 ## Diagnóstico seguro
 
@@ -176,8 +207,10 @@ Os seguintes contratos devem continuar protegidos por testes e smoke de produç�
 - radar não confunde Santiago com Canguçu;
 - Canguçu com `path: null` não é tratado como imagem válida;
 - Santiago/MAXCAPPI só é usado se os bounds cobrirem Pelotas;
+- o quadro do radar dedicado é georreferenciado pelos bounds oficiais sobre MapLibre e mantém fallback para a imagem bruta;
 - a rota pública não expõe segredo;
-- STSC aceita o formato observado em HAR e filtra a área regional;
+- STSC aceita o formato observado em HAR, interpreta timestamps sem zona como UTC e filtra a área regional;
+- timestamps futuros não dominam o resumo global nem são tratados como atualização recente;
 - STSC envia a quantidade validada de quadros em `anima` para a API externa;
 - o limite server-side do STSC permanece alinhado em 12 quadros;
 - um quadro STSC válido com zero pontos regionais não é tratado como indisponibilidade;
