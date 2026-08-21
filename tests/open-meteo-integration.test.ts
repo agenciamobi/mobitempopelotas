@@ -88,7 +88,7 @@ test("URL usa contrato explícito e coordenadas de Pelotas", () => {
   assert.match(hourly, /wind_direction_10m/);
 });
 
-test("normalização preserva ausências e inclui o perfil atmosférico", () => {
+test("normalização preserva ausências, identidade diária e perfil atmosférico", () => {
   const result = normalizeOpenMeteoWeather(makeResponse());
 
   assert.equal(result.status, "live");
@@ -113,6 +113,7 @@ test("normalização preserva ausências e inclui o perfil atmosférico", () => 
   assert.equal(result.hourly[0]?.cloudCoverHigh, 28);
   assert.equal(result.hourly[0]?.cape, 420);
   assert.equal(result.hourly[0]?.boundaryLayerHeight, 410);
+  assert.equal(result.daily[0]?.dateIso, "2026-07-24");
   assert.equal(result.daily[0]?.rainChance, null);
   assert.equal(result.daily[0]?.windGust, null);
   assert.equal(result.daily[0]?.precipitationMm, 0.2);
