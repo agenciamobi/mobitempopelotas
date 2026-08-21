@@ -148,6 +148,7 @@ export function toProductionWeatherData(data: AggregatedWeatherData): WeatherDat
     daily: daily.map((day) => ({
       weekday: day.weekday,
       date: day.date,
+      dateIso: day.dateIso,
       min: day.min,
       max: day.max,
       rainChance: day.rainChance,
