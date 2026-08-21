@@ -34,6 +34,29 @@
   align-items: center;
 }
 
+/* Utilidade pública: os telefones já têm cards amplos; links auxiliares também precisam 44 px. */
+.tp-public-service-strip .tp-public-service-civil-defense__identity > a,
+.tp-public-service-strip .tp-public-service-civil-defense__signup a {
+  min-height: 44px;
+}
+
+/* SACE: filtros são botões; cards de sistema ficam estáveis em vez de saltar no hover. */
+.internal-weather-shell--hydrology .sace-filter-buttons button {
+  min-height: 44px;
+}
+
+.internal-weather-shell--hydrology .sace-system-grid button:hover,
+.internal-weather-shell--hydrology .sace-system-grid button:focus-visible,
+.internal-weather-shell--hydrology .sace-system-grid button.is-active {
+  transform: none;
+}
+
+.internal-weather-shell--hydrology .sace-system-grid button:focus-visible,
+.internal-weather-shell--hydrology .sace-filter-buttons button:focus-visible {
+  outline: 3px solid rgb(24 189 205 / 42%);
+  outline-offset: 3px;
+}
+
 /* PWA é carregado de forma lazy; a especificidade garante o acabamento sem !important. */
 .pwa-launcher.pwa-launcher {
   min-height: 44px;
@@ -168,7 +191,9 @@
 }
 
 @media (forced-colors: active) {
-  .home-forecast-story a:focus-visible {
+  .home-forecast-story a:focus-visible,
+  .internal-weather-shell--hydrology .sace-system-grid button:focus-visible,
+  .internal-weather-shell--hydrology .sace-filter-buttons button:focus-visible {
     outline: 2px solid Highlight;
   }
 }
