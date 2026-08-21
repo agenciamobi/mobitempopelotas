@@ -195,6 +195,7 @@ function normalizeDaily(payload: OpenMeteoPayload): DailyForecast[] | null {
     result.push({
       weekday: weekdayLabel(date, index),
       date: dateLabel(date),
+      dateIso: date,
       min: Math.round(minimum),
       max: Math.round(maximum),
       rainChance: rainChances[index] === null ? null : Math.round(rainChances[index] as number),
@@ -382,6 +383,7 @@ export function recoverWeatherIntelligenceFromOpenMeteo(
   const daily = reconciledDaily.map((day) => ({
     weekday: day.weekday,
     date: day.date,
+    dateIso: day.dateIso,
     min: day.min,
     max: day.max,
     rainChance: day.rainChance,
