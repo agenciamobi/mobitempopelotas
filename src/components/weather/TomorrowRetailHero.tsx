@@ -38,6 +38,12 @@ function formatValue(value: number | null | undefined, suffix = "") {
   return value === null || value === undefined ? "—" : `${value}${suffix}`;
 }
 
+function formatGust(value: number | null | undefined) {
+  if (value === null || value === undefined) return "—";
+  if (value <= 0) return "Sem rajadas";
+  return `${value} km/h`;
+}
+
 function formatTomorrowDate(day: DailyForecast | null) {
   if (!day) return "Data em atualização";
   if (!day.dateIso) return `${day.weekday} · ${day.date}`;
@@ -79,7 +85,7 @@ function buildMetrics(tomorrow: DailyForecast | null): RetailMetric[] {
     },
     {
       label: "Rajada máxima",
-      value: formatValue(tomorrow?.windGust, " km/h"),
+      value: formatGust(tomorrow?.windGust),
       icon: Wind,
     },
   ];
@@ -92,6 +98,7 @@ export function TomorrowRetailHero({
 }: TomorrowRetailHeroProps) {
   const today = weather.daily[0] ?? null;
   const tomorrow = weather.daily[1] ?? null;
+  const hasTomorrow = tomorrow !== null;
   const iconName: WeatherIconName = tomorrow?.icon ?? "cloud";
   const condition = tomorrow ? weatherConditionLabels[iconName] : "Previsão em atualização";
   const metrics = buildMetrics(tomorrow);
@@ -141,11 +148,20 @@ export function TomorrowRetailHero({
           </div>
 
           <div className="today-retail-hero__actions">
-            <a className="today-retail-hero__primary" href="#planejamento-amanha">
-              Ver como se preparar <ArrowRight aria-hidden="true" />
-            </a>
-            <Link className="today-retail-hero__secondary" to="/previsao-7-dias-pelotas">
-              Ver próximos 7 dias
+            {hasTomorrow ? (
+              <a className="today-retail-hero__primary" href="#planejamento-amanha">
+                Ver como se preparar <ArrowRight aria-hidden="true" />
+              </a>
+            ) : (
+              <Link className="today-retail-hero__primary" to="/previsao-7-dias-pelotas">
+                Ver próximos 7 dias <ArrowRight aria-hidden="true" />
+              </Link>
+            )}
+            <Link
+              className="today-retail-hero__secondary"
+              to={hasTomorrow ? "/previsao-7-dias-pelotas" : "/tempo-hoje-pelotas"}
+            >
+              {hasTomorrow ? "Ver próximos 7 dias" : "Ver tempo de hoje"}
             </Link>
           </div>
         </div>
@@ -154,12 +170,20 @@ export function TomorrowRetailHero({
           <article
             className="today-retail-hero__current tomorrow-retail-hero__current"
             style={photoStyle}
-            aria-label="Resumo da previsão do tempo para amanhã em Pelotas"
+            aria-label={
+              hasTomorrow
+                ? "Resumo da previsão do tempo para amanhã em Pelotas"
+                : "Previsão de amanhã em atualização em Pelotas"
+            }
           >
             <div
               className="today-retail-hero__current-photo"
               role="img"
-              aria-label={photo.alt}
+              aria-label={
+                hasTomorrow
+                  ? photo.alt
+                  : "Imagem ilustrativa da previsão meteorológica de Pelotas"
+              }
             />
 
             <div className="today-retail-hero__current-content">
