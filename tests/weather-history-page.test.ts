@@ -6,6 +6,7 @@ const route = readFileSync("src/routes/historico-climatico-pelotas.tsx", "utf8")
 const page = readFileSync("src/components/history/WeatherHistoryPage.tsx", "utf8");
 const chart = readFileSync("src/components/history/WeatherHistoryChart.tsx", "utf8");
 const styles = readFileSync("src/components/history/WeatherHistoryRefinement.css", "utf8");
+const homeContract = readFileSync("src/components/history/WeatherHistoryHomeContract.css", "utf8");
 
 const historySource = `${route}\n${page}\n${chart}`;
 
@@ -17,6 +18,7 @@ test("weather history route uses the shared shell and real history data", () => 
   assert.match(route, /InternalWeatherPageShell/);
   assert.match(route, /WeatherHistoryHero/);
   assert.match(route, /WeatherHistoryPage/);
+  assert.match(route, /WeatherHistoryHomeContract\.css/);
   assert.match(route, /showOfficialAlerts=\{false\}/);
   assert.match(route, /createFaqPageJsonLd\(PAGE_PATH, HISTORY_PAGE_CONTENT\.faqs\)/);
   assert.match(route, /Histórico de 30 dias em Pelotas/);
@@ -95,4 +97,16 @@ test("history refinement follows the current retail layout and accessibility rul
   assert.match(styles, /@media \(forced-colors: active\)/);
   assert.match(styles, /:focus-visible/);
   assert.doesNotMatch(styles, /font-size:\s*0\.[0-6][0-9]rem/);
+});
+
+test("history hero uses documentary color without implying official climatology", () => {
+  assert.match(homeContract, /acento documental/i);
+  assert.match(homeContract, /\.history-hero__content[\s\S]*radial-gradient[\s\S]*linear-gradient/);
+  assert.match(homeContract, /\.history-period-card[\s\S]*radial-gradient[\s\S]*linear-gradient/);
+  assert.match(homeContract, /\.history-period-overview article:nth-child\(1\)/);
+  assert.match(homeContract, /\.history-period-overview article:nth-child\(4\)/);
+  assert.match(homeContract, /\.history-period-source[\s\S]*background:\s*#f9fbfb/);
+  assert.match(homeContract, /\.history-hero__actions a:first-child[\s\S]*linear-gradient/);
+  assert.match(homeContract, /@media \(forced-colors: active\)/);
+  assert.doesNotMatch(homeContract, /!important/);
 });
