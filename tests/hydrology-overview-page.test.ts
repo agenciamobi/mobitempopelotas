@@ -5,6 +5,10 @@ import test from "node:test";
 const route = readFileSync("src/routes/situacao-hidrologica-pelotas.tsx", "utf8");
 const page = readFileSync("src/components/hydrology/HydrologyOverviewV2.tsx", "utf8");
 const styles = readFileSync("src/components/hydrology/HydrologyOverviewV2.css", "utf8");
+const homeContract = readFileSync(
+  "src/components/hydrology/HydrologyOverviewHomeContract.css",
+  "utf8",
+);
 
 const hydrologySource = `${route}\n${page}`;
 
@@ -19,6 +23,7 @@ test("hydrology route loads five independent sources in the shared shell", () =>
   assert.match(route, /InternalWeatherPageShell/);
   assert.match(route, /HydrologyOverviewHero/);
   assert.match(route, /HydrologyOverviewV2/);
+  assert.match(route, /HydrologyOverviewHomeContract\.css/);
   assert.match(route, /pageClassName="internal-weather-shell--hydrology"/);
   assert.match(route, /showOfficialAlerts=\{false\}/);
   assert.match(route, /staleTime: 60 \* 1_000/);
@@ -118,4 +123,16 @@ test("hydrology overview follows responsive retail and accessibility contracts",
   assert.match(styles, /@media \(forced-colors: active\)/);
   assert.match(styles, /:focus-visible/);
   assert.doesNotMatch(styles, /font-size:\s*0\.[0-6][0-9]rem/);
+});
+
+test("hydrology Home contract restores water identity without overriding source semantics", () => {
+  assert.match(homeContract, /Situação das águas — acento hidrológico/);
+  assert.match(homeContract, /\.hydrology-v2-hero__content::before/);
+  assert.match(homeContract, /\.hydrology-v2-hero__reading::before/);
+  assert.match(homeContract, /radial-gradient/);
+  assert.match(homeContract, /\.hydrology-v2-hero__trend\.is-rising/);
+  assert.match(homeContract, /\.hydrology-v2-hero__trend\.is-falling/);
+  assert.match(homeContract, /\.hydrology-v2-chapters[\s\S]*box-shadow:\s*none/);
+  assert.match(homeContract, /min-height:\s*44px/);
+  assert.doesNotMatch(homeContract, /!important/);
 });
