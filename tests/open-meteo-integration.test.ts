@@ -26,8 +26,10 @@ function makeResponse() {
       time: ["2026-07-24T17:00", "2026-07-24T18:00"],
       temperature_2m: [16.1, 15.8],
       precipitation_probability: [null, 41],
+      precipitation: [0, 1.4],
       wind_speed_10m: [7.5, 8.1],
       wind_gusts_10m: [null, 20.2],
+      wind_direction_10m: [108, 122],
       weather_code: [3, 61],
       is_day: [1, 1],
       relative_humidity_2m: [84, 88],
@@ -75,6 +77,7 @@ test("URL usa contrato explícito e coordenadas de Pelotas", () => {
   assert.match(current, /dew_point_2m/);
   assert.match(hourly, /relative_humidity_2m/);
   assert.match(hourly, /dew_point_2m/);
+  assert.match(hourly, /precipitation(?:,|$)/);
   assert.match(hourly, /pressure_msl/);
   assert.match(hourly, /visibility/);
   assert.match(hourly, /cloud_cover_low/);
@@ -82,6 +85,7 @@ test("URL usa contrato explícito e coordenadas de Pelotas", () => {
   assert.match(hourly, /cloud_cover_high/);
   assert.match(hourly, /cape/);
   assert.match(hourly, /boundary_layer_height/);
+  assert.match(hourly, /wind_direction_10m/);
 });
 
 test("normalização preserva ausências e inclui o perfil atmosférico", () => {
@@ -97,7 +101,9 @@ test("normalização preserva ausências e inclui o perfil atmosférico", () => 
   assert.equal(result.hourly[0]?.time, "Agora");
   assert.equal(result.hourly[0]?.timestamp, "2026-07-24T18:00");
   assert.equal(result.hourly[0]?.precipitationProbability, 41);
+  assert.equal(result.hourly[0]?.precipitationMm, 1.4);
   assert.equal(result.hourly[0]?.windGust, 20);
+  assert.equal(result.hourly[0]?.windDirectionDegrees, 122);
   assert.equal(result.hourly[0]?.relativeHumidity, 88);
   assert.equal(result.hourly[0]?.dewPoint, 13.8);
   assert.equal(result.hourly[0]?.pressure, 1020);
