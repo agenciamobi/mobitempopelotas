@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { InternalPageChapters } from "@/components/weather/InternalWeatherWidgets";
+import { localForecastDateKey } from "@/lib/weather/daily-temperature-reconciliation";
 import type { CppmetForecastItem, InmetForecastPeriod } from "@/lib/weather/official-sources.types";
 import type { WeatherIntelligenceData } from "@/lib/weather/weather-intelligence.types";
 import type { DailyForecast } from "@/lib/weather/types";
@@ -73,7 +74,8 @@ function forecastWeekdayKey(day: DailyForecast) {
   const supplied = weekdayKey(day.weekday);
   if (supplied !== "hoje" && supplied !== "amanha") return supplied;
 
-  const parsed = new Date(`${day.date.slice(0, 10)}T12:00:00-03:00`);
+  const dateKey = day.dateIso ?? localForecastDateKey(supplied === "amanha" ? 1 : 0);
+  const parsed = new Date(`${dateKey}T12:00:00-03:00`);
   if (Number.isNaN(parsed.getTime())) return supplied;
 
   return weekdayKey(
@@ -223,7 +225,7 @@ export function TomorrowForecastPageV3({ data }: { data: WeatherIntelligenceData
       ? tomorrow.windGust - today.windGust
       : null;
   const planningCards = buildPlanningCards(tomorrow);
-  const tomorrowDate = tomorrow.date.slice(0, 10);
+  const tomorrowDate = tomorrow.dateIso ?? localForecastDateKey(1);
   const inmetPeriods = weather.inmetForecast
     .filter((period) => period.date?.slice(0, 10) === tomorrowDate)
     .slice(0, 3);
