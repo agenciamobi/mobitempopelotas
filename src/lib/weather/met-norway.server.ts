@@ -6,7 +6,8 @@ const FORECAST_ENDPOINT = "https://api.met.no/weatherapi/locationforecast/2.0/co
 const SOURCE_URL = "https://api.met.no/weatherapi/locationforecast/2.0/documentation";
 const TIMEZONE = "America/Sao_Paulo";
 const REQUEST_TIMEOUT_MS = 3_500;
-const USER_AGENT = "MOBI-Tempo-Pelotas/1.0 (+https://agenciamobi.com.br)";
+const HOURLY_FORECAST_LIMIT = 24;
+const USER_AGENT = "MOBI-Tempo-Pelotas/2.0 (+https://tempopelotas.com.br)";
 
 const PELOTAS = {
   city: "Pelotas",
@@ -43,7 +44,12 @@ const metNorwaySchema = z.object({
                 .object({
                   air_temperature: finiteNumber,
                   relative_humidity: finiteNumber.optional(),
+                  dew_point_temperature: finiteNumber.optional(),
                   air_pressure_at_sea_level: finiteNumber.optional(),
+                  cloud_area_fraction: finiteNumber.optional(),
+                  cloud_area_fraction_low: finiteNumber.optional(),
+                  cloud_area_fraction_medium: finiteNumber.optional(),
+                  cloud_area_fraction_high: finiteNumber.optional(),
                   wind_speed: finiteNumber,
                   wind_speed_of_gust: finiteNumber.optional(),
                   wind_from_direction: finiteNumber.optional(),
@@ -86,6 +92,9 @@ function createUnavailableWeather(message: string): WeatherHomeData {
       key: "met-norway",
       fetchedAt: new Date().toISOString(),
       isFallback: true,
+      model: "Locationforecast 2.0",
+      modelRun: null,
+      temporalResolutionMinutes: null,
     },
     message,
   };
@@ -215,8 +224,21 @@ function precipitationAmount(point: MetPoint) {
   return pointPeriod(point)?.details?.precipitation_amount ?? 0;
 }
 
+function hourlyPrecipitationAmount(point: MetPoint) {
+  const value = point.data.next_1_hours?.details?.precipitation_amount;
+  return value === undefined ? null : Number(value.toFixed(1));
+}
+
+function roundOptional(value: number | undefined) {
+  return value === undefined ? null : Math.round(value);
+}
+
+function decimalOptional(value: number | undefined) {
+  return value === undefined ? null : Number(value.toFixed(1));
+}
+
 function normalizeHourly(points: MetPoint[]): HourlyForecast[] {
-  return points.slice(0, 7).map((point, index) => {
+  return points.slice(0, HOURLY_FORECAST_LIMIT).map((point, index) => {
     const details = point.data.instant.details;
     const presentation = pointPresentation(point);
     const windSpeed = Math.round(details.wind_speed * 3.6);
@@ -224,11 +246,21 @@ function normalizeHourly(points: MetPoint[]): HourlyForecast[] {
 
     return {
       time: index === 0 ? "Agora" : `${formatClock(point.time).slice(0, 2)}h`,
+      timestamp: point.time,
       temperature: Math.round(details.air_temperature),
       precipitationProbability: precipitationProbability(point),
+      precipitationMm: hourlyPrecipitationAmount(point),
       windSpeed,
       windGust,
+      windDirectionDegrees: roundOptional(details.wind_from_direction),
       icon: presentation.icon,
+      relativeHumidity: roundOptional(details.relative_humidity),
+      dewPoint: decimalOptional(details.dew_point_temperature),
+      pressure: roundOptional(details.air_pressure_at_sea_level),
+      cloudCover: roundOptional(details.cloud_area_fraction),
+      cloudCoverLow: roundOptional(details.cloud_area_fraction_low),
+      cloudCoverMid: roundOptional(details.cloud_area_fraction_medium),
+      cloudCoverHigh: roundOptional(details.cloud_area_fraction_high),
     };
   });
 }
@@ -336,19 +368,16 @@ export async function fetchMetNorwayWeather(): Promise<WeatherHomeData> {
         temperature: Math.round(details.air_temperature),
         feelsLike: null,
         condition: presentation.label,
-        humidity:
-          details.relative_humidity === undefined ? null : Math.round(details.relative_humidity),
-        pressure:
-          details.air_pressure_at_sea_level === undefined
-            ? null
-            : Math.round(details.air_pressure_at_sea_level),
+        humidity: roundOptional(details.relative_humidity),
+        dewPoint: decimalOptional(details.dew_point_temperature),
+        pressure: roundOptional(details.air_pressure_at_sea_level),
         windSpeed,
         windGust,
         windDirection: degreesToCompass(details.wind_from_direction),
         visibilityKm: null,
         sunrise: null,
         sunset: null,
-        observedAt: formatClock(currentPoint.time),
+        observedAt: currentPoint.time,
         icon: presentation.icon,
       },
       hourly,
@@ -360,6 +389,9 @@ export async function fetchMetNorwayWeather(): Promise<WeatherHomeData> {
         key: "met-norway",
         fetchedAt: new Date().toISOString(),
         isFallback: true,
+        model: "Locationforecast 2.0",
+        modelRun: null,
+        temporalResolutionMinutes: 60,
       },
       message: null,
     };
