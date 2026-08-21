@@ -42,7 +42,9 @@ function number(value: number | null | undefined, digits = 0) {
 }
 
 function gust(value: number | null | undefined) {
-  return value === null || value === undefined ? "Não informada" : `${number(value)} km/h`;
+  if (value === null || value === undefined) return "Não informada";
+  if (value <= 0) return "Sem rajada prevista";
+  return `${number(value)} km/h`;
 }
 
 function sourceName(source: WeatherSourceKey | null | undefined) {
@@ -55,18 +57,20 @@ function sourceName(source: WeatherSourceKey | null | undefined) {
 }
 
 function spread(hour: HourlyForecast | null) {
-  if (!hour || hour.windGust === null) return null;
+  if (!hour || hour.windGust === null || hour.windGust <= 0) return null;
   return Math.max(0, hour.windGust - hour.windSpeed);
 }
 
 function peakHours(hours: HourlyForecast[]) {
-  return [...hours]
-    .sort((a, b) => (b.windGust ?? b.windSpeed) - (a.windGust ?? a.windSpeed))
+  return hours
+    .filter((hour) => (hour.windGust ?? 0) > 0)
+    .sort((a, b) => (b.windGust ?? 0) - (a.windGust ?? 0))
     .slice(0, 3);
 }
 
 function readingBand(maximum: number | null) {
   if (maximum === null) return { key: "unknown", label: "Rajadas ainda não informadas" };
+  if (maximum <= 0) return { key: "moderate", label: "Sem rajadas positivas previstas nas próximas 24h" };
   const label = `Rajadas de até ${number(maximum)} km/h nas próximas 24h`;
   if (maximum >= 70) return { key: "strong", label };
   if (maximum >= 50) return { key: "elevated", label };
@@ -99,13 +103,14 @@ export function WindForecastPageV3({ data }: { data: WeatherIntelligenceData }) 
   const windSource = weather.currentProvenance.windSpeed ?? null;
   const directionSource = weather.currentProvenance.windDirection ?? null;
   const provider = weather.quality.forecastProvider ?? sourceName(weather.quality.forecastSource);
-  const gustHours = hours.filter((hour) => hour.windGust !== null);
-  const peak = gustHours.length
-    ? gustHours.reduce((selected, hour) =>
+  const publishedGustHours = hours.filter((hour) => hour.windGust !== null);
+  const positiveGustHours = hours.filter((hour) => (hour.windGust ?? 0) > 0);
+  const peak = positiveGustHours.length
+    ? positiveGustHours.reduce((selected, hour) =>
         (hour.windGust ?? -1) > (selected.windGust ?? -1) ? hour : selected,
       )
     : null;
-  const maximumGust = peak?.windGust ?? null;
+  const maximumGust = peak?.windGust ?? (publishedGustHours.length ? 0 : null);
   const band = readingBand(maximumGust);
   const topHours = peakHours(hours);
   const maximumScale = Math.max(1, ...hours.map((hour) => Math.max(hour.windSpeed, hour.windGust ?? 0)));
@@ -131,7 +136,11 @@ export function WindForecastPageV3({ data }: { data: WeatherIntelligenceData }) 
             aumentar nas próximas 24 horas.
           </p>
           <div className="wind-v3-actions">
-            <a href="#vento-por-hora">Ver as próximas 24 horas <ArrowRight aria-hidden="true" /></a>
+            {hours.length ? (
+              <a href="#vento-por-hora">Ver as próximas 24 horas <ArrowRight aria-hidden="true" /></a>
+            ) : (
+              <Link to="/previsao-7-dias-pelotas">Ver previsão de 7 dias <ArrowRight aria-hidden="true" /></Link>
+            )}
             <Link to="/alertas">Avisos oficiais</Link>
           </div>
         </div>
@@ -143,7 +152,7 @@ export function WindForecastPageV3({ data }: { data: WeatherIntelligenceData }) 
             <strong>{number(current?.windSpeed)}</strong>
             <small>{current?.windSpeed === null || current?.windSpeed === undefined ? "km/h indisponíveis" : `km/h · ${current.windDirection ?? "direção não informada"}`}</small>
           </div>
-          <div className="wind-v3-peak"><TrendingUp aria-hidden="true" /><span><small>Rajada mais forte nas próximas 24h</small><strong>{gust(maximumGust)}</strong><b>{peak?.time ?? "Horário não informado"}</b></span></div>
+          <div className="wind-v3-peak"><TrendingUp aria-hidden="true" /><span><small>Rajada mais forte nas próximas 24h</small><strong>{gust(maximumGust)}</strong><b>{peak?.time ?? (maximumGust === 0 ? "Sem horário de rajada positiva" : "Horário não informado")}</b></span></div>
           <dl><div><dt>Dado atual</dt><dd>{sourceName(windSource)}</dd></div><div><dt>Próximas horas</dt><dd>{provider}</dd></div></dl>
           <footer>Resumo da previsão. Avisos oficiais têm prioridade.</footer>
         </aside>
@@ -152,7 +161,11 @@ export function WindForecastPageV3({ data }: { data: WeatherIntelligenceData }) 
       <nav className="wind-v3-chapters" aria-label="Capítulos da previsão de vento">
         <a href="#procedencia"><span>01</span><strong>Origem dos dados</strong><small>Agora e previsão</small></a>
         <a href="#resumo"><span>02</span><strong>Resumo</strong><small>Agora e maior rajada</small></a>
-        <a href="#vento-por-hora"><span>03</span><strong>24 horas</strong><small>Vento e rajadas</small></a>
+        {hours.length ? (
+          <a href="#vento-por-hora"><span>03</span><strong>24 horas</strong><small>Vento e rajadas</small></a>
+        ) : (
+          <Link to="/previsao-7-dias-pelotas"><span>03</span><strong>7 dias</strong><small>Previsão disponível</small></Link>
+        )}
         <a href="#maiores-valores"><span>04</span><strong>Horários mais fortes</strong><small>Maiores rajadas</small></a>
         <a href="#vento-na-semana"><span>05</span><strong>7 dias</strong><small>Rajada por dia</small></a>
         <a href="#direcao-do-vento-por-hora"><span>06</span><strong>Direção prevista</strong><small>Direção por horário</small></a>
@@ -169,7 +182,7 @@ export function WindForecastPageV3({ data }: { data: WeatherIntelligenceData }) 
         <div className="wind-v3-summary-grid">
           <article><Navigation aria-hidden="true" /><span>Vento agora</span><strong>{current?.windSpeed === null || current?.windSpeed === undefined ? "—" : `${number(current.windSpeed)} km/h`}</strong><small>{sourceName(windSource)}</small></article>
           <article><Gauge aria-hidden="true" /><span>Velocidade média nas próximas 24h</span><strong>{averageSpeed === null ? "—" : `${number(averageSpeed, 1)} km/h`}</strong><small>Média dos horários disponíveis</small></article>
-          <article><TrendingUp aria-hidden="true" /><span>Rajada mais forte nas próximas 24h</span><strong>{gust(maximumGust)}</strong><small>{peak?.time ? `Prevista para ${peak.time}` : "Horário não informado"}</small></article>
+          <article><TrendingUp aria-hidden="true" /><span>Rajada mais forte nas próximas 24h</span><strong>{gust(maximumGust)}</strong><small>{peak?.time ? `Prevista para ${peak.time}` : maximumGust === 0 ? "Sem rajada positiva prevista" : "Horário não informado"}</small></article>
           <article><Activity aria-hidden="true" /><span>Aumento durante a rajada</span><strong>{spread(peak) === null ? "—" : `+${number(spread(peak))} km/h`}</strong><small>Quanto a rajada supera o vento naquele horário</small></article>
         </div>
       </section>
@@ -185,7 +198,7 @@ export function WindForecastPageV3({ data }: { data: WeatherIntelligenceData }) 
           <div className="wind-v3-hourly-list">
             {hours.map((hour, index) => {
               const difference = spread(hour);
-              return <article key={`${hour.timestamp ?? hour.time}-${index}`}><time dateTime={hour.timestamp}>{hour.time}</time><strong>{number(hour.windSpeed)} km/h</strong><b>{gust(hour.windGust)}</b><small>{difference === null ? "—" : `+${number(difference)} km/h`}</small><div className="wind-v3-bars" aria-label={`Vento ${number(hour.windSpeed)} km/h; rajada ${gust(hour.windGust)}`}><i><span style={{ width: `${Math.max(3, hour.windSpeed / maximumScale * 100)}%` }} /></i><i><span style={{ width: `${hour.windGust === null ? 0 : Math.max(3, hour.windGust / maximumScale * 100)}%` }} /></i></div></article>;
+              return <article key={`${hour.timestamp ?? hour.time}-${index}`}><time dateTime={hour.timestamp}>{hour.time}</time><strong>{number(hour.windSpeed)} km/h</strong><b>{gust(hour.windGust)}</b><small>{difference === null ? "—" : `+${number(difference)} km/h`}</small><div className="wind-v3-bars" aria-label={`Vento ${number(hour.windSpeed)} km/h; rajada ${gust(hour.windGust)}`}><i><span style={{ width: `${Math.max(3, hour.windSpeed / maximumScale * 100)}%` }} /></i><i><span style={{ width: `${hour.windGust === null || hour.windGust <= 0 ? 0 : Math.max(3, hour.windGust / maximumScale * 100)}%` }} /></i></div></article>;
             })}
           </div>
           <div className="wind-v3-legend"><span><i className="is-speed" />Vento</span><span><i className="is-gust" />Rajada</span></div>
@@ -193,14 +206,18 @@ export function WindForecastPageV3({ data }: { data: WeatherIntelligenceData }) 
       ) : null}
 
       <section className="wind-v3-section" id="maiores-valores" aria-labelledby="wind-v3-peaks-title">
-        <header className="wind-v3-heading"><div><span className="wind-v3-eyebrow">Horários com mais vento</span><h2 id="wind-v3-peaks-title">As rajadas mais fortes das próximas 24 horas</h2></div><p>Quando a fonte não informa rajada, a velocidade prevista é usada apenas para ordenar os horários.</p></header>
-        <div className="wind-v3-peaks-grid">{topHours.map((hour, index) => <article key={`${hour.timestamp ?? hour.time}-peak`}><span>{String(index + 1).padStart(2, "0")}</span><Clock3 aria-hidden="true" /><h3>{hour.time}</h3><dl><div><dt>Vento</dt><dd>{number(hour.windSpeed)} km/h</dd></div><div><dt>Rajada</dt><dd>{gust(hour.windGust)}</dd></div></dl></article>)}</div>
+        <header className="wind-v3-heading"><div><span className="wind-v3-eyebrow">Horários com mais vento</span><h2 id="wind-v3-peaks-title">As rajadas mais fortes das próximas 24 horas</h2></div><p>A lista considera somente horários com rajada positiva publicada. Velocidade sustentada não substitui rajada.</p></header>
+        {topHours.length ? (
+          <div className="wind-v3-peaks-grid">{topHours.map((hour, index) => <article key={`${hour.timestamp ?? hour.time}-peak`}><span>{String(index + 1).padStart(2, "0")}</span><Clock3 aria-hidden="true" /><h3>{hour.time}</h3><dl><div><dt>Vento</dt><dd>{number(hour.windSpeed)} km/h</dd></div><div><dt>Rajada</dt><dd>{gust(hour.windGust)}</dd></div></dl></article>)}</div>
+        ) : (
+          <p>{publishedGustHours.length ? "Não há rajadas positivas previstas para as próximas 24 horas." : "A fonte ainda não informou rajadas para as próximas 24 horas."}</p>
+        )}
       </section>
 
       {days.length ? (
         <section className="wind-v3-section" id="vento-na-semana" aria-labelledby="wind-v3-week-title">
           <header className="wind-v3-heading"><div><span className="wind-v3-eyebrow">Próximos 7 dias</span><h2 id="wind-v3-week-title">Rajada mais forte prevista em cada dia</h2></div><Link to="/previsao-7-dias-pelotas">Ver previsão completa</Link></header>
-          <div className="wind-v3-week-list">{days.map((day) => <article key={`${day.weekday}-${day.date}`}><div><strong>{day.weekday}</strong><span>{day.date}</span></div><Wind aria-hidden="true" /><div className="wind-v3-week-track" aria-label={`Rajada máxima prevista de ${gust(day.windGust)}`}><span style={{ width: `${day.windGust === null ? 0 : Math.max(4, day.windGust / dailyMaximum * 100)}%` }} /></div><strong>{gust(day.windGust)}</strong></article>)}</div>
+          <div className="wind-v3-week-list">{days.map((day) => <article key={`${day.weekday}-${day.date}`}><div><strong>{day.weekday}</strong><span>{day.date}</span></div><Wind aria-hidden="true" /><div className="wind-v3-week-track" aria-label={`Rajada máxima prevista de ${gust(day.windGust)}`}><span style={{ width: `${day.windGust === null || day.windGust <= 0 ? 0 : Math.max(4, day.windGust / dailyMaximum * 100)}%` }} /></div><strong>{gust(day.windGust)}</strong></article>)}</div>
         </section>
       ) : null}
 
