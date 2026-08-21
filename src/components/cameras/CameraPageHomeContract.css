@@ -1,0 +1,235 @@
+/* Contrato visual final das câmeras com a linguagem editorial da Home. */
+
+.internal-weather-shell--cameras {
+  --camera-home-line: rgb(7 30 47 / 10%);
+  --camera-home-soft: #fbfcfc;
+  --camera-home-ink: #071e2f;
+  --camera-home-muted: #58717d;
+}
+
+.internal-weather-shell--cameras .camera-v2-hero {
+  display: grid;
+  width: 100%;
+  max-width: none;
+  grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.66fr);
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--camera-home-line);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: none;
+}
+
+.internal-weather-shell--cameras :is(.camera-v2-hero__content, .camera-v2-featured) {
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background-image: none;
+  box-shadow: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-hero__content {
+  display: grid;
+  align-content: center;
+  padding: clamp(36px, 4.2vw, 60px) clamp(26px, 3.2vw, 42px);
+  color: var(--camera-home-ink);
+  background: #fff;
+}
+
+.internal-weather-shell--cameras .camera-v2-hero__content .camera-v2-eyebrow {
+  color: #087f91;
+}
+
+.internal-weather-shell--cameras .camera-v2-hero__content h1 {
+  max-width: 940px;
+  margin-top: 10px;
+  color: var(--camera-home-ink);
+  font-size: clamp(2.55rem, 4.6vw, 5rem);
+  font-weight: 790;
+  line-height: 0.98;
+  letter-spacing: -0.06em;
+}
+
+.internal-weather-shell--cameras .camera-v2-hero__content > p {
+  max-width: 76ch;
+  margin-top: 16px;
+  color: var(--camera-home-muted);
+  line-height: 1.65;
+}
+
+.internal-weather-shell--cameras .camera-v2-hero__actions a {
+  min-height: 44px;
+  border-color: var(--camera-home-line);
+  color: var(--camera-home-ink);
+  background: #fff;
+  box-shadow: none;
+  transform: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-hero__actions a:first-child {
+  border-color: var(--camera-home-ink);
+  color: #fff;
+  background: var(--camera-home-ink);
+}
+
+.internal-weather-shell--cameras .camera-v2-hero__actions a:hover {
+  border-color: rgb(24 189 205 / 32%);
+  transform: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-featured {
+  padding: clamp(28px, 3.2vw, 42px);
+  border-left: 1px solid var(--camera-home-line);
+  color: var(--camera-home-ink);
+  background: var(--camera-home-soft);
+}
+
+.internal-weather-shell--cameras :is(
+  .camera-v2-chapters,
+  .camera-v2-status,
+  .camera-v2-explorer,
+  .camera-v2-weather,
+  .camera-v2-guidance,
+  .camera-v2-responsibility,
+  .camera-v2-actions,
+  .camera-v2-empty
+) {
+  border-color: var(--camera-home-line);
+  border-radius: 16px;
+  background-color: #fff;
+  background-image: none;
+  box-shadow: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-status {
+  background: #fff;
+}
+
+.internal-weather-shell--cameras :is(
+  .camera-v2-featured dl > div,
+  .camera-v2-status dl > div,
+  .camera-v2-selector button,
+  .camera-v2-details,
+  .camera-v2-weather__grid article,
+  .camera-v2-guidance__grid article
+) {
+  border-color: var(--camera-home-line);
+  border-radius: 14px;
+  background-color: var(--camera-home-soft);
+  background-image: none;
+  box-shadow: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-selector button {
+  transform: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-selector button:hover {
+  border-color: rgb(24 189 205 / 28%);
+  transform: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-selector article.is-active button {
+  border-color: rgb(24 189 205 / 42%);
+  background: #f1fbfc;
+  box-shadow: none;
+}
+
+/* O player e a miniatura permanecem com fundo escuro por função visual. */
+.internal-weather-shell--cameras :is(.camera-v2-stage, .camera-v2-frame, .camera-v2-launch, .camera-v2-placeholder) {
+  box-shadow: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-details {
+  background: #fff;
+}
+
+.internal-weather-shell--cameras .camera-v2-details__state,
+.internal-weather-shell--cameras .camera-v2-details dl > div,
+.internal-weather-shell--cameras .camera-v2-details__title {
+  border-color: var(--camera-home-line);
+  box-shadow: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-responsibility {
+  border-color: rgb(242 112 53 / 22%);
+  background: #fffaf7;
+}
+
+.internal-weather-shell--cameras .camera-v2-actions {
+  color: var(--camera-home-ink);
+  background: #fff;
+}
+
+.internal-weather-shell--cameras .camera-v2-actions a {
+  border-color: var(--camera-home-line);
+  color: var(--camera-home-ink);
+  background: var(--camera-home-soft);
+  box-shadow: none;
+  transform: none;
+}
+
+.internal-weather-shell--cameras .camera-v2-actions a:first-child {
+  border-color: var(--camera-home-ink);
+  color: #fff;
+  background: var(--camera-home-ink);
+}
+
+.internal-weather-shell--cameras .camera-v2-actions a:hover {
+  border-color: rgb(24 189 205 / 28%);
+  transform: none;
+}
+
+@media (max-width: 920px) {
+  .internal-weather-shell--cameras .camera-v2-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .internal-weather-shell--cameras .camera-v2-featured {
+    border-top: 1px solid var(--camera-home-line);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .internal-weather-shell--cameras .camera-v2-hero,
+  .internal-weather-shell--cameras :is(
+    .camera-v2-chapters,
+    .camera-v2-status,
+    .camera-v2-explorer,
+    .camera-v2-weather,
+    .camera-v2-guidance,
+    .camera-v2-responsibility,
+    .camera-v2-actions,
+    .camera-v2-empty
+  ) {
+    border-radius: 12px;
+  }
+
+  .internal-weather-shell--cameras .camera-v2-hero__content {
+    padding: 30px 20px;
+  }
+
+  .internal-weather-shell--cameras .camera-v2-featured {
+    padding: 24px 20px;
+  }
+
+  .internal-weather-shell--cameras .camera-v2-hero__content h1 {
+    font-size: clamp(2.25rem, 11vw, 3.5rem);
+  }
+
+  .internal-weather-shell--cameras :is(
+    .camera-v2-status,
+    .camera-v2-explorer,
+    .camera-v2-weather,
+    .camera-v2-guidance,
+    .camera-v2-responsibility,
+    .camera-v2-actions,
+    .camera-v2-empty
+  ) {
+    padding: 22px 18px;
+  }
+}
