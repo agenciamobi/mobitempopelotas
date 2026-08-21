@@ -196,12 +196,12 @@ export function RadarMapFrame({
           <strong>Base cartográfica indisponível</strong>
           <span>A imagem oficial do radar continua disponível.</span>
         </div>
-      ) : (
+      ) : mapLoaded && overlayLoaded ? (
         <div className={styles.caption}>
           <strong>Radar REDEMET sobre base cartográfica</strong>
           <span>Pelotas marcada para referência regional.</span>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
