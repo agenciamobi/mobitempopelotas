@@ -12,7 +12,14 @@ const RADAR_SOURCE_ID = "redemet-radar-image";
 const RADAR_LAYER_ID = "redemet-radar-image-layer";
 const PELOTAS_COORDINATES: [number, number] = [-52.3376, -31.7654];
 
-function imageCoordinates(bounds: RedemetBounds): [number, number][] {
+type ImageCoordinates = [
+  [number, number],
+  [number, number],
+  [number, number],
+  [number, number],
+];
+
+function imageCoordinates(bounds: RedemetBounds): ImageCoordinates {
   return [
     [bounds.west, bounds.north],
     [bounds.east, bounds.north],
@@ -83,16 +90,21 @@ export function RadarMapFrame({
             url: currentFrame.imageUrl,
             coordinates: imageCoordinates(currentFrame.bounds),
           });
-          map.addLayer({
-            id: RADAR_LAYER_ID,
-            type: "raster",
-            source: RADAR_SOURCE_ID,
-            paint: {
-              "raster-opacity": 0.58,
-              "raster-fade-duration": 0,
-              "raster-contrast": 0.08,
+
+          const firstSymbolLayer = map.getStyle().layers?.find((layer) => layer.type === "symbol")?.id;
+          map.addLayer(
+            {
+              id: RADAR_LAYER_ID,
+              type: "raster",
+              source: RADAR_SOURCE_ID,
+              paint: {
+                "raster-opacity": 0.58,
+                "raster-fade-duration": 0,
+                "raster-contrast": 0.08,
+              },
             },
-          });
+            firstSymbolLayer,
+          );
 
           const markerElement = document.createElement("div");
           markerElement.className = styles.pelotasMarker;
