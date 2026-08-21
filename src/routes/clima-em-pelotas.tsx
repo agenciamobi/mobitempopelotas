@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { ClimatePelotasHero, ClimatePelotasPage } from "@/components/climate/ClimatePelotasPage";
+import "@/components/climate/ClimatePelotasHomeContract.css";
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
 import { createPageHead } from "@/lib/page-meta";
