@@ -13,6 +13,11 @@ const sharedForecastUnknownStyles = readFileSync(
 );
 const todayPage = readFileSync("src/components/weather/TodayForecastPageV5.tsx", "utf8");
 const todayResources = readFileSync("src/components/weather/TodayWeatherResources.tsx", "utf8");
+const todayAtmosphere = readFileSync("src/components/weather/TodayAtmosphericSignals.tsx", "utf8");
+const todayAtmosphereStyles = readFileSync(
+  "src/components/weather/TodayAtmosphericSignals.css",
+  "utf8",
+);
 const todayNavigationStyles = readFileSync(
   "src/components/weather/TodayNavigationAvailability.css",
   "utf8",
@@ -124,6 +129,28 @@ test("Today chapter index hides forecast sections that did not render", () => {
   assert.match(todayNavigationStyles, /:not\(:has\(#atmosfera-hoje\)\)/);
   assert.match(todayNavigationStyles, /a\[href="#atmosfera-hoje"\]/);
   assert.doesNotMatch(todayNavigationStyles, /!important/);
+});
+
+test("Today atmospheric assessment never fabricates fog support values", () => {
+  assert.match(todayAtmosphere, /function fogSupportDetail/);
+  assert.match(todayAtmosphere, /const hasSupportingSignal =/);
+  assert.match(todayAtmosphere, /Ponto de orvalho próximo, mas faltam dados complementares/);
+  assert.match(todayAtmosphere, /Umidade, nuvens baixas e visibilidade não foram informadas/);
+  assert.doesNotMatch(todayAtmosphere, /hour\.relativeHumidity \?\? 70/);
+  assert.doesNotMatch(todayAtmosphere, /hour\.cloudCoverLow \?\? 0/);
+  assert.doesNotMatch(todayAtmosphere, /hour\.visibilityKm \?\? 99/);
+});
+
+test("Today cloud layers distinguish unknown values from a published zero", () => {
+  assert.match(todayAtmosphere, /if \(value === null \|\| value === undefined\) return null/);
+  assert.match(todayAtmosphere, /function cloudBarStyle/);
+  assert.match(todayAtmosphere, /normalized === null \? undefined/);
+  assert.match(todayAtmosphere, /Nuvens baixas: não informada/);
+  assert.match(todayAtmosphere, /Cobertura total não informada/);
+  assert.doesNotMatch(todayAtmosphere, /Math\.max\(cloudValue\(hour\.cloudCoverLow\)/);
+  assert.match(todayAtmosphereStyles, /\.today-atmosphere__legend \.is-unknown/);
+  assert.match(todayAtmosphereStyles, /span\.is-unknown[\s\S]*repeating-linear-gradient/);
+  assert.match(todayAtmosphereStyles, /min-width:\s*0/);
 });
 
 test("main Home hourly summary does not invent a zero-percent peak or a zero gust", () => {
