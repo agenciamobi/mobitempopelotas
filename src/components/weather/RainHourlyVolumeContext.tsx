@@ -65,7 +65,7 @@ export function RainHourlyVolumeContext({ meteogram }: { meteogram: MeteogramDat
   if (!values.length) return null;
 
   const total = values.reduce((sum, value) => sum + value, 0);
-  const peak = peakVolumeHour(hours);
+  const peak = total > 0 ? peakVolumeHour(hours) : null;
   const wet = wetHours(hours);
   const firstWet = wet[0] ?? null;
   const maximum = Math.max(0.1, ...values);
@@ -99,8 +99,8 @@ export function RainHourlyVolumeContext({ meteogram }: { meteogram: MeteogramDat
         <article>
           <CloudRain aria-hidden="true" />
           <span>Maior volume em uma hora</span>
-          <strong>{formatMm(peak?.precipitationMm)}</strong>
-          <small>{peak ? `Por volta de ${formatHour(peak.timestamp)}` : "Horário não informado"}</small>
+          <strong>{peak ? formatMm(peak.precipitationMm) : "Nenhum"}</strong>
+          <small>{peak ? `Por volta de ${formatHour(peak.timestamp)}` : "Sem volume previsto no período"}</small>
         </article>
         <article>
           <Droplets aria-hidden="true" />
