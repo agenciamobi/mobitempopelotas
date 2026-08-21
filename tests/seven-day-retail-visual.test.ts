@@ -47,6 +47,23 @@ test("weekly hero uses a useful search-oriented headline and clear metrics", () 
   assert.doesNotMatch(hero, /weather\.current\.temperature/);
 });
 
+test("weekly empty and zero states do not invent weather highlights", () => {
+  assert.match(hero, /const hasDailyForecast = days\.length > 0/);
+  assert.match(hero, /Previsão semanal em atualização/);
+  assert.match(hero, /Dados da semana em atualização/);
+  assert.match(hero, /const hasPositiveRainVolume =/);
+  assert.match(hero, /Sem volume previsto/);
+  assert.match(hero, /const rainChanceDays = days\.filter/);
+  assert.match(hero, /const gustDays = days\.filter/);
+  assert.match(hero, /Sem rajadas/);
+  assert.match(page, /const hasRiskContrast = maximumRisk > minimumRisk/);
+  assert.match(page, /\.filter\(hasPositiveRain\)/);
+  assert.match(page, /\.filter\(hasPositiveGust\)/);
+  assert.match(page, /Não há valores positivos de chance ou volume de chuva nesta atualização/);
+  assert.match(page, /Não há rajadas positivas previstas para os próximos dias/);
+  assert.match(page, /Sem rajada prevista/);
+});
+
 test("weekly page answers comparison and planning questions in direct language", () => {
   assert.match(page, /weather\.daily\.slice\(0, 7\)/);
   assert.match(page, /InternalPageChapters/);
