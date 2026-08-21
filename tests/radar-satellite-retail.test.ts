@@ -88,6 +88,10 @@ test("latest radar image is compared with the nearest forecast hour", () => {
   assert.match(context, /nearestForecastHour/);
   assert.match(context, /hour\.timestamp/);
   assert.match(context, /difference > 3 \* 60 \* 60 \* 1_000/);
+  assert.match(context, /isUsableRedemetObservedAt/);
+  assert.match(context, /formatRedemetDateTime/);
+  assert.match(context, /redemetFrameDisplayLabel\(frame\)/);
+  assert.match(context, /if \(!value \|\| !isUsableRedemetObservedAt\(value\)\) return null/);
   assert.match(context, /O que a previsão mostrava quando esta imagem foi registrada/);
   assert.match(context, /O radar mostra uma imagem observada pela REDEMET/);
   assert.match(context, /não são medidos pelo radar/);
