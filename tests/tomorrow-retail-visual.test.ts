@@ -80,6 +80,19 @@ test("tomorrow content answers planning questions in direct language", () => {
   assert.doesNotMatch(page, /não publicaram contexto/);
 });
 
+test("tomorrow zero states do not invent gusts or erase positive rain volume", () => {
+  assert.match(page, /function gustPhrase/);
+  assert.match(page, /if \(value <= 0\) return "sem rajada prevista"/);
+  assert.match(page, /function gustTitle/);
+  assert.match(page, /if \(value <= 0\) return "Sem rajadas"/);
+  assert.match(page, /function formatWindDelta/);
+  assert.match(page, /if \(value === 0\) return "Sem mudança"/);
+  assert.match(page, /day\.precipitationMm > 0/);
+  assert.match(page, /com \$\{day\.precipitationMm\} mm previstos neste momento/);
+  assert.match(page, /Não há rajada positiva prevista para amanhã nesta atualização/);
+  assert.match(page, /tomorrow\.windGust <= 0/);
+});
+
 test("tomorrow content matches official sources by stable ISO date", () => {
   assert.match(page, /localForecastDateKey/);
   assert.match(page, /day\.dateIso \?\? localForecastDateKey/);
