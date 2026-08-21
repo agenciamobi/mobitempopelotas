@@ -39,10 +39,24 @@ test("hourly rain detail keeps probability and model volume separate from measur
   assert.doesNotMatch(`${rainDetail}\n${rainRoute}`, /OCR|extrair pixels|chuva medida pelo modelo/i);
 });
 
+test("hourly rain detail distinguishes complete, partial, zero and unknown volume", () => {
+  assert.match(rainDetail, /const availableVolumeHours = hours\.filter\(\(hour\) => hour\.precipitationMm !== null\)/);
+  assert.match(rainDetail, /const hasCompleteVolumeWindow = availableVolumeHours\.length === hours\.length/);
+  assert.match(rainDetail, /Total parcial disponível/);
+  assert.match(rainDetail, /horários têm volume informado/);
+  assert.match(rainDetail, /Entre os \{availableVolumeHours\.length\} horários com volume informado/);
+  assert.match(rainDetail, /chance não informada/);
+  assert.match(rainDetail, /volume não informado/);
+  assert.match(rainDetail, /className=\{volumeKnown \? undefined : "is-unknown"\}/);
+  assert.match(rainStyles, /article\.is-unknown/);
+  assert.match(rainStyles, /repeating-linear-gradient/);
+});
+
 test("zero hourly rain volume does not create a fake peak hour", () => {
   assert.match(rainDetail, /const hasPositiveVolume = total > 0/);
-  assert.match(rainDetail, /hasPositiveVolume \? peakVolumeHour\(hours\) : null/);
-  assert.match(rainDetail, /Sem volume previsto/);
+  assert.match(rainDetail, /hasPositiveVolume \? peakVolumeHour\(availableVolumeHours\) : null/);
+  assert.match(rainDetail, /Sem volume previsto no período/);
+  assert.match(rainDetail, /Sem volume positivo entre os horários informados/);
 });
 
 test("hourly wind direction stays a forecast distinct from current observation", () => {
@@ -59,8 +73,8 @@ test("hourly wind direction stays a forecast distinct from current observation",
 });
 
 test("peak-gust direction never substitutes sustained wind for a missing gust", () => {
-  assert.match(windDetail, /const value = hour\.windGust/);
-  assert.match(windDetail, /selected\.windGust/);
+  assert.match(windDetail, /if \(hour\.windGust === null\) return selected/);
+  assert.match(windDetail, /selected\?\.windGust/);
   assert.doesNotMatch(windDetail, /hour\.windGust \?\? hour\.windSpeed/);
   assert.doesNotMatch(windDetail, /selected\.windGust \?\? selected\.windSpeed/);
 });
@@ -93,16 +107,21 @@ test("today planning only uses sustained wind as a risk fallback, never as a dis
   assert.match(todayResources, /const maxGust = maximum\(hours\.map\(\(hour\) => hour\.windGust\)\)/);
   assert.match(todayResources, /const windRisk = maxGust \?\? maxWindSpeed/);
   assert.match(todayResources, /hour\.windGust \?\? hour\.windSpeed/);
-  assert.match(todayResources, /period\.maxGust === null \? "Não informada"/);
+  assert.match(todayResources, /function formatGust/);
+  assert.match(todayResources, /formatGust\(period\.maxGust\)/);
   assert.match(todayResources, /attentionHour\.windGust === null/);
+  assert.match(todayResources, /sem rajada prevista/);
 });
 
-test("today planning does not color or name arbitrary winners when scores are tied", () => {
-  assert.match(todayResources, /const hasPeriodContrast = Math\.max\(\.\.\.periodScores\) > Math\.min\(\.\.\.periodScores\)/);
+test("today planning does not color or name arbitrary winners when scores are tied or rain is unknown", () => {
+  assert.match(todayResources, /const comparablePeriods = periods\.filter\(\(period\) => period\.peakRain !== null\)/);
+  assert.match(todayResources, /const hasPeriodContrast =/);
+  assert.match(todayResources, /comparableScores\.length > 1/);
   assert.match(todayResources, /const hasHourContrast = Math\.max\(\.\.\.hourRisks\) > Math\.min\(\.\.\.hourRisks\)/);
-  assert.match(todayResources, /className=\{hasPeriodContrast \? "is-best" : undefined\}/);
+  assert.match(todayResources, /className=\{hasPeriodContrast && bestPeriod \? "is-best" : undefined\}/);
   assert.match(todayResources, /className=\{hasHourContrast \? "is-attention" : undefined\}/);
   assert.match(todayResources, /Sem diferença relevante/);
+  assert.match(todayResources, /Chance de chuva em atualização/);
   assert.match(todayResources, /Sem um único horário/);
 });
 
