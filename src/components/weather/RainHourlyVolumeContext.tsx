@@ -39,12 +39,17 @@ function formatMm(value: number | null | undefined) {
   }).format(value)} mm`;
 }
 
-function formatChance(value: number | null | undefined) {
-  return value === null || value === undefined ? "—" : `${Math.round(value)}%`;
+function chanceLabel(value: number | null | undefined) {
+  return value === null || value === undefined
+    ? "chance não informada"
+    : `${Math.round(value)}% de chance`;
 }
 
 function wetHours(hours: MeteogramHour[]) {
-  return hours.filter((hour) => (hour.precipitationMm ?? 0) >= MEASURABLE_RAIN_MM);
+  return hours.filter(
+    (hour) =>
+      hour.precipitationMm !== null && hour.precipitationMm >= MEASURABLE_RAIN_MM,
+  );
 }
 
 function peakVolumeHour(hours: MeteogramHour[]) {
@@ -59,16 +64,20 @@ export function RainHourlyVolumeContext({ meteogram }: { meteogram: MeteogramDat
   if (meteogram.status !== "live" || !meteogram.hours.length) return null;
 
   const hours = meteogram.hours.slice(0, WINDOW_HOURS);
-  const values = hours
-    .map((hour) => hour.precipitationMm)
-    .filter((value): value is number => value !== null);
-  if (!values.length) return null;
+  const availableVolumeHours = hours.filter((hour) => hour.precipitationMm !== null);
+  if (!availableVolumeHours.length) return null;
 
+  const values = availableVolumeHours.map((hour) => hour.precipitationMm as number);
+  const hasCompleteVolumeWindow = availableVolumeHours.length === hours.length;
   const total = values.reduce((sum, value) => sum + value, 0);
-  const peak = total > 0 ? peakVolumeHour(hours) : null;
-  const wet = wetHours(hours);
+  const hasPositiveVolume = total > 0;
+  const peak = hasPositiveVolume ? peakVolumeHour(availableVolumeHours) : null;
+  const wet = wetHours(availableVolumeHours);
   const firstWet = wet[0] ?? null;
   const maximum = Math.max(0.1, ...values);
+  const noPositiveVolumeDetail = hasCompleteVolumeWindow
+    ? "Sem volume previsto no período"
+    : "Sem volume positivo entre os horários informados";
 
   return (
     <section
@@ -92,46 +101,55 @@ export function RainHourlyVolumeContext({ meteogram }: { meteogram: MeteogramDat
       <div className="rain-hourly-volume-context__summary" aria-label="Resumo do volume previsto">
         <article>
           <Droplets aria-hidden="true" />
-          <span>Total nas próximas 12h</span>
+          <span>{hasCompleteVolumeWindow ? "Total nas próximas 12h" : "Total parcial disponível"}</span>
           <strong>{formatMm(total)}</strong>
-          <small>Soma dos volumes horários disponíveis</small>
+          <small>
+            {hasCompleteVolumeWindow
+              ? "Soma dos volumes horários disponíveis"
+              : `${availableVolumeHours.length} de ${hours.length} horários têm volume informado`}
+          </small>
         </article>
         <article>
           <CloudRain aria-hidden="true" />
           <span>Maior volume em uma hora</span>
           <strong>{peak ? formatMm(peak.precipitationMm) : "Nenhum"}</strong>
-          <small>{peak ? `Por volta de ${formatHour(peak.timestamp)}` : "Sem volume previsto no período"}</small>
+          <small>{peak ? `Por volta de ${formatHour(peak.timestamp)}` : noPositiveVolumeDetail}</small>
         </article>
         <article>
           <Droplets aria-hidden="true" />
           <span>Horas com volume ≥ 0,1 mm</span>
           <strong>{wet.length}</strong>
-          <small>Entre os {hours.length} horários consultados</small>
+          <small>Entre os {availableVolumeHours.length} horários com volume informado</small>
         </article>
         <article>
           <Info aria-hidden="true" />
           <span>Primeiro volume previsto</span>
           <strong>{firstWet ? formatHour(firstWet.timestamp) : "Nenhum"}</strong>
-          <small>{firstWet ? formatMm(firstWet.precipitationMm) : "Sem volume ≥ 0,1 mm no período"}</small>
+          <small>
+            {firstWet ? formatMm(firstWet.precipitationMm) : hasCompleteVolumeWindow
+              ? "Sem volume ≥ 0,1 mm no período"
+              : "Sem volume ≥ 0,1 mm entre os horários informados"}
+          </small>
         </article>
       </div>
 
       <div className="rain-hourly-volume-context__timeline" aria-label="Volume e chance de chuva por hora">
         {hours.map((hour) => {
+          const volumeKnown = hour.precipitationMm !== null;
           const volume = hour.precipitationMm ?? 0;
           const style = {
             "--rain-hourly-volume": `${Math.max(0, Math.min(100, (volume / maximum) * 100))}%`,
           } as CSSProperties;
 
           return (
-            <article key={hour.timestamp} style={style}>
+            <article className={volumeKnown ? undefined : "is-unknown"} key={hour.timestamp} style={style}>
               <header>
                 <strong>{formatHour(hour.timestamp)}</strong>
-                <span>{formatChance(hour.precipitationProbability)} chance</span>
+                <span>{chanceLabel(hour.precipitationProbability)}</span>
               </header>
               <div>
                 <strong>{formatMm(hour.precipitationMm)}</strong>
-                <small>volume previsto</small>
+                <small>{volumeKnown ? "volume previsto" : "volume não informado"}</small>
               </div>
               <i aria-hidden="true"><span /></i>
             </article>
