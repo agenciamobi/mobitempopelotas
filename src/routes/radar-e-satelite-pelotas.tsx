@@ -4,6 +4,7 @@ import { EditorialContentSection } from "@/components/content/EditorialContentSe
 import { OfficialDataAccessNotice } from "@/components/content/OfficialDataAccessNotice";
 import { RadarForecastContext } from "@/components/redemet/RadarForecastContext";
 import { RedemetOverview } from "@/components/redemet/RedemetOverview";
+import "@/components/redemet/RedemetHomeContract.css";
 import { RADAR_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
 import { getRedemetOverview } from "@/lib/redemet/redemet.functions";
