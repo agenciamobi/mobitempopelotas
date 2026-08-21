@@ -3,7 +3,6 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const apiRoute = readFileSync("src/routes/api/weather/hourly-precipitation.ts", "utf8");
-const volumeComponent = readFileSync("src/components/weather/HourlyRainVolume.tsx", "utf8");
 const forecastStory = readFileSync("src/components/weather/HomeForecastStory.tsx", "utf8");
 
 test("hourly precipitation API requests millimetres rather than deriving volume from probability", () => {
@@ -13,12 +12,12 @@ test("hourly precipitation API requests millimetres rather than deriving volume 
   assert.doesNotMatch(apiRoute, /precipitation_probability/);
 });
 
-test("seven hourly cards share one request and show the corresponding volume", () => {
-  assert.match(volumeComponent, /let sharedRequest/);
-  assert.match(volumeComponent, /payload\.hours\[index\]/);
-  assert.match(volumeComponent, /mm previstos/);
-  assert.match(volumeComponent, /Volume indisponível/);
-  assert.match(forecastStory, /<HourlyRainVolume index=\{index\} \/>/);
+test("hourly cards render the volume already attached to their own forecast hour", () => {
+  assert.match(forecastStory, /hourlyVolumeLabel\(hour\.precipitationMm\)/);
+  assert.match(forecastStory, /Volume indisponível/);
+  assert.match(forecastStory, /mm previstos/);
+  assert.doesNotMatch(forecastStory, /HourlyRainVolume/);
+  assert.doesNotMatch(forecastStory, /\/api\/weather\/hourly-precipitation/);
 });
 
 test("rain probability remains visible separately from hourly volume", () => {
