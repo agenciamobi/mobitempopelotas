@@ -1,0 +1,83 @@
+/*
+ * Histórico recente — acento documental.
+ * A cor diferencia análise retrospectiva das páginas de previsão, mantendo
+ * gráficos e séries como protagonistas e sem sugerir climatologia oficial.
+ */
+
+.internal-weather-shell--history .history-hero__content {
+  background:
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 7%), transparent 22rem),
+    linear-gradient(145deg, #fafbfc 0%, #ffffff 56%, #f7f5ff 100%);
+}
+
+.internal-weather-shell--history .history-period-card {
+  background:
+    radial-gradient(circle at 100% 0, rgb(94 44 237 / 9%), transparent 20rem),
+    radial-gradient(circle at 0 100%, rgb(24 189 205 / 8%), transparent 18rem),
+    linear-gradient(145deg, #f4f8f9 0%, #ffffff 55%, #f7f5ff 100%);
+}
+
+.internal-weather-shell--history .history-period-overview article {
+  border-color: rgb(7 30 47 / 9%);
+  background: rgb(255 255 255 / 74%);
+  box-shadow: none;
+}
+
+.internal-weather-shell--history .history-period-overview article:nth-child(1) {
+  border-color: rgb(242 112 53 / 12%);
+  background: #fff8f3;
+}
+
+.internal-weather-shell--history .history-period-overview article:nth-child(2) {
+  border-color: rgb(24 189 205 / 13%);
+  background: #f2fbfc;
+}
+
+.internal-weather-shell--history .history-period-overview article:nth-child(3) {
+  border-color: rgb(94 44 237 / 12%);
+  background: #f7f4ff;
+}
+
+.internal-weather-shell--history .history-period-overview article:nth-child(4) {
+  border-color: rgb(231 11 133 / 10%);
+  background: #fff5f9;
+}
+
+.internal-weather-shell--history .history-period-source {
+  border-color: rgb(7 30 47 / 9%);
+  background: #f9fbfb;
+  box-shadow: none;
+}
+
+.internal-weather-shell--history .history-hero__actions a:first-child {
+  border-color: #315f70;
+  color: #fff;
+  background: linear-gradient(135deg, #315f70 0%, #5e2ced 100%);
+}
+
+.internal-weather-shell--history .history-hero__actions a:first-child:hover {
+  border-color: #315f70;
+}
+
+@media (max-width: 720px) {
+  .internal-weather-shell--history .history-hero__content {
+    background: linear-gradient(145deg, #fafbfc, #fff 66%, #f8f6ff);
+  }
+
+  .internal-weather-shell--history .history-period-card {
+    background:
+      radial-gradient(circle at 100% 0, rgb(94 44 237 / 7%), transparent 15rem),
+      linear-gradient(145deg, #f5f8f9, #fff 62%, #f8f6ff);
+  }
+}
+
+@media (forced-colors: active) {
+  .internal-weather-shell--history :is(
+    .history-hero__content,
+    .history-period-card,
+    .history-period-overview article,
+    .history-period-source
+  ) {
+    background: Canvas;
+  }
+}
