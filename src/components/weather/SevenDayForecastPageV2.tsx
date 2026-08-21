@@ -74,7 +74,7 @@ function dayTone(day: DailyForecast): DayTone {
 function toneLabel(tone: DayTone) {
   if (tone === "high") return "Mais chuva ou vento";
   if (tone === "attention") return "Vale acompanhar";
-  return "Menores valores";
+  return "Sem destaque";
 }
 
 function formatRainChance(day: DailyForecast) {
@@ -107,9 +107,6 @@ function planningHeadline(days: DailyForecast[]) {
   const maximum = Math.max(...days.map((day) => day.max));
   const hasPositiveRiskSignal = days.some((day) => hasPositiveRain(day) || hasPositiveGust(day));
 
-  if (!hasPositiveRiskSignal) {
-    return "Não há valores positivos de chuva ou rajadas nesta atualização";
-  }
   if ((rainiest.rainChance ?? 0) >= 70 || rainiest.precipitationMm >= 15) {
     return `${rainiest.weekday} tem a maior combinação de chance e volume de chuva`;
   }
@@ -117,6 +114,9 @@ function planningHeadline(days: DailyForecast[]) {
     return `${windiest.weekday} tem as rajadas mais fortes previstas`;
   }
   if (maximum - minimum >= 14) return "A temperatura deve variar bastante ao longo da semana";
+  if (!hasPositiveRiskSignal) {
+    return "Não há valores positivos de chuva ou rajadas nesta atualização";
+  }
   return "A maior parte da semana tem menores valores de chuva e rajadas";
 }
 
@@ -146,8 +146,8 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
   const minimum = Math.min(...days.map((day) => day.min));
   const maximum = Math.max(...days.map((day) => day.max));
   const temperatureSpan = Math.max(1, maximum - minimum);
-  const warmest = days.reduce((current, day) => (day.max > current.max ? day : current));
-  const coldest = days.reduce((current, day) => (day.min < current.min ? day : current));
+  const warmestDays = days.filter((day) => day.max === maximum);
+  const coldestDays = days.filter((day) => day.min === minimum);
   const riskScores = days.map((day) => riskScore(day));
   const minimumRisk = Math.min(...riskScores);
   const maximumRisk = Math.max(...riskScores);
@@ -319,8 +319,24 @@ export function SevenDayForecastPageV2({ data }: { data: WeatherIntelligenceData
         </div>
 
         <div className="seven-day-v2-trend__facts">
-          <article><Thermometer aria-hidden="true" /><span>Maior máxima</span><strong>{warmest.weekday} · {warmest.max}°</strong></article>
-          <article><Thermometer aria-hidden="true" /><span>Menor mínima</span><strong>{coldest.weekday} · {coldest.min}°</strong></article>
+          <article>
+            <Thermometer aria-hidden="true" />
+            <span>Maior máxima</span>
+            <strong>
+              {warmestDays.length === 1
+                ? `${warmestDays[0]?.weekday} · ${maximum}°`
+                : `${maximum}° · empate em ${warmestDays.length} dias`}
+            </strong>
+          </article>
+          <article>
+            <Thermometer aria-hidden="true" />
+            <span>Menor mínima</span>
+            <strong>
+              {coldestDays.length === 1
+                ? `${coldestDays[0]?.weekday} · ${minimum}°`
+                : `${minimum}° · empate em ${coldestDays.length} dias`}
+            </strong>
+          </article>
           <article><Gauge aria-hidden="true" /><span>Diferença entre extremos</span><strong>{maximum - minimum}°</strong></article>
         </div>
       </section>
