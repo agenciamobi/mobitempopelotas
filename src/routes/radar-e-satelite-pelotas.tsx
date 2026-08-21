@@ -6,6 +6,7 @@ import { RadarForecastContext } from "@/components/redemet/RadarForecastContext"
 import { RedemetDerivedContext } from "@/components/redemet/RedemetDerivedContext";
 import { RedemetOverview } from "@/components/redemet/RedemetOverview";
 import "@/components/redemet/RedemetHomeContract.css";
+import "@/components/redemet/RedemetEmptyStatePolish.css";
 import { RADAR_EDITORIAL_CONTENT } from "@/lib/editorial-content";
 import { createPageHead } from "@/lib/page-meta";
 import { getRedemetOverview } from "@/lib/redemet/redemet.functions";
