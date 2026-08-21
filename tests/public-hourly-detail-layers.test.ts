@@ -12,6 +12,7 @@ const windPage = readFileSync("src/components/weather/WindForecastPageV3.tsx", "
 const windPageStyles = readFileSync("src/components/weather/WindForecastPageV3.css", "utf8");
 const rainPage = readFileSync("src/components/weather/RainForecastPageV2.tsx", "utf8");
 const todayPage = readFileSync("src/components/weather/TodayForecastPageV5.tsx", "utf8");
+const todayHero = readFileSync("src/components/weather/TodayRetailHero.tsx", "utf8");
 const meteogram = readFileSync("src/lib/weather/meteogram.server.ts", "utf8");
 
 test("rain and wind routes reuse the structured 48-hour meteogram in parallel", () => {
@@ -37,9 +38,10 @@ test("hourly rain detail keeps probability and model volume separate from measur
   assert.doesNotMatch(`${rainDetail}\n${rainRoute}`, /OCR|extrair pixels|chuva medida pelo modelo/i);
 });
 
-test("hourly rain detail does not invent a peak when all forecast volumes are zero", () => {
-  assert.match(rainDetail, /const peak = total > 0 \? peakVolumeHour\(hours\) : null/);
-  assert.match(rainDetail, /Sem volume previsto no período/);
+test("zero hourly rain volume does not create a fake peak hour", () => {
+  assert.match(rainDetail, /const hasPositiveVolume = total > 0/);
+  assert.match(rainDetail, /hasPositiveVolume \? peakVolumeHour\(hours\) : null/);
+  assert.match(rainDetail, /Sem volume previsto/);
 });
 
 test("hourly wind direction stays a forecast distinct from current observation", () => {
@@ -55,11 +57,11 @@ test("hourly wind direction stays a forecast distinct from current observation",
   assert.match(windPageStyles, /grid-template-columns: repeat\(6, minmax\(0, 1fr\)\)/);
 });
 
-test("hourly wind direction never substitutes wind speed for an unavailable gust", () => {
-  assert.match(windDetail, /if \(hour\.windGust === null\) return selected/);
-  assert.match(windDetail, /const selectedValue = selected\?\.windGust \?\? null/);
-  assert.match(windDetail, /Rajada não informada no período/);
+test("peak-gust direction never substitutes sustained wind for a missing gust", () => {
+  assert.match(windDetail, /const value = hour\.windGust/);
+  assert.match(windDetail, /selected\.windGust/);
   assert.doesNotMatch(windDetail, /hour\.windGust \?\? hour\.windSpeed/);
+  assert.doesNotMatch(windDetail, /selected\.windGust \?\? selected\.windSpeed/);
 });
 
 test("dedicated Open-Meteo profile explicitly requests rain volume and wind direction", () => {
@@ -73,6 +75,16 @@ test("today atmospheric signals use the same recovered data as the rest of the p
   assert.match(todayPage, /const recoveredData = useOpenMeteoIntelligenceRecovery\(data\)/);
   assert.match(todayPage, /<TodayAtmosphericSignals data=\{recoveredData\} \/>/);
   assert.doesNotMatch(todayPage, /<TodayAtmosphericSignals data=\{data\} \/>/);
+});
+
+test("today empty state does not invent a next-hour condition or a gust", () => {
+  assert.match(todayHero, /const hasForecastSignal = current\.available \|\| nextHour !== null/);
+  assert.match(todayHero, /Dados meteorológicos em atualização/);
+  assert.match(todayHero, /nextHour[\s\S]*Condição prevista para a próxima hora/);
+  assert.match(todayHero, /hasForecastSignal \? "Previsão" : "Atualizando"/);
+  assert.match(todayPage, /function strongestGust/);
+  assert.match(todayPage, /if \(hour\.windGust === null\) return value/);
+  assert.doesNotMatch(todayPage, /hour\.windGust \?\? hour\.windSpeed/);
 });
 
 test("new public detail layers follow the internal editorial rail and responsive contract", () => {
