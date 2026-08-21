@@ -174,11 +174,14 @@ export function RadarMapFrame({
 
   return (
     <div className={styles.shell} data-map-ready={mapLoaded && !failed}>
-      <img className={styles.rawFallback} src={frame.imageUrl} alt={alt} decoding="async" />
+      {failed ? (
+        <img className={styles.rawFallback} src={frame.imageUrl} alt={alt} decoding="async" />
+      ) : null}
       <div
         ref={containerRef}
         className={`${styles.map}${failed ? ` ${styles.hidden}` : ""}`}
-        aria-label="Mapa regional com o radar meteorológico da REDEMET georreferenciado e Pelotas marcada"
+        role="img"
+        aria-label={`${alt}. Radar georreferenciado sobre mapa regional, com Pelotas marcada.`}
       />
 
       {!failed && (!mapLoaded || !overlayLoaded) ? (
