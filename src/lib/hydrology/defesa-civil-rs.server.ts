@@ -463,8 +463,7 @@ function stationCapabilities(
     riverLevel: toFlag(relation?.tem_nivel_do_rio) ?? measurements.levelM !== null,
     rain:
       toFlag(relation?.tem_chuva_acumulada) ??
-      measurements.h1Mm !== null ||
-      measurements.h24Mm !== null,
+      (measurements.h1Mm !== null || measurements.h24Mm !== null),
     pressure: toFlag(relation?.tem_pressao_atmosferica) ?? measurements.pressureHpa !== null,
     humidity: toFlag(relation?.tem_umidade) ?? measurements.humidityPct !== null,
     wind: toFlag(relation?.tem_vento) ?? measurements.windAverageKmh !== null,
