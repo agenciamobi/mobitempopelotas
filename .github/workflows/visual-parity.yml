@@ -12,6 +12,7 @@ on:
       - src/routes/**/*.tsx
       - public/**
       - scripts/visual-parity-audit.mjs
+      - scripts/internal-route-visual-smoke.mjs
       - scripts/auth-visual-smoke.mjs
       - scripts/accessibility-editorial-smoke.mjs
       - scripts/accessibility-failure-screenshots.mjs
@@ -29,6 +30,7 @@ on:
       - src/**
       - public/**
       - scripts/visual-parity-audit.mjs
+      - scripts/internal-route-visual-smoke.mjs
       - scripts/auth-visual-smoke.mjs
       - scripts/accessibility-editorial-smoke.mjs
       - scripts/accessibility-failure-screenshots.mjs
@@ -126,6 +128,11 @@ jobs:
           WAIT_FOR_CANDIDATE_DEPLOYMENT: "false"
           AUDIT_REVISION: ${{ github.sha }}
         run: node scripts/visual-parity-audit.mjs
+
+      - name: Auditar páginas internas críticas
+        env:
+          CANDIDATE_URL: http://127.0.0.1:4173
+        run: node scripts/internal-route-visual-smoke.mjs
 
       - name: Auditar entrada e conta
         env:
