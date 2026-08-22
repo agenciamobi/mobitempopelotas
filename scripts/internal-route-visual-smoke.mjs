@@ -15,6 +15,16 @@ const routes = [
     marker: ".internal-weather-shell--today",
   },
   {
+    name: "tempo-amanha",
+    path: "/tempo-amanha-pelotas",
+    marker: ".internal-weather-shell--tomorrow",
+  },
+  {
+    name: "previsao-7-dias",
+    path: "/previsao-7-dias-pelotas",
+    marker: ".internal-weather-shell--seven-day",
+  },
+  {
     name: "chuva",
     path: "/chuva-em-pelotas",
     marker: ".internal-weather-shell--rain",
@@ -25,6 +35,11 @@ const routes = [
     path: "/vento-em-pelotas",
     marker: ".internal-weather-shell--wind",
     neutralSelectors: [".wind-direction-context"],
+  },
+  {
+    name: "alertas",
+    path: "/alertas",
+    marker: ".internal-weather-shell--alerts",
   },
   {
     name: "clima",
