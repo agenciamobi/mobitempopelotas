@@ -1,6 +1,6 @@
 # Tempo Pelotas — estado atual do projeto
 
-Última atualização: 21/08/2026  
+Última atualização: 22/08/2026  
 Branch operacional: `main`  
 Domínio canônico: `https://tempopelotas.com.br`
 
@@ -747,6 +747,9 @@ A integração pública com CPTEC/SIGMA foi deliberadamente adiada para revisão
 | `docs/open-meteo-production-resilience-2026-07-29.md` | Resiliência Open-Meteo |
 | `WEATHER_PAGE_IDENTITY.md` | Identidade e consistência das páginas meteorológicas |
 | `docs/EXACT_PRODUCTION_CSS_STACK.md` | Stack CSS de produção |
+| `docs/ACCOUNT_AND_PRO_ARCHITECTURE.md` | Arquitetura da conta, autenticação, Free/PRO e entitlements |
+| `docs/HISTORICAL_DATA_INVENTORY.md` | Inventário de históricos, fontes, variáveis e oportunidades de backfill |
+| `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md` | Plano aprovado de aplicação Público / Free / PRO / REVIEW e governança de acesso |
 
 ## 24. Pendências reais atuais
 
@@ -1537,3 +1540,45 @@ A partir da implementação do PRO, este arquivo também deve ser atualizado qua
 - mudança de política de cancelamento;
 - ativação de uma feature flag estrutural;
 - passagem de uma fase do roadmap para concluída.
+
+## 46. Política consolidada de acesso — Público, Free e PRO
+
+Documento especializado e fonte detalhada desta decisão:
+
+- `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md`.
+
+Esta seção **refina e prevalece sobre ambiguidades anteriores** nas seções de produto/PRO quando houver conflito sobre quem pode acessar determinado dado ou ferramenta.
+
+Regras consolidadas:
+
+- tudo que já está público continua público, salvo motivo técnico, institucional ou jurídico documentado;
+- dados oficiais/governamentais adequados à disseminação pública permanecem públicos e não devem ser transformados em paywall apenas para monetização;
+- o usuário Free autenticado recebe valor pela conta: painel pessoal, favoritos, preferências, locais/estações acompanhadas e recursos/datasets definidos como Free;
+- histórico de até 60 dias é um limite de entitlement para determinados recursos Free, **não** uma regra automática para dados oficiais já públicos;
+- o PRO deve priorizar o Historical Data Layer próprio, históricos longos autorizados, indicadores derivados, comparações, análises, ferramentas avançadas, exportações permitidas e futuros recursos desenvolvidos pelo Tempo Pelotas;
+- fonte ou dataset cuja retenção, redistribuição, exportação ou uso comercial permaneça incerto deve ficar em `REVIEW`/interno e não pode ser usado como diferencial PRO até revisão documentada;
+- `/conta` permanece a área de identidade, privacidade, sessão e plano;
+- `/painel` passa a ser concebido como **shell autenticado comum a Free e PRO**, com módulos e profundidade liberados por entitlement, refinando a concepção anterior de painel exclusivamente PRO;
+- esconder um componente no React nunca substitui autorização server-side;
+- a coleta histórica continua em paralelo e não deve esperar billing ou lançamento comercial.
+
+### 46.1. Ordem de aplicação aprovada
+
+A implementação desta nova etapa **ainda não iniciou**. A ordem oficial passa a ser:
+
+1. finalizar e validar E2E/arquitetura da conta atual;
+2. consolidar contrato de entitlements e shell autenticado `/painel`;
+3. classificar fontes/datasets em Público, Free, PRO ou REVIEW conforme `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md`;
+4. continuar ampliando a coleta histórica e os backfills seguros em paralelo;
+5. construir o primeiro painel Free com utilidade real;
+6. criar APIs históricas server-side com política por dataset;
+7. construir o PRO sobre patrimônio próprio, dados claramente autorizados, derivados e ferramentas do Tempo Pelotas;
+8. integrar billing somente depois de o produto autenticado demonstrar valor;
+9. adicionar IA e ferramentas avançadas depois que a camada determinística estiver sólida.
+
+Documentos que devem ser consultados em conjunto antes de iniciar desenvolvimento desta etapa:
+
+- `docs/ACCOUNT_AND_PRO_ARCHITECTURE.md`;
+- `docs/HISTORICAL_DATA_INVENTORY.md`;
+- `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md`;
+- `docs/OFFICIAL_DATA_SOURCE_POLICY.md`.
