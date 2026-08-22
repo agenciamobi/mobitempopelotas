@@ -5,6 +5,7 @@ import test from "node:test";
 const server = readFileSync("src/lib/hydrology/defesa-civil-rs.server.ts", "utf8");
 const area = readFileSync("src/components/hydrology/DefesaCivilHydroNetwork.tsx", "utf8");
 const styles = readFileSync("src/components/hydrology/DefesaCivilHydroInventory.css", "utf8");
+const endpoint = readFileSync("src/routes/api/defesa-civil/stations.ts", "utf8");
 
 test("Defesa Civil station inventory preserves official capability flags", () => {
   assert.match(server, /filter:[\s\S]*relacao:/);
@@ -61,6 +62,19 @@ test("public UI explains capability classification without converting it into ri
   assert.match(area, /não é convertido pelo Tempo Pelotas em classificação de\s+risco/);
   assert.match(area, /Fonte oficial e créditos/);
   assert.match(area, /Dados disponibilizados pela Defesa Civil RS através da MKS/);
+});
+
+test("sanitized public endpoint exposes only normalized station inventory", () => {
+  assert.match(endpoint, /createFileRoute\("\/api\/defesa-civil\/stations"\)/);
+  assert.match(endpoint, /fetchDefesaCivilHydroData\(\)/);
+  assert.match(endpoint, /X-Robots-Tag": "noindex, nofollow"/);
+  assert.match(endpoint, /X-Content-Type-Options": "nosniff"/);
+  assert.match(endpoint, /classification: station\.classification/);
+  assert.match(endpoint, /capabilities: station\.capabilities/);
+  assert.match(endpoint, /trend: station\.river\.trend/);
+  assert.match(endpoint, /h144Mm: station\.rain\.h144Mm/);
+  assert.doesNotMatch(endpoint, /raw|cookie|authorization|token|secret/i);
+  assert.doesNotMatch(endpoint, /drainageArea/);
 });
 
 test("inventory UI remains responsive and readable", () => {
