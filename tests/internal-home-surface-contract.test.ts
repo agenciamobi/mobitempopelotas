@@ -43,6 +43,8 @@ const serviceWorker = readFileSync("public/sw.js", "utf8");
 const offlinePage = readFileSync("public/offline.html", "utf8");
 const cssEntry = readFileSync("src/production/production-styles.css", "utf8");
 const tsEntry = readFileSync("src/production/production-styles.ts", "utf8");
+const internalVisualSmoke = readFileSync("scripts/internal-route-visual-smoke.mjs", "utf8");
+const visualParityWorkflow = readFileSync(".github/workflows/visual-parity.yml", "utf8");
 
 test("public pages reuse the Home editorial header instead of the legacy header", () => {
   assert.match(siteHeader, /HomeEditorialHeader/);
@@ -134,4 +136,29 @@ test("new surface contracts are loaded after the Home shell in both production e
     assert.ok(internalIndex > homeIndex);
     assert.ok(standaloneIndex > internalIndex);
   }
+});
+
+test("visual parity workflow captures critical internal routes on desktop and narrow mobile", () => {
+  for (const route of [
+    "/tempo-hoje-pelotas",
+    "/chuva-em-pelotas",
+    "/vento-em-pelotas",
+    "/clima-em-pelotas",
+    "/meteograma-pelotas",
+    "/historico-climatico-pelotas",
+    "/enchente-2024-pelotas-laranjal",
+    "/estacao-embrapa-pelotas",
+    "/situacao-hidrologica-pelotas",
+  ]) {
+    assert.ok(internalVisualSmoke.includes(route));
+  }
+
+  assert.match(internalVisualSmoke, /desktop-1280/);
+  assert.match(internalVisualSmoke, /mobile-320/);
+  assert.match(internalVisualSmoke, /horizontalOverflow/);
+  assert.match(internalVisualSmoke, /page\.screenshot/);
+  assert.match(internalVisualSmoke, /rain-hourly-volume-context/);
+  assert.match(internalVisualSmoke, /wind-direction-context/);
+  assert.ok(visualParityWorkflow.includes("scripts/internal-route-visual-smoke.mjs"));
+  assert.ok(visualParityWorkflow.includes("node scripts/internal-route-visual-smoke.mjs"));
 });
