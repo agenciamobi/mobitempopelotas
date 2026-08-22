@@ -68,7 +68,7 @@ export function RadarMapFrame({
             [initialFrame.bounds.west, initialFrame.bounds.south],
             [initialFrame.bounds.east, initialFrame.bounds.north],
           ],
-          fitBoundsOptions: { padding: 28, maxZoom: 7.5 },
+          fitBoundsOptions: { padding: 28, maxZoom: 4.5 },
           minZoom: 3,
           maxZoom: 10,
           cooperativeGestures: true,
@@ -167,7 +167,7 @@ export function RadarMapFrame({
           [frame.bounds.west, frame.bounds.south],
           [frame.bounds.east, frame.bounds.north],
         ],
-        { padding: 28, maxZoom: 7.5, duration: 0 },
+        { padding: 28, maxZoom: 4.5, duration: 0 },
       );
     }
   }, [failed, frame, mapLoaded]);
