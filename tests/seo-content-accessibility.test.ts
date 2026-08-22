@@ -119,3 +119,18 @@ test("below-fold editorial content uses delayed rendering", () => {
   assert.match(source, /content-visibility:\s*auto/);
   assert.match(source, /contain-intrinsic-size:\s*auto 900px/);
 });
+
+test("below-fold editorial content owns the Home surface without legacy decorative chrome", () => {
+  const source = read("src/components/content/EditorialContentSection.css");
+
+  assert.match(source, /--editorial-answer-line:\s*rgb\(7 30 47 \/ 10%\)/);
+  assert.match(source, /margin:\s*clamp\(16px, 2vw, 24px\) 0 0/);
+  assert.match(source, /border-radius:\s*16px/);
+  assert.match(source, /background:\s*#fff/);
+  assert.match(source, /box-shadow:\s*none/);
+  assert.doesNotMatch(source, /radial-gradient|linear-gradient/);
+  assert.match(source, /\.editorial-answer-facts li[\s\S]*background:\s*var\(--editorial-answer-soft\)/);
+  assert.match(source, /\.editorial-answer-related a:hover[\s\S]*transform:\s*none/);
+  assert.match(source, /\.editorial-answer-faq-list summary[\s\S]*min-height:\s*44px/);
+  assert.match(source, /@media \(forced-colors: active\)/);
+});
