@@ -38,6 +38,8 @@ const TAGS_DATA_QUERY = `
           rio {
             rio_nome { value }
             rio_nivel { value }
+            rio_nivel_tendencia { value }
+            rio_area_drenagem { value }
           }
           chuva {
             acumulado {
@@ -46,6 +48,11 @@ const TAGS_DATA_QUERY = `
               h006 { value }
               h012 { value }
               h024 { value }
+              h048 { value }
+              h072 { value }
+              h096 { value }
+              h120 { value }
+              h144 { value }
               h168 { value }
             }
           }
@@ -76,6 +83,10 @@ const TAGS_DATA_QUERY = `
 
 const scalarSchema = z.union([z.string(), z.number()]).nullable().optional();
 const metricSchema = z.object({ value: scalarSchema }).passthrough().nullable().optional();
+const capabilityFlagSchema = z
+  .union([z.boolean(), z.string(), z.number()])
+  .nullable()
+  .optional();
 
 const stationSchema = z
   .object({
@@ -107,6 +118,8 @@ const stationSchema = z
           .object({
             rio_nome: metricSchema,
             rio_nivel: metricSchema,
+            rio_nivel_tendencia: metricSchema,
+            rio_area_drenagem: metricSchema,
           })
           .passthrough()
           .nullable()
@@ -120,6 +133,11 @@ const stationSchema = z
                 h006: metricSchema,
                 h012: metricSchema,
                 h024: metricSchema,
+                h048: metricSchema,
+                h072: metricSchema,
+                h096: metricSchema,
+                h120: metricSchema,
+                h144: metricSchema,
                 h168: metricSchema,
               })
               .passthrough()
@@ -139,6 +157,23 @@ const stationSchema = z
             velocidade_media: metricSchema,
             velocidade_maxima: metricSchema,
             direcao: metricSchema,
+          })
+          .passthrough()
+          .nullable()
+          .optional(),
+      })
+      .passthrough()
+      .nullable()
+      .optional(),
+    filter: z
+      .object({
+        relacao: z
+          .object({
+            tem_chuva_acumulada: capabilityFlagSchema,
+            tem_nivel_do_rio: capabilityFlagSchema,
+            tem_pressao_atmosferica: capabilityFlagSchema,
+            tem_umidade: capabilityFlagSchema,
+            tem_vento: capabilityFlagSchema,
           })
           .passthrough()
           .nullable()
@@ -173,6 +208,20 @@ const graphqlResponseSchema = z
   .passthrough();
 
 export type DefesaCivilReadingFreshness = "recent" | "delayed" | "old" | "unknown";
+export type DefesaCivilStationClassification =
+  | "HYDROLOGY"
+  | "METEOROLOGY"
+  | "BOTH"
+  | "UNKNOWN";
+
+export type DefesaCivilStationCapabilities = {
+  riverLevel: boolean;
+  rain: boolean;
+  pressure: boolean;
+  humidity: boolean;
+  wind: boolean;
+  temperature: boolean;
+};
 
 export type DefesaCivilHydroStation = {
   code: string;
@@ -186,9 +235,13 @@ export type DefesaCivilHydroStation = {
   observedAt: string | null;
   ageMinutes: number | null;
   freshness: DefesaCivilReadingFreshness;
+  classification: DefesaCivilStationClassification;
+  capabilities: DefesaCivilStationCapabilities;
   river: {
     name: string | null;
     levelM: number | null;
+    trend: string | null;
+    drainageArea: number | null;
   };
   rain: {
     h1Mm: number | null;
@@ -196,6 +249,11 @@ export type DefesaCivilHydroStation = {
     h6Mm: number | null;
     h12Mm: number | null;
     h24Mm: number | null;
+    h48Mm: number | null;
+    h72Mm: number | null;
+    h96Mm: number | null;
+    h120Mm: number | null;
+    h144Mm: number | null;
     h168Mm: number | null;
   };
   weather: {
@@ -217,6 +275,7 @@ export type DefesaCivilHydroData = {
   regionalStationCount: number;
   recentStationCount: number;
   latestObservationAt: string | null;
+  inventory: Record<DefesaCivilStationClassification, number>;
   source: {
     name: "Defesa Civil RS — Rede de Monitoramento Hidrometeorológico";
     endpoint: string;
@@ -255,9 +314,13 @@ function publication(enabled: boolean) {
   return {
     enabled,
     note: enabled
-      ? "Integração habilitada no runtime após validação técnica e operacional da fonte."
-      : "Integração técnica preparada; ativação aguarda validação do contrato, inventário, timestamps, referência dos níveis e condições indicadas pela documentação oficial.",
+      ? "Integração pública habilitada; o Tempo Pelotas dissemina as leituras preservando origem, horário e semântica da fonte oficial."
+      : "Integração desabilitada explicitamente por configuração operacional do Tempo Pelotas.",
   };
+}
+
+function emptyInventory(): Record<DefesaCivilStationClassification, number> {
+  return { HYDROLOGY: 0, METEOROLOGY: 0, BOTH: 0, UNKNOWN: 0 };
 }
 
 function emptyData(
@@ -273,6 +336,7 @@ function emptyData(
     regionalStationCount: 0,
     recentStationCount: 0,
     latestObservationAt: null,
+    inventory: emptyInventory(),
     source: source(fetchedAt),
     publication: publication(enabled),
     error,
@@ -293,6 +357,20 @@ function toText(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const normalized = value.trim();
   return normalized || null;
+}
+
+function toFlag(value: unknown): boolean | null {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "number") {
+    if (value === 1) return true;
+    if (value === 0) return false;
+    return null;
+  }
+  if (typeof value !== "string") return null;
+  const normalized = value.trim().toLowerCase();
+  if (["true", "1", "sim", "yes"].includes(normalized)) return true;
+  if (["false", "0", "nao", "não", "no"].includes(normalized)) return false;
+  return null;
 }
 
 function normalizeTimestamp(value: string | number | null | undefined): string | null {
@@ -368,6 +446,49 @@ function stationName(station: z.infer<typeof stationSchema>) {
   );
 }
 
+function stationCapabilities(
+  station: z.infer<typeof stationSchema>,
+  measurements: {
+    levelM: number | null;
+    h1Mm: number | null;
+    h24Mm: number | null;
+    temperatureC: number | null;
+    humidityPct: number | null;
+    pressureHpa: number | null;
+    windAverageKmh: number | null;
+  },
+): DefesaCivilStationCapabilities {
+  const relation = station.filter?.relacao;
+  return {
+    riverLevel: toFlag(relation?.tem_nivel_do_rio) ?? measurements.levelM !== null,
+    rain:
+      toFlag(relation?.tem_chuva_acumulada) ??
+      measurements.h1Mm !== null ||
+      measurements.h24Mm !== null,
+    pressure: toFlag(relation?.tem_pressao_atmosferica) ?? measurements.pressureHpa !== null,
+    humidity: toFlag(relation?.tem_umidade) ?? measurements.humidityPct !== null,
+    wind: toFlag(relation?.tem_vento) ?? measurements.windAverageKmh !== null,
+    temperature: measurements.temperatureC !== null,
+  };
+}
+
+function stationClassification(
+  capabilities: DefesaCivilStationCapabilities,
+): DefesaCivilStationClassification {
+  const hydrology = capabilities.riverLevel;
+  const meteorology =
+    capabilities.rain ||
+    capabilities.pressure ||
+    capabilities.humidity ||
+    capabilities.wind ||
+    capabilities.temperature;
+
+  if (hydrology && meteorology) return "BOTH";
+  if (hydrology) return "HYDROLOGY";
+  if (meteorology) return "METEOROLOGY";
+  return "UNKNOWN";
+}
+
 function normalizeStation(
   station: z.infer<typeof stationSchema>,
   fetchedAt: Date,
@@ -380,6 +501,16 @@ function normalizeStation(
   const observedAt = trustedObservedAt(station.timestamp, fetchedAt);
   const timing = freshness(observedAt, fetchedAt);
   const rain = station.data?.chuva?.acumulado;
+  const measurements = {
+    levelM: metricValue(station.data?.rio?.rio_nivel),
+    h1Mm: metricValue(rain?.h001),
+    h24Mm: metricValue(rain?.h024),
+    temperatureC: metricValue(station.data?.temperatura?.atual),
+    humidityPct: metricValue(station.data?.umidade?.atual),
+    pressureHpa: metricValue(station.data?.pressaoatmos?.atual),
+    windAverageKmh: metricValue(station.data?.vento?.velocidade_media),
+  };
+  const capabilities = stationCapabilities(station, measurements);
 
   return {
     code: station.codigo,
@@ -393,25 +524,34 @@ function normalizeStation(
     observedAt,
     ageMinutes: timing.ageMinutes,
     freshness: timing.freshness,
+    classification: stationClassification(capabilities),
+    capabilities,
     river: {
       name: metricText(station.data?.rio?.rio_nome),
-      levelM: metricValue(station.data?.rio?.rio_nivel),
+      levelM: measurements.levelM,
+      trend: metricText(station.data?.rio?.rio_nivel_tendencia),
+      drainageArea: metricValue(station.data?.rio?.rio_area_drenagem),
     },
     rain: {
-      h1Mm: metricValue(rain?.h001),
+      h1Mm: measurements.h1Mm,
       h3Mm: metricValue(rain?.h003),
       h6Mm: metricValue(rain?.h006),
       h12Mm: metricValue(rain?.h012),
-      h24Mm: metricValue(rain?.h024),
+      h24Mm: measurements.h24Mm,
+      h48Mm: metricValue(rain?.h048),
+      h72Mm: metricValue(rain?.h072),
+      h96Mm: metricValue(rain?.h096),
+      h120Mm: metricValue(rain?.h120),
+      h144Mm: metricValue(rain?.h144),
       h168Mm: metricValue(rain?.h168),
     },
     weather: {
-      temperatureC: metricValue(station.data?.temperatura?.atual),
+      temperatureC: measurements.temperatureC,
       apparentTemperatureC: metricValue(station.data?.senstermica?.atual),
-      humidityPct: metricValue(station.data?.umidade?.atual),
-      pressureHpa: metricValue(station.data?.pressaoatmos?.atual),
+      humidityPct: measurements.humidityPct,
+      pressureHpa: measurements.pressureHpa,
       solarRadiationKwhM2: metricValue(station.data?.radiacaosolar?.atual),
-      windAverageKmh: metricValue(station.data?.vento?.velocidade_media),
+      windAverageKmh: measurements.windAverageKmh,
       windMaximumKmh: metricValue(station.data?.vento?.velocidade_maxima),
       windDirectionDeg: metricValue(station.data?.vento?.direcao),
     },
@@ -464,7 +604,7 @@ async function requestGraphql() {
 }
 
 export function isDefesaCivilHydroEnabled() {
-  return process.env.DEFESA_CIVIL_HYDRO_ENABLED?.trim().toLowerCase() === "true";
+  return process.env.DEFESA_CIVIL_HYDRO_ENABLED?.trim().toLowerCase() !== "false";
 }
 
 export async function fetchDefesaCivilHydroData(
@@ -525,6 +665,13 @@ export async function fetchDefesaCivilHydroData(
   const recentStationCount = regionalStations.filter(
     (station) => station.freshness === "recent",
   ).length;
+  const inventory = regionalStations.reduce<Record<DefesaCivilStationClassification, number>>(
+    (summary, station) => {
+      summary[station.classification] += 1;
+      return summary;
+    },
+    emptyInventory(),
+  );
 
   const status: DefesaCivilHydroData["status"] = regionalStations.length > 0 ? "live" : "partial";
 
@@ -535,6 +682,7 @@ export async function fetchDefesaCivilHydroData(
     regionalStationCount: regionalStations.length,
     recentStationCount,
     latestObservationAt,
+    inventory,
     source: source(fetchedAt),
     publication: publication(true),
     error:
