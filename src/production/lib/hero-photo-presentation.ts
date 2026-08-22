@@ -24,9 +24,9 @@ const heroPhotos = {
   },
   clear: {
     kind: "clear",
-    src: "/weather/hero/pelotas-ceu-limpo.webp",
-    position: "center 42%",
-    credit: "Acervo Tempo Pelotas",
+    src: "/weather/hero/pelotas-laranjal-ceu-aberto.webp",
+    position: "center 58%",
+    credit: "Acervo Tempo Pelotas · Praia do Laranjal",
   },
   cloudy: {
     kind: "cloudy",
