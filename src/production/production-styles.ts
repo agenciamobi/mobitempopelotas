@@ -45,6 +45,7 @@ import "./styles/header-template-refinement-v2.css";
 import "./styles/weather-ai-summary.css";
 import "./styles/integrations-v22.css";
 import "./styles/account-v24.css";
+import "./styles/account-dashboard.css";
 import "./styles/account-lgpd-v26.css";
 import "./styles/privacy-data-v26.css";
 import "./styles/footer-editorial-v23.css";
