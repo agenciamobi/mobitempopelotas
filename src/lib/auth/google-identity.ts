@@ -91,40 +91,71 @@ export async function loadGoogleIdentityServices() {
   if (googleIdentityPromise) return googleIdentityPromise;
 
   googleIdentityPromise = new Promise<GoogleIdentityServices>((resolve, reject) => {
-    const resolveGoogle = () => {
+    let settled = false;
+    let timeoutId: number | undefined;
+    let watchedScript: HTMLScriptElement | null = null;
+
+    const cleanup = () => {
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+      watchedScript?.removeEventListener("load", handleLoad);
+      watchedScript?.removeEventListener("error", handleError);
+    };
+
+    const finish = () => {
+      if (settled || !window.google?.accounts?.id) return;
+      settled = true;
+      cleanup();
+      resolve(window.google);
+    };
+
+    const fail = (message: string) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      googleIdentityPromise = null;
+      reject(new Error(message));
+    };
+
+    function handleLoad() {
       if (window.google?.accounts?.id) {
-        resolve(window.google);
+        finish();
         return;
       }
+      fail("Google Identity Services não ficou disponível após carregar o script.");
+    }
 
-      googleIdentityPromise = null;
-      reject(new Error("Google Identity Services não ficou disponível após carregar o script."));
-    };
+    function handleError() {
+      fail("Não foi possível carregar o Google Identity Services.");
+    }
 
-    const rejectGoogle = () => {
-      googleIdentityPromise = null;
-      reject(new Error("Não foi possível carregar o Google Identity Services."));
-    };
-
-    const existing = document.querySelector<HTMLScriptElement>(
+    watchedScript = document.querySelector<HTMLScriptElement>(
       `script[src="${GOOGLE_IDENTITY_SCRIPT_SRC}"]`,
     );
 
-    if (existing) {
-      existing.addEventListener("load", resolveGoogle, { once: true });
-      existing.addEventListener("error", rejectGoogle, { once: true });
-      window.setTimeout(resolveGoogle, 0);
+    if (!watchedScript) {
+      watchedScript = document.createElement("script");
+      watchedScript.src = GOOGLE_IDENTITY_SCRIPT_SRC;
+      watchedScript.async = true;
+      watchedScript.defer = true;
+      watchedScript.referrerPolicy = "strict-origin-when-cross-origin";
+      document.head.appendChild(watchedScript);
+    }
+
+    watchedScript.addEventListener("load", handleLoad, { once: true });
+    watchedScript.addEventListener("error", handleError, { once: true });
+
+    if (window.google?.accounts?.id) {
+      finish();
       return;
     }
 
-    const script = document.createElement("script");
-    script.src = GOOGLE_IDENTITY_SCRIPT_SRC;
-    script.async = true;
-    script.defer = true;
-    script.referrerPolicy = "strict-origin-when-cross-origin";
-    script.addEventListener("load", resolveGoogle, { once: true });
-    script.addEventListener("error", rejectGoogle, { once: true });
-    document.head.appendChild(script);
+    timeoutId = window.setTimeout(() => {
+      if (window.google?.accounts?.id) {
+        finish();
+        return;
+      }
+      fail("O Google Identity Services demorou demais para carregar.");
+    }, 10_000);
   });
 
   return googleIdentityPromise;
