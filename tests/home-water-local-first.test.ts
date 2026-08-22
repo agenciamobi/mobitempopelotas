@@ -15,33 +15,59 @@ test("homepage water chapter treats Laranjal as the local reference", () => {
   assert.match(water, /formatSignedCentimeters/);
 });
 
-test("regional water references follow Guaiba to ocean geographic order", () => {
+test("homepage groups Rio Grande and Sao Jose do Norte with the Laranjal estuary reading", () => {
+  const rioGrande = water.indexOf('"furg-ccmar"');
+  const saoJose = water.indexOf('"sao-jose-do-norte"');
+  const itapua = water.indexOf('"itapua"');
+  const arambare = water.indexOf('"arambare"');
+  const saoLourenco = water.indexOf('"sao-lourenco-do-sul"');
+
+  assert.ok(rioGrande >= 0);
+  assert.ok(saoJose > rioGrande);
+  assert.ok(itapua > saoJose);
+  assert.ok(arambare > itapua);
+  assert.ok(saoLourenco > arambare);
+
+  assert.match(water, /HOME_LOCAL_ESTUARY_STATION_PRIORITY/);
+  assert.match(water, /HOME_REGIONAL_STATION_PRIORITY/);
+  assert.match(water, /localStationIds\.has\(observation\.station\.id\)/);
+  assert.match(water, /Trecho sul e estuário/);
+  assert.match(water, /Rio Grande e São José do Norte/);
+  assert.match(water, /canal de saída da Lagoa dos Patos para o oceano/);
+  assert.match(water, /tp-home-water__local-rows/);
+});
+
+test("broader regional references preserve Guaiba to lagoon context", () => {
   const gasometroRank = water.indexOf('["gasometro", 0]');
   const caisRank = water.indexOf('["cais-maua", 1]');
   assert.ok(gasometroRank >= 0 && caisRank > gasometroRank);
 
-  const itapua = water.indexOf('"itapua"');
-  const arambare = water.indexOf('"arambare"');
-  const saoLourenco = water.indexOf('"sao-lourenco-do-sul"');
-  const saoJose = water.indexOf('"sao-jose-do-norte"');
-  const rioGrande = water.indexOf('"furg-ccmar"');
-
-  assert.ok(itapua >= 0);
-  assert.ok(arambare > itapua);
-  assert.ok(saoLourenco > arambare);
-  assert.ok(saoJose > saoLourenco);
-  assert.ok(rioGrande > saoJose);
-
   assert.match(water, /Porto Alegre \/ RS — Usina do Gasômetro/);
   assert.match(water, /Porto Alegre \/ RS — Cais Mauá/);
+  assert.match(water, /Pontos para acompanhar a Lagoa dos Patos/);
+  assert.match(water, /As réguas possuem referências próprias/);
+  assert.match(water, /regionalStations\.map/);
 });
 
 test("regional network preserves source context and local reference semantics", () => {
-  assert.match(water, /Pontos para acompanhar a Lagoa dos Patos/);
-  assert.match(water, /As réguas possuem referências próprias/);
   assert.match(water, /station\.station\.role/);
   assert.match(water, /is-risk-\$\{station\.risk\}/);
   assert.match(water, /lagoon\.source\.organizations/);
+});
+
+test("Laranjal column uses compact estuary rows without changing station semantics", () => {
+  assert.match(
+    waterCss,
+    /\.tp-home-water__local-network\s*\{[\s\S]*border-top:\s*1px solid var\(--tp-water-line\)/,
+  );
+  assert.match(
+    waterCss,
+    /\.tp-home-water__local-rows article\s*\{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\) auto/,
+  );
+  assert.match(
+    waterCss,
+    /\.tp-home-water__local-rows \.tp-home-water__station-state-wrap\s*\{[\s\S]*grid-column:\s*1 \/ -1/,
+  );
 });
 
 test("water chapter keeps breathing room after the regional station list", () => {
