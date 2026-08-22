@@ -33,6 +33,7 @@ const standaloneRoutes = new Set([
   "/",
   ...internalWeatherStandaloneRoutes,
   "/conta",
+  "/painel",
   "/entrar",
   "/minha-conta",
   "/privacidade-e-dados",
