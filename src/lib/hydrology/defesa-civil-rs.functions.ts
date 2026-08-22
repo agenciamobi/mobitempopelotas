@@ -18,8 +18,12 @@ const DISABLED_CACHE_HEADERS = {
   "CDN-Cache-Control": "max-age=300, must-revalidate",
 };
 
+function isPublicDefesaCivilHydroEnabled() {
+  return process.env.DEFESA_CIVIL_HYDRO_ENABLED?.trim().toLowerCase() !== "false";
+}
+
 export const getDefesaCivilHydroData = createServerFn({ method: "GET" }).handler(async () => {
-  const data = await fetchDefesaCivilHydroData();
+  const data = await fetchDefesaCivilHydroData({ enabled: isPublicDefesaCivilHydroEnabled() });
 
   const headers =
     data.status === "disabled"
