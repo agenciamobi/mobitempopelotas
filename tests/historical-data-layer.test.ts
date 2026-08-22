@@ -7,6 +7,10 @@ const migration = readFileSync(
   "supabase/migrations/20260822025000_create_historical_data_layer.sql",
   "utf8",
 );
+const embrapaExtremesMigration = readFileSync(
+  "supabase/migrations/20260822072000_archive_embrapa_daily_extremes.sql",
+  "utf8",
+);
 const archiveServer = readFileSync("src/lib/history/historical-archive.server.ts", "utf8");
 const snapshotRoute = readFileSync("src/routes/api/cron/weather-snapshot.ts", "utf8");
 
@@ -35,6 +39,22 @@ test("existing Embrapa observations are mirrored and backfilled into the canonic
   assert.match(migration, /'temperature'/);
   assert.match(migration, /'rain_daily'/);
   assert.match(migration, /'wind_direction'/);
+});
+
+test("Embrapa daily extremes use one canonical local-day point and preserve the reported extreme time", () => {
+  assert.match(embrapaExtremesMigration, /mirror_embrapa_daily_extremes_to_history/);
+  assert.match(embrapaExtremesMigration, /America\/Sao_Paulo/);
+  assert.match(embrapaExtremesMigration, /'temperature_daily_min'/);
+  assert.match(embrapaExtremesMigration, /'temperature_daily_max'/);
+  assert.match(embrapaExtremesMigration, /'humidity_daily_min'/);
+  assert.match(embrapaExtremesMigration, /'humidity_daily_max'/);
+  assert.match(embrapaExtremesMigration, /'dew_point_daily_min'/);
+  assert.match(embrapaExtremesMigration, /'dew_point_daily_max'/);
+  assert.match(embrapaExtremesMigration, /'wind_speed_daily_max'/);
+  assert.match(embrapaExtremesMigration, /'extremeTime'/);
+  assert.match(embrapaExtremesMigration, /'period', 'day'/);
+  assert.match(embrapaExtremesMigration, /backfilledFromOwnArchive/);
+  assert.match(embrapaExtremesMigration, /do update set\s+value_numeric = excluded\.value_numeric/s);
 });
 
 test("environmental archive captures water-level sources without depending on page visits", () => {
