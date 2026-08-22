@@ -22,6 +22,8 @@ const radarCss = readFileSync(
   "src/production/components/home-radar-editorial.css",
   "utf8",
 );
+const weatherMap = readFileSync("src/production/components/weather-map.tsx", "utf8");
+const radarMapFrame = readFileSync("src/components/redemet/RadarMapFrame.tsx", "utf8");
 
 test("REDEMET limits animation payloads", () => {
   assert.match(radarRoute, /const MAX_FRAMES = 8;/);
@@ -163,4 +165,12 @@ test("radar isolated layer preserves map gestures and compact operational contro
   assert.match(radarCss, /map-canvas--satellite[\s\S]*width:\s*min\(680px/);
   assert.match(radarCss, /maplibregl-ctrl-bottom-right[\s\S]*top:\s*80px/);
   assert.doesNotMatch(radarCss, /!important/);
+});
+
+test("radar and satellite maps start roughly three zoom levels wider", () => {
+  assert.match(weatherMap, /center: PELOTAS_CENTER,[\s\S]*zoom: 4\.4,[\s\S]*minZoom: 4/);
+  assert.doesNotMatch(weatherMap, /zoom: 7\.4/);
+  assert.match(radarMapFrame, /fitBoundsOptions: \{ padding: 28, maxZoom: 4\.5 \}/);
+  assert.match(radarMapFrame, /\{ padding: 28, maxZoom: 4\.5, duration: 0 \}/);
+  assert.doesNotMatch(radarMapFrame, /maxZoom: 7\.5/);
 });
