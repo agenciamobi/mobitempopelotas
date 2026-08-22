@@ -1,31 +1,112 @@
-# Autenticação, conta, preferências e direitos LGPD
+# Autenticação, conta, painel, preferências e direitos LGPD
 
-## Princípio editorial
+Última atualização: 22/08/2026.
 
-A conta do Tempo Pelotas é opcional. Nenhuma página pública de previsão, chuva, vento, radar, satélite, câmeras, alertas ou situação das águas exige autenticação.
+## Princípio de produto
 
-O login existe somente para:
+A conta do Tempo Pelotas é opcional para o consumo do portal aberto. Nenhuma página pública de previsão, chuva, vento, radar, satélite, câmeras, alertas, dados oficiais ou situação das águas deve exigir autenticação apenas para criar escassez comercial.
 
-- identificação básica do visitante;
-- preferências opcionais de alertas meteorológicos e hidrológicos;
-- resumo diário opcional;
-- novidades do portal, quando autorizadas;
-- exercício dos direitos de acesso, correção, revogação e exclusão.
+A autenticação acrescenta uma camada pessoal ao portal:
 
-## Arquitetura
+- identificação básica;
+- preferências opcionais;
+- painel autenticado;
+- favoritos e locais acompanhados, quando implementados;
+- históricos e ferramentas definidos para a camada Free;
+- futuros recursos PRO por entitlement;
+- exercício de direitos LGPD.
+
+A política de separação Público / Free / PRO está em `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md`.
+
+## Arquitetura atual
 
 O fluxo usa Supabase Auth com Google, PKCE e cookies SSR:
 
-1. `/entrar` inicia `signInWithOAuth` no navegador;
-2. o Google retorna ao Supabase Auth;
-3. o Supabase redireciona para `/auth/callback` com um código temporário;
-4. a rota server-side troca o código pela sessão;
-5. a sessão é persistida em cookies pelo `@supabase/ssr`;
-6. `/minha-conta` valida o usuário no servidor antes de consultar dados privados;
-7. perfil e preferências são lidos e gravados sob RLS;
-8. alterações das quatro preferências geram eventos de consentimento somente quando o estado muda.
+1. `/conta` apresenta o login Google quando não existe sessão;
+2. `GoogleLoginCard` inicia `signInWithOAuth` no navegador;
+3. o Google retorna ao Supabase Auth;
+4. o Supabase redireciona para `/auth/callback` com código temporário;
+5. a rota server-side troca o código pela sessão;
+6. a sessão é persistida em cookies pelo `@supabase/ssr`;
+7. `/conta` valida o usuário no servidor e gerencia identidade, preferências, privacidade e sessão;
+8. `/painel` valida o usuário no servidor e funciona como shell autenticado comum a Free e PRO;
+9. perfil, preferências e camada de acesso são consultados sob RLS;
+10. alterações de preferências usam RPC server-side e geram eventos de consentimento quando o estado muda.
 
-O parâmetro `next` aceita somente caminhos internos normalizados. URLs externas, caminhos iniciados por `//` e variações com barra invertida são recusados.
+As rotas legadas `/entrar` e `/minha-conta` permanecem apenas como redirecionamentos de compatibilidade para `/conta`.
+
+O parâmetro `next` aceita somente caminhos internos normalizados. Isso permite que `/painel` envie o visitante para `/conta?next=/painel` e que, após o OAuth, o usuário retorne ao painel sem aceitar redirects externos.
+
+## Camada de acesso
+
+A migration `20260822043000_create_account_access.sql` cria `public.account_access`.
+
+Cada identidade autenticada recebe uma linha própria com:
+
+- `user_id`;
+- `tier` — `free` ou `pro`;
+- `status` — `active`, `suspended` ou `expired`;
+- `source` — origem da concessão, inicialmente `system`;
+- `valid_until` opcional;
+- timestamps de criação/atualização.
+
+Regras:
+
+- novos usuários nascem `free` e `active` automaticamente;
+- usuários existentes são preenchidos como Free pela migration;
+- o usuário autenticado pode somente **ler a própria linha**;
+- não existe escrita direta de `account_access` pelo browser autenticado;
+- escrita fica reservada a `service_role` e, futuramente, ao fluxo server-side de billing/administração;
+- ausência, expiração ou estado inválido nunca concede PRO por fallback.
+
+`src/lib/auth/account-access.ts` centraliza os entitlements. Componentes não devem espalhar verificações como `plan === "pro"`.
+
+A camada Free começa preparada para:
+
+- acesso ao painel;
+- preferências;
+- favoritos;
+- histórico de até 60 dias nos recursos definidos como Free.
+
+A camada PRO pode liberar, quando implementado e permitido pelas fontes:
+
+- histórico completo;
+- comparações entre períodos, estações e variáveis;
+- exportações;
+- radar/satélite avançados;
+- métricas de acurácia;
+- gráficos e análises avançadas.
+
+Esses entitlements não alteram a regra de que dados oficiais adequados à disseminação pública continuam públicos.
+
+## `/conta` e `/painel`
+
+### `/conta`
+
+Responsabilidades:
+
+- login quando não autenticado;
+- identidade;
+- nome de exibição;
+- preferências e consentimentos;
+- indicação da camada Free/PRO;
+- acesso ao painel;
+- exportação LGPD;
+- exclusão de conta;
+- logout.
+
+### `/painel`
+
+Responsabilidades:
+
+- exigir autenticação server-side;
+- permanecer `noindex, nofollow`;
+- apresentar a camada efetiva da conta;
+- funcionar como shell comum a Free e PRO;
+- receber progressivamente módulos pessoais e premium;
+- nunca ser usado para esconder conteúdo governamental que já pertence ao portal público.
+
+No primeiro estágio, o painel é intencionalmente um shell: ele identifica a conta e mostra a estrutura dos módulos sem fingir que favoritos, históricos avançados, comparações ou exportações já estão concluídos.
 
 ## Variáveis
 
@@ -40,61 +121,40 @@ VITE_SUPABASE_URL=
 VITE_SUPABASE_PUBLISHABLE_KEY=
 ```
 
-As variáveis `VITE_*` contêm somente URL e chave publicável. A chave administrativa permanece exclusivamente no servidor e é usada para operações que exigem remoção da identidade, exportação consolidada e armazenamento web push.
-
-## Configuração do Google e Supabase
-
-No projeto Supabase oficial:
-
-1. habilitar o provedor Google;
-2. cadastrar Client ID e Client Secret no painel do Supabase;
-3. configurar a URL pública do portal em **Site URL**;
-4. adicionar à allowlist de redirects:
-   - `https://DOMINIO-OFICIAL/auth/callback`;
-   - a URL equivalente do ambiente de preview;
-   - `http://localhost:PORTA/auth/callback` somente para desenvolvimento;
-5. remover URLs temporárias quando não forem mais usadas.
-
-No Google Auth Platform, o callback autorizado do cliente OAuth é o callback fornecido pelo próprio projeto Supabase (`/auth/v1/callback`).
+As variáveis `VITE_*` contêm somente URL e chave publicável. A chave administrativa permanece exclusivamente no servidor.
 
 ## Cookies e cache
 
-`src/lib/supabase/request-client.server.ts` adapta os cookies do `@supabase/ssr` ao formato universal Request/Response do TanStack Start.
+Respostas dependentes de sessão usam:
 
-Respostas que dependem de sessão usam:
-
-- `Cache-Control: private, no-store`;
+- `Cache-Control: private, no-store, max-age=0`;
 - `Pragma: no-cache`;
 - `Vary: Cookie, Authorization`.
 
-Isso impede que uma resposta contendo dados de uma conta seja reutilizada por cache compartilhado.
+Isso evita reutilização de respostas privadas por cache compartilhado.
 
-## Proteção dos dados
+## RLS e proteção
 
-As tabelas `profiles`, `user_preferences` e `account_consent_events` têm RLS habilitada. Usuários autenticados consultam somente os próprios registros.
+As tabelas `profiles`, `user_preferences`, `account_consent_events` e `account_access` possuem RLS.
 
-A interface não recebe:
+O browser autenticado não recebe:
 
-- access token;
-- refresh token;
+- access token como dado de aplicação;
+- refresh token como dado de aplicação;
 - chave administrativa;
-- ID interno do usuário;
 - dados de outras contas;
-- chaves criptográficas da inscrição web push.
+- chaves criptográficas web push;
+- mecanismo de escrita direta para promover a própria conta a PRO.
 
-## Histórico de consentimentos
+## Preferências e consentimentos
 
-A migration `20260723133000_add_account_lgpd_rights.sql` cria `account_consent_events` e atualiza `update_account_preferences`.
+`update_account_preferences` é a RPC controlada para atualizar perfil e preferências. O histórico de consentimentos preserva:
 
-O histórico registra:
-
-- canal alterado;
-- estado autorizado ou revogado;
-- origem da alteração;
+- canal;
+- estado autorizado/revogado;
+- origem;
 - versão da política;
-- data e hora.
-
-Um evento é gravado apenas quando o novo estado difere do último registro daquele canal. A tabela é apagada em cascata quando a identidade é excluída.
+- data/hora.
 
 ## Exportação dos dados
 
@@ -102,14 +162,9 @@ Um evento é gravado apenas quando o novo estado difere do último registro daqu
 GET /api/account/export
 ```
 
-A rota exige sessão autenticada e entrega um arquivo JSON contendo:
+A rota exige sessão e entrega JSON com os dados pessoais previstos pelo contrato atual. Tokens, chaves criptográficas e credenciais administrativas são omitidos.
 
-- dados básicos da conta;
-- perfil e preferências;
-- histórico de consentimentos;
-- inscrições de notificação vinculadas à conta.
-
-Tokens, chaves criptográficas e credenciais administrativas são omitidos por segurança. A resposta usa `Content-Disposition: attachment` e não pode ser armazenada em cache compartilhado.
+A camada de acesso deve ser incluída na revisão da exportação antes do lançamento comercial do PRO, sem confundir entitlement com histórico financeiro/fiscal.
 
 ## Exclusão da conta
 
@@ -122,53 +177,28 @@ Content-Type: application/json
 }
 ```
 
-A rota:
-
-- exige mesma origem;
-- limita o corpo JSON;
-- valida a sessão diretamente no Supabase;
-- exige a frase de confirmação exata;
-- remove a identidade pelo cliente administrativo;
-- encerra a sessão local;
-- depende de `ON DELETE CASCADE` para remover perfil, preferências, consentimentos e inscrições push vinculadas.
-
-Inscrições push anônimas não possuem `user_id` e não são removidas pela exclusão da conta. Elas continuam controladas pelo próprio aparelho e são eliminadas quando o visitante desativa o recurso ou o provedor responde com expiração.
+A rota exige mesma origem, limita o corpo, valida sessão, exige frase exata, remove a identidade pelo cliente administrativo e encerra a sessão local. `account_access` usa `ON DELETE CASCADE` e acompanha a exclusão da identidade.
 
 ## Logout
 
-`POST /auth/signout`:
-
-- aceita somente solicitação da mesma origem;
-- encerra a sessão local do dispositivo atual;
-- remove os cookies retornados pelo Supabase;
-- redireciona com status `303` para a página inicial.
-
-## Política pública
-
-A rota `/privacidade-e-dados` explica em linguagem direta:
-
-- quais dados são usados;
-- quais páginas continuam públicas;
-- eventos que determinam a retenção;
-- itens omitidos da exportação por segurança;
-- como baixar, corrigir, revogar ou excluir dados.
+`POST /auth/signout` encerra somente a sessão local do dispositivo atual e redireciona para a Home.
 
 ## Checklist de validação
 
-Antes de habilitar em produção:
+Antes de considerar a fundação da conta concluída:
 
-1. aplicar todas as migrations no Supabase oficial;
-2. regenerar `database.types.ts` a partir do schema aplicado;
-3. testar leitura anônima negada em perfis, preferências e consentimentos;
-4. testar login Google em preview e produção;
-5. confirmar criação automática de perfil e preferências no primeiro acesso;
-6. confirmar que um usuário não consegue consultar ou alterar outro usuário;
-7. testar retorno seguro para `/minha-conta` após o login;
-8. testar rejeição de `next=https://exemplo.com` e `next=//exemplo.com`;
-9. testar exportação e conferir ausência de tokens e chaves;
-10. testar registro de consentimento somente após mudança real;
-11. testar vínculo e desvinculação de inscrições push autenticadas e anônimas;
-12. testar exclusão e confirmar cascata nas quatro tabelas relacionadas;
-13. testar logout e invalidação da sessão local;
-14. confirmar que `/entrar` e `/minha-conta` permanecem `noindex`;
-15. validar `/privacidade-e-dados` no sitemap e no rodapé.
+1. confirmar a migration `account_access` no Supabase externo;
+2. confirmar RLS e ausência de escrita autenticada direta em `account_access`;
+3. testar login Google em preview e produção;
+4. confirmar criação automática de `profiles`, `user_preferences` e `account_access` no primeiro login;
+5. confirmar que o primeiro login recebe `Free`;
+6. validar retorno `/conta?next=/painel` → Google → callback → `/painel`;
+7. testar rejeição de `next=https://exemplo.com` e `next=//exemplo.com`;
+8. confirmar que uma conta não consulta dados privados de outra;
+9. validar `/conta` e `/painel` como `noindex`;
+10. testar atualização de preferências e consentimentos;
+11. testar exportação e ausência de secrets;
+12. testar exclusão e cascata, incluindo `account_access`;
+13. testar logout;
+14. repetir o E2E com duas contas descartáveis em navegador real;
+15. só depois avançar para favoritos, históricos Free e billing PRO.
