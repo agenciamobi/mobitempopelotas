@@ -6,6 +6,36 @@ export type Database = {
   };
   public: {
     Tables: {
+      account_access: {
+        Row: {
+          created_at: string;
+          source: string;
+          status: string;
+          tier: string;
+          updated_at: string;
+          user_id: string;
+          valid_until: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          source?: string;
+          status?: string;
+          tier?: string;
+          updated_at?: string;
+          user_id: string;
+          valid_until?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          source?: string;
+          status?: string;
+          tier?: string;
+          updated_at?: string;
+          user_id?: string;
+          valid_until?: string | null;
+        };
+        Relationships: [];
+      };
       account_consent_events: {
         Row: {
           channel: string;
@@ -450,6 +480,7 @@ export type Database = {
   };
 };
 
+export type AccountAccess = Database["public"]["Tables"]["account_access"]["Row"];
 export type AccountConsentEvent = Database["public"]["Tables"]["account_consent_events"]["Row"];
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type UserPreferences = Database["public"]["Tables"]["user_preferences"]["Row"];
