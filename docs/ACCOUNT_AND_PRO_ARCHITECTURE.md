@@ -61,11 +61,11 @@ A conta gratuita recebe tudo do nível Público, mais:
 - favoritos;
 - preferências;
 - personalizações futuras;
-- histórico de dados de até **60 dias**;
+- histórico de dados de até **60 dias** para datasets/recursos classificados como Free;
 - recursos gratuitos adicionais que ajudem o usuário a personalizar o acompanhamento do tempo e da Lagoa;
 - futuros alertas personalizados básicos, caso sejam reativados e validados.
 
-O limite de 60 dias é uma regra de acesso, não uma regra de retenção. O banco pode possuir anos de dados mesmo quando a conta gratuita enxerga apenas os 60 dias mais recentes.
+O limite de 60 dias é uma regra de acesso para recursos Free, não uma regra global de retenção nem uma regra para esconder dados oficiais já públicos. O banco pode possuir anos de dados mesmo quando determinado recurso Free enxerga apenas os 60 dias mais recentes.
 
 ### 3.3 PRO
 
@@ -73,7 +73,7 @@ O PRO recebe tudo do nível Público e Cadastrado Gratuito, mais acesso ao acerv
 
 Escopo inicial previsto:
 
-- histórico completo disponível no acervo;
+- histórico completo disponível no acervo quando o dataset permitir esse uso;
 - seletores de 7 dias;
 - 30 dias;
 - 60 dias;
@@ -84,16 +84,17 @@ Escopo inicial previsto:
 - comparação entre períodos;
 - comparação entre estações;
 - comparação entre variáveis;
-- exportações;
-- radares completos;
-- satélites completos;
+- exportações somente quando permitidas pela origem/dataset;
+- radares completos quando a política do produto permitir;
+- satélites completos quando a política do produto permitir;
 - séries/animações mais extensas quando a fonte e a licença permitirem;
 - arquivo de radar/satélite quando tecnicamente e contratualmente permitido;
 - métricas de acurácia da previsão;
 - gráficos avançados;
+- dados derivados e ferramentas próprias do Tempo Pelotas;
 - novos recursos premium desenvolvidos posteriormente.
 
-O benefício comercial deve ser comunicado como **histórico completo + ferramentas avançadas**, e não como se 7/30/60 dias fossem exclusivos, pois o cadastrado gratuito já terá acesso a até 60 dias.
+O benefício comercial deve ser comunicado como **histórico próprio/permitido + ferramentas avançadas + análise**, e não como simples cobrança por dados oficiais públicos.
 
 ## 4. Entitlements, não condicionais espalhadas por plano
 
@@ -101,7 +102,7 @@ O código não deve depender de dezenas de condicionais como `plan === "pro"` es
 
 A autorização deve ser baseada em capacidades/entitlements, por exemplo:
 
-- `history_access_days` — 60 para gratuito; ilimitado para PRO;
+- `history_access_days` — 60 para determinados recursos Free; ilimitado para PRO quando a política do dataset permitir;
 - `history_full`;
 - `history_compare`;
 - `station_compare`;
@@ -139,9 +140,9 @@ Regras obrigatórias:
 - autorização para dados pagos deve ocorrer no servidor, nunca apenas escondendo UI no navegador;
 - RLS deve continuar protegendo dados pessoais;
 - tabelas do acervo meteorológico/hidrológico não pertencem diretamente ao usuário;
-- a conta recebe permissão de leitura por APIs internas conforme entitlement;
-- exportações devem validar entitlement no servidor;
-- limites temporais devem ser aplicados server-side;
+- a conta recebe permissão de leitura por APIs internas conforme entitlement e política do dataset;
+- exportações devem validar entitlement e permissão do dataset no servidor;
+- limites temporais devem ser aplicados server-side quando fizerem parte do recurso;
 - dados e recursos públicos continuam acessíveis sem sessão.
 
 ## 7. Relação entre conta e Historical Data Layer
@@ -157,10 +158,11 @@ Coletores e normalizadores
     ↓
 Tempo Pelotas Historical Data Layer
     ↓
-APIs internas com autorização
+Política do dataset + APIs internas + autorização
     ├── Público
-    ├── Cadastrado gratuito — até 60 dias
-    └── PRO — acervo completo + ferramentas avançadas
+    ├── Cadastrado gratuito
+    ├── PRO
+    └── REVIEW / interno
 ```
 
 Não duplicar séries meteorológicas por usuário, plano ou assinatura.
@@ -180,7 +182,7 @@ O produto nunca deve apresentar reanálise como medição observada nem previsã
 
 Começar a coletar cedo é prioritário, porque tempo não capturado não pode ser reconstruído com a mesma fidelidade depois.
 
-Porém, coleta e monetização são decisões diferentes.
+Porém, coleta, exibição pública, cadastro gratuito, exportação e monetização são decisões diferentes.
 
 Para cada fonte devem existir metadados de governança contendo:
 
@@ -189,35 +191,41 @@ Para cada fonte devem existir metadados de governança contendo:
 - início da coleta própria pelo Tempo Pelotas;
 - política/termos revisados;
 - permissão de retenção conhecida;
+- permissão de exibição pública conhecida;
 - permissão de uso comercial conhecida;
+- permissão de exportação conhecida;
 - possibilidade de backfill;
 - observações de qualidade.
 
-**Enquanto o uso comercial de uma fonte não estiver revisado, o dado pode permanecer no arquivo operacional interno, mas não deve ser liberado automaticamente como conteúdo PRO/exportável.**
+**Fonte oficial adequada à disseminação pública deve permanecer no portal público e não deve ser transformada em diferencial exclusivo PRO.**
 
-Isso permite começar a preservar séries agora sem confundir armazenamento técnico com autorização comercial futura.
+**Enquanto uso comercial/exportação não estiverem revisados, o dado não deve ser liberado automaticamente como diferencial PRO/exportável.**
 
 ## 10. Ordem de implementação
 
 1. preservar e concluir a arquitetura atual de autenticação/conta;
-2. implementar plano e entitlements sem billing obrigatório nesta etapa;
-3. implementar favoritos e preferências adicionais;
-4. concluir E2E real de autenticação e autorização;
-5. construir e ampliar o Historical Data Layer em paralelo, iniciando a coleta o quanto antes;
-6. criar APIs históricas server-side;
-7. aplicar limite de até 60 dias ao cadastrado gratuito;
-8. liberar histórico completo e ferramentas avançadas ao PRO;
-9. integrar billing quando produto, preço e provedor estiverem definidos.
+2. implementar entitlements sem billing obrigatório nesta etapa;
+3. preparar o shell autenticado `/painel` para Free e PRO;
+4. implementar favoritos e preferências adicionais;
+5. concluir E2E real de autenticação e autorização;
+6. classificar datasets/recursos por Público, Free, PRO ou REVIEW;
+7. construir e ampliar o Historical Data Layer em paralelo;
+8. criar APIs históricas server-side com política por dataset;
+9. implementar primeiro valor real para o Free;
+10. implementar ferramentas PRO baseadas em patrimônio próprio/permitido;
+11. integrar billing quando produto, preço e provedor estiverem definidos.
 
 ## 11. Decisões que não devem ser revertidas sem revisão arquitetural
 
 - o portal público atual permanece público;
-- cadastrado gratuito recebe histórico de até 60 dias;
-- PRO recebe histórico completo disponível no acervo e ferramentas avançadas;
+- dados oficiais adequados à disseminação pública permanecem públicos;
+- cadastrado gratuito recebe personalização e recursos Free reais;
+- histórico de até 60 dias é limite de determinados recursos Free, não limite de dados oficiais públicos;
+- PRO recebe ferramentas avançadas, histórico próprio/permitido e valor derivado;
 - histórico pertence ao Tempo Pelotas Data Layer, não ao usuário;
 - autorização é baseada em entitlements;
 - retenção de dados começa antes do lançamento comercial do PRO;
-- nenhuma fonte com situação comercial pendente deve ser automaticamente exposta em recurso pago/exportável;
+- nenhuma fonte com situação comercial pendente deve ser automaticamente exposta como diferencial pago/exportável;
 - observação, previsão, reanálise e derivados permanecem semanticamente separados.
 
 ## 12. Inventário operacional de históricos
@@ -226,4 +234,14 @@ O detalhamento de fontes, variáveis, oportunidades de backfill, lacunas atuais,
 
 - `docs/HISTORICAL_DATA_INVENTORY.md`.
 
-Esse inventário é a referência operacional para decidir **o que coletar e preservar**. Este documento de conta continua sendo a referência para decidir **quem pode acessar cada profundidade e recurso**.
+Esse inventário é a referência operacional para decidir **o que coletar e preservar**. Este documento de conta continua sendo a referência para decidir **como a identidade e autorização funcionam**.
+
+## 13. Plano de aplicação Público / Free / PRO
+
+A decisão de produto mais recente e específica sobre distribuição de dados e recursos está documentada em:
+
+- `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md`.
+
+Esse documento refina esta arquitetura com quatro estados operacionais de acesso: **Público**, **Free autenticado**, **PRO** e **REVIEW/interno**.
+
+Em caso de ambiguidade entre textos anteriores deste documento e o plano de aplicação, prevalece a regra mais recente do plano de acesso: **dado oficial adequado à disseminação pública não deve ser deslocado para Free ou PRO apenas para criar paywall; Free agrega experiência pessoal e PRO agrega patrimônio próprio, profundidade, processamento, análise e ferramentas avançadas.**
