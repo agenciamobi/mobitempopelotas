@@ -8,6 +8,7 @@ const loginCard = readFileSync("src/components/auth/GoogleLoginCard.tsx", "utf8"
 const callbackRoute = readFileSync("src/routes/auth/callback.ts", "utf8");
 const signoutRoute = readFileSync("src/routes/auth/signout.ts", "utf8");
 const accountRoute = readFileSync("src/routes/conta.tsx", "utf8");
+const dashboardRoute = readFileSync("src/routes/painel.tsx", "utf8");
 const exportRoute = readFileSync("src/routes/api/account/export.ts", "utf8");
 const deleteRoute = readFileSync("src/routes/api/account/delete.ts", "utf8");
 
@@ -18,6 +19,7 @@ function assertPrivateResponseContract(source: string) {
 
 test("retorno pós-login aceita somente caminhos internos normalizados", () => {
   assert.equal(safeNextPath("/conta", "/"), "/conta");
+  assert.equal(safeNextPath("/painel", "/"), "/painel");
   assert.equal(safeNextPath("/conta?aba=privacidade#consentimentos", "/"), "/conta?aba=privacidade#consentimentos");
   assert.equal(safeNextPath("https://exemplo.com/roubo", "/conta"), "/conta");
   assert.equal(safeNextPath("//exemplo.com/roubo", "/conta"), "/conta");
@@ -48,7 +50,16 @@ test("área de conta é opcional, privada e não indexável", () => {
   assert.match(accountRoute, /name:\s*["']robots["'], content:\s*["']noindex, nofollow["']/);
   assert.match(accountRoute, /loader:\s*\(\)\s*=>\s*getAccountSnapshot\(\)/);
   assert.match(accountRoute, /snapshot\.status === ["']unauthenticated["']/);
-  assert.match(accountRoute, /GoogleLoginCard nextPath=["']\/conta["']/);
+  assert.match(accountRoute, /safeNextPath\(typeof search\.next/);
+  assert.match(accountRoute, /<GoogleLoginCard nextPath=\{nextPath\}/);
+});
+
+test("painel exige autenticação server-side e permanece fora do índice", () => {
+  assert.match(dashboardRoute, /createFileRoute\(["']\/painel["']\)/);
+  assert.match(dashboardRoute, /name:\s*["']robots["'], content:\s*["']noindex, nofollow["']/);
+  assert.match(dashboardRoute, /const snapshot = await getAccountSnapshot\(\)/);
+  assert.match(dashboardRoute, /snapshot\.status === ["']unauthenticated["']/);
+  assert.match(dashboardRoute, /redirect\(\{ to: ["']\/conta["'], search: \{ next: ["']\/painel["'] \} \}\)/);
 });
 
 test("exportação exige sessão e omite tokens e chaves criptográficas", () => {
