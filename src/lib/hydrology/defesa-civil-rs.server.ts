@@ -10,6 +10,7 @@ const REQUEST_TIMEOUT_MS = 8_000;
 const RETRY_DELAY_MS = 250;
 const REGIONAL_RADIUS_KM = 320;
 const MAX_REGIONAL_STATIONS = 36;
+const FUTURE_TIMESTAMP_TOLERANCE_MS = 5 * 60_000;
 
 const TAGS_DATA_QUERY = `
   query TempoPelotasRedeHidrometeorologica {
@@ -254,8 +255,8 @@ function publication(enabled: boolean) {
   return {
     enabled,
     note: enabled
-      ? "Integração habilitada no runtime após validação operacional das condições de uso."
-      : "Integração técnica preparada, mas a publicação permanece desabilitada até a validação das condições de uso da API.",
+      ? "Integração habilitada no runtime após validação técnica e operacional da fonte."
+      : "Integração técnica preparada; ativação aguarda validação do contrato, inventário, timestamps, referência dos níveis e condições indicadas pela documentação oficial.",
   };
 }
 
@@ -308,6 +309,19 @@ function normalizeTimestamp(value: string | number | null | undefined): string |
   const candidate = hasTimezone ? normalized : `${normalized}-03:00`;
   const date = new Date(candidate);
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+function trustedObservedAt(
+  value: string | number | null | undefined,
+  fetchedAt: Date,
+): string | null {
+  const normalized = normalizeTimestamp(value);
+  if (!normalized) return null;
+
+  const observed = new Date(normalized);
+  if (Number.isNaN(observed.getTime())) return null;
+  if (observed.getTime() > fetchedAt.getTime() + FUTURE_TIMESTAMP_TOLERANCE_MS) return null;
+  return normalized;
 }
 
 function distanceKm(latitude: number, longitude: number) {
@@ -363,7 +377,7 @@ function normalizeStation(
   if (latitude === null || longitude === null) return null;
   if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) return null;
 
-  const observedAt = normalizeTimestamp(station.timestamp);
+  const observedAt = trustedObservedAt(station.timestamp, fetchedAt);
   const timing = freshness(observedAt, fetchedAt);
   const rain = station.data?.chuva?.acumulado;
 
