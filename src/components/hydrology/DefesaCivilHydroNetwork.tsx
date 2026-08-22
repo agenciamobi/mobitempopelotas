@@ -19,6 +19,7 @@ import type {
 
 import { DefesaCivilHydroMap } from "./DefesaCivilHydroMap";
 import "./DefesaCivilHydroNetwork.css";
+import "./DefesaCivilHydroInventory.css";
 
 function formatNumber(value: number | null, digits = 1) {
   if (value === null) return "—";
