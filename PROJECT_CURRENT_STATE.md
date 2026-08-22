@@ -40,16 +40,16 @@ O Tempo Pelotas é um portal meteorológico regional focado em Pelotas e Zona Su
 | Trovoadas STSC | Ativo | Contrato atual da API REDEMET, filtro regional e contexto derivado de distância aproximada das ocorrências até Pelotas; nunca tratado como alerta oficial |
 | Mapa regional MapLibre | Ativo | Camadas de radar, satélite e trovoadas |
 | Hidrologia | Ativo | Laranjal, Lagoa dos Patos, Guaíba e rede regional; arquivo próprio ambiental em coleta contínua |
-| Rede Hidrometeorológica Defesa Civil RS | Pesquisa / inventário | API GraphQL e contratos técnicos identificados; ainda não é fonte ativa do runtime público. Próximo passo é inventariar códigos, bacias e capacidades das estações e revisar condições de uso |
+| Rede Hidrometeorológica Defesa Civil RS | Implementação técnica / desativada | Adapter GraphQL server-side, mapa e seção em `/situacao-hidrologica-pelotas` estão preparados; `DEFESA_CIVIL_HYDRO_ENABLED=false` evita consulta e exposição até validar inventário de estações, timezone e referência dos níveis |
 | Histórico climático | Ativo | Janela pública de 30 dias com fonte/fallback documentados |
-| Historical Data Layer | Ativo / em expansão | Arquivo canônico privado com observações Embrapa, extremos diários, níveis hidrológicos e forecast runs ricos do Open-Meteo; classes `observation`, `forecast`, `reanalysis` e `derived` permanecem separadas |
+| Historical Data Layer | Ativo / em expansão | Arquivo canônico privado com observações Embrapa, extremos diários, níveis hidrológicos, forecast runs ricos Open-Meteo/MET Norway, eventos estruturados e série horária INMET A887; classes `observation`, `forecast`, `reanalysis` e `derived` permanecem separadas |
 | Registro histórico da enchente de 2024 | Ativo | Rota pública `/enchente-2024-pelotas-laranjal` registra a linha do tempo da cheia, a propagação Guaíba → Lagoa dos Patos → Pelotas/Laranjal → estuário e a fase de reconstrução |
 | Câmeras | Ativo com dependência externa | YouTube, live/replay e contingências |
 | Páginas regionais | Ativo | 23 cidades além de Pelotas |
 | Blog | Ativo | Rota pública e indexável |
 | SEO técnico | Ativo | Canonical, sitemap, robots, OG/Twitter, Schema.org e imagem social raster |
 | Supabase externo | Ativo | Banco, migrations, RLS, conta/entitlement e coletores históricos implantados; E2E autenticado com duas contas ainda precisa de validação real |
-| Login Google / conta | Parcial operacional | Conta, LGPD, Free/PRO estrutural e login por Google Identity Services + ID Token implementados; falta configurar/confirmar `VITE_GOOGLE_CLIENT_ID` no ambiente publicado e concluir E2E real |
+| Login Google / conta | Parcial operacional | Conta, LGPD, Free/PRO estrutural e login por Google Identity Services + ID Token implementados; `VITE_GOOGLE_CLIENT_ID` está configurado no build de produção e falta concluir E2E real |
 | Weather AI | Ativo controlado | Snapshot persistido, orçamento mensal e fallback determinístico |
 | PWA / Web Push | Suspenso para ativação pública | Código preservado; reativação depende de validação real de navegador e rolagem |
 | CPTEC/SIGMA | Pesquisa futura | Não integrar ao runtime público antes da revisão institucional planejada para novembro/dezembro de 2026 |
@@ -181,7 +181,7 @@ O núcleo meteorológico combina múltiplas fontes e regras de reconciliação, 
 - Open-Meteo: previsão principal/fallback em vários fluxos e páginas;
 - a série principal do Open-Meteo preserva, quando fornecidos, volume de precipitação por hora, direção do vento em graus e perfil atmosférico com umidade, ponto de orvalho, pressão, visibilidade, nuvens por camada, CAPE e altura da camada limite;
 - o coletor de precisão também preserva, desde 22/08/2026, um forecast run horário rico do Open-Meteo por ciclo de 6 horas, separado da tabela diária de acurácia;
-- MET Norway: fonte complementar no domínio de previsão e contingência, preservando campos horários compatíveis; somente `next_1_hours.precipitation_amount` pode ser tratado como volume horário, evitando rotular acumulados de 6h/12h como chuva de uma hora;
+- MET Norway: fonte complementar no domínio de previsão e contingência, preservando campos horários compatíveis; o arquivo rico próprio também preserva snapshots separados por provedor/ciclo e somente `next_1_hours.precipitation_amount` é tratado como volume horário, evitando rotular acumulados de 6h/12h como chuva de uma hora;
 - a recuperação Open-Meteo no navegador preserva até 24 horas dos campos horários ricos quando o SSR precisou usar contingência;
 - lógica centralizada para condição atual, hora a hora e dias seguintes;
 - páginas dedicadas para hoje, amanhã, sete dias, chuva, vento e meteograma;
@@ -238,7 +238,10 @@ O projeto usa INMET para:
 - alertas oficiais aplicáveis a Pelotas;
 - produtos/fontes meteorológicas oficiais complementares;
 - mapa/registros de geadas;
-- satélite oficial complementar onde o fluxo específico utiliza essa fonte.
+- satélite oficial complementar onde o fluxo específico utiliza essa fonte;
+- arquivo histórico horário da estação A887 — Capão do Leão (Pelotas), importado dos arquivos anuais oficiais e mantido separado das leituras correntes de outras fontes.
+
+O arquivo horário A887 possui cobertura confirmada desde **18/07/2019 17:00 UTC**; o arquivo anual de 2018 não contém a estação. O backfill versionado cobre 2019–2026 conforme os arquivos oficiais disponíveis, preservando ausências como ausência e não como zero.
 
 O parser CAP/RSS preserva, quando fornecidos pela fonte, evento, headline, descrição, instruções, severidade, horário de publicação, início, término, áreas, municípios e códigos municipais. A rota `/alertas` mantém a leitura prioritária enxuta e oferece uma camada progressiva em que o visitante pode expandir cada publicação para conferir horários e a abrangência territorial completa recebida do INMET.
 
@@ -287,6 +290,8 @@ O Tempo Pelotas filtra ocorrências em uma área regional de até 450 km de Pelo
 
 A página pública usa as coordenadas já recebidas para calcular distância aproximada em linha reta até um ponto de referência de Pelotas e distribuir as ocorrências do quadro válido mais recente em três faixas: até 50 km, 50–150 km e 150–450 km. Essa distância serve apenas para localização contextual; não mede intensidade, não projeta trajetória e não substitui orientação ou aviso oficial.
 
+Eventos STSC e avisos INMET também possuem arquivo estruturado próprio para preservar ocorrências ao longo do tempo sem misturá-las com séries numéricas de observação.
+
 ### Proxy e segurança
 
 - hosts da API são allowlisted;
@@ -331,20 +336,25 @@ A página `/situacao-hidrologica-pelotas` deve funcionar mesmo quando uma ou mai
 
 O Historical Data Layer captura níveis ambientais a cada 5 minutos e executa backfill diário da janela ainda exposta pelas fontes, com deduplicação por estação/variável/timestamp e registro de execução.
 
-### Rede Hidrometeorológica da Defesa Civil RS — pesquisa
+### Rede Hidrometeorológica da Defesa Civil RS — implementação técnica preparada
 
-Documentação de planejamento: `docs/DEFESA_CIVIL_RS_HYDROMET_PLAN.md`.
+Documentação especializada: `docs/DEFESA_CIVIL_RS_HYDROMET_PLAN.md`.
 
-A API GraphQL e os contratos de consulta/histórico/nowcasting foram identificados tecnicamente, mas a rede **ainda não é consumida pelo runtime público**. O próximo passo é obter o inventário completo de estações `DCRS-xxxxx`, associar código, nome, coordenadas, bacia e capacidades e somente então selecionar os pontos de produção.
+A API GraphQL e os contratos de consulta/histórico/nowcasting estão identificados, e o adapter server-side, função de cache, mapa MapLibre e seção da rota `/situacao-hidrologica-pelotas` já foram integrados ao código atual.
 
-A regra de seleção já foi definida:
+A ativação permanece deliberadamente desligada por `DEFESA_CIVIL_HYDRO_ENABLED=false`. Nesse estado, o adapter retorna `disabled` **sem consultar a API externa** e o componente não é renderizado. Portanto, a rede ainda não é uma fonte ativa exibida no runtime público.
+
+Conforme `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md`, dados oficiais adequados à disseminação pública são destinados à camada pública do portal; a flag da Defesa Civil é um gate técnico de validação, não um paywall Free/PRO.
+
+A regra de seleção permanece:
 
 - para meteorologia, interessa a rede regional ao sul de Porto Alegre e no entorno da Lagoa dos Patos quando houver sensores válidos e leitura recente;
 - para hidrologia, entram somente estações ligadas fisicamente ao Guaíba/Lagoa dos Patos, afluentes relevantes da Bacia do Camaquã, sistema Mirim–São Gonçalo, orla da Lagoa e estuário de Rio Grande;
 - proximidade geográfica isolada não transforma uma estação em contexto hidrológico;
-- as cores dos produtos de chuva da rede não devem ser interpretadas como limiares de alerta.
+- as cores dos produtos de chuva da rede não devem ser interpretadas como limiares de alerta;
+- níveis absolutos de réguas distintas não devem ser comparados por simples subtração.
 
-As condições de uso devem ser revisadas antes da ativação pública/comercial da nova fonte.
+Antes de ligar `DEFESA_CIVIL_HYDRO_ENABLED=true`, ainda é necessário validar uma resposta real no runtime, inventariar códigos `DCRS-xxxxx`, bacias e capacidades, confirmar timezone quando o timestamp vier sem offset e confirmar unidade/referência vertical de `rio_nivel` por estação. A documentação pública da API deve continuar sendo consultada para condições específicas de uso, retenção ou redistribuição quando aplicáveis.
 
 ### Registro histórico da enchente de 2024
 
@@ -414,9 +424,11 @@ Já estão ativos:
 - extremos diários Embrapa como um ponto canônico por dia local, preservando o horário informado do extremo como metadado;
 - níveis do Laranjal, rede da Lagoa dos Patos, Cais Mauá e Gasômetro em coleta ambiental;
 - coleta ambiental a cada 5 minutos e backfill diário da janela oferecida pelas fontes;
-- `weather_forecast_runs` e `weather_forecast_hourly_points` para forecast runs ricos do Open-Meteo.
+- `weather_forecast_runs` e `weather_forecast_hourly_points` para forecast runs ricos separados do Open-Meteo e do MET Norway;
+- `historical_events` para eventos estruturados como STSC e avisos INMET, sem misturar eventos com séries numéricas;
+- arquivo horário compacto da estação INMET A887, com cobertura confirmada desde 18/07/2019 e backfill até o arquivo anual de 2026 disponível no momento da importação.
 
-O primeiro run rico Open-Meteo foi validado em produção em 22/08/2026 com 168 pontos horários e a repetição da captura no mesmo ciclo manteve um único run completo. `captured_at` representa a captura do Tempo Pelotas, não um horário de emissão oficial do modelo quando a fonte não o informa.
+O primeiro run rico Open-Meteo foi validado em produção em 22/08/2026 com 168 pontos horários e a repetição da captura no mesmo ciclo manteve um único run completo. O primeiro snapshot rico MET Norway também foi validado separadamente, preservando apenas precipitação realmente horária quando `next_1_hours` existe. `captured_at` representa a captura do Tempo Pelotas, não um horário de emissão oficial do modelo quando a fonte não o informa.
 
 ### Snapshots meteorológicos
 
@@ -477,7 +489,7 @@ Princípios:
 - privilégios mínimos para fluxos públicos;
 - validação de advisors e políticas conforme documentação de segurança.
 
-Estruturas recentes implantadas incluem `account_access`, reparação segura da fundação da conta, Historical Data Layer, extremos diários Embrapa e arquivo rico de forecast runs Open-Meteo.
+Estruturas recentes implantadas incluem `account_access`, reparação segura da fundação da conta, Historical Data Layer, extremos diários Embrapa, forecast runs ricos Open-Meteo/MET Norway, arquivo de eventos e histórico horário INMET A887.
 
 Estado atual: banco, migrations e endurecimento de RLS estão implantados. O ciclo completo com **duas contas descartáveis** ainda deve ser validado em navegador real para confirmar login, isolamento, consentimento, exportação e exclusão ponta a ponta.
 
@@ -489,7 +501,7 @@ O login Google atual usa:
 
 `Google Identity Services -> Google ID Token -> Supabase signInWithIdToken() -> sessão Supabase`.
 
-Isso evita que o fluxo principal do botão Google navegue pelo host técnico `*.supabase.co/auth/v1/callback`. O arquivo `src/lib/auth/google-identity.ts` carrega GIS e cria nonce via Web Crypto; `GoogleLoginCard` troca o ID Token pela sessão Supabase. A variável pública necessária é `VITE_GOOGLE_CLIENT_ID`. O Client Secret do Google não pertence ao browser nem ao repositório.
+Isso evita que o fluxo principal do botão Google navegue pelo host técnico `*.supabase.co/auth/v1/callback`. O arquivo `src/lib/auth/google-identity.ts` carrega GIS e cria nonce via Web Crypto; `GoogleLoginCard` troca o ID Token pela sessão Supabase. A variável pública necessária `VITE_GOOGLE_CLIENT_ID` está configurada em `.env.production`. O Client Secret do Google não pertence ao browser nem ao repositório.
 
 Rotas principais:
 
@@ -521,7 +533,7 @@ Recursos existentes:
 - PRO estrutural com histórico completo, comparações, exportação e recursos avançados quando a fonte/política permitir;
 - RPC `ensure_current_user_account_foundation()` para reparar perfil/preferências/acesso ausentes sem conceder PRO por fallback.
 
-Pendência principal: configurar/confirmar o Web Client ID público no ambiente publicado e concluir o E2E real com duas contas descartáveis e registro da evidência operacional.
+Pendência principal: concluir o E2E real com duas contas descartáveis e registrar evidência operacional de login, isolamento, consentimentos, exportação, logout e exclusão.
 
 ## 15. APIs internas e endpoints funcionais
 
@@ -640,6 +652,7 @@ Grupos de configuração existentes no template:
 - VAPID/Web Push;
 - Gemini/Weather AI;
 - REDEMET;
+- Defesa Civil RS (`DEFESA_CIVIL_HYDRO_ENABLED`, exclusivamente server-side);
 - URL canônica do site.
 
 ## 19. GitHub Actions e observabilidade
@@ -704,7 +717,8 @@ A suíte de contratos cobre, entre outros domínios:
 
 - níveis de água;
 - Historical Data Layer, coletores ambientais e extremos Embrapa;
-- forecast runs ricos do Open-Meteo, separação run/pontos horários e RLS;
+- forecast runs ricos Open-Meteo/MET Norway, separação run/pontos horários e RLS;
+- arquivo de eventos estruturados e histórico horário INMET A887;
 - Web Push;
 - segurança de banco;
 - conta/autenticação/entitlements;
@@ -718,6 +732,7 @@ A suíte de contratos cobre, entre outros domínios:
 - fontes INMET;
 - reconciliação de temperatura;
 - REDEMET e contratos HAR;
+- adapter e feature flag da Defesa Civil RS, preservação de dados ausentes, separação de observação x alerta/risco e renderização segura do mapa;
 - enriquecimento público derivado dos HARs, incluindo SIMAGRO visual-only, profundidade temporal/atividade elétrica REDEMET e abrangência territorial detalhada do INMET;
 - coerência editorial da Home;
 - coesão visual entre Home e páginas internas/dedicadas;
@@ -798,7 +813,7 @@ A integração pública com CPTEC/SIGMA foi deliberadamente adiada para revisão
 | `docs/REDEMET_OPERATIONS.md` | Fonte operacional da integração REDEMET |
 | `docs/HAR_PUBLIC_ENRICHMENT_2026-08-21.md` | Revisão sanitizada dos HARs recentes, oportunidades de conteúdo público, decisões de uso e fontes deliberadamente não ativadas |
 | `docs/SIMAGRO_RS_HAR_REVIEW.md` | Contrato da camada visual complementar WRF/GFS do SIMAGRO RS, sem uso numérico dos PNGs |
-| `docs/DEFESA_CIVIL_RS_HYDROMET_PLAN.md` | Pesquisa e plano de integração meteorológica/hidrológica da Rede da Defesa Civil RS; ainda sem consumo produtivo |
+| `docs/DEFESA_CIVIL_RS_HYDROMET_PLAN.md` | Implementação técnica preparada da Rede Hidrometeorológica da Defesa Civil RS; ativação pública depende das validações técnicas documentadas |
 | `docs/CPTEC_SIGMA_RESEARCH.md` | Pesquisa futura CPTEC/SIGMA, sem integração produtiva |
 | `docs/RUNTIME_READINESS.md` | Preflight e requisitos do runtime |
 | `docs/PRODUCTION_CUTOVER.md` | Runbook de corte/produção |
@@ -820,16 +835,16 @@ A integração pública com CPTEC/SIGMA foi deliberadamente adiada para revisão
 
 Estas são pendências de produto/operação, não funcionalidades inexistentes disfarçadas de prontas:
 
-1. configurar/confirmar `VITE_GOOGLE_CLIENT_ID` no ambiente publicado e executar E2E de autenticação com duas contas descartáveis, incluindo isolamento RLS, consentimentos, exportação, logout e exclusão;
-2. continuar a Prioridade 0 do Historical Data Layer com forecast run rico do MET Norway, STSC estruturado e arquivo de eventos INMET;
-3. avançar o inventário/backfill observacional com Embrapa/UFPel, INMET e ANA/RHN somente após validar semântica, unidade, timezone, proveniência e regras de retenção/uso;
-4. desenhar rollups horários/diários/mensais antes de servir janelas longas do arquivo aos usuários;
+1. executar E2E de autenticação com duas contas descartáveis, incluindo isolamento RLS, consentimentos, exportação, logout e exclusão;
+2. desenhar rollups horários/diários/mensais e APIs históricas server-side antes de servir janelas longas do arquivo aos usuários;
+3. continuar backfills observacionais seguros e oportunidades de longo prazo, incluindo Embrapa/UFPel e ANA/RHN, somente com semântica, unidade, timezone, proveniência e governança validadas;
+4. auditar cobertura/lacunas e saúde dos coletores históricos já ativos, incluindo INMET A887, eventos, Open-Meteo, MET Norway, Embrapa e hidrologia;
 5. reativar PWA/Web Push somente após validação controlada de navegador e rolagem;
 6. executar auditoria final WCAG 2.2 AA, Core Web Vitals e responsividade ampla;
 7. formalizar rollback de aplicação, banco, DNS e caches;
 8. continuar monitorando a disponibilidade das fontes externas, principalmente radar REDEMET, produtos gráficos do SIMAGRO RS e hidrologia regional;
 9. retomar avaliação CPTEC/SIGMA em novembro/dezembro de 2026, sem assumir previamente autorização ou integração;
-10. concluir o inventário de estações da Rede Hidrometeorológica da Defesa Civil RS, revisar condições de uso e validar bacias/unidades antes de qualquer ativação pública;
+10. validar resposta real da Rede Hidrometeorológica da Defesa Civil RS, inventário DCRS, bacias/capacidades, timezone e unidade/referência dos níveis e somente então habilitar `DEFESA_CIVIL_HYDRO_ENABLED=true`;
 11. manter a limpeza de dívida histórica de lint/formatação separada de mudanças funcionais.
 
 ## 25. Regra de manutenção deste arquivo
@@ -989,8 +1004,10 @@ A base técnica atual reduz bastante o trabalho necessário para o produto pago.
 - Historical Data Layer canônico;
 - observação Embrapa centralizada e extremos diários;
 - arquivo de precisão de previsão;
-- forecast runs ricos do Open-Meteo;
+- forecast runs ricos Open-Meteo/MET Norway;
 - coleta histórica hidrológica;
+- arquivo estruturado de eventos;
+- histórico horário INMET A887 desde 2019;
 - mapa MapLibre e camadas meteorológicas existentes;
 - radar, satélite e STSC;
 - hidrologia regional;
@@ -1406,6 +1423,8 @@ Regras:
 - página pública `/pro` pode ser publicada antes do checkout somente se deixar claro o estado comercial;
 - billing não deve ser habilitado antes de schema, webhook e E2E estarem confirmados.
 
+A integração da Defesa Civil usa uma flag operacional separada, `DEFESA_CIVIL_HYDRO_ENABLED`, que protege ativação técnica da fonte e não representa entitlement Free/PRO.
+
 ## 43. Roadmap de implementação até produção
 
 ### Fase 0 — decisão e documentação
@@ -1429,13 +1448,14 @@ Já existe:
 - `/conta`;
 - `/painel` autenticado/noindex;
 - Google Identity Services + ID Token;
+- Web Client ID público configurado no build de produção;
 - `account_access` Free/PRO;
 - entitlements centralizados;
 - preferências/consentimentos;
 - exportação/exclusão/logout;
 - reparação segura da fundação da conta.
 
-Critério restante: configurar/confirmar `VITE_GOOGLE_CLIENT_ID` no ambiente publicado e executar E2E com duas contas descartáveis.
+Critério restante: executar E2E com duas contas descartáveis.
 
 ### Fase 2 — inventário e governança das fontes
 
@@ -1446,9 +1466,10 @@ Entregas já iniciadas:
 - `docs/HISTORICAL_DATA_INVENTORY.md`;
 - classes observation/forecast/reanalysis/derived;
 - governança `paid_access_allowed` e `retention_policy_status`;
-- separação Público/Free/PRO/REVIEW.
+- separação Público/Free/PRO/REVIEW;
+- implementação técnica da Defesa Civil RS preparada e protegida por flag até validar estações/semântica.
 
-Próximos focos: INMET, Embrapa/UFPel, ANA/RHN, Defesa Civil RS e revisão comercial das fontes candidatas.
+Próximos focos: Embrapa/UFPel, ANA/RHN, Defesa Civil RS e revisão de fontes candidatas a ferramentas pagas/exportáveis.
 
 ### Fase 3 — patrimônio histórico e APIs internas
 
@@ -1459,14 +1480,16 @@ Já implantado:
 - Historical Data Layer canônico;
 - coleta Embrapa + extremos;
 - hidrologia a cada 5 minutos + backfill diário;
-- forecast run rico Open-Meteo por ciclo;
+- forecast run rico Open-Meteo;
+- forecast run rico MET Norway;
+- eventos estruturados STSC/INMET;
+- histórico horário INMET A887 desde 2019;
 - RLS e fontes com uso pago bloqueado por padrão.
 
 Próximos passos:
 
-- MET Norway rico;
-- STSC/eventos INMET;
-- backfills observacionais aprovados;
+- auditoria de cobertura/gaps dos arquivos atuais;
+- backfills observacionais adicionais aprovados;
 - rollups horários/diários/mensais;
 - APIs históricas server-side com entitlement e política por dataset.
 
@@ -1588,15 +1611,16 @@ O PRO só pode ser considerado comercialmente em produção quando todos os iten
 A ordem operacional atual é:
 
 1. manter a Home pública estável e evitar complexidade sem necessidade;
-2. finalizar `VITE_GOOGLE_CLIENT_ID` e E2E da conta com duas contas descartáveis;
-3. continuar a coleta histórica sem esperar billing: MET Norway rico, eventos estruturados e backfills seguros;
+2. concluir E2E da conta com duas contas descartáveis;
+3. auditar e consolidar o patrimônio histórico já coletado, incluindo cobertura/gaps;
 4. definir rollups e APIs históricas server-side;
-5. construir valor real no painel Free, começando pelos históricos/datasets liberados;
-6. concluir a matriz de governança para o que poderá entrar no PRO;
-7. somente então escolher cobrança/preço e ligar billing ao `account_access` existente;
-8. construir profundidade PRO determinística;
-9. adicionar IA PRO depois que dados, entitlement e orçamento estiverem sólidos;
-10. executar hardening e lançamento controlado.
+5. validar inventário/semântica da Defesa Civil RS antes de ativar a nova fonte;
+6. construir valor real no painel Free, começando pelos históricos/datasets liberados;
+7. concluir a matriz de governança para o que poderá entrar no PRO;
+8. somente então escolher cobrança/preço e ligar billing ao `account_access` existente;
+9. construir profundidade PRO determinística;
+10. adicionar IA PRO depois que dados, entitlement e orçamento estiverem sólidos;
+11. executar hardening e lançamento controlado.
 
 Até a integração real de billing, nenhuma tela deve sugerir que o PRO está disponível para compra em produção.
 
@@ -1646,18 +1670,23 @@ Concluído/ativo:
 5. Historical Data Layer canônico;
 6. coleta histórica Embrapa e hidrologia;
 7. extremos diários Embrapa;
-8. forecast run rico Open-Meteo.
+8. forecast run rico Open-Meteo;
+9. forecast run rico MET Norway;
+10. arquivo de eventos estruturados;
+11. histórico horário INMET A887 desde 2019;
+12. integração técnica da Defesa Civil RS preparada e desligada por flag até validação.
 
 Em andamento/próximo:
 
 1. E2E real do login GIS com duas contas;
-2. forecast run rico MET Norway;
-3. backfills observacionais seguros;
+2. auditoria de cobertura/gaps do patrimônio histórico já coletado;
+3. backfills observacionais adicionais seguros;
 4. rollups e APIs históricas server-side;
-5. primeiro painel Free com histórico de até 60 dias nos datasets aprovados;
-6. governança das fontes candidatas ao PRO;
-7. billing somente depois de o produto autenticado demonstrar valor;
-8. IA e ferramentas avançadas depois que a camada determinística estiver sólida.
+5. validação técnica/inventário da Defesa Civil RS;
+6. primeiro painel Free com histórico de até 60 dias nos datasets aprovados;
+7. governança das fontes candidatas ao PRO;
+8. billing somente depois de o produto autenticado demonstrar valor;
+9. IA e ferramentas avançadas depois que a camada determinística estiver sólida.
 
 Documentos que devem ser consultados em conjunto antes de ampliar esta etapa:
 
