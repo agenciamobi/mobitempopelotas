@@ -1,56 +1,69 @@
-# Defesa Civil RS — plano de integração hidrometeorológica
+# Defesa Civil RS — integração hidrometeorológica
 
 Última consolidação: 22/08/2026  
-Estado: **implementação técnica preparada / ativação pública pendente de validação técnica**  
-Runtime público: **integrado ao código, oculto por `DEFESA_CIVIL_HYDRO_ENABLED=false`**
+Estado: **integração pública ativa / inventário e governança avançada em evolução**  
+Runtime público: **ativo por padrão; `DEFESA_CIVIL_HYDRO_ENABLED=false` funciona como kill switch server-side**
 
 ## 1. Objetivo
 
-Usar a Rede de Monitoramento Hidrometeorológico da Defesa Civil do Rio Grande do Sul como fonte oficial regional complementar do Tempo Pelotas em dois eixos distintos:
+Usar a Rede de Monitoramento Hidrometeorológico da Defesa Civil do Rio Grande do Sul como fonte oficial regional complementar do Tempo Pelotas em dois eixos:
 
-1. **meteorologia regional** — estações com chuva, temperatura, vento, rajadas, pressão, umidade, sensação térmica e radiação quando esses sensores existirem e estiverem atualizados;
-2. **hidrologia regional** — nível e chuva em estações cuja posição e bacia ajudem a entender o sistema Guaíba → Lagoa dos Patos → estuário de Rio Grande e o sistema Lagoa Mirim → Canal São Gonçalo.
+1. **meteorologia regional** — chuva, temperatura, vento, rajadas, pressão, umidade, sensação térmica e radiação quando esses sensores existirem e estiverem atualizados;
+2. **hidrologia regional** — nível e chuva em estações cuja posição e bacia ajudem a compreender o sistema Guaíba → Lagoa dos Patos → estuário de Rio Grande e o sistema Lagoa Mirim → Canal São Gonçalo.
 
 A integração não substitui silenciosamente a Estação Laranjal, Embrapa, SACE ou outra fonte já consolidada. Observação, previsão e alerta oficial permanecem semanticamente separados.
 
-## 2. Política de acesso
+## 2. Política de acesso e produto
 
-A decisão de produto vigente está em `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md`.
+A leitura oficial básica da Defesa Civil RS é tratada pelo Tempo Pelotas como **informação pública do portal**, com fonte e créditos explícitos.
 
-Para esta integração:
+Regra de produto:
 
-- leituras oficiais adequadas à disseminação pública são destinadas à **camada pública** do Tempo Pelotas;
 - não criar paywall Free/PRO para esconder a leitura oficial básica;
-- Free e PRO podem futuramente agregar personalização, histórico, comparação, análise e ferramentas próprias, conforme a política de cada dataset;
-- exportação em massa, retenção longa ou uso como diferencial comercial continuam sujeitos à governança específica da fonte/dataset;
-- atribuição à Defesa Civil RS permanece explícita;
+- o Tempo Pelotas público informa e dissemina;
+- Free agrega conta, preferências, favoritos e ferramentas gratuitas;
+- PRO agrega profundidade, histórico autorizado, comparações, análises, personalização, indicadores e ferramentas próprias;
+- o valor comercial deve ser construído sobre a experiência e as ferramentas do Tempo Pelotas, não sobre bloquear a visualização de um dado oficial;
+- exportação em massa, retenção longa, API comercial ou redistribuição específica continuam sujeitos à governança do dataset e à documentação aplicável;
 - a integração não deve ser apresentada como parceria, homologação ou chancela institucional.
 
-A feature flag atual é uma proteção **técnica**, não uma regra de monetização: ela permanece desligada até validar inventário, timezone, unidade e referência dos níveis.
+Essa política segue `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md`.
 
-## 3. Evidência técnica validada
+## 3. Créditos institucionais
 
-A documentação pública da Defesa Civil RS informa a API GraphQL:
+A interface pública deve preservar de forma visível:
+
+- **Rede de Monitoramento Hidrometeorológico da Defesa Civil RS**;
+- **Defesa Civil do Estado do Rio Grande do Sul**;
+- **Casa Militar do Estado do Rio Grande do Sul**;
+- indicação de que os dados são disponibilizados pela Defesa Civil RS através da MKS, conforme a documentação oficial da API;
+- links para o mapa oficial e para a documentação oficial.
+
+O texto institucional do Tempo Pelotas pode explicar que o portal organiza e ajuda a disseminar informações oficiais de órgãos públicos e fontes confiáveis, preservando estação, horário, unidade e origem.
+
+## 4. Evidência técnica validada
+
+Endpoint GraphQL oficial:
 
 `https://redehidrometeorologica.defesacivil.rs.gov.br/graphql`
 
-Contratos identificados:
+Contratos documentados:
 
 - `Historic` — consulta histórica por estação/período;
 - `Tags_data` — consulta filtrada de estações/leituras;
 - `Nowcasting` / `nowcasting_unique` — atualização em tempo real via Subscription.
 
-Parâmetros institucionais observados/documentados:
+Parâmetros institucionais:
 
 - `system: Qualle_Hidrometeorologia`;
 - `client/clients: casa-militar-defesa-civil-rs`;
 - códigos de estação no padrão `DCRS-xxxxx`.
 
-O código preparado usa `tags_data`, `clients: ["casa-militar-defesa-civil-rs"]` e filtro de localização para a UF `43` (Rio Grande do Sul).
+O runtime atual usa `tags_data`, `clients: ["casa-militar-defesa-civil-rs"]` e filtro de localização para a UF `43` — Rio Grande do Sul.
 
-## 4. Implementação atual no repositório
+## 5. Implementação atual
 
-Arquivos ativos:
+Arquivos principais:
 
 - `src/lib/hydrology/defesa-civil-rs.server.ts`;
 - `src/lib/hydrology/defesa-civil-rs.functions.ts`;
@@ -61,38 +74,52 @@ Arquivos ativos:
 - `src/routes/situacao-hidrologica-pelotas.tsx`;
 - `tests/hydrology-overview-page.test.ts`.
 
-Fluxo preparado:
+Fluxo:
 
 `API GraphQL oficial → adapter server-side → Zod → normalização → recorte regional → cache server-side → /situacao-hidrologica-pelotas`
 
 O navegador não chama a GraphQL institucional diretamente.
 
-### 4.1. Feature flag
+## 6. Ativação e kill switch
 
-Variável server-only:
+A integração pública fica habilitada por padrão.
 
-`DEFESA_CIVIL_HYDRO_ENABLED=false`
+Variável exclusivamente server-side:
 
-Regras:
+`DEFESA_CIVIL_HYDRO_ENABLED=true`
 
-- ausente ou `false`: o adapter retorna `disabled` sem consultar a API e o componente não renderiza;
-- `true`: o runtime pode consultar a API e exibir o bloco público;
-- nunca criar `VITE_DEFESA_CIVIL_*`;
-- a ativação só deve ocorrer depois da validação técnica descrita neste documento.
+Comportamento:
 
-### 4.2. Resiliência
+- variável ausente: integração pública habilitada;
+- `true`: integração pública habilitada;
+- `false`: kill switch operacional; a consulta externa não ocorre e o componente não é exibido;
+- nunca criar `VITE_DEFESA_CIVIL_*`.
 
-O adapter preparado possui:
+A flag existe para contingência operacional e não para monetização.
+
+## 7. Resiliência
+
+O adapter possui:
 
 - timeout por tentativa;
-- retry apenas para falhas transitórias;
-- validação de schema;
+- retry para falhas transitórias;
+- validação de schema com Zod;
+- coordenadas validadas;
 - valores ausentes preservados como `null`, nunca convertidos em zero;
+- timestamps futuros incompatíveis rejeitados antes de calcular recência;
 - cache saudável mais longo e cache de falha curto;
 - erro da Defesa Civil isolado das demais fontes da página;
 - nenhum secret necessário no contrato público atualmente utilizado.
 
-## 5. Campos normalizados na primeira versão
+Configuração atual:
+
+- resposta saudável: `max-age=120` + `stale-while-revalidate=300`;
+- indisponibilidade: cache curto de 20 s;
+- kill switch: cache de 300 s;
+- timeout: 8 s por tentativa;
+- uma repetição para falhas transitórias.
+
+## 8. Campos normalizados
 
 ### Identidade e geografia
 
@@ -109,7 +136,7 @@ O adapter preparado possui:
 ### Hidrologia
 
 - nome do rio;
-- nível do rio quando fornecido.
+- nível do rio em metros quando fornecido.
 
 ### Precipitação
 
@@ -122,67 +149,47 @@ O adapter preparado possui:
 
 ### Meteorologia
 
-- temperatura;
-- sensação térmica;
-- umidade;
-- pressão atmosférica;
-- radiação solar;
-- vento médio;
-- vento máximo/rajada;
+- temperatura em °C;
+- sensação térmica em °C;
+- umidade em %;
+- pressão atmosférica em hPa;
+- radiação solar em kWh/m²;
+- vento médio em km/h;
+- vento máximo/rajada em km/h;
 - direção do vento.
 
-Um campo ausente na estação não é tratado como erro nem como valor zero.
+As unidades acima seguem a documentação oficial consultada em 22/08/2026.
 
-## 6. Recorte regional inicial
+## 9. Recorte regional
 
-O adapter técnico usa raio de até **320 km de Pelotas** e limita o payload da interface a até 36 estações, ordenadas por proximidade.
+O adapter usa raio de até **320 km de Pelotas** e limita o payload da interface a até 36 estações, ordenadas por proximidade.
 
-Esse raio é apenas um recorte de descoberta/apresentação. **Proximidade não significa conexão hidrológica.**
+Esse raio é um recorte de descoberta e apresentação. **Proximidade geográfica não significa conexão hidrológica.**
 
-Antes da ativação pública definitiva, as estações precisam ser classificadas por bacia e função.
+Para meteorologia, o recorte regional pode ser útil por proximidade e disponibilidade dos sensores.
 
-### Meteorologia
-
-Território de interesse inclui o corredor ao sul de Porto Alegre e entorno da Lagoa dos Patos, como:
-
-- Porto Alegre / Viamão / Itapuã;
-- Tapes;
-- Arambaré;
-- Camaquã / Cristal;
-- São Lourenço do Sul;
-- Turuçu;
-- Canguçu;
-- Pelotas / Capão do Leão / Morro Redondo;
-- São José do Norte;
-- Rio Grande;
-- Litoral Médio quando relevante.
-
-A lista é território de interesse e não afirma que exista estação DCRS em cada município.
-
-### Hidrologia
-
-Priorizar somente estações cuja bacia/posição tenha relação física demonstrável com:
+Para hidrologia, a seleção editorial deve priorizar estações com relação física demonstrável a:
 
 - Lago Guaíba e entrada na Lagoa dos Patos;
 - Bacia do Camaquã;
-- margens/afluentes da Lagoa dos Patos;
-- Mirim–São Gonçalo;
-- estuário/saída em Rio Grande quando a referência do sensor for adequada.
+- margens e afluentes da Lagoa dos Patos;
+- sistema Mirim–São Gonçalo;
+- estuário e saída em Rio Grande quando a referência do sensor for adequada.
 
 Nunca comparar níveis absolutos de réguas distintas por simples subtração.
 
-## 7. Semântica pública
+## 10. Semântica pública
 
-A área preparada para `/situacao-hidrologica-pelotas` apresenta:
+A área pública de `/situacao-hidrologica-pelotas` apresenta:
 
 - nome e código da estação;
 - bacia quando informada;
 - horário da observação;
 - idade calculada da leitura;
-- nível/chuva e variáveis meteorológicas disponíveis;
+- nível, chuva e variáveis meteorológicas disponíveis;
 - mapa regional MapLibre;
 - links para mapa e documentação oficiais;
-- atribuição explícita à Defesa Civil RS.
+- atribuição explícita à Defesa Civil RS / Casa Militar / MKS conforme documentação da fonte.
 
 A recência calculada pelo Tempo Pelotas (`recent`, `delayed`, `old`, `unknown`) informa apenas a idade da observação.
 
@@ -194,49 +201,63 @@ Ela **não representa**:
 - inundação;
 - previsão de cheia.
 
-O bloco deixa explícito que as medições observadas não são transformadas automaticamente em alerta ou previsão de cheia.
+A integração continua sendo uma camada de observação.
 
-## 8. Timestamp e referência vertical
+## 11. Timestamp e referência vertical
 
 O adapter preserva timestamps com timezone quando fornecidos.
 
-Quando a API enviar data/hora sem offset, a implementação preparada interpreta provisoriamente como horário local do Rio Grande do Sul (`UTC-03:00`). Essa premissa deve ser confirmada antes da ativação pública contínua.
+Quando a API enviar data/hora sem offset, a implementação atual interpreta como horário local do Rio Grande do Sul (`UTC-03:00`). Timestamps que fiquem mais de cinco minutos no futuro em relação à consulta são descartados como não confiáveis para cálculo de recência.
 
-Também deve ser confirmada a semântica/referência vertical de `rio_nivel` por estação.
+A referência vertical de `rio_nivel` continua pertencendo a cada estação/régua.
 
-Até essa validação:
+Regras permanentes:
 
-- não criar limiares próprios;
+- não criar limiares próprios sem contrato técnico específico;
 - não transferir cotas de uma régua para outra;
-- não afirmar equivalência entre níveis absolutos de estações diferentes.
+- não afirmar equivalência entre níveis absolutos de estações diferentes;
+- preservar unidade, horário, estação e fonte.
 
-## 9. Cache e disponibilidade
+## 12. Histórico e ferramentas futuras
 
-Configuração preparada:
+O contrato `Historic` pode ser aproveitado futuramente para séries específicas depois de validar por estação/dataset:
 
-- resposta saudável: `max-age=120` + `stale-while-revalidate=300`;
-- indisponibilidade: cache curto de 20 s;
-- integração desabilitada: cache de 300 s;
-- timeout: 8 s por tentativa;
-- uma repetição para falhas transitórias.
-
-A indisponibilidade da Defesa Civil não derruba a página hidrológica nem altera os dados já existentes de Laranjal, Lagoa, Guaíba e SACE.
-
-## 10. Histórico futuro
-
-O contrato `Historic` poderá alimentar séries específicas depois de validar:
-
-- estação;
 - unidade;
 - timestamp;
 - referência do nível;
 - intervalo suportado;
-- comportamento de lacunas/correções;
-- governança de retenção e exportação.
+- comportamento de lacunas e correções;
+- retenção;
+- redistribuição;
+- exportação.
 
-Histórico oficial básico não deve ser transformado em paywall apenas por ser oficial. O valor Free/PRO deve vir das ferramentas, organização, histórico próprio, comparações e derivados conforme `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md`.
+A leitura oficial básica continua pública. O valor de Free/PRO deve vir de ferramentas do Tempo Pelotas, como:
 
-## 11. Segurança
+- organização e favoritos;
+- comparação temporal;
+- comparação entre estações/variáveis;
+- histórico próprio e histórico autorizado;
+- indicadores derivados;
+- análises e relatórios;
+- alertas personalizados;
+- visualizações avançadas;
+- exportações quando permitidas.
+
+## 13. Governança
+
+A documentação oficial da API informa que, para produções públicas ou comerciais, as condições de uso devem ser consultadas com a equipe responsável.
+
+A decisão operacional atual é:
+
+- a leitura oficial básica integrada ao portal é pública e recebe atribuição integral;
+- não esconder esse dado em Free/PRO;
+- não assumir que o fato de a fonte ser governamental libera automaticamente qualquer forma de armazenamento, exportação, redistribuição em massa ou revenda;
+- manter essas modalidades avançadas sob revisão por dataset;
+- preservar créditos e links oficiais em toda exposição pública.
+
+Isso permite cumprir a estratégia de disseminação pública sem fazer do dado bruto o produto comercial.
+
+## 14. Segurança
 
 - não versionar HAR bruto;
 - não versionar cookies, tokens, headers ou secrets;
@@ -246,29 +267,16 @@ Histórico oficial básico não deve ser transformado em paywall apenas por ser 
 - não expor stack trace ou erro GraphQL bruto ao visitante;
 - não transformar ausência de dado em zero;
 - popup do mapa usa texto seguro (`setText`), não HTML arbitrário;
-- falha da nova fonte permanece isolada.
+- falha da fonte permanece isolada.
 
-## 12. Critério para ativar `DEFESA_CIVIL_HYDRO_ENABLED=true`
+## 15. Próximas etapas
 
-Antes de ligar em produção pública:
+Com o runtime público ativo, a sequência de melhoria é:
 
-1. validar uma resposta real atual de `tags_data` no runtime;
-2. inventariar códigos `DCRS-xxxxx`, nomes, coordenadas e bacias retornadas;
-3. identificar capacidades reais de cada estação;
-4. confirmar timezone quando o timestamp vier sem offset;
-5. confirmar unidade e referência vertical de `rio_nivel`;
-6. confirmar que o recorte de apresentação não está incluindo estações hidrologicamente irrelevantes como se fossem contexto direto de Pelotas;
-7. testar desktop/mobile e acessibilidade com dados reais;
-8. validar que falha/timeout da fonte não afeta as demais fontes da página;
-9. atualizar `PROJECT_CURRENT_STATE.md` com a ativação real.
-
-## 13. Próxima etapa
-
-Com a integração técnica estabilizada na `main`, a sequência é:
-
-1. executar o contrato atual contra a API oficial;
-2. gerar inventário sanitizado de estações e capacidades;
+1. observar o contrato real em produção e o comportamento de disponibilidade;
+2. gerar inventário sanitizado de códigos `DCRS-xxxxx`, nomes, coordenadas, bacias e capacidades;
 3. classificar cada estação como `METEOROLOGY`, `HYDROLOGY`, `BOTH` ou `OUT_OF_SCOPE`;
-4. reduzir o conjunto público hidrológico para estações com relação física defensável ao sistema acompanhado;
-5. ativar a feature flag somente depois das validações acima;
-6. incorporar a fonte ao monitoramento de runtime/status após a ativação.
+4. refinar o conjunto hidrológico para estações com relação física defensável ao sistema acompanhado;
+5. incorporar a saúde da fonte a `/status-dos-dados` e aos smokes de runtime;
+6. avaliar `Historic` separadamente antes de qualquer backfill/arquivo permanente;
+7. revisar governança antes de habilitar exportações ou uso comercial específico do dataset.
