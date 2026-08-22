@@ -44,6 +44,9 @@ jobs:
       - name: Contratos rápidos
         run: npm run test:contracts
 
+      - name: Inventário Defesa Civil RS
+        run: node --test tests/defesa-civil-inventory.test.ts
+
       - name: Arquivo rico de previsões
         run: node --test tests/forecast-rich-runs.test.ts
 
