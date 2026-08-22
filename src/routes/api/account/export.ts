@@ -140,27 +140,38 @@ async function exportAccountData(request: Request) {
     }
 
     const admin = createSupabaseAdminClient();
-    const [profileResult, preferencesResult, consentHistory, notificationDevices] =
-      await Promise.all([
-        admin
-          .from("profiles")
-          .select("email,display_name,avatar_url,created_at,updated_at")
-          .eq("id", account.user.id)
-          .abortSignal(timeoutSignal())
-          .maybeSingle(),
-        admin
-          .from("user_preferences")
-          .select(
-            "weather_alerts,water_alerts,daily_summary,community_updates,created_at,updated_at",
-          )
-          .eq("user_id", account.user.id)
-          .abortSignal(timeoutSignal())
-          .maybeSingle(),
-        loadConsentHistory(admin, account.user.id),
-        loadNotificationDevices(admin, account.user.id),
-      ]);
+    const [
+      profileResult,
+      preferencesResult,
+      accessResult,
+      consentHistory,
+      notificationDevices,
+    ] = await Promise.all([
+      admin
+        .from("profiles")
+        .select("email,display_name,avatar_url,created_at,updated_at")
+        .eq("id", account.user.id)
+        .abortSignal(timeoutSignal())
+        .maybeSingle(),
+      admin
+        .from("user_preferences")
+        .select(
+          "weather_alerts,water_alerts,daily_summary,community_updates,created_at,updated_at",
+        )
+        .eq("user_id", account.user.id)
+        .abortSignal(timeoutSignal())
+        .maybeSingle(),
+      admin
+        .from("account_access")
+        .select("tier,status,source,valid_until,created_at,updated_at")
+        .eq("user_id", account.user.id)
+        .abortSignal(timeoutSignal())
+        .maybeSingle(),
+      loadConsentHistory(admin, account.user.id),
+      loadNotificationDevices(admin, account.user.id),
+    ]);
 
-    const error = profileResult.error ?? preferencesResult.error;
+    const error = profileResult.error ?? preferencesResult.error ?? accessResult.error;
     if (error) {
       console.error("[account/export] Falha ao consultar dados da conta", {
         code: error.code,
@@ -174,7 +185,7 @@ async function exportAccountData(request: Request) {
 
     const exportedAt = new Date();
     const document = {
-      export_version: "1.0",
+      export_version: "1.1",
       exported_at: exportedAt.toISOString(),
       portal: "Tempo Pelotas",
       account: {
@@ -184,6 +195,7 @@ async function exportAccountData(request: Request) {
         last_sign_in_at: account.user.last_sign_in_at ?? null,
         profile: profileResult.data,
         preferences: preferencesResult.data,
+        access: accessResult.data,
       },
       consent_history: consentHistory,
       notification_devices: notificationDevices,
