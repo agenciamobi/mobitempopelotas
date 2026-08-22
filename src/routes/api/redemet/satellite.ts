@@ -2,11 +2,18 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { withRedemetLastGood } from "@/lib/redemet/redemet-last-good.server";
 import { fetchRedemetSatellite } from "@/lib/redemet/redemet.server";
-import type { RedemetSatelliteType } from "@/lib/redemet/redemet.types";
+import {
+  keepUsefulVisibleSatelliteFrames,
+} from "@/lib/redemet/redemet-visible-daylight";
+import type {
+  RedemetImageLayerResponse,
+  RedemetSatelliteType,
+} from "@/lib/redemet/redemet.types";
 
 const ALLOWED_TYPES = new Set<RedemetSatelliteType>(["realcada", "ir", "vis"]);
 const DEFAULT_FRAMES = 8;
 const MAX_FRAMES = 8;
+const VISIBLE_LOOKBACK_FRAMES = 15;
 
 const RESPONSE_HEADERS = {
   "Cache-Control": "public, max-age=120, stale-while-revalidate=600",
@@ -30,16 +37,42 @@ function requestOptions(request: Request) {
   return { type, frames };
 }
 
+function daylightVisiblePayload(payload: RedemetImageLayerResponse, requestedFrames: number) {
+  if (!payload.available) return payload;
+
+  const frames = keepUsefulVisibleSatelliteFrames(payload.frames, requestedFrames);
+  if (!frames.length) {
+    return {
+      ...payload,
+      available: false,
+      frames: [],
+      currentIndex: 0,
+      error:
+        "O canal visível depende de luz solar e não há imagem diurna recente nesta janela. Use Infravermelho ou Realçado durante a noite.",
+    } satisfies RedemetImageLayerResponse;
+  }
+
+  return {
+    ...payload,
+    frames,
+    currentIndex: frames.length - 1,
+    updatedAt: frames.at(-1)?.observedAt ?? payload.updatedAt,
+    error: null,
+  } satisfies RedemetImageLayerResponse;
+}
+
 export const Route = createFileRoute("/api/redemet/satellite")({
   server: {
     handlers: {
       GET: async ({ request }) => {
         const { type, frames } = requestOptions(request);
-        const payload = await withRedemetLastGood(`satellite:${type}:${frames}`, () =>
-          fetchRedemetSatellite(type, frames),
+        const upstreamFrames = type === "vis" ? VISIBLE_LOOKBACK_FRAMES : frames;
+        const payload = await withRedemetLastGood(`satellite:${type}:${upstreamFrames}`, () =>
+          fetchRedemetSatellite(type, upstreamFrames),
         );
+        const publicPayload = type === "vis" ? daylightVisiblePayload(payload, frames) : payload;
 
-        return new Response(JSON.stringify(payload), { headers: RESPONSE_HEADERS });
+        return new Response(JSON.stringify(publicPayload), { headers: RESPONSE_HEADERS });
       },
     },
   },
