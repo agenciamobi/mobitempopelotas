@@ -31,7 +31,8 @@ O fluxo usa Supabase Auth com Google, PKCE e cookies SSR:
 7. `/conta` valida o usuário no servidor e gerencia identidade, preferências, privacidade e sessão;
 8. `/painel` valida o usuário no servidor e funciona como shell autenticado comum a Free e PRO;
 9. perfil, preferências e camada de acesso são consultados sob RLS;
-10. alterações de preferências usam RPC server-side e geram eventos de consentimento quando o estado muda.
+10. alterações de preferências usam RPC server-side e geram eventos de consentimento quando o estado muda;
+11. se uma sessão válida existir mas alguma linha estrutural estiver ausente, a aplicação pode reparar apenas a própria fundação da conta, sempre recriando `account_access` como Free.
 
 As rotas legadas `/entrar` e `/minha-conta` permanecem apenas como redirecionamentos de compatibilidade para `/conta`.
 
@@ -56,7 +57,7 @@ Regras:
 - usuários existentes são preenchidos como Free pela migration;
 - o usuário autenticado pode somente **ler a própria linha**;
 - não existe escrita direta de `account_access` pelo browser autenticado;
-- escrita fica reservada a `service_role` e, futuramente, ao fluxo server-side de billing/administração;
+- escrita administrativa fica reservada a `service_role` e, futuramente, ao fluxo server-side de billing/administração;
 - ausência, expiração ou estado inválido nunca concede PRO por fallback.
 
 `src/lib/auth/account-access.ts` centraliza os entitlements. Componentes não devem espalhar verificações como `plan === "pro"`.
@@ -78,6 +79,29 @@ A camada PRO pode liberar, quando implementado e permitido pelas fontes:
 - gráficos e análises avançadas.
 
 Esses entitlements não alteram a regra de que dados oficiais adequados à disseminação pública continuam públicos.
+
+## Reparação segura da fundação da conta
+
+A migration `20260822045500_repair_authenticated_account_foundation.sql` cria a RPC `ensure_current_user_account_foundation()`.
+
+Finalidade: impedir que uma falha eventual de trigger deixe uma sessão Google válida com conta parcialmente criada.
+
+A função:
+
+- exige `auth.uid()` válido;
+- lê somente a identidade autenticada correspondente em `auth.users`;
+- recria/atualiza o próprio `profiles`;
+- cria `user_preferences` ausente;
+- cria `account_access` ausente estritamente como `free`, `active`, `system`;
+- usa `ON CONFLICT ... DO NOTHING` em `account_access`, portanto não altera uma concessão existente;
+- nunca concede ou restaura PRO;
+- é `SECURITY DEFINER` com `search_path` vazio;
+- não pode ser executada por `anon`;
+- pode ser chamada por `authenticated` somente para a própria identidade obtida por `auth.uid()`.
+
+`getAccountSnapshot()` consulta perfil, preferências e acesso. Se não houver erro de leitura, mas alguma dessas três linhas estiver ausente, chama a reparação uma vez e recarrega a fundação. `storageReady` somente fica verdadeiro quando as três estruturas existem e foram lidas sem erro.
+
+A migration foi aplicada ao Supabase externo em 22/08/2026 e validada com `SECURITY DEFINER`, `search_path` vazio, execução negada a `anon` e liberada a `authenticated`.
 
 ## `/conta` e `/painel`
 
@@ -164,7 +188,7 @@ GET /api/account/export
 
 A rota exige sessão e entrega JSON com os dados pessoais previstos pelo contrato atual. Tokens, chaves criptográficas e credenciais administrativas são omitidos.
 
-A camada de acesso deve ser incluída na revisão da exportação antes do lançamento comercial do PRO, sem confundir entitlement com histórico financeiro/fiscal.
+A exportação versão `1.1` inclui também a camada de acesso (`tier`, `status`, `source`, `valid_until` e timestamps), sem confundir entitlement com histórico financeiro/fiscal. Quando billing existir, dados financeiros sujeitos a retenção legal deverão ter política própria.
 
 ## Exclusão da conta
 
@@ -183,22 +207,49 @@ A rota exige mesma origem, limita o corpo, valida sessão, exige frase exata, re
 
 `POST /auth/signout` encerra somente a sessão local do dispositivo atual e redireciona para a Home.
 
-## Checklist de validação
+## Estado de validação em 22/08/2026
 
-Antes de considerar a fundação da conta concluída:
+Confirmado tecnicamente:
 
-1. confirmar a migration `account_access` no Supabase externo;
-2. confirmar RLS e ausência de escrita autenticada direta em `account_access`;
-3. testar login Google em preview e produção;
-4. confirmar criação automática de `profiles`, `user_preferences` e `account_access` no primeiro login;
-5. confirmar que o primeiro login recebe `Free`;
-6. validar retorno `/conta?next=/painel` → Google → callback → `/painel`;
-7. testar rejeição de `next=https://exemplo.com` e `next=//exemplo.com`;
-8. confirmar que uma conta não consulta dados privados de outra;
-9. validar `/conta` e `/painel` como `noindex`;
-10. testar atualização de preferências e consentimentos;
-11. testar exportação e ausência de secrets;
-12. testar exclusão e cascata, incluindo `account_access`;
-13. testar logout;
-14. repetir o E2E com duas contas descartáveis em navegador real;
-15. só depois avançar para favoritos, históricos Free e billing PRO.
+- migration `account_access` aplicada no Supabase externo;
+- RLS de `account_access` permite apenas leitura da própria linha ao autenticado;
+- escrita administrativa de `account_access` não está disponível ao browser autenticado;
+- triggers de criação de perfil, preferências e acesso existem em `auth.users`;
+- reparação segura da fundação foi aplicada e validada no banco;
+- `/conta` e `/painel` estão preparados como rotas privadas/noindex;
+- `next` rejeita redirects externos por contrato;
+- exportação LGPD inclui a camada de acesso e continua omitindo secrets.
+
+Ainda pendente e obrigatório antes de iniciar favoritos/históricos Free:
+
+- E2E real do Google OAuth em navegador;
+- primeiro login criando `profiles`, `user_preferences` e `account_access`;
+- confirmação visual/funcional de que o primeiro usuário recebe Free;
+- retorno `/conta?next=/painel` → Google → callback → `/painel`;
+- atualização de preferências/consentimentos com sessão real;
+- exportação, logout e exclusão com conta real de teste;
+- isolamento cruzado com duas contas descartáveis;
+- validação em mobile/navegador real.
+
+No momento da última inspeção técnica, `auth.users` ainda estava vazio. Portanto nenhum teste real de Google OAuth foi declarado como concluído.
+
+## Checklist de validação final
+
+1. [x] confirmar a migration `account_access` no Supabase externo;
+2. [x] confirmar RLS e ausência de escrita autenticada direta em `account_access`;
+3. [x] aplicar e validar a reparação segura da fundação da conta;
+4. [ ] testar login Google em preview e produção;
+5. [ ] confirmar criação automática/reparação de `profiles`, `user_preferences` e `account_access` no primeiro login;
+6. [ ] confirmar que o primeiro login recebe `Free`;
+7. [ ] validar retorno `/conta?next=/painel` → Google → callback → `/painel`;
+8. [x] proteger por contrato `next=https://exemplo.com` e `next=//exemplo.com`;
+9. [ ] confirmar em E2E que uma conta não consulta dados privados de outra;
+10. [x] manter `/conta` e `/painel` como `noindex` por contrato;
+11. [ ] testar atualização de preferências e consentimentos em navegador real;
+12. [x] incluir camada de acesso na exportação e manter secrets fora do payload por contrato;
+13. [ ] testar exportação em navegador real;
+14. [ ] testar exclusão e cascata, incluindo `account_access`;
+15. [ ] testar logout;
+16. [ ] repetir o E2E com duas contas descartáveis em navegador real;
+17. [ ] validar mobile;
+18. [ ] somente depois avançar para favoritos, históricos Free e billing PRO.
