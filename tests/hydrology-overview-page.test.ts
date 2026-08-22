@@ -20,6 +20,7 @@ const defesaCivilStyles = readFileSync(
   "src/components/hydrology/DefesaCivilHydroNetwork.css",
   "utf8",
 );
+const envExample = readFileSync(".env.example", "utf8");
 
 const hydrologySource = `${route}\n${page}`;
 const defesaCivilSource = `${defesaCivilServer}\n${defesaCivilFunction}\n${defesaCivilArea}\n${defesaCivilMap}`;
@@ -44,7 +45,7 @@ test("hydrology route loads six independent sources in the shared shell", () => 
   assert.match(route, /staleTime: 60 \* 1_000/);
 });
 
-test("Defesa Civil RS integration is server-side, public-contract based and publication-gated", () => {
+test("Defesa Civil RS integration is server-side, public by default and keeps an explicit kill switch", () => {
   assert.match(
     defesaCivilServer,
     /https:\/\/redehidrometeorologica\.defesacivil\.rs\.gov\.br\/graphql/,
@@ -52,13 +53,19 @@ test("Defesa Civil RS integration is server-side, public-contract based and publ
   assert.match(defesaCivilServer, /casa-militar-defesa-civil-rs/);
   assert.match(defesaCivilServer, /codigos: \["43"\]/);
   assert.match(defesaCivilServer, /tipo: UNIDADE_FEDERATIVA/);
-  assert.match(defesaCivilServer, /DEFESA_CIVIL_HYDRO_ENABLED/);
-  assert.match(defesaCivilServer, /process\.env\.DEFESA_CIVIL_HYDRO_ENABLED/);
-  assert.match(defesaCivilServer, /if \(!enabled\)/);
-  assert.match(defesaCivilServer, /emptyData\("disabled"/);
   assert.match(defesaCivilArea, /data\.status === "disabled"/);
   assert.match(defesaCivilFunction, /createServerFn\(\{ method: "GET" \}\)/);
+  assert.match(defesaCivilFunction, /DEFESA_CIVIL_HYDRO_ENABLED/);
+  assert.match(
+    defesaCivilFunction,
+    /process\.env\.DEFESA_CIVIL_HYDRO_ENABLED\?\.trim\(\)\.toLowerCase\(\) !== "false"/,
+  );
+  assert.match(
+    defesaCivilFunction,
+    /fetchDefesaCivilHydroData\(\{ enabled: isPublicDefesaCivilHydroEnabled\(\) \}\)/,
+  );
   assert.match(defesaCivilFunction, /stale-while-revalidate=300/);
+  assert.match(envExample, /^DEFESA_CIVIL_HYDRO_ENABLED=true$/m);
   assert.doesNotMatch(defesaCivilSource, /VITE_DEFESA_CIVIL/i);
   assert.doesNotMatch(defesaCivilSource, /api[_-]?key|authorization:\s*bearer/i);
 });
@@ -91,11 +98,14 @@ test("Defesa Civil RS adapter preserves observation identity, timestamp and miss
   assert.doesNotMatch(defesaCivilServer, /\?\?\s*0\b/);
 });
 
-test("Defesa Civil RS area keeps observed data separate from alert and risk classification", () => {
+test("Defesa Civil RS area gives explicit institutional credit and keeps observations separate from alerts", () => {
   assert.match(defesaCivilArea, /Rede oficial · Defesa Civil RS/);
+  assert.match(defesaCivilArea, /Leituras oficiais da Rede de Monitoramento Hidrometeorológico/);
+  assert.match(defesaCivilArea, /ajuda a disseminar informações de órgãos públicos e fontes confiáveis/);
+  assert.match(defesaCivilArea, /preservando estação, horário, unidade e origem/);
   assert.match(
     defesaCivilArea,
-    /não transforma essas medições em alerta ou previsão\s+de cheia/,
+    /sem transformar essas medições em alerta ou\s+previsão de cheia/,
   );
   assert.match(
     defesaCivilArea,
@@ -103,9 +113,11 @@ test("Defesa Civil RS area keeps observed data separate from alert and risk clas
   );
   assert.match(
     defesaCivilArea,
-    /não\s+substitui os canais oficiais de alerta e orientação da\s+Defesa Civil/,
+    /não substitui os canais oficiais de alerta e orientação da Defesa Civil/,
   );
-  assert.match(defesaCivilArea, /Fonte e responsabilidade dos dados/);
+  assert.match(defesaCivilArea, /Fonte oficial e créditos/);
+  assert.match(defesaCivilArea, /Casa Militar do Estado do\s+Rio Grande do Sul/);
+  assert.match(defesaCivilArea, /Dados disponibilizados pela Defesa Civil RS através da MKS/);
   assert.match(defesaCivilArea, /Abrir mapa oficial/);
   assert.match(defesaCivilArea, /Documentação da API/);
   assert.match(defesaCivilArea, /formatDateTime\(station\.observedAt\)/);
