@@ -77,6 +77,40 @@
   color: #1769e0;
 }
 
+.login-card__google {
+  min-height: 56px;
+  margin: 24px 0 16px;
+  display: grid;
+  place-items: center;
+  gap: 8px;
+}
+
+.login-card__google-host {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card__google-host > div,
+.login-card__google-host iframe {
+  max-width: 100% !important;
+}
+
+.login-card__google.is-loading {
+  opacity: 0.68;
+  pointer-events: none;
+}
+
+.login-card__google-loading {
+  display: block;
+  color: #647887;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
 .login-card small,
 .login-card__notice,
 .login-card__error {
@@ -296,6 +330,10 @@
   .login-card {
     padding: 26px 20px;
     border-radius: 22px;
+  }
+
+  .login-card__google-host {
+    overflow: hidden;
   }
 
   .ufpel-hydrology-widget {
