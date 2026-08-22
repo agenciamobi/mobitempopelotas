@@ -43,6 +43,8 @@ const defaultPreferences: AccountPreferences = {
   communityUpdates: false,
 };
 
+type AccountRequestClient = ReturnType<typeof createSupabaseRequestClient>["client"];
+
 function metadataText(value: unknown) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
@@ -52,6 +54,26 @@ function applyPrivateResponseHeaders(headers: Headers) {
   headers.set("Pragma", "no-cache");
   headers.set("Vary", "Cookie, Authorization");
   setResponseHeaders(headers);
+}
+
+function loadAccountFoundation(client: AccountRequestClient, userId: string) {
+  return Promise.all([
+    client
+      .from("profiles")
+      .select("display_name,email,avatar_url")
+      .eq("id", userId)
+      .maybeSingle(),
+    client
+      .from("user_preferences")
+      .select("weather_alerts,water_alerts,daily_summary,community_updates")
+      .eq("user_id", userId)
+      .maybeSingle(),
+    client
+      .from("account_access")
+      .select("tier,status,source,valid_until")
+      .eq("user_id", userId)
+      .maybeSingle(),
+  ]);
 }
 
 export const getAccountSnapshot = createServerFn({ method: "GET" }).handler(
@@ -72,27 +94,35 @@ export const getAccountSnapshot = createServerFn({ method: "GET" }).handler(
       return { status: "unauthenticated" };
     }
 
-    const [
-      { data: profile, error: profileError },
-      { data: preferences, error: preferencesError },
-      { data: accountAccess, error: accessError },
-    ] = await Promise.all([
-      client
-        .from("profiles")
-        .select("display_name,email,avatar_url")
-        .eq("id", user.id)
-        .maybeSingle(),
-      client
-        .from("user_preferences")
-        .select("weather_alerts,water_alerts,daily_summary,community_updates")
-        .eq("user_id", user.id)
-        .maybeSingle(),
-      client
-        .from("account_access")
-        .select("tier,status,source,valid_until")
-        .eq("user_id", user.id)
-        .maybeSingle(),
-    ]);
+    let foundation = await loadAccountFoundation(client, user.id);
+    let [profileResult, preferencesResult, accessResult] = foundation;
+    const lookupFailed = Boolean(
+      profileResult.error || preferencesResult.error || accessResult.error,
+    );
+    const foundationMissing = Boolean(
+      !profileResult.data || !preferencesResult.data || !accessResult.data,
+    );
+
+    if (!lookupFailed && foundationMissing) {
+      const { error: repairError } = await client.rpc("ensure_current_user_account_foundation");
+
+      if (repairError) {
+        console.error("[account] Falha ao reparar a fundação da conta autenticada", {
+          code: repairError.code,
+          message: repairError.message,
+        });
+      } else {
+        foundation = await loadAccountFoundation(client, user.id);
+        [profileResult, preferencesResult, accessResult] = foundation;
+      }
+    }
+
+    const profile = profileResult.data;
+    const preferences = preferencesResult.data;
+    const accountAccess = accessResult.data;
+    const profileError = profileResult.error;
+    const preferencesError = preferencesResult.error;
+    const accessError = accessResult.error;
 
     const displayName =
       profile?.display_name ??
@@ -114,11 +144,20 @@ export const getAccountSnapshot = createServerFn({ method: "GET" }).handler(
       });
     }
 
+    const storageReady = Boolean(
+      !profileError &&
+        !preferencesError &&
+        !accessError &&
+        profile &&
+        preferences &&
+        accountAccess,
+    );
+
     applyPrivateResponseHeaders(responseHeaders);
 
     return {
       status: "authenticated",
-      storageReady: !profileError && !preferencesError && !accessError,
+      storageReady,
       identity: { displayName, email, avatarUrl },
       preferences: preferences
         ? {
