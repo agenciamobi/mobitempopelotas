@@ -219,3 +219,11 @@ Isso permite começar a preservar séries agora sem confundir armazenamento téc
 - retenção de dados começa antes do lançamento comercial do PRO;
 - nenhuma fonte com situação comercial pendente deve ser automaticamente exposta em recurso pago/exportável;
 - observação, previsão, reanálise e derivados permanecem semanticamente separados.
+
+## 12. Inventário operacional de históricos
+
+O detalhamento de fontes, variáveis, oportunidades de backfill, lacunas atuais, prioridades e regras de preservação está em:
+
+- `docs/HISTORICAL_DATA_INVENTORY.md`.
+
+Esse inventário é a referência operacional para decidir **o que coletar e preservar**. Este documento de conta continua sendo a referência para decidir **quem pode acessar cada profundidade e recurso**.
