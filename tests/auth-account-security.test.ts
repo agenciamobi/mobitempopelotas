@@ -62,12 +62,16 @@ test("painel exige autenticação server-side e permanece fora do índice", () =
   assert.match(dashboardRoute, /redirect\(\{ to: ["']\/conta["'], search: \{ next: ["']\/painel["'] \} \}\)/);
 });
 
-test("exportação exige sessão e omite tokens e chaves criptográficas", () => {
+test("exportação exige sessão, inclui camada de acesso e omite secrets", () => {
   assert.match(exportRoute, /getVerifiedRequestUser\(request\)/);
   assert.match(exportRoute, /status:\s*401/);
   assert.match(exportRoute, /Content-Disposition/);
   assert.match(exportRoute, /X-Robots-Tag["']?,?\s*["']noindex, nofollow/);
   assertPrivateResponseContract(exportRoute);
+  assert.match(exportRoute, /\.from\("account_access"\)/);
+  assert.match(exportRoute, /\.select\("tier,status,source,valid_until,created_at,updated_at"\)/);
+  assert.match(exportRoute, /access:\s*accessResult\.data/);
+  assert.match(exportRoute, /export_version:\s*["']1\.1["']/);
   assert.match(exportRoute, /\.select\(["']endpoint,user_agent,topics,created_at,updated_at,last_seen_at["']\)/);
   assert.doesNotMatch(exportRoute, /\.select\(["'][^"']*(?:p256dh|auth|access_token|refresh_token|service_role)[^"']*["']\)/);
   assert.match(exportRoute, /Chaves criptográficas de entrega e credenciais de sessão não fazem parte da exportação/);
