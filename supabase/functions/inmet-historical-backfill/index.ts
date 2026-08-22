@@ -6,11 +6,10 @@ const COLLECTOR_KEY = "inmet-historical-backfill";
 const STATION_CODE = "A887";
 const STATION_KEY = "inmet-a887-capao-do-leao-pelotas";
 const MIN_YEAR = 2000;
-const REQUEST_TIMEOUT_MS = 45_000;
+const REQUEST_TIMEOUT_MS = 100_000;
 const UPSERT_BATCH_SIZE = 500;
 
 type JsonRecord = Record<string, unknown>;
-
 type ObservationRow = {
   station_key: string;
   station_code: string;
@@ -76,8 +75,9 @@ function normalizeText(value: string) {
 function decodeCsv(bytes: Uint8Array) {
   const utf8 = new TextDecoder("utf-8").decode(bytes);
   const replacementRatio = (utf8.match(/�/g)?.length ?? 0) / Math.max(1, utf8.length);
-  if (replacementRatio < 0.0001) return utf8;
-  return new TextDecoder("windows-1252").decode(bytes);
+  return replacementRatio < 0.0001
+    ? utf8
+    : new TextDecoder("windows-1252").decode(bytes);
 }
 
 function splitCsvLine(line: string) {
@@ -112,17 +112,14 @@ function parseNumber(value: string | undefined) {
   if (!value) return null;
   const normalized = value.trim().replace(",", ".");
   if (!normalized || /^(null|nan|na|n\/a)$/i.test(normalized)) return null;
-  const number = Number(normalized);
-  if (!Number.isFinite(number) || Math.abs(number) >= 9999) return null;
-  return number;
+  const numeric = Number(normalized);
+  return !Number.isFinite(numeric) || Math.abs(numeric) >= 9999 ? null : numeric;
 }
 
 function parseDate(value: string | undefined) {
   if (!value) return null;
-  const normalized = value.trim();
-  const match = normalized.match(/^(\d{4})[-/](\d{2})[-/](\d{2})$/);
-  if (!match) return null;
-  return `${match[1]}-${match[2]}-${match[3]}`;
+  const match = value.trim().match(/^(\d{4})[-/](\d{2})[-/](\d{2})$/);
+  return match ? `${match[1]}-${match[2]}-${match[3]}` : null;
 }
 
 function parseHour(value: string | undefined) {
@@ -192,16 +189,11 @@ function hasUsefulObservation(row: ObservationRow) {
 }
 
 function parseStationCsv(content: string, sourceFile: string) {
-  const lines = content
-    .replace(/^\uFEFF/, "")
-    .split(/\r?\n/)
-    .map((line) => line.trimEnd());
-
+  const lines = content.replace(/^\uFEFF/, "").split(/\r?\n/).map((line) => line.trimEnd());
   const headerIndex = lines.findIndex((line) => {
     const normalized = normalizeText(line);
     return normalized.includes("data") && normalized.includes("hora utc") && line.includes(";");
   });
-
   if (headerIndex < 0) throw new Error("Cabeçalho horário do INMET não foi encontrado no CSV.");
 
   const headers = splitCsvLine(lines[headerIndex]);
@@ -264,13 +256,7 @@ function parseStationCsv(content: string, sourceFile: string) {
     rows.push(row);
   }
 
-  return {
-    rows,
-    headers,
-    headerIndex,
-    malformedCount,
-    emptyCount,
-  };
+  return { rows, headers, malformedCount, emptyCount };
 }
 
 async function fetchAnnualZip(year: number) {
@@ -283,19 +269,17 @@ async function fetchAnnualZip(year: number) {
     signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   if (!response.ok) throw new Error(`INMET ${year} respondeu HTTP ${response.status}.`);
-  return { url, bytes: new Uint8Array(await response.arrayBuffer()) };
+  return { bytes: new Uint8Array(await response.arrayBuffer()) };
 }
 
 function stationFileFromZip(bytes: Uint8Array) {
   const files = unzipSync(bytes, {
-    filter: (file) => normalizeText(file.name).includes(STATION_CODE.toLowerCase()),
+    filter: (file) => file.name.toUpperCase().includes(STATION_CODE),
   });
-
   const entry = Object.entries(files).find(([name]) =>
     name.toUpperCase().includes(STATION_CODE) && name.toLowerCase().endsWith(".csv")
   );
-  if (!entry) return null;
-  return { name: entry[0], bytes: entry[1] };
+  return entry ? { name: entry[0], bytes: entry[1] } : null;
 }
 
 async function upsertBatches(supabase: ReturnType<typeof createClient>, rows: ObservationRow[]) {
@@ -313,7 +297,9 @@ async function upsertBatches(supabase: ReturnType<typeof createClient>, rows: Ob
 }
 
 Deno.serve(async (request) => {
-  if (request.method !== "POST") return json({ success: false, error: "Método não permitido." }, 405);
+  if (request.method !== "POST") {
+    return json({ success: false, error: "Método não permitido." }, 405);
+  }
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
@@ -344,7 +330,6 @@ Deno.serve(async (request) => {
     ? body.stationCode.trim().toUpperCase()
     : STATION_CODE;
   const currentYear = new Date().getUTCFullYear();
-
   if (!Number.isInteger(year) || year < MIN_YEAR || year > currentYear || stationCode !== STATION_CODE) {
     return json({ success: false, error: "Ano ou estação não suportados." }, 400);
   }
@@ -355,8 +340,9 @@ Deno.serve(async (request) => {
     .insert({ station_code: STATION_CODE, year, source_url: sourceUrl })
     .select("id")
     .maybeSingle();
-  if (runError || !run?.id) return json({ success: false, error: runError?.message ?? "Falha ao abrir run." }, 500);
-
+  if (runError || !run?.id) {
+    return json({ success: false, error: runError?.message ?? "Falha ao abrir run." }, 500);
+  }
   const runId = Number(run.id);
 
   try {
@@ -372,7 +358,9 @@ Deno.serve(async (request) => {
     }
 
     const parsed = parseStationCsv(decodeCsv(stationFile.bytes), stationFile.name);
-    if (!parsed.rows.length) throw new Error("O CSV da estação não contém observações úteis reconhecidas.");
+    if (!parsed.rows.length) {
+      throw new Error("O CSV da estação não contém observações úteis reconhecidas.");
+    }
 
     const storedCount = await upsertBatches(supabase, parsed.rows);
     const firstObservedAt = parsed.rows[0].observed_at;
@@ -409,7 +397,6 @@ Deno.serve(async (request) => {
       .order("observed_at", { ascending: true })
       .limit(1)
       .maybeSingle();
-
     if (coverage?.observed_at) {
       await supabase
         .from("historical_data_sources")
