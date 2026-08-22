@@ -458,6 +458,10 @@ export type Database = {
         };
         Returns: boolean;
       };
+      ensure_current_user_account_foundation: {
+        Args: Record<PropertyKey, never>;
+        Returns: undefined;
+      };
       invoke_embrapa_collector: {
         Args: Record<PropertyKey, never>;
         Returns: number;
