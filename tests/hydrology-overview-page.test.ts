@@ -78,6 +78,16 @@ test("Defesa Civil RS adapter preserves observation identity, timestamp and miss
   assert.match(defesaCivilServer, /distanceFromPelotasKm/);
   assert.match(defesaCivilServer, /Number\.isFinite\(parsed\) \? parsed : null/);
   assert.match(defesaCivilServer, /if \(!normalized\) return null/);
+  assert.match(defesaCivilServer, /FUTURE_TIMESTAMP_TOLERANCE_MS = 5 \* 60_000/);
+  assert.match(defesaCivilServer, /function trustedObservedAt/);
+  assert.match(
+    defesaCivilServer,
+    /observed\.getTime\(\) > fetchedAt\.getTime\(\) \+ FUTURE_TIMESTAMP_TOLERANCE_MS/,
+  );
+  assert.match(
+    defesaCivilServer,
+    /const observedAt = trustedObservedAt\(station\.timestamp, fetchedAt\)/,
+  );
   assert.doesNotMatch(defesaCivilServer, /\?\?\s*0\b/);
 });
 
