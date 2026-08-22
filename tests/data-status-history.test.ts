@@ -8,6 +8,7 @@ const migration = readFileSync(
 );
 const route = readFileSync("src/routes/status-dos-dados.tsx", "utf8");
 const storage = readFileSync("src/lib/status/data-status-storage.server.ts", "utf8");
+const statusServer = readFileSync("src/lib/status/data-status.server.ts", "utf8");
 const cronRoute = readFileSync("src/routes/api/cron/data-status.ts", "utf8");
 const workflow = readFileSync(".github/workflows/data-status-monitor.yml", "utf8");
 const oidc = readFileSync("src/lib/github-actions-oidc.server.ts", "utf8");
@@ -42,6 +43,20 @@ test("a página de status mostra disponibilidade e histórico de incidentes", ()
   assert.match(route, /Manutenções programadas/);
   assert.match(route, /aproximadamente a cada 10 minutos/);
   assert.match(publicRoutes, /path: "\/status-dos-dados"/);
+});
+
+test("a Defesa Civil RS entra no monitoramento operacional como fonte pública real", () => {
+  assert.match(statusServer, /fetchDefesaCivilHydroData/);
+  assert.match(statusServer, /defesaCivilResult/);
+  assert.match(statusServer, /id: "defesa-civil-rs-hydromet"/);
+  assert.match(statusServer, /provider: "Defesa Civil RS \/ Casa Militar"/);
+  assert.match(statusServer, /data\.regionalStationCount/);
+  assert.match(statusServer, /data\.recentStationCount/);
+  assert.match(statusServer, /data\.inventory\.HYDROLOGY/);
+  assert.match(statusServer, /data\.inventory\.METEOROLOGY/);
+  assert.match(statusServer, /data\.inventory\.BOTH/);
+  assert.match(statusServer, /sourceUrl: data\.source\.mapUrl/);
+  assert.doesNotMatch(statusServer, /state:\s*"implementation"[\s\S]{0,120}defesa-civil-rs-hydromet/);
 });
 
 test("o coletor automático usa OIDC restrito ao workflow de status", () => {
