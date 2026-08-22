@@ -24,6 +24,8 @@ export type RedemetImageLayerResponse = {
   currentIndex: number;
   updatedAt: string;
   error: string | null;
+  availabilityReason?: "daylight" | null;
+  nextExpectedAt?: string | null;
 };
 
 export type RedemetStormPoint = {
