@@ -20,23 +20,48 @@ A política de separação Público / Free / PRO está em `docs/DATA_ACCESS_PUBL
 
 ## Arquitetura atual
 
-O fluxo usa Supabase Auth com Google, PKCE e cookies SSR:
+O login Google para Web passa a usar **Google Identity Services diretamente no Tempo Pelotas + Supabase `signInWithIdToken()`**.
 
-1. `/conta` apresenta o login Google quando não existe sessão;
-2. `GoogleLoginCard` inicia `signInWithOAuth` no navegador;
-3. o Google retorna ao Supabase Auth;
-4. o Supabase redireciona para `/auth/callback` com código temporário;
-5. a rota server-side troca o código pela sessão;
-6. a sessão é persistida em cookies pelo `@supabase/ssr`;
-7. `/conta` valida o usuário no servidor e gerencia identidade, preferências, privacidade e sessão;
-8. `/painel` valida o usuário no servidor e funciona como shell autenticado comum a Free e PRO;
-9. perfil, preferências e camada de acesso são consultados sob RLS;
-10. alterações de preferências usam RPC server-side e geram eventos de consentimento quando o estado muda;
-11. se uma sessão válida existir mas alguma linha estrutural estiver ausente, a aplicação pode reparar apenas a própria fundação da conta, sempre recriando `account_access` como Free.
+Objetivo: manter o Supabase como provedor de sessão e identidade sem expor o domínio técnico `<project-ref>.supabase.co` na etapa em que o usuário escolhe a conta Google e sem depender do add-on pago de Custom Domain.
+
+Fluxo principal:
+
+1. `/conta` apresenta o botão oficial do Google quando não existe sessão;
+2. `GoogleLoginCard` carrega `https://accounts.google.com/gsi/client` no navegador;
+3. o Google Identity Services é inicializado com o **Web Client ID público** em `VITE_GOOGLE_CLIENT_ID`;
+4. a aplicação gera nonce aleatório com Web Crypto, envia ao Google a versão SHA-256 e mantém o nonce bruto apenas em memória para validação;
+5. o Google abre o seletor/fluxo diretamente a partir do Tempo Pelotas e devolve um ID Token para o callback JavaScript;
+6. o browser chama `supabase.auth.signInWithIdToken({ provider: "google", token, nonce })`;
+7. o Supabase valida a identidade Google e cria/abre a sessão normal do Supabase Auth;
+8. após sucesso, a aplicação navega diretamente para o `next` interno normalizado, como `/painel`;
+9. `/conta` e `/painel` revalidam o usuário no servidor e seguem usando as mesmas tabelas, RLS, preferências e entitlements;
+10. se uma sessão válida existir mas alguma linha estrutural estiver ausente, a aplicação pode reparar apenas a própria fundação da conta, sempre recriando `account_access` como Free.
+
+O fluxo antigo PKCE via `signInWithOAuth()` não é mais a entrada principal do Google. A rota `/auth/callback` permanece temporariamente como compatibilidade segura durante a transição, mas o novo botão Google não navega para `*.supabase.co/auth/v1/callback`.
 
 As rotas legadas `/entrar` e `/minha-conta` permanecem apenas como redirecionamentos de compatibilidade para `/conta`.
 
-O parâmetro `next` aceita somente caminhos internos normalizados. Isso permite que `/painel` envie o visitante para `/conta?next=/painel` e que, após o OAuth, o usuário retorne ao painel sem aceitar redirects externos.
+O parâmetro `next` aceita somente caminhos internos normalizados. Isso permite que `/painel` envie o visitante para `/conta?next=/painel` e que, após a autenticação, o usuário retorne ao painel sem aceitar redirects externos.
+
+## Configuração Google Web
+
+O frontend precisa somente do **Web Client ID público** do Google:
+
+```env
+VITE_GOOGLE_CLIENT_ID=000000000000-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com
+```
+
+Esse Client ID é público por natureza e pode ser incorporado ao bundle. O **Google Client Secret não pode ser colocado em `VITE_*`, no frontend ou versionado no GitHub**; ele continua restrito à configuração do provider no Supabase quando necessário.
+
+No Google Auth Platform, as origens JavaScript autorizadas devem incluir os hosts reais do portal que executarão o Google Identity Services, por exemplo:
+
+- `https://tempopelotas.com.br`;
+- `https://www.tempopelotas.com.br`;
+- ambientes adicionais somente quando realmente usados para teste.
+
+O novo fluxo por ID Token não depende de cadastrar `https://tempopelotas.com.br/auth/v1/callback` como callback do Google. Esse caminho não hospeda o serviço Auth do Supabase.
+
+Branding do Google deve usar nome, domínio, logotipo, política de privacidade e demais informações oficiais do Tempo Pelotas. Isso é independente da autenticação Supabase e melhora a identificação do aplicativo pelo usuário.
 
 ## Camada de acesso
 
@@ -143,9 +168,10 @@ SUPABASE_SECRET_KEY=
 VITE_SUPABASE_MODE=external
 VITE_SUPABASE_URL=
 VITE_SUPABASE_PUBLISHABLE_KEY=
+VITE_GOOGLE_CLIENT_ID=
 ```
 
-As variáveis `VITE_*` contêm somente URL e chave publicável. A chave administrativa permanece exclusivamente no servidor.
+As variáveis `VITE_*` contêm somente valores públicos. A chave administrativa e qualquer Client Secret permanecem exclusivamente fora do bundle do navegador.
 
 ## Cookies e cache
 
@@ -166,6 +192,7 @@ O browser autenticado não recebe:
 - access token como dado de aplicação;
 - refresh token como dado de aplicação;
 - chave administrativa;
+- Google Client Secret;
 - dados de outras contas;
 - chaves criptográficas web push;
 - mecanismo de escrita direta para promover a própria conta a PRO.
@@ -218,38 +245,45 @@ Confirmado tecnicamente:
 - reparação segura da fundação foi aplicada e validada no banco;
 - `/conta` e `/painel` estão preparados como rotas privadas/noindex;
 - `next` rejeita redirects externos por contrato;
-- exportação LGPD inclui a camada de acesso e continua omitindo secrets.
+- exportação LGPD inclui a camada de acesso e continua omitindo secrets;
+- código do login foi migrado de `signInWithOAuth()` para Google Identity Services + `signInWithIdToken()`;
+- nonce do Google é gerado com Web Crypto e validado pelo Supabase;
+- o botão principal não referencia `/auth/v1/callback` do Supabase.
 
 Ainda pendente e obrigatório antes de iniciar favoritos/históricos Free:
 
-- E2E real do Google OAuth em navegador;
+- configurar `VITE_GOOGLE_CLIENT_ID` no build de produção;
+- E2E real do Google Identity Services em navegador;
 - primeiro login criando `profiles`, `user_preferences` e `account_access`;
 - confirmação visual/funcional de que o primeiro usuário recebe Free;
-- retorno `/conta?next=/painel` → Google → callback → `/painel`;
+- retorno `/conta?next=/painel` → Google → ID Token → Supabase → `/painel`;
 - atualização de preferências/consentimentos com sessão real;
 - exportação, logout e exclusão com conta real de teste;
 - isolamento cruzado com duas contas descartáveis;
 - validação em mobile/navegador real.
 
-No momento da última inspeção técnica, `auth.users` ainda estava vazio. Portanto nenhum teste real de Google OAuth foi declarado como concluído.
+No momento da última inspeção técnica, `auth.users` ainda estava vazio. Portanto nenhum teste real do novo login Google foi declarado como concluído.
 
 ## Checklist de validação final
 
 1. [x] confirmar a migration `account_access` no Supabase externo;
 2. [x] confirmar RLS e ausência de escrita autenticada direta em `account_access`;
 3. [x] aplicar e validar a reparação segura da fundação da conta;
-4. [ ] testar login Google em preview e produção;
-5. [ ] confirmar criação automática/reparação de `profiles`, `user_preferences` e `account_access` no primeiro login;
-6. [ ] confirmar que o primeiro login recebe `Free`;
-7. [ ] validar retorno `/conta?next=/painel` → Google → callback → `/painel`;
-8. [x] proteger por contrato `next=https://exemplo.com` e `next=//exemplo.com`;
-9. [ ] confirmar em E2E que uma conta não consulta dados privados de outra;
-10. [x] manter `/conta` e `/painel` como `noindex` por contrato;
-11. [ ] testar atualização de preferências e consentimentos em navegador real;
-12. [x] incluir camada de acesso na exportação e manter secrets fora do payload por contrato;
-13. [ ] testar exportação em navegador real;
-14. [ ] testar exclusão e cascata, incluindo `account_access`;
-15. [ ] testar logout;
-16. [ ] repetir o E2E com duas contas descartáveis em navegador real;
-17. [ ] validar mobile;
-18. [ ] somente depois avançar para favoritos, históricos Free e billing PRO.
+4. [x] remover `signInWithOAuth()` da entrada principal do Google;
+5. [x] implementar Google Identity Services + `signInWithIdToken()` com nonce;
+6. [ ] configurar `VITE_GOOGLE_CLIENT_ID` em produção;
+7. [ ] testar login Google em produção;
+8. [ ] confirmar criação automática/reparação de `profiles`, `user_preferences` e `account_access` no primeiro login;
+9. [ ] confirmar que o primeiro login recebe `Free`;
+10. [ ] validar retorno `/conta?next=/painel` → Google → ID Token → Supabase → `/painel`;
+11. [x] proteger por contrato `next=https://exemplo.com` e `next=//exemplo.com`;
+12. [ ] confirmar em E2E que uma conta não consulta dados privados de outra;
+13. [x] manter `/conta` e `/painel` como `noindex` por contrato;
+14. [ ] testar atualização de preferências e consentimentos em navegador real;
+15. [x] incluir camada de acesso na exportação e manter secrets fora do payload por contrato;
+16. [ ] testar exportação em navegador real;
+17. [ ] testar exclusão e cascata, incluindo `account_access`;
+18. [ ] testar logout;
+19. [ ] repetir o E2E com duas contas descartáveis em navegador real;
+20. [ ] validar mobile;
+21. [ ] somente depois avançar para favoritos, históricos Free e billing PRO.
