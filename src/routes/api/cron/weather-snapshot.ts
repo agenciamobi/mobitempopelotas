@@ -1,5 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import {
+  authorizeHistoricalArchiveRequest,
+  captureEnvironmentalHistory,
+} from "@/lib/history/historical-archive.server";
 import { fetchPelotasWeatherHistory } from "@/lib/weather/history.server";
 import {
   getWeatherSnapshotStorageStatus,
@@ -14,6 +18,12 @@ const RESPONSE_HEADERS = {
   "X-Content-Type-Options": "nosniff",
   "X-Robots-Tag": "noindex, nofollow",
 } as const;
+
+type ArchiveAction =
+  | "environmental-capture"
+  | "environmental-backfill"
+  | "weather-daily"
+  | "weather-backfill";
 
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
@@ -39,42 +49,31 @@ function shiftDate(date: string, amount: number) {
   return value.toISOString().slice(0, 10);
 }
 
-function authorizeSnapshotRequest(request: Request) {
-  const cronSecret = process.env.CRON_SECRET?.trim();
-  if (!cronSecret) {
-    return jsonResponse(
-      {
-        success: false,
-        configured: false,
-        error: "A rotina de arquivo meteorológico ainda não foi configurada.",
-      },
-      503,
-    );
-  }
-
-  if (request.headers.get("authorization") !== `Bearer ${cronSecret}`) {
+async function authorizeSnapshotRequest(request: Request) {
+  if (!(await authorizeHistoricalArchiveRequest(request))) {
     return jsonResponse({ success: false, error: "Não autorizado." }, 401);
   }
-
-  const storage = getWeatherSnapshotStorageStatus();
-  if (!storage.configured) {
-    return jsonResponse(
-      {
-        success: false,
-        configured: false,
-        error: "O armazenamento de snapshots meteorológicos ainda não está disponível.",
-        missing: storage.missing,
-      },
-      503,
-    );
-  }
-
   return null;
 }
 
-async function captureDailySnapshot(request: Request) {
-  const guardResponse = authorizeSnapshotRequest(request);
-  if (guardResponse) return guardResponse;
+function ensureWeatherSnapshotStorage() {
+  const storage = getWeatherSnapshotStorageStatus();
+  if (storage.configured) return null;
+
+  return jsonResponse(
+    {
+      success: false,
+      configured: false,
+      error: "O armazenamento de snapshots meteorológicos ainda não está disponível.",
+      missing: storage.missing,
+    },
+    503,
+  );
+}
+
+async function captureDailySnapshot() {
+  const storageGuard = ensureWeatherSnapshotStorage();
+  if (storageGuard) return storageGuard;
 
   try {
     const history = await fetchPelotasWeatherHistory();
@@ -106,6 +105,7 @@ async function captureDailySnapshot(request: Request) {
     const snapshot = await upsertWeatherSnapshot(day, history.source.name);
     return jsonResponse({
       success: true,
+      action: "weather-daily",
       stored: true,
       targetDate,
       snapshot,
@@ -118,6 +118,7 @@ async function captureDailySnapshot(request: Request) {
     return jsonResponse(
       {
         success: false,
+        action: "weather-daily",
         stored: false,
         error: "Não foi possível persistir o snapshot meteorológico.",
       },
@@ -126,9 +127,9 @@ async function captureDailySnapshot(request: Request) {
   }
 }
 
-async function backfillSnapshots(request: Request) {
-  const guardResponse = authorizeSnapshotRequest(request);
-  if (guardResponse) return guardResponse;
+async function backfillSnapshots() {
+  const storageGuard = ensureWeatherSnapshotStorage();
+  if (storageGuard) return storageGuard;
 
   try {
     const history = await fetchPelotasWeatherHistory();
@@ -136,6 +137,7 @@ async function backfillSnapshots(request: Request) {
       return jsonResponse(
         {
           success: false,
+          action: "weather-backfill",
           backfill: false,
           error:
             "O preenchimento foi interrompido porque nenhuma série histórica real está disponível.",
@@ -147,6 +149,7 @@ async function backfillSnapshots(request: Request) {
     const snapshots = await upsertWeatherSnapshots(history.days, history.source.name);
     return jsonResponse({
       success: true,
+      action: "weather-backfill",
       backfill: true,
       storedCount: snapshots.length,
       firstDate: snapshots[0]?.date ?? null,
@@ -160,6 +163,7 @@ async function backfillSnapshots(request: Request) {
     return jsonResponse(
       {
         success: false,
+        action: "weather-backfill",
         backfill: false,
         error: "Não foi possível preencher o arquivo meteorológico.",
       },
@@ -168,11 +172,54 @@ async function backfillSnapshots(request: Request) {
   }
 }
 
+async function environmentalArchive(backfill: boolean) {
+  try {
+    const result = await captureEnvironmentalHistory(backfill);
+    return jsonResponse({ success: true, ...result });
+  } catch (error) {
+    console.error("[history/archive] Falha na captura ambiental", {
+      backfill,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return jsonResponse(
+      {
+        success: false,
+        action: backfill ? "environmental-backfill" : "environmental-capture",
+        error: "Não foi possível atualizar o arquivo histórico ambiental.",
+      },
+      500,
+    );
+  }
+}
+
+async function postAction(request: Request) {
+  let action: ArchiveAction = "weather-backfill";
+
+  try {
+    const body = (await request.json()) as { action?: unknown };
+    if (typeof body?.action === "string") action = body.action as ArchiveAction;
+  } catch {
+    // Compatibilidade com o POST histórico: sem corpo continua executando backfill meteorológico.
+  }
+
+  if (action === "weather-daily") return captureDailySnapshot();
+  if (action === "weather-backfill") return backfillSnapshots();
+  if (action === "environmental-capture") return environmentalArchive(false);
+  if (action === "environmental-backfill") return environmentalArchive(true);
+
+  return jsonResponse({ success: false, error: "Ação histórica inválida." }, 400);
+}
+
+async function handleAuthorized(request: Request, handler: () => Promise<Response>) {
+  const guard = await authorizeSnapshotRequest(request);
+  return guard ?? handler();
+}
+
 export const Route = createFileRoute("/api/cron/weather-snapshot")({
   server: {
     handlers: {
-      GET: ({ request }) => captureDailySnapshot(request),
-      POST: ({ request }) => backfillSnapshots(request),
+      GET: ({ request }) => handleAuthorized(request, captureDailySnapshot),
+      POST: ({ request }) => handleAuthorized(request, () => postAction(request)),
     },
   },
 });
