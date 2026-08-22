@@ -191,9 +191,10 @@ export function DefesaCivilHydroNetwork({ data }: { data: DefesaCivilHydroData }
           <h2 id="defesa-civil-hydro-title">Monitoramento hidrometeorológico da Zona Sul</h2>
         </div>
         <p>
-          Leituras observadas da Rede de Monitoramento Hidrometeorológico do Estado. O Tempo Pelotas
-          preserva estação, horário e unidade e não transforma essas medições em alerta ou previsão
-          de cheia.
+          Leituras oficiais da Rede de Monitoramento Hidrometeorológico da Defesa Civil RS. O Tempo
+          Pelotas organiza e ajuda a disseminar informações de órgãos públicos e fontes confiáveis,
+          preservando estação, horário, unidade e origem sem transformar essas medições em alerta ou
+          previsão de cheia.
         </p>
       </header>
 
@@ -287,12 +288,12 @@ export function DefesaCivilHydroNetwork({ data }: { data: DefesaCivilHydroData }
 
       <footer className="defesa-civil-hydro__source">
         <div>
-          <strong>Fonte e responsabilidade dos dados</strong>
+          <strong>Fonte oficial e créditos</strong>
           <p>
-            Dados originados na Rede de Monitoramento Hidrometeorológico e disponibilizados pela
-            Defesa Civil do Estado do Rio Grande do Sul. O Tempo Pelotas atua como interface
-            independente de consulta e não substitui os canais oficiais de alerta e orientação da
-            Defesa Civil.
+            Rede de Monitoramento Hidrometeorológico da Defesa Civil RS · Casa Militar do Estado do
+            Rio Grande do Sul. Dados disponibilizados pela Defesa Civil RS através da MKS. O Tempo
+            Pelotas atua como interface independente de consulta e disseminação, preserva a origem
+            das leituras e não substitui os canais oficiais de alerta e orientação da Defesa Civil.
           </p>
         </div>
         <div>
