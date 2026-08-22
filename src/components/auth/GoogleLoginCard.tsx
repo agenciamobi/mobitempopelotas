@@ -1,69 +1,115 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
+import {
+  createGoogleIdentityNonce,
+  getGoogleWebClientId,
+  loadGoogleIdentityServices,
+  type GoogleCredentialResponse,
+} from "@/lib/auth/google-identity";
 import { safeNextPath } from "@/lib/auth/paths";
 import { getSupabaseBrowserClient, isSupabaseBrowserConfigured } from "@/lib/supabase/client";
 
 const AUTH_ERRORS: Record<string, string> = {
   configuracao: "A autenticação está temporariamente indisponível neste ambiente.",
-  codigo: "O Google não devolveu um código de autenticação válido.",
+  codigo: "O Google não devolveu uma credencial de autenticação válida.",
   oauth: "Não foi possível concluir o acesso. Tente novamente.",
 };
 
-function GoogleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.8 3-4.3 3-7.3Z"
-      />
-      <path
-        fill="currentColor"
-        d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1a5.8 5.8 0 0 1-5.5-4H3.2v2.6A10 10 0 0 0 12 22Z"
-      />
-      <path fill="currentColor" d="M6.5 14a6 6 0 0 1 0-4V7.4H3.2a10 10 0 0 0 0 9.2L6.5 14Z" />
-      <path
-        fill="currentColor"
-        d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.8A9.7 9.7 0 0 0 12 2a10 10 0 0 0-8.8 5.4L6.5 10A5.8 5.8 0 0 1 12 5.9Z"
-      />
-    </svg>
-  );
-}
-
 export function GoogleLoginCard({ nextPath, errorCode }: { nextPath: string; errorCode?: string }) {
-  const configured = isSupabaseBrowserConfigured();
+  const buttonHostRef = useRef<HTMLDivElement>(null);
+  const supabaseConfigured = isSupabaseBrowserConfigured();
+  const googleClientId = getGoogleWebClientId();
+  const googleConfigured = googleClientId.length > 0;
+  const configured = supabaseConfigured && googleConfigured;
+  const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(
     errorCode ? (AUTH_ERRORS[errorCode] ?? null) : null,
   );
 
-  async function signIn() {
-    const client = getSupabaseBrowserClient();
-    if (!client) {
-      setError(AUTH_ERRORS.configuracao);
-      return;
+  useEffect(() => {
+    if (!configured || !buttonHostRef.current) return;
+
+    let active = true;
+    const host = buttonHostRef.current;
+
+    async function initializeGoogleIdentity() {
+      try {
+        const [google, nonce] = await Promise.all([
+          loadGoogleIdentityServices(),
+          createGoogleIdentityNonce(),
+        ]);
+
+        if (!active) return;
+
+        google.accounts.id.initialize({
+          client_id: googleClientId,
+          nonce: nonce.hashedNonce,
+          auto_select: false,
+          context: "signin",
+          ux_mode: "popup",
+          use_fedcm_for_prompt: true,
+          itp_support: true,
+          callback: async (response: GoogleCredentialResponse) => {
+            if (!active) return;
+
+            const client = getSupabaseBrowserClient();
+            if (!client || !response.credential) {
+              setError(AUTH_ERRORS.codigo);
+              return;
+            }
+
+            setLoading(true);
+            setError(null);
+
+            const { error: signInError } = await client.auth.signInWithIdToken({
+              provider: "google",
+              token: response.credential,
+              nonce: nonce.rawNonce,
+            });
+
+            if (!active) return;
+
+            if (signInError) {
+              setLoading(false);
+              setError("Não foi possível validar o acesso com Google.");
+              return;
+            }
+
+            window.location.replace(safeNextPath(nextPath, "/conta"));
+          },
+        });
+
+        host.replaceChildren();
+        google.accounts.id.renderButton(host, {
+          type: "standard",
+          theme: "outline",
+          size: "large",
+          text: "continue_with",
+          shape: "pill",
+          logo_alignment: "left",
+          width: Math.max(240, Math.min(400, Math.round(host.clientWidth || 320))),
+          locale: "pt-BR",
+        });
+        setReady(true);
+      } catch (cause) {
+        if (!active) return;
+        setReady(false);
+        setError(
+          cause instanceof Error
+            ? cause.message
+            : "Não foi possível preparar o acesso seguro com Google.",
+        );
+      }
     }
 
-    setLoading(true);
-    setError(null);
+    void initializeGoogleIdentity();
 
-    const callback = new URL("/auth/callback", window.location.origin);
-    callback.searchParams.set("next", safeNextPath(nextPath, "/conta"));
-
-    const { error: signInError } = await client.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: callback.toString(),
-        queryParams: {
-          prompt: "select_account",
-        },
-      },
-    });
-
-    if (signInError) {
-      setLoading(false);
-      setError("Não foi possível abrir o acesso com Google.");
-    }
-  }
+    return () => {
+      active = false;
+      host.replaceChildren();
+    };
+  }, [configured, googleClientId, nextPath]);
 
   return (
     <section className="login-card" aria-labelledby="login-card-title">
@@ -73,13 +119,32 @@ export function GoogleLoginCard({ nextPath, errorCode }: { nextPath: string; err
         A conta serve apenas para preferências opcionais. Previsão, imagens de satélite, câmeras,
         níveis das águas e avisos oficiais continuam disponíveis para todos.
       </p>
-      <button type="button" onClick={signIn} disabled={loading || !configured}>
-        <GoogleIcon />
-        <span>{loading ? "Abrindo o Google…" : "Continuar com Google"}</span>
-      </button>
-      {!configured ? (
+
+      <div
+        className={`login-card__google${loading ? " is-loading" : ""}`}
+        aria-busy={loading || (configured && !ready)}
+      >
+        <div ref={buttonHostRef} className="login-card__google-host" />
+        {configured && !ready && !error ? (
+          <span className="login-card__google-loading" role="status">
+            Carregando acesso seguro com Google…
+          </span>
+        ) : null}
+        {loading ? (
+          <span className="login-card__google-loading" role="status">
+            Validando sua conta…
+          </span>
+        ) : null}
+      </div>
+
+      {!supabaseConfigured ? (
         <p className="login-card__notice" role="status">
           A autenticação ainda não foi habilitada neste ambiente.
+        </p>
+      ) : null}
+      {supabaseConfigured && !googleConfigured ? (
+        <p className="login-card__notice" role="status">
+          O Client ID público do Google ainda não foi configurado neste ambiente.
         </p>
       ) : null}
       {error ? (
@@ -88,8 +153,8 @@ export function GoogleLoginCard({ nextPath, errorCode }: { nextPath: string; err
         </p>
       ) : null}
       <small>
-        O portal solicita somente identificação básica fornecida pelo Google. Nenhuma previsão ou
-        informação pública depende da criação de uma conta.
+        O Google autentica diretamente no Tempo Pelotas. Depois, a credencial é validada pelo
+        Supabase para abrir sua sessão; o domínio técnico do banco não faz parte da escolha da conta.
       </small>
     </section>
   );
