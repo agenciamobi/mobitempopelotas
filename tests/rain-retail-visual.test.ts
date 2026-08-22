@@ -7,6 +7,10 @@ const hero = readFileSync("src/components/weather/RainRetailHero.tsx", "utf8");
 const heroStyles = readFileSync("src/components/weather/RainRetailHero.css", "utf8");
 const page = readFileSync("src/components/weather/RainForecastPageV2.tsx", "utf8");
 const pageStyles = readFileSync("src/components/weather/RainForecastPageV2.css", "utf8");
+const hourlyVolumeStyles = readFileSync(
+  "src/components/weather/RainHourlyVolumeContext.css",
+  "utf8",
+);
 const shellStyles = readFileSync("src/components/layout/InternalWeatherPageShell.css", "utf8");
 
 test("rain route uses the shared shell with a dedicated retail hero", () => {
@@ -119,6 +123,18 @@ test("rain experience uses the exact header rail", () => {
     /\.internal-weather-shell--rain \.rain-v2-page,[\s\S]*width:\s*100%[\s\S]*max-width:\s*none/,
   );
   assert.match(heroStyles, /max-width:\s*var\(--internal-weather-frame-max\)/);
+});
+
+test("hourly rain volume uses Home surfaces while keeping functional precipitation bars", () => {
+  assert.match(hourlyVolumeStyles, /\.internal-weather-shell--rain \.rain-hourly-volume-context \{/);
+  assert.match(hourlyVolumeStyles, /background:\s*#fff/);
+  assert.match(hourlyVolumeStyles, /\.rain-hourly-volume-context__summary article[\s\S]*background:\s*#fbfcfc/);
+  assert.match(hourlyVolumeStyles, /\.rain-hourly-volume-context__timeline article[\s\S]*background:\s*#fbfcfc/);
+  assert.match(hourlyVolumeStyles, /box-shadow:\s*none/);
+  assert.doesNotMatch(hourlyVolumeStyles, /radial-gradient/);
+  assert.match(hourlyVolumeStyles, /gradiente abaixo é funcional/);
+  assert.match(hourlyVolumeStyles, /linear-gradient\(90deg, #18bdcd, #5e2ced\)/);
+  assert.match(hourlyVolumeStyles, /repeating-linear-gradient/);
 });
 
 test("rain typography remains readable and responsive", () => {
