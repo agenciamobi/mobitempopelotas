@@ -126,15 +126,6 @@
   line-height: 1.25;
 }
 
-.internal-weather-shell--rain .rain-retail-hero__inner {
-  width: 100%;
-  max-width: var(--internal-weather-frame-max);
-  margin-inline: auto;
-  padding-right: var(--internal-weather-frame-gutter);
-  padding-left: var(--internal-weather-frame-gutter);
-  box-sizing: border-box;
-}
-
 .rain-retail-hero.today-retail-hero--attention .today-retail-hero__primary,
 .rain-retail-hero.today-retail-hero--warning .today-retail-hero__primary {
   background: linear-gradient(135deg, #ef5b4d, #cf342c);
