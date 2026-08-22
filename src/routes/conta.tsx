@@ -3,11 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AccountPage } from "@/components/auth/AccountPage";
 import { GoogleLoginCard } from "@/components/auth/GoogleLoginCard";
 import { getAccountSnapshot } from "@/lib/auth/account.functions";
+import { safeNextPath } from "@/lib/auth/paths";
 import { absoluteUrl, SITE_NAME } from "@/lib/site-config";
 
 function validateSearch(search: Record<string, unknown>) {
   return {
     erro: typeof search.erro === "string" ? search.erro : undefined,
+    next: safeNextPath(typeof search.next === "string" ? search.next : null, "/conta"),
   };
 }
 
@@ -54,7 +56,7 @@ function AccountUnavailable() {
   );
 }
 
-function VisitorLogin({ errorCode }: { errorCode?: string }) {
+function VisitorLogin({ errorCode, nextPath }: { errorCode?: string; nextPath: string }) {
   return (
     <main className="login-page" id="conteudo-principal">
       <Link className="login-page__brand" to="/" aria-label="Voltar ao Tempo Pelotas">
@@ -65,7 +67,7 @@ function VisitorLogin({ errorCode }: { errorCode?: string }) {
           height={1552}
         />
       </Link>
-      <GoogleLoginCard nextPath="/conta" errorCode={errorCode} />
+      <GoogleLoginCard nextPath={nextPath} errorCode={errorCode} />
       <Link className="login-page__back" to="/">
         ← Voltar para a previsão
       </Link>
@@ -78,7 +80,9 @@ function ContaPage() {
   const search = Route.useSearch();
 
   if (snapshot.status === "unavailable") return <AccountUnavailable />;
-  if (snapshot.status === "unauthenticated") return <VisitorLogin errorCode={search.erro} />;
+  if (snapshot.status === "unauthenticated") {
+    return <VisitorLogin errorCode={search.erro} nextPath={search.next} />;
+  }
 
   return <AccountPage snapshot={snapshot} />;
 }
