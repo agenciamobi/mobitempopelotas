@@ -5,6 +5,7 @@ import test from "node:test";
 import { safeNextPath } from "../src/lib/auth/paths.ts";
 
 const loginCard = readFileSync("src/components/auth/GoogleLoginCard.tsx", "utf8");
+const googleIdentity = readFileSync("src/lib/auth/google-identity.ts", "utf8");
 const callbackRoute = readFileSync("src/routes/auth/callback.ts", "utf8");
 const signoutRoute = readFileSync("src/routes/auth/signout.ts", "utf8");
 const accountRoute = readFileSync("src/routes/conta.tsx", "utf8");
@@ -28,16 +29,24 @@ test("retorno pós-login aceita somente caminhos internos normalizados", () => {
   assert.equal(safeNextPath(null, "/conta"), "/conta");
 });
 
-test("login Google usa PKCE do Supabase e callback do próprio domínio", () => {
-  assert.match(loginCard, /signInWithOAuth/);
+test("login Google usa Identity Services direto no portal e valida ID token no Supabase", () => {
+  assert.match(loginCard, /signInWithIdToken/);
   assert.match(loginCard, /provider:\s*["']google["']/);
-  assert.match(loginCard, /new URL\(["']\/auth\/callback["'], window\.location\.origin\)/);
-  assert.match(loginCard, /callback\.searchParams\.set\(["']next["'], safeNextPath/);
-  assert.match(loginCard, /redirectTo:\s*callback\.toString\(\)/);
-  assert.match(loginCard, /prompt:\s*["']select_account["']/);
+  assert.match(loginCard, /token:\s*response\.credential/);
+  assert.match(loginCard, /nonce:\s*nonce\.rawNonce/);
+  assert.match(loginCard, /ux_mode:\s*["']popup["']/);
+  assert.match(loginCard, /use_fedcm_for_prompt:\s*true/);
+  assert.doesNotMatch(loginCard, /signInWithOAuth/);
+  assert.doesNotMatch(loginCard, /\/auth\/v1\/callback/);
+
+  assert.match(googleIdentity, /VITE_GOOGLE_CLIENT_ID/);
+  assert.match(googleIdentity, /https:\/\/accounts\.google\.com\/gsi\/client/);
+  assert.match(googleIdentity, /crypto\.subtle\.digest\(["']SHA-256["']/);
+  assert.match(googleIdentity, /hashedNonce/);
+  assert.match(googleIdentity, /rawNonce/);
 });
 
-test("callback troca o código no servidor e não aceita redirect externo", () => {
+test("callback PKCE legado permanece seguro durante a transição", () => {
   assert.match(callbackRoute, /safeNextPath\(url\.searchParams\.get\(["']next["']\), ["']\/conta["']\)/);
   assert.match(callbackRoute, /client\.auth\.exchangeCodeForSession\(code\)/);
   assert.match(callbackRoute, /new URL\(next, url\.origin\)/);
