@@ -3,7 +3,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { withRedemetLastGood } from "@/lib/redemet/redemet-last-good.server";
 import { fetchRedemetSatellite } from "@/lib/redemet/redemet.server";
 import {
+  isUsefulVisibleSatelliteTimestamp,
   keepUsefulVisibleSatelliteFrames,
+  nextUsefulVisibleSatelliteTimestamp,
 } from "@/lib/redemet/redemet-visible-daylight";
 import type {
   RedemetImageLayerResponse,
@@ -42,13 +44,19 @@ function daylightVisiblePayload(payload: RedemetImageLayerResponse, requestedFra
 
   const frames = keepUsefulVisibleSatelliteFrames(payload.frames, requestedFrames);
   if (!frames.length) {
+    const now = new Date();
+    const isNighttime = !isUsefulVisibleSatelliteTimestamp(now.toISOString());
+
     return {
       ...payload,
       available: false,
       frames: [],
       currentIndex: 0,
-      error:
-        "O canal visível depende de luz solar e não há imagem diurna recente nesta janela. Use Infravermelho ou Realçado durante a noite.",
+      availabilityReason: isNighttime ? "daylight" : null,
+      nextExpectedAt: isNighttime ? nextUsefulVisibleSatelliteTimestamp(now) : null,
+      error: isNighttime
+        ? "Durante a noite, o canal visível não produz uma imagem útil. Use Infravermelho ou Realçado enquanto aguardamos a próxima janela de luz solar."
+        : "Ainda não há uma imagem visível diurna utilizável nesta atualização da REDEMET.",
     } satisfies RedemetImageLayerResponse;
   }
 
@@ -58,6 +66,8 @@ function daylightVisiblePayload(payload: RedemetImageLayerResponse, requestedFra
     currentIndex: frames.length - 1,
     updatedAt: frames.at(-1)?.observedAt ?? payload.updatedAt,
     error: null,
+    availabilityReason: null,
+    nextExpectedAt: null,
   } satisfies RedemetImageLayerResponse;
 }
 
