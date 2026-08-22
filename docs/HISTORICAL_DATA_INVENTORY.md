@@ -25,6 +25,7 @@ Referências principais:
 - `docs/DEFESA_CIVIL_RS_HYDROMET_PLAN.md`;
 - `docs/REDEMET_OPERATIONS.md`;
 - `supabase/migrations/20260822025000_create_historical_data_layer.sql`;
+- `supabase/migrations/20260822072000_archive_embrapa_daily_extremes.sql`;
 - `src/lib/history/historical-archive.server.ts`.
 
 ## 2. Classes obrigatórias de dados
@@ -90,7 +91,10 @@ Em 22/08/2026 o projeto já possui uma camada histórica canônica com:
 - coletor protegido e agendado;
 - deduplicação por fonte + estação + variável + classe + horário;
 - separação entre `observation`, `forecast`, `reanalysis` e `derived`;
-- `paid_access_allowed=false` por padrão para fontes ainda não revisadas comercialmente.
+- `paid_access_allowed=false` por padrão para fontes ainda não revisadas comercialmente;
+- espelhamento automático da observação Embrapa;
+- extremos diários da Embrapa mantidos como um ponto canônico por dia local, atualizado ao longo do dia e retropreenchido a partir do arquivo próprio já existente;
+- coleta hidrológica ambiental agendada a cada 5 minutos, com backfill diário da janela exposta pelas fontes.
 
 O banco também mantém estruturas anteriores/especializadas que não devem ser destruídas apenas para centralização:
 
@@ -108,7 +112,7 @@ O Historical Data Layer deve consolidar acesso e patrimônio de dados sem exigir
 | Fonte / conjunto | Variáveis ou ativos históricos | Classe | Situação | Potencial retroativo | Prioridade |
 | --- | --- | --- | --- | --- | --- |
 | Embrapa Clima Temperado — atual | temperatura, sensação, umidade, ponto de orvalho, pressão, tendência de pressão, vento, direção, chuva, evapotranspiração | `observation` | **já armazenando** | arquivo próprio desde 29/07/2026; investigar acervo anterior | muito alta |
-| Embrapa — extremos diários | temperatura min/max + horário, umidade min/max, ponto de orvalho min/max, vento máximo + horário | `observation` | parser já captura; histórico ainda incompleto | investigar boletins/acervo | **imediata** |
+| Embrapa — extremos diários | temperatura min/max + horário, umidade min/max, ponto de orvalho min/max, vento máximo + horário | `observation` | **já armazenando em ponto diário canônico** | retropreenchido a partir do arquivo próprio; investigar boletins/acervo anterior | muito alta |
 | Embrapa/UFPel — boletins agroclimáticos | conjunto amplo de variáveis meteorológicas diárias, médias mensais e dados de solo conforme boletim | `observation` | candidato de backfill | acervo histórico conhecido; validar formato e termos antes da importação | muito alta |
 | INMET — estações automáticas | temperatura, extremos, umidade, ponto de orvalho, pressão, chuva, vento, direção, rajada, radiação e demais campos disponíveis | `observation` | ainda não importado para o arquivo próprio | arquivos históricos anuais conforme estação/período disponível | muito alta |
 | Laranjal / LabHidroSens | nível da Lagoa | `observation` | **já armazenando** | janela disponibilizada pela fonte + coleta daqui para frente | muito alta |
@@ -148,28 +152,11 @@ O Historical Data Layer já recebe da estação Embrapa:
 - `evapotranspiration_monthly`;
 - `evapotranspiration_annual`.
 
-### 5.2. Variáveis que o parser já reconhece e não devem continuar escapando
+### 5.2. Extremos diários agora historizados
 
-O parser atual também reconhece extremos e seus horários:
+O parser reconhece os extremos e seus horários, e desde a migration `20260822072000_archive_embrapa_daily_extremes.sql` esses campos deixam de escapar do arquivo canônico.
 
-- temperatura mínima do dia;
-- horário da temperatura mínima;
-- temperatura máxima do dia;
-- horário da temperatura máxima;
-- umidade mínima;
-- horário da umidade mínima;
-- umidade máxima;
-- horário da umidade máxima;
-- ponto de orvalho mínimo;
-- horário do ponto de orvalho mínimo;
-- ponto de orvalho máximo;
-- horário do ponto de orvalho máximo;
-- velocidade máxima do vento;
-- horário da velocidade máxima do vento.
-
-Esses campos devem ser incorporados ao arquivo histórico com semântica explícita.
-
-Nomes candidatos:
+Variáveis preservadas:
 
 ```text
 temperature_daily_min
@@ -181,7 +168,17 @@ dew_point_daily_max
 wind_speed_daily_max
 ```
 
-Os horários dos extremos podem ser preservados como metadado do ponto diário ou como campo associado no rollup diário. Evitar modelá-los como medições independentes sem necessidade.
+Semântica adotada:
+
+- existe **um ponto por variável e por dia local de Pelotas**, usando `America/Sao_Paulo`;
+- o `observed_at` representa o início do dia local da estatística diária, não o horário em que o extremo ocorreu;
+- o horário informado pela Embrapa para cada mínimo/máximo fica em `metadata.extremeTime`;
+- `metadata.period = day` diferencia explicitamente a natureza diária do ponto;
+- o ponto do dia corrente é atualizado conforme novas leituras da própria Embrapa mudam o extremo acumulado daquele dia;
+- o backfill inicial usa a última observação disponível de cada dia no arquivo próprio `weather_station_observations`;
+- dados anteriores ao início do arquivo próprio continuam dependendo de boletins/acervo externo e revisão específica.
+
+Essa abordagem evita gerar uma “medição falsa” no horário do mínimo/máximo e também evita gravar centenas de versões intermediárias da mesma estatística diária.
 
 ### 5.3. Boletins históricos Embrapa/UFPel
 
@@ -277,6 +274,8 @@ O coletor atual preserva `water_level` para:
 - Gasômetro.
 
 A deduplicação é feita por estação + variável + classe + timestamp.
+
+No banco oficial, a coleta `environmental-capture` está agendada a cada 5 minutos e a ação `environmental-backfill` roda diariamente para reaproveitar a janela histórica que cada fonte ainda expõe. Execuções bem-sucedidas e contagens são registradas em `historical_collection_runs`.
 
 ### 8.2. ANA / RHN
 
@@ -592,14 +591,17 @@ Rollups futuros devem preservar conforme a variável:
 
 ### Prioridade 0 — não perder o que já passa pelo código
 
-Antes de grandes backfills:
+Concluído nesta prioridade:
 
-1. completar extremos da Embrapa;
-2. preservar forecast run rico do Open-Meteo;
-3. iniciar arquivo equivalente do MET Norway;
-4. avaliar arquivo estruturado do STSC;
-5. iniciar arquivo de eventos INMET;
-6. manter níveis/hidrologia já em coleta.
+1. extremos diários da Embrapa agora possuem ponto canônico diário e backfill do próprio arquivo;
+2. níveis/hidrologia já permanecem em coleta contínua.
+
+Próximos itens urgentes:
+
+1. preservar forecast run rico do Open-Meteo;
+2. iniciar arquivo equivalente do MET Norway;
+3. avaliar arquivo estruturado do STSC;
+4. iniciar arquivo de eventos INMET.
 
 Essa etapa é urgente porque não depende de recuperar o passado: evita perder o presente.
 
@@ -704,16 +706,15 @@ O Historical Data Layer deve evoluir de maneira que essas perguntas possam ser r
 
 ## 20. Próximas ações
 
-1. ampliar imediatamente o espelhamento da Embrapa para todos os extremos já capturados;
-2. desenhar o schema de forecast runs completos sem destruir `weather_forecast_predictions`;
-3. começar a preservar Open-Meteo e MET Norway por ciclo;
-4. criar inventário técnico de estações INMET relevantes;
-5. mapear o acervo Embrapa/UFPel para backfill;
-6. concluir o contrato histórico ANA/RHN;
-7. concluir o catálogo da Defesa Civil RS;
-8. definir política de eventos para INMET/STSC;
-9. avaliar metadados de radar/satélite;
-10. somente depois iniciar backfills massivos de reanálise e storage pesado.
+1. desenhar o schema de forecast runs completos sem destruir `weather_forecast_predictions`;
+2. começar a preservar Open-Meteo e MET Norway por ciclo;
+3. criar inventário técnico de estações INMET relevantes;
+4. mapear o acervo Embrapa/UFPel para backfill;
+5. concluir o contrato histórico ANA/RHN;
+6. concluir o catálogo da Defesa Civil RS;
+7. definir política de eventos para INMET/STSC;
+8. avaliar metadados de radar/satélite;
+9. somente depois iniciar backfills massivos de reanálise e storage pesado.
 
 Este documento deve ser atualizado sempre que:
 
