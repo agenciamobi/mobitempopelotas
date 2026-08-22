@@ -176,7 +176,7 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
           container: mapContainerRef.current,
           style: MAP_STYLE,
           center: PELOTAS_CENTER,
-          zoom: 7.4,
+          zoom: 4.4,
           minZoom: 4,
           maxZoom: 13,
           cooperativeGestures: true,
