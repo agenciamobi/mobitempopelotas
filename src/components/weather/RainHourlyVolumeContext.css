@@ -5,10 +5,7 @@
   padding: clamp(1.35rem, 3vw, 2.5rem);
   border: 1px solid var(--internal-weather-line, rgb(7 30 47 / 10%));
   border-radius: var(--internal-weather-radius, 16px);
-  background:
-    radial-gradient(circle at 100% 0, rgb(94 44 237 / 6%), transparent 22rem),
-    radial-gradient(circle at 0 100%, rgb(24 189 205 / 7%), transparent 20rem),
-    #fff;
+  background: #fff;
   box-shadow: none;
 }
 
@@ -69,19 +66,8 @@
   padding: 1rem;
   border: 1px solid rgb(7 30 47 / 8%);
   border-radius: 13px;
-  background: #f5fbfc;
-}
-
-.internal-weather-shell--rain .rain-hourly-volume-context__summary article:nth-child(2) {
-  background: #f7f4ff;
-}
-
-.internal-weather-shell--rain .rain-hourly-volume-context__summary article:nth-child(3) {
-  background: #fff8f3;
-}
-
-.internal-weather-shell--rain .rain-hourly-volume-context__summary article:nth-child(4) {
-  background: #fff4f9;
+  background: #fbfcfc;
+  box-shadow: none;
 }
 
 .internal-weather-shell--rain .rain-hourly-volume-context__summary svg {
@@ -144,6 +130,7 @@
   border: 1px solid rgb(7 30 47 / 8%);
   border-radius: 12px;
   background: #fbfcfc;
+  box-shadow: none;
   scroll-snap-align: start;
 }
 
@@ -182,6 +169,7 @@
   background: rgb(7 30 47 / 7%);
 }
 
+/* O gradiente abaixo é funcional: representa visualmente o volume previsto. */
 .internal-weather-shell--rain .rain-hourly-volume-context__timeline i span {
   display: block;
   width: var(--rain-hourly-volume, 0%);
@@ -204,7 +192,8 @@
   display: flex;
   align-items: flex-start;
   gap: 0.55rem;
-  padding-top: 0.15rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgb(7 30 47 / 8%);
   color: #607984;
 }
 
