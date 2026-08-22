@@ -8,6 +8,10 @@ const migration = readFileSync(
   "supabase/migrations/20260822043000_create_account_access.sql",
   "utf8",
 );
+const repairMigration = readFileSync(
+  "supabase/migrations/20260822045500_repair_authenticated_account_foundation.sql",
+  "utf8",
+);
 const accountFunctions = readFileSync("src/lib/auth/account.functions.ts", "utf8");
 
 test("authenticated account defaults safely to Free", () => {
@@ -55,9 +59,27 @@ test("account_access is private, user-readable and automatically created as Free
   assert.doesNotMatch(migration, /grant (?:insert|update|delete).*authenticated/i);
 });
 
-test("backend resolves the access layer together with the authenticated account", () => {
+test("authenticated self-repair can only recreate the account foundation as Free", () => {
+  assert.match(repairMigration, /security definer/i);
+  assert.match(repairMigration, /set search_path = ''/);
+  assert.match(repairMigration, /v_user_id uuid := auth\.uid\(\)/);
+  assert.match(repairMigration, /insert into public\.profiles/);
+  assert.match(repairMigration, /insert into public\.user_preferences/);
+  assert.match(repairMigration, /insert into public\.account_access/);
+  assert.match(repairMigration, /values \(v_user_id, 'free', 'active', 'system'\)/);
+  assert.match(repairMigration, /on conflict \(user_id\) do nothing/);
+  assert.match(repairMigration, /revoke all on function public\.ensure_current_user_account_foundation\(\) from public, anon/);
+  assert.match(repairMigration, /grant execute on function public\.ensure_current_user_account_foundation\(\) to authenticated/);
+  assert.doesNotMatch(repairMigration, /values\s*\([^)]*'pro'/i);
+  assert.doesNotMatch(repairMigration, /update\s+public\.account_access[\s\S]*tier\s*=/i);
+});
+
+test("backend resolves and repairs the authenticated account foundation", () => {
   assert.match(accountFunctions, /\.from\("account_access"\)/);
   assert.match(accountFunctions, /\.select\("tier,status,source,valid_until"\)/);
+  assert.match(accountFunctions, /rpc\("ensure_current_user_account_foundation"\)/);
+  assert.match(accountFunctions, /!profileResult\.data \|\| !preferencesResult\.data \|\| !accessResult\.data/);
+  assert.match(accountFunctions, /profile &&\s*preferences &&\s*accountAccess/s);
   assert.match(accountFunctions, /resolveAccountAccess/);
   assert.match(accountFunctions, /Cache-Control", "private, no-store, max-age=0"/);
 });
