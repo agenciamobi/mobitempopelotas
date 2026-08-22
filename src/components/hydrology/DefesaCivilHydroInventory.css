@@ -1,0 +1,122 @@
+.defesa-civil-hydro__inventory {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.8rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid #e4e8ef;
+  border-radius: 0.9rem;
+  background: #fbfcff;
+}
+
+.defesa-civil-hydro__inventory > span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  min-height: 2rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid #e1e6ef;
+  border-radius: 999px;
+  background: #fff;
+  color: #566173;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.defesa-civil-hydro__inventory > span strong {
+  color: #172033;
+  font-size: 0.9rem;
+}
+
+.defesa-civil-hydro__inventory > small {
+  flex: 1 1 24rem;
+  color: #697386;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.defesa-civil-hydro__station-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.defesa-civil-hydro__classification {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+  padding: 0.18rem 0.48rem;
+  border: 1px solid #dfe4ec;
+  border-radius: 999px;
+  background: #f7f8fb;
+  color: #596579;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.defesa-civil-hydro__classification.is-hydrology {
+  border-color: rgb(23 189 204 / 28%);
+  background: rgb(23 189 204 / 8%);
+  color: #087d89;
+}
+
+.defesa-civil-hydro__classification.is-meteorology {
+  border-color: rgb(242 111 53 / 28%);
+  background: rgb(242 111 53 / 8%);
+  color: #9a431f;
+}
+
+.defesa-civil-hydro__classification.is-both {
+  border-color: rgb(94 44 237 / 22%);
+  background: rgb(94 44 237 / 7%);
+  color: #4b2ad0;
+}
+
+.defesa-civil-hydro__capabilities {
+  margin: 0.7rem 0 0;
+  color: #697386;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.defesa-civil-hydro__river-trend {
+  margin: 0.6rem 0 0;
+  padding: 0.65rem 0.75rem;
+  border-left: 3px solid #17bdcc;
+  border-radius: 0.55rem;
+  background: #f6fbfc;
+  color: #536173;
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.defesa-civil-hydro__river-trend strong {
+  color: #172033;
+}
+
+@media (max-width: 680px) {
+  .defesa-civil-hydro__inventory {
+    align-items: stretch;
+  }
+
+  .defesa-civil-hydro__inventory > span {
+    flex: 1 1 calc(50% - 0.55rem);
+    justify-content: center;
+  }
+
+  .defesa-civil-hydro__inventory > small {
+    flex-basis: 100%;
+  }
+}
+
+@media (forced-colors: active) {
+  .defesa-civil-hydro__inventory,
+  .defesa-civil-hydro__inventory > span,
+  .defesa-civil-hydro__classification,
+  .defesa-civil-hydro__river-trend {
+    border: 1px solid CanvasText;
+  }
+}
