@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest, setResponseHeaders } from "@tanstack/react-start/server";
 import { z } from "zod";
 
+import { resolveAccountAccess, type EffectiveAccountAccess } from "@/lib/auth/account-access";
 import { createSupabaseRequestClient } from "@/lib/supabase/request-client.server";
 import { getSupabaseServerConfig } from "@/lib/supabase/server-client.server";
 
@@ -32,6 +33,7 @@ export type AccountSnapshot =
         avatarUrl: string | null;
       };
       preferences: AccountPreferences;
+      access: EffectiveAccountAccess;
     };
 
 const defaultPreferences: AccountPreferences = {
@@ -70,19 +72,27 @@ export const getAccountSnapshot = createServerFn({ method: "GET" }).handler(
       return { status: "unauthenticated" };
     }
 
-    const [{ data: profile, error: profileError }, { data: preferences, error: preferencesError }] =
-      await Promise.all([
-        client
-          .from("profiles")
-          .select("display_name,email,avatar_url")
-          .eq("id", user.id)
-          .maybeSingle(),
-        client
-          .from("user_preferences")
-          .select("weather_alerts,water_alerts,daily_summary,community_updates")
-          .eq("user_id", user.id)
-          .maybeSingle(),
-      ]);
+    const [
+      { data: profile, error: profileError },
+      { data: preferences, error: preferencesError },
+      { data: accountAccess, error: accessError },
+    ] = await Promise.all([
+      client
+        .from("profiles")
+        .select("display_name,email,avatar_url")
+        .eq("id", user.id)
+        .maybeSingle(),
+      client
+        .from("user_preferences")
+        .select("weather_alerts,water_alerts,daily_summary,community_updates")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      client
+        .from("account_access")
+        .select("tier,status,source,valid_until")
+        .eq("user_id", user.id)
+        .maybeSingle(),
+    ]);
 
     const displayName =
       profile?.display_name ??
@@ -96,10 +106,11 @@ export const getAccountSnapshot = createServerFn({ method: "GET" }).handler(
       metadataText(user.user_metadata?.avatar_url) ??
       metadataText(user.user_metadata?.picture);
 
-    if (profileError || preferencesError) {
-      console.error("[account] Falha ao consultar perfil ou preferências", {
+    if (profileError || preferencesError || accessError) {
+      console.error("[account] Falha ao consultar dados da conta", {
         profile: profileError?.message,
         preferences: preferencesError?.message,
+        access: accessError?.message,
       });
     }
 
@@ -107,7 +118,7 @@ export const getAccountSnapshot = createServerFn({ method: "GET" }).handler(
 
     return {
       status: "authenticated",
-      storageReady: !profileError && !preferencesError,
+      storageReady: !profileError && !preferencesError && !accessError,
       identity: { displayName, email, avatarUrl },
       preferences: preferences
         ? {
@@ -117,6 +128,16 @@ export const getAccountSnapshot = createServerFn({ method: "GET" }).handler(
             communityUpdates: preferences.community_updates,
           }
         : defaultPreferences,
+      access: resolveAccountAccess(
+        accountAccess
+          ? {
+              tier: accountAccess.tier,
+              status: accountAccess.status,
+              source: accountAccess.source,
+              validUntil: accountAccess.valid_until,
+            }
+          : null,
+      ),
     };
   },
 );
