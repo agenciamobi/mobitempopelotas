@@ -44,6 +44,9 @@ jobs:
       - name: Contratos rápidos
         run: npm run test:contracts
 
+      - name: Arquivo rico de previsões
+        run: node --test tests/forecast-rich-runs.test.ts
+
       - name: Contrato Weather AI
         run: node --test tests/weather-ai-snapshots.test.ts
 
