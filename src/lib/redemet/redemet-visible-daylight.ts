@@ -2,6 +2,8 @@ import type { RedemetImageFrame } from "./redemet.types";
 
 const PELOTAS_COORDINATES = { latitude: -31.7654, longitude: -52.3376 } as const;
 const MINIMUM_USEFUL_SOLAR_ELEVATION_DEGREES = -3;
+const NEXT_WINDOW_STEP_MINUTES = 5;
+const NEXT_WINDOW_HORIZON_HOURS = 36;
 
 function normalizeDegrees(value: number) {
   return ((value % 360) + 360) % 360;
@@ -53,6 +55,27 @@ export function isUsefulVisibleSatelliteTimestamp(value: string | null | undefin
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return false;
   return solarElevationDegrees(date) >= MINIMUM_USEFUL_SOLAR_ELEVATION_DEGREES;
+}
+
+export function nextUsefulVisibleSatelliteTimestamp(from = new Date()) {
+  if (Number.isNaN(from.getTime())) return null;
+
+  const start = from.getTime();
+  const stepMs = NEXT_WINDOW_STEP_MINUTES * 60_000;
+  const horizonMs = NEXT_WINDOW_HORIZON_HOURS * 60 * 60_000;
+  const currentlyUseful =
+    solarElevationDegrees(from) >= MINIMUM_USEFUL_SOLAR_ELEVATION_DEGREES;
+
+  if (currentlyUseful) return from.toISOString();
+
+  for (let offset = stepMs; offset <= horizonMs; offset += stepMs) {
+    const candidate = new Date(start + offset);
+    if (solarElevationDegrees(candidate) >= MINIMUM_USEFUL_SOLAR_ELEVATION_DEGREES) {
+      return candidate.toISOString();
+    }
+  }
+
+  return null;
 }
 
 export function keepUsefulVisibleSatelliteFrames(
