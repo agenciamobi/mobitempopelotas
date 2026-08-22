@@ -26,7 +26,9 @@ Referências principais:
 - `docs/REDEMET_OPERATIONS.md`;
 - `supabase/migrations/20260822025000_create_historical_data_layer.sql`;
 - `supabase/migrations/20260822072000_archive_embrapa_daily_extremes.sql`;
-- `src/lib/history/historical-archive.server.ts`.
+- `supabase/migrations/20260822073500_archive_rich_open_meteo_forecast_runs.sql`;
+- `src/lib/history/historical-archive.server.ts`;
+- `supabase/functions/forecast-open-meteo-capture/index.ts`.
 
 ## 2. Classes obrigatórias de dados
 
@@ -55,7 +57,7 @@ Exemplos:
 - MET Norway prevendo rajada de 42 km/h;
 - probabilidade de precipitação prevista para determinada hora.
 
-O histórico deve preservar **quando a previsão foi emitida** e **para quando ela era válida**.
+O histórico deve preservar **quando o Tempo Pelotas capturou a previsão**, para quando ela era válida e, quando a própria fonte fornecer de forma confiável, o horário/ciclo oficial de emissão do modelo. Não inferir emissão oficial a partir do horário de captura.
 
 ### `reanalysis`
 
@@ -94,7 +96,8 @@ Em 22/08/2026 o projeto já possui uma camada histórica canônica com:
 - `paid_access_allowed=false` por padrão para fontes ainda não revisadas comercialmente;
 - espelhamento automático da observação Embrapa;
 - extremos diários da Embrapa mantidos como um ponto canônico por dia local, atualizado ao longo do dia e retropreenchido a partir do arquivo próprio já existente;
-- coleta hidrológica ambiental agendada a cada 5 minutos, com backfill diário da janela exposta pelas fontes.
+- coleta hidrológica ambiental agendada a cada 5 minutos, com backfill diário da janela exposta pelas fontes;
+- arquivo rico de forecast runs do Open-Meteo, com um snapshot completo por ciclo de 6 horas e série horária de 7 dias.
 
 O banco também mantém estruturas anteriores/especializadas que não devem ser destruídas apenas para centralização:
 
@@ -102,6 +105,8 @@ O banco também mantém estruturas anteriores/especializadas que não devem ser 
 - `weather_station_current`;
 - `weather_forecast_predictions`;
 - `weather_forecast_verifications`;
+- `weather_forecast_runs`;
+- `weather_forecast_hourly_points`;
 - `weather_daily_snapshots`;
 - `weather_provider_payload_cache`.
 
@@ -121,8 +126,8 @@ O Historical Data Layer deve consolidar acesso e patrimônio de dados sem exigir
 | Gasômetro / Nível Guaíba | nível | `observation` | **já armazenando daqui para frente** | investigar histórico oficial/subjacente e origem ANA/SGB quando aplicável | alta |
 | ANA / SNIRH / RHN | nível, vazão, chuva e outros parâmetros conforme estação | `observation` | integração em validação | HidroWeb possui acervo histórico; contrato técnico e uso ainda precisam ser fechados | **muito alta** |
 | Defesa Civil RS | nível, chuva, temperatura, umidade, pressão, sensação, vento, rajada, direção, radiação e outros sensores | `observation` | pesquisa/inventário | API identificada com operação `Historic`; confirmar estações, retenção e termos | **muito alta** |
-| Open-Meteo — forecast | temperatura, sensação, umidade, ponto de orvalho, chuva, probabilidade, pressão, visibilidade, nuvens, CAPE, camada limite, vento, rajada, direção e campos diários | `forecast` | arquivo parcial já existe | preservar todos os ciclos daqui para frente; backfill de forecast quando contratualmente disponível | **imediata** |
-| MET Norway — forecast | temperatura, umidade, ponto de orvalho, pressão, cobertura de nuvens, precipitação, vento, rajada, direção e condição | `forecast` | usado no runtime, ainda sem arquivo histórico completo | coleta própria daqui para frente | alta |
+| Open-Meteo — forecast | temperatura, sensação, umidade, ponto de orvalho, chuva, probabilidade, pressão, visibilidade, nuvens, CAPE, camada limite, vento, rajada, direção, código meteorológico e dia/noite | `forecast` | **forecast run rico já armazenando por ciclo** | coleta própria daqui para frente; backfill de forecast depende de disponibilidade/licença | muito alta |
+| MET Norway — forecast | temperatura, umidade, ponto de orvalho, pressão, cobertura de nuvens, precipitação, vento, rajada, direção e condição | `forecast` | usado no runtime, ainda sem arquivo histórico completo | coleta própria daqui para frente | **imediata** |
 | Open-Meteo Historical / ERA5 | amplo conjunto meteorológico histórico | `reanalysis` | não importado | potencial de décadas, dependendo do dataset e plano de acesso | alta |
 | NASA POWER | meteorologia, energia solar/radiação e variáveis agroclimáticas | `reanalysis` / dataset modelado | já usado como fallback em snapshot diário; sem arquivo amplo próprio | potencial de série longa | alta |
 | REDEMET radar | produto, radar, timestamp, bounds, sequência e referência de quadro | monitoramento / metadado | não arquivado como série própria completa | guardar metadados é barato; retenção de imagens requer revisão | média/alta |
@@ -331,11 +336,18 @@ O histórico de previsão é um patrimônio diferente do histórico observado.
 
 Não basta guardar “a previsão de hoje”. Devemos saber:
 
-> **o que cada provedor previa em cada ciclo para cada horário futuro.**
+> **o que cada provedor apresentava em cada ciclo de captura para cada horário futuro.**
 
-### 9.1. Open-Meteo
+Quando a fonte não informa o horário oficial de emissão do modelo, o arquivo deve falar em **captura do Tempo Pelotas**, e não inventar um `issued_at` do provedor.
 
-O runtime já recebe séries horárias ricas com:
+### 9.1. Open-Meteo — forecast run rico ativo
+
+A migration `20260822073500_archive_rich_open_meteo_forecast_runs.sql` criou duas estruturas especializadas, sem destruir `weather_forecast_predictions`:
+
+- `weather_forecast_runs` — metadados de um snapshot por provedor/local/ciclo;
+- `weather_forecast_hourly_points` — série horária rica vinculada ao run.
+
+O coletor `forecast-open-meteo-capture` continua alimentando a tabela diária usada na acurácia e, adicionalmente, arquiva sete dias horários com:
 
 - temperatura;
 - sensação térmica;
@@ -357,28 +369,18 @@ O runtime já recebe séries horárias ricas com:
 - weather code;
 - indicador dia/noite.
 
-Campos diários já incluem, entre outros:
+Política de integridade:
 
-- temperatura mínima/máxima;
-- precipitação acumulada;
-- probabilidade máxima;
-- rajada máxima;
-- nascer/pôr do sol.
+- o ciclo do arquivo é a janela de coleta do Tempo Pelotas (`0`, `6`, `12`, `18` em horário local), não uma alegação de ciclo oficial do modelo;
+- o primeiro snapshot **completo** do ciclo fica imutável;
+- repetição da captura no mesmo ciclo reutiliza o run já concluído;
+- runs incompletos/falhos podem ser retomados;
+- cada run guarda hash SHA-256 do payload, horário de captura, timezone, coordenadas, resolução e faixa temporal;
+- falha no arquivo rico não derruba a captura diária usada pelo portal/acurácia;
+- as tabelas permanecem privadas, sob RLS e acesso administrativo;
+- a fonte foi cadastrada com `retention_policy_status=pending_review` e `paid_access_allowed=false`.
 
-Prioridade imediata: preservar o **forecast run completo**, não apenas os poucos campos hoje usados na tabela de acurácia.
-
-Estrutura conceitual:
-
-```text
-provider
-model
-issued_at
-valid_at
-lead_hours
-variable
-value
-unit
-```
+O primeiro run produtivo foi validado em 22/08/2026 com **168 pontos horários**, cobrindo sete dias, incluindo temperatura, precipitação, direção do vento, CAPE e altura da camada limite. Uma segunda captura no mesmo ciclo manteve exatamente um run, confirmando a política de imutabilidade por ciclo.
 
 ### 9.2. MET Norway
 
@@ -397,6 +399,8 @@ O fallback MET Norway já fornece campos úteis que também merecem arquivo sepa
 - símbolo/condição do período.
 
 Nunca consolidar Open-Meteo e MET Norway em uma série única antes de armazenar. O dado bruto normalizado por provedor deve permanecer auditável.
+
+Próxima evolução imediata: adaptar o mesmo contrato de `weather_forecast_runs`/`weather_forecast_hourly_points` ao MET Norway, preservando campos ausentes como `null` e metadados próprios do provedor.
 
 ## 10. Reanálise e datasets históricos
 
@@ -593,15 +597,15 @@ Rollups futuros devem preservar conforme a variável:
 
 Concluído nesta prioridade:
 
-1. extremos diários da Embrapa agora possuem ponto canônico diário e backfill do próprio arquivo;
-2. níveis/hidrologia já permanecem em coleta contínua.
+1. extremos diários da Embrapa possuem ponto canônico diário e backfill do próprio arquivo;
+2. níveis/hidrologia permanecem em coleta contínua;
+3. forecast runs ricos do Open-Meteo são preservados por ciclo de 6 horas.
 
 Próximos itens urgentes:
 
-1. preservar forecast run rico do Open-Meteo;
-2. iniciar arquivo equivalente do MET Norway;
-3. avaliar arquivo estruturado do STSC;
-4. iniciar arquivo de eventos INMET.
+1. iniciar arquivo equivalente do MET Norway;
+2. avaliar arquivo estruturado do STSC;
+3. iniciar arquivo de eventos INMET.
 
 Essa etapa é urgente porque não depende de recuperar o passado: evita perder o presente.
 
@@ -685,7 +689,7 @@ Mantém tudo que já é público atualmente no portal.
 - satélite completo;
 - novos recursos avançados.
 
-Uma fonte com `paid_access_allowed=false` não deve ser exposta pelo PRO/exportação apenas porque está armazenada internamente.
+Uma fonte com `paid_access_allowed=false` não deve ser exposta pelo PRO/exportação apenas porque está armazenada internamente. Isso inclui atualmente `open-meteo-forecast`, cuja coleta interna está ativa, mas cuja liberação comercial continua bloqueada até revisão específica.
 
 ## 19. Resultado esperado
 
@@ -706,14 +710,14 @@ O Historical Data Layer deve evoluir de maneira que essas perguntas possam ser r
 
 ## 20. Próximas ações
 
-1. desenhar o schema de forecast runs completos sem destruir `weather_forecast_predictions`;
-2. começar a preservar Open-Meteo e MET Norway por ciclo;
-3. criar inventário técnico de estações INMET relevantes;
-4. mapear o acervo Embrapa/UFPel para backfill;
-5. concluir o contrato histórico ANA/RHN;
-6. concluir o catálogo da Defesa Civil RS;
-7. definir política de eventos para INMET/STSC;
-8. avaliar metadados de radar/satélite;
+1. adaptar `weather_forecast_runs` e `weather_forecast_hourly_points` ao MET Norway sem misturar provedores;
+2. criar inventário técnico de estações INMET relevantes;
+3. mapear o acervo Embrapa/UFPel para backfill;
+4. concluir o contrato histórico ANA/RHN;
+5. concluir o catálogo da Defesa Civil RS;
+6. definir política de eventos para INMET/STSC;
+7. avaliar metadados de radar/satélite;
+8. desenhar rollups horários/diários/mensais para consultas longas;
 9. somente depois iniciar backfills massivos de reanálise e storage pesado.
 
 Este documento deve ser atualizado sempre que:
