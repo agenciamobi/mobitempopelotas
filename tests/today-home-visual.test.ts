@@ -30,10 +30,6 @@ const internalShellStyles = readFileSync(
   "src/components/layout/InternalWeatherPageShell.css",
   "utf8",
 );
-const headerFrameStyles = readFileSync(
-  "src/production/styles/header-hero-fullwidth-v32.css",
-  "utf8",
-);
 const homeForecastStory = readFileSync(
   "src/components/weather/HomeForecastStory.tsx",
   "utf8",
@@ -85,49 +81,47 @@ test("internal weather pages own one retail shell without duplicated global chro
   assert.match(siteLayout, /standaloneRoutes/);
 });
 
-test("the shared shell codifies tempo hoje as the internal weather visual contract", () => {
-  assert.match(internalShell, /data-internal-weather-style="tempo-hoje-retail"/);
+test("the shared shell codifies the Home editorial contract for internal weather pages", () => {
+  assert.match(internalShell, /data-internal-weather-style="home-editorial"/);
   assert.match(internalShell, /SiteHeader/);
   assert.match(internalShell, /SiteFooter/);
   assert.match(internalShell, /InmetAlertsPanel/);
   assert.match(internalShell, /hasVerifiedInmetAlertSemantics/);
   assert.match(internalShell, /toProductionWeatherData/);
-  assert.match(internalShellStyles, /based on \/tempo-hoje-pelotas/);
+  assert.match(internalShellStyles, /A Home é a fonte da geometria/);
   assert.match(internalShellStyles, /> \.daily-page/);
   assert.match(internalShellStyles, /> \.forecast-page/);
   assert.match(internalShellStyles, /> \.condition-page/);
   assert.match(internalShellStyles, /\.condition-page-header/);
-  assert.match(internalShellStyles, /@media \(max-width: 680px\)/);
+  assert.match(internalShellStyles, /@media \(max-width: 720px\)/);
 });
 
-test("tempo hoje sections reuse the exact header container geometry", () => {
-  assert.match(headerFrameStyles, /--portal-frame-max:\s*1760px/);
-  assert.match(headerFrameStyles, /--portal-content-gutter:\s*clamp\(22px, 2\.4vw, 42px\)/);
+test("tempo hoje sections reuse the current Home container geometry", () => {
   assert.match(
-    headerFrameStyles,
-    /\.production-header-inner,[\s\S]*max-width:\s*var\(--portal-frame-max\)/,
+    internalShellStyles,
+    /--internal-weather-frame-max:\s*var\(--tp-home-container-max, 1440px\)/,
   );
   assert.match(
     internalShellStyles,
-    /--internal-weather-frame-max:\s*var\(--portal-frame-max, 1760px\)/,
+    /--internal-weather-frame-gutter:\s*var\(--tp-home-container-gutter, 48px\)/,
   );
   assert.match(
     internalShellStyles,
-    /--internal-weather-frame-gutter:\s*var\([\s\S]*--portal-content-gutter/,
+    /--internal-weather-section-padding:\s*clamp\(24px, 3vw, 34px\)/,
   );
   assert.match(
     internalShellStyles,
-    /\.site-shell--home-editorial\.internal-weather-shell \.internal-weather-main[\s\S]*width:\s*100%[\s\S]*max-width:\s*var\(--internal-weather-frame-max\)/,
+    /\.site-shell--home-editorial\.internal-weather-shell \.internal-weather-main[\s\S]*width:\s*100%[\s\S]*max-width:\s*none/,
   );
-  assert.match(internalShellStyles, /padding-right:\s*var\(--internal-weather-frame-gutter\)/);
-  assert.match(internalShellStyles, /padding-left:\s*var\(--internal-weather-frame-gutter\)/);
+  assert.match(internalShellStyles, /padding-right:\s*var\(--internal-weather-section-padding\)/);
+  assert.match(internalShellStyles, /padding-left:\s*var\(--internal-weather-section-padding\)/);
   assert.match(
     internalShellStyles,
-    /\.internal-weather-shell--today \.today-retail-hero__inner[\s\S]*max-width:\s*var\(--internal-weather-frame-max\)/,
+    /\.internal-weather-shell--today \.today-retail-hero__inner[\s\S]*width:\s*100%[\s\S]*max-width:\s*none/,
   );
   assert.match(
     internalShellStyles,
-    /\.internal-weather-shell--today \.today-v5-page,[\s\S]*width:\s*100%[\s\S]*max-width:\s*none/,
+    /\.internal-weather-main > \*,[\s\S]*--tp-home-container-max, 1440px/,
   );
   assert.doesNotMatch(todayStyles, /calc\(100% - 56px\)/);
   assert.doesNotMatch(todayStyles, /calc\(100% - 40px\)/);
