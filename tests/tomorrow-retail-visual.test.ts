@@ -114,17 +114,25 @@ test("tomorrow content remains comparative and source-aware", () => {
   assert.doesNotMatch(page, /daily-condition-card/);
 });
 
-test("tomorrow sections use the exact header rail", () => {
+test("tomorrow sections use the current Home rail", () => {
   assert.match(
     shellStyles,
-    /\.internal-weather-shell--tomorrow \.tomorrow-retail-hero__inner[\s\S]*max-width:\s*var\(--internal-weather-frame-max\)/,
+    /--internal-weather-frame-max:\s*var\(--tp-home-container-max, 1440px\)/,
   );
   assert.match(
     shellStyles,
-    /\.internal-weather-shell--tomorrow \.tomorrow-v3-page,[\s\S]*width:\s*100%[\s\S]*max-width:\s*none/,
+    /--internal-weather-section-padding:\s*clamp\(24px, 3vw, 34px\)/,
   );
-  assert.match(shellStyles, /padding-right:\s*var\(--internal-weather-frame-gutter\)/);
-  assert.match(shellStyles, /padding-left:\s*var\(--internal-weather-frame-gutter\)/);
+  assert.match(
+    shellStyles,
+    /\.internal-weather-shell--tomorrow \.tomorrow-retail-hero__inner[\s\S]*width:\s*100%[\s\S]*max-width:\s*none/,
+  );
+  assert.match(shellStyles, /padding-right:\s*var\(--internal-weather-section-padding\)/);
+  assert.match(shellStyles, /padding-left:\s*var\(--internal-weather-section-padding\)/);
+  assert.match(
+    shellStyles,
+    /\.internal-weather-main > \*,[\s\S]*--tp-home-container-max, 1440px/,
+  );
 });
 
 test("tomorrow visual system remains responsive and accessible", () => {
