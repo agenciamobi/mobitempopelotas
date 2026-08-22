@@ -40,7 +40,7 @@ O Tempo Pelotas é um portal meteorológico regional focado em Pelotas e Zona Su
 | Trovoadas STSC | Ativo | Contrato atual da API REDEMET, filtro regional e contexto derivado de distância aproximada das ocorrências até Pelotas; nunca tratado como alerta oficial |
 | Mapa regional MapLibre | Ativo | Camadas de radar, satélite e trovoadas |
 | Hidrologia | Ativo | Laranjal, Lagoa dos Patos, Guaíba e rede regional; arquivo próprio ambiental em coleta contínua |
-| Rede Hidrometeorológica Defesa Civil RS | Implementação técnica / desativada | Adapter GraphQL server-side, mapa e seção em `/situacao-hidrologica-pelotas` estão preparados; `DEFESA_CIVIL_HYDRO_ENABLED=false` evita consulta e exposição até validar inventário de estações, timezone e referência dos níveis |
+| Rede Hidrometeorológica Defesa Civil RS | Ativo público | Adapter GraphQL server-side, mapa e seção em `/situacao-hidrologica-pelotas` ativos por padrão, com créditos explícitos à Defesa Civil RS, Casa Militar do Estado do Rio Grande do Sul e MKS; `DEFESA_CIVIL_HYDRO_ENABLED=false` permanece como kill switch operacional server-side |
 | Histórico climático | Ativo | Janela pública de 30 dias com fonte/fallback documentados |
 | Historical Data Layer | Ativo / em expansão | Arquivo canônico privado com observações Embrapa, extremos diários, níveis hidrológicos, forecast runs ricos Open-Meteo/MET Norway, eventos estruturados e série horária INMET A887; classes `observation`, `forecast`, `reanalysis` e `derived` permanecem separadas |
 | Registro histórico da enchente de 2024 | Ativo | Rota pública `/enchente-2024-pelotas-laranjal` registra a linha do tempo da cheia, a propagação Guaíba → Lagoa dos Patos → Pelotas/Laranjal → estuário e a fase de reconstrução |
@@ -336,15 +336,17 @@ A página `/situacao-hidrologica-pelotas` deve funcionar mesmo quando uma ou mai
 
 O Historical Data Layer captura níveis ambientais a cada 5 minutos e executa backfill diário da janela ainda exposta pelas fontes, com deduplicação por estação/variável/timestamp e registro de execução.
 
-### Rede Hidrometeorológica da Defesa Civil RS — implementação técnica preparada
+### Rede Hidrometeorológica da Defesa Civil RS — ativa no portal público
 
 Documentação especializada: `docs/DEFESA_CIVIL_RS_HYDROMET_PLAN.md`.
 
-A API GraphQL e os contratos de consulta/histórico/nowcasting estão identificados, e o adapter server-side, função de cache, mapa MapLibre e seção da rota `/situacao-hidrologica-pelotas` já foram integrados ao código atual.
+A API GraphQL e os contratos de consulta/histórico/nowcasting estão identificados. O adapter server-side, função de cache, mapa MapLibre e seção da rota `/situacao-hidrologica-pelotas` estão ativos por padrão no runtime público.
 
-A ativação permanece deliberadamente desligada por `DEFESA_CIVIL_HYDRO_ENABLED=false`. Nesse estado, o adapter retorna `disabled` **sem consultar a API externa** e o componente não é renderizado. Portanto, a rede ainda não é uma fonte ativa exibida no runtime público.
+O wrapper público considera a integração habilitada quando `DEFESA_CIVIL_HYDRO_ENABLED` está ausente ou `true`. O valor explícito `false` funciona como kill switch operacional server-side: nesse estado a consulta externa não ocorre e a seção não é exibida. A flag não representa entitlement Free/PRO.
 
-Conforme `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md`, dados oficiais adequados à disseminação pública são destinados à camada pública do portal; a flag da Defesa Civil é um gate técnico de validação, não um paywall Free/PRO.
+A exposição pública preserva créditos visíveis à **Rede de Monitoramento Hidrometeorológico da Defesa Civil RS**, **Defesa Civil do Estado do Rio Grande do Sul**, **Casa Militar do Estado do Rio Grande do Sul** e informa que os dados são disponibilizados pela Defesa Civil RS através da **MKS**, conforme a documentação oficial da API. O Tempo Pelotas se apresenta como interface independente de consulta e disseminação e não como parceiro, homologado ou representante institucional.
+
+Conforme `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md`, a leitura oficial básica da Defesa Civil integra a camada pública do portal. O valor de Free/PRO deve ser construído sobre ferramentas do Tempo Pelotas — personalização, histórico autorizado, comparações, indicadores, análises, relatórios e derivados — e não sobre esconder a leitura oficial básica.
 
 A regra de seleção permanece:
 
@@ -352,9 +354,10 @@ A regra de seleção permanece:
 - para hidrologia, entram somente estações ligadas fisicamente ao Guaíba/Lagoa dos Patos, afluentes relevantes da Bacia do Camaquã, sistema Mirim–São Gonçalo, orla da Lagoa e estuário de Rio Grande;
 - proximidade geográfica isolada não transforma uma estação em contexto hidrológico;
 - as cores dos produtos de chuva da rede não devem ser interpretadas como limiares de alerta;
-- níveis absolutos de réguas distintas não devem ser comparados por simples subtração.
+- níveis absolutos de réguas distintas não devem ser comparados por simples subtração;
+- timestamps futuros incompatíveis são rejeitados antes do cálculo de recência.
 
-Antes de ligar `DEFESA_CIVIL_HYDRO_ENABLED=true`, ainda é necessário validar uma resposta real no runtime, inventariar códigos `DCRS-xxxxx`, bacias e capacidades, confirmar timezone quando o timestamp vier sem offset e confirmar unidade/referência vertical de `rio_nivel` por estação. A documentação pública da API deve continuar sendo consultada para condições específicas de uso, retenção ou redistribuição quando aplicáveis.
+A ativação pública da leitura básica não elimina a governança por dataset. Histórico permanente via `Historic`, exportação em massa, redistribuição específica, API comercial ou retenção longa continuam condicionados à revisão da semântica, referência vertical e condições aplicáveis ao produto/dataset.
 
 ### Registro histórico da enchente de 2024
 
@@ -379,6 +382,7 @@ Características atuais:
 - comparação contextual com previsão por hora;
 - janela temporal e cadência observada derivadas apenas de timestamps utilizáveis da sequência;
 - distância aproximada da atividade STSC até Pelotas, com faixas regionais derivadas das coordenadas da própria REDEMET;
+- enquadramento inicial regional ampliado: o mapa compartilhado de Radar/Satélite inicia em zoom `4.4` e o `RadarMapFrame` limita o fit inicial/refit a `4.5`, aproximadamente três níveis mais aberto que o baseline anterior;
 - proteção contra SSR/hidratação;
 - layout responsivo e controles de mapa.
 
@@ -652,7 +656,7 @@ Grupos de configuração existentes no template:
 - VAPID/Web Push;
 - Gemini/Weather AI;
 - REDEMET;
-- Defesa Civil RS (`DEFESA_CIVIL_HYDRO_ENABLED`, exclusivamente server-side);
+- Defesa Civil RS (`DEFESA_CIVIL_HYDRO_ENABLED`, exclusivamente server-side; integração pública habilitada por padrão e `false` como kill switch);
 - URL canônica do site.
 
 ## 19. GitHub Actions e observabilidade
@@ -732,7 +736,8 @@ A suíte de contratos cobre, entre outros domínios:
 - fontes INMET;
 - reconciliação de temperatura;
 - REDEMET e contratos HAR;
-- adapter e feature flag da Defesa Civil RS, preservação de dados ausentes, separação de observação x alerta/risco e renderização segura do mapa;
+- Defesa Civil RS pública por padrão com kill switch explícito, créditos institucionais, preservação de dados ausentes, rejeição de timestamps futuros e separação observação x alerta/risco;
+- zoom regional inicial dos mapas de radar/satélite em `4.4`/`4.5`;
 - enriquecimento público derivado dos HARs, incluindo SIMAGRO visual-only, profundidade temporal/atividade elétrica REDEMET e abrangência territorial detalhada do INMET;
 - coerência editorial da Home;
 - coesão visual entre Home e páginas internas/dedicadas;
@@ -813,7 +818,7 @@ A integração pública com CPTEC/SIGMA foi deliberadamente adiada para revisão
 | `docs/REDEMET_OPERATIONS.md` | Fonte operacional da integração REDEMET |
 | `docs/HAR_PUBLIC_ENRICHMENT_2026-08-21.md` | Revisão sanitizada dos HARs recentes, oportunidades de conteúdo público, decisões de uso e fontes deliberadamente não ativadas |
 | `docs/SIMAGRO_RS_HAR_REVIEW.md` | Contrato da camada visual complementar WRF/GFS do SIMAGRO RS, sem uso numérico dos PNGs |
-| `docs/DEFESA_CIVIL_RS_HYDROMET_PLAN.md` | Implementação técnica preparada da Rede Hidrometeorológica da Defesa Civil RS; ativação pública depende das validações técnicas documentadas |
+| `docs/DEFESA_CIVIL_RS_HYDROMET_PLAN.md` | Integração pública ativa da Rede Hidrometeorológica da Defesa Civil RS, com arquitetura, créditos, semântica, kill switch e governança de usos avançados |
 | `docs/CPTEC_SIGMA_RESEARCH.md` | Pesquisa futura CPTEC/SIGMA, sem integração produtiva |
 | `docs/RUNTIME_READINESS.md` | Preflight e requisitos do runtime |
 | `docs/PRODUCTION_CUTOVER.md` | Runbook de corte/produção |
@@ -844,7 +849,7 @@ Estas são pendências de produto/operação, não funcionalidades inexistentes 
 7. formalizar rollback de aplicação, banco, DNS e caches;
 8. continuar monitorando a disponibilidade das fontes externas, principalmente radar REDEMET, produtos gráficos do SIMAGRO RS e hidrologia regional;
 9. retomar avaliação CPTEC/SIGMA em novembro/dezembro de 2026, sem assumir previamente autorização ou integração;
-10. validar resposta real da Rede Hidrometeorológica da Defesa Civil RS, inventário DCRS, bacias/capacidades, timezone e unidade/referência dos níveis e somente então habilitar `DEFESA_CIVIL_HYDRO_ENABLED=true`;
+10. acompanhar a integração pública da Defesa Civil RS, concluir inventário DCRS, bacias/capacidades, validar timezone e unidade/referência vertical por estação e incorporar a saúde da fonte ao status/runtime;
 11. manter a limpeza de dívida histórica de lint/formatação separada de mudanças funcionais.
 
 ## 25. Regra de manutenção deste arquivo
@@ -1423,7 +1428,7 @@ Regras:
 - página pública `/pro` pode ser publicada antes do checkout somente se deixar claro o estado comercial;
 - billing não deve ser habilitado antes de schema, webhook e E2E estarem confirmados.
 
-A integração da Defesa Civil usa uma flag operacional separada, `DEFESA_CIVIL_HYDRO_ENABLED`, que protege ativação técnica da fonte e não representa entitlement Free/PRO.
+A integração da Defesa Civil usa uma flag operacional separada, `DEFESA_CIVIL_HYDRO_ENABLED`: a fonte pública fica habilitada por padrão e o valor explícito `false` funciona como kill switch técnico. Essa flag não representa entitlement Free/PRO.
 
 ## 43. Roadmap de implementação até produção
 
@@ -1467,9 +1472,9 @@ Entregas já iniciadas:
 - classes observation/forecast/reanalysis/derived;
 - governança `paid_access_allowed` e `retention_policy_status`;
 - separação Público/Free/PRO/REVIEW;
-- implementação técnica da Defesa Civil RS preparada e protegida por flag até validar estações/semântica.
+- integração pública da Defesa Civil RS ativa por padrão, com créditos explícitos e kill switch server-side.
 
-Próximos focos: Embrapa/UFPel, ANA/RHN, Defesa Civil RS e revisão de fontes candidatas a ferramentas pagas/exportáveis.
+Próximos focos: Embrapa/UFPel, ANA/RHN, inventário/semântica da Defesa Civil RS e revisão de fontes candidatas a ferramentas pagas/exportáveis.
 
 ### Fase 3 — patrimônio histórico e APIs internas
 
@@ -1614,7 +1619,7 @@ A ordem operacional atual é:
 2. concluir E2E da conta com duas contas descartáveis;
 3. auditar e consolidar o patrimônio histórico já coletado, incluindo cobertura/gaps;
 4. definir rollups e APIs históricas server-side;
-5. validar inventário/semântica da Defesa Civil RS antes de ativar a nova fonte;
+5. monitorar a integração pública da Defesa Civil RS e concluir inventário/semântica/health da nova fonte;
 6. construir valor real no painel Free, começando pelos históricos/datasets liberados;
 7. concluir a matriz de governança para o que poderá entrar no PRO;
 8. somente então escolher cobrança/preço e ligar billing ao `account_access` existente;
@@ -1674,7 +1679,7 @@ Concluído/ativo:
 9. forecast run rico MET Norway;
 10. arquivo de eventos estruturados;
 11. histórico horário INMET A887 desde 2019;
-12. integração técnica da Defesa Civil RS preparada e desligada por flag até validação.
+12. integração pública da Defesa Civil RS ativa por padrão, com atribuição explícita e kill switch server-side.
 
 Em andamento/próximo:
 
@@ -1682,7 +1687,7 @@ Em andamento/próximo:
 2. auditoria de cobertura/gaps do patrimônio histórico já coletado;
 3. backfills observacionais adicionais seguros;
 4. rollups e APIs históricas server-side;
-5. validação técnica/inventário da Defesa Civil RS;
+5. inventário, semântica e observabilidade da Defesa Civil RS já ativa publicamente;
 6. primeiro painel Free com histórico de até 60 dias nos datasets aprovados;
 7. governança das fontes candidatas ao PRO;
 8. billing somente depois de o produto autenticado demonstrar valor;
