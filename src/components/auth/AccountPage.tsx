@@ -43,7 +43,7 @@ export function AccountPage({ snapshot }: { snapshot: AuthenticatedAccount }) {
       ? null
       : {
           tone: "error",
-          text: "Seu acesso está ativo, mas o armazenamento de preferências ainda não foi aplicado neste ambiente.",
+          text: "Seu login está ativo, mas parte da estrutura da conta ainda não foi aplicada neste ambiente.",
         },
   );
 
@@ -160,9 +160,24 @@ export function AccountPage({ snapshot }: { snapshot: AuthenticatedAccount }) {
               <small>Conectado com Google</small>
               <strong>{displayName}</strong>
               <span>{snapshot.identity.email}</span>
+              <span className={`account-tier-badge is-${snapshot.access.tier}`}>
+                Plano {snapshot.access.label}
+              </span>
             </div>
           </div>
         </section>
+
+        <div className="account-dashboard-entry">
+          <div>
+            <span className="eyebrow">Área pessoal</span>
+            <strong>Seu painel já está separado das configurações da conta.</strong>
+            <p>
+              Favoritos, históricos e novas ferramentas serão adicionados ao painel conforme os
+              recursos da camada Free e, futuramente, do PRO.
+            </p>
+          </div>
+          <Link to="/painel">Abrir meu painel →</Link>
+        </div>
 
         {feedback ? (
           <p
