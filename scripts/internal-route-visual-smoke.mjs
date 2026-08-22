@@ -191,8 +191,8 @@ try {
               return {
                 httpStatus,
                 hasRouteMarker: Boolean(document.querySelector(marker)),
-                hasHeader: Boolean(document.querySelector("header")),
-                hasFooter: Boolean(document.querySelector("footer")),
+                hasHeader: Boolean(document.querySelector(".tp-home-header")),
+                hasFooter: Boolean(document.querySelector(".tp-home-footer-shell")),
                 mainCount: document.querySelectorAll("main").length,
                 h1Count,
                 horizontalOverflow: Math.max(0, root.scrollWidth - root.clientWidth),
