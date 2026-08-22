@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorialContentSection } from "@/components/content/EditorialContentSection";
 import { OfficialDataAccessNotice } from "@/components/content/OfficialDataAccessNotice";
+import { DefesaCivilHydroNetwork } from "@/components/hydrology/DefesaCivilHydroNetwork";
 import {
   HydrologyOverviewHero,
   HydrologyOverviewV2,
@@ -9,6 +10,7 @@ import {
 import "@/components/hydrology/HydrologyOverviewHomeContract.css";
 import { InternalWeatherPageShell } from "@/components/layout/InternalWeatherPageShell";
 import { HYDROLOGY_EDITORIAL_CONTENT } from "@/lib/editorial-content";
+import { getDefesaCivilHydroData } from "@/lib/hydrology/defesa-civil-rs.functions";
 import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
 import { getLagoonMonitoringNetwork } from "@/lib/hydrology/lagoon-network.functions";
 import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
@@ -133,14 +135,15 @@ export const Route = createFileRoute("/situacao-hidrologica-pelotas")({
       createFaqPageJsonLd(PAGE_PATH, HYDROLOGY_PAGE_CONTENT.faqs),
     ]),
   loader: async () => {
-    const [weather, level, guaiba, lagoon, sace] = await Promise.all([
+    const [weather, level, guaiba, lagoon, sace, defesaCivil] = await Promise.all([
       getWeatherIntelligence(),
       getLaranjalLevelData(),
       getGuaibaObservation(),
       getLagoonMonitoringNetwork(),
       getSaceGuaibaData(),
+      getDefesaCivilHydroData(),
     ]);
-    return { weather, level, guaiba, lagoon, sace };
+    return { weather, level, guaiba, lagoon, sace, defesaCivil };
   },
   staleTime: 60 * 1_000,
   component: SituacaoHidrologicaPage,
@@ -169,6 +172,7 @@ function SituacaoHidrologicaPage() {
         lagoon={data.lagoon}
         sace={data.sace}
       />
+      <DefesaCivilHydroNetwork data={data.defesaCivil} />
       <OfficialDataAccessNotice scope="hydrology" />
       <EditorialContentSection
         id="como-interpretar-situacao-das-aguas"
