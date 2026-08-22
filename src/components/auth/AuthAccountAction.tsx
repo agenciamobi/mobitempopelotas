@@ -41,11 +41,11 @@ export function AuthAccountAction() {
   return (
     <Link
       className={`header-account-link${authenticated ? " is-authenticated" : ""}`}
-      href="/conta"
-      aria-label={authenticated ? "Abrir minha conta" : "Entrar na conta do Tempo Pelotas"}
+      href={authenticated ? "/painel" : "/conta"}
+      aria-label={authenticated ? "Abrir meu painel" : "Entrar na conta do Tempo Pelotas"}
     >
       {authenticated ? <span aria-hidden="true">✓</span> : null}
-      <strong>{authenticated ? "Minha conta" : "Entrar"}</strong>
+      <strong>{authenticated ? "Meu painel" : "Entrar"}</strong>
     </Link>
   );
 }
