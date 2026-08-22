@@ -8,7 +8,7 @@ const RESOLVER_PATH = new URL("../src/production/lib/hero-photo-presentation.ts"
 const expectedAssets = [
   "/weather/hero/pelotas-laranjal-chuva.webp",
   "/weather/hero/pelotas-nevoeiro-centro.webp",
-  "/weather/hero/pelotas-ceu-limpo.webp",
+  "/weather/hero/pelotas-laranjal-ceu-aberto.webp",
   "/weather/hero/pelotas-parcialmente-nublado.avif",
 ];
 
@@ -25,4 +25,7 @@ test("o hero estático usa somente o acervo local de Pelotas", async () => {
   for (const asset of expectedAssets) {
     assert.ok(resolver.includes(asset), `o resolvedor precisa registrar ${asset}`);
   }
+
+  assert.match(resolver, /if \(icon === "sun"\) \{\s*return heroPhotos\.clear;/);
+  assert.match(resolver, /Acervo Tempo Pelotas · Praia do Laranjal/);
 });
