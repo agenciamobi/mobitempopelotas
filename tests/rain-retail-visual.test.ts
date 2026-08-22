@@ -113,16 +113,26 @@ test("rain page answers when, how much and which period in direct language", () 
   assert.doesNotMatch(page, /QualitySummary/);
 });
 
-test("rain experience uses the exact header rail", () => {
+test("rain experience uses the current Home rail", () => {
   assert.match(
     shellStyles,
-    /\.internal-weather-shell--rain \.rain-retail-hero__inner[\s\S]*max-width:\s*var\(--internal-weather-frame-max\)/,
+    /--internal-weather-frame-max:\s*var\(--tp-home-container-max, 1440px\)/,
   );
   assert.match(
     shellStyles,
-    /\.internal-weather-shell--rain \.rain-v2-page,[\s\S]*width:\s*100%[\s\S]*max-width:\s*none/,
+    /--internal-weather-section-padding:\s*clamp\(24px, 3vw, 34px\)/,
   );
-  assert.match(heroStyles, /max-width:\s*var\(--internal-weather-frame-max\)/);
+  assert.match(
+    shellStyles,
+    /\.internal-weather-shell--rain \.rain-retail-hero__inner[\s\S]*width:\s*100%[\s\S]*max-width:\s*none/,
+  );
+  assert.match(shellStyles, /padding-right:\s*var\(--internal-weather-section-padding\)/);
+  assert.match(shellStyles, /padding-left:\s*var\(--internal-weather-section-padding\)/);
+  assert.match(
+    shellStyles,
+    /\.internal-weather-main > \*,[\s\S]*--tp-home-container-max, 1440px/,
+  );
+  assert.doesNotMatch(heroStyles, /max-width:\s*var\(--internal-weather-frame-max\)/);
 });
 
 test("hourly rain volume uses Home surfaces while keeping functional precipitation bars", () => {
