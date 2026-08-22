@@ -141,8 +141,11 @@ test("new surface contracts are loaded after the Home shell in both production e
 test("visual parity workflow captures critical internal routes on desktop and narrow mobile", () => {
   for (const route of [
     "/tempo-hoje-pelotas",
+    "/tempo-amanha-pelotas",
+    "/previsao-7-dias-pelotas",
     "/chuva-em-pelotas",
     "/vento-em-pelotas",
+    "/alertas",
     "/clima-em-pelotas",
     "/meteograma-pelotas",
     "/historico-climatico-pelotas",
