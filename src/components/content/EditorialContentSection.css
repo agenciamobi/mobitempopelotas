@@ -5,6 +5,7 @@
   --editorial-answer-muted: #58717d;
   margin: clamp(16px, 2vw, 24px) 0 0;
   padding: clamp(26px, 3.2vw, 42px);
+  scroll-margin-top: 8rem;
   border: 1px solid var(--editorial-answer-line);
   border-radius: 16px;
   background: #fff;
