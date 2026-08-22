@@ -34,21 +34,22 @@ O Tempo Pelotas é um portal meteorológico regional focado em Pelotas e Zona Su
 | Chuva, vento e meteograma | Ativo | Visões temáticas e hora a hora; `/chuva-em-pelotas` expõe volume previsto por hora e `/vento-em-pelotas` expõe direção prevista por hora reutilizando o meteograma estruturado Open-Meteo; `/meteograma-pelotas` também oferece comparação visual complementar com produtos WRF/GFS do SIMAGRO RS |
 | SIMAGRO RS | Ativo complementar / visual only | Meteogramas WRF, GFS e GFS Agro para Pelotas exibidos como PNG oficial da fonte; não há OCR, leitura de pixels ou incorporação desses gráficos ao feed numérico do portal |
 | Alertas oficiais | Ativo | INMET e conteúdo preventivo claramente separado; a rota `/alertas` preserva publicação, validade e abrangência territorial completa do CAP/RSS em detalhe progressivo quando disponível |
-| Estação Embrapa | Ativo | Observação local, timestamp e estado de atualidade |
+| Estação Embrapa | Ativo | Observação local, timestamp, estado de atualidade e histórico canônico, incluindo extremos diários |
 | Radar REDEMET | Ativo com dependência externa | Santiago (`sg`) é a estação operacional preferencial; Canguçu (`cn`) é fallback quando voltar a fornecer imagem; a página pública deriva janela temporal e cadência observada apenas de quadros com horário utilizável |
-| Satélite REDEMET | Ativo | Realçada, infravermelho e visível |
+| Satélite REDEMET | Ativo | Realçada, infravermelho e visível; VIS filtra quadros sem iluminação solar útil |
 | Trovoadas STSC | Ativo | Contrato atual da API REDEMET, filtro regional e contexto derivado de distância aproximada das ocorrências até Pelotas; nunca tratado como alerta oficial |
 | Mapa regional MapLibre | Ativo | Camadas de radar, satélite e trovoadas |
-| Hidrologia | Ativo | Laranjal, Lagoa dos Patos, Guaíba e rede regional |
+| Hidrologia | Ativo | Laranjal, Lagoa dos Patos, Guaíba e rede regional; arquivo próprio ambiental em coleta contínua |
 | Rede Hidrometeorológica Defesa Civil RS | Pesquisa / inventário | API GraphQL e contratos técnicos identificados; ainda não é fonte ativa do runtime público. Próximo passo é inventariar códigos, bacias e capacidades das estações e revisar condições de uso |
-| Histórico climático | Ativo | Janela de 30 dias com fonte/fallback documentados |
+| Histórico climático | Ativo | Janela pública de 30 dias com fonte/fallback documentados |
+| Historical Data Layer | Ativo / em expansão | Arquivo canônico privado com observações Embrapa, extremos diários, níveis hidrológicos e forecast runs ricos do Open-Meteo; classes `observation`, `forecast`, `reanalysis` e `derived` permanecem separadas |
 | Registro histórico da enchente de 2024 | Ativo | Rota pública `/enchente-2024-pelotas-laranjal` registra a linha do tempo da cheia, a propagação Guaíba → Lagoa dos Patos → Pelotas/Laranjal → estuário e a fase de reconstrução |
 | Câmeras | Ativo com dependência externa | YouTube, live/replay e contingências |
 | Páginas regionais | Ativo | 23 cidades além de Pelotas |
 | Blog | Ativo | Rota pública e indexável |
 | SEO técnico | Ativo | Canonical, sitemap, robots, OG/Twitter, Schema.org e imagem social raster |
-| Supabase externo | Ativo/parcial | Banco e RLS implantados; ciclo autenticado completo com duas contas ainda precisa de validação real |
-| Login Google / conta | Parcial | Base funcional, exportação e exclusão implementadas; E2E real ainda pendente |
+| Supabase externo | Ativo | Banco, migrations, RLS, conta/entitlement e coletores históricos implantados; E2E autenticado com duas contas ainda precisa de validação real |
+| Login Google / conta | Parcial operacional | Conta, LGPD, Free/PRO estrutural e login por Google Identity Services + ID Token implementados; falta configurar/confirmar `VITE_GOOGLE_CLIENT_ID` no ambiente publicado e concluir E2E real |
 | Weather AI | Ativo controlado | Snapshot persistido, orçamento mensal e fallback determinístico |
 | PWA / Web Push | Suspenso para ativação pública | Código preservado; reativação depende de validação real de navegador e rolagem |
 | CPTEC/SIGMA | Pesquisa futura | Não integrar ao runtime público antes da revisão institucional planejada para novembro/dezembro de 2026 |
@@ -161,10 +162,13 @@ Além das páginas de conteúdo, existem rotas funcionais que não pertencem ao 
 
 - `/entrar`;
 - `/conta`;
+- `/painel`;
 - `/auth/callback`;
 - `/auth/signout`;
 - `/embed/nivel-laranjal`;
 - `/embed/status-tempo-agora`.
+
+`/auth/callback` permanece como rota de compatibilidade/infraestrutura, mas o botão Google atual não depende de redirecionar o navegador pelo callback técnico do Supabase.
 
 Também existem endpoints/máquinas públicas como `robots.txt`, `sitemap.xml`, feed JSON e `pelotas.json`, protegidos por contratos próprios de conteúdo, cache e indexação.
 
@@ -176,6 +180,7 @@ O núcleo meteorológico combina múltiplas fontes e regras de reconciliação, 
 
 - Open-Meteo: previsão principal/fallback em vários fluxos e páginas;
 - a série principal do Open-Meteo preserva, quando fornecidos, volume de precipitação por hora, direção do vento em graus e perfil atmosférico com umidade, ponto de orvalho, pressão, visibilidade, nuvens por camada, CAPE e altura da camada limite;
+- o coletor de precisão também preserva, desde 22/08/2026, um forecast run horário rico do Open-Meteo por ciclo de 6 horas, separado da tabela diária de acurácia;
 - MET Norway: fonte complementar no domínio de previsão e contingência, preservando campos horários compatíveis; somente `next_1_hours.precipitation_amount` pode ser tratado como volume horário, evitando rotular acumulados de 6h/12h como chuva de uma hora;
 - a recuperação Open-Meteo no navegador preserva até 24 horas dos campos horários ricos quando o SSR precisou usar contingência;
 - lógica centralizada para condição atual, hora a hora e dias seguintes;
@@ -197,7 +202,9 @@ O projeto possui:
 - histórico/snapshots;
 - estado explícito de leitura atualizada, atrasada ou indisponível;
 - coleta centralizada por cron;
-- comparação da previsão com observação real para arquivo de precisão.
+- comparação da previsão com observação real para arquivo de precisão;
+- espelhamento automático no Historical Data Layer;
+- extremos diários canônicos de temperatura, umidade, ponto de orvalho e vento, com horário do extremo preservado como metadado.
 
 ### CPPMet / UFPel
 
@@ -270,7 +277,7 @@ Produtos suportados:
 - infravermelho;
 - visível.
 
-A camada mantém timeline, timestamp, bounds e atribuição de origem. A página pública também calcula janela e cadência observada dos quadros com horário utilizável, sem reinterpretar esses valores como compromisso de frequência da fonte.
+A camada mantém timeline, timestamp, bounds e atribuição de origem. A página pública também calcula janela e cadência observada dos quadros com horário utilizável, sem reinterpretar esses valores como compromisso de frequência da fonte. O produto visível usa apenas quadros com iluminação solar útil e mostra estado noturno explícito quando não há VIS adequado.
 
 ### STSC / trovoadas
 
@@ -318,7 +325,11 @@ A situação hidrológica também agrega estações e referências da Lagoa dos 
 - Guaíba em Porto Alegre;
 - demais fontes regionais normalizadas pelos módulos de hidrologia.
 
+A Home agrupa Laranjal com Rio Grande e São José do Norte no trecho sul/estuário e mantém as referências do Guaíba/centro-norte em coluna própria, sem afirmar fluxo hidrodinâmico determinístico entre réguas distintas.
+
 A página `/situacao-hidrologica-pelotas` deve funcionar mesmo quando uma ou mais fontes externas estiverem indisponíveis.
+
+O Historical Data Layer captura níveis ambientais a cada 5 minutos e executa backfill diário da janela ainda exposta pelas fontes, com deduplicação por estação/variável/timestamp e registro de execução.
 
 ### Rede Hidrometeorológica da Defesa Civil RS — pesquisa
 
@@ -371,11 +382,11 @@ O código ativo de câmera está em `src/lib/cameras/*.server.ts` e componentes 
 
 A disponibilidade de uma transmissão é externa ao portal; a interface deve sinalizar claramente quando uma live não está disponível em vez de apresentar vídeo gravado como transmissão atual.
 
-## 11. Histórico, snapshots e precisão
+## 11. Histórico, Historical Data Layer, snapshots e precisão
 
-O projeto mantém três conceitos separados:
+O projeto mantém quatro conceitos separados e complementares.
 
-### Histórico climático
+### Histórico climático público
 
 - página pública de 30 dias;
 - séries de temperatura máxima/mínima, chuva e vento/rajadas;
@@ -383,19 +394,44 @@ O projeto mantém três conceitos separados:
 - estados vazios e fallback editorial;
 - metadados de período e origem.
 
+### Historical Data Layer canônico
+
+Documentação: `docs/HISTORICAL_DATA_INVENTORY.md`.
+
+O arquivo próprio usa:
+
+- `historical_data_sources` para governança de fonte;
+- `historical_stations` para identidade de estação/grid;
+- `historical_measurements` para séries canônicas;
+- `historical_collection_runs` para auditoria dos coletores;
+- classes explícitas `observation`, `forecast`, `reanalysis` e `derived`;
+- RLS e acesso administrativo, sem exposição direta ampla ao browser;
+- `paid_access_allowed=false` enquanto uma fonte não tiver revisão documental específica para uso pago/exportável.
+
+Já estão ativos:
+
+- observações Embrapa espelhadas automaticamente;
+- extremos diários Embrapa como um ponto canônico por dia local, preservando o horário informado do extremo como metadado;
+- níveis do Laranjal, rede da Lagoa dos Patos, Cais Mauá e Gasômetro em coleta ambiental;
+- coleta ambiental a cada 5 minutos e backfill diário da janela oferecida pelas fontes;
+- `weather_forecast_runs` e `weather_forecast_hourly_points` para forecast runs ricos do Open-Meteo.
+
+O primeiro run rico Open-Meteo foi validado em produção em 22/08/2026 com 168 pontos horários e a repetição da captura no mesmo ciclo manteve um único run completo. `captured_at` representa a captura do Tempo Pelotas, não um horário de emissão oficial do modelo quando a fonte não o informa.
+
 ### Snapshots meteorológicos
 
 - captura periódica de estado meteorológico;
 - persistência no Supabase;
 - upsert/idempotência;
 - rota protegida de cron;
-- uso futuro como arquivo próprio de observações/previsões.
+- uso operacional/editorial próprio, separado do arquivo de forecast run.
 
 ### Precisão de previsão
 
-- armazenamento/arquivo de previsões;
-- comparação posterior com observação Embrapa;
-- contratos automatizados para evitar degradação silenciosa;
+- `weather_forecast_predictions` preserva o arquivo diário usado na avaliação;
+- `weather_forecast_verifications` compara posteriormente previsão com observação Embrapa;
+- o arquivo rico de run não substitui nem destrói essas tabelas;
+- contratos automatizados evitam degradação silenciosa;
 - painel/uso editorial de métricas conforme implementado no produto.
 
 ## 12. Weather AI / Gemini
@@ -435,22 +471,32 @@ Princípios:
 - chave administrativa nunca enviada ao cliente;
 - RLS como camada de isolamento;
 - migrations versionadas em `supabase/migrations/`;
+- migrations estruturais são aplicadas e validadas diretamente no Supabase externo, independentemente do deploy do Lovable;
 - schema/objetos privados quando necessário;
 - snapshots e dados operacionais persistidos no servidor;
 - privilégios mínimos para fluxos públicos;
 - validação de advisors e políticas conforme documentação de segurança.
 
-Estado atual: banco, migrations e endurecimento de RLS estão implantados, mas o ciclo completo com **duas contas descartáveis** ainda deve ser validado em navegador real para confirmar isolamento, consentimento, exportação e exclusão ponta a ponta.
+Estruturas recentes implantadas incluem `account_access`, reparação segura da fundação da conta, Historical Data Layer, extremos diários Embrapa e arquivo rico de forecast runs Open-Meteo.
 
-## 14. Autenticação, conta e LGPD
+Estado atual: banco, migrations e endurecimento de RLS estão implantados. O ciclo completo com **duas contas descartáveis** ainda deve ser validado em navegador real para confirmar login, isolamento, consentimento, exportação e exclusão ponta a ponta.
 
-O fluxo usa Supabase Auth com Google OAuth.
+## 14. Autenticação, conta, entitlement e LGPD
+
+Documentação: `docs/auth-account.md` e `docs/ACCOUNT_AND_PRO_ARCHITECTURE.md`.
+
+O login Google atual usa:
+
+`Google Identity Services -> Google ID Token -> Supabase signInWithIdToken() -> sessão Supabase`.
+
+Isso evita que o fluxo principal do botão Google navegue pelo host técnico `*.supabase.co/auth/v1/callback`. O arquivo `src/lib/auth/google-identity.ts` carrega GIS e cria nonce via Web Crypto; `GoogleLoginCard` troca o ID Token pela sessão Supabase. A variável pública necessária é `VITE_GOOGLE_CLIENT_ID`. O Client Secret do Google não pertence ao browser nem ao repositório.
 
 Rotas principais:
 
-- `/entrar`;
-- `/conta`;
-- `/auth/callback`;
+- `/entrar` — compatibilidade/redirecionamento para a conta;
+- `/conta` — identidade, preferências, privacidade e plano;
+- `/painel` — shell autenticado comum a Free e PRO;
+- `/auth/callback` — compatibilidade/fluxos legados que ainda necessitem troca server-side;
 - `/auth/signout`.
 
 APIs de direitos do titular:
@@ -460,16 +506,22 @@ APIs de direitos do titular:
 
 Recursos existentes:
 
-- PKCE/callback server-side;
 - sessão por cookies SSR;
-- logout;
+- login Google por ID Token com nonce;
+- `next` limitado a caminhos internos normalizados;
+- logout local por POST da mesma origem;
 - conta autenticada;
 - consentimentos versionados;
 - exportação dos dados;
 - exclusão de conta/dados com fluxo protegido;
-- página `/privacidade-e-dados`.
+- página `/privacidade-e-dados`;
+- `account_access` com `free|pro`, status, origem e validade;
+- entitlements centralizados em `src/lib/auth/account-access.ts`;
+- Free com shell/painel, favoritos/preferências e limite arquitetural de 60 dias para históricos definidos como Free;
+- PRO estrutural com histórico completo, comparações, exportação e recursos avançados quando a fonte/política permitir;
+- RPC `ensure_current_user_account_foundation()` para reparar perfil/preferências/acesso ausentes sem conceder PRO por fallback.
 
-Pendência principal: validação E2E real com duas contas descartáveis e registro da evidência operacional.
+Pendência principal: configurar/confirmar o Web Client ID público no ambiente publicado e concluir o E2E real com duas contas descartáveis e registro da evidência operacional.
 
 ## 15. APIs internas e endpoints funcionais
 
@@ -483,7 +535,8 @@ Pendência principal: validação E2E real com duas contas descartáveis e regis
 - `/api/cron/embrapa`;
 - `/api/cron/forecast-accuracy`;
 - `/api/cron/push-daily`;
-- `/api/cron/weather-snapshot`.
+- `/api/cron/weather-snapshot`;
+- `/api/cron/data-status`.
 
 ### REDEMET
 
@@ -570,6 +623,8 @@ Regras permanentes:
 - nenhum secret real é versionado;
 - arquivos `.env` privados são ignorados pelo Git;
 - variáveis server-only não usam prefixo `VITE_`;
+- `VITE_GOOGLE_CLIENT_ID` é identificador público do cliente Web Google e não deve ser confundido com Client Secret;
+- Google Client Secret não é necessário no navegador e não deve ser enviado ao chat/repo para este fluxo;
 - REDEMET, Gemini, Supabase administrativo, cron e VAPID privado ficam somente no servidor;
 - `.env.example` contém nomes e defaults seguros, nunca valores de produção;
 - logs e relatórios devem ser sanitizados;
@@ -580,6 +635,7 @@ Regras permanentes:
 Grupos de configuração existentes no template:
 
 - Supabase público e server-side;
+- Google Identity Services (`VITE_GOOGLE_CLIENT_ID`);
 - cron;
 - VAPID/Web Push;
 - Gemini/Weather AI;
@@ -588,7 +644,7 @@ Grupos de configuração existentes no template:
 
 ## 19. GitHub Actions e observabilidade
 
-Existem cinco workflows ativos em `.github/workflows/`.
+Existem **seis workflows ativos** em `.github/workflows/`.
 
 ### `quality.yml` — Qualidade
 
@@ -614,6 +670,10 @@ Executa:
 - `scripts/cutover-smoke.mjs`;
 - `scripts/seo-production-smoke.mjs`;
 - relatório de artefato com retenção de 30 dias.
+
+### `data-status-monitor.yml` — Status das fontes
+
+Executa a cada 10 minutos e manualmente. Usa GitHub OIDC com audience própria para chamar `/api/cron/data-status`, persistindo o estado das fontes sem secret estático no workflow. Em pushes relevantes, aguarda a publicação da rota antes de falhar por 404/503 transitório.
 
 ### `runtime-smoke.yml` — Runtime de produção
 
@@ -643,9 +703,11 @@ Executa quatro vezes ao dia e manualmente, com GitHub OIDC e endpoint protegido 
 A suíte de contratos cobre, entre outros domínios:
 
 - níveis de água;
+- Historical Data Layer, coletores ambientais e extremos Embrapa;
+- forecast runs ricos do Open-Meteo, separação run/pontos horários e RLS;
 - Web Push;
 - segurança de banco;
-- conta/autenticação;
+- conta/autenticação/entitlements;
 - centralização Embrapa;
 - precisão de previsão;
 - resiliência Open-Meteo;
@@ -685,12 +747,15 @@ A interface pública usa a Home como fonte de verdade visual: `HomeEditorialHead
 
 Regras:
 
+- GitHub `main` é a fonte de código/versionamento;
+- Lovable é usado para publicação do app e não deve provisionar banco paralelo;
+- migrations e Edge Functions do Supabase externo são implantadas diretamente no Supabase quando o código correspondente muda;
 - não reescrever histórico publicado com force-push/rebase destrutivo;
 - manter commits pequenos e coerentes;
 - preservar a `main` em estado buildável;
 - verificar `Qualidade` após mudanças funcionais;
 - usar smoke/runtime para validar integrações externas e domínio público;
-- evitar alterações automáticas do Lovable fora do escopo; quando ocorrerem, revisar e reverter mudanças colaterais.
+- evitar mensagens desnecessárias ao agente do Lovable quando GitHub/Supabase resolvem o trabalho sem consumo de créditos.
 
 Runbooks:
 
@@ -742,28 +807,30 @@ A integração pública com CPTEC/SIGMA foi deliberadamente adiada para revisão
 | `docs/weather-ai-snapshots.md` | Arquitetura Weather AI persistida |
 | `docs/weather-snapshots.md` | Snapshots meteorológicos |
 | `docs/web-push.md` | Arquitetura Web Push/PWA |
-| `docs/auth-account.md` | Conta, autenticação e direitos do titular |
+| `docs/auth-account.md` | Conta, autenticação, entitlement e direitos do titular |
 | `docs/auth-production-validation-2026-07-29.md` | Evidências e validações de auth |
 | `docs/open-meteo-production-resilience-2026-07-29.md` | Resiliência Open-Meteo |
 | `WEATHER_PAGE_IDENTITY.md` | Identidade e consistência das páginas meteorológicas |
 | `docs/EXACT_PRODUCTION_CSS_STACK.md` | Stack CSS de produção |
 | `docs/ACCOUNT_AND_PRO_ARCHITECTURE.md` | Arquitetura da conta, autenticação, Free/PRO e entitlements |
-| `docs/HISTORICAL_DATA_INVENTORY.md` | Inventário de históricos, fontes, variáveis e oportunidades de backfill |
+| `docs/HISTORICAL_DATA_INVENTORY.md` | Inventário de históricos, fontes, variáveis, coletores e oportunidades de backfill |
 | `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md` | Plano aprovado de aplicação Público / Free / PRO / REVIEW e governança de acesso |
 
 ## 24. Pendências reais atuais
 
 Estas são pendências de produto/operação, não funcionalidades inexistentes disfarçadas de prontas:
 
-1. executar e registrar E2E de autenticação com duas contas descartáveis, incluindo isolamento RLS, consentimentos, exportação, logout e exclusão;
-2. reativar PWA/Web Push somente após validação controlada de navegador e rolagem;
-3. executar auditoria final WCAG 2.2 AA, Core Web Vitals e responsividade ampla;
-4. formalizar rollback de aplicação, banco, DNS e caches;
-5. continuar monitorando a disponibilidade das fontes externas, principalmente radar REDEMET, produtos gráficos do SIMAGRO RS e hidrologia regional;
-6. retomar avaliação CPTEC/SIGMA em novembro/dezembro de 2026, sem assumir previamente autorização ou integração;
-7. concluir o inventário de estações da Rede Hidrometeorológica da Defesa Civil RS, revisar condições de uso e validar bacias/unidades antes de qualquer ativação pública;
-8. concluir a validação operacional/semântica da ANA/RHN antes de qualquer promoção dessa fonte a leitura pública ativa;
-9. manter a limpeza de dívida histórica de lint/formatação separada de mudanças funcionais.
+1. configurar/confirmar `VITE_GOOGLE_CLIENT_ID` no ambiente publicado e executar E2E de autenticação com duas contas descartáveis, incluindo isolamento RLS, consentimentos, exportação, logout e exclusão;
+2. continuar a Prioridade 0 do Historical Data Layer com forecast run rico do MET Norway, STSC estruturado e arquivo de eventos INMET;
+3. avançar o inventário/backfill observacional com Embrapa/UFPel, INMET e ANA/RHN somente após validar semântica, unidade, timezone, proveniência e regras de retenção/uso;
+4. desenhar rollups horários/diários/mensais antes de servir janelas longas do arquivo aos usuários;
+5. reativar PWA/Web Push somente após validação controlada de navegador e rolagem;
+6. executar auditoria final WCAG 2.2 AA, Core Web Vitals e responsividade ampla;
+7. formalizar rollback de aplicação, banco, DNS e caches;
+8. continuar monitorando a disponibilidade das fontes externas, principalmente radar REDEMET, produtos gráficos do SIMAGRO RS e hidrologia regional;
+9. retomar avaliação CPTEC/SIGMA em novembro/dezembro de 2026, sem assumir previamente autorização ou integração;
+10. concluir o inventário de estações da Rede Hidrometeorológica da Defesa Civil RS, revisar condições de uso e validar bacias/unidades antes de qualquer ativação pública;
+11. manter a limpeza de dívida histórica de lint/formatação separada de mudanças funcionais.
 
 ## 25. Regra de manutenção deste arquivo
 
@@ -786,13 +853,13 @@ Atualizar `PROJECT_CURRENT_STATE.md` no mesmo conjunto de mudanças sempre que o
 
 O objetivo é que uma pessoa possa abrir este arquivo meses depois e responder rapidamente: **o que o Tempo Pelotas faz hoje, de onde vêm os dados, como opera e o que ainda não está concluído?**
 
-## 26. Direção de produto aprovada — Tempo Pelotas público e Tempo Pelotas PRO
+## 26. Direção de produto aprovada — Tempo Pelotas público, Free e PRO
 
-A próxima evolução estrutural do projeto é transformar a área autenticada em um produto pago, mantendo o portal público útil, aberto e editorialmente simples.
+A evolução estrutural do projeto transforma a área autenticada em uma camada de produto Free/PRO, mantendo o portal público útil, aberto e editorialmente simples.
 
-A regra central passa a ser:
+A regra central é:
 
-> **O Tempo Pelotas público informa. O Tempo Pelotas PRO analisa, compara, acompanha e interpreta.**
+> **O Tempo Pelotas público informa. A conta Free organiza e acompanha. O Tempo Pelotas PRO analisa, compara e aprofunda.**
 
 O PRO não deve cobrar pelo simples acesso a uma imagem de satélite, radar, aviso oficial ou dado que já faz sentido permanecer público. O valor comercial deve vir da profundidade, organização, histórico, cruzamento entre fontes, personalização, alertas avançados, dados derivados e interpretação assistida por IA.
 
@@ -810,7 +877,19 @@ O portal público deve responder rapidamente às perguntas mais comuns:
 
 O front público deve continuar funcional sem autenticação, sem assinatura e sem chamada de IA no caminho crítico. A direção visual deve privilegiar informação simples, leitura editorial, identidade local e boa hierarquia, evitando transformar a Home em um dashboard técnico.
 
-### 26.2. Papel do PRO
+### 26.2. Papel da conta Free
+
+A conta Free é o primeiro degrau autenticado e já possui contrato de entitlements. Ela deve receber progressivamente:
+
+- shell `/painel`;
+- preferências;
+- favoritos/locais acompanhados quando implementados;
+- histórico de até 60 dias nos datasets definidos como Free;
+- utilidades pessoais que não exijam assinatura.
+
+Esse limite de 60 dias não transforma dado oficial já público em paywall.
+
+### 26.3. Papel do PRO
 
 O PRO será a camada de inteligência meteorológica e hidrológica para usuários que precisam acompanhar Pelotas e a região em maior profundidade.
 
@@ -894,20 +973,24 @@ Exceções acima da cota normal só podem ocorrer por regra registrada, por exem
 
 ## 28. Leitura do estado atual para chegada do PRO
 
-A base técnica atual reduz bastante o trabalho necessário para o produto pago, mas ainda não existe uma camada comercial completa.
+A base técnica atual reduz bastante o trabalho necessário para o produto pago. A fundação de identidade/entitlement já existe; cobrança ainda não.
 
 ### 28.1. O que já pode ser reaproveitado
 
-- autenticação Google com Supabase Auth;
+- Google Identity Services integrado ao Supabase Auth por ID Token;
 - sessão SSR por cookies;
 - rota amigável `/conta`;
+- shell autenticado `/painel`;
+- `account_access` com `free|pro` e resolução centralizada de entitlements;
 - RLS e padrões de isolamento já existentes;
 - perfil do usuário;
 - preferências e consentimentos versionados;
 - exportação e exclusão de conta;
-- histórico/snapshots meteorológicos;
-- observação Embrapa centralizada;
+- Historical Data Layer canônico;
+- observação Embrapa centralizada e extremos diários;
 - arquivo de precisão de previsão;
+- forecast runs ricos do Open-Meteo;
+- coleta histórica hidrológica;
 - mapa MapLibre e camadas meteorológicas existentes;
 - radar, satélite e STSC;
 - hidrologia regional;
@@ -919,22 +1002,21 @@ A base técnica atual reduz bastante o trabalho necessário para o produto pago,
 
 ### 28.2. O que ainda não existe
 
-No estado atual não há evidência no runtime de:
+Ainda não existe uma camada comercial completa de assinatura:
 
-- produto/plano comercial PRO;
-- provedor de cobrança definido;
+- produto/preço comercial PRO definido no provedor;
+- provedor de cobrança escolhido e integrado;
 - checkout;
 - customer portal de cobrança;
 - webhooks de pagamento;
-- tabela de assinaturas;
+- tabelas de customer/subscription/eventos financeiros;
 - estado de pagamento normalizado;
-- entitlement PRO;
-- guard server-side por recurso premium;
-- dashboard PRO separado da conta;
-- catálogo de features premium;
-- limite diário de IA por utilidade e por usuário;
-- camada de analytics de conversão/receita;
-- política documentada de uso comercial para cada nova fonte que venha a compor o PRO.
+- ativação automática do `account_access.tier='pro'` por billing;
+- analytics de conversão/receita;
+- política comercial final de preço/cancelamento;
+- autorização comercial concluída para cada fonte candidata a diferencial pago.
+
+O entitlement estrutural **já existe** em `account_access` e `src/lib/auth/account-access.ts`; ele não deve ser recriado em arquitetura paralela. Billing futuro deverá apenas alimentar/conceder a camada de acesso de forma server-side e auditável.
 
 O `package.json` atual também não contém SDK específico de cobrança. A escolha do provedor deve ser feita antes da fase de checkout, sem acoplar o modelo de dados central a um fornecedor específico.
 
@@ -944,7 +1026,7 @@ O `package.json` atual também não contém SDK específico de cobrança. A esco
 
 O repositório operacional permanece `agenciamobi/mobitempopelotas`, branch `main`.
 
-A implementação do PRO será feita diretamente na `main`, sem PR, conforme decisão operacional atual. Isso aumenta a importância de:
+A implementação é feita diretamente na `main`, sem PR, conforme decisão operacional atual. Isso aumenta a importância de:
 
 - commits pequenos;
 - feature flags;
@@ -967,35 +1049,34 @@ O Tempo Pelotas usa **Supabase externo**.
 
 O repositório mantém as migrations como fonte versionada da evolução do schema, mas aplicar uma migration ao ambiente oficial é uma etapa independente do deploy do Lovable.
 
-Regra para o PRO:
+Regra:
 
 1. criar migration retrocompatível no GitHub;
 2. revisar RLS, grants, funções e impactos de LGPD;
 3. aplicar no Supabase externo oficial;
 4. regenerar tipos quando necessário;
-5. validar o schema aplicado;
+5. validar o schema aplicado e executar uma captura/teste controlado quando aplicável;
 6. somente depois habilitar no runtime a feature que depende daquela migration.
 
-Enquanto o Supabase externo não estiver acessível por ferramenta nesta sessão de trabalho, alterações de banco podem ser preparadas no repositório, mas **não podem ser declaradas como implantadas ou validadas em produção**.
+O Supabase externo está acessível pelas ferramentas operacionais desta sessão e as migrations históricas recentes foram aplicadas e validadas diretamente nele. Não declarar implantação de banco apenas por commit; exigir sempre evidência do ambiente oficial.
 
 ## 30. Modelo de dados alvo do PRO
 
-Os nomes definitivos podem ser ajustados na implementação, mas o domínio deve separar identidade, cobrança, entitlement, preferências de produto e consumo de IA.
+A camada de entitlement base já existe em `account_access`. A chegada de cobrança deve acrescentar domínio financeiro sem duplicar identidade/acesso.
 
 ### 30.1. Cobrança e entitlement
 
-Estrutura recomendada:
+Estrutura futura recomendada para billing:
 
 - `products` — produto lógico, inicialmente `tempo_pelotas_pro`;
-- `plans` — preço/ciclo e configuração comercial, inicialmente um plano principal;
+- `plans` — preço/ciclo e configuração comercial;
 - `billing_customers` — vínculo entre usuário e identificador do provedor;
 - `subscriptions` — estado normalizado da assinatura;
-- `subscription_events` — eventos recebidos do provedor, com idempotência;
-- `entitlements` — direitos efetivos concedidos ao usuário.
+- `subscription_events` — eventos recebidos do provedor, com idempotência.
 
-`subscriptions` não deve ser consultada pelo browser para decidir acesso. O backend resolve entitlement e entrega somente o necessário para a interface.
+`account_access` continua sendo a fonte simples dos direitos efetivos da conta no estágio atual. Billing futuro deve sincronizar essa camada no servidor; o browser nunca promove a própria conta.
 
-Estados mínimos a normalizar, independentemente do provedor escolhido:
+Estados mínimos a normalizar no billing, independentemente do provedor escolhido:
 
 - `incomplete`;
 - `active`;
@@ -1028,24 +1109,19 @@ O mecanismo existente de `weather_ai_snapshots`, `weather_ai_monthly_usage` e `w
 
 ## 31. Entitlement e segurança de acesso
 
-O PRO precisa ser protegido no servidor. Esconder componente React não é controle de acesso.
+O acesso avançado precisa ser protegido no servidor. Esconder componente React não é controle de acesso.
 
-A aplicação deve evoluir para helpers server-side equivalentes a:
-
-- `requireAuthenticatedUser()`;
-- `getUserSubscription()`;
-- `getUserEntitlements()`;
-- `requireEntitlement("pro")`;
-- `requireFeature("model_comparison")`.
+O contrato atual já centraliza Free/PRO em `resolveAccountAccess()` e seus `AccountEntitlements`. A evolução server-side deve consumir esse contrato em guards/helpers de recurso, sem espalhar `if (plan === 'pro')` pelos componentes.
 
 Regras:
 
 - usuário não autenticado não acessa dados privados;
-- usuário autenticado sem assinatura ativa pode acessar `/conta`, checkout e páginas públicas, mas não o painel PRO;
-- usuário com entitlement ativo acessa os recursos contratados;
+- usuário autenticado Free pode acessar `/conta`, `/painel` e recursos liberados pelo seu entitlement;
+- usuário PRO ativo acessa somente recursos cuja fonte/política também permita exposição;
+- ausência, suspensão ou expiração nunca concede PRO por fallback;
 - estado do front nunca é fonte de verdade;
 - resposta autenticada usa `private, no-store` e `Vary` apropriado;
-- nenhuma rota premium deve entrar no sitemap;
+- nenhuma rota premium entra no sitemap;
 - endpoints premium precisam de rate limit quando houver custo ou risco de abuso;
 - RLS continua sendo defesa adicional, não substituto do guard da aplicação.
 
@@ -1075,7 +1151,7 @@ Requisitos obrigatórios:
 
 O fluxo de ativação alvo é:
 
-`checkout confirmado -> webhook válido -> subscription normalizada -> entitlement ativo -> acesso ao /painel`.
+`checkout confirmado -> webhook válido -> subscription normalizada -> account_access/entitlement PRO ativo -> acesso aos módulos PRO`.
 
 Não liberar PRO apenas pelo retorno do navegador após o checkout.
 
@@ -1085,12 +1161,12 @@ Separar claramente marketing, conta e produto autenticado.
 
 ### Pública e indexável
 
-- `/pro` — apresentação do produto, diferenciais, preço e CTA;
+- `/pro` — apresentação do produto, quando houver oferta comercial definida;
 
 ### Autenticada, noindex
 
-- `/conta` — identidade, assinatura, cobrança, privacidade e sessão;
-- `/painel` — visão geral do PRO;
+- `/conta` — identidade, plano, privacidade e sessão;
+- `/painel` — shell comum a Free e PRO;
 - `/painel/tempo` — previsão detalhada e séries;
 - `/painel/mapas` — camadas avançadas quando disponíveis;
 - `/painel/modelos` — comparação de fontes/modelos;
@@ -1101,19 +1177,27 @@ Separar claramente marketing, conta e produto autenticado.
 
 Não é obrigatório lançar todas as subrotas na primeira versão. O shell deve permitir crescimento sem transformar `/conta` no dashboard técnico.
 
-## 34. Escopo recomendado para o primeiro PRO em produção
+## 34. Escopo recomendado para o primeiro produto autenticado
 
-A primeira versão paga deve ser forte o suficiente para justificar assinatura, mas menor que a visão final.
+Antes do billing, o primeiro valor real deve aparecer para usuário Free; o PRO é a extensão de profundidade.
 
-### MVP comercial recomendado
+### Base autenticada recomendada
 
-1. dashboard PRO com situação atual refinada;
-2. previsão horária mais extensa e filtros;
-3. gráficos de temperatura, chuva, vento/rajadas e pressão quando disponíveis;
-4. histórico e comparação temporal já sustentados pelo arquivo atual;
-5. hidrologia detalhada com evolução e comparação entre pontos disponíveis;
-6. mapa com controles e camadas adicionais que tenham uso/licença confirmados;
-7. comparação de duas ou mais fontes/modelos onde os dados forem estruturados e confiáveis;
+1. shell `/painel` com estado de conta e fontes;
+2. preferências/favoritos quando prontos;
+3. histórico Free de até 60 dias nos datasets aprovados;
+4. data freshness e proveniência visíveis;
+5. gráficos determinísticos e estados de indisponibilidade.
+
+### MVP comercial PRO recomendado
+
+1. histórico além da janela Free quando a fonte permitir;
+2. comparação temporal e entre estações/variáveis;
+3. previsão/forecast archive aprofundado;
+4. hidrologia detalhada com evolução e comparação;
+5. mapa/camadas adicionais com uso/licença confirmados;
+6. comparação de fontes/modelos estruturados;
+7. exportação quando permitida;
 8. bloco `O que mudou`;
 9. resumo inteligente PRO compartilhado e persistido;
 10. tela de assinatura/estado de pagamento na conta.
@@ -1129,21 +1213,21 @@ A primeira versão paga deve ser forte o suficiente para justificar assinatura, 
 - novos níveis de assinatura;
 - API comercial para terceiros.
 
-## 35. Diferença de produto entre público e PRO
+## 35. Diferença de produto entre público, Free e PRO
 
-| Domínio | Público | PRO |
-| --- | --- | --- |
-| Agora | leitura simples | leitura refinada + séries/contexto |
-| Próximas horas | resumo | horizonte maior, filtros e gráficos |
-| Próximos dias | tendência simples | comparação, evolução e divergências |
-| Radar/satélite | visualização base | mais contexto, camadas/timeline conforme permissões |
-| Alertas oficiais | sempre públicos | públicos + contexto e personalização, sem substituir fonte oficial |
-| Lagoa/águas | nível e tendência principal | histórico, comparação, filtros e análise |
-| Histórico | visão pública limitada | histórico ampliado e comparação |
-| Modelos/fontes | fonte editorial consolidada + visualização complementar SIMAGRO quando aplicável | comparação explícita e divergências entre fontes estruturadas aprovadas |
-| IA | somente mecanismo público já existente e controlado | análises refinadas, quotas por utilidade e recursos personalizados |
-| Exportação | apenas direitos LGPD da conta | dados/relatórios do produto quando permitido |
-| Personalização | preferências básicas | dashboard, favoritos, alertas e configurações avançadas |
+| Domínio | Público | Free autenticado | PRO |
+| --- | --- | --- | --- |
+| Agora | leitura simples | preferências/painel pessoal | leitura refinada + séries/contexto |
+| Próximas horas | resumo | recursos pessoais definidos como Free | horizonte maior, filtros e gráficos |
+| Próximos dias | tendência simples | acompanhamento pessoal | comparação, evolução e divergências |
+| Radar/satélite | visualização base | base pública + preferências futuras | mais contexto, arquivo/timeline conforme permissões |
+| Alertas oficiais | sempre públicos | sempre públicos | públicos + contexto/personalização, sem substituir fonte oficial |
+| Lagoa/águas | nível e tendência principal | histórico Free quando aprovado | histórico longo, comparação, filtros e análise |
+| Histórico | visão pública existente | até 60 dias nos datasets Free | histórico completo permitido e comparação |
+| Modelos/fontes | fonte editorial consolidada + SIMAGRO visual-only quando aplicável | acompanhamento básico | comparação explícita e divergências entre fontes estruturadas aprovadas |
+| IA | somente mecanismo público já existente e controlado | sem depender de IA | análises refinadas, quotas por utilidade e recursos personalizados |
+| Exportação | direitos LGPD da conta | direitos LGPD | dados/relatórios do produto quando permitido |
+| Personalização | nenhuma obrigatória | preferências/favoritos | dashboard, alertas e configurações avançadas |
 
 ## 36. Governança das fontes antes da monetização
 
@@ -1172,13 +1256,15 @@ Princípios:
 - cobrar pela experiência, processamento, organização, histórico, comparação e interpretação desenvolvidos pelo Tempo Pelotas;
 - não extrair números por OCR de imagens para transformá-los em feed operacional sem endpoint estruturado e validação;
 - preservar atribuição visível;
-- a camada pública atual do SIMAGRO RS é `VIEW_ONLY`: produto gráfico complementar, sem incorporação ao feed numérico e sem pressupor autorização automática para uso como diferencial comercial do PRO;
+- `historical_data_sources.paid_access_allowed` permanece `false` até revisão específica;
+- `open-meteo-forecast` está em `pending_review` e não está liberado automaticamente para PRO/exportação apesar de o arquivo interno já estar ativo;
+- a camada pública atual do SIMAGRO RS é `VIEW_ONLY`;
 - manter CPTEC/SIGMA fora do runtime até a revisão institucional já planejada;
 - revisar qualquer nova camada REDEMET, INMET, ANA, SIMAGRO ou outra fonte antes de torná-la diferencial comercial.
 
-## 37. Design e UX do PRO
+## 37. Design e UX do produto autenticado
 
-A área pública e o PRO devem compartilhar identidade, mas não densidade.
+A área pública e o painel devem compartilhar identidade, mas não densidade.
 
 ### Público
 
@@ -1192,7 +1278,7 @@ Direção:
 - fotografia regional quando fizer sentido;
 - sem aparência de SaaS técnico na Home.
 
-### PRO
+### Painel Free/PRO
 
 Direção:
 
@@ -1203,17 +1289,18 @@ Direção:
 - superfícies modulares;
 - navegação persistente do painel;
 - estados de atualização/fonte sempre visíveis;
+- módulos e profundidade liberados por entitlement;
 - sem ornamentação que prejudique leitura técnica.
 
-O PRO deve parecer mais poderoso que o front público, não apenas mais cheio.
+O PRO deve parecer mais poderoso que o Free por capacidade e profundidade, não apenas mais cheio.
 
 ## 38. Alertas, PWA e notificações no PRO
 
 O código de Web Push existe, mas permanece suspenso para ativação pública enquanto a validação real de navegadores não for concluída.
 
-Para o PRO:
+Para o produto autenticado:
 
-- não usar Web Push como bloqueador do primeiro lançamento pago;
+- não usar Web Push como bloqueador do primeiro lançamento;
 - primeiro validar novamente service worker, inscrição, unsubscribe, permissões e rolagem;
 - depois vincular alertas personalizados a `alert_rules`;
 - deduplicar eventos;
@@ -1226,7 +1313,7 @@ Para o PRO:
 
 A chegada da assinatura amplia o escopo dos direitos do titular e da política de privacidade.
 
-Antes de produção:
+Antes de produção comercial:
 
 - exportação da conta deve incluir os novos dados pessoais que façam sentido exportar;
 - exclusão deve remover preferências e artefatos pessoais conforme a política definida;
@@ -1243,7 +1330,7 @@ O PRO precisa nascer mensurável.
 
 Métricas mínimas:
 
-- visita à página `/pro`;
+- visita à futura página `/pro`;
 - clique para assinar;
 - checkout iniciado;
 - checkout concluído;
@@ -1254,36 +1341,35 @@ Métricas mínimas:
 - MRR/receita recorrente conforme o provedor;
 - churn;
 - assinantes ativos;
-- usuários PRO ativos por período;
+- usuários Free/PRO ativos por período;
 - uso por módulo;
 - custo de IA por utilidade;
 - custo de IA por assinante;
 - cache hit de análises compartilhadas;
 - chamadas evitadas por fingerprint;
 - erros por fonte externa;
-- tempo de resposta dos módulos PRO;
-- falhas de entitlement/webhook.
+- tempo de resposta dos módulos;
+- falhas de entitlement/webhook;
+- saúde e gaps dos coletores históricos.
 
 Não registrar conteúdo pessoal de forma desnecessária apenas para analytics.
 
-## 41. Contratos e testes que devem existir antes do lançamento
-
-Criar cobertura específica do PRO sem depender apenas de teste visual.
+## 41. Contratos e testes antes do lançamento comercial
 
 Contratos mínimos:
 
 - usuário anônimo não acessa `/painel`;
-- usuário autenticado sem entitlement não acessa PRO;
-- assinatura ativa concede entitlement;
-- assinatura cancelada expira conforme regra comercial;
+- usuário Free recebe somente seus entitlements;
+- tier/status/validade inválidos não concedem PRO;
+- assinatura ativa futura concede PRO somente após confirmação server-side;
+- assinatura cancelada futura expira conforme regra comercial;
 - webhook duplicado não duplica evento nem entitlement;
 - webhook inválido é recusado;
 - retorno de checkout sem webhook válido não libera acesso;
-- RLS impede leitura de assinatura/preferências de outro usuário;
-- rota PRO é `noindex`;
-- `/pro` pública permanece indexável;
+- RLS impede leitura de dados privados de outro usuário;
+- rota autenticada é `noindex`;
+- futura `/pro` pública permanece indexável quando criada;
 - quota diária de IA bloqueia chamada excedente;
-- exceção de IA exige motivo permitido;
 - cache/fingerprint evita nova chamada quando aplicável;
 - falha de IA não torna o painel meteorológico indisponível;
 - front público continua sem chamada direta de IA;
@@ -1293,24 +1379,19 @@ Contratos mínimos:
 
 E2E real obrigatório antes do lançamento:
 
-1. conta A sem assinatura;
-2. conta B com assinatura ativa;
-3. tentativa de isolamento cruzado;
-4. checkout sandbox;
-5. ativação por webhook;
-6. acesso ao painel;
-7. cancelamento;
-8. expiração/estado final;
-9. exportação de dados;
-10. exclusão da conta conforme política;
-11. login/logout em navegador real;
-12. validação mobile.
+1. conta A Free;
+2. conta B descartável para isolamento cruzado;
+3. login/logout em navegador real e mobile;
+4. preferências/consentimentos;
+5. exportação;
+6. exclusão;
+7. depois, quando billing existir, checkout sandbox, webhook, ativação e cancelamento PRO.
 
 ## 42. Feature flags para implantação segura na `main`
 
-Como o trabalho será feito diretamente na `main`, recursos estruturais devem nascer desativados até o ambiente estar pronto.
+Como o trabalho é feito diretamente na `main`, recursos comerciais estruturais devem nascer desativados até o ambiente estar pronto.
 
-Flags recomendadas:
+Flags recomendadas quando a camada correspondente existir:
 
 - `PRO_ENABLED`;
 - `PRO_BILLING_ENABLED`;
@@ -1322,112 +1403,112 @@ Regras:
 
 - flags estruturais devem ser avaliadas server-side quando protegem acesso/custo;
 - não usar flag cliente como segurança;
-- página pública `/pro` pode ser publicada antes do checkout, se deixar claro o estado comercial;
-- `/painel` não deve ser habilitado em produção antes de schema, entitlement e E2E estarem confirmados.
+- página pública `/pro` pode ser publicada antes do checkout somente se deixar claro o estado comercial;
+- billing não deve ser habilitado antes de schema, webhook e E2E estarem confirmados.
 
 ## 43. Roadmap de implementação até produção
 
 ### Fase 0 — decisão e documentação
 
-Estado: **iniciada por esta atualização**.
+Estado: **consolidada**.
+
+Entregas concluídas:
+
+- público x Free x PRO documentados;
+- regra de IA pública congelada;
+- escopo inicial de produto autenticado registrado;
+- infraestrutura correta registrada: Lovable para deploy e Supabase externo separado;
+- `PROJECT_CURRENT_STATE.md` mantido como fonte de direção.
+
+### Fase 1 — fundação da conta
+
+Estado: **estruturalmente implementada; E2E pendente**.
+
+Já existe:
+
+- `/conta`;
+- `/painel` autenticado/noindex;
+- Google Identity Services + ID Token;
+- `account_access` Free/PRO;
+- entitlements centralizados;
+- preferências/consentimentos;
+- exportação/exclusão/logout;
+- reparação segura da fundação da conta.
+
+Critério restante: configurar/confirmar `VITE_GOOGLE_CLIENT_ID` no ambiente publicado e executar E2E com duas contas descartáveis.
+
+### Fase 2 — inventário e governança das fontes
+
+Estado: **em andamento**.
+
+Entregas já iniciadas:
+
+- `docs/HISTORICAL_DATA_INVENTORY.md`;
+- classes observation/forecast/reanalysis/derived;
+- governança `paid_access_allowed` e `retention_policy_status`;
+- separação Público/Free/PRO/REVIEW.
+
+Próximos focos: INMET, Embrapa/UFPel, ANA/RHN, Defesa Civil RS e revisão comercial das fontes candidatas.
+
+### Fase 3 — patrimônio histórico e APIs internas
+
+Estado: **em andamento em paralelo**.
+
+Já implantado:
+
+- Historical Data Layer canônico;
+- coleta Embrapa + extremos;
+- hidrologia a cada 5 minutos + backfill diário;
+- forecast run rico Open-Meteo por ciclo;
+- RLS e fontes com uso pago bloqueado por padrão.
+
+Próximos passos:
+
+- MET Norway rico;
+- STSC/eventos INMET;
+- backfills observacionais aprovados;
+- rollups horários/diários/mensais;
+- APIs históricas server-side com entitlement e política por dataset.
+
+### Fase 4 — primeiro painel Free útil
 
 Entregas:
 
-- consolidar público x PRO;
-- congelar regra de IA pública;
-- definir escopo inicial do PRO;
-- registrar infraestrutura correta: Lovable para deploy, Supabase externo separado;
-- manter `PROJECT_CURRENT_STATE.md` como fonte de direção.
-
-Critério de saída: equipe consegue explicar o produto pago sem depender de decisões implícitas.
-
-### Fase 1 — estabilizar a conta existente
-
-Entregas:
-
-- executar E2E com duas contas descartáveis;
-- corrigir qualquer falha de RLS, callback, sessão, exportação ou exclusão;
-- reconciliar documentação antiga que ainda mencione `/minha-conta` quando o fluxo vigente é `/conta`;
-- garantir que a conta atual continue funcional antes de introduzir cobrança.
-
-Critério de saída: autenticação e LGPD validadas ponta a ponta em produção/ambiente equivalente.
-
-### Fase 2 — auditoria das fontes para uso PRO
-
-Entregas:
-
-- criar matriz de uso/licença;
-- classificar fontes atuais;
-- marcar quais dados podem ser públicos, PRO, derivados, apenas visualização ou dependem de revisão;
-- impedir que uma camada incerta entre no MVP pago.
-
-Critério de saída: todos os recursos do MVP PRO têm origem e regra de uso conhecidas.
-
-### Fase 3 — fundação de banco e entitlement
-
-Entregas no repositório:
-
-- migrations de billing/subscription/entitlement;
-- RLS e grants;
-- tipos;
-- helpers server-side;
-- testes estáticos/de contrato;
-- flags desligadas por padrão.
-
-Checkpoint externo obrigatório:
-
-- aplicar migrations no Supabase externo;
-- validar schema real;
-- validar duas contas;
-- registrar evidência.
-
-Critério de saída: entitlement pode ser calculado com segurança sem qualquer cobrança real ainda.
-
-### Fase 4 — escolher e integrar cobrança
-
-Entregas:
-
-- escolher provedor;
-- definir preço e ciclo;
-- cadastrar produto/preço no provedor;
-- implementar adapter;
-- checkout server-side;
-- webhook validado e idempotente;
-- sincronização de assinatura;
-- estado da assinatura em `/conta`;
-- customer portal/cancelamento quando suportado;
-- sandbox completo.
-
-Critério de saída: pagamento de teste gera entitlement e cancelamento remove/agenda acesso conforme regra.
-
-### Fase 5 — shell do painel PRO sem IA
-
-Entregas:
-
-- `/painel` protegido no servidor;
-- navegação do painel;
-- visão geral;
-- data freshness e fontes visíveis;
-- componentes reutilizando dados atuais;
+- favoritos/locais quando definidos;
+- histórico de até 60 dias para datasets Free;
+- freshness/proveniência;
 - gráficos determinísticos;
-- histórico/hidrologia detalhados;
-- skeletons, empty states e erros por fonte;
+- estados vazios/erros;
 - mobile e acessibilidade.
 
-Critério de saída: já existe valor real suficiente no PRO mesmo com `PRO_AI_ENABLED=false`.
+Critério de saída: existe valor autenticado real antes de pedir pagamento.
 
-### Fase 6 — profundidade de dados
+### Fase 5 — escolher e integrar cobrança
 
 Entregas:
 
-- comparação entre fontes/modelos escolhidos;
-- séries mais longas quando sustentadas pelo arquivo;
-- novos agregados derivados;
-- mapa/camadas adicionais aprovadas;
-- comparativos hidrológicos;
-- favoritos/configurações essenciais.
+- escolher provedor e preço;
+- implementar adapter;
+- migrations de customer/subscription/eventos sem duplicar `account_access`;
+- checkout server-side;
+- webhook validado e idempotente;
+- sincronização de assinatura -> entitlement;
+- estado da assinatura em `/conta`;
+- sandbox completo.
 
-Critério de saída: o PRO não é apenas uma versão visualmente diferente do portal público.
+### Fase 6 — profundidade PRO sem IA
+
+Entregas:
+
+- histórico longo autorizado;
+- comparação entre fontes/modelos;
+- comparações entre períodos/estações/variáveis;
+- exportação permitida;
+- mapas/camadas aprovadas;
+- comparativos hidrológicos;
+- recursos avançados protegidos por entitlement.
+
+Critério de saída: PRO já possui valor real com IA desligada.
 
 ### Fase 7 — camada de IA PRO
 
@@ -1442,29 +1523,24 @@ Entregas:
 - cache compartilhado;
 - logs e custo estimado;
 - kill switch;
-- primeira análise PRO: resumo refinado + `O que mudou`;
-- comparação interpretativa somente quando as fontes estruturadas sustentarem o conteúdo.
-
-Critério de saída: IA agrega interpretação sem criar dependência, duplicação de chamadas ou custo imprevisível.
+- primeira análise PRO: resumo refinado + `O que mudou`.
 
 ### Fase 8 — hardening comercial e operacional
 
 Entregas:
 
 - termos/privacidade atualizados;
-- política de cancelamento/reembolso conforme modelo comercial;
+- política de cancelamento/reembolso;
 - export/delete revisados;
 - rate limits;
 - observabilidade de cobrança;
 - dashboards de erro/custo;
 - backup/rollback de banco documentado;
-- smoke de rotas PRO;
+- smoke de rotas autenticadas/PRO;
 - Core Web Vitals e WCAG;
 - testes de navegador e mobile;
 - revisão de secrets;
 - revisão final das fontes usadas no plano pago.
-
-Critério de saída: checklist de produção sem bloqueadores críticos.
 
 ### Fase 9 — lançamento controlado
 
@@ -1477,28 +1553,26 @@ Sequência:
 5. verificar webhook e entitlement;
 6. acessar o painel como assinante real;
 7. testar cancelamento/portal;
-8. ativar `PRO_ENABLED`;
-9. ativar `PRO_BILLING_ENABLED`;
-10. manter `PRO_AI_ENABLED` inicialmente controlado se necessário;
-11. acompanhar erros, custo e conversão nas primeiras horas/dias;
-12. ampliar divulgação apenas depois da estabilidade operacional.
+8. ativar billing/PRO gradualmente;
+9. acompanhar erros, custo e conversão;
+10. ampliar divulgação apenas depois da estabilidade operacional.
 
 ## 44. Critérios de GO LIVE do Tempo Pelotas PRO
 
-O PRO só pode ser considerado em produção quando todos os itens críticos abaixo estiverem confirmados:
+O PRO só pode ser considerado comercialmente em produção quando todos os itens críticos abaixo estiverem confirmados:
 
 - autenticação E2E real concluída;
 - Supabase externo com migrations aplicadas e RLS validada;
 - cobrança de produção configurada;
 - webhook assinado e idempotente;
 - assinatura ativa gera entitlement sem ação manual;
-- usuário sem assinatura não consegue contornar o guard;
+- usuário Free não consegue contornar o guard;
 - cancelamento funciona conforme regra comercial;
 - `/painel` é noindex;
 - dados públicos continuam disponíveis sem login;
 - portal público funciona com IA desligada;
 - PRO funciona meteorologicamente com IA desligada;
-- quotas de IA e teto financeiro funcionam;
+- quotas de IA e teto financeiro funcionam quando IA PRO for habilitada;
 - nenhuma chamada de IA ocorre por simples pageview público;
 - nenhuma fonte usada no MVP pago permanece com autorização de uso indefinida;
 - política de privacidade e conta cobrem cobrança e novos dados;
@@ -1509,27 +1583,26 @@ O PRO só pode ser considerado em produção quando todos os itens críticos aba
 - responsividade e acessibilidade foram testadas;
 - rollback de aplicação e banco está documentado.
 
-## 45. Prioridade imediata a partir desta decisão
+## 45. Prioridade imediata
 
-A ordem recomendada agora é:
+A ordem operacional atual é:
 
-1. não ampliar mais a complexidade da Home pública sem necessidade;
-2. concluir refinos editoriais atuais do front simples;
-3. validar definitivamente o fluxo `/conta` com duas contas;
-4. auditar fontes para uso comercial/derivado;
-5. escolher provedor de cobrança e regra de preço;
-6. preparar migrations de subscription + entitlement;
-7. implementar guards do PRO ainda atrás de flag;
-8. construir o primeiro `/painel` sem IA;
-9. adicionar profundidade de dados;
-10. implementar IA PRO com orçamento por utilidade;
-11. executar hardening e lançamento controlado.
+1. manter a Home pública estável e evitar complexidade sem necessidade;
+2. finalizar `VITE_GOOGLE_CLIENT_ID` e E2E da conta com duas contas descartáveis;
+3. continuar a coleta histórica sem esperar billing: MET Norway rico, eventos estruturados e backfills seguros;
+4. definir rollups e APIs históricas server-side;
+5. construir valor real no painel Free, começando pelos históricos/datasets liberados;
+6. concluir a matriz de governança para o que poderá entrar no PRO;
+7. somente então escolher cobrança/preço e ligar billing ao `account_access` existente;
+8. construir profundidade PRO determinística;
+9. adicionar IA PRO depois que dados, entitlement e orçamento estiverem sólidos;
+10. executar hardening e lançamento controlado.
 
-Até a Fase 4, nenhuma tela deve sugerir que o PRO está disponível para compra em produção.
+Até a integração real de billing, nenhuma tela deve sugerir que o PRO está disponível para compra em produção.
 
-A partir da implementação do PRO, este arquivo também deve ser atualizado quando ocorrer:
+Este arquivo também deve ser atualizado quando ocorrer:
 
-- mudança de escopo público x PRO;
+- mudança de escopo público x Free x PRO;
 - criação de plano/preço;
 - escolha ou troca de provedor de cobrança;
 - mudança de entitlement;
@@ -1547,8 +1620,6 @@ Documento especializado e fonte detalhada desta decisão:
 
 - `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md`.
 
-Esta seção **refina e prevalece sobre ambiguidades anteriores** nas seções de produto/PRO quando houver conflito sobre quem pode acessar determinado dado ou ferramenta.
-
 Regras consolidadas:
 
 - tudo que já está público continua público, salvo motivo técnico, institucional ou jurídico documentado;
@@ -1556,27 +1627,39 @@ Regras consolidadas:
 - o usuário Free autenticado recebe valor pela conta: painel pessoal, favoritos, preferências, locais/estações acompanhadas e recursos/datasets definidos como Free;
 - histórico de até 60 dias é um limite de entitlement para determinados recursos Free, **não** uma regra automática para dados oficiais já públicos;
 - o PRO deve priorizar o Historical Data Layer próprio, históricos longos autorizados, indicadores derivados, comparações, análises, ferramentas avançadas, exportações permitidas e futuros recursos desenvolvidos pelo Tempo Pelotas;
-- fonte ou dataset cuja retenção, redistribuição, exportação ou uso comercial permaneça incerto deve ficar em `REVIEW`/interno e não pode ser usado como diferencial PRO até revisão documentada;
+- fonte ou dataset cuja retenção, redistribuição, exportação ou uso comercial permaneça incerto fica em `REVIEW`/interno e não pode ser usado como diferencial PRO até revisão documentada;
 - `/conta` permanece a área de identidade, privacidade, sessão e plano;
-- `/painel` passa a ser concebido como **shell autenticado comum a Free e PRO**, com módulos e profundidade liberados por entitlement, refinando a concepção anterior de painel exclusivamente PRO;
+- `/painel` é o **shell autenticado comum a Free e PRO**, com módulos e profundidade liberados por entitlement;
 - esconder um componente no React nunca substitui autorização server-side;
-- a coleta histórica continua em paralelo e não deve esperar billing ou lançamento comercial.
+- a coleta histórica continua em paralelo e não espera billing ou lançamento comercial.
 
-### 46.1. Ordem de aplicação aprovada
+### 46.1. Estado da aplicação desta política
 
-A implementação desta nova etapa **ainda não iniciou**. A ordem oficial passa a ser:
+A implementação **já iniciou**.
 
-1. finalizar e validar E2E/arquitetura da conta atual;
-2. consolidar contrato de entitlements e shell autenticado `/painel`;
-3. classificar fontes/datasets em Público, Free, PRO ou REVIEW conforme `docs/DATA_ACCESS_PUBLIC_FREE_PRO_PLAN.md`;
-4. continuar ampliando a coleta histórica e os backfills seguros em paralelo;
-5. construir o primeiro painel Free com utilidade real;
-6. criar APIs históricas server-side com política por dataset;
-7. construir o PRO sobre patrimônio próprio, dados claramente autorizados, derivados e ferramentas do Tempo Pelotas;
-8. integrar billing somente depois de o produto autenticado demonstrar valor;
-9. adicionar IA e ferramentas avançadas depois que a camada determinística estiver sólida.
+Concluído/ativo:
 
-Documentos que devem ser consultados em conjunto antes de iniciar desenvolvimento desta etapa:
+1. fundação de conta e `account_access` Free/PRO;
+2. entitlements centralizados;
+3. `/painel` autenticado/noindex;
+4. política Público/Free/PRO/REVIEW documentada;
+5. Historical Data Layer canônico;
+6. coleta histórica Embrapa e hidrologia;
+7. extremos diários Embrapa;
+8. forecast run rico Open-Meteo.
+
+Em andamento/próximo:
+
+1. E2E real do login GIS com duas contas;
+2. forecast run rico MET Norway;
+3. backfills observacionais seguros;
+4. rollups e APIs históricas server-side;
+5. primeiro painel Free com histórico de até 60 dias nos datasets aprovados;
+6. governança das fontes candidatas ao PRO;
+7. billing somente depois de o produto autenticado demonstrar valor;
+8. IA e ferramentas avançadas depois que a camada determinística estiver sólida.
+
+Documentos que devem ser consultados em conjunto antes de ampliar esta etapa:
 
 - `docs/ACCOUNT_AND_PRO_ARCHITECTURE.md`;
 - `docs/HISTORICAL_DATA_INVENTORY.md`;
