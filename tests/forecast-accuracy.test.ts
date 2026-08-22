@@ -6,6 +6,10 @@ const migration = readFileSync(
   "supabase/migrations/20260729060000_forecast_accuracy.sql",
   "utf8",
 );
+const richArchiveMigration = readFileSync(
+  "supabase/migrations/20260822073500_archive_rich_open_meteo_forecast_runs.sql",
+  "utf8",
+);
 const server = readFileSync("src/lib/weather/forecast-accuracy.server.ts", "utf8");
 const openMeteoDaily = readFileSync("src/lib/weather/open-meteo-daily.server.ts", "utf8");
 const openMeteoEdge = readFileSync(
@@ -36,19 +40,52 @@ test("arquiva previsões por provedor, ciclo, data alvo e antecedência", () => 
   assert.match(weatherTypes, /dateIso\?: string/);
 });
 
-test("Open-Meteo é coletado pela Edge Function em payload diário leve", () => {
+test("Open-Meteo preserva previsão diária e um forecast run horário rico por ciclo", () => {
   assert.match(openMeteoDaily, /functions\/v1\/\$\{EDGE_FUNCTION_NAME\}/);
   assert.match(openMeteoDaily, /X-Collector-Token/);
   assert.match(openMeteoDaily, /readCapturedRows/);
   assert.doesNotMatch(openMeteoDaily, /api\.open-meteo\.com/);
   assert.match(openMeteoEdge, /api\.open-meteo\.com\/v1\/forecast/);
-  assert.match(openMeteoEdge, /forecast_days: "7"/);
+  assert.match(openMeteoEdge, /forecast_days: String\(FORECAST_DAYS\)/);
   assert.match(openMeteoEdge, /temperature_2m_max/);
   assert.match(openMeteoEdge, /precipitation_sum/);
+  assert.match(openMeteoEdge, /boundary_layer_height/);
+  assert.match(openMeteoEdge, /cloud_cover_low/);
+  assert.match(openMeteoEdge, /wind_direction_10m/);
+  assert.match(openMeteoEdge, /archiveRichForecastRun/);
+  assert.match(openMeteoEdge, /first-complete-snapshot-per-6h-bucket/);
+  assert.match(openMeteoEdge, /capture_status === "complete"/);
+  assert.match(openMeteoEdge, /weather_forecast_hourly_points/);
+  assert.match(openMeteoEdge, /onConflict: "run_id,valid_at"/);
   assert.match(openMeteoEdge, /MAX_ATTEMPTS = 2/);
-  assert.match(openMeteoEdge, /onConflict: "location_slug,provider_key,issued_local_date,cycle_hour,target_date"/);
-  assert.doesNotMatch(openMeteoEdge, /boundary_layer_height/);
-  assert.doesNotMatch(openMeteoEdge, /cloud_cover_low/);
+  assert.match(
+    openMeteoEdge,
+    /onConflict: "location_slug,provider_key,issued_local_date,cycle_hour,target_date"/,
+  );
+});
+
+test("arquivo rico separa run e pontos horários e permanece privado", () => {
+  assert.match(richArchiveMigration, /create table if not exists public\.weather_forecast_runs/);
+  assert.match(
+    richArchiveMigration,
+    /create table if not exists public\.weather_forecast_hourly_points/,
+  );
+  assert.match(
+    richArchiveMigration,
+    /unique \(location_slug, provider_key, captured_local_date, cycle_hour\)/,
+  );
+  assert.match(richArchiveMigration, /unique \(run_id, valid_at\)/);
+  assert.match(richArchiveMigration, /captured_at.*não deve ser interpretado/s);
+  assert.match(richArchiveMigration, /paid_access_allowed[\s\S]*false/);
+  assert.match(richArchiveMigration, /retention_policy_status[\s\S]*pending_review/);
+  assert.match(
+    richArchiveMigration,
+    /revoke all on table public\.weather_forecast_runs from public, anon, authenticated/,
+  );
+  assert.match(
+    richArchiveMigration,
+    /revoke all on table public\.weather_forecast_hourly_points from public, anon, authenticated/,
+  );
 });
 
 test("verificação usa somente dia completo observado pela Embrapa", () => {
