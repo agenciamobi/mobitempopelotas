@@ -14,6 +14,7 @@ import type {
   DefesaCivilHydroData,
   DefesaCivilHydroStation,
   DefesaCivilReadingFreshness,
+  DefesaCivilStationClassification,
 } from "@/lib/hydrology/defesa-civil-rs.server";
 
 import { DefesaCivilHydroMap } from "./DefesaCivilHydroMap";
@@ -58,27 +59,60 @@ function freshnessCopy(value: DefesaCivilReadingFreshness) {
   return { label: "Horário não informado", className: "is-unknown" };
 }
 
+function classificationCopy(value: DefesaCivilStationClassification) {
+  if (value === "HYDROLOGY") return { label: "Hidrológica", className: "is-hydrology" };
+  if (value === "METEOROLOGY") return { label: "Meteorológica", className: "is-meteorology" };
+  if (value === "BOTH") return { label: "Hidro + meteo", className: "is-both" };
+  return { label: "Capacidade não identificada", className: "is-unknown" };
+}
+
 function hasValue(values: Array<number | null>) {
   return values.some((value) => value !== null);
 }
 
+function capabilityLabels(station: DefesaCivilHydroStation) {
+  const labels: string[] = [];
+  if (station.capabilities.riverLevel) labels.push("nível");
+  if (station.capabilities.rain) labels.push("chuva");
+  if (station.capabilities.temperature) labels.push("temperatura");
+  if (station.capabilities.humidity) labels.push("umidade");
+  if (station.capabilities.pressure) labels.push("pressão");
+  if (station.capabilities.wind) labels.push("vento");
+  return labels;
+}
+
 function StationCard({ station }: { station: DefesaCivilHydroStation }) {
   const freshness = freshnessCopy(station.freshness);
-  const hasHydrology = station.river.levelM !== null || station.rain.h24Mm !== null;
-  const hasWeather = hasValue([
-    station.weather.temperatureC,
-    station.weather.humidityPct,
-    station.weather.windAverageKmh,
-  ]);
+  const classification = classificationCopy(station.classification);
+  const capabilities = capabilityLabels(station);
+  const hasHydrology = station.capabilities.riverLevel || station.river.levelM !== null;
+  const hasWeather =
+    station.capabilities.rain ||
+    station.capabilities.temperature ||
+    station.capabilities.humidity ||
+    station.capabilities.pressure ||
+    station.capabilities.wind ||
+    hasValue([
+      station.rain.h1Mm,
+      station.rain.h24Mm,
+      station.weather.temperatureC,
+      station.weather.humidityPct,
+      station.weather.windAverageKmh,
+    ]);
 
   return (
     <article className="defesa-civil-hydro__station">
       <header>
         <div>
-          <span className={`defesa-civil-hydro__freshness ${freshness.className}`}>
-            <i aria-hidden="true" />
-            {freshness.label}
-          </span>
+          <div className="defesa-civil-hydro__station-badges">
+            <span className={`defesa-civil-hydro__freshness ${freshness.className}`}>
+              <i aria-hidden="true" />
+              {freshness.label}
+            </span>
+            <span className={`defesa-civil-hydro__classification ${classification.className}`}>
+              {classification.label}
+            </span>
+          </div>
           <h3>{station.name}</h3>
           <p>
             {station.code}
@@ -90,6 +124,12 @@ function StationCard({ station }: { station: DefesaCivilHydroStation }) {
           {formatNumber(station.distanceFromPelotasKm, 0)} km de Pelotas
         </span>
       </header>
+
+      {capabilities.length > 0 ? (
+        <p className="defesa-civil-hydro__capabilities">
+          Sensores/campos informados pela rede: {capabilities.join(" · ")}.
+        </p>
+      ) : null}
 
       <div className="defesa-civil-hydro__station-time">
         <Clock3 aria-hidden="true" />
@@ -125,6 +165,14 @@ function StationCard({ station }: { station: DefesaCivilHydroStation }) {
             <small>acumulado da estação</small>
           </div>
         </dl>
+      ) : null}
+
+      {station.river.trend ? (
+        <p className="defesa-civil-hydro__river-trend">
+          <strong>Tendência informada pela estação:</strong> {station.river.trend}. Este texto é
+          preservado como dado da fonte e não é convertido pelo Tempo Pelotas em classificação de
+          risco.
+        </p>
       ) : null}
 
       {hasWeather ? (
@@ -241,6 +289,27 @@ export function DefesaCivilHydroNetwork({ data }: { data: DefesaCivilHydroData }
             </div>
           </dl>
 
+          <div className="defesa-civil-hydro__inventory" aria-label="Inventário regional por capacidade">
+            <span>
+              <strong>{data.inventory.HYDROLOGY}</strong> hidrológicas
+            </span>
+            <span>
+              <strong>{data.inventory.METEOROLOGY}</strong> meteorológicas
+            </span>
+            <span>
+              <strong>{data.inventory.BOTH}</strong> mistas
+            </span>
+            {data.inventory.UNKNOWN > 0 ? (
+              <span>
+                <strong>{data.inventory.UNKNOWN}</strong> sem capacidade identificada
+              </span>
+            ) : null}
+            <small>
+              Classificação automática baseada nas capacidades e variáveis que a própria API informa
+              para cada estação; não representa risco, prioridade ou estado operacional oficial.
+            </small>
+          </div>
+
           <div className="defesa-civil-hydro__map-block">
             <div className="defesa-civil-hydro__map-copy">
               <span>Distribuição das estações</span>
@@ -275,7 +344,8 @@ export function DefesaCivilHydroNetwork({ data }: { data: DefesaCivilHydroData }
             <p>
               A recência é calculada pelo Tempo Pelotas somente para informar a idade da observação.
               Ela não representa estado operacional, nível de atenção ou classificação oficial de
-              risco.
+              risco. A classificação hidro/meteo informa apenas quais grupos de dados a estação
+              disponibiliza.
             </p>
           </div>
           <div className="defesa-civil-hydro__stations">
