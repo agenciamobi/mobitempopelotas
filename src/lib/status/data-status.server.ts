@@ -1,3 +1,4 @@
+import { fetchDefesaCivilHydroData } from "@/lib/hydrology/defesa-civil-rs.server";
 import { getGuaibaObservation } from "@/lib/hydrology/guaiba.functions";
 import { getLagoonMonitoringNetwork } from "@/lib/hydrology/lagoon-network.functions";
 import { getLaranjalLevelData } from "@/lib/hydrology/laranjal-level.functions";
@@ -75,6 +76,14 @@ function stateFromRegionalHydrology(status: "live" | "partial" | "stale" | "unav
   return "operational";
 }
 
+function stateFromDefesaCivil(
+  status: "disabled" | "live" | "partial" | "unavailable",
+): ServiceState {
+  if (status === "unavailable" || status === "disabled") return "offline";
+  if (status === "partial") return "partial";
+  return "operational";
+}
+
 function stateFromLayer(configured: boolean, available: boolean): ServiceState {
   return configured && available ? "operational" : "offline";
 }
@@ -137,13 +146,15 @@ function applyMaintenanceWindows(services: ServiceStatus[], maintenance: Awaited
 
 export async function collectDataStatus(): Promise<DataStatusOverview> {
   const checkedAt = new Date().toISOString();
-  const [weatherResult, redemetResult, laranjalResult, guaibaResult, lagoonResult] = await Promise.allSettled([
-    getWeatherIntelligence(),
-    getRedemetOverview(),
-    getLaranjalLevelData(),
-    getGuaibaObservation(),
-    getLagoonMonitoringNetwork(),
-  ]);
+  const [weatherResult, redemetResult, laranjalResult, guaibaResult, lagoonResult, defesaCivilResult] =
+    await Promise.allSettled([
+      getWeatherIntelligence(),
+      getRedemetOverview(),
+      getLaranjalLevelData(),
+      getGuaibaObservation(),
+      getLagoonMonitoringNetwork(),
+      fetchDefesaCivilHydroData(),
+    ]);
 
   const services: ServiceStatus[] = [];
 
@@ -283,6 +294,39 @@ export async function collectDataStatus(): Promise<DataStatusOverview> {
       detail: detailForState("offline"),
       checkedAt,
       sourceUrl: "https://monitoramentolagoadospatos.com.br/",
+    });
+  }
+
+  if (defesaCivilResult.status === "fulfilled") {
+    const data = defesaCivilResult.value;
+    const state = stateFromDefesaCivil(data.status);
+    const detail =
+      data.status === "live"
+        ? `${data.regionalStationCount} estações no recorte regional; ${data.recentStationCount} com leitura recente. Inventário: ${data.inventory.HYDROLOGY} hidrológicas, ${data.inventory.METEOROLOGY} meteorológicas e ${data.inventory.BOTH} mistas.`
+        : data.status === "disabled"
+          ? "Integração desabilitada explicitamente pelo kill switch operacional do Tempo Pelotas."
+          : data.error || detailForState(state);
+
+    services.push({
+      id: "defesa-civil-rs-hydromet",
+      name: "Rede de Monitoramento Hidrometeorológico",
+      provider: "Defesa Civil RS / Casa Militar",
+      category: "Hidrologia",
+      state,
+      detail,
+      checkedAt: data.source.fetchedAt || checkedAt,
+      sourceUrl: data.source.mapUrl,
+    });
+  } else {
+    services.push({
+      id: "defesa-civil-rs-hydromet",
+      name: "Rede de Monitoramento Hidrometeorológico",
+      provider: "Defesa Civil RS / Casa Militar",
+      category: "Hidrologia",
+      state: "offline",
+      detail: detailForState("offline"),
+      checkedAt,
+      sourceUrl: "https://redehidrometeorologica.defesacivil.rs.gov.br/Mapa",
     });
   }
 
