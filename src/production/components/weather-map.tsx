@@ -62,6 +62,20 @@ function formatUpdatedAt(value: string | null | undefined) {
   }).format(date);
 }
 
+function formatExpectedTime(value: string | null | undefined) {
+  if (!value) return null;
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
+}
+
 function createLocationMarker(label: string, detail: string, variant: "pelotas" | "radar") {
   const element = document.createElement("div");
   element.className = `${styles.locationMarker} ${styles[variant]}`;
@@ -122,6 +136,18 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
   const frames = activeLayer?.data.frames ?? [];
   const selectedFrame = frames[selectedFrameIndex] ?? null;
   const available = Boolean(activeLayer?.data.available && selectedFrame);
+  const hasUnavailableLayer = Boolean(!loadingLayer && activeLayer && !activeLayer.data.available);
+  const visibleDaylightPause = Boolean(
+    mode === "satellite" &&
+      satelliteType === "vis" &&
+      activeLayer?.kind === "image" &&
+      activeLayer.data.availabilityReason === "daylight" &&
+      !activeLayer.data.available,
+  );
+  const nextVisibleTime =
+    visibleDaylightPause && activeLayer?.kind === "image"
+      ? formatExpectedTime(activeLayer.data.nextExpectedAt)
+      : null;
 
   const layerEndpoint = useMemo(() => {
     if (mode === "radar") return "/api/redemet/radar?frames=10";
@@ -464,7 +490,7 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
       </div>
 
       <div
-        className={`map-canvas map-canvas--interactive map-canvas--${mode} ${styles.canvas}`}
+        className={`map-canvas map-canvas--interactive map-canvas--${mode}${hasUnavailableLayer ? " has-layer-notice" : ""} ${styles.canvas}`}
         aria-label="Mapa meteorológico oficial da REDEMET para Pelotas e região"
       >
         <div ref={mapContainerRef} className="regional-map-engine" />
@@ -527,18 +553,13 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
                 ? "Consultando REDEMET"
                 : available
                   ? "Dados atualizados"
-                  : "Camada indisponível"}
+                  : visibleDaylightPause
+                    ? "Aguardando luz solar"
+                    : "Camada indisponível"}
             </strong>
             <small>{sourceDescription}</small>
           </div>
         </div>
-
-        {!loadingLayer && activeLayer && !activeLayer.data.available ? (
-          <div className="map-radar-unavailable" role="status">
-            <strong>Camada temporariamente indisponível</strong>
-            <span>{activeLayer.data.error}</span>
-          </div>
-        ) : null}
 
         <div
           className={`map-loading ${isLoaded ? "is-hidden" : ""} ${hasMapError ? "has-error" : ""}`}
@@ -636,6 +657,23 @@ export function WeatherMap({ regionalWeather }: WeatherMapProps) {
               {activeLayer.data.product} · {activeLayer.data.provider} · atualização{" "}
               {formatUpdatedAt(activeLayer.data.updatedAt)}
             </small>
+          </div>
+        ) : null}
+
+        {hasUnavailableLayer && activeLayer ? (
+          <div
+            className={`map-radar-unavailable${visibleDaylightPause ? " is-daylight" : ""}`}
+            role="status"
+          >
+            <strong>
+              {visibleDaylightPause
+                ? "Canal visível depende de luz solar"
+                : "Camada temporariamente indisponível"}
+            </strong>
+            <span>{activeLayer.data.error}</span>
+            {visibleDaylightPause && nextVisibleTime ? (
+              <small>Próxima imagem útil esperada: por volta de {nextVisibleTime}.</small>
+            ) : null}
           </div>
         ) : null}
       </div>
