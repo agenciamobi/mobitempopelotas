@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const legacyDailyComponent = readFileSync("src/components/weather/DailyForecastPagesV2.tsx", "utf8");
 const todayComponent = readFileSync("src/components/weather/TodayForecastPageV5.tsx", "utf8");
 const tomorrowComponent = readFileSync("src/components/weather/TomorrowForecastPageV3.tsx", "utf8");
 const internalWidgets = readFileSync("src/components/weather/InternalWeatherWidgets.tsx", "utf8");
@@ -26,7 +25,6 @@ test("today and tomorrow use dedicated retail compositions inside the shared she
   assert.match(tomorrowRoute, /TomorrowRetailHero/);
   assert.match(tomorrowRoute, /TomorrowForecastPageV3/);
   assert.doesNotMatch(tomorrowRoute, /TomorrowForecastPageV2/);
-  assert.match(legacyDailyComponent, /export function TomorrowForecastPageV2/);
 });
 
 test("measurement and visual-condition availability remain separate states", () => {
@@ -94,13 +92,20 @@ test("tomorrow adds comparison planning and official context without another her
   assert.doesNotMatch(tomorrowComponent, /daily-condition-card/);
 });
 
-test("daily pages share the exact header frame and retain mobile rendering contracts", () => {
-  assert.match(shellStyles, /--internal-weather-frame-max:\s*var\(--portal-frame-max, 1760px\)/);
-  assert.match(shellStyles, /--internal-weather-frame-gutter:/);
+test("daily pages share the Home rail and retain mobile rendering contracts", () => {
+  assert.match(
+    shellStyles,
+    /--internal-weather-frame-max:\s*var\(--tp-home-container-max, 1440px\)/,
+  );
+  assert.match(
+    shellStyles,
+    /--internal-weather-frame-gutter:\s*var\(--tp-home-container-gutter, 48px\)/,
+  );
+  assert.match(shellStyles, /--internal-weather-section-padding:\s*clamp\(24px, 3vw, 34px\)/);
   assert.match(shellStyles, /internal-weather-shell--today \.today-retail-hero__inner/);
   assert.match(shellStyles, /internal-weather-shell--tomorrow \.tomorrow-retail-hero__inner/);
-  assert.match(shellStyles, /padding-right:\s*var\(--internal-weather-frame-gutter\)/);
-  assert.match(shellStyles, /padding-left:\s*var\(--internal-weather-frame-gutter\)/);
+  assert.match(shellStyles, /padding-right:\s*var\(--internal-weather-section-padding\)/);
+  assert.match(shellStyles, /padding-left:\s*var\(--internal-weather-section-padding\)/);
   assert.match(internalWidgetStyles, /content-visibility:\s*auto/);
   assert.match(internalWidgetStyles, /contain-intrinsic-size/);
   assert.match(internalWidgetStyles, /@media \(max-width: 980px\)/);
